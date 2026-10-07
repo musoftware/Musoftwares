@@ -95,4 +95,29 @@ class UserCustomHourRateTest extends TestCase
             ->where('hour_rate', 250)
         );
     }
+
+    public function test_timer_details_renders_dash_rate_when_exchange_rate_is_missing(): void
+    {
+        $invoice = Invoice::create([
+            'user_id' => $this->client->id,
+            'currency_id' => $this->currency->id,
+            'status' => 'unpaid',
+        ]);
+
+        $item = InvoiceItem::create([
+            'invoice_id' => $invoice->id,
+            'item_title' => 'Development Services',
+            'amount' => 100,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.invoices.timer-details', $item->id));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Invoices/TimerDetails')
+            ->where('is_custom_rate_enabled', false)
+            ->where('system_base_rate', null)
+            ->where('hour_rate', null)
+        );
+    }
 }

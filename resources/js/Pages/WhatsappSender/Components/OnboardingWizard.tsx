@@ -1,5 +1,6 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
-import { CheckCircle2, Smartphone, FileText, Send, Sparkles } from 'lucide-react';
+import { CheckCircle2, Smartphone, FileText, Send, Sparkles, Zap } from 'lucide-react';
 
 interface Props {
     hasConnectedAccount: boolean;
@@ -21,7 +22,7 @@ export default function OnboardingWizard({
     const steps = [
         {
             number: 1,
-            title: 'Connect Number',
+            title: __('whatsapp.onboarding_step1_title'),
             subtitle: 'Meta Cloud API',
             isDone: hasConnectedAccount,
             onClick: onConnectClick,
@@ -29,24 +30,24 @@ export default function OnboardingWizard({
         },
         {
             number: 2,
-            title: 'Create WABA Template',
-            subtitle: 'Approved Message',
+            title: __('whatsapp.onboarding_step2_title'),
+            subtitle: __('whatsapp.onboarding_step2_subtitle'),
             isDone: hasTemplate,
             onClick: onTemplateClick,
             icon: FileText,
         },
         {
             number: 3,
-            title: 'Send First Test Message',
-            subtitle: 'Send under 60s',
+            title: __('whatsapp.onboarding_step3_title'),
+            subtitle: __('whatsapp.onboarding_step3_subtitle'),
             isDone: hasSentMessage,
             onClick: onSendClick,
             icon: Send,
         },
         {
             number: 4,
-            title: 'Run Meta CTWA Ad',
-            subtitle: '72h Free Window',
+            title: __('whatsapp.onboarding_step4_title'),
+            subtitle: __('whatsapp.onboarding_step4_subtitle'),
             isDone: false,
             onClick: () => {},
             icon: Sparkles,
@@ -62,7 +63,8 @@ export default function OnboardingWizard({
                 <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                     <h3 className="text-xs font-bold text-zinc-950 dark:text-zinc-50 uppercase tracking-wider">
-                        ⚡ Quick Start Guide &mdash; Setup in under 60 seconds ({completedCount}/4 Completed)
+                        <Zap className="inline w-3.5 h-3.5 me-1" aria-hidden="true" />
+                        {__('whatsapp.onboarding_title', { done: completedCount, total: 4 })}
                     </h3>
                 </div>
             </div>
@@ -73,7 +75,10 @@ export default function OnboardingWizard({
                     return (
                         <div
                             key={step.number}
+                            role="button"
+                            tabIndex={0}
                             onClick={step.onClick}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); step.onClick(); } }}
                             className={`p-3 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
                                 step.isDone
                                     ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60 text-emerald-800 dark:text-emerald-300'

@@ -22,13 +22,7 @@ class ContractAiController extends Controller
 
         $user = Auth::user();
         $defaultProvider = 'gemini';
-        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: env('GEMINI_API_KEY') ?: config('services.gemini.key');
-        
-        $apiKey = null;
-        if ($apiKeysString) {
-            $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
-            $apiKey = $keys[0] ?? null;
-        }
+        $apiKey = $this->resolveGeminiApiKey();
         
         $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
 
@@ -119,13 +113,7 @@ class ContractAiController extends Controller
 
         $user = Auth::user();
         $defaultProvider = 'gemini';
-        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: env('GEMINI_API_KEY') ?: config('services.gemini.key');
-        
-        $apiKey = null;
-        if ($apiKeysString) {
-            $keys = array_filter(array_map('trim', explode(',', $apiKeysString)));
-            $apiKey = $keys[0] ?? null;
-        }
+        $apiKey = $this->resolveGeminiApiKey();
         
         $model = AdminSettings::GetValue('gemini_model', 'gemini-2.0-flash');
         $providerName = 'Gemini';
@@ -194,5 +182,20 @@ class ContractAiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'AI Review Failed: '.$e->getMessage()], 500);
         }
+    }
+
+    /**
+     * First Gemini key from admin settings, falling back to config('services.gemini.key').
+     */
+    private function resolveGeminiApiKey(): ?string
+    {
+        $apiKeysString = AdminSettings::GetValue('gemini_api_keys') ?: AdminSettings::GetValue('gemini_api_key') ?: config('services.gemini.key');
+        if (! $apiKeysString) {
+            return null;
+        }
+
+        $keys = array_values(array_filter(array_map('trim', explode(',', (string) $apiKeysString))));
+
+        return $keys[0] ?? null;
     }
 }

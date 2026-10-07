@@ -31,7 +31,7 @@ return [
     'sop_workflow' => 'Execution Workflow (SOP)',
     'thank_you_msg' => 'Thank You & Delivery Message',
     'internal_notes' => 'Internal Execution Notes',
-    'available' => '✓ Available',
+    'available' => 'Available',
     'not_added' => 'Not Added',
 
     // Form Sections

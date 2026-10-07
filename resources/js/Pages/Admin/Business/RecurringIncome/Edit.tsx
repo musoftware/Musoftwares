@@ -6,6 +6,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { ArrowLeft, Save } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { MONTH_DAYS, weekDayOptions, yearDayOptions } from '../Components/recurringSchedule';
 
 export default function Edit({ income, currencies, categories }) {
     const { errors } = usePage().props;
@@ -37,37 +38,10 @@ export default function Edit({ income, currencies, categories }) {
         });
     };
 
-    // Week days helper list
-    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-    // Month days helper list (1-31)
-    const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
-
-    // Month name helper
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    // Days in month helper for year selection
-    const getYearDaysList = () => {
-        const list: { val: string; label: string }[] = [];
-        monthNames.forEach((month, mIdx) => {
-            const daysInMonth = new Date(2024, mIdx + 1, 0).getDate(); // Leap year 2024 to support Feb 29
-            for (let d = 1; d <= daysInMonth; d++) {
-                list.push({
-                    val: `${d}-${mIdx + 1}`,
-                    label: `${d.toString().padStart(2, '0')} - ${month}`
-                });
-            }
-        });
-        return list;
-    };
-
-    const yearDaysList = getYearDaysList();
+    const yearDaysList = yearDayOptions();
 
     return (
-        <AdminSidebarLayout title={__('general.edit_recurring_income')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.edit_recurring_income')} header={__('admin.business_operations')}>
             <Head title={__('general.edit_recurring_income')} />
 
             <div className="mb-4">
@@ -115,7 +89,7 @@ export default function Edit({ income, currencies, categories }) {
                                 {categoriesList.filter(c => !['retainer', 'subscription', 'consulting'].includes(c.toLowerCase())).map((c, i) => (
                                     <option key={i} value={c}>{c}</option>
                                 ))}
-                                <option value="custom">-- Custom Reason --</option>
+                                <option value="custom">{__('admin.recurring_custom_reason_option')}</option>
                             </select>
                             {reasonOption === 'custom' && (
                                 <Input required placeholder={__('general.specify_reason')} value={editIncome.custom_reason} onChange={e => setEditIncome({...editIncome, custom_reason: e.target.value})} />
@@ -141,7 +115,7 @@ export default function Edit({ income, currencies, categories }) {
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="interval">Interval (Every N)</Label>
+                            <Label htmlFor="interval">{__('admin.recurring_interval_every_n')}</Label>
                             <select id="interval" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editIncome.recurring_times} onChange={e => setEditIncome({...editIncome, recurring_times: parseInt(e.target.value) || 1})}>
                                 {Array.from({ length: 30 }, (_, i) => i + 1).map(num => (
                                     <option key={num} value={num}>{num}</option>
@@ -163,9 +137,9 @@ export default function Edit({ income, currencies, categories }) {
                                     setEditIncome({...editIncome, recurring_times_week: vals});
                                 }}
                             >
-                                {weekDays.map(wd => <option key={wd} value={wd}>{wd}</option>)}
+                                {weekDayOptions().map((wd) => <option key={wd.value} value={wd.value}>{wd.label}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days. Current: {editIncome.recurring_times_week.join(', ') || 'None'}</span>
+                            <span className="text-xs text-gray-400">{__('admin.recurring_multi_select_current_days', { current: editIncome.recurring_times_week.join(', ') || __('general.none') })}</span>
                         </div>
                     )}
 
@@ -182,9 +156,9 @@ export default function Edit({ income, currencies, categories }) {
                                     setEditIncome({...editIncome, recurring_times_month: vals});
                                 }}
                             >
-                                {monthDays.map(d => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
+                                {MONTH_DAYS.map(d => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days. Current: {editIncome.recurring_times_month.join(', ') || 'None'}</span>
+                            <span className="text-xs text-gray-400">{__('admin.recurring_multi_select_current_days', { current: editIncome.recurring_times_month.join(', ') || __('general.none') })}</span>
                         </div>
                     )}
 
@@ -203,7 +177,7 @@ export default function Edit({ income, currencies, categories }) {
                             >
                                 {yearDaysList.map(yd => <option key={yd.val} value={yd.val}>{yd.label}</option>)}
                             </select>
-                            <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple dates. Current: {editIncome.recurring_times_year.join(', ') || 'None'}</span>
+                            <span className="text-xs text-gray-400">{__('admin.recurring_multi_select_current_dates', { current: editIncome.recurring_times_year.join(', ') || __('general.none') })}</span>
                         </div>
                     )}
 

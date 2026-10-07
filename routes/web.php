@@ -104,7 +104,6 @@ use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\WalletTransferController;
-use App\Services\AmcAcademyApiService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -138,26 +137,8 @@ Route::get('/install-app', function () {
     return Inertia\Inertia::render('PWA/InstallGuide');
 })->name('install-app');
 
-Route::get('/test-amc-api', function (AmcAcademyApiService $service) {
-    // Array of mock FBIDs to test bulk lookup and deduction
-    $testFbids = ['10000000000001', '10000000000002'];
-    $result = $service->searchFbidsBulk($testFbids);
 
-    return response()->json([
-        'message' => 'API Test Completed',
-        'fbids_sent' => $testFbids,
-        'result' => $result,
-    ]);
-});
 
-Route::get('/test22', function () {
-    Artisan::call('optimize:clear');
-    Artisan::call('migrate');
-});
-
-Route::get('/test233', function () {
-    Artisan::call('schedule:run');
-});
 // Platforms
 Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
 Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
@@ -240,15 +221,15 @@ Route::get('/tools/image-cropper', [PublicToolsController::class, 'imageCropper'
 Route::get('/tools/facebook-page-cost', [PublicToolsController::class, 'facebookCostCalculator'])->name('public.tools.facebook-cost');
 Route::get('/tools/invoice-generator', [PublicToolsController::class, 'invoiceGenerator'])->name('public.tools.invoice-generator');
 Route::get('/tools/website-checker', [PublicToolsController::class, 'websiteChecker'])->name('public.tools.website-checker');
-Route::post('/tools/inspect-website', [PublicToolsController::class, 'inspectWebsite'])->name('public.tools.inspect-website');
+Route::post('/tools/inspect-website', [PublicToolsController::class, 'inspectWebsite'])->middleware('throttle:20,1')->name('public.tools.inspect-website');
 Route::get('/tools/speed-loss-calculator', [PublicToolsController::class, 'speedLossCalculator'])->name('public.tools.speed-loss-calculator');
-Route::post('/tools/inspect-speed-loss', [PublicToolsController::class, 'inspectSpeedLoss'])->name('public.tools.inspect-speed-loss');
+Route::post('/tools/inspect-speed-loss', [PublicToolsController::class, 'inspectSpeedLoss'])->middleware('throttle:20,1')->name('public.tools.inspect-speed-loss');
 Route::get('/tools/payment-gateway-auditor', [PublicToolsController::class, 'paymentGatewayAuditor'])->name('public.tools.payment-gateway-auditor');
-Route::post('/tools/inspect-payment-gateway', [PublicToolsController::class, 'inspectPaymentGateway'])->name('public.tools.inspect-payment-gateway');
+Route::post('/tools/inspect-payment-gateway', [PublicToolsController::class, 'inspectPaymentGateway'])->middleware('throttle:20,1')->name('public.tools.inspect-payment-gateway');
 Route::get('/tools/pixel-tracker-auditor', [PublicToolsController::class, 'pixelAuditor'])->name('public.tools.pixel-tracker-auditor');
-Route::post('/tools/inspect-pixel', [PublicToolsController::class, 'inspectPixel'])->name('public.tools.inspect-pixel');
+Route::post('/tools/inspect-pixel', [PublicToolsController::class, 'inspectPixel'])->middleware('throttle:20,1')->name('public.tools.inspect-pixel');
 Route::get('/tools/competitor-tech-spy', [PublicToolsController::class, 'competitorSpy'])->name('public.tools.competitor-tech-spy');
-Route::post('/tools/inspect-competitor', [PublicToolsController::class, 'inspectCompetitor'])->name('public.tools.inspect-competitor');
+Route::post('/tools/inspect-competitor', [PublicToolsController::class, 'inspectCompetitor'])->middleware('throttle:20,1')->name('public.tools.inspect-competitor');
 Route::post('/tools/lead-capture', [PublicToolsController::class, 'captureLead'])->name('public.tools.lead-capture');
 Route::post('/newsletter/subscribe', [PublicToolsController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 
@@ -400,12 +381,6 @@ Route::get('/r/{ref}', [ReferralController::class, 'referral_redirect'])
 Route::get('/track/campaign/{id}', [TrackingController::class, 'trackCampaign'])->name('track.campaign');
 Route::get('/track/campaign/{id}/view.png', [TrackingController::class, 'trackCampaignView'])->name('track.campaign.view');
 
-Route::get('/fix-cities', function () {
-    DB::table('cities')->truncate();
-    Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder', '--force' => true]);
-
-    return 'Done';
-});
 
 /* // ERP Routes (Migrated to Modules/ERP/routes/web.php)
 Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.team.permissions'])->prefix('erp')->name('erp.')->group(function () {
@@ -991,11 +966,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/tasks/todos/{todo}/schedule', [AdminTaskController::class, 'scheduleTodo'])->name('tasks.todos.schedule');
     Route::put('/tasks/todos/{todo}', [AdminTaskController::class, 'updateTodo'])->name('tasks.todos.update');
 
-    Route::get('/erp/{id}/impersonate', [ImpersonateController::class, 'impersonate'])->name('erp.impersonate');
+    Route::post('/erp/{id}/impersonate', [ImpersonateController::class, 'impersonate'])->name('erp.impersonate');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/admin/stop-impersonate', [ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
+    Route::post('/admin/stop-impersonate', [ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
 
 // Public SaaS Routes
@@ -1028,7 +1003,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Software & Tools Store Public Routes
 Route::get('/store/tools', [ToolStoreController::class, 'index'])->name('store.tools.index');
-Route::post('/store/tools/{storeTool}/purchase', [ToolStoreController::class, 'purchase'])->name('store.tools.purchase');
+Route::post('/store/tools/{storeTool}/purchase', [ToolStoreController::class, 'purchase'])
+    ->middleware(['auth', 'throttle:10,1'])
+    ->name('store.tools.purchase');
 
 require __DIR__.'/auth.php';
 
@@ -1084,7 +1061,7 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
     })->name('notifications.index');
 
     Route::get('/transfer-api/calculate-fee', [WalletTransferController::class, 'calculateFee'])->name('transfer.calculate-fee');
-    Route::get('/transfer-api/search-users', [WalletTransferController::class, 'searchUsers'])->name('transfer.search-users');
+    Route::get('/transfer-api/search-users', [WalletTransferController::class, 'searchUsers'])->middleware('throttle:30,1')->name('transfer.search-users');
     Route::get('/transfer/history', [WalletTransferController::class, 'history'])->name('transfer.history');
     Route::get('/transfer/{id}', [WalletTransferController::class, 'show'])->name('transfer.show');
 });
@@ -1144,7 +1121,7 @@ Route::get('/guest/quotations/{uuid}/checkout', [\App\Http\Controllers\GuestQuot
 Route::post('/guest/quotations/{uuid}/pay', [\App\Http\Controllers\GuestQuotationController::class, 'initiatePayment'])->name('guest.quotations.pay');
 Route::get('/guest/quotations/payment/success/{orderUuid}', [\App\Http\Controllers\GuestQuotationController::class, 'paymentSuccess'])->name('guest.quotations.payment.success');
 Route::get('/guest/quotations/payment/failure/{orderUuid}', [\App\Http\Controllers\GuestQuotationController::class, 'paymentFailure'])->name('guest.quotations.payment.failure');
-Route::match(['get', 'post'], '/guest/quotations/payment/webhook', [\App\Http\Controllers\GuestQuotationController::class, 'webhook'])->name('guest.quotations.payment.webhook');
+Route::post('/guest/quotations/payment/webhook', [\App\Http\Controllers\GuestQuotationController::class, 'webhook'])->name('guest.quotations.payment.webhook');
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
@@ -1357,6 +1334,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
         Route::post('invoices/{id}/toggle-status', [RecurringInvoiceController::class, 'toggle'])->name('recurring_invoices.toggle');
         Route::post('invoices/{id}/generate-missing', [RecurringInvoiceController::class, 'generateMissing'])->name('recurring_invoices.generate_missing');
         Route::post('invoices/{id}/fire-run', [RecurringInvoiceController::class, 'fireRun'])->name('recurring_invoices.fire_run');
+        Route::post('invoices/{id}/notify-client', [RecurringInvoiceController::class, 'notifyClient'])->name('recurring_invoices.notify_client');
         Route::delete('invoices/{invoice}/records/{record}', [RecurringInvoiceController::class, 'deleteRecord'])->name('recurring_invoices.records.delete');
 
         // Notices — managed inline from the Board page (no admin CRUD pages).

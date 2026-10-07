@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { Head } from '@inertiajs/react';
 
@@ -15,7 +16,7 @@ export default function GuestSuccess({ business }: Props) {
             <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/10 blur-[120px]" />
 
             <Head>
-                <title>{`Connection Successful - ${business.name}`}</title>
+                <title>{__('whatsapp.guest_success_page_title', { name: business.name })}</title>
             </Head>
 
             <div className="max-w-md w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 text-center">
@@ -27,20 +28,20 @@ export default function GuestSuccess({ business }: Props) {
                 </div>
 
                 <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent mb-2">
-                    Connection Successful!
+                    {__('whatsapp.guest_success_title')}
                 </h1>
                 <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                    Your Meta WhatsApp Business account has been linked successfully to <span className="font-semibold text-slate-200">{business.name}</span>. The business manager can now send templates and manage campaigns.
+                    {__('whatsapp.guest_success_desc', { name: business.name })}
                 </p>
 
                 <p className="text-xs text-slate-500">
-                    You can safely close this browser window or tab now.
+                    {__('whatsapp.guest_success_close')}
                 </p>
             </div>
 
             {/* Footer */}
             <div className="mt-8 text-center text-slate-600 text-xs relative z-10">
-                Powered by Musoftware Business Platform &copy; {new Date().getFullYear()}
+                {__('whatsapp.guest_powered_by', { year: new Date().getFullYear() })}
             </div>
         </div>
     );

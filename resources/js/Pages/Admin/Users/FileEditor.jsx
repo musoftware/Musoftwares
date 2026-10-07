@@ -5,6 +5,7 @@ import Editor from '@monaco-editor/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 export default function FileEditor({ user, file }) {
     const { toast } = useToast();
@@ -51,18 +52,18 @@ export default function FileEditor({ user, file }) {
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: __('general.file_saved_successfully', 'File saved successfully.') });
+                toast({ title: __('general.file_saved_successfully') });
             },
             onError: () => {
-                toast({ title: 'Failed to save', variant: 'destructive' });
+                toast({ title: __('admin.file_save_failed'), variant: 'destructive' });
             },
             onFinish: () => setIsSaving(false)
         });
     };
 
     return (
-        <AdminSidebarLayout title={__('general.file_editor', 'File Editor')} header="File Editor">
-            <Head title={`Editing ${file.name} - ${user.name}`} />
+        <AdminSidebarLayout title={__('general.file_editor')} header={__('general.file_editor')}>
+            <Head title={__('admin.file_editing_title', { file: file.name, name: user.name })} />
 
             <div className="flex flex-col h-[calc(100vh-100px)]">
                 {/* Toolbar */}
@@ -71,8 +72,10 @@ export default function FileEditor({ user, file }) {
                         <Link 
                             href={route('admin.users.files.index', { userId: user.id, folder: file.folder_id })} 
                             className="text-slate-500 hover:text-slate-700 transition-colors"
+                            aria-label={__('general.back')}
+                            title={__('general.back')}
                         >
-                            <ArrowLeft className="h-5 w-5" />
+                            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
                         </Link>
                         <div>
                             <h2 className="text-lg font-semibold text-slate-800">{file.name}</h2>
@@ -83,7 +86,7 @@ export default function FileEditor({ user, file }) {
                     <div>
                         <Button onClick={handleSave} disabled={isSaving || content === file.content}>
                             <Save className="h-4 w-4 me-2" />
-                            {isSaving ? 'Saving...' : 'Save Changes'}
+                            {isSaving ? __('general.saving') : __('general.save_changes')}
                         </Button>
                     </div>
                 </div>

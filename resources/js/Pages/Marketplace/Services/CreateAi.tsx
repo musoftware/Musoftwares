@@ -24,7 +24,7 @@ export default function CreateAiService({ categories }: Props) {
 
     return (
         <MarketplaceLayout>
-            <Head title="توليد خدمة بالذكاء الاصطناعي | AI Service Generator" />
+            <Head title={__('marketplace.ai_gen_page_title')} />
 
             <div className="min-h-screen bg-slate-900 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
                 {/* Background decorative glow */}
@@ -38,10 +38,10 @@ export default function CreateAiService({ categories }: Props) {
                             className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            العودة إلى صفحة الإنشاء العادية
+                            {__('marketplace.ai_gen_back_to_manual')}
                         </Link>
                         <span className="text-xs bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full font-semibold">
-                            Admin Only Feature
+                            {__('marketplace.ai_gen_admin_only_feature')}
                         </span>
                     </div>
 
@@ -49,13 +49,13 @@ export default function CreateAiService({ categories }: Props) {
                     <div className="text-center mb-10">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-4">
                             <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-                            مولّد الخدمات التلقائي بالذكاء الاصطناعي
+                            {__('marketplace.ai_gen_badge')}
                         </div>
                         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                            أنشئ خدمة متكاملة بضغطة زر واحدة ⚡
+                            {__('marketplace.ai_gen_heading')}
                         </h1>
                         <p className="mt-3 text-slate-400 text-sm sm:text-base max-w-xl mx-auto">
-                            أدخل عنوان الخدمة فقط وسيقوم الذكاء الاصطناعي بتوليد العنوان الدقيق، الوصف الشامل، الباقات الثلاث، الكلمات المفتاحية وصورة الغلاف فوراً.
+                            {__('marketplace.ai_gen_intro')}
                         </p>
                     </div>
 
@@ -66,7 +66,7 @@ export default function CreateAiService({ categories }: Props) {
                             <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3 text-rose-300 text-sm">
                                 <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                                 <div>
-                                    <h4 className="font-bold text-rose-200 mb-1">تعذر استكمال توليد الخدمة بالذكاء الاصطناعي</h4>
+                                    <h4 className="font-bold text-rose-200 mb-1">{__('marketplace.ai_gen_error_title')}</h4>
                                     <p className="text-rose-300/90 leading-relaxed">{(errors as Record<string, string>).error || (errors as Record<string, string>).message}</p>
                                 </div>
                             </div>
@@ -77,13 +77,14 @@ export default function CreateAiService({ categories }: Props) {
                             {/* Service Title Input */}
                             <div>
                                 <label className="block text-sm font-semibold text-slate-200 mb-2">
-                                    عنوان الخدمة أو فكرتها الأساسية <span className="text-rose-400">*</span>
+                                    {__('marketplace.ai_gen_title_label')} <span className="text-rose-400">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={data.title}
                                     onChange={e => setData('title', e.target.value)}
-                                    placeholder="مثال: تصميم وتطوير متجر إلكتروني متكامل بشرائح الدفع"
+                                    placeholder={__('marketplace.ai_gen_title_placeholder')}
+                                    aria-label={__('marketplace.ai_gen_title_label')}
                                     disabled={processing}
                                     className="w-full px-4 py-3.5 bg-slate-900/90 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all"
                                     required
@@ -96,7 +97,7 @@ export default function CreateAiService({ categories }: Props) {
                             {/* Provider Choice */}
                             <div>
                                 <label className="block text-sm font-semibold text-slate-200 mb-3">
-                                    اختر محرك الذكاء الاصطناعي (AI Provider)
+                                    {__('marketplace.ai_gen_provider_label')}
                                 </label>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     
@@ -123,7 +124,7 @@ export default function CreateAiService({ categories }: Props) {
                                                 ChatGPT (OpenAI)
                                             </div>
                                             <p className="text-xs text-slate-400 mt-1">
-                                                يستخدم GPT-4o لتوليد تفاصيل الخدمة و DALL-E لإنشاء صورة الغلاف.
+                                                {__('marketplace.ai_gen_chatgpt_desc')}
                                             </p>
                                         </div>
                                     </label>
@@ -151,7 +152,7 @@ export default function CreateAiService({ categories }: Props) {
                                                 Google Gemini
                                             </div>
                                             <p className="text-xs text-slate-400 mt-1">
-                                                يستخدم Gemini 2.0 Flash السريع للتوليد الفائق مع DALL-E للصورة.
+                                                {__('marketplace.ai_gen_gemini_desc')}
                                             </p>
                                         </div>
                                     </label>
@@ -163,32 +164,32 @@ export default function CreateAiService({ categories }: Props) {
                             <div className="bg-slate-900/60 rounded-xl p-4 border border-slate-700/40 space-y-2 text-xs text-slate-300">
                                 <div className="flex items-center gap-2 text-slate-200 font-semibold mb-1">
                                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                                    ما الذي سيتم إنشاؤه تلقائياً؟
+                                    {__('marketplace.ai_gen_what_created')}
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-slate-400">
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        عنوان جذاب وتسويقي احترافي
+                                        {__('marketplace.ai_gen_feature_title')}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        وصف كامل +150 كلمة بالتفاصيل
+                                        {__('marketplace.ai_gen_feature_description')}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        تحديد القسم الأنسب تلقائياً
+                                        {__('marketplace.ai_gen_feature_category')}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        3 باقات (Basic, Standard, Premium)
+                                        {__('marketplace.ai_gen_feature_packages')}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        تأليف الأسئلة الشائعة والطلبات
+                                        {__('marketplace.ai_gen_feature_faq')}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                                        صورة غلاف حصرية بواسطة AI
+                                        {__('marketplace.ai_gen_feature_cover')}
                                     </div>
                                 </div>
                             </div>
@@ -202,12 +203,12 @@ export default function CreateAiService({ categories }: Props) {
                                 {processing ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        جاري توليد التفاصيل والصورة بنجاح...
+                                        {__('marketplace.ai_gen_processing')}
                                     </>
                                 ) : (
                                     <>
                                         <Sparkles className="w-5 h-5 text-amber-300" />
-                                        توليد ونشر الخدمة فكلياً
+                                        {__('marketplace.ai_gen_submit')}
                                     </>
                                 )}
                             </Button>

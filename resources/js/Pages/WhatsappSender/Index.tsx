@@ -1,6 +1,10 @@
+import { __ } from '@/lib/i18n';
 import React, { useState } from 'react';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Search } from 'lucide-react';
+import { toast } from 'sonner';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface Business {
     id: number;
@@ -30,6 +34,7 @@ interface Props {
 }
 
 export default function Index({ businesses, apiToken, filters, isAdmin }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [search, setSearch] = useState(filters.search || '');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showRechargeModal, setShowRechargeModal] = useState<Business | null>(null);
@@ -136,58 +141,59 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
 
     return (
         <AuthenticatedLayout>
-            <Head title="WhatsApp & Telegram Sender Hub" />
+            <Head title={__('whatsapp.sender_index_page_title')} />
 
             <div className="py-8 px-4 max-w-7xl mx-auto space-y-8">
                 {/* Dashboard Header Banner */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Sender Hub Directory</h1>
-                        <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm font-medium">Manage corporate companies and client communication channels in one sandbox.</p>
+                        <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">{__('whatsapp.sender_index_heading')}</h1>
+                        <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm font-medium">{__('whatsapp.sender_index_subheading')}</p>
                     </div>
                     <button
                         onClick={() => setShowCreateModal(true)}
                         className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold px-5 py-3 rounded-2xl text-sm transition shadow-sm"
                     >
-                        + Create Business Profile
+                        {__('whatsapp.sender_index_create_profile_btn')}
                     </button>
                 </div>
 
                 {/* Key Summary Stats Widget */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-5 shadow-xs">
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">Active Client Businesses</span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">{__('whatsapp.sender_index_active_businesses')}</span>
                         <span className="text-3xl font-black text-zinc-900 dark:text-zinc-50 block mt-2">{businesses.length}</span>
                     </div>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-5 shadow-xs">
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">Aggregate Wallet Capital</span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">{__('whatsapp.sender_index_total_wallet')}</span>
                         <span className="text-3xl font-black text-zinc-900 dark:text-zinc-50 block mt-2">${totalBalance.toFixed(2)} USD</span>
                     </div>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-5 shadow-xs">
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">Connected WABA accounts</span>
-                        <span className="text-3xl font-black text-zinc-900 dark:text-zinc-50 block mt-2">{totalAccounts} accounts</span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold block uppercase tracking-wider">{__('whatsapp.sender_index_connected_waba')}</span>
+                        <span className="text-3xl font-black text-zinc-900 dark:text-zinc-50 block mt-2">{__('whatsapp.sender_index_accounts_count', { count: totalAccounts })}</span>
                     </div>
                 </div>
 
                 {/* Interactive API Token playground section */}
                 <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6">
-                    <h2 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">Developer API Access Token</h2>
-                    <p className="text-xs text-zinc-500 mt-1">Use this developer Sanctum Bearer token to authorize external software calls to scheduling endpoints.</p>
+                    <h2 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">{__('whatsapp.sender_index_api_token_title')}</h2>
+                    <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.sender_index_api_token_desc')}</p>
                     <div className="mt-4 flex items-center gap-2 max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded-2xl">
                         <input
                             type="text"
                             readOnly
                             value={apiToken}
+                            aria-label={__('whatsapp.sender_index_api_token_title')}
                             className="bg-transparent border-0 ring-0 focus:ring-0 text-xs flex-1 text-zinc-600 dark:text-zinc-300 font-mono"
                         />
                         <button
                             onClick={() => {
                                 navigator.clipboard.writeText(apiToken);
-                                alert('API Token copied to clipboard!');
+                                toast.success(__('whatsapp.sender_index_token_copied'));
                             }}
                             className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-850 dark:text-zinc-200 text-xs px-3.5 py-1.5 rounded-xl font-semibold transition"
                         >
-                            Copy
+                            {__('general.copy')}
                         </button>
                     </div>
                 </div>
@@ -196,12 +202,13 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 px-4 py-3 rounded-2xl max-w-md w-full">
-                            <span className="text-zinc-400">🔍</span>
+                            <Search className="w-4 h-4 text-zinc-400" aria-hidden="true" />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={handleSearchChange}
-                                placeholder="Search client name, email, mobile, whatsapp, company..."
+                                placeholder={__('whatsapp.sender_index_search_placeholder')}
+                                aria-label={__('whatsapp.sender_index_search_placeholder')}
                                 className="bg-transparent border-0 focus:ring-0 text-sm w-full p-0 text-zinc-700 dark:text-zinc-300"
                             />
                         </div>
@@ -216,7 +223,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
-                                    حساباتي الخاصة (My Workspaces)
+                                    {__('whatsapp.sender_index_scope_my')}
                                 </button>
                                 <button
                                     onClick={() => handleScopeChange('all')}
@@ -226,7 +233,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                             : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
                                     }`}
                                 >
-                                    جميع حسابات النظام (All System)
+                                    {__('whatsapp.sender_index_scope_all')}
                                 </button>
                             </div>
                         )}
@@ -236,14 +243,14 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                         <table className="w-full text-left text-sm border-collapse font-sans">
                             <thead>
                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 font-medium">
-                                    <th className="py-3 px-2 font-semibold">Company Name</th>
-                                    <th className="py-3 px-2 font-semibold">Client Name</th>
-                                    <th className="py-3 px-2 font-semibold">Email</th>
-                                    <th className="py-3 px-2 font-semibold">Mobile</th>
+                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.sender_index_col_company')}</th>
+                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.sender_index_col_client')}</th>
+                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.sender_index_col_email')}</th>
+                                    <th className="py-3 px-2 font-semibold">{__('general.mobile')}</th>
                                     <th className="py-3 px-2 font-semibold">WhatsApp</th>
-                                    {isAdmin && <th className="py-3 px-2 font-semibold">Fees (Msg/Bot)</th>}
-                                    <th className="py-3 px-2 font-semibold">Wallet Balance</th>
-                                    <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                    {isAdmin && <th className="py-3 px-2 font-semibold">{__('whatsapp.sender_index_col_fees')}</th>}
+                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.sender_index_col_wallet')}</th>
+                                    <th className="py-3 px-2 font-semibold text-right">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -251,16 +258,16 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                     <tr key={biz.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
                                         <td className="py-4 px-2">
                                             <div className="font-bold text-zinc-900 dark:text-zinc-100">{biz.name}</div>
-                                            <span className="text-xxs text-zinc-400 dark:text-zinc-500">{biz.accounts_count || 0} active numbers</span>
+                                            <span className="text-xxs text-zinc-400 dark:text-zinc-500">{__('whatsapp.sender_index_active_numbers', { count: biz.accounts_count || 0 })}</span>
                                         </td>
-                                        <td className="py-4 px-2 text-zinc-700 dark:text-zinc-300 font-medium">{biz.client_name || 'N/A'}</td>
-                                        <td className="py-4 px-2 text-zinc-500 text-xs">{biz.client_email || 'N/A'}</td>
-                                        <td className="py-4 px-2 text-zinc-500 text-xs font-mono">{biz.client_mobile || 'N/A'}</td>
-                                        <td className="py-4 px-2 text-zinc-500 text-xs font-mono">{biz.client_whatsapp || 'N/A'}</td>
+                                        <td className="py-4 px-2 text-zinc-700 dark:text-zinc-300 font-medium">{biz.client_name || __('general.n_a')}</td>
+                                        <td className="py-4 px-2 text-zinc-500 text-xs">{biz.client_email || __('general.n_a')}</td>
+                                        <td className="py-4 px-2 text-zinc-500 text-xs font-mono">{biz.client_mobile || __('general.n_a')}</td>
+                                        <td className="py-4 px-2 text-zinc-500 text-xs font-mono">{biz.client_whatsapp || __('general.n_a')}</td>
                                         {isAdmin && (
                                             <td className="py-4 px-2">
-                                                <div className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Msg: ${parseFloat(biz.per_message_fee).toFixed(4)}</div>
-                                                <div className="text-[10px] font-semibold text-zinc-400 mt-0.5">Bot: ${parseFloat(biz.bot_reply_fee || '0.0005').toFixed(4)}</div>
+                                                <div className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{__('whatsapp.sender_index_fee_msg', { amount: parseFloat(biz.per_message_fee).toFixed(4) })}</div>
+                                                <div className="text-[10px] font-semibold text-zinc-400 mt-0.5">{__('whatsapp.sender_index_fee_bot', { amount: parseFloat(biz.bot_reply_fee || '0.0005').toFixed(4) })}</div>
                                             </td>
                                         )}
                                         <td className="py-4 px-2">
@@ -271,36 +278,35 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                                 href={`/whatsapp-sender/businesses/${biz.id}`}
                                                 className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2 rounded-xl transition inline-block"
                                             >
-                                                Manage Workspace
+                                                {__('whatsapp.sender_index_manage_workspace')}
                                             </Link>
                                             <button
                                                 onClick={() => triggerEditModal(biz)}
                                                 className="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold px-3 py-2 rounded-xl transition"
                                             >
-                                                Edit Settings
+                                                {__('whatsapp.sender_index_edit_settings')}
                                             </button>
                                             <button
                                                 onClick={() => setShowRechargeModal(biz)}
                                                 className="border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold px-3 py-2 rounded-xl transition"
                                             >
-                                                Top up
+                                                {__('whatsapp.sender_index_top_up')}
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    if(confirm('Are you sure you want to delete this business profile? All data and connected channels will be deleted.')) {
-                                                        router.delete(`/whatsapp-sender/businesses/${biz.id}`);
-                                                    }
+                                                onClick={async () => {
+                                                    if (!(await confirm({ title: __('whatsapp.sender_index_delete_title'), description: __('whatsapp.sender_index_delete_desc'), variant: 'danger' }))) return;
+                                                    router.delete(`/whatsapp-sender/businesses/${biz.id}`);
                                                 }}
                                                 className="text-red-500 hover:text-red-600 text-xs font-bold"
                                             >
-                                                Delete
+                                                {__('general.delete')}
                                             </button>
                                         </td>
                                     </tr>
                                 ))}
                                 {businesses.length === 0 && (
                                     <tr>
-                                        <td colSpan={isAdmin ? 8 : 7} className="py-8 text-center text-zinc-400">No matching business clients found.</td>
+                                        <td colSpan={isAdmin ? 8 : 7} className="py-8 text-center text-zinc-400">{__('whatsapp.sender_index_empty')}</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -313,67 +319,67 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
                             <div>
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Client Business Profile</h3>
-                                <p className="text-xs text-zinc-400 mt-1">Fill out the company and client profile information below.</p>
+                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.sender_index_create_title')}</h3>
+                                <p className="text-xs text-zinc-400 mt-1">{__('whatsapp.sender_index_create_desc')}</p>
                             </div>
                             <form onSubmit={handleCreateBusiness} className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_company_name')}</label>
                                     <input
                                         type="text"
                                         required
                                         value={createForm.data.name}
                                         onChange={e => createForm.setData('name', e.target.value)}
-                                        placeholder="e.g. Acme Corp"
+                                        placeholder={__('whatsapp.sender_index_company_placeholder')}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_contact_name')}</label>
                                         <input
                                             type="text"
                                             value={createForm.data.client_name}
                                             onChange={e => createForm.setData('client_name', e.target.value)}
-                                            placeholder="e.g. John Doe"
+                                            placeholder={__('whatsapp.sender_index_contact_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_email')}</label>
                                         <input
                                             type="email"
                                             value={createForm.data.client_email}
                                             onChange={e => createForm.setData('client_email', e.target.value)}
-                                            placeholder="e.g. john@example.com"
+                                            placeholder={__('whatsapp.sender_index_email_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
                                         />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_mobile')}</label>
                                         <input
                                             type="text"
                                             value={createForm.data.client_mobile}
                                             onChange={e => createForm.setData('client_mobile', e.target.value)}
-                                            placeholder="e.g. 201001234567"
+                                            placeholder={__('whatsapp.sender_index_phone_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_whatsapp')}</label>
                                         <input
                                             type="text"
                                             value={createForm.data.client_whatsapp}
                                             onChange={e => createForm.setData('client_whatsapp', e.target.value)}
-                                            placeholder="e.g. 201001234567"
+                                            placeholder={__('whatsapp.sender_index_phone_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Initial Balance Top-up ($ USD)</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_initial_balance')}</label>
                                     <input
                                         type="number"
                                         step="0.01"
@@ -388,17 +394,17 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_meta_app_id')}</label>
                                         <input
                                             type="text"
                                             value={createForm.data.facebook_client_id}
                                             onChange={e => createForm.setData('facebook_client_id', e.target.value)}
-                                            placeholder="e.g. 104829384920"
+                                            placeholder={__('whatsapp.sender_index_app_id_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_meta_app_secret')}</label>
                                         <input
                                             type="password"
                                             value={createForm.data.facebook_client_secret}
@@ -412,7 +418,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                 {isAdmin && (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_per_message_fee')}</label>
                                             <input
                                                 type="number"
                                                 step="0.0001"
@@ -422,7 +428,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_bot_reply_fee')}</label>
                                             <input
                                                 type="number"
                                                 step="0.0001"
@@ -440,14 +446,14 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                         onClick={() => setShowCreateModal(false)}
                                         className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Cancel
+                                        {__('general.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={createForm.processing}
                                         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Create Profile
+                                        {__('whatsapp.sender_index_create_submit')}
                                     </button>
                                 </div>
                             </form>
@@ -460,12 +466,12 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-sm w-full rounded-3xl p-6 shadow-2xl space-y-6">
                             <div>
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Top-up {showRechargeModal.name} Wallet</h3>
-                                <p className="text-xs text-zinc-400 mt-1">Deduct credit from your platform account to top-up this client business profile.</p>
+                                <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.sender_index_topup_title', { name: showRechargeModal.name })}</h3>
+                                <p className="text-xs text-zinc-400 mt-1">{__('whatsapp.sender_index_topup_desc')}</p>
                             </div>
                             <form onSubmit={handleRecharge} className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Top-up Amount ($ USD)</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_topup_amount')}</label>
                                     <input
                                         type="number"
                                         step="0.10"
@@ -484,14 +490,14 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                         onClick={() => setShowRechargeModal(null)}
                                         className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Cancel
+                                        {__('general.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={rechargeForm.processing}
                                         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Process Top-up
+                                        {__('whatsapp.sender_index_topup_submit')}
                                     </button>
                                 </div>
                             </form>
@@ -504,12 +510,12 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
                             <div>
-                                <h3 className="text-xl font-bold tracking-tight text-zinc-955 dark:text-zinc-50">Edit Client Business Profile</h3>
-                                <p className="text-xs text-zinc-400 mt-1">Modify company properties and custom billing structures.</p>
+                                <h3 className="text-xl font-bold tracking-tight text-zinc-955 dark:text-zinc-50">{__('whatsapp.sender_index_edit_title')}</h3>
+                                <p className="text-xs text-zinc-400 mt-1">{__('whatsapp.sender_index_edit_desc')}</p>
                             </div>
                             <form onSubmit={handleEditBusiness} className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_company_name')}</label>
                                     <input
                                         type="text"
                                         required
@@ -520,7 +526,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_contact_name')}</label>
                                         <input
                                             type="text"
                                             value={editForm.data.client_name}
@@ -529,7 +535,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_email')}</label>
                                         <input
                                             type="email"
                                             value={editForm.data.client_email}
@@ -540,7 +546,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_mobile')}</label>
                                         <input
                                             type="text"
                                             value={editForm.data.client_mobile}
@@ -549,7 +555,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_client_whatsapp')}</label>
                                         <input
                                             type="text"
                                             value={editForm.data.client_whatsapp}
@@ -561,17 +567,17 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_meta_app_id')}</label>
                                         <input
                                             type="text"
                                             value={editForm.data.facebook_client_id}
                                             onChange={e => editForm.setData('facebook_client_id', e.target.value)}
-                                            placeholder="e.g. 104829384920"
+                                            placeholder={__('whatsapp.sender_index_app_id_placeholder')}
                                             className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_meta_app_secret')}</label>
                                         <input
                                             type="password"
                                             value={editForm.data.facebook_client_secret}
@@ -585,7 +591,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                 {isAdmin && (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_per_message_fee')}</label>
                                             <input
                                                 type="number"
                                                 step="0.0001"
@@ -595,7 +601,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.sender_index_bot_reply_fee')}</label>
                                             <input
                                                 type="number"
                                                 step="0.0001"
@@ -613,14 +619,14 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                                         onClick={() => setShowEditModal(null)}
                                         className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Cancel
+                                        {__('general.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={editForm.processing}
                                         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                     >
-                                        Save Changes
+                                        {__('general.save_changes')}
                                     </button>
                                 </div>
                             </form>
@@ -628,6 +634,7 @@ export default function Index({ businesses, apiToken, filters, isAdmin }: Props)
                     </div>
                 )}
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

@@ -9,6 +9,7 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Calendar, Clock, Users, CalendarOff, Plus, Trash2 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface ExceptionsProps {
     providers: any[];
@@ -26,6 +27,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
     });
 
     const [isAdding, setIsAdding] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,23 +39,22 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
         });
     };
 
-    const deleteException = (id: number) => {
-        if (confirm('Are you sure you want to remove this exception?')) {
-            router.delete(route('booking.exceptions.destroy', id));
-        }
+    const deleteException = async (id: number) => {
+        if (!(await confirm({ title: __('booking.remove_exception'), description: __('booking.remove_exception_confirm'), variant: 'danger' }))) return;
+        router.delete(route('booking.exceptions.destroy', id));
     };
 
     return (
         <WorkspaceLayout
             title={__('general.booking_exceptions')}
-            workspaceName="Booking Settings"
+            workspaceName={__('booking.settings_workspace')}
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
-                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
-                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
-                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: true },
+                { id: 'dashboard', label: __('general.dashboard'), icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: __('booking.nav_appointments'), icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'events', label: __('booking.nav_event_types'), icon: Calendar, href: '/booking/events', isActive: false },
+                { id: 'providers', label: __('booking.nav_providers'), icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: __('booking.nav_exceptions'), icon: CalendarOff, href: '/booking/exceptions', isActive: true },
             ]}
         >
             <Head title={__('general.exceptions_days_off')} />
@@ -81,7 +82,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                     <div className="space-y-2">
                                         <Label>{__('general.provider')}</Label>
                                         <Select onValueChange={(value) => setData('booking_provider_id', String(value))} value={data.booking_provider_id}>
-                                            <SelectTrigger>
+                                            <SelectTrigger aria-label={__('general.provider')}>
                                                 <SelectValue placeholder={__('general.select_provider')} />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -93,17 +94,17 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                         {errors.booking_provider_id && <p className="text-sm text-red-500">{errors.booking_provider_id}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Reason (Optional)</Label>
-                                        <Input value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder={__('general.e_g_vacation_sick_leave')} />
+                                        <Label htmlFor="exception-reason">{__('booking.reason_optional')}</Label>
+                                        <Input id="exception-reason" value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder={__('general.e_g_vacation_sick_leave')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>{__('general.start_date_time')}</Label>
-                                        <Input type="datetime-local" value={data.starts_at} onChange={e => setData('starts_at', e.target.value)} />
+                                        <Label htmlFor="exception-starts-at">{__('general.start_date_time')}</Label>
+                                        <Input id="exception-starts-at" type="datetime-local" value={data.starts_at} onChange={e => setData('starts_at', e.target.value)} />
                                         {errors.starts_at && <p className="text-sm text-red-500">{errors.starts_at}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>{__('general.end_date_time')}</Label>
-                                        <Input type="datetime-local" value={data.ends_at} onChange={e => setData('ends_at', e.target.value)} />
+                                        <Label htmlFor="exception-ends-at">{__('general.end_date_time')}</Label>
+                                        <Input id="exception-ends-at" type="datetime-local" value={data.ends_at} onChange={e => setData('ends_at', e.target.value)} />
                                         {errors.ends_at && <p className="text-sm text-red-500">{errors.ends_at}</p>}
                                     </div>
                                 </div>
@@ -132,17 +133,17 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                                 <CalendarOff className="w-5 h-5 text-slate-500" />
                                             </div>
                                             <div>
-                                                <p className="font-medium text-slate-900">{ex.reason || 'Blocked Time'}</p>
+                                                <p className="font-medium text-slate-900">{ex.reason || __('booking.blocked_time')}</p>
                                                 <p className="text-sm text-slate-600 mt-0.5">
-                                                    Provider: <span className="font-medium">{ex.provider?.name}</span>
+                                                    {__('booking.provider_label')} <span className="font-medium">{ex.provider?.name}</span>
                                                 </p>
                                                 <p className="text-xs text-slate-500 mt-1">
-                                                    From: {new Date(ex.starts_at).toLocaleString()} <br/>
-                                                    To: {new Date(ex.ends_at).toLocaleString()}
+                                                    {__('booking.from_datetime', { date: new Date(ex.starts_at).toLocaleString() })} <br/>
+                                                    {__('booking.to_datetime', { date: new Date(ex.ends_at).toLocaleString() })}
                                                 </p>
                                             </div>
                                         </div>
-                                        <Button variant="ghost" size="icon" onClick={() => deleteException(ex.id)} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                        <Button variant="ghost" size="icon" onClick={() => deleteException(ex.id)} aria-label={__('booking.remove_exception')} className="text-red-500 hover:text-red-700 hover:bg-red-50">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -152,6 +153,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                     </CardContent>
                 </Card>
             </div>
+            {confirmDialog}
         </WorkspaceLayout>
     );
 }

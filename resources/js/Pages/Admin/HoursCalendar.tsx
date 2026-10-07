@@ -14,7 +14,8 @@ import {
     ArrowUpRight
 } from 'lucide-react';
 import axios from 'axios';
-import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
+import { __, getLoadedLocale } from '@/lib/i18n';
 import { IsoCurrencyAmount } from '@/lib/currencyDisplay';
 import { 
     ResponsiveContainer, 
@@ -28,6 +29,12 @@ import {
     ComposedChart,
     Line
 } from 'recharts';
+
+const WEEKDAY_LABEL_KEYS = ['general.cal_sun', 'general.cal_mon', 'general.cal_tue', 'general.cal_wed', 'general.cal_thu', 'general.cal_fri', 'general.cal_sat'];
+
+function activeLocale(): string {
+    return getLoadedLocale() ?? 'en';
+}
 
 export default function HoursCalendar({ years, auth }: any) {
     const [selectedYear, setSelectedYear] = useState<number>(years[0] || new Date().getFullYear());
@@ -78,8 +85,8 @@ export default function HoursCalendar({ years, auth }: any) {
                 setData(responseData);
                 generateCalendar(year, responseData);
             }
-        } catch (error: any) {
-            console.error('Failed to load hours calendar data', error);
+        } catch {
+            toast.error(__('admin.hours_calendar_load_failed'));
         } finally {
             setIsLoading(false);
         }
@@ -87,7 +94,15 @@ export default function HoursCalendar({ years, auth }: any) {
 
     const exportToCSV = () => {
         if (!last30DaysTimers.length) return;
-        const headers = ['Date', 'Client', 'Project', 'Duration', 'Client Amount', 'Business Amount', 'Actual Yield'];
+        const headers = [
+            __('general.date'),
+            __('admin.hours_calendar_client'),
+            __('general.project'),
+            __('admin.hours_calendar_duration'),
+            __('admin.hours_calendar_client_amount'),
+            __('admin.hours_calendar_business_amount'),
+            __('admin.hours_calendar_actual_yield'),
+        ];
         const rows = last30DaysTimers.map(t => [
             t.date,
             t.client_name,
@@ -162,8 +177,6 @@ export default function HoursCalendar({ years, auth }: any) {
 
     const generateMonthLabels = (year: number, startDayOfWeek: number) => {
         const months: any[] = [];
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
         const startDate = new Date(year, 0, 1);
         
         for (let month = 0; month < 12; month++) {
@@ -173,7 +186,7 @@ export default function HoursCalendar({ years, auth }: any) {
             const weekStart = Math.floor(firstGridIndex / 7) + 1;
             
             months.push({
-                name: monthNames[month],
+                name: firstDay.toLocaleDateString(activeLocale(), { month: 'short' }),
                 weekStart: weekStart
             } as any);
         }
@@ -186,7 +199,7 @@ export default function HoursCalendar({ years, auth }: any) {
         
         const rect = (e.target as HTMLElement).getBoundingClientRect();
         const date = new Date(day.date);
-        const formattedDate = date.toLocaleDateString('en-US', { 
+        const formattedDate = date.toLocaleDateString(activeLocale(), { 
             weekday: 'short', 
             year: 'numeric', 
             month: 'short', 
@@ -198,7 +211,7 @@ export default function HoursCalendar({ years, auth }: any) {
             x: rect.left + rect.width / 2,
             y: rect.top - 10,
             date: formattedDate,
-            hours: day.count > 0 ? `${day.count.toFixed(1)} hours` : 'No activity'
+            hours: day.count > 0 ? __('admin.hours_calendar_hours_value', { hours: day.count.toFixed(1) }) : __('admin.hours_calendar_no_activity')
         });
     };
 
@@ -230,7 +243,7 @@ export default function HoursCalendar({ years, auth }: any) {
     return (
         <AdminSidebarLayout 
             title={__('general.work_hours_calendar')}
-            header="Work Hours Calendar"
+            header={__('general.work_hours_calendar')}
             user={auth?.user}
         >
             <div className="space-y-6 pb-10">
@@ -281,7 +294,7 @@ export default function HoursCalendar({ years, auth }: any) {
                     </div>
                 )}
 
-                <OperationalCard title={`Heatmap (${selectedYear})`} className="relative">
+                <OperationalCard title={__('admin.hours_calendar_heatmap_title', { year: selectedYear })} className="relative">
                     {isLoading && (
                         <div className="absolute inset-0 bg-white/70 z-10 flex flex-col items-center justify-center rounded-xl">
                             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900 mb-3"></div>
@@ -304,13 +317,9 @@ export default function HoursCalendar({ years, auth }: any) {
 
                             <div className="flex">
                                 <div className="flex flex-col justify-between text-xs text-slate-400 pe-2 pb-[2px] pt-[2px]" style={{ height: '110px' }}>
-                                    <div className="invisible">Sun</div>
-                                    <div>Mon</div>
-                                    <div className="invisible">Tue</div>
-                                    <div>Wed</div>
-                                    <div className="invisible">Thu</div>
-                                    <div>Fri</div>
-                                    <div className="invisible">Sat</div>
+                                    {WEEKDAY_LABEL_KEYS.map((key, idx) => (
+                                        <div key={key} className={idx % 2 === 0 ? 'invisible' : undefined}>{__(key)}</div>
+                                    ))}
                                 </div>
                                 
                                 <div 
@@ -362,7 +371,7 @@ export default function HoursCalendar({ years, auth }: any) {
                     <div className="space-y-4">
                         <h2 className="text-lg font-bold text-slate-900 px-1 flex items-center gap-2">
                             <Activity className="w-5 h-5 text-indigo-600" />
-                            {__('general.productivity')} (آخر 30 يوم)
+                            {__('admin.hours_calendar_productivity_last_30_days')}
                         </h2>
                         
                         {/* KPI 1: Market Hourly Rate */}
@@ -375,7 +384,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                 <IsoCurrencyAmount amount={marketHourlyRate} currency={{ currency: businessCurrency }} size="lg" />
                                 <span className="text-xs text-slate-400">/ {__('general.per_hour')}</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">سعر الساعة التقديري في السوق حالياً</p>
+                            <p className="text-xs text-slate-400 mt-2">{__('admin.hours_calendar_market_rate_hint')}</p>
                         </div>
 
                         {/* KPI 2: Average Hourly Yield */}
@@ -388,7 +397,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                 <IsoCurrencyAmount amount={avgYield30} currency={{ currency: businessCurrency }} size="lg" />
                                 <span className="text-xs text-slate-400">/ {__('general.per_hour')}</span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">متوسط العائد الفعلي المحقق لكل ساعة عمل</p>
+                            <p className="text-xs text-slate-400 mt-2">{__('admin.hours_calendar_avg_yield_hint')}</p>
                         </div>
 
                         {/* KPI 3: Market Savings */}
@@ -400,13 +409,13 @@ export default function HoursCalendar({ years, auth }: any) {
                             <div className="flex items-baseline gap-2">
                                 <IsoCurrencyAmount amount={marketSavings30} currency={{ currency: businessCurrency }} size="lg" />
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">الوفر والخصومات المقدمة للعملاء مقارنة بالسوق</p>
+                            <p className="text-xs text-slate-400 mt-2">{__('admin.hours_calendar_savings_hint')}</p>
                         </div>
                     </div>
 
                     {/* Right: Chart Comparison */}
                     <div className="lg:col-span-2">
-                        <OperationalCard title="مقارنة سعر الساعة الفعلي وسعر السوق (آخر 30 يوم)" className="h-full">
+                        <OperationalCard title={__('admin.hours_calendar_chart_title')} className="h-full">
                             <div className="h-[280px] w-full mt-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -424,8 +433,8 @@ export default function HoursCalendar({ years, auth }: any) {
                                             tickFormatter={(str) => {
                                                 try {
                                                     const d = new Date(str);
-                                                    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-                                                } catch (e) {
+                                                    return d.toLocaleDateString(activeLocale(), { day: 'numeric', month: 'short' });
+                                                } catch {
                                                     return str;
                                                 }
                                             }}
@@ -451,7 +460,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                             strokeWidth={2} 
                                             fillOpacity={1} 
                                             fill="url(#colorActual)" 
-                                            name="العائد الفعلي لساعتك" 
+                                            name={__('admin.hours_calendar_series_actual')} 
                                         />
                                         
                                         {/* market hourly rate baseline */}
@@ -462,7 +471,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                             strokeWidth={1.5} 
                                             strokeDasharray="4 4" 
                                             dot={false} 
-                                            name="سعر ساعة السوق" 
+                                            name={__('admin.hours_calendar_series_market')} 
                                         />
 
                                         {/* recommended hourly rate baseline */}
@@ -473,7 +482,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                             strokeWidth={1.5} 
                                             strokeDasharray="3 3" 
                                             dot={false} 
-                                            name="السعر الموصى به" 
+                                            name={__('admin.hours_calendar_series_recommended')} 
                                         />
                                     </ComposedChart>
                                 </ResponsiveContainer>
@@ -489,7 +498,7 @@ export default function HoursCalendar({ years, auth }: any) {
                         <div className="flex items-center gap-3">
                             <input 
                                 type="text"
-                                placeholder="بحث عن عميل أو مشروع..."
+                                placeholder={__('admin.hours_calendar_search_placeholder')}
                                 className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-500 w-48 md:w-64"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -500,7 +509,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Download className="w-3.5 h-3.5" />
-                                تصدير CSV
+                                {__('admin.hours_calendar_export_csv')}
                             </button>
                         </div>
                     }
@@ -510,13 +519,13 @@ export default function HoursCalendar({ years, auth }: any) {
                             <thead className="text-xs text-slate-700 bg-slate-50 border-b border-slate-200">
                                 <tr>
                                     <th className="px-6 py-3 font-semibold text-center">{__('general.date')}</th>
-                                    <th className="px-6 py-3 font-semibold text-center">العميل</th>
-                                    <th className="px-6 py-3 font-semibold text-center">المشروع</th>
-                                    <th className="px-6 py-3 font-semibold text-center">المدة</th>
-                                    <th className="px-6 py-3 font-semibold text-center">معدل الساعة الفعلي</th>
-                                    <th className="px-6 py-3 font-semibold text-center">قيمة الجلسة</th>
-                                    <th className="px-6 py-3 font-semibold text-center">معدل الساعة بالـ Business</th>
-                                    <th className="px-6 py-3 font-semibold text-center">الفاتورة</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_client')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('general.project')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_duration')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_actual_hourly_rate')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_session_value')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_business_hourly_rate')}</th>
+                                    <th className="px-6 py-3 font-semibold text-center">{__('admin.hours_calendar_invoice')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -526,10 +535,10 @@ export default function HoursCalendar({ years, auth }: any) {
                                             <td className="px-6 py-4 text-center font-medium text-slate-900 whitespace-nowrap">{timer.date}</td>
                                             <td className="px-6 py-4 text-center">{timer.client_name}</td>
                                             <td className="px-6 py-4 text-center">{timer.project_name}</td>
-                                            <td className="px-6 py-4 text-center font-semibold text-slate-700 whitespace-nowrap">{timer.duration_str} ({timer.hours}h)</td>
-                                            <td className="px-6 py-4 text-center text-slate-700 font-medium whitespace-nowrap">{timer.actual_rate_str} / ساعة</td>
+                                            <td className="px-6 py-4 text-center font-semibold text-slate-700 whitespace-nowrap">{timer.duration_str} ({__('admin.hours_calendar_hours_short', { hours: timer.hours })})</td>
+                                            <td className="px-6 py-4 text-center text-slate-700 font-medium whitespace-nowrap">{timer.actual_rate_str} {__('general.per_hour')}</td>
                                             <td className="px-6 py-4 text-center font-semibold text-slate-900 whitespace-nowrap">{timer.amount_str}</td>
-                                            <td className="px-6 py-4 text-center text-indigo-600 font-semibold whitespace-nowrap">{timer.business_rate_str} / ساعة</td>
+                                            <td className="px-6 py-4 text-center text-indigo-600 font-semibold whitespace-nowrap">{timer.business_rate_str} {__('general.per_hour')}</td>
                                             <td className="px-6 py-4 text-center whitespace-nowrap">
                                                 {timer.invoice_id ? (
                                                     <Link 
@@ -548,7 +557,7 @@ export default function HoursCalendar({ years, auth }: any) {
                                 ) : (
                                     <tr>
                                         <td colSpan={8} className="px-6 py-10 text-center text-slate-400">
-                                            لا توجد جلسات عمل مسجلة في الـ 30 يومًا الماضية تطابق البحث.
+                                            {__('admin.hours_calendar_no_sessions')}
                                         </td>
                                     </tr>
                                 )}

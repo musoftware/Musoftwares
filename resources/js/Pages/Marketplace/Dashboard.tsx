@@ -28,6 +28,7 @@ import { formatMoney, formatDate } from '@/lib/utils';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface OrderItem {
     id: number;
@@ -98,17 +99,24 @@ export default function MarketplaceDashboard({
     const { auth } = usePage().props as any;
     const { mode, setMode } = useMarketplaceMode();
     const isBuyer = mode === 'client';
+    const { confirm, confirmDialog } = useConfirm();
 
-    const handleDeleteGig = (id: number, title: string) => {
-        if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || `Are you sure you want to delete "${title}"?`)) {
-            router.delete(route('marketplace.services.destroy', id));
-        }
+    const handleDeleteGig = async (id: number, title: string) => {
+        const accepted = await confirm({
+            title: __('marketplace.delete_service_title'),
+            description: __('marketplace.delete_service_desc', { title }),
+            confirmLabel: __('general.delete'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('marketplace.services.destroy', id));
     };
 
 
     return (
         <MarketplaceLayout>
-            <Head title={isBuyer ? __('general.buyer_dashboard') || 'Buyer Dashboard' : __('general.seller_dashboard') || 'Seller Workspace'} />
+            <Head title={isBuyer ? __('general.buyer_dashboard') : __('general.seller_dashboard')} />
+            {confirmDialog}
 
             <div className="min-h-screen bg-slate-50/50 dark:bg-[#090d16] text-[#1d1d1f] dark:text-[#f8fafc] pb-16 transition-colors">
                 
@@ -122,9 +130,9 @@ export default function MarketplaceDashboard({
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                                         {isBuyer ? (
-                                            <span>{__('general.buyer_dashboard') || 'Buyer Dashboard'}</span>
+                                            <span>{__('general.buyer_dashboard')}</span>
                                         ) : (
-                                            <span>{__('general.seller_workspace') || 'Seller Workspace'}</span>
+                                            <span>{__('general.seller_workspace')}</span>
                                         )}
                                     </h1>
                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
@@ -132,13 +140,13 @@ export default function MarketplaceDashboard({
                                             ? 'bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/40' 
                                             : 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
                                     }`}>
-                                        {isBuyer ? 'Buying Mode' : 'Seller Mode'}
+                                        {isBuyer ? __('marketplace.dash_buying_mode') : __('marketplace.dash_selling_mode')}
                                     </span>
                                 </div>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
                                     {isBuyer 
-                                        ? (__('general.what_should_i_do_now') || 'Track your active orders, deliverable approvals, and seller messages.')
-                                        : (__('general.what_work_should_i_do_now') || 'Manage client orders, work queue, revisions, and revenue.')
+                                        ? (__('general.what_should_i_do_now'))
+                                        : (__('general.what_work_should_i_do_now'))
                                     }
                                 </p>
                             </div>
@@ -156,7 +164,7 @@ export default function MarketplaceDashboard({
                                         }`}
                                     >
                                         <ShoppingBag className="w-3.5 h-3.5" />
-                                        <span>{__('general.buyer_dashboard') || 'Buyer'}</span>
+                                        <span>{__('general.buyer_dashboard')}</span>
                                     </button>
                                     <button
                                         type="button"
@@ -168,7 +176,7 @@ export default function MarketplaceDashboard({
                                         }`}
                                     >
                                         <Store className="w-3.5 h-3.5" />
-                                        <span>{__('general.seller_dashboard') || 'Seller'}</span>
+                                        <span>{__('general.seller_dashboard')}</span>
                                     </button>
                                 </div>
 
@@ -178,7 +186,7 @@ export default function MarketplaceDashboard({
                                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors shadow-sm"
                                     >
                                         <Search className="w-3.5 h-3.5" />
-                                        <span>{__('general.browse_services') || 'Browse Services'}</span>
+                                        <span>{__('general.browse_services')}</span>
                                     </Link>
                                 ) : (
                                     <Link
@@ -186,7 +194,7 @@ export default function MarketplaceDashboard({
                                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors shadow-sm"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>{__('general.create_a_gig') || 'Create a Gig'}</span>
+                                        <span>{__('general.create_a_gig')}</span>
                                     </Link>
                                 )}
                             </div>
@@ -208,7 +216,7 @@ export default function MarketplaceDashboard({
                                 <div className="rounded-2xl border border-amber-200/80 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 p-6 space-y-4">
                                     <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-base">
                                         <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-                                        <span>{__('general.needs_your_action') || 'Needs Your Action'}</span>
+                                        <span>{__('general.needs_your_action')}</span>
                                         <span className="ms-auto rounded-full bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200 text-xs px-2.5 py-0.5 font-extrabold">
                                             {needsActionPurchases.length}
                                         </span>
@@ -219,13 +227,13 @@ export default function MarketplaceDashboard({
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="space-y-1">
                                                         <span className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-                                                            {order.actionNeededText || 'Action Required'}
+                                                            {order.actionNeededText || __('marketplace.dash_action_required')}
                                                         </span>
                                                         <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">
-                                                            Order #{order.id}: {order.title}
+                                                            {__('marketplace.dash_order_title', { id: order.id, title: order.title })}
                                                         </h4>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                            Seller: <span className="font-medium text-slate-700 dark:text-slate-300">{order.sellerName}</span>
+                                                            {__('marketplace.dash_seller_label')} <span className="font-medium text-slate-700 dark:text-slate-300">{order.sellerName}</span>
                                                         </p>
                                                     </div>
                                                     <StatusBadge status={order.status} />
@@ -238,7 +246,7 @@ export default function MarketplaceDashboard({
                                                         href={`/marketplace/orders/${order.id}`}
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-colors"
                                                     >
-                                                        <span>Take Action</span>
+                                                        <span>{__('marketplace.dash_take_action')}</span>
                                                         <ArrowRight className="w-3.5 h-3.5" />
                                                     </Link>
                                                 </div>
@@ -257,13 +265,13 @@ export default function MarketplaceDashboard({
                                         </div>
                                         <div>
                                             <h2 className="font-extrabold text-slate-900 dark:text-white text-base">
-                                                {__('general.active_orders') || 'Active Orders'}
+                                                {__('general.active_orders')}
                                             </h2>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Track orders currently in progress with sellers</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">{__('marketplace.dash_track_orders_desc')}</p>
                                         </div>
                                     </div>
                                     <Link href="/marketplace/orders" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors flex items-center gap-1">
-                                        <span>View All Orders</span>
+                                        <span>{__('marketplace.dash_view_all_orders')}</span>
                                         <ChevronRight className="w-3.5 h-3.5" />
                                     </Link>
                                 </div>
@@ -274,9 +282,9 @@ export default function MarketplaceDashboard({
                                             <ShoppingBag className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_orders_yet') || 'No Orders Yet'}</h3>
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_orders_yet')}</h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                                                You don't have any active orders in progress right now. Explore professional services to get started!
+                                                {__('marketplace.dash_no_active_orders_desc')}
                                             </p>
                                         </div>
                                         <Link
@@ -284,7 +292,7 @@ export default function MarketplaceDashboard({
                                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors shadow-sm"
                                         >
                                             <Search className="w-4 h-4" />
-                                            <span>{__('general.browse_services') || 'Browse Services'}</span>
+                                            <span>{__('general.browse_services')}</span>
                                         </Link>
                                     </div>
                                 ) : (
@@ -299,8 +307,8 @@ export default function MarketplaceDashboard({
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-                                                        <span>Seller: <strong className="text-slate-700 dark:text-slate-300">{order.sellerName}</strong></span>
-                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
+                                                        <span>{__('marketplace.dash_seller_label')} <strong className="text-slate-700 dark:text-slate-300">{order.sellerName}</strong></span>
+                                                        {order.deliveryDate && <span>{__('marketplace.dash_due_label')} <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
                                                     </div>
                                                 </div>
 
@@ -313,7 +321,7 @@ export default function MarketplaceDashboard({
                                                         href={`/marketplace/orders/${order.id}`}
                                                         className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 font-bold text-xs text-slate-700 dark:text-slate-300 shadow-2xs transition-colors"
                                                     >
-                                                        View Order
+                                                        {__('marketplace.dash_view_order')}
                                                     </Link>
                                                 </div>
                                             </div>
@@ -325,7 +333,7 @@ export default function MarketplaceDashboard({
                             {/* SECTION 3: Recent Activity Stream */}
                             {buyerActivity.length > 0 && (
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 space-y-4 transition-colors">
-                                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base">Recent Order Activity</h3>
+                                    <h3 className="font-extrabold text-slate-900 dark:text-white text-base">{__('marketplace.dash_recent_activity')}</h3>
                                     <div className="space-y-3">
                                         {buyerActivity.map((activity) => (
                                             <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/10 text-xs">
@@ -334,7 +342,7 @@ export default function MarketplaceDashboard({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-slate-900 dark:text-slate-200 font-medium">
-                                                        Order #{activity.orderId} ({activity.serviceTitle}) status changed to <span className="font-bold text-indigo-700 dark:text-indigo-400 uppercase">{activity.newStatus}</span> by {activity.changedByName}.
+                                                        {__('marketplace.dash_activity_status_changed', { id: activity.orderId, service: activity.serviceTitle })} <span className="font-bold text-indigo-700 dark:text-indigo-400 uppercase">{activity.newStatus}</span> {__('marketplace.dash_activity_changed_by', { name: activity.changedByName })}
                                                     </p>
                                                     {activity.note && <p className="text-slate-500 dark:text-slate-400 italic mt-0.5">"{activity.note}"</p>}
                                                     <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">{activity.timestamp}</span>
@@ -348,15 +356,15 @@ export default function MarketplaceDashboard({
                             {/* SECTION 4: Statistics (At the bottom) */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Spent</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('general.total_spent')}</span>
                                     <p className="text-2xl font-black text-slate-900 dark:text-white">{formatMoney(buyerStats.totalSpent, auth?.user?.currency)}</p>
                                 </div>
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Purchases</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('general.active_purchases')}</span>
                                     <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{buyerStats.activeOrders}</p>
                                 </div>
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Protected Escrow</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('general.protected_escrow')}</span>
                                     <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{formatMoney(buyerStats.lockedEscrow, auth?.user?.currency)}</p>
                                 </div>
                             </div>
@@ -374,7 +382,7 @@ export default function MarketplaceDashboard({
                                 <div className="rounded-2xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 p-6 space-y-4">
                                     <div className="flex items-center gap-2 text-rose-900 dark:text-rose-300 font-bold text-base">
                                         <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-                                        <span>{__('general.orders_need_attention') || 'Orders Need Attention'}</span>
+                                        <span>{__('general.orders_need_attention')}</span>
                                         <span className="ms-auto rounded-full bg-rose-200 dark:bg-rose-900/60 text-rose-900 dark:text-rose-200 text-xs px-2.5 py-0.5 font-extrabold">
                                             {needsActionSales.length}
                                         </span>
@@ -385,13 +393,13 @@ export default function MarketplaceDashboard({
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="space-y-1">
                                                         <span className="text-xs font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">
-                                                            {order.actionNeededText || 'Work Submission Due'}
+                                                            {order.actionNeededText || __('marketplace.dash_work_submission_due')}
                                                         </span>
                                                         <h4 className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1">
-                                                            Order #{order.id}: {order.title}
+                                                            {__('marketplace.dash_order_title', { id: order.id, title: order.title })}
                                                         </h4>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                            Client: <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerName}</span>
+                                                            {__('marketplace.dash_client_label')} <span className="font-medium text-slate-700 dark:text-slate-300">{order.buyerName}</span>
                                                         </p>
                                                     </div>
                                                     <StatusBadge status={order.status} />
@@ -404,7 +412,7 @@ export default function MarketplaceDashboard({
                                                         href={`/marketplace/orders/${order.id}`}
                                                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors"
                                                     >
-                                                        <span>Submit Work</span>
+                                                        <span>{__('general.submit_work')}</span>
                                                         <ArrowRight className="w-3.5 h-3.5" />
                                                     </Link>
                                                 </div>
@@ -423,13 +431,13 @@ export default function MarketplaceDashboard({
                                         </div>
                                         <div>
                                             <h2 className="font-extrabold text-slate-900 dark:text-white text-base">
-                                                {__('general.active_client_orders') || 'Active Client Orders'}
+                                                {__('general.active_client_orders')}
                                             </h2>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">Deliverables and client orders currently assigned to you</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">{__('marketplace.dash_assigned_orders_desc')}</p>
                                         </div>
                                     </div>
                                     <Link href="/marketplace/orders" className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors flex items-center gap-1">
-                                        <span>Manage All Orders</span>
+                                        <span>{__('marketplace.dash_manage_all_orders')}</span>
                                         <ChevronRight className="w-3.5 h-3.5" />
                                     </Link>
                                 </div>
@@ -440,9 +448,9 @@ export default function MarketplaceDashboard({
                                             <Store className="w-8 h-8" />
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_client_orders_yet') || 'No Active Orders'}</h3>
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-base">{__('general.no_client_orders_yet')}</h3>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                                                You don't have any incoming client orders to deliver right now. Keep your Gigs updated!
+                                                {__('marketplace.dash_no_client_orders_desc')}
                                             </p>
                                         </div>
                                         <Link
@@ -450,7 +458,7 @@ export default function MarketplaceDashboard({
                                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-sm"
                                         >
                                             <Plus className="w-4 h-4" />
-                                            <span>{__('general.create_a_gig') || 'Create a Gig'}</span>
+                                            <span>{__('general.create_a_gig')}</span>
                                         </Link>
                                     </div>
                                 ) : (
@@ -465,8 +473,8 @@ export default function MarketplaceDashboard({
                                                         </Link>
                                                     </div>
                                                     <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-                                                        <span>Client: <strong className="text-slate-700 dark:text-slate-300">{order.buyerName}</strong></span>
-                                                        {order.deliveryDate && <span>Due: <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
+                                                        <span>{__('marketplace.dash_client_label')} <strong className="text-slate-700 dark:text-slate-300">{order.buyerName}</strong></span>
+                                                        {order.deliveryDate && <span>{__('marketplace.dash_due_label')} <strong className="text-slate-700 dark:text-slate-300">{formatDate(order.deliveryDate)}</strong></span>}
                                                     </div>
                                                 </div>
 
@@ -479,7 +487,7 @@ export default function MarketplaceDashboard({
                                                         href={`/marketplace/orders/${order.id}`}
                                                         className="px-3.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 font-bold text-xs text-emerald-800 dark:text-emerald-300 transition-colors"
                                                     >
-                                                        Deliver / Workspace
+                                                        {__('marketplace.dash_deliver_workspace')}
                                                     </Link>
                                                 </div>
                                             </div>
@@ -492,27 +500,27 @@ export default function MarketplaceDashboard({
                             <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs p-6 space-y-4 transition-colors">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="font-extrabold text-slate-900 dark:text-white text-base">{__('general.my_gigs') || 'My Services & Gigs'}</h3>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">Services you offer in the marketplace catalog</p>
+                                        <h3 className="font-extrabold text-slate-900 dark:text-white text-base">{__('general.my_gigs')}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{__('marketplace.dash_gigs_desc')}</p>
                                     </div>
                                     <Link
                                         href="/marketplace/services/create"
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-xs"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>New Gig</span>
+                                        <span>{__('marketplace.dash_new_gig')}</span>
                                     </Link>
                                 </div>
 
                                 {listedGigs.length === 0 ? (
                                     <div className="p-8 text-center bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-dashed border-slate-200 dark:border-white/10 space-y-3">
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">You haven't created any marketplace services yet.</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{__('marketplace.dash_no_gigs_desc')}</p>
                                         <Link
                                             href="/marketplace/services/create"
                                             className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                                         >
                                             <Plus className="w-3.5 h-3.5" />
-                                            <span>Publish Your First Service</span>
+                                            <span>{__('marketplace.dash_publish_first_service')}</span>
                                         </Link>
                                     </div>
                                 ) : (
@@ -526,7 +534,7 @@ export default function MarketplaceDashboard({
                                                             <Link
                                                                 href={route('marketplace.services.edit', gig.id)}
                                                                 className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                                                                title={__('general.edit') || 'Edit'}
+                                                                title={__('general.edit')}
                                                             >
                                                                 <Edit className="w-4 h-4" />
                                                             </Link>
@@ -534,7 +542,7 @@ export default function MarketplaceDashboard({
                                                                 type="button"
                                                                 onClick={() => handleDeleteGig(gig.id, gig.title)}
                                                                 className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                                                                title={__('general.delete') || 'Delete'}
+                                                                title={__('general.delete')}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
@@ -542,10 +550,10 @@ export default function MarketplaceDashboard({
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/60 dark:border-white/10">
-                                                    <span className="font-bold text-slate-900 dark:text-white">From {formatMoney(gig.price, auth?.user?.currency)}</span>
+                                                    <span className="font-bold text-slate-900 dark:text-white">{__('marketplace.dash_price_from', { price: formatMoney(gig.price, auth?.user?.currency) })}</span>
                                                     <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
                                                         <Star className="w-3.5 h-3.5 fill-current" />
-                                                        <span>{gig.rating > 0 ? gig.rating.toFixed(1) : 'New'}</span>
+                                                        <span>{gig.rating > 0 ? gig.rating.toFixed(1) : __('general.new')}</span>
                                                         <span className="text-slate-400 dark:text-slate-500 font-normal">({gig.reviews})</span>
                                                     </div>
                                                 </div>
@@ -558,19 +566,19 @@ export default function MarketplaceDashboard({
                             {/* SECTION 4: Revenue & Analytics (At the bottom) */}
                             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Sales</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('general.total_sales')}</span>
                                     <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{formatMoney(sellerStats.totalSales, auth?.user?.currency)}</p>
                                 </div>
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Held Escrow</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('marketplace.dash_held_escrow')}</span>
                                     <p className="text-2xl font-black text-slate-900 dark:text-white">{formatMoney(sellerStats.lockedEscrow, auth?.user?.currency)}</p>
                                 </div>
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Completion Rate</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('marketplace.dash_completion_rate')}</span>
                                     <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{sellerStats.completionRate}%</p>
                                 </div>
                                 <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-5 space-y-1 transition-colors">
-                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Services</span>
+                                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{__('general.total_services')}</span>
                                     <p className="text-2xl font-black text-slate-900 dark:text-white">{sellerStats.servicesListed}</p>
                                 </div>
                             </div>

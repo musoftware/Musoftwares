@@ -58,8 +58,8 @@ export default function Edit({ exchange, currencies }: Props) {
             <div className="w-full max-w-3xl space-y-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
-                        <Link href={route('admin.currency-exchanges.index')}>
-                            <ArrowLeft className="h-4 w-4" />
+                        <Link href={route('admin.currency-exchanges.index')} aria-label={__('general.back')} title={__('general.back')}>
+                            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
                         </Link>
                     </Button>
                     <div>

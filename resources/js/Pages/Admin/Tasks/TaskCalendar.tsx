@@ -16,6 +16,8 @@ import {
     X,
     Info,
     Briefcase,
+    ArrowLeft,
+    ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -328,7 +330,7 @@ export default function TaskCalendar({ events, year, month, tz, clients, stats, 
                     <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" onClick={handlePrevMonth} aria-label={__('general.prev_month')}>
-                                <ChevronLeft className="h-4 w-4" />
+                                <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
                             </Button>
                             <Button variant="outline" size="sm" onClick={handleGoToToday} aria-label={__('general.jump_to_today')}>
                                 {__('general.today')}
@@ -336,8 +338,10 @@ export default function TaskCalendar({ events, year, month, tz, clients, stats, 
                             <Button variant="outline" size="sm" onClick={handleNextMonth} aria-label={__('general.next_month')}>
                                 <ChevronRight className="h-4 w-4" />
                             </Button>
-                            <span className="text-[10px] text-slate-400 hidden md:inline">
-                                ← → T C
+                            <span className="text-[10px] text-slate-400 hidden md:inline-flex items-center gap-0.5" title={__('admin.task_calendar_shortcuts_hint')}>
+                                <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+                                <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                                <span className="ms-0.5">T C</span>
                             </span>
                         </div>
                         <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -664,8 +668,8 @@ function Legend() {
     return (
         <div className="px-4 py-2 border-b border-slate-100 bg-white flex flex-wrap items-center gap-3 text-[10px] text-slate-500">
             <span className="font-semibold uppercase tracking-wider">{__('general.legend')}:</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-100 border border-green-200" />{__('general.todos') ?? 'Todos'}</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-100 border border-slate-200" />{__('general.tasks') ?? 'Tasks'}</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-100 border border-green-200" />{__('general.todos')}</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-100 border border-slate-200" />{__('general.tasks')}</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-100 border border-red-200" />{__('general.busy')}</span>
         </div>
     );
@@ -740,7 +744,7 @@ function DayDetailDrawer({
                         <DialogTitle>
                             {format(dateObj, 'EEEE, MMMM d, yyyy')}
                         </DialogTitle>
-                        <Button variant="ghost" size="sm" onClick={onClose} className="h-7 w-7 p-0">
+                        <Button variant="ghost" size="sm" onClick={onClose} className="h-7 w-7 p-0" aria-label={__('general.close')}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
@@ -761,14 +765,14 @@ function DayDetailDrawer({
                                 </Section>
                             )}
                             {events.tasks.length > 0 && (
-                                <Section title={__('general.tasks') ?? 'Tasks'}>
+                                <Section title={__('general.tasks')}>
                                     {events.tasks.map((t) => (
                                         <EventRow key={`task-${t.id}`} kind="task" title={t.title} meta={t.client ?? null} link={t.client_id ? route('admin.tasks.client-tasks', { client_id: t.client_id }) : null} completed={t.completed} />
                                     ))}
                                 </Section>
                             )}
                             {events.todos.length > 0 && (
-                                <Section title={__('general.todos') ?? 'Todos'}>
+                                <Section title={__('general.todos')}>
                                     {events.todos.map((td) => (
                                         <EventRow key={`todo-${td.id}`} kind="todo" title={td.title} meta={`${td.start_time}${td.end_time ? ' – ' + td.end_time : ''}${td.client ? ' · ' + td.client : ''}`} completed={td.completed} />
                                     ))}

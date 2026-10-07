@@ -11,6 +11,7 @@ import { Input } from '@/Components/ui/input';
 import { formatMoney } from '@/lib/utils';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface Timer {
     id: number | string;
@@ -35,10 +36,10 @@ interface Props {
     total_seconds: number;
     total_billable: number;
     span_seconds: number;
-    system_base_rate: number;
+    system_base_rate: number | null;
     client_rate: number;
     is_custom_rate_enabled?: boolean;
-    hour_rate: number;
+    hour_rate: number | null;
     is_editable?: boolean;
 }
 
@@ -89,6 +90,7 @@ export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
     system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, is_editable = true,
 }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const isCanEdit = item.invoice_status === 'unpaid' && is_editable !== false;
     const storageKey = `timer-details-${item.id}`;
 
@@ -145,13 +147,13 @@ export default function TimerDetails({
 
     const [manualHours, setManualHours] = useState('');
     const [manualMinutes, setManualMinutes] = useState('');
-    const [rate, setRate] = useState<number>(hour_rate || system_base_rate);
+    const [rate, setRate] = useState<number>(hour_rate || system_base_rate || 0);
     const [rateVisible, setRateVisible] = useState(false);
     const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        setRate(hour_rate || system_base_rate);
+        setRate(hour_rate || system_base_rate || 0);
     }, [hour_rate, system_base_rate]);
 
     useEffect(() => {
@@ -243,10 +245,15 @@ export default function TimerDetails({
         setManualMinutes('');
     };
 
-    const handleDelete = (index: number) => {
+    const handleDelete = async (index: number) => {
         const timerToDelete = timers[index];
         if (!timerToDelete.isNew) {
-            if (!confirm(__('general.are_you_sure_you_want_to_delete_this_session'))) return;
+            const accepted = await confirm({
+                title: __('general.are_you_sure_you_want_to_delete_this_session'),
+                variant: 'danger',
+                confirmLabel: __('general.delete'),
+            });
+            if (!accepted) return;
             const newTimers = [...timers];
             newTimers.splice(index, 1);
             setTimers(newTimers);
@@ -254,7 +261,7 @@ export default function TimerDetails({
                 preserveScroll: true,
                 onError: () => {
                     setTimers(timers);
-                    toast.error(__('general.error_occurred') || 'Something went wrong');
+                    toast.error(__('general.error_occurred'));
                 },
             });
         } else {
@@ -266,12 +273,12 @@ export default function TimerDetails({
 
     const handleSave = () => {
         if (!reason.trim()) {
-            toast.error(__('general.reason_is_empty_you_have') || 'Reason is required.');
+            toast.error(__('general.reason_is_empty_you_have'));
             return;
         }
         const newSessions = timers.filter((t) => t.isNew);
         if (newSessions.length === 0) {
-            toast.error(__('general.no_new_sessions_to_save') || 'No new sessions to save.');
+            toast.error(__('general.no_new_sessions_to_save'));
             return;
         }
         if (isRunning) handleStop();
@@ -284,7 +291,7 @@ export default function TimerDetails({
                 setIsSaving(false);
                 try { localStorage.removeItem(storageKey); } catch { /* empty */ }
                 setTimers((prev) => prev.filter((t) => !t.isNew));
-                toast.success(__('general.saved') || 'Saved');
+                toast.success(__('general.saved'));
             },
             onError: () => setIsSaving(false),
         });
@@ -310,7 +317,7 @@ export default function TimerDetails({
 
     return (
         <AdminSidebarLayout>
-            <Head title={`${__('general.timer_details')} - Invoice #${item.invoice_number}`} />
+            <Head title={`${__('general.timer_details')} - ${__('admin.invoice_number_ref', { number: item.invoice_number })}`} />
 
             <div className="max-w-7xl mx-auto pb-12">
                 <div className="mb-5">
@@ -341,8 +348,8 @@ export default function TimerDetails({
                                 <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
                                 <span>
                                     {item.invoice_status !== 'unpaid'
-                                        ? (__('admin.only_unpaid_invoices_can_be_edited') || 'Only unpaid invoices can be edited.')
-                                        : (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }) || 'Cannot add or edit timer sessions for invoices created more than 3 days ago.')}
+                                        ? (__('admin.only_unpaid_invoices_can_be_edited'))
+                                        : (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }))}
                                 </span>
                             </div>
                         )}
@@ -355,12 +362,12 @@ export default function TimerDetails({
                                 <div className="flex items-center gap-1.5 text-xs font-medium text-gray-700 mb-2.5">
                                     {is_custom_rate_enabled ? (
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                            {__('general.custom_client_rate') || 'سعر الساعة المخصص للعميل'} ({client_rate})
+                                            {__('general.custom_client_rate')} ({client_rate})
                                         </span>
                                     ) : (
                                         <>
                                             <span className="font-semibold">{__('admin.base_system_rate')}</span>
-                                            <span className="text-gray-500">({system_base_rate})</span>
+                                            <span className="text-gray-500">({system_base_rate ?? '-'})</span>
                                         </>
                                     )}
                                 </div>
@@ -420,9 +427,9 @@ export default function TimerDetails({
                                 <thead className="bg-gray-50 border-b border-gray-200">
                                     <tr>
                                         <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">{__('general.start')}</th>
-                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">End</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">{__('general.end')}</th>
                                         <th className="px-4 py-2 text-start font-semibold text-gray-600 w-1/4">{__('general.duration')}</th>
-                                        <th className="px-4 py-2 text-start font-semibold text-gray-600">{invoice_currency?.currency || 'Amount'}</th>
+                                        <th className="px-4 py-2 text-start font-semibold text-gray-600">{invoice_currency?.currency || __('general.amount')}</th>
                                         <th className="px-4 py-2 w-12"></th>
                                     </tr>
                                 </thead>
@@ -433,8 +440,8 @@ export default function TimerDetails({
                                             <td className="px-4 py-2.5 font-mono text-xs text-gray-600">{parseDateTime(timer.end_date).full}</td>
                                             <td className="px-4 py-2.5 font-mono text-xs font-medium">
                                                 {formatDurationMS(timer.duration_seconds)}
-                                                {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">New</span>}
-                                                {timer.isPseudo && <span className="ms-2 text-[9px] font-bold bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{__('general.pseudo_badge') || 'تجريبي (خصم 95%)'}</span>}
+                                                {timer.isNew && <span className="ms-2 text-[9px] font-bold bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{__('general.new')}</span>}
+                                                {timer.isPseudo && <span className="ms-2 text-[9px] font-bold bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-sm uppercase tracking-wider">{__('general.pseudo_badge')}</span>}
                                             </td>
                                             <td className="px-4 py-2.5 font-bold text-gray-900">{formatMoney(timer.amount, invoice_currency)}</td>
                                             <td className="px-4 py-2.5 text-center">
@@ -450,7 +457,7 @@ export default function TimerDetails({
                                         <tr>
                                             <td colSpan={5} className="px-4 py-6 text-center text-gray-400 text-sm">
                                                 <Clock className="w-5 h-5 mx-auto mb-2 opacity-50" />
-                                                {__('general.no_sessions_yet') || 'No sessions yet — start the timer to record time.'}
+                                                {__('general.no_sessions_yet')}
                                             </td>
                                         </tr>
                                     )}
@@ -467,7 +474,7 @@ export default function TimerDetails({
                                     <div className={`w-2.5 h-2.5 rounded-full motion-reduce:animate-none ${isPseudoMode ? 'bg-purple-600 animate-pulse' : 'bg-red-500'
                                         }`} />
                                     <span className="font-semibold uppercase tracking-wider text-xs">
-                                        {isPseudoMode ? (__('general.pseudo_timer_running') || 'مؤقت تجريبي يعمل (خصم 95%)') : __('general.timer_running')}
+                                        {isPseudoMode ? (__('general.pseudo_timer_running')) : __('general.timer_running')}
                                     </span>
                                     <span className="font-bold text-base">{formatDurationMS(liveSeconds)}</span>
                                     <span className="ms-auto font-bold">
@@ -489,7 +496,7 @@ export default function TimerDetails({
                                     disabled={isRunning || !isCanEdit}
                                     className="bg-purple-700 hover:bg-purple-800 text-white shadow-sm"
                                 >
-                                    <Play className="w-4 h-4 me-2" /> {__('general.pseudo_start') || 'تشغيل تجريبي (خصم 95%)'}
+                                    <Play className="w-4 h-4 me-2" /> {__('general.pseudo_start')}
                                 </Button>
                                 <Button
                                     onClick={handleStop}
@@ -528,16 +535,16 @@ export default function TimerDetails({
                                     <div className="font-mono text-base font-extrabold text-slate-900">{formatDurationMS(currentTotalSeconds)}</div>
                                 </div>
                                 <div className="flex-1 min-w-[130px]">
-                                    <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">{__('general.full_real_value') || 'القيمة الفعلية بسعر الساعة'}</span>
+                                    <span className="block text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">{__('general.full_real_value')}</span>
                                     <div className="text-base font-black text-blue-700">{formatMoney(currentFullRealValue, invoice_currency)}</div>
                                 </div>
                                 <div className="flex-1 min-w-[130px]">
-                                    <span className="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.billed_amount') || 'المبلغ الصافي بالفاتورة'}</span>
+                                    <span className="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.billed_amount')}</span>
                                     <div className="text-base font-black text-emerald-700">{formatMoney(currentTotalBillable, invoice_currency)}</div>
                                 </div>
                                 {currentDiscountSavings > 0.01 && (
                                     <div className="flex-1 min-w-[120px]">
-                                        <span className="block text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-1">{__('general.discount_savings') || 'إجمالي الخصم / الوفر'}</span>
+                                        <span className="block text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-1">{__('general.discount_savings')}</span>
                                         <div className="text-base font-black text-purple-700">-{formatMoney(currentDiscountSavings, invoice_currency)}</div>
                                     </div>
                                 )}
@@ -546,19 +553,19 @@ export default function TimerDetails({
                             {/* Row 2: Average Rate Insights */}
                             <div className="bg-slate-900 text-white rounded-xl p-4 flex flex-wrap gap-4 sm:gap-6 border border-slate-800 shadow-sm">
                                 <div className="flex-1 min-w-[130px]">
-                                    <span className="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">{__('general.avg_billed_rate') || 'متوسط سعر الساعة المفوترة'}</span>
+                                    <span className="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">{__('general.avg_billed_rate')}</span>
                                     <div className="text-base font-black text-emerald-300 font-mono">
-                                        {formatMoney(currentAvgBilledRate, invoice_currency)} <span className="text-xs font-normal text-emerald-400">{__('general.per_hour') || '/ hr'}</span>
+                                        {formatMoney(currentAvgBilledRate, invoice_currency)} <span className="text-xs font-normal text-emerald-400">{__('general.per_hour')}</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-[130px]">
-                                    <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">{__('general.avg_real_rate') || 'متوسط سعر الساعة الفعلي'}</span>
+                                    <span className="block text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">{__('general.avg_real_rate')}</span>
                                     <div className="text-base font-black text-blue-300 font-mono">
-                                        {formatMoney(currentAvgRealRate, invoice_currency)} <span className="text-xs font-normal text-blue-400">{__('general.per_hour') || '/ hr'}</span>
+                                        {formatMoney(currentAvgRealRate, invoice_currency)} <span className="text-xs font-normal text-blue-400">{__('general.per_hour')}</span>
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-[120px]">
-                                    <span className="block text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-1">{__('general.effective_discount') || 'معدل الخصم الفعلي'}</span>
+                                    <span className="block text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-1">{__('general.effective_discount')}</span>
                                     <div className="text-base font-black text-purple-300 font-mono">
                                         {currentEffectiveDiscountPercent}%
                                     </div>
@@ -566,7 +573,7 @@ export default function TimerDetails({
                                 <div className="flex-1 min-w-[120px]">
                                     <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{__('general.total_billable_hours')}</span>
                                     <div className="text-base font-extrabold text-gray-200 font-mono">
-                                        {totalHours.toFixed(2)} hrs
+                                        {__('admin.hours_short_value', { hours: totalHours.toFixed(2) })}
                                     </div>
                                 </div>
                             </div>
@@ -574,6 +581,7 @@ export default function TimerDetails({
                     </CardContent>
                 </Card>
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

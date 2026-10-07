@@ -5,6 +5,7 @@ import Message from './Message';
 import { Paperclip, Send, X, WifiOff, FileText, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
 
 export default function ChatWindow({
     conversationId,
@@ -160,7 +161,7 @@ export default function ChatWindow({
         const file = e.target.files[0];
         if (file) {
             if (file.size > 15 * 1024 * 1024) {
-                alert('File size must be less than 15MB');
+                toast.error(__('general.chat_file_too_large'));
                 return;
             }
             setAttachment(file);
@@ -228,7 +229,7 @@ export default function ChatWindow({
         } catch (error) {
             console.error('Error sending message:', error);
             setMessages((prev) => prev.filter((m) => m.id !== tempMessage.id));
-            alert('Failed to send message');
+            toast.error(__('general.chat_send_failed'));
         }
     };
 
@@ -267,7 +268,7 @@ export default function ChatWindow({
                                     {chatTitle}
                                 </h3>
                                 <p className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400">
-                                    {readOnly ? __('general.read_only', {}, 'للقراءة فقط') : __('general.active', {}, 'نشط')}
+                                    {readOnly ? __('general.read_only') : __('general.active')}
                                 </p>
                             </div>
                         </div>
@@ -279,7 +280,7 @@ export default function ChatWindow({
             {!isConnected && (
                 <div className="bg-amber-50 dark:bg-amber-950/40 px-4 py-2 text-xs text-amber-800 dark:text-amber-300 font-medium flex items-center justify-center gap-2 border-b border-amber-200/50 dark:border-amber-900/50 shrink-0">
                     <WifiOff className="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                    <span>Real-time connection paused. Polling every 5s.</span>
+                    <span>{__('general.chat_polling_notice')}</span>
                 </div>
             )}
 
@@ -300,7 +301,7 @@ export default function ChatWindow({
                                         <div className="flex items-center my-4 select-none">
                                             <div className="flex-1 border-t border-rose-200 dark:border-rose-900/40" />
                                             <span className="px-3 text-[11px] text-rose-600 dark:text-rose-400 font-semibold uppercase tracking-wider">
-                                                {unreadCount} {__('general.new_messages', {}, 'رسائل جديدة')}
+                                                {unreadCount} {__('general.new_messages')}
                                             </span>
                                             <div className="flex-1 border-t border-rose-200 dark:border-rose-900/40" />
                                         </div>
@@ -334,7 +335,7 @@ export default function ChatWindow({
                 {readOnly ? (
                     <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium">
                         <Lock className="w-3.5 h-3.5" />
-                        <span>{__('general.conversation_closed_notice', {}, 'تم إغلاق هذه التذكرة ولا يمكن إرسال ردود جديدة بها.')}</span>
+                        <span>{__('general.conversation_closed_notice')}</span>
                     </div>
                 ) : (
                     <div>
@@ -344,7 +345,7 @@ export default function ChatWindow({
                                 {preview ? (
                                     <img
                                         src={preview}
-                                        alt="Preview"
+                                        alt={__('general.chat_image_preview')}
                                         className="h-12 w-12 rounded-lg object-cover border border-black/10"
                                     />
                                 ) : (
@@ -363,6 +364,7 @@ export default function ChatWindow({
                                 <button
                                     type="button"
                                     onClick={removeAttachment}
+                                    aria-label={__('general.remove_attachment')}
                                     className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-black/5 transition-colors cursor-pointer"
                                 >
                                     <X className="w-4 h-4" />
@@ -388,7 +390,8 @@ export default function ChatWindow({
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={readOnly}
                                 className="h-10 w-10 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40 cursor-pointer shrink-0"
-                                title={__('general.attach_file', {}, 'إرفاق ملف أو صورة')}
+                                title={__('general.attach_file')}
+                                aria-label={__('general.attach_file')}
                             >
                                 <Paperclip className="w-4 h-4" />
                             </button>
@@ -398,7 +401,8 @@ export default function ChatWindow({
                                 ref={textareaRef}
                                 value={newMessage}
                                 onChange={handleTyping}
-                                placeholder={__('general.type_a_message', {}, 'اكتب رسالتك هنا...')}
+                                placeholder={__('general.type_a_message')}
+                                aria-label={__('general.type_a_message')}
                                 disabled={readOnly}
                                 rows={1}
                                 className="flex-1 min-h-[42px] max-h-32 resize-none rounded-xl border border-black/10 dark:border-white/10 bg-[#f5f5f7] dark:bg-zinc-800/80 px-3.5 py-2.5 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#0071e3] transition-all"
@@ -416,7 +420,8 @@ export default function ChatWindow({
                                 type="submit"
                                 disabled={readOnly || (!newMessage.trim() && !attachment)}
                                 className="h-10 w-10 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm shrink-0 cursor-pointer"
-                                title={__('general.send', {}, 'إرسال')}
+                                title={__('general.send')}
+                                aria-label={__('general.send')}
                             >
                                 <Send className="w-4 h-4 rtl:-scale-x-100" />
                             </button>

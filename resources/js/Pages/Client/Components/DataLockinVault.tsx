@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, FileCode, Package, FileText, Download, HardDrive, ShieldCheck, Check } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export interface VaultAssetItem {
     id: number;
@@ -42,14 +43,14 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
         switch (type) {
             case 'source_code':
                 return {
-                    label: 'Source Code',
+                    label: __('client.vault_source_code'),
                     icon: FileCode,
                     color: 'text-emerald-600 dark:text-emerald-400',
                     badge: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20',
                 };
             case 'delivery_build':
                 return {
-                    label: 'Production Build',
+                    label: __('client.vault_production_build'),
                     icon: Package,
                     color: 'text-[#0071e3] dark:text-sky-400',
                     badge: 'bg-blue-50 dark:bg-sky-500/10 text-[#0071e3] dark:text-sky-300 border-blue-200 dark:border-sky-500/20',
@@ -57,14 +58,14 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
             case 'final_invoice':
             case 'contract':
                 return {
-                    label: 'Signed Deed / Invoice',
+                    label: __('client.vault_signed_deed'),
                     icon: FileText,
                     color: 'text-amber-600 dark:text-amber-400',
                     badge: 'bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-500/20',
                 };
             default:
                 return {
-                    label: 'Binary Asset',
+                    label: __('client.vault_binary_asset'),
                     icon: HardDrive,
                     color: 'text-zinc-500 dark:text-zinc-400',
                     badge: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-black/10 dark:border-white/10',
@@ -93,15 +94,15 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
                     <div>
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
-                                Sovereign Client Vault
+                                {__('client.vault_title')}
                             </h3>
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-zinc-100 dark:bg-zinc-800 border border-black/10 dark:border-white/10 text-zinc-600 dark:text-zinc-400">
                                 <ShieldCheck className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
-                                Encrypted
+                                {__('client.vault_encrypted')}
                             </span>
                         </div>
                         <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
-                            Authenticated repository for intellectual property, compilation artifacts, and verified legal invoices.
+                            {__('client.vault_desc')}
                         </p>
                     </div>
                 </div>
@@ -113,21 +114,21 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
                         onClick={() => setFilterType('all')}
                         className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${filterType === 'all' ? 'bg-white dark:bg-zinc-800 text-[#1d1d1f] dark:text-white shadow-sm font-semibold' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'}`}
                     >
-                        All ({assets.length})
+                        {__('client.vault_filter_all', { count: assets.length })}
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilterType('source_code')}
                         className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${filterType === 'source_code' ? 'bg-white dark:bg-zinc-800 text-[#1d1d1f] dark:text-white shadow-sm font-semibold' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'}`}
                     >
-                        Code
+                        {__('client.vault_filter_code')}
                     </button>
                     <button
                         type="button"
                         onClick={() => setFilterType('delivery_build')}
                         className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${filterType === 'delivery_build' ? 'bg-white dark:bg-zinc-800 text-[#1d1d1f] dark:text-white shadow-sm font-semibold' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'}`}
                     >
-                        Builds
+                        {__('client.vault_filter_builds')}
                     </button>
                 </div>
             </div>
@@ -137,18 +138,18 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
                 <table className="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr className="border-b border-black/5 dark:border-white/5 text-zinc-500 dark:text-zinc-400 font-mono">
-                            <th className="py-3 px-3">Asset Designation</th>
-                            <th className="py-3 px-3">Classification</th>
-                            <th className="py-3 px-3">Byte Size</th>
-                            <th className="py-3 px-3">Integrity & Logs</th>
-                            <th className="py-3 px-3 text-right">Access</th>
+                            <th className="py-3 px-3">{__('client.vault_col_asset')}</th>
+                            <th className="py-3 px-3">{__('client.vault_col_classification')}</th>
+                            <th className="py-3 px-3">{__('client.vault_col_size')}</th>
+                            <th className="py-3 px-3">{__('client.vault_col_integrity')}</th>
+                            <th className="py-3 px-3 text-right">{__('client.vault_col_access')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-black/5 dark:divide-white/5 font-sans">
                         {filteredAssets.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="py-10 text-center text-zinc-400 dark:text-zinc-500 font-mono text-xs">
-                                    No confidential assets cataloged in this classification.
+                                    {__('client.vault_empty')}
                                 </td>
                             </tr>
                         ) : (
@@ -175,7 +176,7 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
                                             {formatBytes(asset.file_size_bytes)}
                                         </td>
                                         <td className="py-3.5 px-3 font-mono text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
-                                            <span>{asset.download_count} authenticated pulls</span>
+                                            <span>{__('client.vault_downloads', { count: asset.download_count })}</span>
                                         </td>
                                         <td className="py-3.5 px-3 text-right">
                                             <button
@@ -185,7 +186,7 @@ export const DataLockinVault: React.FC<DataLockinVaultProps> = ({
                                                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#1d1d1f] dark:text-white border border-black/10 dark:border-white/10 transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                                             >
                                                 <Download className="w-3.5 h-3.5" />
-                                                <span>{downloadingId === asset.id ? 'Decrypting...' : 'Acquire'}</span>
+                                                <span>{downloadingId === asset.id ? __('client.vault_decrypting') : __('client.vault_acquire')}</span>
                                             </button>
                                         </td>
                                     </tr>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
@@ -16,11 +16,13 @@ import {
     DialogTitle,
 } from '@/Components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
-import { Plus, Copy, ExternalLink, Trash2, MoreHorizontal, Search, Link2, Sparkles, Image as ImageIcon, Globe, Share2, Eye } from 'lucide-react';
+import { Plus, Copy, ExternalLink, Trash2, MoreHorizontal, Search, Link2, Sparkles, Globe, Share2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import axios from 'axios';
+import Pagination from '@/Components/Pagination';
+import { __ } from '@/lib/i18n';
 
 interface ShortLinkItem {
     id: number;
@@ -55,10 +57,9 @@ interface PaginatedLinks {
 interface Props {
     links: PaginatedLinks;
     filters: { q?: string };
-    translations: Record<string, string>;
 }
 
-export default function Index({ links, filters, translations }: Props) {
+export default function Index({ links, filters }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [previewModalItem, setPreviewModalItem] = useState<ShortLinkItem | null>(null);
     const [submitting, setSubmitting] = useState(false);
@@ -73,17 +74,15 @@ export default function Index({ links, filters, translations }: Props) {
     });
     const [pendingDelete, setPendingDelete] = useState<ShortLinkItem | null>(null);
 
-    const t = (key: string, fallback = key) => translations[key] ?? fallback;
-
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
-            toast.success(t('copied', 'Copied!'));
+            toast.success(__('shortlink.copied'));
         });
     };
 
     const handleFetchMeta = async () => {
         if (!form.destination_url) {
-            toast.error(t('enter_url_first', 'Please enter destination URL first.'));
+            toast.error(__('admin.shortlinks_enter_url_first'));
             return;
         }
 
@@ -100,10 +99,10 @@ export default function Index({ links, filters, translations }: Props) {
                     description: response.data.description || prev.description,
                     image_url: response.data.image_url || prev.image_url,
                 }));
-                toast.success(t('meta_fetched_successfully', 'SEO metadata fetched successfully!'));
+                toast.success(__('admin.shortlinks_meta_fetched'));
             }
         } catch (error) {
-            toast.error(t('meta_fetch_failed', 'Could not auto-fetch metadata from this URL.'));
+            toast.error(__('admin.shortlinks_meta_fetch_failed'));
         } finally {
             setFetchingMeta(false);
         }
@@ -134,10 +133,10 @@ export default function Index({ links, filters, translations }: Props) {
                         expires_at: '',
                     });
                     setCreateOpen(false);
-                    toastSuccess(t('created_successfully', 'Short link created with full SEO metadata'));
+                    toastSuccess(__('shortlink.created_successfully'));
                 },
                 onError: () => {
-                    toast.error(t('invalid_url', 'Please check the entered URL and fields.'));
+                    toast.error(__('admin.shortlinks_invalid_input'));
                 },
                 onFinish: () => setSubmitting(false),
             },
@@ -147,8 +146,8 @@ export default function Index({ links, filters, translations }: Props) {
     const toggleStatus = (item: ShortLinkItem) => {
         router.post(route('admin.shortlinks.toggle', item.id), {}, {
             preserveScroll: true,
-            onSuccess: () => toastSuccess(item.is_active ? 'Link deactivated' : 'Link activated'),
-            onError: () => toastError('Failed to update link status'),
+            onSuccess: () => toastSuccess(item.is_active ? __('admin.shortlinks_deactivated') : __('admin.shortlinks_activated')),
+            onError: () => toastError(__('admin.shortlinks_status_update_failed')),
         });
     };
 
@@ -158,8 +157,8 @@ export default function Index({ links, filters, translations }: Props) {
         setPendingDelete(null);
         router.delete(route('admin.shortlinks.destroy', id), {
             preserveScroll: true,
-            onSuccess: () => toastSuccess('Link deleted'),
-            onError: () => toastError('Failed to delete link'),
+            onSuccess: () => toastSuccess(__('shortlink.deleted_successfully')),
+            onError: () => toastError(__('admin.shortlinks_delete_failed')),
         });
     };
 
@@ -172,7 +171,7 @@ export default function Index({ links, filters, translations }: Props) {
     };
 
     const fmtDate = (iso: string | null) => {
-        if (!iso) return t('never', 'Never');
+        if (!iso) return __('shortlink.never');
         try {
             return new Date(iso).toLocaleString();
         } catch {
@@ -180,27 +179,26 @@ export default function Index({ links, filters, translations }: Props) {
         }
     };
 
-    // Live preview card computed values
-    const previewTitle = form.title || form.label || 'Musoftware | Systems & Digital Solutions';
-    const previewDesc = form.description || 'Discover powerful tools, automated workflows, and enterprise solutions.';
+    const previewTitle = form.title || form.label || __('admin.shortlinks_preview_default_title');
+    const previewDesc = form.description || __('admin.shortlinks_preview_default_description');
     const previewImg = form.image_url || '/images/default-meta.png';
 
     return (
-        <AdminSidebarLayout title={t('title')} header={t('title')}>
-            <Head title={t('title')} />
+        <AdminSidebarLayout title={__('shortlink.title')} header={__('shortlink.title')}>
+            <Head title={__('shortlink.title')} />
 
             <div className="space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                             <Link2 className="h-6 w-6 text-slate-500" />
-                            {t('title')}
+                            {__('shortlink.title')}
                         </h1>
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{__('shortlink.subtitle')}</p>
                     </div>
                     <Button onClick={() => setCreateOpen(true)} className="gap-2">
                         <Plus className="h-4 w-4" />
-                        {t('create_new')}
+                        {__('shortlink.create_new')}
                     </Button>
                 </div>
 
@@ -210,7 +208,7 @@ export default function Index({ links, filters, translations }: Props) {
                             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <Input
                                 defaultValue={filters.q ?? ''}
-                                placeholder={t('search_placeholder')}
+                                placeholder={__('shortlink.search_placeholder')}
                                 onChange={(e) => onSearch(e.target.value)}
                                 className="pl-8"
                             />
@@ -220,14 +218,14 @@ export default function Index({ links, filters, translations }: Props) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>{t('short_url')}</TableHead>
-                                <TableHead>{t('destination_url')}</TableHead>
-                                <TableHead>{t('label')}</TableHead>
-                                <TableHead>SEO / Preview</TableHead>
-                                <TableHead className="text-center">{t('clicks')}</TableHead>
-                                <TableHead className="text-center">{t('status')}</TableHead>
-                                <TableHead>{t('expires_at')}</TableHead>
-                                <TableHead className="text-end">{t('actions')}</TableHead>
+                                <TableHead>{__('shortlink.short_url')}</TableHead>
+                                <TableHead>{__('shortlink.destination_url')}</TableHead>
+                                <TableHead>{__('shortlink.label')}</TableHead>
+                                <TableHead>{__('admin.shortlinks_seo_preview_column')}</TableHead>
+                                <TableHead className="text-center">{__('shortlink.clicks')}</TableHead>
+                                <TableHead className="text-center">{__('shortlink.status')}</TableHead>
+                                <TableHead>{__('shortlink.expires_at')}</TableHead>
+                                <TableHead className="text-end">{__('shortlink.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -239,7 +237,7 @@ export default function Index({ links, filters, translations }: Props) {
                                                 <button
                                                     type="button"
                                                     onClick={() => copyToClipboard(item.short_url)}
-                                                    title={t('copy')}
+                                                    title={__('shortlink.copy')}
                                                     className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                                                 >
                                                     /l/{item.short_code}
@@ -269,7 +267,7 @@ export default function Index({ links, filters, translations }: Props) {
                                                 className="h-7 gap-1 px-2 text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                                             >
                                                 <Eye className="h-3.5 w-3.5" />
-                                                <span>Social Card</span>
+                                                <span>{__('admin.shortlinks_social_card')}</span>
                                             </Button>
                                         </TableCell>
                                         <TableCell className="text-center font-mono text-xs">{item.clicks}</TableCell>
@@ -283,7 +281,7 @@ export default function Index({ links, filters, translations }: Props) {
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">{t('actions')}</span>
+                                                        <span className="sr-only">{__('shortlink.actions')}</span>
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -296,7 +294,7 @@ export default function Index({ links, filters, translations }: Props) {
                                                             className="flex cursor-pointer items-center"
                                                         >
                                                             <ExternalLink className="me-2 h-4 w-4" />
-                                                            {t('open')}
+                                                            {__('shortlink.open')}
                                                         </a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
@@ -304,21 +302,21 @@ export default function Index({ links, filters, translations }: Props) {
                                                         className="flex cursor-pointer items-center"
                                                     >
                                                         <Copy className="me-2 h-4 w-4" />
-                                                        {t('copy')}
+                                                        {__('shortlink.copy')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => setPreviewModalItem(item)}
                                                         className="flex cursor-pointer items-center"
                                                     >
                                                         <Share2 className="me-2 h-4 w-4" />
-                                                        Preview Social Card
+                                                        {__('admin.shortlinks_preview_social_card')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => setPendingDelete(item)}
                                                         className="flex cursor-pointer items-center text-red-600 focus:text-red-700"
                                                     >
                                                         <Trash2 className="me-2 h-4 w-4" />
-                                                        {t('delete')}
+                                                        {__('shortlink.delete')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -328,7 +326,7 @@ export default function Index({ links, filters, translations }: Props) {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={8} className="h-24 text-center text-slate-500">
-                                        {t('no_links')}
+                                        {__('shortlink.no_links')}
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -336,18 +334,8 @@ export default function Index({ links, filters, translations }: Props) {
                     </Table>
 
                     {links.last_page > 1 && (
-                        <div className="flex items-center justify-center gap-1 border-t border-slate-100 p-4 dark:border-slate-800">
-                            {links.links.map((link: any, i: number) => (
-                                <Button
-                                    key={i}
-                                    variant={link.active ? 'default' : 'outline'}
-                                    size="sm"
-                                    disabled={!link.url}
-                                    onClick={() => link.url && router.visit(link.url, { preserveScroll: true })}
-                                >
-                                    {link.label}
-                                </Button>
-                            ))}
+                        <div className="border-t border-slate-100 p-4 dark:border-slate-800">
+                            <Pagination links={links.links} />
                         </div>
                     )}
                 </div>
@@ -355,10 +343,10 @@ export default function Index({ links, filters, translations }: Props) {
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title="Delete short link?"
-                description={`This will permanently delete "/l/${pendingDelete?.short_code}".`}
-                confirmLabel="Delete"
-                cancelLabel="Cancel"
+                title={__('shortlink.confirm_delete')}
+                description={__('admin.shortlinks_delete_description', { code: `/l/${pendingDelete?.short_code ?? ''}` })}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
                 variant="danger"
                 onConfirm={confirmDelete}
                 onCancel={() => setPendingDelete(null)}
@@ -370,10 +358,10 @@ export default function Index({ links, filters, translations }: Props) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Share2 className="h-5 w-5 text-emerald-500" />
-                            WhatsApp / Social Preview
+                            {__('admin.shortlinks_social_preview_title')}
                         </DialogTitle>
                         <DialogDescription>
-                            How this shortlink appears when shared on WhatsApp, Facebook, Twitter, and Telegram.
+                            {__('admin.shortlinks_social_preview_description')}
                         </DialogDescription>
                     </DialogHeader>
                     {previewModalItem && (
@@ -383,7 +371,7 @@ export default function Index({ links, filters, translations }: Props) {
                                     <div className="h-44 w-full overflow-hidden bg-slate-950">
                                         <img
                                             src={previewModalItem.image_url || previewModalItem.effective_image}
-                                            alt={previewModalItem.effective_title || 'Preview'}
+                                            alt={previewModalItem.effective_title || __('admin.shortlinks_preview_image_alt')}
                                             className="h-full w-full object-cover"
                                             onError={(e) => {
                                                 (e.target as HTMLImageElement).src = '/images/default-meta.png';
@@ -399,7 +387,7 @@ export default function Index({ links, filters, translations }: Props) {
                                         {previewModalItem.effective_title || previewModalItem.title || previewModalItem.label || 'Musoftware'}
                                     </div>
                                     <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                                        {previewModalItem.effective_description || previewModalItem.description || 'Digital Systems & Automation'}
+                                        {previewModalItem.effective_description || previewModalItem.description || __('admin.shortlinks_preview_fallback_description')}
                                     </div>
                                     <div className="pt-2 text-xs font-mono text-emerald-600 dark:text-emerald-400 truncate">
                                         {previewModalItem.short_url}
@@ -410,7 +398,7 @@ export default function Index({ links, filters, translations }: Props) {
                     )}
                     <DialogFooter>
                         <Button type="button" onClick={() => setPreviewModalItem(null)}>
-                            Close
+                            {__('general.close')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -420,13 +408,13 @@ export default function Index({ links, filters, translations }: Props) {
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                 <DialogContent className="sm:max-w-[620px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{t('create_new')}</DialogTitle>
-                        <DialogDescription>{t('subtitle')}</DialogDescription>
+                        <DialogTitle>{__('shortlink.create_new')}</DialogTitle>
+                        <DialogDescription>{__('shortlink.subtitle')}</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submit} className="space-y-4">
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="destination_url">{t('destination_url')} *</Label>
+                                <Label htmlFor="destination_url">{__('shortlink.destination_url')} *</Label>
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -436,7 +424,7 @@ export default function Index({ links, filters, translations }: Props) {
                                     className="h-7 gap-1 px-2.5 text-xs text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-800"
                                 >
                                     <Sparkles className="h-3 w-3" />
-                                    {fetchingMeta ? t('fetching_meta') : t('fetch_meta')}
+                                    {fetchingMeta ? __('shortlink.fetching_meta') : __('shortlink.fetch_meta')}
                                 </Button>
                             </div>
                             <Input
@@ -444,7 +432,7 @@ export default function Index({ links, filters, translations }: Props) {
                                 type="url"
                                 required
                                 autoFocus
-                                placeholder="https://example.com/item or /proposals/..."
+                                placeholder={__('shortlink.destination_url_placeholder')}
                                 value={form.destination_url}
                                 onChange={(e) => setForm((f) => ({ ...f, destination_url: e.target.value }))}
                             />
@@ -452,20 +440,20 @@ export default function Index({ links, filters, translations }: Props) {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="space-y-1.5">
-                                <Label htmlFor="label">{t('label')}</Label>
+                                <Label htmlFor="label">{__('shortlink.label')}</Label>
                                 <Input
                                     id="label"
-                                    placeholder={t('label_placeholder')}
+                                    placeholder={__('shortlink.label_placeholder')}
                                     value={form.label}
                                     onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <Label htmlFor="expires_at">{t('expires_at')}</Label>
+                                <Label htmlFor="expires_at">{__('shortlink.expires_at')}</Label>
                                 <Input
                                     id="expires_at"
                                     type="datetime-local"
-                                    placeholder={t('expires_at_placeholder')}
+                                    placeholder={__('shortlink.expires_at_placeholder')}
                                     value={form.expires_at}
                                     onChange={(e) => setForm((f) => ({ ...f, expires_at: e.target.value }))}
                                 />
@@ -476,14 +464,14 @@ export default function Index({ links, filters, translations }: Props) {
                         <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3 dark:border-slate-800 dark:bg-slate-900/50">
                             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                                 <Globe className="h-4 w-4 text-emerald-500" />
-                                {t('seo_preview_title')}
+                                {__('shortlink.seo_preview_title')}
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="seo_title" className="text-xs">{t('seo_title')}</Label>
+                                <Label htmlFor="seo_title" className="text-xs">{__('shortlink.seo_title')}</Label>
                                 <Input
                                     id="seo_title"
-                                    placeholder="e.g. Exclusive Offer | Musoftware"
+                                    placeholder={__('admin.shortlinks_seo_title_placeholder')}
                                     value={form.title}
                                     onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                                     className="h-8 text-xs"
@@ -491,10 +479,10 @@ export default function Index({ links, filters, translations }: Props) {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="seo_description" className="text-xs">{t('seo_description')}</Label>
+                                <Label htmlFor="seo_description" className="text-xs">{__('shortlink.seo_description')}</Label>
                                 <Textarea
                                     id="seo_description"
-                                    placeholder="Brief description that appears when link is shared on WhatsApp..."
+                                    placeholder={__('admin.shortlinks_seo_description_placeholder')}
                                     rows={2}
                                     value={form.description}
                                     onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -503,7 +491,7 @@ export default function Index({ links, filters, translations }: Props) {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="seo_image" className="text-xs">{t('seo_image')}</Label>
+                                <Label htmlFor="seo_image" className="text-xs">{__('shortlink.seo_image')}</Label>
                                 <Input
                                     id="seo_image"
                                     type="url"
@@ -517,14 +505,14 @@ export default function Index({ links, filters, translations }: Props) {
                             {/* Live Social Card Preview */}
                             <div className="pt-2">
                                 <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-2">
-                                    {t('preview_card_heading')}
+                                    {__('shortlink.preview_card_heading')}
                                 </div>
                                 <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
                                     {form.image_url ? (
                                         <div className="h-32 w-full overflow-hidden bg-slate-900">
                                             <img
                                                 src={form.image_url}
-                                                alt="Preview"
+                                                alt={__('admin.shortlinks_preview_image_alt')}
                                                 className="h-full w-full object-cover"
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = '/images/default-meta.png';
@@ -547,10 +535,10 @@ export default function Index({ links, filters, translations }: Props) {
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
-                                {t('cancel')}
+                                {__('shortlink.cancel')}
                             </Button>
                             <Button type="submit" disabled={submitting}>
-                                {t('submit')}
+                                {__('shortlink.submit')}
                             </Button>
                         </DialogFooter>
                     </form>

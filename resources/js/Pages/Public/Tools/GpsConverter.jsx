@@ -74,7 +74,7 @@ export default function GpsConverter() {
         const lng = parseFloat(ddLng);
 
         if (isNaN(lat) || lat < -90 || lat > 90 || isNaN(lng) || lng < -180 || lng > 180) {
-            setErrorMsg(__('tools.gps_invalid') || 'Invalid latitude or longitude values.');
+            setErrorMsg(__('tools.gps_invalid'));
             setDmsResult(null);
             return;
         }
@@ -138,7 +138,7 @@ export default function GpsConverter() {
             isNaN(lngMin) || lngMin < 0 || lngMin >= 60 ||
             isNaN(lngSec) || lngSec < 0 || lngSec >= 60
         ) {
-            setErrorMsg(__('tools.gps_invalid') || 'Invalid latitude or longitude values.');
+            setErrorMsg(__('tools.gps_invalid'));
             setDdResult(null);
             return;
         }
@@ -207,7 +207,7 @@ export default function GpsConverter() {
 
             <FloatingWhatsAppButton 
                 phoneNumber={phoneNumber} 
-                defaultMessage="Hello Mahmoud, I'm interested in building a custom GIS or map tracking system." 
+                defaultMessage={__('tools.gps_whatsapp_message')} 
             />
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white pt-24 pb-16 lg:pt-36">
@@ -216,7 +216,7 @@ export default function GpsConverter() {
                 <section className="reveal-section max-w-7xl mx-auto px-6 lg:px-8 mb-16 text-center">
                     <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-6 bg-white mx-auto">
                         <Globe className="h-3 w-3 text-slate-800" />
-                        {__('tools.tools_directory') || 'Free Tools'}
+                        {__('tools.tools_directory')}
                     </div>
                     <h1 className="gsap-fade-up text-4xl lg:text-6xl font-extrabold text-[#111111] tracking-tight mb-4">
                         {__('tools.gps_title')}
@@ -237,7 +237,7 @@ export default function GpsConverter() {
                                 {__('tools.gps_decimal_degrees')} &rarr; {__('tools.gps_dms')}
                             </CardTitle>
                             <CardDescription>
-                                Convert decimals (e.g. 30.0444) to degrees, minutes, and seconds.
+                                {__('tools.gps_dd_to_dms_desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -268,7 +268,7 @@ export default function GpsConverter() {
 
                             {dmsResult && (
                                 <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col gap-2">
-                                    <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Result (DMS)</span>
+                                    <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">{__('tools.gps_result_dms')}</span>
                                     <div className="flex items-center justify-between gap-4">
                                         <span className="font-mono text-sm sm:text-base font-bold text-slate-900 break-all select-all">
                                             {dmsResult.formatted}
@@ -278,6 +278,7 @@ export default function GpsConverter() {
                                                 variant="outline" 
                                                 size="icon" 
                                                 onClick={() => handleCopy(dmsResult.formatted, 'dms')}
+                                                aria-label={__('general.copy')}
                                                 className="h-8 w-8 hover:bg-slate-100 border-slate-200"
                                             >
                                                 {copiedDms ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
@@ -314,7 +315,7 @@ export default function GpsConverter() {
                                 {__('tools.gps_dms')} &rarr; {__('tools.gps_decimal_degrees')}
                             </CardTitle>
                             <CardDescription>
-                                Convert degrees, minutes, and seconds coordinates to decimal format.
+                                {__('tools.gps_dms_to_dd_desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -337,7 +338,7 @@ export default function GpsConverter() {
                                     <div className="space-y-1">
                                         <Label className="text-[10px] text-slate-500">{__('tools.gps_direction')}</Label>
                                         <Select value={dmsLatDir} onValueChange={setDmsLatDir}>
-                                            <SelectTrigger className="h-9">
+                                            <SelectTrigger className="h-9" aria-label={__('tools.gps_direction')}>
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -368,7 +369,7 @@ export default function GpsConverter() {
                                     <div className="space-y-1">
                                         <Label className="text-[10px] text-slate-500">{__('tools.gps_direction')}</Label>
                                         <Select value={dmsLngDir} onValueChange={setDmsLngDir}>
-                                            <SelectTrigger className="h-9">
+                                            <SelectTrigger className="h-9" aria-label={__('tools.gps_direction')}>
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -382,7 +383,7 @@ export default function GpsConverter() {
 
                             {ddResult && (
                                 <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col gap-2">
-                                    <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Result (Decimal)</span>
+                                    <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">{__('tools.gps_result_decimal')}</span>
                                     <div className="flex items-center justify-between gap-4">
                                         <span className="font-mono text-sm sm:text-base font-bold text-slate-900 break-all select-all">
                                             {ddResult.formatted}
@@ -392,6 +393,7 @@ export default function GpsConverter() {
                                                 variant="outline" 
                                                 size="icon" 
                                                 onClick={() => handleCopy(ddResult.formatted, 'dd')}
+                                                aria-label={__('general.copy')}
                                                 className="h-8 w-8 hover:bg-slate-100 border-slate-200"
                                             >
                                                 {copiedDd ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
@@ -449,14 +451,14 @@ export default function GpsConverter() {
                                 <div className="space-y-2">
                                     <Label htmlFor="scopingPrompt" className="text-slate-300 font-semibold text-xs uppercase tracking-wider flex items-center gap-1">
                                         <MessageSquare className="h-3 w-3 text-slate-400" />
-                                        Describe what maps/systems you need built:
+                                        {__('tools.gps_scoping_label')}
                                     </Label>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                         <Input
                                             id="scopingPrompt"
                                             value={scopingPrompt}
                                             onChange={(e) => setScopingPrompt(e.target.value)}
-                                            placeholder="e.g. A map dashboard to show field employee locations in real time..."
+                                            placeholder={__('tools.gps_scoping_placeholder')}
                                             className="bg-slate-800/80 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-white h-11 flex-1"
                                         />
                                         <Button

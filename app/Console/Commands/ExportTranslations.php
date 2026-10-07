@@ -19,81 +19,95 @@ class ExportTranslations extends Command
      *
      * @var string
      */
-    protected $description = 'Export all Laravel language files to a single JSON file for frontend use';
+    protected $description = 'Export Laravel language files to one JSON file per locale for frontend use';
+
+    private const MAX_WRITE_ATTEMPTS = 5;
+
+    private const RETRY_DELAY_MICROSECONDS = 100000;
 
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $langPath = base_path('lang');
-        $outputPath = resource_path('js/translations.json');
+        $outputDir = resource_path('js/lang');
 
         if (! File::exists($langPath)) {
             $this->error("Lang directory not found at {$langPath}");
 
-            return 1;
+            return self::FAILURE;
         }
 
+        File::ensureDirectoryExists($outputDir);
+
+        foreach ($this->collectTranslations($langPath) as $locale => $translations) {
+            $outputPath = "{$outputDir}/{$locale}.json";
+            $this->writeWithRetry($outputPath, json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+            $this->info("Translations for [{$locale}] exported to {$outputPath}");
+        }
+
+        return self::SUCCESS;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function collectTranslations(string $langPath): array
+    {
         $translations = [];
 
-        // 1. Process standard PHP translation files (e.g., lang/en/messages.php)
         foreach (File::directories($langPath) as $dir) {
-            $locale = basename($dir);
-            if (! isset($translations[$locale])) {
-                $translations[$locale] = [];
-            }
-
-            foreach (File::allFiles($dir) as $file) {
-                if ($file->getExtension() === 'php') {
-                    $group = $file->getFilenameWithoutExtension();
-                    $content = require $file->getPathname();
-                    if (is_array($content)) {
-                        $translations[$locale][$group] = $content;
-                    }
-                }
-            }
+            $translations[basename($dir)] = $this->collectPhpGroups($dir);
         }
 
-        // 2. Process root JSON translation files (e.g., lang/en.json)
         foreach (File::files($langPath) as $file) {
-            if ($file->getExtension() === 'json') {
-                $locale = $file->getFilenameWithoutExtension();
-                $content = json_decode(File::get($file->getPathname()), true);
-
-                if (is_array($content)) {
-                    if (! isset($translations[$locale])) {
-                        $translations[$locale] = [];
-                    }
-                    // JSON files are loaded at the root of the locale
-                    $translations[$locale] = array_merge($translations[$locale], $content);
-                }
+            if ($file->getExtension() !== 'json') {
+                continue;
+            }
+            $locale = $file->getFilenameWithoutExtension();
+            $content = json_decode(File::get($file->getPathname()), true);
+            if (is_array($content)) {
+                // JSON files are loaded at the root of the locale
+                $translations[$locale] = array_merge($translations[$locale] ?? [], $content);
             }
         }
 
-        $encoded = json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        return $translations;
+    }
 
-        $attempts = 0;
-        $maxAttempts = 5;
-        $saved = false;
+    /**
+     * @return array<string, mixed>
+     */
+    private function collectPhpGroups(string $dir): array
+    {
+        $groups = [];
 
-        while ($attempts < $maxAttempts && ! $saved) {
-            $attempts++;
+        foreach (File::allFiles($dir) as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $content = require $file->getPathname();
+            if (is_array($content)) {
+                $groups[$file->getFilenameWithoutExtension()] = $content;
+            }
+        }
+
+        return $groups;
+    }
+
+    private function writeWithRetry(string $outputPath, string $encoded): void
+    {
+        for ($attempt = 1; $attempt < self::MAX_WRITE_ATTEMPTS; $attempt++) {
             try {
                 File::replace($outputPath, $encoded);
-                $saved = true;
+
+                return;
             } catch (\Throwable $e) {
-                if ($attempts >= $maxAttempts) {
-                    File::put($outputPath, $encoded);
-                    $saved = true;
-                } else {
-                    usleep(100000); // 100ms retry delay
-                }
+                usleep(self::RETRY_DELAY_MICROSECONDS);
             }
         }
 
-        $this->info("Translations exported successfully to {$outputPath}");
-
-        return 0;
+        File::put($outputPath, $encoded);
     }
 }

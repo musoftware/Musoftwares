@@ -13,16 +13,9 @@ Base URL: http://localhost
 - OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
 
 ## Service Categories
+- **Web Dev**: http://localhost/marketplace/categories/web-dev
 
 ## Full Services Catalog
 
 ## Full Blog Articles Catalog
-
-### Test Article
-- **Slug**: test-article
-- **URL**: http://localhost/blog/test-article
-- **Published At**: 2026-09-26T20:54:16+00:00
-- **Excerpt**: 
-- **Content**:
-This is a test article.
 

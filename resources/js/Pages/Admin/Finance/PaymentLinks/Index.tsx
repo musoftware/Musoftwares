@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
-import { formatMoney, cn } from '@/lib/utils';
+import { formatMoney } from '@/lib/utils';
 import {
     MoreHorizontal, Plus, Copy, Trash, Search, FilterX, ExternalLink,
     DollarSign, Clock, Eye, CheckCircle, XCircle, CalendarOff, Pencil,
@@ -41,6 +41,7 @@ import { CurrencySelect } from '@/Components/CurrencySelect';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface PaymentLink {
     id: number;
@@ -155,9 +156,9 @@ export default function Index({
             onSuccess: () => {
                 setIsCreateModalOpen(false);
                 createForm.reset();
-                toast.success(__('admin.payment_link_created') || 'Payment link created');
+                toast.success(__('admin.payment_link_created'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     }
 
@@ -179,9 +180,9 @@ export default function Index({
         editForm.put(route('admin.payment-links.update', editing.id), {
             onSuccess: () => {
                 setEditing(null);
-                toast.success(__('admin.payment_link_updated') || 'Updated');
+                toast.success(__('admin.payment_link_updated'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     }
 
@@ -190,11 +191,11 @@ export default function Index({
         router.delete(route('admin.payment-links.destroy', pendingDelete.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -205,11 +206,11 @@ export default function Index({
         router.put(route('admin.payment-links.cancel', pendingCancel.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('admin.payment_link_cancelled') || 'Cancelled');
+                toast.success(__('admin.payment_link_cancelled'));
                 setPendingCancel(null);
             },
             onError: (errs) => {
-                const msg = errs?.error || __('general.error_occurred') || 'Something went wrong';
+                const msg = errs?.error || __('general.error_occurred');
                 toast.error(msg);
                 setPendingCancel(null);
             },
@@ -221,11 +222,11 @@ export default function Index({
         router.post(route('admin.payment-links.mark-paid', pendingMarkPaid.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('admin.payment_link_marked_paid') || 'Marked paid');
+                toast.success(__('admin.payment_link_marked_paid'));
                 setPendingMarkPaid(null);
             },
             onError: (errs) => {
-                const msg = errs?.error || __('general.error_occurred') || 'Something went wrong';
+                const msg = errs?.error || __('general.error_occurred');
                 toast.error(msg);
                 setPendingMarkPaid(null);
             },
@@ -237,12 +238,12 @@ export default function Index({
         router.post(route('admin.payment-links.bulk-destroy'), { ids: selected }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('admin.bulk_deleted', { count: selected.length }) || 'Deleted');
+                toast.success(__('admin.bulk_deleted', { count: selected.length }));
                 setSelected([]);
                 setPendingBulkDelete(false);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingBulkDelete(false);
             },
         });
@@ -251,7 +252,7 @@ export default function Index({
     const copyToClipboard = (uuid: string) => {
         const url = route('guest.payment-links.show', uuid);
         navigator.clipboard.writeText(url);
-        toast.success(__('admin.copied_to_clipboard') || 'Copied to clipboard');
+        toast.success(__('admin.copied_to_clipboard'));
     };
 
     const paginationLinks = paymentLinks?.links;
@@ -328,7 +329,7 @@ export default function Index({
                     )}
 
                     <Button onClick={openCreate} className="h-9">
-                        <Plus className="me-2 h-4 w-4" />{__('admin.create_payment_link', { default: 'Create Link' })}
+                        <Plus className="me-2 h-4 w-4" />{__('admin.create_payment_link')}
                     </Button>
                 </CardContent>
             </Card>
@@ -351,11 +352,11 @@ export default function Index({
                 <EmptyState
                     icon={DollarSign}
                     title={hasActiveFilters
-                        ? __('admin.no_results', { default: 'No results match your filters.' })
-                        : __('admin.no_payment_links_found', { default: 'No payment links found.' })}
-                    description={__('admin.create_a_payment_link_cta') || 'Create a payment link to get paid by anyone.'}
+                        ? __('admin.no_results')
+                        : __('admin.no_payment_links_found')}
+                    description={__('admin.create_a_payment_link_cta')}
                     onClick={openCreate}
-                    actionLabel={__('admin.create_payment_link', { default: 'Create Link' })}
+                    actionLabel={__('admin.create_payment_link')}
                     actionIcon={Plus}
                 />
             ) : (
@@ -369,7 +370,7 @@ export default function Index({
                                         <TableHead className="w-10">
                                             <Checkbox checked={allOnPageSelected} onCheckedChange={toggleSelectAll} />
                                         </TableHead>
-                                        <TableHead className="uppercase text-xs">ID</TableHead>
+                                        <TableHead className="uppercase text-xs">{__('general.id')}</TableHead>
                                         <TableHead className="uppercase text-xs">{__('general.title')}</TableHead>
                                         <TableHead className="uppercase text-xs">{__('general.amount')}</TableHead>
                                         <TableHead className="uppercase text-xs">{__('general.currency')}</TableHead>
@@ -389,7 +390,7 @@ export default function Index({
                                                     onCheckedChange={() => toggleOne(link.id)}
                                                 />
                                             </TableCell>
-                                            <TableCell data-label="ID" className="font-medium">#{link.id}</TableCell>
+                                            <TableCell data-label={__('general.id')} className="font-medium">#{link.id}</TableCell>
                                             <TableCell data-label={__('general.title')}>
                                                 <div className="font-medium text-slate-900">{link.title}</div>
                                                 {link.description && (
@@ -427,27 +428,27 @@ export default function Index({
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem onClick={() => copyToClipboard(link.uuid)}>
-                                                            <Copy className="me-2 h-4 w-4" />{__('admin.copy_link', { default: 'Copy Link' })}
+                                                            <Copy className="me-2 h-4 w-4" />{__('admin.copy_link')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
                                                             <a href={route('guest.payment-links.show', link.uuid)} target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
-                                                                <ExternalLink className="me-2 h-4 w-4" />{__('admin.view_link', { default: 'View Link' })}
+                                                                <ExternalLink className="me-2 h-4 w-4" />{__('admin.view_link')}
                                                             </a>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {link.status === 'pending' && (
                                                             <>
                                                                 <DropdownMenuItem onClick={() => openEdit(link)}>
-                                                                    <Pencil className="me-2 h-4 w-4" />{__('admin.edit_payment_link', { default: 'Edit' })}
+                                                                    <Pencil className="me-2 h-4 w-4" />{__('admin.edit_payment_link')}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem onClick={() => setPendingCancel(link)} className="text-amber-600 focus:text-amber-600">
-                                                                    <XCircle className="me-2 h-4 w-4" />{__('admin.cancel_payment_link', { default: 'Cancel Link' })}
+                                                                    <XCircle className="me-2 h-4 w-4" />{__('admin.cancel_payment_link')}
                                                                 </DropdownMenuItem>
                                                             </>
                                                         )}
                                                         {canForceMarkPaid && link.status === 'pending' && (
                                                             <DropdownMenuItem onClick={() => setPendingMarkPaid(link)} className="text-emerald-600 focus:text-emerald-600">
-                                                                <CheckCircle className="me-2 h-4 w-4" />{__('admin.mark_paid_manually', { default: 'Mark as Paid' })}
+                                                                <CheckCircle className="me-2 h-4 w-4" />{__('admin.mark_paid_manually')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuItem onClick={() => setPendingDelete(link)} className="text-red-600 focus:text-red-600">
@@ -464,37 +465,17 @@ export default function Index({
                     </Card>
                 </div>
                 <div className="mt-3 text-sm text-muted-foreground">
-                    {__('admin.pagination_summary', { from: firstItem, to: lastItem, total: totalAll, default: `Showing ${firstItem}-${lastItem} of ${totalAll}` })}
+                    {__('admin.pagination_summary', { from: firstItem, to: lastItem, total: totalAll })}
                 </div>
                 </>
             )}
 
-            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-center md:justify-end">
-                    <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                        {paginationLinks.map((link: any, i: number) => (
-                            <Link
-                                key={i}
-                                href={link.url || '#'}
-                                className={cn(
-                                    'px-3 py-2 text-sm border',
-                                    link.active
-                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium'
-                                        : 'bg-background border-input text-muted-foreground hover:bg-muted',
-                                    i === 0 ? 'rounded-s-md' : '',
-                                    i === paginationLinks.length - 1 ? 'rounded-e-md' : '',
-                                )}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+            {Array.isArray(paginationLinks) && <Pagination links={paginationLinks} />}
 
             <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('admin.create_payment_link', { default: 'Create Payment Link' })}</DialogTitle>
+                        <DialogTitle>{__('admin.create_payment_link')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreate}>
                         <div className="space-y-4 py-4">
@@ -504,7 +485,7 @@ export default function Index({
                                     value={createForm.data.title}
                                     onChange={(e) => createForm.setData('title', e.target.value)}
                                     required
-                                    placeholder={__('admin.payment_link_title_placeholder', { default: 'e.g. Website Maintenance' })}
+                                    placeholder={__('admin.payment_link_title_placeholder')}
                                 />
                                 {createForm.errors.title && <p className="text-sm text-destructive mt-1">{createForm.errors.title}</p>}
                             </div>
@@ -542,11 +523,11 @@ export default function Index({
                                     onChange={(val) => createForm.setData('client_id', val ? String(val) : '')}
                                     asyncEndpoint={route('admin.users.search')}
                                     placeholder={__('admin.select_client')}
-                                    searchPlaceholder={__('general.search_users') || 'Search users...'}
+                                    searchPlaceholder={__('general.search_users')}
                                 />
                             </div>
                             <div>
-                                <Label>{__('general.expires_at') || 'Expires At'}</Label>
+                                <Label>{__('general.expires_at')}</Label>
                                 <Input
                                     type="datetime-local"
                                     value={createForm.data.expires_at}
@@ -570,7 +551,7 @@ export default function Index({
             <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('admin.edit_payment_link', { default: 'Edit Payment Link' })}</DialogTitle>
+                        <DialogTitle>{__('admin.edit_payment_link')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEdit}>
                         <div className="space-y-4 py-4">
@@ -610,7 +591,7 @@ export default function Index({
                                 />
                             </div>
                             <div>
-                                <Label>{__('general.expires_at') || 'Expires At'}</Label>
+                                <Label>{__('general.expires_at')}</Label>
                                 <Input
                                     type="datetime-local"
                                     value={editForm.data.expires_at}
@@ -632,8 +613,8 @@ export default function Index({
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete') || 'Delete?'}
-                description={__('admin.confirm_delete_payment_link', { default: 'Are you sure you want to delete this payment link?' })}
+                title={__('general.delete')}
+                description={__('admin.confirm_delete_payment_link')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"
@@ -643,9 +624,9 @@ export default function Index({
 
             <ConfirmModal
                 isOpen={pendingCancel !== null}
-                title={__('admin.cancel_payment_link', { default: 'Cancel Link' })}
-                description={__('admin.only_pending_can_be_cancelled', { default: 'Only pending links can be cancelled.' })}
-                confirmLabel={__('general.confirm') || 'Confirm'}
+                title={__('admin.cancel_payment_link')}
+                description={__('admin.only_pending_can_be_cancelled')}
+                confirmLabel={__('general.confirm')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"
                 onConfirm={doCancel}
@@ -654,9 +635,9 @@ export default function Index({
 
             <ConfirmModal
                 isOpen={pendingMarkPaid !== null}
-                title={__('admin.mark_paid_manually', { default: 'Mark as Paid' })}
-                description={__('admin.only_super_admin_can_mark_paid', { default: 'Only super admins can mark a link as paid manually.' })}
-                confirmLabel={__('general.confirm') || 'Confirm'}
+                title={__('admin.mark_paid_manually')}
+                description={__('admin.only_super_admin_can_mark_paid')}
+                confirmLabel={__('general.confirm')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={doMarkPaid}
                 onCancel={() => setPendingMarkPaid(null)}
@@ -665,7 +646,7 @@ export default function Index({
             <ConfirmModal
                 isOpen={pendingBulkDelete}
                 title={__('admin.bulk_delete')}
-                description={__('admin.confirm_bulk_delete_payment_links', { count: totalSelected, default: `Delete ${totalSelected} selected payment links?` })}
+                description={__('admin.confirm_bulk_delete_payment_links', { count: totalSelected })}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

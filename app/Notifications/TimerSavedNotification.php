@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\FinanceHelper;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
@@ -12,6 +13,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class TimerSavedNotification extends Notification implements ShouldQueue
 {
@@ -244,7 +246,7 @@ class TimerSavedNotification extends Notification implements ShouldQueue
         $user = $invoice?->user ?? ($this->target->user ?? null);
 
         $baseRate = FinanceHelper::calculateOverheadHourlyRate();
-        $systemBaseRate = CurrenciesExchange::RateToday(
+        $systemBaseRate = $this->convertRateForDisplay(
             $baseRate,
             AdminSettings::GetValue('business_currency', 2),
             $currencyId
@@ -255,7 +257,7 @@ class TimerSavedNotification extends Notification implements ShouldQueue
         if ($user) {
             $isCustomRateEnabled = (bool) ($user->enable_custom_hour_rate ?? false);
             if ((float) ($user->hour_rate ?? 0) > 0) {
-                $clientRate = CurrenciesExchange::RateToday(
+                $clientRate = $this->convertRateForDisplay(
                     $user->hour_rate,
                     $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
                     $currencyId
@@ -277,5 +279,20 @@ class TimerSavedNotification extends Notification implements ShouldQueue
             'discount_savings_str' => FinanceHelper::instance()->format_money($discountSavings, $currencyId),
             'has_discount' => $hasDiscount,
         ];
+    }
+
+    /**
+     * The discount line is informational. A missing exchange rate drops it (rate 0 = no discount
+     * shown) instead of failing the whole notification.
+     */
+    private function convertRateForDisplay(float|string $amount, mixed $fromCurrencyId, mixed $toCurrencyId): float
+    {
+        try {
+            return (float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $toCurrencyId);
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Timer notification discount skipped: missing exchange rate.', ['error' => $e->getMessage()]);
+
+            return 0.0;
+        }
     }
 }

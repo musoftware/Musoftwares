@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Builders\KashierCheckoutBuilder;
-use App\Helpers\KashierHelper;
-use App\Models\Plan;
-use App\Models\Transaction;
-use App\Models\User;
+use App\Models\KashierCheckout;
 use App\Models\UserSubscription;
 use App\Services\IpGeolocationService;
+use App\Services\KashierCheckoutFulfillment;
 use App\Services\PricingService;
 use App\Services\SubscriptionService;
 use App\Traits\ConvertsCurrency;
@@ -148,17 +146,19 @@ class SubscriptionController extends Controller
 
         $plan_amount = $currencyDetails['currencyCode'] === 'EGP' ? round($base_plan_amount) : psychological_price($base_plan_amount);
 
+        // What is bought lives server-side; the webhook fulfils this row, never the payer-editable metaData.
+        $checkout = KashierCheckout::open($user, KashierCheckout::PURPOSE_SUBSCRIPTION, (float) $plan_amount, (int) $currencyDetails['currencyId'], [
+            'billing_cycle' => $billingCycle,
+            'days' => (int) $billing['days'],
+            'items' => array_values($request->items ?? []),
+            'is_new_system' => (bool) $isNewSystem,
+        ]);
+
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($plan_amount, $currencyDetails['currencyCode'])
             ->forUser($user->id, $user->name, $user->email)
-            ->withSource('subscription-purchase', 'sub_')
-            ->withMetadata([
-                'plan_id' => null,
-                'billing_cycle' => $billingCycle,
-                'days' => $billing['days'],
-                'items' => $request->items ?? [],
-                'is_new_system' => $isNewSystem,
-            ])
+            ->withSource(KashierCheckout::PURPOSE_SUBSCRIPTION, 'sub_')
+            ->withMetadata(['checkout_id' => $checkout->id])
             ->withRoutes(
                 success: route('subscriptions.kashier.success'),
                 failure: route('subscriptions.kashier.failure'),
@@ -169,58 +169,9 @@ class SubscriptionController extends Controller
         return Inertia::location($paymentUrl);
     }
 
-    public function webhook(Request $request)
+    public function webhook(Request $request, KashierCheckoutFulfillment $fulfillment)
     {
-        Log::info('Subscription Kashier Webhook received:', $request->all());
-
-        if (KashierHelper::validatePayload()) {
-            if ($request->input('data.status') === 'SUCCESS') {
-                $data = $request->input('data');
-                $metadata = $data['metaData'] ?? [];
-                if (is_string($metadata)) {
-                    $metadata = json_decode($metadata, true) ?: [];
-                }
-
-                $userId = $metadata['user_id'] ?? null;
-                $trxId = $data['transactionId'] ?? null;
-                $amountPaid = floatval($data['amount'] ?? 0);
-                $days = $metadata['days'] ?? 365;
-                $isNewSystem = $metadata['is_new_system'] ?? true;
-
-                if ($userId && $trxId && $amountPaid > 0) {
-                    $user = User::find($userId);
-
-                    if ($user) {
-                        $amountPaid = KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
-
-                        // Idempotency check
-                        $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
-                        $alreadyProcessed = Transaction::where('user_id', $user->id)
-                            ->where('reason', $reason)
-                            ->exists();
-
-                        if (! $alreadyProcessed) {
-                            try {
-                                $this->subscriptionService->processSubscription($user, $amountPaid, $days, $metadata['items'] ?? [], $isNewSystem, $reason, 'webhook_received');
-                                Log::info("Kashier subscription processed successfully for User $userId");
-
-                                return response()->json(['status' => 'success', 'message' => 'Subscription processed successfully']);
-                            } catch (\Exception $e) {
-                                Log::error('Kashier subscription failed: '.$e->getMessage());
-                            }
-                        } else {
-                            Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
-
-                            return response()->json(['status' => 'success', 'message' => 'Already processed']);
-                        }
-                    }
-                }
-            }
-
-            return response()->json(['status' => 'ignored']);
-        }
-
-        return response()->json(['error' => 'Invalid webhook signature'], 400);
+        return $fulfillment->respondToWebhook($request, KashierCheckout::PURPOSE_SUBSCRIPTION);
     }
 
     public function kashierSuccess(Request $request)

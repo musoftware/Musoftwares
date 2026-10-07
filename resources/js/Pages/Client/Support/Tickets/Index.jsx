@@ -41,19 +41,19 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     const columns = [
         { 
             key: 'id', 
-            label: 'ID', 
+            label: __('general.id'), 
             render: (row) => <span className="font-mono text-xs font-semibold text-[#1d1d1f]/60">#{row.id}</span> 
         },
         { 
             key: 'subject', 
-            label: 'Subject', 
+            label: __('general.subject'), 
             render: (row) => <span className="font-semibold text-xs sm:text-sm text-[#1d1d1f]">{row.ticket_subject || row.subject || row.title}</span> 
         },
-        ...(isAdmin ? [{ key: 'client', label: 'Client', render: (row) => <span className="text-xs text-[#1d1d1f]/70">{row.user?.name}</span> }] : []),
-        { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.ticket_status || row.status || 'open'} /> },
+        ...(isAdmin ? [{ key: 'client', label: __('general.client'), render: (row) => <span className="text-xs text-[#1d1d1f]/70">{row.user?.name}</span> }] : []),
+        { key: 'status', label: __('general.status'), render: (row) => <StatusBadge status={row.ticket_status || row.status || 'open'} /> },
         {
             key: 'priority',
-            label: 'Priority',
+            label: __('general.priority'),
             render: (row) => (
                 <span
                     className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider font-mono border ${
@@ -70,7 +70,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
         },
         { 
             key: 'updated_at', 
-            label: 'Last Reply', 
+            label: __('client.tickets_last_reply'), 
             render: (row) => <span className="text-[#1d1d1f]/50 text-xs font-sans">{new Date(row.updated_at).toLocaleDateString()}</span> 
         },
         {
@@ -82,10 +82,10 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                         type="button"
                         onClick={(e) => handleRowOpen(row.id, e.currentTarget)}
                         className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[#0071e3] hover:bg-[#0071e3]/10 transition-colors cursor-pointer"
-                        aria-label={isAdmin ? 'View / Respond' : 'View Ticket'}
+                        aria-label={isAdmin ? __('client.tickets_view_respond') : __('client.tickets_view_ticket')}
                     >
                         <Eye className="w-3.5 h-3.5 me-1.5" />
-                        {isAdmin ? 'View / Respond' : 'View Ticket'}
+                        {isAdmin ? __('client.tickets_view_respond') : __('client.tickets_view_ticket')}
                     </button>
                 </div>
             ),
@@ -103,7 +103,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${__('general.support_tickets') || 'Support Tickets'} — Musoftwares Studio`} />
+            <Head title={__('client.tickets_page_title')} />
 
             <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
                 
@@ -119,10 +119,10 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 {__('general.back_to_dashboard')}
                             </Link>
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                {__('general.support_tickets') || 'Support Tickets'}
+                                {__('general.support_tickets')}
                             </h1>
                             <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                                {isAdmin ? "Manage client support requests and communications." : "Direct communication channel with our engineering & support team."}
+                                {isAdmin ? __('client.tickets_admin_desc') : __('client.tickets_client_desc')}
                             </p>
                         </div>
 
@@ -132,7 +132,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>{__('general.open_ticket') || 'Open Ticket'}</span>
+                                <span>{__('general.open_ticket')}</span>
                             </Link>
                         )}
                     </div>
@@ -145,23 +145,25 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                         <div className="flex gap-3 w-full max-w-md bg-white p-3 rounded-2xl border border-black/5 shadow-sm">
                             <select
                                 value={filterStatus}
+                                aria-label={__('general.status')}
                                 onChange={(e) => setFilterStatus(e.target.value)}
                                 className="h-10 w-full rounded-xl border-black/10 text-xs font-medium text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]"
                             >
-                                <option value="">{__('general.all_statuses') || 'All Statuses'}</option>
-                                <option value="open">{__('general.open') || 'Open'}</option>
-                                <option value="in_progress">{__('general.in_progress') || 'In Progress'}</option>
-                                <option value="closed">{__('general.resolved') || 'Resolved'}</option>
+                                <option value="">{__('general.all_statuses')}</option>
+                                <option value="open">{__('general.open')}</option>
+                                <option value="in_progress">{__('general.in_progress')}</option>
+                                <option value="closed">{__('general.resolved')}</option>
                             </select>
                             <select
                                 value={filterPriority}
+                                aria-label={__('general.priority')}
                                 onChange={(e) => setFilterPriority(e.target.value)}
                                 className="h-10 w-full rounded-xl border-black/10 text-xs font-medium text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3]"
                             >
-                                <option value="">{__('general.all_priorities') || 'All Priorities'}</option>
-                                <option value="High">{__('general.high') || 'High'}</option>
-                                <option value="Medium">{__('general.medium') || 'Medium'}</option>
-                                <option value="Low">Low</option>
+                                <option value="">{__('general.all_priorities')}</option>
+                                <option value="High">{__('client.tickets_priority_high')}</option>
+                                <option value="Medium">{__('client.tickets_priority_medium')}</option>
+                                <option value="Low">{__('client.tickets_priority_low')}</option>
                             </select>
                         </div>
                     )}
@@ -170,8 +172,8 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                         <DataTable
                             columns={columns}
                             data={isAdmin ? filteredTickets : tickets?.data || []}
-                            emptyTitle={__('general.no_support_tickets_yet') || 'No Support Tickets Yet'}
-                            emptyDescription={__('general.empty_tickets_friendly') || 'Quiet inbox. Need anything? We are here.'}
+                            emptyTitle={__('general.no_support_tickets_yet')}
+                            emptyDescription={__('general.empty_tickets_friendly')}
                         />
                     </div>
 
@@ -216,7 +218,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     href={route('tickets.show', openTicket.id)}
                                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed]"
                                 >
-                                    <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_in_page') || 'Open in page'}
+                                    <ExternalLink className="h-3.5 w-3.5" /> {__('general.open_in_page')}
                                 </Link>
                             </div>
                         </>

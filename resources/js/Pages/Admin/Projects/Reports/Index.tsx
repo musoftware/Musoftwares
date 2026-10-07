@@ -4,6 +4,7 @@ import { ArrowLeft, FileText, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface ReportItem {
     id: number;
@@ -24,13 +25,13 @@ interface Props {
     reports: ReportItem[];
 }
 
-const TYPE_LABELS: Record<string, string> = {
-    progress: 'Progress Update',
-    milestone: 'Milestone',
-    issue: 'Issue / Risk',
-    summary: 'Weekly Summary',
-    financial: 'Financial',
-    final: 'Final Report',
+const TYPE_LABEL_KEYS: Record<string, string> = {
+    progress: 'admin.report_type_progress',
+    milestone: 'admin.report_type_milestone',
+    issue: 'admin.report_type_issue',
+    summary: 'admin.report_type_summary',
+    financial: 'admin.report_type_financial',
+    final: 'admin.report_type_final',
 };
 
 const PRIORITY_STYLES: Record<string, { dot: string; label: string }> = {
@@ -40,16 +41,23 @@ const PRIORITY_STYLES: Record<string, { dot: string; label: string }> = {
     urgent: { dot: 'bg-rose-500', label: 'bg-rose-50 text-rose-700' },
 };
 
-const PRIORITY_LABELS: Record<string, string> = {
-    low: 'Low',
-    normal: 'Normal',
-    high: 'High',
-    urgent: 'Urgent',
+const PRIORITY_LABEL_KEYS: Record<string, string> = {
+    low: 'general.priority_low',
+    normal: 'admin.report_priority_normal',
+    high: 'general.priority_high',
+    urgent: 'general.priority_urgent',
 };
 
 export default function AdminProjectReportsIndex({ project, reports = [] }: Props) {
-    const destroy = (id: number) => {
-        if (!confirm(__('general.delete_this_report'))) return;
+    const { confirm, confirmDialog } = useConfirm();
+
+    const destroy = async (id: number) => {
+        const accepted = await confirm({
+            title: __('general.delete_this_report'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         router.delete(
             route('admin.projects.reports.destroy', { project: project.id, report: id }),
             { preserveScroll: true },
@@ -69,7 +77,7 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
                             href={route('admin.projects.index')}
                             className="mb-2 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
                         >
-                            <ArrowLeft className="h-4 w-4" /> {__('general.back_to_projects')}
+                            <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {__('general.back_to_projects')}
                         </Link>
                         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
                             <FileText className="h-5 w-5 text-emerald-600" />
@@ -88,7 +96,7 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
 
                 <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                        <thead className="bg-slate-50 text-start text-xs uppercase tracking-wide text-slate-500">
                             <tr>
                                 <th className="px-4 py-3">{__('general.title')}</th>
                                 <th className="px-4 py-3">{__('general.report_type')}</th>
@@ -124,14 +132,14 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
                                                 )}
                                             </td>
                                             <td className="px-4 py-3 text-slate-600">
-                                                {TYPE_LABELS[r.type] ?? r.type}
+                                                {TYPE_LABEL_KEYS[r.type] ? __(TYPE_LABEL_KEYS[r.type]) : r.type}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span
                                                     className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${pStyle.label}`}
                                                 >
                                                     <span className={`h-1.5 w-1.5 rounded-full ${pStyle.dot}`} />
-                                                    {PRIORITY_LABELS[r.priority] ?? r.priority}
+                                                    {PRIORITY_LABEL_KEYS[r.priority] ? __(PRIORITY_LABEL_KEYS[r.priority]) : r.priority}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-slate-500">
@@ -164,6 +172,7 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
                                                             rel="noreferrer"
                                                             className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100"
                                                             title={__('general.preview')}
+                                                            aria-label={__('general.preview')}
                                                         >
                                                             <Eye className="h-4 w-4" />
                                                         </a>
@@ -175,13 +184,16 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
                                                         })}
                                                         className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100"
                                                         title={__('general.edit')}
+                                                        aria-label={__('general.edit')}
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </Link>
                                                     <button
+                                                        type="button"
                                                         onClick={() => destroy(r.id)}
                                                         className="rounded-md p-1.5 text-rose-500 hover:bg-rose-50"
                                                         title={__('general.delete')}
+                                                        aria-label={__('general.delete')}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -195,6 +207,7 @@ export default function AdminProjectReportsIndex({ project, reports = [] }: Prop
                     </table>
                 </div>
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

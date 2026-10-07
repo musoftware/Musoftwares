@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Builders\KashierCheckoutBuilder;
+use App\Exceptions\MissingExchangeRateException;
+use App\Exceptions\WithdrawalRejectedException;
 use App\Helpers\FinanceHelper;
 use App\Helpers\KashierHelper;
+use App\Helpers\KashierSignedAmount;
 use App\Models\CurrenciesExchange;
 use App\Models\User;
 use App\Services\BalanceService;
@@ -81,30 +84,31 @@ class FinancialController extends Controller
     public function requestWithdrawal(Request $request)
     {
         $user = $request->user();
-        $wallet = ['id' => null, 'balance' => (float) $user->user_balance, 'currency' => $user->currency_name()];
 
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'payout_method_id' => 'required|exists:payout_methods,id',
         ]);
 
-        // Validate using BalanceService (recovered pattern from old BalancesHelper)
-        $balanceService = app(BalanceService::class);
-        $eligibility = $balanceService->validateWithdrawalEligibility(
-            $user,
-            (float) $request->amount,
-            (int) $request->payout_method_id
-        );
+        $amount = (float) $request->amount;
+        $payoutMethodId = (int) $request->payout_method_id;
 
-        if (! $eligibility['eligible']) {
-            return back()->withErrors(['amount' => $eligibility['reason']]);
-        }
-
+        // Eligibility is checked inside the service under a user row lock.
         try {
-            $balanceService->processWithdrawalRequest($user, (float) $request->amount, (int) $request->payout_method_id);
+            app(BalanceService::class)->processWithdrawalRequest($user, $amount, $payoutMethodId);
 
             return back()->with('success', __('general.withdrawal_requested_successfully'));
-        } catch (\Exception $e) {
+        } catch (WithdrawalRejectedException $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            Log::error('Withdrawal request failed', [
+                'user_id' => $user->id,
+                'amount' => $amount,
+                'payout_method_id' => $payoutMethodId,
+                'exception' => $e::class,
+                'error' => $e->getMessage(),
+            ]);
+
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);
         }
     }
@@ -114,17 +118,30 @@ class FinancialController extends Controller
         $user = $request->user();
         $wallet = ['id' => null, 'balance' => (float) $user->user_balance, 'currency' => $user->currency_name()];
 
-        $baseUSD = [50, 100, 150, 200, 400, 700, 1000];
-        $presets = [];
-        foreach ($baseUSD as $usd) {
-            $exchanged = CurrenciesExchange::RateToday($usd, 1, $user->currency);
-            $presets[] = FinanceHelper::instance()->price_fixer($exchanged, $user->currency);
-        }
-
         return Inertia::render('Client/Financial/AddBalance', [
             'wallet' => $wallet,
-            'presets' => $presets,
+            'presets' => $this->depositPresets($user),
         ]);
+    }
+
+    /**
+     * Suggested deposit amounts (display only). With no USD rate for the wallet currency the page
+     * shows no preset buttons (the form still works) instead of failing.
+     */
+    private function depositPresets(User $user): array
+    {
+        $baseUSD = [50, 100, 150, 200, 400, 700, 1000];
+
+        try {
+            return array_map(
+                fn ($usd) => FinanceHelper::instance()->price_fixer(CurrenciesExchange::RateToday($usd, 1, $user->currency), $user->currency),
+                $baseUSD
+            );
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Deposit presets hidden: missing exchange rate.', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return [];
+        }
     }
 
     public function depositKashier(Request $request)
@@ -160,46 +177,44 @@ class FinancialController extends Controller
         return redirect()->route('financial.add-balance')->with('error', __('general.payment_failed_or_was_canceled_please_try_again'));
     }
 
+    /**
+     * Kashier deposit webhook (synchronous). Crediting goes through
+     * BalanceService::processKashierDepositWebhook, the same path the queued handler uses.
+     */
     public function webhook(Request $request)
     {
-        Log::info('Kashier Webhook received:', $request->all());
+        Log::info('Kashier deposit webhook received.', ['trx' => $request->input('data.transactionId')]);
 
-        if (KashierHelper::validatePayload()) {
-            if ($request->input('data.status') === 'SUCCESS') {
-                $data = $request->input('data');
-                $metadata = $data['metaData'] ?? [];
-                if (is_string($metadata)) {
-                    $metadata = json_decode($metadata, true) ?: [];
-                }
+        if (! KashierHelper::validatePayload()) {
+            Log::warning('Kashier deposit webhook rejected: invalid signature.');
 
-                $userId = $metadata['user_id'] ?? null;
-                $trxId = $data['transactionId'] ?? null;
-                $amountPaid = floatval($data['amount'] ?? 0);
+            return response()->json(['error' => 'Invalid webhook signature'], 400);
+        }
 
-                if ($userId && $trxId && $amountPaid > 0) {
-                    $user = User::find($userId);
-                    if ($user) {
-                        $amountPaid = KashierHelper::getWebhookAmountInUserCurrency($amountPaid, $metadata, $user);
+        $data = (array) $request->input('data', []);
+        $metadata = $data['metaData'] ?? [];
+        if (is_string($metadata)) {
+            $metadata = json_decode($metadata, true) ?: [];
+        }
 
-                        $balanceService = app(BalanceService::class);
-                        $result = $balanceService->processKashierDepositWebhook($user, $amountPaid, $trxId);
+        $trxId = $data['transactionId'] ?? null;
+        $user = isset($metadata['user_id']) ? User::find($metadata['user_id']) : null;
+        $paid = KashierSignedAmount::fromWebhookData($data);
 
-                        if (! $result['already_processed']) {
-                            Log::info("Kashier deposit processed successfully for User $userId, Amount: $amountPaid");
-
-                            return response()->json(['status' => 'success', 'message' => $result['message']]);
-                        } else {
-                            Log::warning("Duplicate Kashier webhook received for Trx $trxId - skipped");
-
-                            return response()->json(['status' => 'success', 'message' => $result['message']]);
-                        }
-                    }
-                }
-            }
+        if (($data['status'] ?? null) !== 'SUCCESS' || ! $trxId || ! $user || ! $paid) {
+            Log::info('Kashier deposit webhook ignored.', ['trx' => $trxId, 'status' => $data['status'] ?? null]);
 
             return response()->json(['status' => 'ignored']);
         }
 
-        return response()->json(['error' => 'Invalid webhook signature'], 400);
+        try {
+            $result = app(BalanceService::class)->processKashierDepositWebhook($user, $paid, (string) $trxId, $data);
+        } catch (\Throwable $e) {
+            Log::error('Kashier deposit webhook failed.', ['trx' => $trxId, 'user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return response()->json(['status' => 'error', 'message' => 'Failed to process deposit'], 500);
+        }
+
+        return response()->json(['status' => 'success', 'message' => $result['message']]);
     }
 }

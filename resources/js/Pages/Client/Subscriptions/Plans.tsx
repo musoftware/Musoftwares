@@ -11,6 +11,7 @@ import {
     ArrowLeft, PlusCircle, CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface PlansProps {
     serviceItems: ServiceItem[];
@@ -27,42 +28,43 @@ export default function Plans({
     currency,
     proratedRefund = 0
 }: PlansProps) {
+    const { confirm, confirmDialog } = useConfirm();
     const hasActiveSub = !!(activeSubscription?.owned_features && activeSubscription.owned_features.length > 0);
     const [isNewSystem, setIsNewSystem] = useState<boolean>(!hasActiveSub);
 
     const menuItems = [
-        { id: 'dashboard', label: 'Overview', icon: Building2, href: '/dashboard', isActive: false },
-        { id: 'wallet', label: 'Wallet', icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
-        { id: 'subscriptions', label: 'Subscriptions', icon: Crown, href: route('subscriptions.manage'), isActive: false },
-        { id: 'plans', label: 'Browse Plans', icon: Sparkles, href: route('subscriptions.plans'), isActive: true },
-        { id: 'settings', label: 'Settings', icon: Settings, href: '/profile', isActive: false },
+        { id: 'dashboard', label: __('general.overview'), icon: Building2, href: '/dashboard', isActive: false },
+        { id: 'wallet', label: __('general.wallet'), icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
+        { id: 'subscriptions', label: __('general.subscriptions'), icon: Crown, href: route('subscriptions.manage'), isActive: false },
+        { id: 'plans', label: __('client.subs_browse_plans'), icon: Sparkles, href: route('subscriptions.plans'), isActive: true },
+        { id: 'settings', label: __('general.settings'), icon: Settings, href: '/profile', isActive: false },
     ];
 
     const breadcrumbs = [
-        { label: 'Portal', href: '/dashboard' },
-        { label: __('general.my_subscriptions') || 'Subscriptions', href: route('subscriptions.manage') },
-        { label: __('general.build_your_workspace') || 'Browse Plans', active: true },
+        { label: __('client.subs_portal'), href: '/dashboard' },
+        { label: __('general.my_subscriptions'), href: route('subscriptions.manage') },
+        { label: __('general.build_your_workspace'), active: true },
     ];
 
     return (
         <WorkspaceLayout
-            title={__('general.build_your_workspace') || 'Workspace Plans'}
-            workspaceName="Musoftware Portal"
+            title={__('general.build_your_workspace')}
+            workspaceName={__('client.subs_workspace_name')}
             tenantId="CUST-PORTAL"
             menuItems={menuItems}
         >
             <div className="space-y-6">
                 {/* ── Module Page Header ── */}
                 <ModulePageHeader
-                    title={__('general.build_your_workspace') || 'Build Your Workspace'}
-                    description={__('general.select_exactly_what_you_need_no_more_no_less') || 'Select the core architecture modules and automation tools tailored to your operational needs.'}
+                    title={__('general.build_your_workspace')}
+                    description={__('general.select_exactly_what_you_need_no_more_no_less')}
                     icon={Crown}
                     breadcrumbs={breadcrumbs}
                     actions={
                         <Link href={route('subscriptions.manage')}>
                             <Button variant="outline" size="sm" className="h-9 text-xs font-semibold gap-1.5 border-slate-200 hover:bg-slate-50">
                                 <ArrowLeft className="h-3.5 w-3.5" />
-                                {__('general.back_to_my_subscriptions') || 'My Subscriptions'}
+                                {__('general.back_to_my_subscriptions')}
                             </Button>
                         </Link>
                     }
@@ -78,11 +80,11 @@ export default function Plans({
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
-                                        Active Workspace Modules
+                                        {__('client.subs_active_modules')}
                                     </h4>
                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                        Your current plan has active features
-                                        {activeSubscription.expires_at && ` • Renews on ${activeSubscription.expires_at}`}
+                                        {__('client.subs_active_features')}
+                                        {activeSubscription.expires_at && __('client.subs_renews_on', { date: activeSubscription.expires_at })}
                                     </p>
                                 </div>
                             </div>
@@ -100,7 +102,7 @@ export default function Plans({
                                     )}
                                 >
                                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                                    <span>Add to Current Workspace</span>
+                                    <span>{__('client.subs_add_to_current')}</span>
                                 </button>
                                 <button
                                     type="button"
@@ -113,7 +115,7 @@ export default function Plans({
                                     )}
                                 >
                                     <PlusCircle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                                    <span>New Workspace</span>
+                                    <span>{__('client.subs_new_workspace')}</span>
                                 </button>
                             </div>
                         </div>
@@ -132,18 +134,18 @@ export default function Plans({
                         const finalTotal = Math.max(0, total - (!isNewSystem ? proratedRefund : 0));
                         const canAfford = walletBalance >= finalTotal;
 
-                        const handleSubscribeWallet = () => {
+                        const handleSubscribeWallet = async () => {
                             if (selectedItems.length === 0) return;
                             const msg = isNewSystem
-                                ? `Create a NEW workspace with these ${selectedItems.length} items?`
-                                : `Subscribe to these ${selectedItems.length} items using your wallet balance?`;
-                            if (confirm(msg)) {
-                                router.post(route('subscriptions.subscribe'), {
-                                    items: selectedItems,
-                                    billing_cycle: billing,
-                                    is_new_system: isNewSystem
-                                });
-                            }
+                                ? __('client.subs_confirm_new_workspace', { count: selectedItems.length })
+                                : __('client.subs_confirm_wallet', { count: selectedItems.length });
+                            const accepted = await confirm({ title: __('client.subs_confirm_title'), description: msg });
+                            if (!accepted) return;
+                            router.post(route('subscriptions.subscribe'), {
+                                items: selectedItems,
+                                billing_cycle: billing,
+                                is_new_system: isNewSystem
+                            });
                         };
 
                         const handleSubscribeKashier = () => {
@@ -170,8 +172,8 @@ export default function Plans({
                                 >
                                     <Wallet className="h-4 w-4" />
                                     {canAfford || selectedItems.length === 0
-                                        ? 'Subscribe with Wallet'
-                                        : `Insufficient Balance (Need ${finalTotal.toFixed(2)} ${currency})`}
+                                        ? __('client.subs_subscribe_wallet')
+                                        : __('client.subs_insufficient_need', { amount: `${finalTotal.toFixed(2)} ${currency}` })}
                                 </Button>
 
                                 <Button
@@ -182,20 +184,20 @@ export default function Plans({
                                     className="w-full h-11 rounded-xl text-xs font-semibold gap-2 border-slate-200 hover:bg-slate-50 text-slate-700"
                                 >
                                     <CreditCard className="h-4 w-4 text-slate-400" />
-                                    {__('general.pay_by_card') || 'Pay by Card'}
+                                    {__('general.pay_by_card')}
                                 </Button>
 
                                 {/* Wallet Status & Quick Top-Up */}
                                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                                     <div className="flex items-center gap-1.5">
                                         <Wallet className="h-3.5 w-3.5 text-slate-400" />
-                                        <span>Wallet: <strong className="text-slate-800 font-semibold">{walletBalance.toFixed(2)} {currency}</strong></span>
+                                        <span>{__('client.subs_wallet_label')} <strong className="text-slate-800 font-semibold">{walletBalance.toFixed(2)} {currency}</strong></span>
                                     </div>
                                     <Link
                                         href={route().has('financial.add-balance') ? route('financial.add-balance') : '#'}
                                         className="text-indigo-600 hover:text-indigo-700 font-semibold inline-flex items-center gap-1 text-[11px]"
                                     >
-                                        {__('general.add_funds_to_wallet') || 'Add Funds'}
+                                        {__('general.add_funds_to_wallet')}
                                         <ArrowRight className="h-3 w-3" />
                                     </Link>
                                 </div>
@@ -204,6 +206,7 @@ export default function Plans({
                     }}
                 />
             </div>
+            {confirmDialog}
         </WorkspaceLayout>
     );
 }

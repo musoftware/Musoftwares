@@ -67,7 +67,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
         } else {
             fallback();
         }
-        toast({ title: __('general.copied') || 'Copied', description: `${label} ${__('general.copied_to_clipboard') || 'copied to clipboard.'}` });
+        toast({ title: __('general.copied'), description: `${label} ${__('general.copied_to_clipboard')}` });
     };
 
     const handleSearch = (search) => {
@@ -103,8 +103,8 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
             }
         }).catch(() => {
             toast({
-                title: "Error",
-                description: "Failed to login as client.",
+                title: __('general.error'),
+                description: __('admin.user_impersonate_failed'),
                 variant: "destructive"
             });
         });
@@ -141,14 +141,14 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
     const columns = [
         {
             key: 'id',
-            label: 'ID',
+            label: __('general.id'),
             sortable: true,
             className: 'w-[60px]',
             render: (client) => <span className="text-slate-500 font-mono text-xs">#{client.id}</span>
         },
         {
             key: 'employee',
-            label: 'EMPLOYEE',
+            label: __('general.employee'),
             sortable: true,
             render: (client) => (
                 <div className="flex items-center gap-3">
@@ -194,7 +194,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                             </span>
                             {client.loyalty_tier?.points_balance !== undefined && (
                                 <span className="text-[10px] font-mono font-semibold text-amber-700 bg-amber-50 border border-amber-200/70 px-1.5 py-0.5 rounded">
-                                    {client.loyalty_tier.points_balance.toLocaleString()} PTS
+                                    {__('admin.loyalty_points_short', { count: client.loyalty_tier.points_balance.toLocaleString() })}
                                 </span>
                             )}
                         </div>
@@ -204,12 +204,12 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
         },
         {
             key: 'phone_number',
-            label: 'Phone',
+            label: __('general.phone'),
             render: (client) => <span className="text-slate-600">{client.phone_number || client.phone || '—'}</span>,
         },
         {
             key: 'created_at',
-            label: 'Joined',
+            label: __('general.joined'),
             sortable: true,
             render: (client) => (
                 <span className="text-slate-600 whitespace-nowrap">
@@ -292,6 +292,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.role || ''}
+                aria-label={__('general.all_roles')}
                 onChange={(e) => handleFilter('role', e.target.value)}
             >
                 <option value="">{__('general.all_roles')}</option>
@@ -302,6 +303,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.status || ''}
+                aria-label={__('general.all_statuses')}
                 onChange={(e) => handleFilter('status', e.target.value)}
             >
                 <option value="">{__('general.all_statuses')}</option>
@@ -311,6 +313,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
             <select 
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 value={filters.kyc || ''}
+                aria-label={__('general.all_kyc')}
                 onChange={(e) => handleFilter('kyc', e.target.value)}
             >
                 <option value="">{__('general.all_kyc')}</option>
@@ -321,7 +324,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
     );
 
     return (
-        <AdminSidebarLayout title={__('general.clients')} header="Platform Users">
+        <AdminSidebarLayout title={__('general.clients')} header={__('admin.platform_users')}>
             {stats && (
                 <div className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
@@ -362,7 +365,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                         }`}
                     >
-                        <span>{__('general.customers') || 'Customers'}</span>
+                        <span>{__('general.customers')}</span>
                         <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
                             activeTab === 'customers' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                         }`}>
@@ -379,7 +382,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                         }`}
                     >
-                        <span>{__('general.leads') || 'Leads'}</span>
+                        <span>{__('general.leads')}</span>
                         <span className={`px-2 py-0.5 text-xs rounded-full font-bold ${
                             activeTab === 'leads' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                         }`}>
@@ -390,10 +393,10 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
 
                 <div className="flex items-center gap-2">
                     <Link href="/admin/users/bulk-create">
-                        <Button variant="outline">{__('general.bulk_create') || 'Bulk Create'}</Button>
+                        <Button variant="outline">{__('general.bulk_create')}</Button>
                     </Link>
                     <Link href="/admin/users/create">
-                        <Button>{__('general.create_account') || 'Create User'}</Button>
+                        <Button>{__('general.create_account')}</Button>
                     </Link>
                 </div>
             </div>
@@ -406,8 +409,8 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                     filters={{ ...filters, extra: advancedFilters }}
                     onSearch={handleSearch}
                     onSort={handleSort}
-                    emptyTitle={activeTab === 'customers' ? "No customers found" : "No leads found"}
-                    emptyDescription="Try adjusting your search filters."
+                    emptyTitle={activeTab === 'customers' ? __('admin.no_customers_found') : __('admin.no_leads_found')}
+                    emptyDescription={__('general.try_adjusting_your_search_filters')}
                 />
             </div>
             
@@ -453,7 +456,7 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                                         required
                                     >
                                         <option value="client">{__("erp.client")}</option>
-                                        <option value="software_reseller">{__("general.software_reseller") || "Software Reseller"}</option>
+                                        <option value="software_reseller">{__("general.software_reseller")}</option>
                                         <option value="admin">{__("admin.admin")}</option>
                                         <option value="manager">{__("general.manager")}</option>
                                         <option value="employee">{__("general.employee")}</option>
@@ -505,8 +508,8 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                                             } }));
                                         }).catch(() => {
                                             toast({
-                                                title: "Error",
-                                                description: "Failed to reset password.",
+                                                title: __('general.error'),
+                                                description: __('admin.user_reset_password_failed'),
                                                 variant: "destructive"
                                             });
                                             setResetPasswordState(prev => ({ ...prev, isOpen: false }));
@@ -530,43 +533,43 @@ export default function Index({ clients, filters, stats, tabCounts = { customers
                             <DialogHeader>
                                 <DialogTitle className="text-green-600 flex items-center gap-2">
                                     <CheckCircle2 className="h-5 w-5" />
-                                    {resetPasswordState.info?.message || __('general.password_reset_email_sent_with_new_password') || 'A new password has been generated and emailed to the user.'}
+                                    {resetPasswordState.info?.message || __('general.password_reset_email_sent_with_new_password')}
                                 </DialogTitle>
                                 <DialogDescription className="pt-2 text-slate-600">
-                                    {__('general.share_credentials_with_user') || 'You can copy these credentials and share them with the user manually if needed.'}
+                                    {__('general.share_credentials_with_user')}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="my-2 space-y-3">
                                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                                    {__('general.credentials_ready_to_send') || 'Credentials ready to send'}
+                                    {__('general.credentials_ready_to_send')}
                                 </div>
 
                                 <div className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                                     <div className="min-w-0">
-                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.email') || 'Email'}</div>
+                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.email')}</div>
                                         <div className="truncate font-mono text-sm text-slate-800">{resetPasswordState.info?.email}</div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.email, 'Email')}>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.email, __('general.email'))} aria-label={__('admin.copy_value', { label: __('general.email') })}>
                                         <Copy className="h-4 w-4" />
                                     </Button>
                                 </div>
 
                                 <div className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
                                     <div className="min-w-0 flex-1">
-                                        <div className="text-[11px] uppercase tracking-wide text-amber-700">{__('general.new_password') || 'New password'}</div>
+                                        <div className="text-[11px] uppercase tracking-wide text-amber-700">{__('general.new_password')}</div>
                                         <div className="truncate font-mono text-sm font-semibold text-amber-900">{resetPasswordState.info?.password}</div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.password, 'Password')}>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.password, __('general.new_password'))} aria-label={__('admin.copy_value', { label: __('general.new_password') })}>
                                         <Copy className="h-4 w-4" />
                                     </Button>
                                 </div>
 
                                 <div className="flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
                                     <div className="min-w-0 flex-1">
-                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.login_url') || 'Login URL'}</div>
+                                        <div className="text-[11px] uppercase tracking-wide text-slate-500">{__('general.login_url')}</div>
                                         <div className="truncate font-mono text-sm text-slate-800">{resetPasswordState.info?.loginUrl}</div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.loginUrl, 'Login URL')}>
+                                    <Button type="button" variant="ghost" size="sm" onClick={() => copyToClipboard(resetPasswordState.info?.loginUrl, __('general.login_url'))} aria-label={__('admin.copy_value', { label: __('general.login_url') })}>
                                         <Copy className="h-4 w-4" />
                                     </Button>
                                 </div>

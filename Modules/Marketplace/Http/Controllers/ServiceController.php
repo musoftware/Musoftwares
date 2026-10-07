@@ -84,7 +84,7 @@ class ServiceController extends Controller
             });
         }
 
-        $services = $query->latest()->paginate(15);
+        $services = $query->latest()->paginate(15)->withQueryString();
         $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
             return ServiceCategory::orderBy('name')->get();
         });
@@ -925,7 +925,7 @@ class ServiceController extends Controller
             ->where('status', 'active')
             ->whereJsonContains('tags', $tagClean);
 
-        $services = $query->latest()->paginate(15);
+        $services = $query->latest()->paginate(15)->withQueryString();
         $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
             return ServiceCategory::orderBy('name')->get();
         });
@@ -979,7 +979,7 @@ class ServiceController extends Controller
                   ->orWhere('description', 'like', "%{$tagClean}%");
             });
 
-        $services = $query->latest()->paginate(15);
+        $services = $query->latest()->paginate(15)->withQueryString();
         $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
             return ServiceCategory::orderBy('name')->get();
         });

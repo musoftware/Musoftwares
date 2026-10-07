@@ -22,7 +22,7 @@ function TagList({ tags, colorClass = 'bg-green-50 text-green-700 border-green-1
                 <button
                     onClick={() => setExpanded(true)}
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200 transition-colors">
-                    +{hidden} more
+                    {__('admin.more_count', { count: hidden })}
                 </button>
             )}
             {expanded && hidden > 0 && (
@@ -55,8 +55,9 @@ function LegacyCard({ worker }) {
                     href={`/admin/users/legacy-coworker/${worker.id}`}
                     className="text-green-600 hover:text-green-800 transition-colors flex-shrink-0"
                     title={__('general.view_details_1')}
+                    aria-label={__('general.view_details_1')}
                 >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-5 h-5 rtl:rotate-180" />
                 </Link>
             </div>
 
@@ -121,7 +122,7 @@ export default function CoWork({ legacyCoWorkers = [] }) {
     );
 
     return (
-        <AdminSidebarLayout title={__('general.co_work')} header="Private Co-Work">
+        <AdminSidebarLayout title={__('general.co_work')} header={__('admin.private_co_work')}>
             <Head title={__('general.co_work')} />
 
             {/* Stats row */}
@@ -140,7 +141,8 @@ export default function CoWork({ legacyCoWorkers = [] }) {
                         <input
                             id="cowork-search"
                             type="text"
-                            placeholder="Search by name, email, tag…"
+                            placeholder={__('admin.cowork_search_placeholder')}
+                            aria-label={__('admin.cowork_search_placeholder')}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="h-9 ps-9 pe-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent w-64"
@@ -153,7 +155,7 @@ export default function CoWork({ legacyCoWorkers = [] }) {
                         <div className="py-16 flex flex-col items-center text-slate-400 gap-3">
                             <Users className="w-10 h-10 opacity-30" />
                             <p className="text-sm">
-                                {search ? 'No results for your search.' : 'No legacy co-workers found.'}
+                                {search ? __('admin.no_search_results') : __('admin.no_legacy_co_workers')}
                             </p>
                         </div>
                     ) : (

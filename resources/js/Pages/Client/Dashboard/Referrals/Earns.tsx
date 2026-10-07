@@ -60,10 +60,10 @@ export default function Earns({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <div className="space-y-1">
                                     <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                        {__('general.pending_earns') || __('general.pending_commission') || 'Pending Earns'}
+                                        {__('general.pending_earns') || __('general.pending_commission')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('general.earned_not_cleared_yet') || 'Earned but not yet cleared'}
+                                        {__('general.earned_not_cleared_yet')}
                                     </CardDescription>
                                 </div>
                                 <Clock className="w-5 h-5 text-amber-500" />
@@ -80,10 +80,10 @@ export default function Earns({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <div className="space-y-1">
                                     <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                        {__('general.available_commission') || 'Available Commission'}
+                                        {__('general.available_commission')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('general.ready_for_withdrawal') || 'Available to withdraw'}
+                                        {__('general.ready_for_withdrawal')}
                                     </CardDescription>
                                 </div>
                                 <Wallet className="w-5 h-5 text-indigo-500" />
@@ -100,10 +100,10 @@ export default function Earns({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <div className="space-y-1">
                                     <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                        {__('general.withdrawn_commission') || 'Withdrawn Commission'}
+                                        {__('general.withdrawn_commission')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('general.successfully_paid_out') || 'Successfully paid out'}
+                                        {__('general.successfully_paid_out')}
                                     </CardDescription>
                                 </div>
                                 <CheckCircle2 className="w-5 h-5 text-emerald-500" />

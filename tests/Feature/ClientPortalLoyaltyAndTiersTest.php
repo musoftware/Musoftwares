@@ -30,15 +30,37 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
         );
     }
 
+    /**
+     * Creating a user awards the 50-point welcome bonus (User::created hook). Tests that need an exact
+     * starting balance pin it after creation so their arithmetic stays about the feature under test.
+     */
     protected function createClient(array $attributes = []): User
     {
-        return User::factory()->create(array_merge([
+        $user = User::factory()->create(array_merge([
             'currency_id' => $this->currency->id,
             'tier' => 'standard',
             'lifetime_spend' => 0.00,
             'loyalty_points_balance' => 0,
             'profile_completion_percentage' => 25,
         ], $attributes));
+
+        if (array_key_exists('loyalty_points_balance', $attributes)) {
+            $user->forceFill(['loyalty_points_balance' => $attributes['loyalty_points_balance']])->saveQuietly();
+        }
+
+        return $user->fresh();
+    }
+
+    public function test_every_new_client_receives_welcome_points_once(): void
+    {
+        $first = $this->createClient();
+        $second = $this->createClient();
+
+        $this->assertSame(50, (int) $first->loyalty_points_balance);
+        $this->assertSame(50, (int) $second->loyalty_points_balance);
+
+        app(\App\Services\LoyaltyService::class)->awardPointsForEvent($second, 'user_welcome');
+        $this->assertSame(50, (int) $second->fresh()->loyalty_points_balance);
     }
 
     public function test_client_can_get_loyalty_overview_and_rewards_catalog(): void
@@ -62,7 +84,8 @@ class ClientPortalLoyaltyAndTiersTest extends TestCase
         $overviewRes = $this->getJson('/api/portal/loyalty/overview');
         $overviewRes->assertStatus(200)
             ->assertJsonPath('data.balance', 350)
-            ->assertJsonPath('data.tier', 'pro');
+            // Tier is derived from loyalty_tiers by lifetime points (350 >= Silver's 200), not the legacy users.tier text.
+            ->assertJsonPath('data.tier', 'silver');
 
         $rewardsRes = $this->getJson('/api/portal/loyalty/rewards');
         $rewardsRes->assertStatus(200)

@@ -3,7 +3,7 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ArrowLeft, Sparkles, Send, Paperclip, X, Download, FileText,
     BrainCircuit, CheckCircle2, HelpCircle, Check, CreditCard, MessageCircle, Bug,
-    LifeBuoy, Bot
+    LifeBuoy, Bot, AlertTriangle, Lightbulb
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -138,7 +138,7 @@ export default function ProjectShow({
         try {
             const response = await axios.post(route('client.projects.ai.activate', { project: project.id }));
             if (response.data.ok) {
-                toast.success(response.data.message || 'AI activated successfully!');
+                toast.success(response.data.message || __('client.projects_ai_activated'));
                 router.reload();
             }
         } catch (error: any) {
@@ -146,7 +146,7 @@ export default function ProjectShow({
                 setRequiredAmount(error.response.data.required);
                 setTopupModalOpen(true);
             } else {
-                toast.error(error.response?.data?.message || 'Failed to activate AI.');
+                toast.error(error.response?.data?.message || __('client.projects_ai_activate_failed'));
             }
         } finally {
             setActivationLoading(false);
@@ -165,9 +165,9 @@ export default function ProjectShow({
         const tempUserMessage = {
             id: tempMsgId,
             author_id: currentUserId,
-            body: outgoingText || (outgoingFile ? `📎 ${outgoingFile.name}` : ''),
+            body: outgoingText || (outgoingFile ? outgoingFile.name : ''),
             created_at: new Date().toISOString(),
-            guest_name: 'Client',
+            guest_name: __('client.projects_chat_client'),
         };
 
         setChatFeed((prev) => [...prev, tempUserMessage as any]);
@@ -203,7 +203,7 @@ export default function ProjectShow({
         } catch (err) {
             // Revert optimistic message on failure
             setChatFeed((prev) => prev.filter((m) => String(m.id) !== String(tempMsgId)));
-            toast.error(__('general.error') || 'Failed to send message.');
+            toast.error(__('general.error'));
         } finally {
             setSubmitting(false);
             setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -215,11 +215,11 @@ export default function ProjectShow({
         try {
             const res = await axios.post(route('client.projects.ai.approve-budget', { project: project.id }));
             if (res.data.ok) {
-                toast.success(res.data.message || 'تم اعتماد الفاتورة والميزانية بنجاح!');
+                toast.success(res.data.message || __('client.projects_budget_approved'));
                 router.reload();
             }
         } catch (err) {
-            toast.error('فشل في اعتماد الفاتورة.');
+            toast.error(__('client.projects_budget_approve_failed'));
         } finally {
             setSubmitting(false);
         }
@@ -230,11 +230,11 @@ export default function ProjectShow({
         try {
             const res = await axios.post(route('client.projects.ai.confirm-invoice', { project: project.id }));
             if (res.data.ok) {
-                toast.success(res.data.message || 'تم إذن إصدار الفاتورة وتأكيد الاتفاق بنجاح!');
+                toast.success(res.data.message || __('client.projects_invoice_confirmed'));
                 router.reload();
             }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'حدث خطأ أثناء إصدار الفاتورة');
+            toast.error(err.response?.data?.message || __('client.projects_invoice_confirm_failed'));
         } finally {
             setSubmitting(false);
         }
@@ -270,7 +270,7 @@ export default function ProjectShow({
 
     return (
         <AuthenticatedLayout>
-            <Head title={`AI Agency — ${project.name}`} />
+            <Head title={__('client.projects_page_title', { name: project.name })} />
 
             <div className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8 space-y-4">
                 
@@ -280,6 +280,7 @@ export default function ProjectShow({
                         <Link
                             href={route('client.projects.index')}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition hover:bg-slate-200"
+                            aria-label={__('general.back')}
                         >
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
@@ -289,10 +290,10 @@ export default function ProjectShow({
                                 <h1 className="text-lg font-black text-slate-900 tracking-tight">{project.name}</h1>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-200">
                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    AI Software Agency
+                                    {__('client.projects_ai_agency_badge')}
                                 </span>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium">Chat-first interactive project workspace</p>
+                            <p className="text-xs text-slate-500 font-medium">{__('client.projects_workspace_subtitle')}</p>
                         </div>
                     </div>
 
@@ -304,7 +305,7 @@ export default function ProjectShow({
                                 className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-700 transition"
                             >
                                 <Sparkles className="h-4 w-4 text-indigo-200" />
-                                {activationLoading ? 'Activating...' : 'Activate AI Manager (10 EGP)'}
+                                {activationLoading ? __('client.projects_activating') : __('client.projects_activate_ai', { amount: 10 })}
                             </button>
                         )}
                         <AvatarStack members={team} max={4} size="sm" />
@@ -324,29 +325,29 @@ export default function ProjectShow({
                                     <Bot className="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <span className="text-xs font-black text-slate-900">AI Project Manager</span>
-                                    <span className="text-[10px] text-slate-400 block font-medium">Direct interactive chat — answers, estimates & invoice inline</span>
+                                    <span className="text-xs font-black text-slate-900">{__('client.projects_ai_manager')}</span>
+                                    <span className="text-[10px] text-slate-400 block font-medium">{__('client.projects_ai_manager_subtitle')}</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Link
                                     href={route('tickets.create', { project_id: project.id })}
                                     className="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 px-3 py-1 text-xs font-bold text-[#0071e3] hover:bg-blue-500/20 border border-blue-300/40 transition shadow-2xs cursor-pointer"
-                                    title="Open Support Ticket for this Project (+15 Loyalty Points)"
+                                    title={__('client.projects_ticket_title')}
                                 >
                                     <LifeBuoy className="h-3.5 w-3.5 text-[#0071e3]" />
-                                    <span>تذكرة للمشروع (+15 PTS)</span>
+                                    <span>{__('client.projects_ticket_button')}</span>
                                 </Link>
                                 <button
                                     onClick={() => setDebugModalOpen(true)}
                                     className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-700 hover:bg-amber-500/20 border border-amber-300/40 transition shadow-2xs"
-                                    title="كشف الـ Context البرمجي الحالي والتشخيص (Debug Panel)"
+                                    title={__('client.projects_debug_title_attr')}
                                 >
                                     <Bug className="h-3.5 w-3.5 text-amber-600" />
-                                    <span>AI Debug / كشف Context</span>
+                                    <span>{__('client.projects_debug_button')}</span>
                                 </button>
                                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-extrabold text-indigo-700 border border-indigo-100">
-                                    Stage: {aiStage.toUpperCase()}
+                                    {__('client.projects_stage', { stage: aiStage.toUpperCase() })}
                                 </span>
                             </div>
                         </div>
@@ -356,8 +357,8 @@ export default function ProjectShow({
                             {chatFeed.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
                                     <BrainCircuit className="h-12 w-12 text-indigo-400 mb-3 animate-bounce" />
-                                    <p className="text-sm font-black text-slate-800">أهلاً بك في AI Software Agency</p>
-                                    <p className="text-xs max-w-sm mt-1 text-slate-500">اكتب فكرة مشروعك أو أي متطلبات بالأسفل. وسيقوم الـ AI Project Manager بإجابتك ودراسة المتطلبات مباشرة.</p>
+                                    <p className="text-sm font-black text-slate-800">{__('client.projects_chat_welcome')}</p>
+                                    <p className="text-xs max-w-sm mt-1 text-slate-500">{__('client.projects_chat_welcome_hint')}</p>
                                 </div>
                             ) : (
                                 chatFeed.map((msg) => {
@@ -381,7 +382,7 @@ export default function ProjectShow({
 
                                     const isCurrentUser = msg.author_id === currentUserId;
                                     const isAi = !msg.author_id && (msg.guest_name?.includes('AI') || !msg.author);
-                                    const authorName = isAi ? 'AI Project Manager' : (msg.author?.name || msg.guest_name || 'Client');
+                                    const authorName = isAi ? __('client.projects_ai_manager') : (msg.author?.name || msg.guest_name || __('client.projects_chat_client'));
                                     const initials = authorName.slice(0, 1).toUpperCase();
 
                                     const hasPricingCard = displayText.includes('[Card:Pricing]');
@@ -401,7 +402,7 @@ export default function ProjectShow({
                                             >
                                                 {!isCurrentUser && (
                                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-black text-indigo-700 shadow-xs">
-                                                        {isAi ? '🤖' : initials}
+                                                        {isAi ? <Bot className="h-4 w-4" /> : initials}
                                                     </div>
                                                 )}
 
@@ -432,6 +433,7 @@ export default function ProjectShow({
                                                                     download
                                                                     target="_blank"
                                                                     rel="noreferrer"
+                                                                    aria-label={__('client.board_download_file', { name: fileData.original_name })}
                                                                     className="inline-flex items-center gap-1 rounded-lg bg-white/20 px-2 py-1 text-[11px] font-bold text-white hover:bg-white/30"
                                                                 >
                                                                     <Download className="h-3 w-3" />
@@ -459,11 +461,11 @@ export default function ProjectShow({
                                                              <div className="flex items-center justify-between">
                                                                  <div className="flex items-center gap-2 text-indigo-900 font-extrabold text-xs">
                                                                      <FileText className="h-4 w-4 text-indigo-600" />
-                                                                     <span>عقد اتفاقية المشروع والسياسات (50% دفعة أولى)</span>
+                                                                     <span>{__('client.projects_contract_card_title')}</span>
                                                                  </div>
                                                              </div>
                                                              <p className="text-[11px] text-indigo-800 font-medium leading-relaxed">
-                                                                 تم تجهيز العقد الرسمي الخاص بالمشروع شامل المتطلبات والأسعار وشروط السداد. اتفضل بالاطلاع والتوقيع واعتمد الدفعة الأولى لبدء التنفيذ.
+                                                                 {__('client.projects_contract_card_body')}
                                                              </p>
                                                              <div className="flex flex-wrap items-center gap-2 pt-1">
                                                                  <a
@@ -473,7 +475,7 @@ export default function ProjectShow({
                                                                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs h-9 rounded-xl px-4 shadow-xs inline-flex items-center gap-1.5 transition"
                                                                  >
                                                                      <FileText className="h-4 w-4" />
-                                                                     مراجعة وتوقيع العقد (50%) 📄
+                                                                     {__('client.projects_contract_review_sign')}
                                                                  </a>
                                                              </div>
                                                          </div>
@@ -485,14 +487,14 @@ export default function ProjectShow({
                                                             <div className="flex items-center justify-between">
                                                                 <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-xs">
                                                                     <CreditCard className="h-4 w-4 text-emerald-600" />
-                                                                    <span>عرض السعر المبدئي والفاتورة</span>
+                                                                    <span>{__('client.projects_pricing_card_title')}</span>
                                                                 </div>
                                                                 <span className="text-sm font-black text-emerald-700">
                                                                     {project.budget} {currencySymbol}
                                                                 </span>
                                                             </div>
                                                             <p className="text-[11px] text-emerald-800 font-medium leading-relaxed">
-                                                                التكلفة التقديرية تشمل تحليل الخصائص وصياغة المهام واستلام المخرجات البرمجية. عند الضغط على الاعتماد، سيتم توليد فاتورة المشروع وبدء التنفيذ الفوري.
+                                                                {__('client.projects_pricing_card_body')}
                                                             </p>
                                                             <div className="flex flex-wrap items-center gap-2 pt-1">
                                                                 <Button
@@ -501,15 +503,15 @@ export default function ProjectShow({
                                                                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs h-9 rounded-xl px-4 shadow-xs inline-flex items-center gap-1.5"
                                                                 >
                                                                     <Check className="h-4 w-4" />
-                                                                    {submitting ? 'جاري الاعتماد...' : 'اعتماد الفاتورة وبدء التنفيذ'}
+                                                                    {submitting ? __('client.projects_approving') : __('client.projects_approve_invoice_start')}
                                                                 </Button>
                                                                 <Button
                                                                     variant="outline"
-                                                                    onClick={() => setMessageText('عايز اعدل الميزانية واقترح سعر اقل')}
+                                                                    onClick={() => setMessageText(__('client.projects_negotiate_message'))}
                                                                     className="border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs h-9 rounded-xl px-3 inline-flex items-center gap-1.5"
                                                                 >
                                                                     <MessageCircle className="h-3.5 w-3.5" />
-                                                                    تعديل / تفاوض الميزانية
+                                                                    {__('client.projects_negotiate_budget')}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -526,10 +528,10 @@ export default function ProjectShow({
                                 <div className="flex flex-col w-full my-1.5 items-start animate-fade-in">
                                     <div className="flex gap-3 max-w-md rounded-2xl p-3 shadow-xs bg-white border border-slate-200 text-slate-800 rounded-tl-none items-center">
                                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700 shadow-xs">
-                                            🤖
+                                            <Bot className="h-4 w-4" />
                                         </div>
                                         <div className="flex items-center gap-1.5 px-2 py-1">
-                                            <span className="text-xs text-slate-500 font-bold ml-1">AI Project Manager يكتب الآن</span>
+                                            <span className="text-xs text-slate-500 font-bold ms-1">{__('client.projects_ai_typing')}</span>
                                             <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.3s]" />
                                             <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce [animation-delay:-0.15s]" />
                                             <span className="h-2 w-2 rounded-full bg-indigo-600 animate-bounce" />
@@ -546,7 +548,7 @@ export default function ProjectShow({
                             {selectedFile && (
                                 <div className="mb-2 flex items-center justify-between rounded-xl bg-indigo-50 px-3 py-1.5 text-xs text-indigo-700 border border-indigo-100">
                                     <span className="truncate font-bold">{selectedFile.name}</span>
-                                    <button onClick={() => setSelectedFile(null)} className="text-indigo-400 hover:text-indigo-600">
+                                    <button type="button" onClick={() => setSelectedFile(null)} className="text-indigo-400 hover:text-indigo-600" aria-label={__('client.projects_remove_file')}>
                                         <X className="h-4 w-4" />
                                     </button>
                                 </div>
@@ -564,7 +566,8 @@ export default function ProjectShow({
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 transition"
-                                    title="Attach File"
+                                    title={__('client.projects_attach_file')}
+                                    aria-label={__('client.projects_attach_file')}
                                 >
                                     <Paperclip className="h-4 w-4" />
                                 </button>
@@ -578,7 +581,8 @@ export default function ProjectShow({
                                             handleSendMessage(e);
                                         }
                                     }}
-                                    placeholder="اكتب رسالتك هنا... تفاصيل الفكرة، الاستفسارات، أو التعديلات"
+                                    placeholder={__('client.projects_message_placeholder')}
+                                    aria-label={__('client.projects_message_placeholder')}
                                     rows={1}
                                     className="min-h-[44px] max-h-32 flex-1 resize-none rounded-xl border-slate-200 text-xs py-2.5 focus:border-indigo-500 focus:ring-indigo-500"
                                 />
@@ -587,6 +591,7 @@ export default function ProjectShow({
                                     type="submit"
                                     disabled={submitting || (!messageText.trim() && !selectedFile)}
                                     className="h-10 w-10 shrink-0 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition p-0 flex items-center justify-center"
+                                    aria-label={__('client.projects_send_message')}
                                 >
                                     <Send className="h-4 w-4" />
                                 </Button>
@@ -602,13 +607,13 @@ export default function ProjectShow({
                             <CardHeader className="p-3.5 pb-2">
                                 <CardTitle className="text-xs font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                                     <BrainCircuit className="h-4 w-4 text-indigo-600" />
-                                    حالة المشـــــروع
+                                    {__('client.projects_status_title')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-3.5 pt-0">
                                 <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-50 px-3 py-1 text-xs font-extrabold text-indigo-700 border border-indigo-200">
                                     <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                                    {aiContext.current_stage ? aiContext.current_stage.toUpperCase() : 'GREETING'}
+                                    {aiContext.current_stage ? aiContext.current_stage.toUpperCase() : __('client.projects_stage_greeting')}
                                 </span>
                             </CardContent>
                         </Card>
@@ -619,7 +624,7 @@ export default function ProjectShow({
                                 <CardHeader className="p-3.5 pb-2">
                                     <CardTitle className="text-xs font-black text-indigo-900 tracking-tight flex items-center gap-1.5">
                                         <Sparkles className="h-4 w-4 text-indigo-600" />
-                                        الميزات المطلوبة
+                                        {__('client.projects_pending_features')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-3.5 pt-0 space-y-1.5">
@@ -639,13 +644,13 @@ export default function ProjectShow({
                                 <CardHeader className="p-3.5 pb-2">
                                     <CardTitle className="text-xs font-black text-emerald-900 tracking-tight flex items-center gap-1.5">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                                        الميزات المكتملة
+                                        {__('client.projects_completed_features')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-3.5 pt-0 space-y-1.5">
                                     {aiContext.completed_features.map((feat, idx) => (
                                         <div key={idx} className="text-[11px] font-bold text-emerald-800 bg-white p-2 rounded-lg border border-emerald-100 flex items-start gap-1.5 shadow-2xs">
-                                            <span className="text-emerald-500 font-extrabold">✓</span>
+                                            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                                             <span className="truncate">{feat}</span>
                                         </div>
                                     ))}
@@ -660,18 +665,18 @@ export default function ProjectShow({
             <Dialog open={topupModalOpen} onOpenChange={setTopupModalOpen}>
                 <DialogContent className="max-w-md rounded-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-black text-slate-900">محفظة الرصيد غير كافية</DialogTitle>
+                        <DialogTitle className="text-base font-black text-slate-900">{__('client.projects_topup_title')}</DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 mt-1">
-                            تحتاج إلى رصيد إضافي بقيمة <strong>{requiredAmount} EGP</strong> لتفعيل الـ AI Manager في هذا المشروع.
+                            {__('client.projects_topup_desc', { amount: requiredAmount })}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="mt-4 flex gap-2">
-                        <Button variant="outline" onClick={() => setTopupModalOpen(false)}>إلغاء</Button>
+                        <Button variant="outline" onClick={() => setTopupModalOpen(false)}>{__('general.cancel')}</Button>
                         <Link
                             href="/dashboard"
                             className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-700"
                         >
-                            شحن المحفظة الآن
+                            {__('client.projects_topup_now')}
                         </Link>
                     </DialogFooter>
                 </DialogContent>
@@ -683,10 +688,10 @@ export default function ProjectShow({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-amber-400 text-base font-black">
                             <Bug className="h-5 w-5 text-amber-400" />
-                            تشخيص محركات الذكاء الاصطناعي (AI Context Debug Panel)
+                            {__('client.projects_debug_heading')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-400">
-                            عرض المحتوى الحقيقي المخزن في ai_context للتحقق من خلوه من التناقضات ومتابعة التفكير الحقيقي للنظام.
+                            {__('client.projects_debug_desc')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -694,44 +699,46 @@ export default function ProjectShow({
                         {/* Quick Status Cards */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
-                                <span className="text-[10px] text-slate-400 block">Current Stage</span>
+                                <span className="text-[10px] text-slate-400 block">{__('client.projects_debug_current_stage')}</span>
                                 <span className="text-xs font-black text-emerald-400">{aiStage.toUpperCase()}</span>
                             </div>
                             <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
-                                <span className="text-[10px] text-slate-400 block">Archetype</span>
-                                <span className="text-xs font-black text-cyan-400">{(aiContext as any)?.current_archetype || 'N/A'}</span>
+                                <span className="text-[10px] text-slate-400 block">{__('client.projects_debug_archetype')}</span>
+                                <span className="text-xs font-black text-cyan-400">{(aiContext as any)?.current_archetype || __('general.n_a')}</span>
                             </div>
                             <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
-                                <span className="text-[10px] text-slate-400 block">Conflict Status</span>
+                                <span className="text-[10px] text-slate-400 block">{__('client.projects_debug_conflict_status')}</span>
                                 <span className={`text-xs font-black ${(aiContext as any)?.conflict_detected ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`}>
-                                    {(aiContext as any)?.conflict_detected ? '⚠️ Conflict Reconciled' : 'Clean'}
+                                    {(aiContext as any)?.conflict_detected ? (
+                                        <span className="inline-flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />{__('client.projects_debug_conflict_reconciled')}</span>
+                                    ) : __('client.projects_debug_clean')}
                                 </span>
                             </div>
                             <div className="rounded-xl border border-slate-800 bg-slate-900/90 p-3">
-                                <span className="text-[10px] text-slate-400 block">Clean Last Feature</span>
-                                <span className="text-xs font-black text-indigo-300 truncate block">{(aiContext as any)?.last_user_message_clean || 'N/A'}</span>
+                                <span className="text-[10px] text-slate-400 block">{__('client.projects_debug_last_feature')}</span>
+                                <span className="text-xs font-black text-indigo-300 truncate block">{(aiContext as any)?.last_user_message_clean || __('general.n_a')}</span>
                             </div>
                         </div>
 
                         {/* Conflict Reason Alert if any */}
                         {(aiContext as any)?.reconciliation_reason && (
                             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300 font-medium">
-                                💡 <strong>سبب إعادة التوفيق والضبط:</strong> {(aiContext as any).reconciliation_reason}
+                                <Lightbulb className="inline h-3.5 w-3.5 me-1" /> <strong>{__('client.projects_debug_reconcile_reason')}</strong> {(aiContext as any).reconciliation_reason}
                             </div>
                         )}
 
                         {/* Raw JSON viewer */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-xs font-bold text-slate-300">محتوى ai_context الخام (JSON):</span>
+                                <span className="text-xs font-bold text-slate-300">{__('client.projects_debug_raw_json')}</span>
                                 <button
                                     onClick={() => {
                                         navigator.clipboard.writeText(JSON.stringify(aiContext, null, 2));
-                                        toast.success('تم نسخ JSON للـ Context بنجاح!');
+                                        toast.success(__('client.projects_debug_json_copied'));
                                     }}
                                     className="text-[11px] text-indigo-400 hover:underline font-bold"
                                 >
-                                    نسخ JSON
+                                    {__('client.projects_debug_copy_json')}
                                 </button>
                             </div>
                             <pre className="rounded-xl bg-slate-900 p-4 text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-[350px] border border-slate-800 dir-ltr">
@@ -746,7 +753,7 @@ export default function ProjectShow({
                             onClick={() => setDebugModalOpen(false)}
                             className="bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-800"
                         >
-                            إغلاق نافذة Debug
+                            {__('client.projects_debug_close')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

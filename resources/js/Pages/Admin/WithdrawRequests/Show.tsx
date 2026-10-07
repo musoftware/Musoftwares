@@ -3,8 +3,8 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
-import { ConfirmModal } from '@/Components/ui/ConfirmModal';
-import { ArrowLeft, User, Wallet, Calendar, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useConfirm } from '@/hooks/useConfirm';
+import { ArrowLeft, ArrowRight, User, Wallet, Calendar, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
@@ -23,38 +23,51 @@ interface Props {
     withdrawRequest: WithdrawRequest;
 }
 
-const statusStyles: Record<string, { cls: string; label: string }> = {
-    pending:   { cls: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'Pending' },
-    reviewing: { cls: 'bg-slate-50 text-slate-900 border-slate-200',       label: 'Reviewing' },
-    approved:  { cls: 'bg-green-100 text-green-800 border-green-200',    label: 'Approved' },
-    declined:  { cls: 'bg-red-100 text-red-800 border-red-200',          label: 'Declined' },
+const statusStyles: Record<string, { cls: string; labelKey: string }> = {
+    pending:   { cls: 'bg-yellow-100 text-yellow-800 border-yellow-200', labelKey: 'general.pending' },
+    reviewing: { cls: 'bg-slate-50 text-slate-900 border-slate-200',       labelKey: 'general.reviewing' },
+    approved:  { cls: 'bg-green-100 text-green-800 border-green-200',    labelKey: 'general.approved' },
+    declined:  { cls: 'bg-red-100 text-red-800 border-red-200',          labelKey: 'general.declined' },
 };
+
+const statusLabel = (status: string): string =>
+    statusStyles[status] ? __(statusStyles[status].labelKey) : status;
 
 export default function Show({ withdrawRequest }: Props) {
     const { settings } = usePage<any>().props;
     const base_currency = settings?.base_currency;
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
-    const updateStatus = (status: string) => {
-        if (!confirm(`Change status to "${status}"?`)) return;
+    const updateStatus = async (status: string) => {
+        const accepted = await confirm({
+            title: __('admin.withdraw_requests_change_status_title'),
+            description: __('admin.withdraw_requests_change_status_body', { status: statusLabel(status) }),
+            variant: status === 'declined' ? 'danger' : 'default',
+            confirmLabel: __('general.confirm'),
+        });
+        if (!accepted) return;
         setLoading(true);
         router.patch(
             `/admin/withdraw-requests/${withdrawRequest.id}`,
             { status },
             {
-                onSuccess: () => toastSuccess(__('general.status_updated_to', { status }) || `Status updated to "${status}".`),
-                onError: () => toastError(__('general.failed_update_status') || 'Failed to update status.'),
+                onSuccess: () => toastSuccess(__('admin.withdraw_requests_status_updated', { status: statusLabel(status) })),
+                onError: () => toastError(__('general.failed_update_status')),
                 onFinish: () => setLoading(false),
             }
         );
     };
 
-    const badge = statusStyles[withdrawRequest.status] ?? { cls: 'bg-slate-100 text-slate-700', label: withdrawRequest.status };
+    const badge = {
+        cls: statusStyles[withdrawRequest.status]?.cls ?? 'bg-slate-100 text-slate-700',
+        label: statusLabel(withdrawRequest.status),
+    };
 
     return (
-        <AdminSidebarLayout title={__('general.withdraw_request')} header="Withdraw Request Detail">
-            <Head title={`Withdraw Request #${withdrawRequest.id}`} />
+        <AdminSidebarLayout title={__('general.withdraw_request')} header={__('admin.withdraw_requests_show_header')}>
+            <Head title={__('admin.withdraw_requests_show_title', { id: withdrawRequest.id })} />
 
             {/* Back link */}
             <div className="mb-6">
@@ -71,7 +84,7 @@ export default function Show({ withdrawRequest }: Props) {
                     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
                         <div className="flex items-center justify-between mb-5">
                             <h2 className="text-base font-semibold text-slate-800">
-                                Request #{withdrawRequest.id}
+                                {__('admin.withdraw_requests_request_number', { id: withdrawRequest.id })}
                             </h2>
                             <span
                                 className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold capitalize ${badge.cls}`}
@@ -147,9 +160,10 @@ export default function Show({ withdrawRequest }: Props) {
                         {withdrawRequest.user && (
                             <Link
                                 href={`/admin/users/${withdrawRequest.user.id}`}
-                                className="mt-3 block text-center text-xs text-slate-900 hover:text-slate-900 font-medium transition-colors"
+                                className="mt-3 flex items-center justify-center gap-1 text-xs text-slate-900 hover:text-slate-900 font-medium transition-colors"
                             >
-                                View User Profile →
+                                {__('admin.payment_methods_view_user_profile')}
+                                <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                             </Link>
                         )}
                     </div>
@@ -201,6 +215,7 @@ export default function Show({ withdrawRequest }: Props) {
                     )}
                 </div>
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

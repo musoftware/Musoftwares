@@ -35,7 +35,7 @@ class HostedCheckoutTest extends TestCase
 
     public function test_can_view_hosted_checkout_page_for_open_session()
     {
-        $response = $this->get('/pay/' . $this->session->session_id);
+        $response = $this->get('/sms-pay/' . $this->session->session_id);
         
         $response->assertStatus(200)
                  ->assertViewIs('sms-payment-gateway::checkout.hosted')
@@ -47,7 +47,7 @@ class HostedCheckoutTest extends TestCase
         // Force expire the session in the past
         $this->session->update(['expires_at' => now()->subMinutes(10)]);
         
-        $response = $this->get('/pay/' . $this->session->session_id);
+        $response = $this->get('/sms-pay/' . $this->session->session_id);
         
         $response->assertStatus(200)
                  ->assertViewIs('sms-payment-gateway::checkout.hosted')
@@ -68,7 +68,7 @@ class HostedCheckoutTest extends TestCase
             'sms_message' => 'تم استلام مبلغ',
         ]);
 
-        $response = $this->postJson('/pay/' . $this->session->session_id . '/verify', [
+        $response = $this->postJson('/sms-pay/' . $this->session->session_id . '/verify', [
             'transaction_reference' => 'REF123456789',
             'payment_method' => 'vodafone_cash'
         ]);
@@ -85,7 +85,7 @@ class HostedCheckoutTest extends TestCase
 
     public function test_cannot_verify_payment_with_wrong_reference()
     {
-        $response = $this->postJson('/pay/' . $this->session->session_id . '/verify', [
+        $response = $this->postJson('/sms-pay/' . $this->session->session_id . '/verify', [
             'transaction_reference' => 'WRONG_REF',
             'payment_method' => 'vodafone_cash'
         ]);

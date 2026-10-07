@@ -5,6 +5,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 
 export default function AddSubscription({ user, serviceItems }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -23,8 +24,8 @@ export default function AddSubscription({ user, serviceItems }) {
     };
 
     return (
-        <AdminSidebarLayout title={`Add Subscription: ${user.name}`} header="Add Subscription">
-            <Head title={`Add Subscription - ${user.name}`} />
+        <AdminSidebarLayout title={__('admin.add_subscription_for', { name: user.name })} header={__('admin.add_subscription')}>
+            <Head title={__('admin.add_subscription_for', { name: user.name })} />
 
             <div className="flex justify-between items-center mb-6">
                 <div>

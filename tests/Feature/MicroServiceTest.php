@@ -16,6 +16,7 @@ use Tests\TestCase;
 class MicroServiceTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $admin;
     protected User $clientUser;
@@ -24,11 +25,12 @@ class MicroServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->baseCurrency = Currency::firstOrCreate(
-            ['id' => 1],
+            ['currency' => 'EGP'],
             [
                 'name' => 'Egyptian Pound',
                 'currency' => 'EGP',
@@ -146,14 +148,8 @@ class MicroServiceTest extends TestCase
     {
         Mail::fake();
 
-        $usd = Currency::create([
-            'id' => 2,
-            'name' => 'US Dollar',
-            'currency' => 'USD',
-            'symbol' => '$',
-            'string_format' => '$%01.2f',
-            'is_default' => false,
-        ]);
+        // Real seeded currencies (USD = 1, EGP = 2) so the wallet ledger can convert to the EGP business currency.
+        $usd = Currency::where('currency', 'USD')->firstOrFail();
 
         // Exchange rate: 1 USD = 50 EGP (1 EGP = 0.02 USD)
         CurrenciesExchange::updateOrCreate(

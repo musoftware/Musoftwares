@@ -8,6 +8,7 @@ use App\Models\SerialSoftware;
 use App\Models\SerialSoftwareKey;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Serial Device Check-In API — called by client software on startup.
@@ -609,7 +610,7 @@ class SerialDeviceController extends Controller
                     $user->assignRole('client');
                 }
             } catch (\Throwable $e) {
-                // Ignore role assignment failure if roles table not initialized
+                Log::warning('Serial device: client role assignment failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
             }
         }
 

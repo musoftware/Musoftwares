@@ -30,6 +30,7 @@ import {
     CheckCircle2,
     Eye,
 } from 'lucide-react';
+import { __, getLoadedLocale } from '@/lib/i18n';
 
 interface TemplateItem {
     key: string;
@@ -51,6 +52,12 @@ interface Props {
     templates: TemplateItem[];
     selectedKey: string;
     adminEmail: string;
+}
+
+/** Pick the text that matches the active locale, falling back to the other one. */
+function localized(english: string, arabic: string): string {
+    if (getLoadedLocale() === 'ar') return arabic || english;
+    return english || arabic;
 }
 
 export default function Index({ templates, selectedKey: initialSelectedKey, adminEmail }: Props) {
@@ -75,7 +82,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
         const cats = new Map<string, string>();
         templates.forEach((t) => {
             if (!cats.has(t.category)) {
-                cats.set(t.category, t.category_label_ar || t.category_label);
+                cats.set(t.category, localized(t.category_label, t.category_label_ar));
             }
         });
         return Array.from(cats.entries()).map(([slug, label]) => ({ slug, label }));
@@ -118,7 +125,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
         if (!currentTemplate?.blade_source) return;
         navigator.clipboard.writeText(currentTemplate.blade_source);
         setCopiedSource(true);
-        toast({ title: 'تم نسخ كود الـ Blade بنجاح' });
+        toast({ title: __('admin.email_templates_copy_source_success') });
         setTimeout(() => setCopiedSource(false), 2000);
     };
 
@@ -126,14 +133,14 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
         if (!currentTemplate?.sample_data) return;
         navigator.clipboard.writeText(JSON.stringify(currentTemplate.sample_data, null, 2));
         setCopiedVars(true);
-        toast({ title: 'تم نسخ المتغيرات التجريبية بصيغة JSON' });
+        toast({ title: __('admin.email_templates_copy_vars_success') });
         setTimeout(() => setCopiedVars(false), 2000);
     };
 
     const handleSendTestEmail = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!testRecipient || !testRecipient.includes('@')) {
-            toast({ title: 'يرجى إدخال عنوان بريد إلكتروني صحيح', variant: 'destructive' });
+            toast({ title: __('admin.email_templates_invalid_email'), variant: 'destructive' });
             return;
         }
 
@@ -151,17 +158,17 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
 
             const data = await response.json();
             if (response.ok && data.success) {
-                toast({ title: data.message || 'تم إرسال البريد التجريبي بنجاح!' });
+                toast({ title: data.message || __('admin.email_templates_test_sent') });
                 setTestModalOpen(false);
             } else {
                 toast({
-                    title: data.message || 'حدث خطأ أثناء إرسال البريد التجريبي',
+                    title: data.message || __('admin.email_templates_test_failed'),
                     variant: 'destructive',
                 });
             }
         } catch (error: any) {
             toast({
-                title: 'تعذر الاتصال بالسيرفر لإرسال البريد: ' + (error?.message || ''),
+                title: __('admin.email_templates_connection_failed', { error: error?.message || '' }),
                 variant: 'destructive',
             });
         } finally {
@@ -172,8 +179,8 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
     const previewUrl = currentTemplate ? `/admin/email-templates/${currentTemplate.key}/preview` : '';
 
     return (
-        <AdminSidebarLayout header="معرض وقوالب البريد الإلكتروني (Email Templates)">
-            <Head title="معرض وقوالب البريد الإلكتروني — Musoftwares Studio" />
+        <AdminSidebarLayout header={__('admin.email_templates_header')}>
+            <Head title={__('admin.email_templates_header')} />
 
             <div className="space-y-6">
                 {/* Header Banner */}
@@ -185,18 +192,18 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                     <Mail className="h-5 w-5" />
                                 </div>
                                 <h1 className="text-xl font-bold text-slate-900">
-                                    معرض واستوديو قوالب البريد (Email Templates & Views)
+                                    {__('admin.email_templates_page_heading')}
                                 </h1>
                             </div>
                             <p className="text-xs text-slate-500 max-w-2xl">
-                                استعراض وفحص جميع تصاميم وقوالب الـ Blade الخاصة بالبريد الإلكتروني على السيستم، محاكاة العرض على الهواتف والشاشات المكتبية، واختبار الإرسال المباشر.
+                                {__('admin.email_templates_page_description')}
                             </p>
                         </div>
 
                         {/* Top quick stats */}
                         <div className="flex items-center gap-3">
                             <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-center">
-                                <span className="block text-xs font-semibold text-slate-500">إجمالي القوالب</span>
+                                <span className="block text-xs font-semibold text-slate-500">{__('admin.email_templates_total_templates')}</span>
                                 <span className="text-lg font-bold text-slate-900 font-mono">{templates.length}</span>
                             </div>
                             <Button
@@ -204,7 +211,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                 className="bg-slate-900 hover:bg-slate-800 text-white text-xs gap-1.5 h-10 px-4 shadow-sm"
                             >
                                 <Send className="h-3.5 w-3.5" />
-                                إرسال بريد تجريبي
+                                {__('admin.email_templates_send_test_email')}
                             </Button>
                         </div>
                     </div>
@@ -221,7 +228,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                             >
-                                الكل ({templates.length})
+                                {__('admin.email_templates_filter_all', { count: templates.length })}
                             </button>
                             {categories.map((cat) => {
                                 const count = templates.filter((t) => t.category === cat.slug).length;
@@ -247,7 +254,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                             <Input
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="بحث باسم القالب أو المسار..."
+                                placeholder={__('admin.email_templates_search_placeholder')}
                                 className="pl-9 h-9 text-xs rounded-lg border-slate-200"
                             />
                         </div>
@@ -261,14 +268,14 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                         <div className="border-b border-slate-100 px-4 py-3 bg-slate-50/50 flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                 <Layers className="h-3.5 w-3.5 text-slate-700" />
-                                دليل قوالب النظام ({filteredTemplates.length})
+                                {__('admin.email_templates_directory_heading', { count: filteredTemplates.length })}
                             </span>
                         </div>
 
                         <div className="divide-y divide-slate-100 max-h-[750px] overflow-y-auto">
                             {filteredTemplates.length === 0 ? (
                                 <div className="p-8 text-center text-xs text-slate-400">
-                                    لا توجد قوالب تطابق معايير البحث
+                                    {__('admin.email_templates_no_results')}
                                 </div>
                             ) : (
                                 filteredTemplates.map((t) => {
@@ -285,7 +292,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         >
                                             <div className="flex items-center justify-between gap-2">
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/80">
-                                                    {t.category_label_ar || t.category_label}
+                                                    {localized(t.category_label, t.category_label_ar)}
                                                 </span>
                                                 <span className="text-[10px] font-mono text-slate-400 truncate max-w-[140px]">
                                                     {t.blade_view}
@@ -293,14 +300,11 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                             </div>
 
                                             <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                                                {t.name_ar}
+                                                {localized(t.name, t.name_ar)}
                                             </h3>
-                                            <p className="text-xs text-slate-500 font-medium">
-                                                {t.name}
-                                            </p>
 
                                             <p className="text-[11px] text-slate-400 line-clamp-2 mt-0.5">
-                                                {t.description_ar}
+                                                {localized(t.description, t.description_ar)}
                                             </p>
 
                                             <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
@@ -325,14 +329,14 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                     <div className="min-w-0">
                                         <div className="flex items-center gap-2">
                                             <h2 className="text-base font-bold text-slate-900 truncate">
-                                                {currentTemplate.name_ar}
+                                                {localized(currentTemplate.name, currentTemplate.name_ar)}
                                             </h2>
                                             <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">
                                                 {currentTemplate.blade_path}
                                             </span>
                                         </div>
                                         <p className="text-xs text-slate-500 mt-0.5 truncate max-w-xl">
-                                            الموضوع الافتراضي: <span className="font-semibold text-slate-700">{currentTemplate.subject}</span>
+                                            {__('admin.email_templates_default_subject')} <span className="font-semibold text-slate-700">{currentTemplate.subject}</span>
                                         </p>
                                     </div>
 
@@ -348,10 +352,10 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                                             ? 'bg-white text-slate-900 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-900'
                                                     }`}
-                                                    title="معاينة شاشات الكمبيوتر"
+                                                    title={__('admin.email_templates_desktop_preview_title')}
                                                 >
                                                     <Monitor className="h-3.5 w-3.5" />
-                                                    Desktop
+                                                    {__('admin.email_templates_desktop')}
                                                 </button>
                                                 <button
                                                     onClick={() => setViewportMode('mobile')}
@@ -360,10 +364,10 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                                             ? 'bg-white text-slate-900 shadow-xs'
                                                             : 'text-slate-500 hover:text-slate-900'
                                                     }`}
-                                                    title="معاينة الهاتف المحمول (375px)"
+                                                    title={__('admin.email_templates_mobile_preview_title')}
                                                 >
                                                     <Smartphone className="h-3.5 w-3.5" />
-                                                    Mobile
+                                                    {__('admin.email_templates_mobile')}
                                                 </button>
                                             </div>
                                         )}
@@ -373,7 +377,8 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                             size="sm"
                                             onClick={handleRefreshPreview}
                                             className="h-8 px-2.5 text-xs text-slate-600 border-slate-200 hover:bg-slate-50"
-                                            title="إعادة تحميل المعاينة"
+                                            title={__('admin.email_templates_refresh_preview')}
+                                            aria-label={__('admin.email_templates_refresh_preview')}
                                         >
                                             <RefreshCw className="h-3.5 w-3.5" />
                                         </Button>
@@ -383,7 +388,8 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center justify-center h-8 px-2.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors"
-                                            title="فتح المعاينة في تبويب مستقل"
+                                            title={__('admin.email_templates_open_new_tab')}
+                                            aria-label={__('admin.email_templates_open_new_tab')}
                                         >
                                             <ExternalLink className="h-3.5 w-3.5" />
                                         </a>
@@ -394,7 +400,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                             className="h-8 px-3 text-xs bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
                                         >
                                             <Send className="h-3.5 w-3.5" />
-                                            إرسال تجريبي
+                                            {__('admin.email_templates_send_test')}
                                         </Button>
                                     </div>
                                 </div>
@@ -410,7 +416,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         }`}
                                     >
                                         <Eye className="h-3.5 w-3.5" />
-                                        المعاينة الحية (Live Viewport)
+                                        {__('admin.email_templates_tab_preview')}
                                     </button>
 
                                     <button
@@ -422,7 +428,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         }`}
                                     >
                                         <Code className="h-3.5 w-3.5" />
-                                        كود الـ Blade ({currentTemplate.blade_view})
+                                        {__('admin.email_templates_tab_source', { view: currentTemplate.blade_view })}
                                     </button>
 
                                     <button
@@ -434,7 +440,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         }`}
                                     >
                                         <SlidersHorizontal className="h-3.5 w-3.5" />
-                                        المتغيرات المحقونة (Sample Data)
+                                        {__('admin.email_templates_tab_variables')}
                                     </button>
                                 </div>
 
@@ -507,19 +513,19 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                                     {copiedSource ? (
                                                         <>
                                                             <Check className="h-3.5 w-3.5 text-emerald-600" />
-                                                            تم النسخ!
+                                                            {__('admin.email_templates_copied')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Copy className="h-3.5 w-3.5" />
-                                                            نسخ الكود
+                                                            {__('admin.email_templates_copy_code')}
                                                         </>
                                                     )}
                                                 </Button>
                                             </div>
 
                                             <pre className="p-4 text-xs font-mono bg-slate-900 text-slate-100 overflow-x-auto max-h-[640px] leading-relaxed select-all">
-                                                <code>{currentTemplate.blade_source || 'No source content found.'}</code>
+                                                <code>{currentTemplate.blade_source || __('admin.email_templates_no_source')}</code>
                                             </pre>
                                         </div>
                                     )}
@@ -529,7 +535,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                         <div className="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                             <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 flex items-center justify-between">
                                                 <span className="text-xs font-semibold text-slate-700">
-                                                    المتغيرات المحقونة لتوليد المعاينة (JSON Payload)
+                                                    {__('admin.email_templates_variables_heading')}
                                                 </span>
                                                 <Button
                                                     size="sm"
@@ -540,12 +546,12 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                                     {copiedVars ? (
                                                         <>
                                                             <Check className="h-3.5 w-3.5 text-emerald-600" />
-                                                            تم النسخ!
+                                                            {__('admin.email_templates_copied')}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Copy className="h-3.5 w-3.5" />
-                                                            نسخ JSON
+                                                            {__('admin.email_templates_copy_json')}
                                                         </>
                                                     )}
                                                 </Button>
@@ -569,14 +575,14 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Send className="h-5 w-5 text-slate-900" />
-                            إرسال بريد تجريبي لقالب {currentTemplate?.name_ar}
+                            {__('admin.email_templates_dialog_title', { name: currentTemplate ? localized(currentTemplate.name, currentTemplate.name_ar) : '' })}
                         </DialogTitle>
                     </DialogHeader>
 
                     <form onSubmit={handleSendTestEmail} className="space-y-4 py-3">
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                البريد الإلكتروني للمستلم *
+                                {__('admin.email_templates_recipient_label')}
                             </label>
                             <Input
                                 type="email"
@@ -587,14 +593,14 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                 className="w-full text-sm font-mono"
                             />
                             <p className="text-[11px] text-slate-400 mt-1">
-                                سيتم إرسال هذا البريد فوراً باستخدام إعدادات الـ SMTP مع وسم [TEST PREVIEW] في العنوان.
+                                {__('admin.email_templates_recipient_hint')}
                             </p>
                         </div>
 
                         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
-                            <p className="font-bold text-slate-900">معلومات القالب المرسل:</p>
-                            <p><strong className="text-slate-700">القالب:</strong> {currentTemplate?.blade_view}</p>
-                            <p><strong className="text-slate-700">العنوان:</strong> [TEST PREVIEW] {currentTemplate?.subject}</p>
+                            <p className="font-bold text-slate-900">{__('admin.email_templates_template_info')}</p>
+                            <p><strong className="text-slate-700">{__('admin.email_templates_template_label')}</strong> {currentTemplate?.blade_view}</p>
+                            <p><strong className="text-slate-700">{__('admin.email_templates_subject_label')}</strong> [TEST PREVIEW] {currentTemplate?.subject}</p>
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-0 pt-2">
@@ -604,7 +610,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                 onClick={() => setTestModalOpen(false)}
                                 disabled={sendingTest}
                             >
-                                إلغاء
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -612,7 +618,7 @@ export default function Index({ templates, selectedKey: initialSelectedKey, admi
                                 className="bg-slate-900 hover:bg-slate-800 text-white gap-1.5"
                             >
                                 <Send className="h-3.5 w-3.5" />
-                                {sendingTest ? 'جاري الإرسال...' : 'إرسال البريد التجريبي الآن'}
+                                {sendingTest ? __('admin.email_templates_sending') : __('admin.email_templates_send_now')}
                             </Button>
                         </DialogFooter>
                     </form>

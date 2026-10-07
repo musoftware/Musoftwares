@@ -1456,111 +1456,14 @@ null";
     }
 
     /**
-     * Debug API: Check transactions with empty phone_number and test parser
-     * GET /api/sms-payment-gateway/debug/empty-phone-numbers
-     * POST /api/sms-payment-gateway/debug/empty-phone-numbers?update=true (to update transactions)
-     * Public endpoint for debugging
-     */
-    public function debugEmptyPhoneNumbers(Request $request)
-    {
-        // Get limit from request or default to 50
-        $limit = $request->input('limit', 50);
-        $update = $request->input('update', false);
-
-        // Get all transactions with null phone_number
-        $transactions = SmsPaymentGatewayTransaction::query()
-            ->with('device.user') // Eager load device and user for Gemini API access
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-
-        $results = [];
-        $updatedCount = 0;
-
-        foreach ($transactions as $transaction) {
-            // Get the sender from transaction
-            $sender = $transaction->sender;
-
-            // Get device for Gemini API access
-            $device = $transaction->device;
-
-            // Re-run the parser on the SMS message
-            $parsedData = $this->detectTransaction($transaction->sms_message, $sender, $device);
-
-            $parserFoundPhone = $parsedData && isset($parsedData['phone_number']) && !empty($parsedData['phone_number']);
-            $parserFoundSenderName = $parsedData && isset($parsedData['sender_name']) && !empty($parsedData['sender_name']);
-            $parserFoundAmount = $parsedData && isset($parsedData['amount']) && !empty($parsedData['amount']);
-
-            $updateData = [];
-            $wasUpdated = false;
-
-            // Update transaction if update flag is set and parser found data
-            if ($update && $parsedData) {
-                if ($parserFoundPhone) {
-                    $updateData['phone_number'] = $parsedData['phone_number'];
-                }
-
-                if ($parserFoundSenderName) {
-                    $updateData['sender_name'] = $parsedData['sender_name'];
-                }
-
-                if ($parserFoundAmount) {
-                    $updateData['amount'] = $parsedData['amount'];
-                }
-
-                if (!empty($updateData)) {
-                    $transaction->update($updateData);
-                    $updatedCount++;
-                    $wasUpdated = true;
-                    // Refresh transaction to get updated values
-                    $transaction->refresh();
-                }
-            }
-
-            $results[] = [
-                'transaction_id' => $transaction->id,
-                'created_at' => $transaction->created_at->toIso8601String(),
-                'sms_message' => $transaction->sms_message,
-                'sender' => $sender,
-                'stored_amount' => $transaction->amount,
-                'stored_currency' => $transaction->currency,
-                'stored_phone_number' => $transaction->phone_number,
-                'stored_sender_name' => $transaction->sender_name,
-                'parsed_data' => $parsedData,
-                'parser_found_phone' => $parserFoundPhone,
-                'parser_found_sender_name' => $parserFoundSenderName,
-                'parser_found_amount' => $parsedData && isset($parsedData['amount']) && $parsedData['amount'] > 0,
-                'phone_number_match' => $parsedData &&
-                    isset($parsedData['phone_number']) &&
-                    $parsedData['phone_number'] === $transaction->phone_number,
-                'updated' => $wasUpdated,
-            ];
-        }
-
-        return response()->json([
-            'success' => true,
-            'total_found' => $transactions->count(),
-            'limit' => $limit,
-            'update_mode' => $update,
-            'updated_count' => $updatedCount,
-            'results' => $results,
-            'summary' => [
-                'with_parsed_phone' => collect($results)->where('parser_found_phone', true)->count(),
-                'with_parsed_sender_name' => collect($results)->where('parser_found_sender_name', true)->count(),
-                'with_parsed_amount' => collect($results)->where('parser_found_amount', true)->count(),
-            ],
-        ]);
-    }
-
-    /**
-     * Get a random active wallet for payment
+     * Get a random active wallet of the merchant that owns the API key.
      * GET /api/sms-payment-gateway/get-random-wallet
-     * Public endpoint (no auth required)
+     * Requires a merchant API key (pk_* or sk_*).
      */
     public function getRandomWallet(Request $request)
     {
-        // Get all active wallets
-        $wallets = SmsPaymentGatewayWallet::where('is_active', true)
+        $wallets = SmsPaymentGatewayWallet::where('user_id', $request->user()->id)
+            ->where('is_active', true)
             ->inRandomOrder()
             ->first();
 
@@ -1583,23 +1486,25 @@ null";
     }
 
     /**
-     * Verify payment by phone number
+     * Verify payment by phone number, limited to the merchant that owns the API key.
      * POST /api/sms-payment-gateway/verify-payment
-     * Public endpoint (no auth required)
+     * Requires a merchant API key (pk_* or sk_*).
      */
     public function verifyPayment(Request $request)
     {
         $request->validate([
             'phone_number' => 'required|string|max:20',
-            'wallet_id' => 'nullable|integer|exists:sms_payment_gateway_wallets,id',
+            'wallet_id' => 'nullable|integer',
         ]);
 
+        $merchantId = $request->user()->id;
         $phoneNumber = $request->phone_number;
         $walletId = $request->wallet_id;
 
         // If wallet_id is provided, verify against that specific wallet
         if ($walletId) {
             $wallet = SmsPaymentGatewayWallet::where('id', $walletId)
+                ->where('user_id', $merchantId)
                 ->where('is_active', true)
                 ->first();
 
@@ -1627,7 +1532,8 @@ null";
 
         // Otherwise, search for any transaction with this phone number
         // This allows verification by checking if a payment was received
-        $transaction = SmsPaymentGatewayTransaction::where('phone_number', $phoneNumber)
+        $transaction = SmsPaymentGatewayTransaction::where('user_id', $merchantId)
+            ->where('phone_number', $phoneNumber)
             ->where('status', 'processed')
             ->orderBy('created_at', 'desc')
             ->first();

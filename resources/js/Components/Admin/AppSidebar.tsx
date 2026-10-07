@@ -21,6 +21,7 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
 
 type MenuItem = {
+  /** Translation key for the menu label. */
   title: string;
   url: string;
   icon: any;
@@ -28,151 +29,156 @@ type MenuItem = {
 };
 
 const items: MenuItem[] = [
-  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "admin.sidebar_dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
   {
-    title: "User & Content",
+    title: "admin.sidebar_user_content",
     url: "/admin/users-content",
     icon: Users,
     subItems: [
-        { title: "Users", url: "/admin/users" },
-        { title: "Projects", url: "/admin/projects" },
-        { title: "Plans", url: "/admin/plans" },
-        { title: "Blog Articles", url: "/admin/blog-articles" },
-        { title: "Prompt Gallery", url: "/admin/prompts" },
+        { title: "admin.sidebar_users", url: "/admin/users" },
+        { title: "admin.sidebar_projects", url: "/admin/projects" },
+        { title: "admin.sidebar_plans", url: "/admin/plans" },
+        { title: "admin.sidebar_blog_articles", url: "/admin/blog-articles" },
+        { title: "admin.sidebar_prompt_gallery", url: "/admin/prompts" },
     ]
   },
   {
-    title: "Tasks",
+    title: "admin.sidebar_tasks",
     url: "/admin/tasks",
     icon: ListTodo,
         subItems: [
-            { title: "Pending Tasks", url: "/admin/tasks/pending", badgeCountKey: "pending_tasks" },
-            { title: "Tasks List", url: "/admin/tasks/as_list" },
-            { title: "Board Explorer", url: "/admin/tasks/board-explorer" },
-            { title: "Task Calendar", url: "/admin/tasks/calendar" },
-            { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
-            { title: "Employee Todos", url: "/admin/employee-todos" },
-            { title: "Tickets", url: "/admin/tickets", badgeCountKey: "open_tickets" },
+            { title: "admin.sidebar_pending_tasks", url: "/admin/tasks/pending", badgeCountKey: "pending_tasks" },
+            { title: "admin.sidebar_tasks_list", url: "/admin/tasks/as_list" },
+            { title: "admin.sidebar_board_explorer", url: "/admin/tasks/board-explorer" },
+            { title: "admin.sidebar_task_calendar", url: "/admin/tasks/calendar" },
+            { title: "admin.sidebar_client_tasks", url: "/admin/tasks/client-tasks" },
+            { title: "admin.sidebar_employee_todos", url: "/admin/employee-todos" },
+            { title: "admin.sidebar_tickets", url: "/admin/tickets", badgeCountKey: "open_tickets" },
         ]
   },
   {
-    title: "Invoices",
+    title: "admin.sidebar_invoices",
     url: "/admin/invoices", 
     icon: DollarSign,
     subItems: [
-        { title: "Clients Dues Board", url: "/admin/invoices/dues" },
-        { title: "Unpaid Invoices", url: "/admin/invoices/unpaid" },
-        { title: "Suspended Invoices", url: "/admin/invoices/suspended" },
-        { title: "Archived Invoices", url: "/admin/invoices/archive" },
-        { title: "All Invoices", url: "/admin/invoices" },
+        { title: "admin.sidebar_clients_dues_board", url: "/admin/invoices/dues" },
+        { title: "admin.sidebar_unpaid_invoices", url: "/admin/invoices/unpaid" },
+        { title: "admin.sidebar_suspended_invoices", url: "/admin/invoices/suspended" },
+        { title: "admin.sidebar_archived_invoices", url: "/admin/invoices/archive" },
+        { title: "admin.sidebar_all_invoices", url: "/admin/invoices" },
     ]
   },
   { 
-    title: "Finance & Business", 
+    title: "admin.sidebar_finance_business", 
     url: "/admin/finance", 
     icon: DollarSign,
     subItems: [
-        { title: "Costs", url: "/admin/business/costs" },
-        { title: "Recurring Costs", url: "/admin/business/recurring/costs" },
-        { title: "Income", url: "/admin/business/income" },
-        { title: "Recurring Income", url: "/admin/business/recurring/income" },
-        { title: "Recurring Salaries", url: "/admin/business/recurring/salaries" },
-        { title: "Recurring Invoices", url: "/admin/business/recurring/invoices" },
-        { title: "Reports", url: "/admin/business/reports" },
-        { title: "Balance", url: "/admin/business/balance-report" },
-        { title: "Payment Links", url: "/admin/payment-links" },
-        { title: "Hours Calendar", url: "/admin/hours-calendar" },
-        { title: "Transactions", url: "/admin/transactions?type=income" },
-        { title: "Cost Transactions", url: "/admin/transactions?type=cost" },
-        { title: "Currencies", url: "/admin/currencies" },
-        { title: "Currency Exchanges", url: "/admin/currency-exchanges" },
+        { title: "admin.sidebar_costs", url: "/admin/business/costs" },
+        { title: "admin.sidebar_recurring_costs", url: "/admin/business/recurring/costs" },
+        { title: "admin.sidebar_income", url: "/admin/business/income" },
+        { title: "admin.sidebar_recurring_income", url: "/admin/business/recurring/income" },
+        { title: "admin.sidebar_recurring_salaries", url: "/admin/business/recurring/salaries" },
+        { title: "admin.sidebar_recurring_invoices", url: "/admin/business/recurring/invoices" },
+        { title: "admin.sidebar_reports", url: "/admin/business/reports" },
+        { title: "admin.sidebar_balance", url: "/admin/business/balance-report" },
+        { title: "admin.sidebar_payment_links", url: "/admin/payment-links" },
+        { title: "admin.sidebar_hours_calendar", url: "/admin/hours-calendar" },
+        { title: "admin.sidebar_transactions", url: "/admin/transactions?type=income" },
+        { title: "admin.sidebar_cost_transactions", url: "/admin/transactions?type=cost" },
+        { title: "admin.sidebar_currencies", url: "/admin/currencies" },
+        { title: "admin.sidebar_currency_exchanges", url: "/admin/currency-exchanges" },
     ]
   },
   { 
-    title: "Operations", 
+    title: "admin.sidebar_operations", 
     url: "/admin/operations", 
     icon: Briefcase,
     subItems: [
-        { title: "Bulk Notify", url: "/admin/notifications/broadcast" },
-        { title: "Website Services", url: "/admin/website-services" },
-        { title: "Micro Services", url: "/admin/micro-services" },
-        { title: "Guest Tickets", url: "/admin/guest-tickets" },
-        { title: "Tickets", url: "/admin/tickets" },
-        { title: "Busy Times", url: "/admin/busy-times" },
-        { title: "Points Control", url: "/admin/points_controller" },
-        { title: "Point Packages", url: "/admin/point-packages" },
-        { title: "Charity", url: "/admin/charity-counter" },
-        { title: "KYC Verification", url: "/admin/kyc" },
-        { title: "Contracts", url: "/admin/contracts" },
-        { title: "Contract Price List", url: "/admin/contract-price-items" },
-        { title: "Project Cost Estimator", url: "/estimator" },
-        { title: "Commissions", url: "/admin/commissions" },
+        { title: "admin.sidebar_bulk_notify", url: "/admin/notifications/broadcast" },
+        { title: "admin.sidebar_website_services", url: "/admin/website-services" },
+        { title: "admin.sidebar_micro_services", url: "/admin/micro-services" },
+        { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets" },
+        { title: "admin.sidebar_tickets", url: "/admin/tickets" },
+        { title: "admin.sidebar_busy_times", url: "/admin/busy-times" },
+        { title: "admin.sidebar_points_control", url: "/admin/points_controller" },
+        { title: "admin.sidebar_point_packages", url: "/admin/point-packages" },
+        { title: "admin.sidebar_charity", url: "/admin/charity-counter" },
+        { title: "admin.sidebar_kyc_verification", url: "/admin/kyc" },
+        { title: "admin.sidebar_contracts", url: "/admin/contracts" },
+        { title: "admin.sidebar_contract_price_list", url: "/admin/contract-price-items" },
+        { title: "admin.sidebar_project_cost_estimator", url: "/estimator" },
+        { title: "admin.sidebar_commissions", url: "/admin/commissions" },
     ]
   },
   { 
-    title: "Marketplace", 
+    title: "admin.sidebar_marketplace", 
     url: "/admin/marketplace", 
     icon: Building2,
     subItems: [
-        { title: "Software & Tools Store", url: "/admin/store-tools" },
-        { title: "Digital Books", url: "/admin/digital-products" },
-        { title: "Upload Book (PDF)", url: "/admin/digital-products/create" },
-        { title: "Book Categories", url: "/admin/digital-products/categories" },
-        { title: "Quotations", url: "/admin/marketplace/quotations" },
-        { title: "Service Playbooks", url: "/admin/marketplace/service-playbooks" },
-        { title: "All Services", url: "/admin/marketplace/all-services" },
-        { title: "Pending Services", url: "/admin/marketplace/pending-services" },
-        { title: "Categories", url: "/admin/marketplace/categories" },
-        { title: "Orders", url: "/admin/marketplace/orders" },
-        { title: "Landing Pages", url: "/admin/marketplace/service-landing-pages" },
+        { title: "admin.sidebar_software_tools_store", url: "/admin/store-tools" },
+        { title: "admin.sidebar_digital_books", url: "/admin/digital-products" },
+        { title: "admin.sidebar_upload_book_pdf", url: "/admin/digital-products/create" },
+        { title: "admin.sidebar_book_categories", url: "/admin/digital-products/categories" },
+        { title: "admin.sidebar_quotations", url: "/admin/marketplace/quotations" },
+        { title: "admin.sidebar_service_playbooks", url: "/admin/marketplace/service-playbooks" },
+        { title: "admin.sidebar_all_services", url: "/admin/marketplace/all-services" },
+        { title: "admin.sidebar_pending_services", url: "/admin/marketplace/pending-services" },
+        { title: "admin.sidebar_categories", url: "/admin/marketplace/categories" },
+        { title: "admin.sidebar_orders", url: "/admin/marketplace/orders" },
+        { title: "admin.sidebar_landing_pages", url: "/admin/marketplace/service-landing-pages" },
     ]
   },
   { 
-    title: "Seller & Payout", 
+    title: "admin.sidebar_seller_payout", 
     url: "/admin/seller", 
     icon: CreditCard,
     subItems: [
-        { title: "Payouts", url: "/admin/payouts" },
-        { title: "Payment Methods", url: "/admin/payment-methods" },
-        { title: "Withdraw Requests", url: "/admin/withdraw-requests" },
-        { title: "Earning Analyze", url: "/admin/users/earning-analyze" },
-        { title: "Private CoWork", url: "/admin/users/co-work" },
-        { title: "Vouchers", url: "/admin/vouchers" },
-        { title: "Coupons", url: "/admin/coupons" },
+        { title: "admin.sidebar_payouts", url: "/admin/payouts" },
+        { title: "admin.sidebar_payment_methods", url: "/admin/payment-methods" },
+        { title: "admin.sidebar_withdraw_requests", url: "/admin/withdraw-requests" },
+        { title: "admin.sidebar_earning_analyze", url: "/admin/users/earning-analyze" },
+        { title: "admin.sidebar_private_cowork", url: "/admin/users/co-work" },
+        { title: "admin.sidebar_vouchers", url: "/admin/vouchers" },
+        { title: "admin.sidebar_coupons", url: "/admin/coupons" },
     ]
   },
   { 
-    title: "Short Links", 
+    title: "admin.sidebar_short_links", 
     url: "/admin/shortlinks", 
     icon: Link2,
   },
   { 
-    title: "Email Templates", 
+    title: "admin.sidebar_email_templates", 
     url: "/admin/email-templates", 
     icon: LayoutTemplate,
   },
   { 
-    title: "Outgoing Emails", 
+    title: "admin.sidebar_outgoing_emails", 
     url: "/admin/outgoing-emails", 
     icon: Mail,
   },
   { 
-    title: "System & Settings", 
+    title: "admin.sidebar_system_settings", 
     url: "/admin/system", 
     icon: Settings,
     subItems: [
-        { title: "Software & Tools Store", url: "/admin/store-tools" },
-        { title: "User Assignments", url: "/admin/serial-user-devices" },
-        { title: "Serial Softwares", url: "/admin/serial-softwares" },
-        { title: "Serial Devices", url: "/admin/serial-devices" },
-        { title: "Quick Activate", url: "/admin/serial-devices-quick-activate" },
+        { title: "admin.sidebar_software_tools_store", url: "/admin/store-tools" },
+        { title: "admin.sidebar_user_assignments", url: "/admin/serial-user-devices" },
+        { title: "admin.sidebar_serial_softwares", url: "/admin/serial-softwares" },
+        { title: "admin.sidebar_serial_devices", url: "/admin/serial-devices" },
+        { title: "admin.sidebar_quick_activate", url: "/admin/serial-devices-quick-activate" },
         
-        { title: "Partner Gateway (B2B API)", url: "/admin/partner-gateway" },
-        { title: "Settings", url: "/admin/settings" },
-        { title: "Security & Rate Limits", url: "/admin/settings/security" },
+        { title: "admin.sidebar_partner_gateway_b2b_api", url: "/admin/partner-gateway" },
+        { title: "admin.sidebar_settings", url: "/admin/settings" },
+        { title: "admin.sidebar_security_rate_limits", url: "/admin/settings/security" },
     ]
   },
 ];
+
+const ACCOUNTANT_GROUP_URLS = ['/admin/invoices', '/admin/finance', '/admin/seller'];
+const OPERATIONS_URL = '/admin/operations';
+const SUPPORT_AGENT_URLS = ['/admin/tickets', '/admin/guest-tickets'];
+const MODERATOR_URLS = ['/admin/tickets'];
 
 export function AppSidebar() {
   const { url, props } = usePage();
@@ -188,24 +194,24 @@ export function AppSidebar() {
 
   if (isAccountant) {
       visibleItems = items.filter(item => 
-          ['Invoices', 'Finance & Business', 'Seller & Payout'].includes(item.title)
+          ACCOUNTANT_GROUP_URLS.includes(item.url)
       );
   } else if (isSupportAgent) {
       visibleItems = items.map(item => {
-          if (item.title === 'Operations') {
+          if (item.url === OPERATIONS_URL) {
               return {
                   ...item,
-                  subItems: item.subItems?.filter(sub => sub.title === 'Tickets' || sub.title === 'Guest Tickets')
+                  subItems: item.subItems?.filter(sub => SUPPORT_AGENT_URLS.includes(sub.url))
               };
           }
           return null;
       }).filter(Boolean) as typeof items;
   } else if (isOnlyModerator) {
       visibleItems = items.map(item => {
-          if (item.title === 'Operations') {
+          if (item.url === OPERATIONS_URL) {
               return {
                   ...item,
-                  subItems: item.subItems?.filter(sub => sub.title === 'Tickets')
+                  subItems: item.subItems?.filter(sub => MODERATOR_URLS.includes(sub.url))
               };
           }
           return null;
@@ -240,11 +246,11 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <CollapsibleTrigger
                                     render={
-                                        <SidebarMenuButton tooltip={item.title} />
+                                        <SidebarMenuButton tooltip={__(item.title)} />
                                     }
                                 >
                                     <item.icon className="h-4 w-4" />
-                                    <span>{item.title}</span>
+                                    <span>{__(item.title)}</span>
                                     <ChevronRight className="ms-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
@@ -263,7 +269,7 @@ export function AppSidebar() {
                                                         }
                                                     >
                                                         <span className="flex items-center justify-between w-full">
-                                                            <span>{subItem.title}</span>
+                                                            <span>{__(subItem.title)}</span>
                                                             {typeof count === 'number' && count > 0 && (
                                                                 <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-900 text-white dark:bg-white dark:text-slate-900 leading-none">
                                                                     {count}
@@ -285,11 +291,11 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       isActive={isActive}
-                      tooltip={item.title}
+                      tooltip={__(item.title)}
                       render={<Link href={item.url} />}
                     >
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>{__(item.title)}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -300,7 +306,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-4">
         <div className="text-xs text-muted-foreground/70 text-center">
-            Musoftware Admin &copy; {new Date().getFullYear()}
+            {__('admin.sidebar_footer_copyright', { year: new Date().getFullYear() })}
         </div>
       </SidebarFooter>
     </Sidebar>

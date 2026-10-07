@@ -40,24 +40,24 @@ export default function Dashboard({
     }, []);
 
     const chartData = revenueChartData || [];
-    const pieData = moduleBreakdown || [{ name: 'No data', value: 0, color: '#94a3b8' }];
+    const pieData = moduleBreakdown || [{ name: __('admin.dashboard_no_data'), value: 0, color: '#94a3b8' }];
 
     const recentTransactionsColumns = [
-        { key: 'user_name', label: 'User', render: (row: any) => <span className="font-medium text-sm">{row.user_name}</span> },
-        { key: 'amount', label: 'Amount', render: (row: any) => <span className={`font-mono text-sm ${row.type === 'received' ? 'text-green-600' : 'text-red-600'}`}>{row.type === 'received' ? '+' : '-'}{formatCurrency(row.amount, businessCurrency)}</span> },
-        { key: 'created_at', label: 'Time', render: (row: any) => <span className="text-xs text-slate-500">{row.created_at}</span> },
+        { key: 'user_name', label: __('general.user'), render: (row: any) => <span className="font-medium text-sm">{row.user_name}</span> },
+        { key: 'amount', label: __('general.amount'), render: (row: any) => <span className={`font-mono text-sm ${row.type === 'received' ? 'text-green-600' : 'text-red-600'}`}>{row.type === 'received' ? '+' : '-'}{formatCurrency(row.amount, businessCurrency)}</span> },
+        { key: 'created_at', label: __('admin.dashboard_time'), render: (row: any) => <span className="text-xs text-slate-500">{row.created_at}</span> },
     ];
 
     const recentUsersColumns = [
-        { key: 'name', label: 'Name', render: (row: any) => <span className="font-medium text-sm">{row.name}</span> },
-        { key: 'email', label: 'Email', render: (row: any) => <span className="text-sm text-slate-600">{row.email}</span> },
-        { key: 'created_at', label: 'Joined', render: (row: any) => <span className="text-xs text-slate-500">{row.created_at}</span> },
+        { key: 'name', label: __('general.name'), render: (row: any) => <span className="font-medium text-sm">{row.name}</span> },
+        { key: 'email', label: __('general.email'), render: (row: any) => <span className="text-sm text-slate-600">{row.email}</span> },
+        { key: 'created_at', label: __('general.joined'), render: (row: any) => <span className="text-xs text-slate-500">{row.created_at}</span> },
     ];
 
     const recentTicketsColumns = [
-        { key: 'user_name', label: 'User', render: (row: any) => <span className="font-medium text-sm">{row.user_name}</span> },
-        { key: 'subject', label: 'Subject', render: (row: any) => <span className="text-sm truncate max-w-[150px] inline-block">{row.subject}</span> },
-        { key: 'status', label: 'Status', render: (row: any) => <StatusBadge status={row.status === 'closed' ? 'success' : 'warning'} label={row.status} size="sm" /> },
+        { key: 'user_name', label: __('general.user'), render: (row: any) => <span className="font-medium text-sm">{row.user_name}</span> },
+        { key: 'subject', label: __('general.subject'), render: (row: any) => <span className="text-sm truncate max-w-[150px] inline-block">{row.subject}</span> },
+        { key: 'status', label: __('general.status'), render: (row: any) => <StatusBadge status={row.status === 'closed' ? 'success' : 'warning'} label={row.status} size="sm" /> },
     ];
 
     const toggleValues = () => {
@@ -76,7 +76,7 @@ export default function Dashboard({
     return (
         <AdminSidebarLayout 
             title={__('general.admin_platform')}
-            header="Admin Dashboard"
+            header={__('general.admin_dashboard')}
             user={auth?.user}
         >
             <div className="space-y-8 pb-10">
@@ -91,7 +91,7 @@ export default function Dashboard({
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <Button variant="outline" size="sm" onClick={toggleValues}>
-                            {showValues ? 'Hide Values' : 'Show Values'}
+                            {showValues ? __('admin.dashboard_hide_values') : __('admin.dashboard_show_values')}
                         </Button>
                         <div className="hidden md:flex items-center gap-2">
                             <span className="bg-slate-50 text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-50 flex items-center gap-1.5">
@@ -153,8 +153,8 @@ export default function Dashboard({
                                         <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: businessCurrency, maximumFractionDigits: 0 }).format(value)} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
                                         <RechartsTooltip formatter={(value: any) => [formatCurrency(value, businessCurrency), undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
                                         <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                        <Line type="monotone" dataKey="income" name="Income" stroke="#10b981" strokeWidth={2} activeDot={{ r: 6 }} dot={false} />
-                                        <Line type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} dot={false} />
+                                        <Line type="monotone" dataKey="income" name={__('general.income')} stroke="#10b981" strokeWidth={2} activeDot={{ r: 6 }} dot={false} />
+                                        <Line type="monotone" dataKey="expenses" name={__('general.expenses')} stroke="#ef4444" strokeWidth={2} dot={false} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -300,7 +300,7 @@ export default function Dashboard({
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Active (30d)</span>
+                                    <span className="text-sm text-slate-600">{__('admin.dashboard_active_30_days')}</span>
                                     <span className="font-bold text-slate-900">{maskValue(operationalStats?.activeUsers30d)}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">

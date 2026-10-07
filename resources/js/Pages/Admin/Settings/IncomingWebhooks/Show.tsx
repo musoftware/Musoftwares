@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { ArrowLeft, CheckCircle2, Clock, XCircle, FileJson } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 
 interface Webhook {
     id: number;
@@ -22,7 +23,17 @@ interface Props {
     webhook: Webhook;
 }
 
+const copyJson = async (value: unknown) => {
+    try {
+        await navigator.clipboard.writeText(JSON.stringify(value, null, 2));
+        toastSuccess(__('admin.copied_to_clipboard'));
+    } catch {
+        toastError(__('general.error_occurred'));
+    }
+};
+
 export default function Show({ webhook }: Props) {
+    const pageTitle = __('admin.settings_webhook_title', { id: webhook.id });
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'processed':
@@ -30,22 +41,25 @@ export default function Show({ webhook }: Props) {
             case 'failed':
                 return <Badge className="bg-red-100 text-red-800"><XCircle className="w-4 h-4 me-1" /> {__('general.failed')}</Badge>;
             default:
-                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 me-1" /> {__('general.pending')}</Badge>;
+                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 me-1" /> {__('general.status_pending')}</Badge>;
         }
     };
 
     return (
-        <AdminSidebarLayout title={`Webhook #${webhook.id}`} header="Webhook Details">
-            <Head title={`Webhook #${webhook.id}`} />
+        <AdminSidebarLayout title={pageTitle} header={__('admin.settings_webhook_details')}>
+            <Head title={pageTitle} />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href={route('admin.settings.incoming-webhooks.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                            <ArrowLeft className="w-5 h-5" />
+                        <Link href={route('admin.settings.incoming-webhooks.index')} className="text-slate-500 hover:text-slate-900 transition-colors"
+                            aria-label={__('admin.settings_webhook_back_to_list')}
+                            title={__('admin.settings_webhook_back_to_list')}
+                        >
+                            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                         </Link>
                         <h1 className="text-2xl font-bold text-slate-900">
-                            Webhook #{webhook.id}
+                            {pageTitle}
                         </h1>
                         {getStatusBadge(webhook.status)}
                     </div>
@@ -80,7 +94,7 @@ export default function Show({ webhook }: Props) {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-slate-500">{__('general.event_type')}</p>
-                                    <p className="font-semibold text-slate-900 mt-1">{webhook.event_type || 'N/A'}</p>
+                                    <p className="font-semibold text-slate-900 mt-1">{webhook.event_type || __('general.n_a')}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-slate-500">{__('general.received_at')}</p>
@@ -89,7 +103,7 @@ export default function Show({ webhook }: Props) {
                                 <div>
                                     <p className="text-sm font-medium text-slate-500">{__('general.processed_at')}</p>
                                     <p className="font-semibold text-slate-900 mt-1">
-                                        {webhook.processed_at ? new Date(webhook.processed_at).toLocaleString() : 'Not processed yet'}
+                                        {webhook.processed_at ? new Date(webhook.processed_at).toLocaleString() : __('admin.settings_webhook_not_processed')}
                                     </p>
                                 </div>
                             </div>
@@ -103,12 +117,10 @@ export default function Show({ webhook }: Props) {
                             </CardTitle>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(JSON.stringify(webhook.headers, null, 2));
-                                }}
+                                onClick={() => copyJson(webhook.headers)}
                                 className="text-xs text-slate-500 hover:text-slate-900"
                             >
-                                {__('general.copy') || 'Copy'}
+                                {__('general.copy')}
                             </button>
                         </CardHeader>
                         <CardContent>
@@ -128,12 +140,10 @@ export default function Show({ webhook }: Props) {
                         </CardTitle>
                         <button
                             type="button"
-                            onClick={() => {
-                                navigator.clipboard.writeText(JSON.stringify(webhook.payload, null, 2));
-                            }}
+                            onClick={() => copyJson(webhook.payload)}
                             className="text-xs text-slate-500 hover:text-slate-900"
                         >
-                            {__('general.copy') || 'Copy'}
+                            {__('general.copy')}
                         </button>
                     </CardHeader>
                     <CardContent>

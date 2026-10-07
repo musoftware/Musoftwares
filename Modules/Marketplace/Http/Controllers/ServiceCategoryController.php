@@ -161,7 +161,7 @@ class ServiceCategoryController extends Controller
             ->where('category_id', $category->id)
             ->where('status', 'active')
             ->latest()
-            ->paginate(15);
+            ->paginate(15)->withQueryString();
 
         $categories = \Illuminate\Support\Facades\Cache::remember('mk_categories_list', 3600, function () {
             return ServiceCategory::orderBy('name')->get();

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
 use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use App\Support\SsoSignature;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ExchangeRateSyncController extends Controller
 {
@@ -16,38 +17,9 @@ class ExchangeRateSyncController extends Controller
      */
     public function sync(Request $request): JsonResponse
     {
-        $system = $request->header('X-Investor-System')
-            ?? $request->header('X-GoldSaver-System')
-            ?? $request->header('X-Sso-System');
-
-        $signature = $request->header('X-Investor-Signature')
-            ?? $request->header('X-GoldSaver-Signature')
-            ?? $request->header('X-Sso-Signature');
-
-        $timestamp = $request->header('X-Investor-Timestamp')
-            ?? $request->header('X-GoldSaver-Timestamp')
-            ?? $request->header('X-Sso-Timestamp');
-
-        if (! $signature || ! $timestamp || ! $system) {
-            return response()->json(['error' => 'missing_signature_headers'], 401);
-        }
-
-        $secret = (string) config("services.{$system}.shared_secret", config('services.goldsaversys.shared_secret', ''));
-
-        // Prevent replay attacks (allow 5 minute clock drift)
-        if (abs(now()->timestamp - (int) $timestamp) > 300) {
-            return response()->json(['error' => 'signature_expired'], 401);
-        }
-
-        $expected = hash_hmac('sha256', $timestamp.'.exchange-rates-sync', $secret);
-        if (! hash_equals($expected, $signature)) {
-            Log::warning('SSO Exchange Rates Sync signature mismatch', [
-                'ip' => $request->ip(),
-                'received' => $signature,
-                'expected' => $expected,
-            ]);
-
-            return response()->json(['error' => 'invalid_signature'], 401);
+        $signatureError = SsoSignature::verify($request, SsoSignature::systemFromHeaders($request), 'exchange-rates-sync');
+        if ($signatureError !== null) {
+            return response()->json(['error' => $signatureError], 401);
         }
 
         $request->validate([
@@ -69,6 +41,7 @@ class ExchangeRateSyncController extends Controller
         foreach ($currencies as $currency) {
             if ($currency->id == 1 || strtoupper($currency->currency) === 'USD') {
                 $usdRates[$currency->id] = 1.0;
+
                 continue;
             }
 
@@ -86,7 +59,7 @@ class ExchangeRateSyncController extends Controller
             $code = strtoupper($currency->currency);
             $currenciesData[] = [
                 'code' => $code,
-                'name' => $currencyNames[$code] ?? ($code . ' Currency'),
+                'name' => $currencyNames[$code] ?? ($code.' Currency'),
                 'symbol' => $currency->symbol,
                 'current_usd_rate' => number_format($usdRates[$currency->id] ?? 1.0, 8, '.', ''),
                 'is_active' => true,
@@ -106,7 +79,7 @@ class ExchangeRateSyncController extends Controller
                     'from_currency' => strtoupper($ex->currencyFrom->currency),
                     'to_currency' => strtoupper($ex->currencyTo->currency),
                     'rate' => number_format((float) $ex->rate, 8, '.', ''),
-                    'date' => $ex->date_string instanceof \Carbon\Carbon ? $ex->date_string->toDateString() : (string) $ex->date_string,
+                    'date' => $ex->date_string instanceof Carbon ? $ex->date_string->toDateString() : (string) $ex->date_string,
                     'source' => 'monolith',
                 ];
             }

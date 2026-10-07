@@ -31,7 +31,7 @@ return [
     'sop_workflow' => 'خطوات التنفيذ (SOP)',
     'thank_you_msg' => 'رسالة الشكر والتسليم',
     'internal_notes' => 'ملاحظات التنفيذ الداخلية',
-    'available' => '✓ متوفرة',
+    'available' => 'متوفرة',
     'not_added' => 'غير مضافة',
 
     // Form Sections

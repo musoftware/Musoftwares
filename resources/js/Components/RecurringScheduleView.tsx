@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Card, CardContent } from '@/Components/ui/card';
-import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2, X, Play } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2, X, Play, Mail } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/Components/ui/table';
 import { formatMoney } from '@/lib/utils';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { useConfirm } from '@/hooks/useConfirm';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
@@ -55,40 +56,58 @@ export function RecurringScheduleView({
     const scheduleItems: any[] = Array.isArray(upcomingSchedule) ? upcomingSchedule : [];
     const [pendingDelete, setPendingDelete] = useState<number | null>(null);
     const [generating, setGenerating] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
+    const [sendingEmail, setSendingEmail] = useState(false);
     const [firingDate, setFiringDate] = useState<string | null>(null);
 
-    const handleFireRun = (date: string) => {
-        const confirmMsg = __('general.confirm_fire_invoice_for_date') || `Are you sure you want to fire this recurring invoice for ${date}?`;
-        if (confirm(confirmMsg)) {
-            setFiringDate(date);
-            router.post(route('admin.recurring_invoices.fire_run', item.id), { date }, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success(__('general.recurring_invoice_fired_successfully') || 'Invoice fired successfully');
-                },
-                onError: (err: any) => {
-                    toast.error(err?.message || __('general.failed_to_fire_recurring_invoice') || 'Failed to fire invoice');
-                },
-                onFinish: () => setFiringDate(null),
-            });
-        }
+    const handleSendEmail = () => {
+        setSendingEmail(true);
+        router.post(route('admin.recurring_invoices.notify_client', item.id), {}, {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const flash = page.props.flash as { success?: string; error?: string } | undefined;
+                if (flash?.error) {
+                    toast.error(flash.error);
+                    return;
+                }
+                toast.success(flash?.success || __('general.notification_sent'));
+            },
+            onError: () => toast.error(__('admin.notification_failed')),
+            onFinish: () => setSendingEmail(false),
+        });
     };
 
-    const handleGenerateMissing = () => {
+    const handleFireRun = async (date: string) => {
+        const accepted = await confirm({ description: __('general.confirm_fire_invoice_for_date', { date }) });
+        if (!accepted) return;
+        setFiringDate(date);
+        router.post(route('admin.recurring_invoices.fire_run', item.id), { date }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(__('general.recurring_invoice_fired_successfully'));
+            },
+            onError: (err: any) => {
+                toast.error(err?.message || __('general.failed_to_fire_recurring_invoice'));
+            },
+            onFinish: () => setFiringDate(null),
+        });
+    };
+
+    const handleGenerateMissing = async () => {
         const genRoute = kind === 'salary' ? 'admin.recurring_salaries.generate_missing' : 'admin.recurring_invoices.generate_missing';
-        if (confirm(__('general.confirm_generate_missing') || 'Are you sure you want to generate all missing past transactions up to today for this schedule?')) {
-            setGenerating(true);
-            router.post(route(genRoute, item.id), {}, {
-                preserveScroll: true,
-                onFinish: () => setGenerating(false),
-            });
-        }
+        const accepted = await confirm({ description: __('general.confirm_generate_missing') });
+        if (!accepted) return;
+        setGenerating(true);
+        router.post(route(genRoute, item.id), {}, {
+            preserveScroll: true,
+            onFinish: () => setGenerating(false),
+        });
     };
 
     const handleDelete = () => {
         router.delete(route(deleteRoute, item.id), {
-            onSuccess: () => toast.success(__('general.deleted') || 'Deleted'),
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toast.success(__('general.deleted')),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -103,11 +122,11 @@ export function RecurringScheduleView({
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(__('general.removed') || 'Removed');
+                    toast.success(__('general.removed'));
                     setPendingDelete(null);
                 },
                 onError: () => {
-                    toast.error(__('general.error_occurred') || 'Something went wrong');
+                    toast.error(__('general.error_occurred'));
                     setPendingDelete(null);
                 },
             },
@@ -130,8 +149,14 @@ export function RecurringScheduleView({
                 <div className="flex items-center gap-2">
                     <Button variant="default" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm" onClick={handleGenerateMissing} disabled={generating}>
                         <Play className="w-3.5 h-3.5 fill-current" />
-                        {generating ? (__('general.loading') || 'Generating...') : (__('general.generate_missing_transactions') || 'Generate Missing')}
+                        {generating ? (__('general.loading')) : (__('general.generate_missing_transactions'))}
                     </Button>
+                    {kind === 'invoice' && (
+                        <Button variant="outline" size="sm" className="flex items-center gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-100" onClick={handleSendEmail} disabled={sendingEmail}>
+                            <Mail className="w-4 h-4" />
+                            {sendingEmail ? (__('general.loading')) : (__('general.send_email_to_customer'))}
+                        </Button>
+                    )}
                     <Link href={route(editRoute, item.id)}>
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                             <Edit className="w-4 h-4" /> {__('general.edit')}
@@ -170,7 +195,7 @@ export function RecurringScheduleView({
                         {kind === 'invoice' && item.cost !== undefined && (
                             <div>
                                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
-                                    {__('general.cost') || 'Cost'}
+                                    {__('general.cost')}
                                 </span>
                                 <span className="text-sm font-bold text-slate-700 block mt-1 break-words">
                                     {formatMoney(item.cost, item.currency)}
@@ -202,10 +227,10 @@ export function RecurringScheduleView({
                         {kind === 'invoice' && item.days_before !== undefined && (
                             <div className="mt-2">
                                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
-                                    {__('general.fire_in_advance_days') || 'Advance Notice'}
+                                    {__('general.fire_in_advance_days')}
                                 </span>
                                 <span className="text-sm font-medium text-slate-800 block mt-0.5">
-                                    {item.days_before} {__('general.days_before_due') || 'days before'}
+                                    {item.days_before} {__('general.days_before_due')}
                                 </span>
                             </div>
                         )}
@@ -356,7 +381,7 @@ export function RecurringScheduleView({
                                                             disabled={firingDate === run.date}
                                                         >
                                                             <Play className="w-3 h-3 fill-current" />
-                                                            {firingDate === run.date ? (__('general.firing') || 'Firing...') : (__('general.fire_now') || 'Fire Now')}
+                                                            {firingDate === run.date ? (__('general.firing')) : (__('general.fire_now'))}
                                                         </Button>
                                                     )}
                                                     {!run.can_fire && !run.recorded && run.days_away > 3 && (
@@ -377,14 +402,15 @@ export function RecurringScheduleView({
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.confirm_remove_transaction') || 'Remove transaction?'}
-                description={__('general.confirm_remove_transaction_desc') || 'This transaction will be removed from the schedule history.'}
+                title={__('general.confirm_remove_transaction')}
+                description={__('general.confirm_remove_transaction_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"
                 onConfirm={confirmRemoveRecord}
                 onCancel={() => setPendingDelete(null)}
             />
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

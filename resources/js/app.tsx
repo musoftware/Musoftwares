@@ -8,11 +8,28 @@ import { Toaster } from '@/Components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
-import { syncDocumentDirection } from '@/lib/i18n';
+import { getLoadedLocale, loadTranslations, syncDocumentDirection } from '@/lib/i18n';
 import { initTheme, applyTheme } from '@/lib/theme';
 import { useAppStore } from '@/store/useAppStore';
 import { initAllMouseScrollContainers } from '@/lib/mouseScroll';
-// WebSockets disabled for main SaaS
+
+type SharedPageProps = {
+    locale?: string;
+    currencies?: SharedCurrency[];
+    wallet?: { currency?: string };
+    settings?: { base_currency?: string };
+};
+
+/** Expose currency data from page props to the money formatting helpers. */
+function syncGlobalCurrencyState(props: SharedPageProps): void {
+    if (props.currencies) {
+        window.currencies = props.currencies;
+    }
+    const defaultCurrency = props.wallet?.currency || props.settings?.base_currency;
+    if (defaultCurrency) {
+        window.defaultCurrency = defaultCurrency;
+    }
+}
 
 // Initialize Auto / System / Dark / Light theme reactivity
 if (typeof window !== 'undefined') {
@@ -22,19 +39,18 @@ if (typeof window !== 'undefined') {
 
 // Listen for Inertia page transitions to keep document lang & dir synced
 router.on('navigate', (event) => {
-    const page = event.detail.page as any;
-    const props = page.props as any;
-    if (props?.locale) {
+    const page = event.detail.page;
+    const props = (page.props ?? {}) as SharedPageProps;
+    const loadedLocale = getLoadedLocale();
+    if (props.locale && loadedLocale && props.locale !== loadedLocale) {
+        // Only the active locale is bundled in memory; reload to fetch the new one.
+        window.location.reload();
+        return;
+    }
+    if (props.locale) {
         syncDocumentDirection(props.locale);
     }
-    if (props?.currencies) {
-        (window as any).currencies = props.currencies;
-    }
-    if (props?.wallet?.currency) {
-        (window as any).defaultCurrency = props.wallet.currency;
-    } else if (props?.settings?.base_currency) {
-        (window as any).defaultCurrency = props.settings.base_currency;
-    }
+    syncGlobalCurrencyState(props);
 
     // Keep public pages strictly locked to light theme during client-side navigation
     if (page?.component?.startsWith('Public/') || page?.component === 'Frontend/Contract/Show') {
@@ -71,6 +87,8 @@ router.on('invalid', (event: any) => {
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 // Global Scroll Animation Observer
+const ANIMATE_SELECTOR = '.animate-on-scroll:not(.is-observed)';
+
 const initScrollObserver = () => {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -83,39 +101,63 @@ const initScrollObserver = () => {
         rootMargin: '0px 0px -50px 0px'
     });
 
-    const observeElements = () => {
-        document.querySelectorAll('.animate-on-scroll:not(.is-observed)').forEach((el) => {
-            el.classList.add('is-observed');
-            observer.observe(el);
-        });
+    const observeElement = (el: Element) => {
+        el.classList.add('is-observed');
+        observer.observe(el);
     };
 
-    // Initial check
-    observeElements();
+    const scanSubtree = (root: ParentNode) => {
+        if (root instanceof Element && root.matches(ANIMATE_SELECTOR)) {
+            observeElement(root);
+        }
+        root.querySelectorAll(ANIMATE_SELECTOR).forEach(observeElement);
+        initAllMouseScrollContainers(root);
+    };
 
-    // Re-check when DOM changes (useful for React/Inertia dynamic rendering)
-    const mutationObserver = new MutationObserver(() => {
-        observeElements();
-        initAllMouseScrollContainers();
+    scanSubtree(document);
+
+    // Batch DOM changes into one scan per animation frame, and only look at added nodes.
+    let pendingNodes: Element[] = [];
+    let frameRequested = false;
+
+    const flushPendingNodes = () => {
+        const nodes = pendingNodes;
+        pendingNodes = [];
+        frameRequested = false;
+        nodes.filter((node) => node.isConnected).forEach(scanSubtree);
+    };
+
+    const mutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node instanceof Element) pendingNodes.push(node);
+            });
+        });
+        if (pendingNodes.length === 0 || frameRequested) return;
+        frameRequested = true;
+        requestAnimationFrame(flushPendingNodes);
     });
     mutationObserver.observe(document.body, { childList: true, subtree: true });
 };
 
-// Start the observer
+// Start the observer once the page has loaded
 if (typeof window !== 'undefined') {
-    window.addEventListener('load', () => {
-        initScrollObserver();
-        initAllMouseScrollContainers();
-    });
     if (document.readyState === 'complete') {
         initScrollObserver();
-        initAllMouseScrollContainers();
+    } else {
+        window.addEventListener('load', initScrollObserver, { once: true });
     }
 }
+
 const appElement = document.getElementById('app');
 
-if (appElement && appElement.dataset.page) {
-    createInertiaApp({
+async function bootInertiaApp(pageData: string): Promise<void> {
+    const initialLocale = (JSON.parse(pageData)?.props as SharedPageProps | undefined)?.locale
+        || document.documentElement.lang
+        || 'en';
+    await loadTranslations(initialLocale);
+
+    await createInertiaApp({
         title: (title) => `${title} - ${appName}`,
         resolve: (name) =>
             resolvePageComponent(
@@ -125,18 +167,11 @@ if (appElement && appElement.dataset.page) {
         setup({ el, App, props }) {
             const root = createRoot(el);
             
-            const pageProps = props.initialPage.props as any;
+            const pageProps = props.initialPage.props as SharedPageProps;
             if (pageProps.locale) {
                 syncDocumentDirection(pageProps.locale);
             }
-            if (pageProps.currencies) {
-                (window as any).currencies = pageProps.currencies;
-            }
-            if (pageProps.wallet?.currency) {
-                (window as any).defaultCurrency = pageProps.wallet.currency;
-            } else if (pageProps.settings?.base_currency) {
-                (window as any).defaultCurrency = pageProps.settings.base_currency;
-            }
+            syncGlobalCurrencyState(pageProps);
 
             root.render(
                 <MarketplaceModeProvider>
@@ -153,3 +188,8 @@ if (appElement && appElement.dataset.page) {
     });
 }
 
+if (appElement?.dataset.page) {
+    bootInertiaApp(appElement.dataset.page).catch((error) => {
+        console.error('[app] Failed to start the application.', error);
+    });
+}

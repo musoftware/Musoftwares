@@ -17,11 +17,15 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { __ } from '@/lib/i18n';
+import { MONTH_DAYS, formatRecurringSchedule, weekDayOptions, yearDayOptions } from '../Components/recurringSchedule';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 export default function Index({ incomes, currencies, categories, stats }) {
   const { errors } = usePage().props;
   const currenciesList = Array.isArray(currencies) ? currencies : currencies ? Object.values(currencies) : [];
   const categoriesList = Array.isArray(categories) ? categories : categories ? Object.values(categories) : [];
+  const { confirm, confirmDialog } = useConfirm();
 
   // Dialog State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -69,10 +73,15 @@ export default function Index({ incomes, currencies, categories, stats }) {
     });
   };
 
-  const handleDelete = (id) => {
-    if (confirm('Are you sure you want to delete this recurring income?')) {
-      router.delete(route('admin.recurring_income.delete', id));
-    }
+  const handleDelete = async (id) => {
+    const accepted = await confirm({
+      title: __('admin.recurring_income_delete_title'),
+      description: __('admin.recurring_income_delete_desc'),
+      variant: 'danger',
+      confirmLabel: __('general.delete')
+    });
+    if (!accepted) return;
+    router.delete(route('admin.recurring_income.delete', id));
   };
 
   const handleToggleActive = (id) => {
@@ -81,55 +90,22 @@ export default function Index({ incomes, currencies, categories, stats }) {
     });
   };
 
-  const handleDeleteWithTransactions = (id) => {
-    if (confirm('Are you sure you want to delete this recurring income AND all its generated transactions? This cannot be undone.')) {
-      router.delete(route('admin.recurring_income.delete_with_transaction', id));
-    }
-  };
-
-  const formatSchedule = (income) => {
-    let scheduleStr = `Every ${income.recurring_times} ${income.recurring}(s)`;
-    if (income.recurring === 'week' && income.recurring_times_week) {
-      scheduleStr += ` on [${income.recurring_times_week}]`;
-    } else if (income.recurring === 'month' && income.recurring_times_month) {
-      scheduleStr += ` on day [${income.recurring_times_month}]`;
-    } else if (income.recurring === 'year' && income.recurring_times_year) {
-      scheduleStr += ` on [${income.recurring_times_year}]`;
-    }
-    return scheduleStr;
-  };
-
-  // Week days helper list
-  const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-  // Month days helper list (1-31)
-  const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
-
-  // Month name helper
-  const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'];
-
-
-  // Days in month helper for year selection
-  const getYearDaysList = () => {
-    const list: {val: string;label: string;}[] = [];
-    monthNames.forEach((month, mIdx) => {
-      const daysInMonth = new Date(2024, mIdx + 1, 0).getDate(); // Leap year 2024 to support Feb 29
-      for (let d = 1; d <= daysInMonth; d++) {
-        list.push({
-          val: `${d}-${mIdx + 1}`,
-          label: `${d.toString().padStart(2, '0')} - ${month}`
-        });
-      }
+  const handleDeleteWithTransactions = async (id) => {
+    const accepted = await confirm({
+      title: __('admin.recurring_income_delete_all_title'),
+      description: __('admin.recurring_income_delete_all_desc'),
+      variant: 'danger',
+      confirmLabel: __('general.delete_everything')
     });
-    return list;
+    if (!accepted) return;
+    router.delete(route('admin.recurring_income.delete_with_transaction', id));
   };
 
-  const yearDaysList = getYearDaysList();
+
+  const yearDaysList = yearDayOptions();
 
   return (
-    <AdminSidebarLayout title={__('general.recurring_income')} header="Business Operations">
+    <AdminSidebarLayout title={__('general.recurring_income')} header={__('admin.business_operations')}>
             <Head title={__('general.admin_recurring_income')} />
 
             <div className="mb-4">
@@ -210,7 +186,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                             {categoriesList.filter((c) => !['retainer', 'subscription', 'consulting'].includes(c.toLowerCase())).map((c, i) =>
                       <option key={i} value={c}>{c}</option>
                       )}
-                                            <option value="custom">-- Custom Reason --</option>
+                                            <option value="custom">{__('admin.recurring_custom_reason_option')}</option>
                                         </select>
                                         {createReasonOption === 'custom' &&
                     <Input required placeholder={__('general.specify_reason')} value={newIncome.custom_reason} onChange={(e) => setNewIncome({ ...newIncome, custom_reason: e.target.value })} />
@@ -236,7 +212,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                         </select>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="interval">Interval (Every N)</Label>
+                                        <Label htmlFor="interval">{__('admin.recurring_interval_every_n')}</Label>
                                         <select id="interval" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newIncome.recurring_times} onChange={(e) => setNewIncome({ ...newIncome, recurring_times: parseInt(e.target.value) || 1 })}>
                                             {Array.from({ length: 30 }, (_, i) => i + 1).map((num) =>
                       <option key={num} value={num}>{num}</option>
@@ -258,7 +234,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                       setNewIncome({ ...newIncome, recurring_times_week: vals });
                     }}>
                     
-                                            {weekDays.map((wd) => <option key={wd} value={wd}>{wd}</option>)}
+                                            {weekDayOptions().map((wd) => <option key={wd.value} value={wd.value}>{wd.label}</option>)}
                                         </select>
                                         <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                                     </div>
@@ -277,7 +253,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                       setNewIncome({ ...newIncome, recurring_times_month: vals });
                     }}>
                     
-                                            {monthDays.map((d) => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
+                                            {MONTH_DAYS.map((d) => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
                                         </select>
                                         <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                                     </div>
@@ -333,12 +309,12 @@ export default function Index({ incomes, currencies, categories, stats }) {
             <tr key={income.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="text-sm font-semibold text-gray-900">{income.title}</div>
-                                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Clock className="w-3 h-3" /> {formatSchedule(income)}</div>
+                                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Clock className="w-3 h-3" /> {formatRecurringSchedule(income)}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">{new Date(income.start_date).toLocaleDateString()}</div>
                                     {(income.next_date || income.current_date) && (
-                                        <div className="text-xs text-gray-500 mt-0.5">Next: {new Date(income.next_date || income.current_date).toLocaleDateString()}</div>
+                                        <div className="text-xs text-gray-500 mt-0.5">{__('admin.recurring_next_run', { date: new Date(income.next_date || income.current_date).toLocaleDateString() })}</div>
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -364,19 +340,19 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                     <Link href={route('admin.recurring_income.view', income.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.view_details')}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.view_details')} aria-label={__('general.view_details')}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                     </Link>
                                     <Link href={route('admin.recurring_income.edit', income.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')} aria-label={__('general.edit')}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(income.id)} title={__('general.delete_schedule_only')}>
+                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(income.id)} title={__('general.delete_schedule_only')} aria-label={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(income.id)} title={__('general.delete_everything')}>
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(income.id)} title={__('general.delete_everything')} aria-label={__('general.delete_everything')}>
                                         <Trash2 className="w-4 h-4 border border-red-200 rounded p-0.5" />
                                     </Button>
                                 </td>
@@ -399,20 +375,12 @@ export default function Index({ incomes, currencies, categories, stats }) {
             {incomes.links && incomes.links.length > 3 &&
       <div className="flex justify-end gap-4 items-center mt-6">
                     <div className="me-auto text-sm text-gray-500">
-                        Showing {incomes.from} to {incomes.to} of {incomes.total} entries
+                        {__('admin.pagination_showing_entries', { from: incomes.from, to: incomes.to, total: incomes.total })}
                     </div>
-                    <div className="flex space-x-1">
-                        {incomes.links.map((link, idx) =>
-          <Link
-            key={idx}
-            href={link.url || '#'}
-            className={`px-3 py-2 border rounded text-sm ${link.active ? 'bg-black text-white border-black font-semibold' : 'bg-white text-gray-700 hover:bg-gray-50'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
-            dangerouslySetInnerHTML={{ __html: link.label }} />
-
-          )}
-                    </div>
+                    <Pagination links={incomes.links} />
                 </div>
       }
+            {confirmDialog}
         </AdminSidebarLayout>);
 
 }

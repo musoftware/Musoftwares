@@ -144,6 +144,13 @@ class ResellerDeviceControllerTest extends TestCase
             'expires_at' => now()->addDays(5), // expires in 5 days
         ]);
 
+        // Renewal finds the software through the package or the hardware device row.
+        SerialDevice::create([
+            'device_id' => 'HWID-RENEW-01',
+            'serial_software_id' => $this->software->id,
+            'status' => 'active',
+        ]);
+
         $oldExpiry = $assignment->expires_at;
 
         $response = $this->actingAs($this->reseller)->post("/portal/devices/{$assignment->id}/renew", [

@@ -28,14 +28,13 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { formatMoney } from '@/lib/utils';
-import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
 export type TransactionsTab = 'income' | 'cost' | 'revenue';
 
 export interface FilterOptions {
-    users?: Array<{ id: number; name: string; email: string }>;
     projects?: Array<{ id: number; project_name: string; user_id?: number }>;
     currencies?: Array<{ id: number; currency: string; symbol: string }>;
     types?: string[];
@@ -79,11 +78,11 @@ function TransactionActions({ tx, type }: { tx: any; type: TransactionsTab }) {
             preserveScroll: true,
             onSuccess: () => {
                 setPending(false);
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
             },
             onError: () => {
                 setPending(false);
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
             },
         });
     };
@@ -399,19 +398,19 @@ export function TransactionsPage(props: TransactionsPageProps) {
                                 href="/admin/transactions?type=income"
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'income' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
-                                {__('erp.income_transactions') || 'Income'}
+                                {__('erp.income_transactions')}
                             </Link>
                             <Link
                                 href="/admin/transactions?type=cost"
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'cost' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
-                                {__('erp.cost_transactions') || 'Cost'}
+                                {__('erp.cost_transactions')}
                             </Link>
                             <Link
                                 href="/admin/transactions?type=revenue"
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'revenue' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
-                                {__('general.revenue') || 'Revenue'}
+                                {__('general.revenue')}
                             </Link>
                         </nav>
                     </div>
@@ -443,7 +442,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                     <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                         <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                            <span className="text-xs font-medium">{__('general.total_transactions') || 'Matching Count'}</span>
+                            <span className="text-xs font-medium">{__('general.total_transactions')}</span>
                             <Hash className="w-3.5 h-3.5" />
                         </div>
                         <div className="text-lg font-bold font-mono text-slate-900 dark:text-zinc-100">
@@ -453,7 +452,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
                     <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                         <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                            <span className="text-xs font-medium">{__('general.volume') || 'Net Volume'}</span>
+                            <span className="text-xs font-medium">{__('general.volume')}</span>
                             <Coins className="w-3.5 h-3.5" />
                         </div>
                         <div className="text-lg font-bold font-mono text-slate-900 dark:text-zinc-100">
@@ -465,7 +464,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         <>
                             <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                                 <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                                    <span className="text-xs font-medium">{__('general.received') || 'Inflow'}</span>
+                                    <span className="text-xs font-medium">{__('general.received')}</span>
                                     <ArrowDownRight className="w-3.5 h-3.5 text-emerald-600" />
                                 </div>
                                 <div className="text-lg font-bold font-mono text-emerald-600">
@@ -475,7 +474,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
                             <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                                 <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                                    <span className="text-xs font-medium">{__('general.used') || 'Outflow'}</span>
+                                    <span className="text-xs font-medium">{__('general.used')}</span>
                                     <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
                                 </div>
                                 <div className="text-lg font-bold font-mono text-rose-600">
@@ -486,7 +485,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                     ) : (
                         <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm col-span-2">
                             <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                                <span className="text-xs font-medium">{__('erp.avg_cost') || 'Average Transaction'}</span>
+                                <span className="text-xs font-medium">{__('erp.avg_cost')}</span>
                                 <Coins className="w-3.5 h-3.5" />
                             </div>
                             <div className="text-lg font-bold font-mono text-slate-900 dark:text-zinc-100">
@@ -509,13 +508,14 @@ export function TransactionsPage(props: TransactionsPageProps) {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onBlur={() => applyFilters({ search: searchTerm.trim() })}
-                            placeholder={__('general.search_transactions_hint') || 'Search ID (#123), description, client, or project...'}
+                            placeholder={__('general.search_transactions_hint')}
                             className="ps-9 pe-9 h-9 text-xs bg-slate-50/50 dark:bg-zinc-950/50 border-slate-200 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-900 dark:focus-visible:ring-zinc-100"
                         />
                         {searchTerm && (
                             <button
                                 type="button"
                                 onClick={handleClearSearch}
+                                aria-label={__('general.clear_search')}
                                 className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-0.5"
                             >
                                 <X className="w-3.5 h-3.5" />
@@ -536,13 +536,13 @@ export function TransactionsPage(props: TransactionsPageProps) {
                                 onChange={(e) => handleDatePreset(e.target.value)}
                                 className="h-9 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/50 px-2.5 text-xs text-slate-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-zinc-100"
                             >
-                                <option value="all">{__('general.all_time') || 'All Time'}</option>
-                                <option value="today">{__('general.today') || 'Today'}</option>
-                                <option value="yesterday">{__('general.yesterday') || 'Yesterday'}</option>
-                                <option value="this_week">{__('general.this_week') || 'This Week'}</option>
-                                <option value="this_month">{__('general.this_month') || 'This Month'}</option>
-                                <option value="last_month">{__('general.last_month') || 'Last Month'}</option>
-                                <option value="this_year">{__('general.this_year') || 'This Year'}</option>
+                                <option value="all">{__('general.all_time')}</option>
+                                <option value="today">{__('general.today')}</option>
+                                <option value="yesterday">{__('general.yesterday')}</option>
+                                <option value="this_week">{__('general.this_week')}</option>
+                                <option value="this_month">{__('general.this_month')}</option>
+                                <option value="last_month">{__('general.last_month')}</option>
+                                <option value="this_year">{__('general.this_year')}</option>
                             </select>
                         </div>
 
@@ -554,7 +554,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                             className={`h-9 text-xs border-slate-200 dark:border-zinc-800 ${showAdvancedFilters ? 'bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white font-medium' : 'text-slate-600 dark:text-zinc-400'}`}
                         >
                             <SlidersHorizontal className="w-3.5 h-3.5 me-1.5" />
-                            {__('general.filters') || 'Filters'}
+                            {__('general.filters')}
                             {activeFilterCount > 0 && (
                                 <span className="ms-1.5 inline-flex items-center justify-center h-4 w-4 rounded-full bg-slate-900 dark:bg-white text-[10px] text-white dark:text-slate-900 font-bold">
                                     {activeFilterCount}
@@ -569,10 +569,10 @@ export function TransactionsPage(props: TransactionsPageProps) {
                                 size="sm"
                                 onClick={handleResetAll}
                                 className="h-9 text-xs text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-                                title={__('general.reset_filters') || 'Reset All'}
+                                title={__('general.reset_filters')}
                             >
                                 <RotateCcw className="w-3.5 h-3.5 me-1" />
-                                {__('general.reset') || 'Reset'}
+                                {__('general.reset')}
                             </Button>
                         )}
                     </div>
@@ -585,19 +585,19 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {type === 'income' && (
                             <div className="space-y-1">
                                 <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                    {__('general.type') || 'Transaction Type'}
+                                    {__('general.type')}
                                 </label>
                                 <select
                                     value={filters?.tx_type || ''}
                                     onChange={(e) => applyFilters({ tx_type: e.target.value })}
                                     className="w-full h-8 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 text-xs text-slate-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-zinc-100"
                                 >
-                                    <option value="">{__('general.all_types') || 'All Types'}</option>
-                                    <option value="received">{__('general.received') || 'Received (Deposit)'}</option>
-                                    <option value="earned">{__('general.earned') || 'Earned'}</option>
-                                    <option value="used">{__('general.used') || 'Used (Paid)'}</option>
-                                    <option value="refunded">{__('general.refunded') || 'Refunded'}</option>
-                                    <option value="sent">{__('general.sent') || 'Sent'}</option>
+                                    <option value="">{__('general.all_types')}</option>
+                                    <option value="received">{__('general.received')}</option>
+                                    <option value="earned">{__('general.earned')}</option>
+                                    <option value="used">{__('general.used')}</option>
+                                    <option value="refunded">{__('general.refunded')}</option>
+                                    <option value="sent">{__('general.sent')}</option>
                                 </select>
                             </div>
                         )}
@@ -605,35 +605,29 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Client / User Filter */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.client') || 'Client'}
+                                {__('general.client')}
                             </label>
-                            <PremiumCombobox
+                            <UserSearchCombobox
                                 className="w-full"
                                 value={filters?.user ? String(filters.user) : ''}
                                 onChange={(val) => applyFilters({ user: val ? String(val) : '', project: '' })}
-                                options={[
-                                    { value: '', label: __('general.all_clients') || 'All Clients' },
-                                    ...(filterOptions.users || []).map((u) => ({
-                                        value: String(u.id),
-                                        label: u.email ? `${u.name} (${u.email})` : u.name,
-                                    }))
-                                ]}
-                                placeholder={__('general.all_clients') || 'All Clients'}
-                                searchPlaceholder={__('general.search_users') || 'Search users...'}
+                                emptyOptionLabel={__('general.all_clients')}
+                                placeholder={__('general.all_clients')}
+                                searchPlaceholder={__('general.search_users')}
                             />
                         </div>
 
                         {/* Project Filter */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('erp.project') || 'Project'}
+                                {__('erp.project')}
                             </label>
                             <select
                                 value={filters?.project || ''}
                                 onChange={(e) => applyFilters({ project: e.target.value })}
                                 className="w-full h-8 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 text-xs text-slate-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-zinc-100 truncate"
                             >
-                                <option value="">{__('general.all_projects') || 'All Projects'}</option>
+                                <option value="">{__('general.all_projects')}</option>
                                 {availableProjects.map((p) => (
                                     <option key={p.id} value={p.id}>
                                         {p.project_name}
@@ -645,14 +639,14 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Currency Filter */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.currency') || 'Currency'}
+                                {__('general.currency')}
                             </label>
                             <select
                                 value={filters?.currency || ''}
                                 onChange={(e) => applyFilters({ currency: e.target.value })}
                                 className="w-full h-8 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-2 text-xs text-slate-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-zinc-100"
                             >
-                                <option value="">{__('general.all_currencies') || 'All Currencies'}</option>
+                                <option value="">{__('general.all_currencies')}</option>
                                 {(filterOptions.currencies || []).map((c) => (
                                     <option key={c.id} value={c.id}>
                                         {c.currency} ({c.symbol})
@@ -664,7 +658,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Date From */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.from_date') || 'From Date'}
+                                {__('general.from_date')}
                             </label>
                             <Input
                                 type="date"
@@ -680,7 +674,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Date To */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.to_date') || 'To Date'}
+                                {__('general.to_date')}
                             </label>
                             <Input
                                 type="date"
@@ -696,7 +690,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Min Amount */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.min_amount') || 'Min Amount'}
+                                {__('general.min_amount')}
                             </label>
                             <Input
                                 type="number"
@@ -712,7 +706,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {/* Max Amount */}
                         <div className="space-y-1">
                             <label className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
-                                {__('general.max_amount') || 'Max Amount'}
+                                {__('general.max_amount')}
                             </label>
                             <Input
                                 type="number"
@@ -731,7 +725,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                 {activeFilterCount > 0 && (
                     <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 flex items-center gap-1.5 flex-wrap text-xs">
                         <span className="text-slate-400 dark:text-zinc-500 text-[11px] me-1">
-                            {__('general.active_filters') || 'Active filters:'}
+                            {__('general.active_filters')}
                         </span>
 
                         {filters?.search && (
@@ -765,7 +759,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         {filters?.user && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700">
                                 <UserIcon className="w-3 h-3 text-slate-400" />
-                                {filterOptions.users?.find((u) => String(u.id) === String(filters.user))?.name || `User #${filters.user}`}
+                                {filteredUser?.name || `User #${filters.user}`}
                                 <button
                                     onClick={() => applyFilters({ user: '', project: '' })}
                                     className="hover:text-slate-950 dark:hover:text-white"
@@ -838,7 +832,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                             onClick={handleResetAll}
                             className="text-[11px] text-slate-500 hover:text-slate-900 dark:hover:text-white underline ms-1"
                         >
-                            {__('general.clear_all') || 'Clear all'}
+                            {__('general.clear_all')}
                         </button>
                     </div>
                 )}

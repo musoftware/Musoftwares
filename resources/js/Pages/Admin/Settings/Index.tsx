@@ -83,6 +83,18 @@ interface Props {
     overheadHourlyRateEgp: number;
 }
 
+const NOTIFICATION_CHANNEL_LABEL_KEYS: Record<string, string> = {
+    mail: 'admin.settings_channel_mail',
+    fcm: 'admin.settings_channel_fcm',
+    sms: 'admin.settings_channel_sms',
+    whatsapp: 'admin.settings_channel_whatsapp',
+};
+
+const channelLabel = (channel: string): string => {
+    const key = NOTIFICATION_CHANNEL_LABEL_KEYS[channel];
+    return key ? __(key) : channel;
+};
+
 function SectionCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
     return (
         <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
@@ -210,9 +222,8 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
         
         axios.post(route('admin.settings.calculate-hourly-rate'), { currency_id: bulkCurrency })
             .then((res) => {
-                if (isMounted && res.data.rate !== undefined) {
-                    setComputedRate(res.data.rate.toFixed(2));
-                }
+                if (!isMounted) return;
+                setComputedRate(typeof res.data.rate === 'number' ? res.data.rate.toFixed(2) : '-');
             })
             .catch((err) => {
                 console.error('Failed to fetch calculated rate', err);
@@ -230,8 +241,8 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
     const handleSettingsSave = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('admin.settings.store'), form as any, {
-            onSuccess: () => toastSuccess(__('general.saved') || 'Settings saved'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.saved')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -247,14 +258,14 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
             currency: bulkCurrency,
             update_projects: updateProjects ? '1' : '0',
         }, {
-            onSuccess: () => toastSuccess(__('general.prices_updated') || 'Prices updated'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.prices_updated')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
     return (
-        <AdminSidebarLayout title={__('general.settings')} header="System Settings">
-            <Head title={__('general.admin_settings')} />
+        <AdminSidebarLayout title={__('general.settings')} header={__('admin.settings_system_settings')}>
+            <Head title={__('admin.settings_system_settings')} />
 
             {/* Flash message */}
             {flash?.success && (
@@ -282,7 +293,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     placeholder={__('general.e_g_musoftware')}
                                 />
                             </Field>
-                            <Field label={__('general.business_address')}>
+                            <Field label={__('admin.settings_business_address')}>
                                 <Input
                                     id="business_address"
                                     value={form.business_address ?? ''}
@@ -310,7 +321,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                 </Field>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label={__('general.business_tax')}>
+                                <Field label={__('admin.settings_business_tax')}>
                                     <Input
                                         id="business_tax"
                                         type="number"
@@ -335,7 +346,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                     <div className="space-y-6">
                         <SectionCard title={__('general.project_work_settings')} icon={Clock}>
                             <div className="space-y-5">
-                                <Field label={__('general.default_overhead_cost')}>
+                                <Field label={__('admin.settings_default_overhead_cost')}>
                                     <Input
                                         id="overhead_cost_default"
                                         type="number"
@@ -344,7 +355,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         placeholder="150"
                                     />
                                     <p className="text-xs font-semibold text-green-600 mt-1">
-                                        Current Derived Rate: {overheadHourlyRateEgp} EGP / Hour
+                                        {__('admin.settings_current_derived_rate', { rate: overheadHourlyRateEgp })}
                                     </p>
                                 </Field>
                                 <Field label={__('general.market_hourly_rate')}>
@@ -363,10 +374,10 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-500 mt-1">
-                                        Used to calculate actual discount compared to market hourly rate.
+                                        {__('admin.settings_market_rate_help')}
                                     </p>
                                 </Field>
-                                <Field label={__('general.max_devices_per_tenant_default')}>
+                                <Field label={__('admin.settings_max_devices_default')}>
                                     <Input
                                         id="max_devices_per_tenant"
                                         type="number"
@@ -376,7 +387,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         onChange={(e) => set('max_devices_per_tenant', parseInt(e.target.value) || 1)}
                                         placeholder="1"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">{__('general.the_global_default_number_of_allowed_devices_per_user_can_be_overridden_in_user_edit_page')}</p>
+                                    <p className="text-xs text-gray-500 mt-1">{__('admin.settings_max_devices_help')}</p>
                                 </Field>
                                 <Toggle
                                     id="friday_work_allowed"
@@ -389,9 +400,9 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                         </SectionCard>
 
                         {/* Invoicing & Auto-Pay Settings */}
-                        <SectionCard title={__('general.invoicing_and_autopay_settings') || 'Invoicing & Auto-Pay Settings'} icon={CreditCard}>
+                        <SectionCard title={__('general.invoicing_and_autopay_settings')} icon={CreditCard}>
                             <div className="space-y-4">
-                                <Field label={__('general.auto_pay_after_days') || 'Auto-Pay Unpaid Invoices After (Days)'}>
+                                <Field label={__('general.auto_pay_after_days')}>
                                     <Input
                                         id="auto_pay_after_days"
                                         type="number"
@@ -402,7 +413,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         placeholder="3"
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
-                                        {__('general.auto_pay_after_days_help') || 'Automatically pay unpaid invoices using the client\'s balance after this many days (for invoices with amount > 0).'}
+                                        {__('general.auto_pay_after_days_help')}
                                     </p>
                                 </Field>
 
@@ -410,15 +421,15 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
                                 <Toggle
                                     id="enable_dso_system"
-                                    label={__('general.enable_dso_system') || 'Enable Days Sales Outstanding (DSO) System'}
+                                    label={__('general.enable_dso_system')}
                                     checked={form.enable_dso_system}
                                     onChange={(v) => set('enable_dso_system', v)}
-                                    description={__('general.enable_dso_system_help') || 'Enable or disable the entire DSO warning and serial suspension system.'}
+                                    description={__('general.enable_dso_system_help')}
                                 />
 
                                 {form.enable_dso_system && (
                                     <div className="mt-4 pl-4 border-l-2 border-slate-200 space-y-4">
-                                        <Field label={__('general.global_dso_limit') || 'Global DSO Limit (Days)'}>
+                                        <Field label={__('general.global_dso_limit')}>
                                             <Input
                                                 id="global_dso_limit"
                                                 type="number"
@@ -429,16 +440,16 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                                 placeholder="30"
                                             />
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {__('general.global_dso_limit_help') || 'Maximum Days Sales Outstanding allowed for a client before automatically suspending their serial keys and programs.'}
+                                                {__('general.global_dso_limit_help')}
                                             </p>
                                         </Field>
 
                                         <Toggle
                                             id="enable_dso_decrement"
-                                            label={__('general.enable_dso_decrement') || 'Enable Monthly DSO Limit Decrement'}
+                                            label={__('general.enable_dso_decrement')}
                                             checked={form.enable_dso_decrement}
                                             onChange={(v) => set('enable_dso_decrement', v)}
-                                            description={__('general.enable_dso_decrement_help') || 'If enabled, the global DSO limit will automatically decrease by 1 day on the 1st of every month down to a minimum of 1 day.'}
+                                            description={__('general.enable_dso_decrement_help')}
                                         />
                                     </div>
                                 )}
@@ -453,7 +464,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                 value={form.whatsapp_default_channel_id ?? ''}
                                 onChange={(v) => set('whatsapp_default_channel_id', v)}
                             >
-                                <option value="">Round-robin (use channels in rotation)</option>
+                                <option value="">{__('admin.settings_whatsapp_round_robin')}</option>
                                 {(whatsappChannels ?? []).map((ch) => (
                                     <option key={ch.id} value={String(ch.id)}>
                                         {ch.name}{ch.phone_number ? ` (${ch.phone_number})` : ''}
@@ -481,7 +492,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                                 checked={enabledChannels.includes(ch)}
                                                 onChange={(e) => toggleChannel(ch, e.target.checked)}
                                             />
-                                            <span className="capitalize">{ch}</span>
+                                            <span>{channelLabel(ch)}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -501,15 +512,15 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         id="gemini_api_keys"
                                         value={form.gemini_api_keys ?? ''}
                                         onChange={(e) => set('gemini_api_keys', e.target.value)}
-                                        placeholder={__('general.paste_multiple_keys_separated_by_commas_e_g_aiza_aiza')}
+                                        placeholder={__('admin.settings_gemini_keys_placeholder')}
                                         rows={3}
                                         className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">{__('general.provide_one_or_more_gemini_api_keys_comma_separated_for_load_balancing_ai_features_across_multiple_free_tier_accounts')}</p>
+                                    <p className="text-xs text-gray-500 mt-1">{__('admin.settings_gemini_keys_help')}</p>
                                 </Field>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Field label="OpenAI 1M Tokens Price ($)">
+                                    <Field label={__('admin.settings_openai_token_price')}>
                                         <Input
                                             id="openai_1m_tokens_price"
                                             type="number"
@@ -517,10 +528,10 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                             min="0"
                                             value={form.openai_1m_tokens_price ?? ''}
                                             onChange={(e) => set('openai_1m_tokens_price', e.target.value)}
-                                            placeholder="e.g. 5.00"
+                                            placeholder={__('admin.settings_example_value', { value: '5.00' })}
                                         />
                                     </Field>
-                                    <Field label="Gemini 1M Tokens Price ($)">
+                                    <Field label={__('admin.settings_gemini_token_price')}>
                                         <Input
                                             id="gemini_1m_tokens_price"
                                             type="number"
@@ -528,7 +539,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                             min="0"
                                             value={form.gemini_1m_tokens_price ?? ''}
                                             onChange={(e) => set('gemini_1m_tokens_price', e.target.value)}
-                                            placeholder="e.g. 1.00"
+                                            placeholder={__('admin.settings_example_value', { value: '1.00' })}
                                         />
                                     </Field>
                                 </div>
@@ -563,23 +574,23 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                 </div>
 
                 {/* SEO & Analytics Integrations */}
-                <SectionCard title={__('general.seo_analytics_integrations') || 'SEO & Analytics Integrations'} icon={Globe}>
+                <SectionCard title={__('general.seo_analytics_integrations')} icon={Globe}>
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <Field label="Google Analytics ID (e.g. G-XXXXXXX)">
+                            <Field label={__('admin.settings_google_analytics_id')}>
                                 <Input
                                     id="google_analytics_id"
                                     value={form.google_analytics_id ?? ''}
                                     onChange={(e) => set('google_analytics_id', e.target.value)}
-                                    placeholder={__('general.g')}
+                                    placeholder="G-XXXXXXX"
                                 />
                             </Field>
-                            <Field label="Google Tag Manager ID (e.g. GTM-XXXXX)">
+                            <Field label={__('admin.settings_google_tag_manager_id')}>
                                 <Input
                                     id="google_tag_manager_id"
                                     value={form.google_tag_manager_id ?? ''}
                                     onChange={(e) => set('google_tag_manager_id', e.target.value)}
-                                    placeholder={__('general.gtm')}
+                                    placeholder="GTM-XXXXX"
                                 />
                             </Field>
                             <Field label={__('general.meta_pixel_id')}>
@@ -593,7 +604,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                         </div>
 
                         <div className="space-y-4">
-                            <Field label="Custom Header Scripts (<head>)">
+                            <Field label={__('admin.settings_custom_head_scripts')}>
                                 <textarea
                                     id="custom_head_scripts"
                                     value={form.custom_head_scripts ?? ''}
@@ -602,9 +613,9 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     rows={4}
                                     className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white font-mono"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">These scripts will be injected globally inside the &lt;head&gt; tag.</p>
+                                <p className="text-xs text-gray-500 mt-1">{__('admin.settings_custom_head_scripts_help')}</p>
                             </Field>
-                            <Field label="Custom Body Scripts (<body>)">
+                            <Field label={__('admin.settings_custom_body_scripts')}>
                                 <textarea
                                     id="custom_body_scripts"
                                     value={form.custom_body_scripts ?? ''}
@@ -613,7 +624,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     rows={4}
                                     className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white font-mono"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">These scripts will be injected globally right after the &lt;body&gt; tag.</p>
+                                <p className="text-xs text-gray-500 mt-1">{__('admin.settings_custom_body_scripts_help')}</p>
                             </Field>
                         </div>
                     </div>
@@ -700,7 +711,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                 {/* Save button */}
                 <div className="flex justify-center py-2">
                     <Button type="submit" size="lg" className="px-10 gap-2">
-                        <Save className="h-4 w-4" />{__('general.save_all_settings')}</Button>
+                        <Save className="h-4 w-4" />{__('admin.settings_save_all')}</Button>
                 </div>
             </form>
 
@@ -709,7 +720,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
             {/* Danger / Utility zone */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Bulk Hourly Rate Update */}
-                <SectionCard title={__('general.bulk_hourly_rate_update')} icon={AlertTriangle}>
+                <SectionCard title={__('admin.settings_bulk_hourly_rate_update')} icon={AlertTriangle}>
                     <p className="text-sm font-semibold text-red-600 mb-4 flex items-center gap-1">
                         <AlertTriangle className="h-4 w-4 shrink-0" />{__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects')}</p>
                     <form onSubmit={handleBulkPriceUpdate} className="space-y-4">
@@ -743,7 +754,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                             />
                             <Label htmlFor="bulk_update_projects" className="text-sm font-medium cursor-pointer">{__('general.update_open_projects_too')}</Label>
                         </div>
-                        <Button type="submit" variant="destructive" className="w-full">{__('general.update_all')}</Button>
+                        <Button type="submit" variant="destructive" className="w-full" disabled={computedRate === '-'}>{__('general.update_all')}</Button>
                     </form>
                 </SectionCard>
 
@@ -761,7 +772,7 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                 </SectionCard>
                 {/* Incoming Webhooks */}
                 <SectionCard title={__('general.incoming_webhooks')} icon={Globe}>
-                    <p className="text-sm font-medium text-gray-700 mb-4">View and monitor webhooks received from external platforms (e.g., Kashier, Stripe, WhatsApp).</p>
+                    <p className="text-sm font-medium text-gray-700 mb-4">{__('admin.settings_incoming_webhooks_help')}</p>
                     <Button type="button" variant="outline" className="w-full" onClick={() => router.visit(route('admin.settings.incoming-webhooks.index'))}>
                         {__('general.view_webhooks_log')}</Button>
                 </SectionCard>
@@ -771,8 +782,8 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
             <ConfirmModal
                 isOpen={pendingBulk}
-                title={__('general.update_all_prices') || 'Update all prices?'}
-                description={__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects') || 'This will update the hourly rate for ALL clients and optionally all open projects.'}
+                title={__('general.update_all_prices')}
+                description={__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects')}
                 confirmLabel={__('general.update_all')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"
@@ -782,14 +793,15 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
 
             <ConfirmModal
                 isOpen={pendingSync}
-                title={__('general.sync_exchange_rates_now') || 'Sync Exchange Rates'}
-                description="Are you sure you want to sync exchange rates from the external API?"
-                confirmLabel="Yes, Sync"
+                title={__('general.sync_exchange_rates_now')}
+                description={__('admin.settings_sync_confirm_description')}
+                confirmLabel={__('admin.settings_sync_confirm_label')}
+                cancelLabel={__('general.cancel')}
                 onConfirm={() => {
                     setPendingSync(false);
                     router.post(route('admin.settings.sync-exchange-rates'), {}, {
-                        onSuccess: () => toastSuccess(__('general.exchange_rates_synced') || 'Exchange rates synced'),
-                        onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+                        onSuccess: () => toastSuccess(__('general.exchange_rates_synced')),
+                        onError: () => toastError(__('general.error_occurred')),
                     });
                 }}
                 onCancel={() => setPendingSync(false)}

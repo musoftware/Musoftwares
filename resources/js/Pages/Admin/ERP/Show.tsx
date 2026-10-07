@@ -85,12 +85,12 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
     const [activeTab, setActiveTab] = useState<'clients' | 'invoices' | 'team' | 'tasks'>('clients');
 
     const handleImpersonate = () => {
-        router.get(route('admin.erp.impersonate', tenant.user_id));
+        router.post(route('admin.erp.impersonate', tenant.user_id));
     };
 
     return (
-        <AdminSidebarLayout title={__('general.erp_client')} header="ERP Client">
-            <Head title={`Oversight — ${tenant.name}`} />
+        <AdminSidebarLayout title={__('general.erp_client')} header={__('general.erp_client')}>
+            <Head title={__('admin.erp_oversight_title', { name: tenant.name })} />
 
             <div className="space-y-6">
                 {/* Back Link */}

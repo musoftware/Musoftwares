@@ -4,6 +4,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { MoreHorizontal, FileText, Send, CheckCircle, XCircle, Trash2, Sparkles } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,15 +16,15 @@ import {
 } from '@/Components/ui/dropdown-menu';
 
 export default function Index({ contracts, currentTab }) {
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleStatusUpdate = (id, status) => {
         router.post(route('isaas.contracts.update-status', id), { status });
     };
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this contract?')) {
-            router.delete(route('isaas.contracts.destroy', id));
-        }
+    const handleDelete = async (id) => {
+        if (!(await confirm({ title: __('general.delete_contract'), description: __('general.confirm_delete_contract'), variant: 'danger' }))) return;
+        router.delete(route('isaas.contracts.destroy', id));
     };
 
     const getStatusBadge = (status) => {
@@ -78,12 +80,12 @@ export default function Index({ contracts, currentTab }) {
                         <Link href="/admin/contracts/quick-create">
                             <Button variant="outline" className="gap-2 border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 font-bold shadow-sm">
                                 <Sparkles className="h-4 w-4 text-amber-500" />
-                                {__('general.quick_pricing_and_contract', { default: 'التسعير والعقد السريع' })}
+                                {__('general.quick_pricing_and_contract')}
                             </Button>
                         </Link>
                         <Link href={route('isaas.contracts.create')}>
                             <Button>
-                                + Create Contract
+                                + {__('general.create_contract')}
                             </Button>
                         </Link>
                     </div>
@@ -107,10 +109,10 @@ export default function Index({ contracts, currentTab }) {
                                 <tr key={contract.id} className="hover:bg-muted/30">
                                     <td className="p-4 font-medium text-foreground">{contract.reference || `CTR-${contract.id}`}</td>
                                     <td className="p-4">
-                                        <div className="font-medium text-foreground">{contract.client_name || 'Unknown'}</div>
+                                        <div className="font-medium text-foreground">{contract.client_name || __('general.unknown')}</div>
                                     </td>
                                     <td className="p-4 text-muted-foreground">
-                                        <div className="font-medium text-foreground">{contract.project_name || 'N/A'}</div>
+                                        <div className="font-medium text-foreground">{contract.project_name || __('general.n_a')}</div>
                                     </td>
                                     <td className="p-4 text-end font-medium text-foreground">
                                         {contract.total_amount ? `${parseFloat(contract.total_amount).toFixed(2)} ${contract.currency}` : '-'}
@@ -163,22 +165,9 @@ export default function Index({ contracts, currentTab }) {
                     </table>
                 </div>
 
-                {/* Pagination Controls */}
-                {contracts.links && contracts.links.length > 3 && (
-                    <div className="mt-4 flex justify-center">
-                        <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                            {contracts.links.map((link, i) => (
-                                <Link
-                                    key={i}
-                                    href={link.url || '#'}
-                                    className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-primary text-primary-foreground border-primary' : 'bg-card border-border text-muted-foreground hover:bg-muted'} ${i === 0 ? 'rounded-s-md' : ''} ${i === contracts.links.length - 1 ? 'rounded-e-md' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
+                <Pagination links={contracts.links} />
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

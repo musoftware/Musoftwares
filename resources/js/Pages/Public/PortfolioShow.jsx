@@ -66,9 +66,9 @@ export default function PortfolioShow({ slug, dbProject = null }) {
             <PublicLayout>
                 <div className="min-h-[60vh] flex items-center justify-center bg-white text-[#1d1d1f] font-sans">
                     <div className="text-center space-y-4">
-                        <h2 className="text-2xl font-semibold text-[#1d1d1f]">{__('general.not_found') || 'Case Study Not Found'}</h2>
+                        <h2 className="text-2xl font-semibold text-[#1d1d1f]">{__('general.not_found')}</h2>
                         <Link href="/portfolio" className="text-xs font-semibold text-[#0071e3] hover:underline block">
-                            ➔ {__('general.back_to_portfolio') || 'Back to Studio Archive'}
+                            ➔ {__('general.back_to_portfolio')}
                         </Link>
                     </div>
                 </div>
@@ -78,7 +78,7 @@ export default function PortfolioShow({ slug, dbProject = null }) {
 
     return (
         <PublicLayout>
-            <Head title={`${item.title} | ${__('general.musoftware_unified_workspace') || 'Musoftwares'}`}>
+            <Head title={`${item.title} | ${__('general.musoftware_unified_workspace')}`}>
                 <meta name="description" content={item.desc} />
             </Head>
 
@@ -91,7 +91,7 @@ export default function PortfolioShow({ slug, dbProject = null }) {
                         className="gsap-fade-up inline-flex items-center text-xs font-semibold uppercase tracking-wider text-[#1d1d1f]/60 hover:text-[#0071e3] transition-colors mb-8"
                     >
                         <ArrowLeft className="w-3.5 h-3.5 me-2 rtl:ms-2 rtl:me-0 rtl:rotate-180" />
-                        {__('general.back_to_portfolio') || 'STUDIO ARCHIVE'}
+                        {__('general.back_to_portfolio')}
                     </Link>
 
                     <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
@@ -132,7 +132,7 @@ export default function PortfolioShow({ slug, dbProject = null }) {
                                         className="gsap-fade-up inline-flex items-center gap-2 px-8 py-3 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-colors shadow-md shadow-blue-500/20"
                                     >
                                         <Globe className="w-4 h-4" />
-                                        <span>{__('general.visit_live_website') || 'LAUNCH PLATFORM'} ➔</span>
+                                        <span>{__('general.visit_live_website')} ➔</span>
                                     </a>
                                 </div>
                             )}

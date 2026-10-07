@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Services\LoyaltyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProjectTrackerController extends Controller
 {
@@ -153,7 +154,7 @@ class ProjectTrackerController extends Controller
                 ]
             );
         } catch (\Throwable $e) {
-            // Graceful fallback
+            Log::warning('Client portal feedback: loyalty award failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
         }
 
         return response()->json([

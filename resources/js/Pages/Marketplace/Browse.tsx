@@ -5,6 +5,7 @@ import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Plus } from 'lucide-react';
+import Pagination from '@/Components/Pagination';
 
 export default function Browse({ services, categories, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
@@ -15,8 +16,8 @@ export default function Browse({ services, categories, filters }: any) {
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
-        'name': __('general.software_services_marketplace') || 'Software Development & IT Services Marketplace',
-        'description': __('general.marketplace_seo_description') || 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.',
+        'name': __('general.software_services_marketplace'),
+        'description': __('general.marketplace_seo_description'),
         'itemListElement': services?.data?.map((service: any, index: number) => ({
             '@type': 'ListItem',
             'position': index + 1,
@@ -107,8 +108,8 @@ export default function Browse({ services, categories, filters }: any) {
     return (
         <MarketplaceLayout>
             <SeoHead
-                title={`${__('general.software_services_marketplace') || 'Software Development & IT Services Marketplace'} | MuSoftwares`}
-                description={__('general.marketplace_seo_description') || 'Browse top software development, IT services, custom scripts, and digital solutions on MuSoftwares Marketplace.'}
+                title={`${__('general.software_services_marketplace')} | MuSoftwares`}
+                description={__('general.marketplace_seo_description')}
                 canonicalUrl="https://www.musoftwares.com/marketplace/services"
                 type="website"
                 jsonLd={jsonLd}
@@ -127,6 +128,7 @@ export default function Browse({ services, categories, filters }: any) {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder={__('general.what_service_are_you_looking_for_today')}
+                            aria-label={__('general.what_service_are_you_looking_for_today')}
                             className="w-full rounded-full py-4 pe-32 ps-6 text-lg bg-white dark:bg-[#0f172a] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 shadow-lg focus:ring-4 focus:ring-indigo-300 focus:outline-none border-0 dark:border dark:border-white/10"
                         />
                         <button
@@ -136,13 +138,13 @@ export default function Browse({ services, categories, filters }: any) {
                             {__('general.search')}</button>
                     </form>
                     <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-                        <span className="text-indigo-200">{__('general.are_you_a_freelancer_or_vendor') || 'Are you a freelancer or software seller?'}</span>
+                        <span className="text-indigo-200">{__('general.are_you_a_freelancer_or_vendor')}</span>
                         <Link
                             href="/marketplace/services/create"
                             className="inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 px-4 py-1.5 font-semibold text-white backdrop-blur-sm transition border border-white/20"
                         >
                             <Plus className="h-4 w-4 text-indigo-300" />
-                            <span>{__('general.add_marketplace_item') || __('general.publish_service') || 'Add Marketplace Item'}</span>
+                            <span>{__('general.add_marketplace_item')}</span>
                         </Link>
                     </div>
                 </div>
@@ -153,7 +155,7 @@ export default function Browse({ services, categories, filters }: any) {
                 <div className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#090d16] py-3">
                     <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
-                            <span className="font-medium text-gray-500 dark:text-slate-400">{__('general.filtering_by') || 'Filtering by'}:</span>
+                            <span className="font-medium text-gray-500 dark:text-slate-400">{__('general.filtering_by')}:</span>
                             {filters.category && (
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 dark:bg-indigo-950/50 px-3 py-1 text-xs font-semibold text-indigo-800 dark:text-indigo-300">
                                     {filters.category_name || categories.find((c: any) =>
@@ -165,6 +167,7 @@ export default function Browse({ services, categories, filters }: any) {
                                     <button
                                         type="button"
                                         onClick={() => selectCategory('')}
+                                        aria-label={__('marketplace.browse_remove_category_filter')}
                                         className="ms-1 font-bold hover:text-indigo-950 dark:hover:text-white"
                                     >
                                         ×
@@ -184,6 +187,7 @@ export default function Browse({ services, categories, filters }: any) {
                                                 { preserveState: true }
                                             );
                                         }}
+                                        aria-label={__('general.clear_search')}
                                         className="ms-1 font-bold hover:text-gray-950 dark:hover:text-white"
                                     >
                                         ×
@@ -204,7 +208,7 @@ export default function Browse({ services, categories, filters }: any) {
                             }}
                             className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                         >
-                            {__('general.clear_all_filters') || 'Clear all'}
+                            {__('general.clear_all_filters')}
                         </button>
                     </div>
                 </div>
@@ -280,7 +284,7 @@ export default function Browse({ services, categories, filters }: any) {
                                             )}
                                             {hasDiscount ? (
                                                 <div className="absolute top-3 start-3 rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-extrabold text-white shadow-md z-10">
-                                                    🔥 -{discountPct}% OFF
+                                                    {__('marketplace.discount_percent_off', { percent: discountPct })}
                                                 </div>
                                             ) : service.is_featured ? (
                                                 <div className="absolute top-3 start-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
@@ -298,7 +302,8 @@ export default function Browse({ services, categories, filters }: any) {
                                                     );
                                                 }}
                                                 className={`absolute top-3 end-3 rounded-full bg-white/90 dark:bg-slate-900/90 p-2 shadow-sm transition-colors ${service.is_favorited ? 'text-red-500 hover:text-red-600' : 'text-gray-400 dark:text-slate-400 hover:text-red-500'}`}
-                                                title={service.is_favorited ? __('general.remove_from_favorites') || 'Remove from favorites' : __('general.add_to_favorites') || 'Add to favorites'}
+                                                title={service.is_favorited ? __('general.remove_from_favorites') : __('general.add_to_favorites')}
+                                                aria-label={service.is_favorited ? __('general.remove_from_favorites') : __('general.add_to_favorites')}
                                             >
                                                 <svg
                                                     className="h-5 w-5"
@@ -421,29 +426,9 @@ export default function Browse({ services, categories, filters }: any) {
                     )}
 
                     {/* Pagination */}
-                    {services.links && services.links.length > 3 && (
-                        <div className="mt-10 flex justify-center gap-2">
-                            {services.links.map((link: any, idx: number) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => {
-                                        if (link.url)
-                                            router.get(
-                                                link.url,
-                                                {
-                                                    search,
-                                                    category_id: categoryId,
-                                                },
-                                                { preserveState: true },
-                                            );
-                                    }}
-                                    disabled={!link.url}
-                                    className={`rounded-md border px-4 py-2 text-sm font-medium transition ${link.active ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 dark:border-white/10 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'} ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
-                                />
-                            ))}
+                    {services.links && (
+                        <div className="mt-10">
+                            <Pagination links={services.links} />
                         </div>
                     )}
                 </div>

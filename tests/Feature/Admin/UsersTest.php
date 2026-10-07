@@ -7,11 +7,13 @@ use App\Models\UserSubscription;
 use App\Services\PricingService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class UsersTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected User $admin;
 
@@ -244,6 +246,8 @@ class UsersTest extends TestCase
 
     public function test_admin_can_search_user_by_alias_email(): void
     {
+        // A wallet row makes the user a customer; writing it converts to the business currency.
+        $this->seedUsdEgpRates();
         \App\Models\Transaction::create([
             'user_id' => $this->clientUser->id,
             'amount' => 100,

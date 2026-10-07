@@ -23,6 +23,7 @@ import {
 import Pagination from '@/Components/Pagination';
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { toast } from 'sonner';
+import { __, getLoadedLocale } from '@/lib/i18n';
 
 interface CharityCounterProps {
   charityCounters: any;
@@ -66,10 +67,10 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
       onSuccess: () => {
         setIsAddModalOpen(false);
         addForm.reset();
-        toast.success('تم إضافة المبلغ بنجاح');
+        toast.success(__('admin.charity_counter_add_success'));
       },
       onError: () => {
-        toast.error('حدث خطأ أثناء إضافة المبلغ');
+        toast.error(__('admin.charity_counter_add_failed'));
       }
     });
   };
@@ -80,35 +81,35 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
       onSuccess: () => {
         setIsSubtractModalOpen(false);
         subtractForm.reset();
-        toast.success('تم خصم المبلغ بنجاح');
+        toast.success(__('admin.charity_counter_subtract_success'));
       },
       onError: () => {
-        toast.error('حدث خطأ أثناء خصم المبلغ');
+        toast.error(__('admin.charity_counter_subtract_failed'));
       }
     });
   };
 
   return (
     <AdminSidebarLayout>
-            <Head title="إدارة عداد الخير" />
+            <Head title={__('admin.charity_counter_page_title')} />
 
             <div className="space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 gap-4">
                     <div className="me-auto">
-                        <h1 className="text-2xl font-bold tracking-tight">إدارة العداد العام للخير</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('admin.charity_counter_heading')}</h1>
                         <p className="text-muted-foreground mt-1">
-                            إدارة العداد العام لتبرعات جميع المستخدمين
+                            {__('admin.charity_counter_subtitle')}
                         </p>
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" className="text-destructive hover:bg-destructive/10" onClick={() => setIsSubtractModalOpen(true)}>
                             <Minus className="w-4 h-4 me-2" />
-                            خصم من العداد العام
+                            {__('admin.charity_counter_subtract_button')}
                         </Button>
                         <Button onClick={() => setIsAddModalOpen(true)}>
                             <Plus className="w-4 h-4 me-2" />
-                            إضافة للعداد العام
+                            {__('admin.charity_counter_add_button')}
                         </Button>
                     </div>
                 </div>
@@ -116,23 +117,23 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <MetricCard
-            label="الرصيد العام الحالي"
+            label={__('admin.charity_counter_current_balance')}
             value={formatMoney(stats.totalBalance)}
             icon={Wallet}
             className="border-primary/20" />
           
                     <MetricCard
-            label="إجمالي التبرعات"
+            label={__('admin.charity_counter_total_donations')}
             value={formatMoney(stats.totalReceived)}
             icon={TrendingUp} />
           
                     <MetricCard
-            label="إجمالي المصروفات"
+            label={__('admin.charity_counter_total_spent')}
             value={formatMoney(stats.totalSpent)}
             icon={TrendingDown} />
           
                     <MetricCard
-            label="عدد المتبرعين"
+            label={__('admin.charity_counter_donors_count')}
             value={stats.totalUsers.toString()}
             icon={Users} />
           
@@ -143,7 +144,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     <CardHeader className="pb-3 border-b bg-muted/30">
                         <div className="flex items-center gap-2">
                             <Settings className="w-5 h-5 text-primary" />
-                            <CardTitle className="text-lg">إدارة العداد العام</CardTitle>
+                            <CardTitle className="text-lg">{__('admin.charity_counter_manage_title')}</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -151,12 +152,12 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                             <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 text-center md:text-end">
                                 <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-semibold mb-2">
                                     <Heart className="w-5 h-5" />
-                                    <span>الرصيد العام الحالي</span>
+                                    <span>{__('admin.charity_counter_current_balance')}</span>
                                 </div>
                                 <div className="text-4xl font-bold text-primary mb-1">
                                     {formatMoney(stats.totalBalance)}
                                 </div>
-                                <p className="text-sm text-primary/80">إجمالي جميع تبرعات المستخدمين</p>
+                                <p className="text-sm text-primary/80">{__('admin.charity_counter_balance_hint')}</p>
                             </div>
                             
                             <div className="flex flex-col sm:flex-row gap-3 h-full justify-center md:justify-end">
@@ -166,7 +167,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                   onClick={() => setIsAddModalOpen(true)}>
                   
                                     <Plus className="w-5 h-5 me-2" />
-                                    إضافة مبلغ للعداد العام
+                                    {__('admin.charity_counter_add_amount_title')}
                                 </Button>
                                 <Button
                   size="lg"
@@ -175,7 +176,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                   onClick={() => setIsSubtractModalOpen(true)}>
                   
                                     <Minus className="w-5 h-5 me-2" />
-                                    خصم من العداد العام
+                                    {__('admin.charity_counter_subtract_button')}
                                 </Button>
                             </div>
                         </div>
@@ -187,20 +188,20 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                     <CardHeader className="flex flex-col sm:flex-row justify-end gap-4 sm:items-center gap-4 border-b pb-4">
                         <div className="me-auto flex items-center gap-2">
                             <Users className="w-5 h-5 text-muted-foreground" />
-                            <CardTitle>تبرعات المستخدمين</CardTitle>
+                            <CardTitle>{__('admin.charity_counter_user_donations')}</CardTitle>
                         </div>
                         
                         <form onSubmit={handleSearch} className="flex gap-2 max-w-sm w-full">
                             <div className="relative flex-1">
                                 <Search className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
-                  placeholder="بحث بالاسم أو البريد..."
+                  placeholder={__('admin.charity_counter_search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="ps-3 pe-9" />
                 
                             </div>
-                            <Button type="submit" variant="secondary">بحث</Button>
+                            <Button type="submit" variant="secondary">{__('general.search')}</Button>
                         </form>
                     </CardHeader>
                     
@@ -209,10 +210,10 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                             <table className="w-full text-sm text-end">
                                 <thead className="bg-muted/50 border-b">
                                     <tr>
-                                        <th className="py-3 px-4 font-semibold text-muted-foreground">المستخدم</th>
-                                        <th className="py-3 px-4 font-semibold text-muted-foreground">البريد الإلكتروني</th>
-                                        <th className="py-3 px-4 font-semibold text-muted-foreground">إجمالي التبرعات</th>
-                                        <th className="py-3 px-4 font-semibold text-muted-foreground">تاريخ آخر تبرع</th>
+                                        <th className="py-3 px-4 font-semibold text-muted-foreground">{__('general.user')}</th>
+                                        <th className="py-3 px-4 font-semibold text-muted-foreground">{__('common.email')}</th>
+                                        <th className="py-3 px-4 font-semibold text-muted-foreground">{__('admin.charity_counter_total_donations')}</th>
+                                        <th className="py-3 px-4 font-semibold text-muted-foreground">{__('admin.charity_counter_last_donation_date')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -231,7 +232,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                                 <td className="py-3 px-4 text-muted-foreground">{counter.user.email}</td>
                                                 <td className="py-3 px-4 font-bold text-success">{formatMoney(counter.total_received)}</td>
                                                 <td className="py-3 px-4 text-muted-foreground">
-                                                    {new Date(counter.updated_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                                    {new Date(counter.updated_at).toLocaleDateString(getLoadedLocale() ?? 'en', { year: 'numeric', month: 'short', day: 'numeric' })}
                                                 </td>
                                             </tr>
                   ) :
@@ -240,7 +241,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                                             <td colSpan={4} className="py-12 text-center text-muted-foreground">
                                                 <div className="flex flex-col items-center justify-center">
                                                     <Wallet className="w-12 h-12 mb-3 text-muted-foreground/30" />
-                                                    <p>لا توجد تبرعات حتى الآن</p>
+                                                    <p>{__('admin.charity_counter_no_donations')}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -262,15 +263,15 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>إضافة مبلغ للعداد العام</DialogTitle>
+                        <DialogTitle>{__('admin.charity_counter_add_amount_title')}</DialogTitle>
                         <DialogDescription>
-                            قم بإضافة مبلغ للعداد العام للخير، سيتم تسجيل هذه المعاملة باسمك كإضافة إدارية.
+                            {__('admin.charity_counter_add_description')}
                         </DialogDescription>
                     </DialogHeader>
                     
                     <form onSubmit={handleAddSubmit} className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="add-amount">المبلغ</Label>
+                            <Label htmlFor="add-amount">{__('general.amount')}</Label>
                             <Input
                 id="add-amount"
                 type="number"
@@ -283,21 +284,21 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                             {addForm.errors.amount && <p className="text-sm text-destructive">{addForm.errors.amount}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="add-desc">الوصف والسبب</Label>
+                            <Label htmlFor="add-desc">{__('admin.charity_counter_add_reason_label')}</Label>
                             <Textarea
                 id="add-desc"
                 value={addForm.data.description}
                 onChange={(e) => addForm.setData('description', e.target.value)}
-                placeholder="اكتب سبب إضافة هذا المبلغ..."
+                placeholder={__('admin.charity_counter_add_reason_placeholder')}
                 required />
               
                             {addForm.errors.description && <p className="text-sm text-destructive">{addForm.errors.description}</p>}
                         </div>
                         
                         <DialogFooter className="mt-6">
-                            <Button type="button" variant="ghost" onClick={() => setIsAddModalOpen(false)}>إلغاء</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsAddModalOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit" disabled={addForm.processing}>
-                                إضافة المبلغ
+                                {__('admin.charity_counter_add_submit')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -308,20 +309,20 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
             <Dialog open={isSubtractModalOpen} onOpenChange={setIsSubtractModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>خصم مبلغ من العداد العام</DialogTitle>
+                        <DialogTitle>{__('admin.charity_counter_subtract_title')}</DialogTitle>
                         <DialogDescription>
-                            قم بخصم مبلغ من العداد العام للخير عند إنفاقه في أوجه الخير.
+                            {__('admin.charity_counter_subtract_description')}
                         </DialogDescription>
                     </DialogHeader>
                     
                     <form onSubmit={handleSubtractSubmit} className="space-y-4 py-4">
                         <div className="p-3 bg-muted rounded-md mb-4 flex justify-end gap-4 items-center">
-                            <span className="me-auto text-sm font-medium">الرصيد العام الحالي:</span>
+                            <span className="me-auto text-sm font-medium">{__('admin.charity_counter_current_balance_label')}</span>
                             <span className="font-bold text-primary">{formatMoney(stats.totalBalance)}</span>
                         </div>
                         
                         <div className="space-y-2">
-                            <Label htmlFor="sub-amount">المبلغ المراد خصمه</Label>
+                            <Label htmlFor="sub-amount">{__('admin.charity_counter_subtract_amount_label')}</Label>
                             <Input
                 id="sub-amount"
                 type="number"
@@ -335,21 +336,21 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                             {subtractForm.errors.amount && <p className="text-sm text-destructive">{subtractForm.errors.amount}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="sub-desc">الوصف وأوجه الصرف</Label>
+                            <Label htmlFor="sub-desc">{__('admin.charity_counter_subtract_reason_label')}</Label>
                             <Textarea
                 id="sub-desc"
                 value={subtractForm.data.description}
                 onChange={(e) => subtractForm.setData('description', e.target.value)}
-                placeholder="اكتب تفاصيل صرف هذا المبلغ..."
+                placeholder={__('admin.charity_counter_subtract_reason_placeholder')}
                 required />
               
                             {subtractForm.errors.description && <p className="text-sm text-destructive">{subtractForm.errors.description}</p>}
                         </div>
                         
                         <DialogFooter className="mt-6">
-                            <Button type="button" variant="ghost" onClick={() => setIsSubtractModalOpen(false)}>إلغاء</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsSubtractModalOpen(false)}>{__('general.cancel')}</Button>
                             <Button type="submit" variant="destructive" disabled={subtractForm.processing}>
-                                خصم المبلغ
+                                {__('admin.charity_counter_subtract_submit')}
                             </Button>
                         </DialogFooter>
                     </form>

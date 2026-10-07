@@ -39,14 +39,14 @@ export default function Create() {
     return (
         <WorkspaceLayout
             title={__('general.create_event_type')}
-            workspaceName="Booking Settings"
+            workspaceName={__('booking.settings_workspace')}
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
-                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
-                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
-                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
+                { id: 'dashboard', label: __('general.dashboard'), icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: __('booking.nav_appointments'), icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'events', label: __('booking.nav_event_types'), icon: Calendar, href: '/booking/events', isActive: true },
+                { id: 'providers', label: __('booking.nav_providers'), icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: __('booking.nav_exceptions'), icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title={__('general.create_event_type')} />
@@ -121,7 +121,7 @@ export default function Create() {
                         <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="duration_minutes">Duration (Minutes)</Label>
+                                <Label htmlFor="duration_minutes">{__('booking.duration_minutes')}</Label>
                                 <Input 
                                     id="duration_minutes" 
                                     type="number"
@@ -150,6 +150,7 @@ export default function Create() {
                                     <p className="text-sm text-muted-foreground">{__('general.ask_for_payment_when_booking')}</p>
                                 </div>
                                 <Switch 
+                                    aria-label={__('general.require_payment')}
                                     checked={data.requires_payment}
                                     onCheckedChange={checked => setData('requires_payment', checked)}
                                 />

@@ -16,10 +16,12 @@ use Tests\TestCase;
 class SubscriptionModuleTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
     }
 

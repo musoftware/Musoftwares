@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { AlertCircle, Archive, ArchiveRestore, Edit, LayoutDashboard, ListTodo, FileText, Paperclip, Trash2, User, Wallet } from 'lucide-react';
+import { AlertCircle, Archive, ArchiveRestore, ArrowRight, Edit, LayoutDashboard, ListTodo, FileText, Paperclip, Trash2, User, Wallet } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { cn, formatMoney, formatDate } from '@/lib/utils';
 import type { Project } from '@/types/project';
+import { projectStatusLabel } from './ProjectFormFields';
 
 const STATUS_STYLES: Record<string, string> = {
     open: 'bg-emerald-100 text-emerald-700',
@@ -66,7 +67,7 @@ export function ProjectCard({
                         <Checkbox
                             checked={isSelected}
                             onCheckedChange={() => onSelect(project.id)}
-                            aria-label={__('general.select_project', { name: project.project_name })}
+                            aria-label={__('admin.projects_select_project', { name: project.project_name })}
                             className={cn(
                                 'shrink-0 transition-opacity',
                                 isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
@@ -88,7 +89,7 @@ export function ProjectCard({
                         </span>
                     ) : (
                         <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold capitalize', STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-600')}>
-                            {status.replace('_', ' ')}
+                            {projectStatusLabel(status)}
                         </span>
                     )}
                 </div>
@@ -154,8 +155,8 @@ export function ProjectCard({
                 )}
 
                 {(project.date_start || project.date_end) && (
-                    <p className="mb-3 text-xs text-slate-400">
-                        {formatDate(project.date_start)} → {project.date_end ? formatDate(project.date_end) : '…'}
+                    <p className="mb-3 flex items-center gap-1 text-xs text-slate-400">
+                        {formatDate(project.date_start)} <ArrowRight className="h-3 w-3 rtl:rotate-180" aria-hidden="true" /> {project.date_end ? formatDate(project.date_end) : '…'}
                     </p>
                 )}
 

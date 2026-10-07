@@ -52,7 +52,7 @@ class SubscriptionExpiryRemindersTest extends TestCase
         $this->assertNotNull($subscription->last_expired_reminder_sent_at);
 
         // Assert email log was created in outgoing_emails
-        $emailLog = OutgoingEmail::where('to_email', 'client@example.com')->first();
+        $emailLog = $this->reminderLogsFor('client@example.com')->first();
         $this->assertNotNull($emailLog);
         $this->assertEquals('sent', $emailLog->status);
         $this->assertEquals('SubscriptionExpiredReminderMail', $emailLog->mail_class);
@@ -100,7 +100,7 @@ class SubscriptionExpiryRemindersTest extends TestCase
         $this->assertTrue(Carbon::parse($subscription->last_expired_reminder_sent_at)->isToday());
 
         // Assert English subject is logged
-        $emailLogs = OutgoingEmail::where('to_email', 'client2@example.com')->get();
+        $emailLogs = $this->reminderLogsFor('client2@example.com')->get();
         $this->assertCount(1, $emailLogs);
         $this->assertStringContainsString('Subscription Expired', $emailLogs->first()->subject);
 
@@ -156,7 +156,7 @@ class SubscriptionExpiryRemindersTest extends TestCase
         $this->assertEquals(0, $subscription->expired_reminders_sent);
 
         // Assert no email logs created
-        $this->assertFalse(OutgoingEmail::where('to_email', 'renewed@example.com')->exists());
+        $this->assertFalse($this->reminderLogsFor('renewed@example.com')->exists());
     }
 
     /**
@@ -175,9 +175,20 @@ class SubscriptionExpiryRemindersTest extends TestCase
         });
 
         // Verify that the email was logged and updated to 'sent'
-        $emailLog = OutgoingEmail::where('to_email', 'logtest@example.com')->first();
+        $emailLog = OutgoingEmail::where('to_email', 'logtest@example.com')
+            ->where('subject', 'Direct Log Test')
+            ->first();
         $this->assertNotNull($emailLog);
         $this->assertEquals('sent', $emailLog->status);
         $this->assertEquals('Direct Log Test', $emailLog->subject);
+    }
+    /**
+     * Only the subscription reminder mails. New users also get loyalty mails
+     * (welcome points can unlock the first tier), which these tests do not cover.
+     */
+    private function reminderLogsFor(string $email): \Illuminate\Database\Eloquent\Builder
+    {
+        return OutgoingEmail::where('to_email', $email)
+            ->where('mail_class', 'SubscriptionExpiredReminderMail');
     }
 }

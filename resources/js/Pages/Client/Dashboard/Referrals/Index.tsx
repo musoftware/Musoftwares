@@ -83,15 +83,15 @@ export default function Index({ auth, referral, commission_percentage, embedKey 
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <LinkIcon className="w-5 h-5 text-indigo-500" />
-                                {__('messages.your_referral_link') || __('general.referral_link')}
+                                {__('messages.your_referral_link')}
                             </CardTitle>
                             <CardDescription>
-                                {__('messages.share_referral_desc') || 'Share this link to earn commission when users register.'}
+                                {__('messages.share_referral_desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-center space-x-2">
-                                <Input value={referralLink} readOnly className="bg-gray-50 font-mono text-sm" />
+                                <Input value={referralLink} readOnly aria-label={__('client.referral_link_label')} className="bg-gray-50 font-mono text-sm" />
                                 <Button onClick={() => handleCopy(referralLink, false)} variant="outline">
                                     <Copy className="w-4 h-4 me-2" />
                                     {copied ? __('general.copied') : __('general.copy')}
@@ -101,7 +101,7 @@ export default function Index({ auth, referral, commission_percentage, embedKey 
                             <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-between gap-4">
                                 <div>
                                     <h4 className="font-semibold text-indigo-900">{__('general.your_commission_rate')}</h4>
-                                    <p className="text-sm text-indigo-700">{__('general.you_earn_this_percentage_from_all_paymen') || 'Percentage of payments made by referred users.'}</p>
+                                    <p className="text-sm text-indigo-700">{__('general.you_earn_this_percentage_from_all_paymen')}</p>
                                 </div>
                                 <Badge className="bg-indigo-600 text-white text-lg py-1 px-3">
                                     {formattedCommission}
@@ -115,16 +115,16 @@ export default function Index({ auth, referral, commission_percentage, embedKey 
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <LinkIcon className="w-5 h-5 text-indigo-500" />
-                                {__('general.custom_referral_slug') || 'Custom Referral Slug'}
+                                {__('general.custom_referral_slug')}
                             </CardTitle>
                             <CardDescription>
-                                {__('general.customize_your_link_slug') || 'Set a custom ending for your referral link. Once set, it cannot be changed.'}
+                                {__('general.customize_your_link_slug')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleUpdateSlug} className="space-y-4">
                                 <div className="flex flex-col gap-2">
-                                    <Label htmlFor="slug">{__('general.slug') || 'Slug'}</Label>
+                                    <Label htmlFor="slug">{__('general.slug')}</Label>
                                     <div className="flex items-center space-x-2">
                                         <div className="flex-1 relative">
                                             <Input
@@ -144,7 +144,7 @@ export default function Index({ auth, referral, commission_percentage, embedKey 
                                         {!hasCustomSlug && (
                                             <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">
                                                 <Save className="w-4 h-4 me-2" />
-                                                {__('general.save') || 'Save'}
+                                                {__('general.save')}
                                             </Button>
                                         )}
                                     </div>
@@ -159,18 +159,18 @@ export default function Index({ auth, referral, commission_percentage, embedKey 
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Code className="w-5 h-5 text-emerald-500" />
-                                {__('messages.embed_modules') || __('general.embed_modules')}
+                                {__('messages.embed_modules')}
                             </CardTitle>
                             <CardDescription>
-                                {__('general.you_can_embed_modules_or_tools_directly') || 'You can embed tools directly using your key.'}
+                                {__('general.you_can_embed_modules_or_tools_directly')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             {embedKey ? (
                                 <div className="space-y-4">
-                                    <Label className="text-slate-700 font-medium">{__('general.embed_key') || 'Your Embed Key'}</Label>
+                                    <Label className="text-slate-700 font-medium">{__('general.embed_key')}</Label>
                                     <div className="flex items-center space-x-2">
-                                        <Input value={embedKey.key} readOnly className="bg-gray-50 font-mono text-sm" />
+                                        <Input value={embedKey.key} readOnly aria-label={__('general.embed_key')} className="bg-gray-50 font-mono text-sm" />
                                         <Button onClick={() => handleCopy(embedKey.key, true)} variant="outline">
                                             <Copy className="w-4 h-4 me-2" />
                                             {copiedEmbed ? __('general.copied') : __('general.copy')}

@@ -321,7 +321,7 @@ export default function PricingBuilder({
                                     </h3>
                                     {item.type === 'module' && (
                                         <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
-                                            Platform Module
+                                            {__('general.pricing_platform_module')}
                                         </span>
                                     )}
                                 </div>
@@ -350,8 +350,9 @@ export default function PricingBuilder({
                                     ownedFeature.status === 'active' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                                 )}>
                                     <Info className="w-3.5 h-3.5" />
-                                    {ownedFeature.status === 'active' ? 'Renews / Expires on' : 'Expired on'} {ownedFeature.expires_at}
-                                    {ownedFeature.status === 'expired' && ' — Select to Renew'}
+                                    {ownedFeature.status === 'active'
+                                        ? __('general.pricing_renews_on', { date: ownedFeature.expires_at })
+                                        : __('general.pricing_expired_on', { date: ownedFeature.expires_at })}
                                 </p>
                             )}
                         </div>
@@ -389,7 +390,7 @@ export default function PricingBuilder({
                     <div>
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100/80 mb-1.5 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800">
                             <Building2 className="w-3 h-3" />
-                            <span>Architecture Core</span>
+                            <span>{__('general.pricing_architecture_core')}</span>
                         </div>
                         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                             {__('general.core_modules')}
@@ -451,7 +452,7 @@ export default function PricingBuilder({
                         <div>
                             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100/80 mb-1.5 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
                                 <Zap className="w-3 h-3" />
-                                <span>Automation Layer</span>
+                                <span>{__('general.pricing_automation_layer')}</span>
                             </div>
                             <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                                 {__('general.automation_tools')}
@@ -595,14 +596,14 @@ export default function PricingBuilder({
 
                                     {discount > 0 && (
                                         <div className="flex justify-between text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-                                            <span>Annual Savings</span>
+                                            <span>{__('general.pricing_annual_savings')}</span>
                                             <span>-{discount.toFixed(2)} {currency}</span>
                                         </div>
                                     )}
 
                                     {!isNewSystem && proratedRefund > 0 && (
                                         <div className="flex justify-between text-xs text-amber-600 dark:text-amber-400 font-semibold">
-                                            <span>Prorated Credit</span>
+                                            <span>{__('general.pricing_prorated_credit')}</span>
                                             <span>-{proratedRefund.toFixed(2)} {currency}</span>
                                         </div>
                                     )}

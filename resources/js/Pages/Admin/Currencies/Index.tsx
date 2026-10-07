@@ -20,6 +20,7 @@ import {
 } from '@/Components/ui/select';
 import { MoreHorizontal, Search, Plus, Trash2, Edit } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface Currency {
     id: number;
@@ -32,7 +33,7 @@ interface Currency {
     exchanges_to_count?: number;
 }
 
-interface Pagination<T> {
+interface Paginated<T> {
     data: T[];
     links: { url: string | null; label: string; active: boolean }[];
     from: number;
@@ -41,7 +42,7 @@ interface Pagination<T> {
 }
 
 interface Props {
-    currencies: Pagination<Currency>;
+    currencies: Paginated<Currency>;
     search: string;
 }
 
@@ -132,14 +133,14 @@ export default function Index({ currencies, search }: Props) {
                                             <td className="px-4 py-3 text-slate-600">
                                                 {c.is_default ? (
                                                     <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200">
-                                                        {__('general.default') || 'Default'}
+                                                        {__('general.default')}
                                                     </span>
                                                 ) : null}
                                             </td>
                                             <td className="px-4 py-3 text-end">
                                                 <Dialog>
                                                     <DialogTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <Button variant="ghost" className="h-8 w-8 p-0" aria-label={__('general.actions')} title={__('general.actions')}>
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DialogTrigger>
@@ -172,7 +173,7 @@ export default function Index({ currencies, search }: Props) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                        <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                                             {__('general.no_records_found')}
                                         </td>
                                     </tr>
@@ -181,30 +182,9 @@ export default function Index({ currencies, search }: Props) {
                         </table>
                     </div>
 
-                    {currencies.total > 0 && currencies.links.length > 3 && (
-                        <div className="flex items-center justify-end gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                            <div className="me-auto flex items-center gap-1">
-                                {currencies.links.map((link, idx) =>
-                                    link.url ? (
-                                        <button
-                                            key={idx}
-                                            onClick={() => router.visit(link.url!)}
-                                            className={`rounded-md px-3 py-1 text-sm transition-colors ${
-                                                link.active
-                                                    ? 'bg-slate-900 font-medium text-white shadow-sm'
-                                                    : 'text-slate-500 hover:bg-slate-100'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ) : (
-                                        <span
-                                            key={idx}
-                                            className="rounded-md px-3 py-1 text-sm text-slate-300 cursor-not-allowed"
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ),
-                                )}
-                            </div>
+                    {currencies.total > 0 && (
+                        <div className="border-t border-slate-200 bg-slate-50 px-4 pb-3">
+                            <Pagination links={currencies.links} />
                         </div>
                     )}
                 </div>

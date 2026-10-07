@@ -63,10 +63,10 @@ export default function Index({ services }: any) {
                     <div className="relative overflow-hidden bg-zinc-900 border border-zinc-800 p-6 shadow-xl sm:rounded-2xl">
                         {loading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-950/70 backdrop-blur-sm">
-                                <div className="font-medium text-emerald-400">{__('general.loading') || 'Loading...'}</div>
+                                <div className="font-medium text-emerald-400">{__('general.loading')}</div>
                             </div>
                         )}
-                        <h3 className="mb-6 text-2xl font-bold text-white tracking-tight">{__('general.services') || 'Explore Software Services'}</h3>
+                        <h3 className="mb-6 text-2xl font-bold text-white tracking-tight">{__('general.services')}</h3>
 
                         {(services.data as any).length > 0 ? (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -80,8 +80,8 @@ export default function Index({ services }: any) {
                                                 {service.title}
                                             </h4>
                                             <p className="text-xs text-zinc-400 mb-4">
-                                                {__('general.by') || 'By'}{' '}
-                                                <span className="text-zinc-200 font-medium">{service.seller?.name || __('general.unknown') || 'Verified Partner'}</span>
+                                                {__('general.by')}{' '}
+                                                <span className="text-zinc-200 font-medium">{service.seller?.name || __('general.unknown')}</span>
                                             </p>
                                         </div>
                                         <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
@@ -100,7 +100,7 @@ export default function Index({ services }: any) {
                             </div>
                         ) : (
                             <div className="py-12 text-center">
-                                <p className="text-zinc-400">{__('general.no_services_found_1') || 'No services available at the moment.'}</p>
+                                <p className="text-zinc-400">{__('general.no_services_found_1')}</p>
                             </div>
                         )}
 

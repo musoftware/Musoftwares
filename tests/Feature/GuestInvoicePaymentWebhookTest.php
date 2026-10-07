@@ -18,7 +18,7 @@ class GuestInvoicePaymentWebhookTest extends TestCase
         config(['services.kashier.secret_key' => 'test_secret_key']);
 
         $currency = Currency::firstOrCreate(
-            ['id' => 1],
+            ['currency' => 'EGP'], // id 1 is USD; the payload is charged in EGP
             [
                 'currency' => 'EGP',
                 'symbol' => 'EGP',
@@ -100,7 +100,7 @@ class GuestInvoicePaymentWebhookTest extends TestCase
         config(['services.kashier.secret_key' => 'test_secret_key']);
 
         $currency = Currency::firstOrCreate(
-            ['id' => 1],
+            ['currency' => 'EGP'], // id 1 is USD; the payload is charged in EGP
             [
                 'currency' => 'EGP',
                 'symbol' => 'EGP',

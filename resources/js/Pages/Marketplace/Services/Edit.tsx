@@ -4,7 +4,7 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import {
-    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star
+    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star, Camera
 } from 'lucide-react';
 import OverviewStep from './Steps/OverviewStep';
 import PricingStep from './Steps/PricingStep';
@@ -17,11 +17,11 @@ interface Category { id: number; name: string; slug: string; }
 interface Props { categories: Category[]; service: any; }
 
 const STEPS = [
-    { id: 1, label: 'Overview' },
-    { id: 2, label: 'Pricing' },
-    { id: 3, label: 'Description & FAQ' },
-    { id: 4, label: 'Gallery' },
-    { id: 5, label: 'Publish' },
+    { id: 1, labelKey: 'general.overview' },
+    { id: 2, labelKey: 'general.pricing' },
+    { id: 3, labelKey: 'marketplace.svc_step_description_faq' },
+    { id: 4, labelKey: 'general.gallery' },
+    { id: 5, labelKey: 'marketplace.svc_step_publish' },
 ];
 
 export const emptyPackage = () => ({
@@ -97,7 +97,7 @@ export default function EditService({ categories, service }: Props) {
                         <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                             <ArrowLeft className="w-4 h-4" /> {__('general.back')}</Link>
                         <h1 className="text-base font-semibold text-foreground">{__('general.edit_service')}</h1>
-                        <div className="text-xs text-slate-400">Step {step} of {STEPS.length}</div>
+                        <div className="text-xs text-slate-400">{__('marketplace.svc_step_of', { step, total: STEPS.length })}</div>
                     </div>
 
                     {/* Step tabs */}
@@ -121,7 +121,7 @@ export default function EditService({ categories, service }: Props) {
                                         )}>
                                             {s.id}
                                         </span>
-                                        <span className="hidden sm:block">{s.label}</span>
+                                        <span className="hidden sm:block">{__(s.labelKey)}</span>
                                     </button>
                                 );
                             })}
@@ -171,12 +171,12 @@ export default function EditService({ categories, service }: Props) {
                                 {/* Thumbnail */}
                                 <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden flex items-center justify-center">
                                     {data.gallery.length > 0 ? (
-                                        <img src={URL.createObjectURL(data.gallery[0])} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={URL.createObjectURL(data.gallery[0])} alt={__('marketplace.svc_thumbnail_alt')} className="w-full h-full object-cover" />
                                     ) : data.kept_gallery.length > 0 ? (
-                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt={__('marketplace.svc_thumbnail_alt')} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
-                                            <span className="text-4xl mb-2">📸</span>
+                                            <Camera className="w-9 h-9 mb-2" aria-hidden="true" />
                                             <span className="text-xs font-medium">{__('general.image_preview')}</span>
                                         </div>
                                     )}
@@ -201,7 +201,7 @@ export default function EditService({ categories, service }: Props) {
 
                                     {/* Title */}
                                     <h4 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-snug mb-4 min-h-[40px]">
-                                        {data.title || 'I will...'}
+                                        {data.title || __('marketplace.svc_title_preview_placeholder')}
                                     </h4>
 
                                     {/* Footer */}

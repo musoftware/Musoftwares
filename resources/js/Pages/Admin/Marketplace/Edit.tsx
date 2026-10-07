@@ -15,6 +15,7 @@ import {
 } from '@/Components/ui/select';
 import { ArrowLeft, Save, Plus, Trash2, Globe, Image as ImageIcon } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
 
 interface Category {
     id: number;
@@ -169,7 +170,7 @@ export default function Edit({ auth, service, categories }: Props) {
             // Limit total images to 5
             const totalImages = data.kept_gallery.length + data.gallery.length + files.length;
             if (totalImages > 5) {
-                alert(__('general.max_5_images_allowed'));
+                toast.error(__('general.max_5_images_allowed'));
                 return;
             }
             setData('gallery', [...data.gallery, ...files]);
@@ -198,8 +199,8 @@ export default function Edit({ auth, service, categories }: Props) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title={__('general.edit_service')} header="Edit Service">
-            <Head title={`Edit Service: ${service.title}`} />
+        <AdminSidebarLayout user={auth?.user} title={__('general.edit_service')} header={__('general.edit_service')}>
+            <Head title={__('admin.marketplace_edit_service_title', { title: service.title })} />
 
             <div className="py-8 bg-slate-50 min-h-screen">
                 <div className="mx-auto w-full max-w-7xl sm:px-6 lg:px-8 space-y-6">
@@ -209,11 +210,13 @@ export default function Edit({ auth, service, categories }: Props) {
                             <Link 
                                 href={route('admin.marketplace.services.all')}
                                 className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-slate-900 transition-colors shadow-sm"
+                                aria-label={__('general.back')}
+                                title={__('general.back')}
                             >
-                                <ArrowLeft className="w-5 h-5" />
+                                <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                             </Link>
                             <div>
-                                <h1 className="text-2xl font-bold text-slate-900">Edit Service #{service.id}</h1>
+                                <h1 className="text-2xl font-bold text-slate-900">{__('admin.marketplace_edit_service_heading', { id: service.id })}</h1>
                                 <p className="text-sm text-slate-500">{__('general.make_changes_to_the_service_details_or_packages')}</p>
                             </div>
                         </div>
@@ -247,7 +250,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         size="sm" 
                                         onClick={() => setLocale('ar')}
                                     >
-                                        العربية
+                                        {__('general.arabic')}
                                     </Button>
                                 </div>
                             </div>
@@ -259,7 +262,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         id="title"
                                         value={data.title_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('title', e.target.value)}
-                                        dir={__('ltr')}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
                                     />
                                 </div>
 
@@ -269,7 +272,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         id="tagline"
                                         value={data.tagline_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('tagline', e.target.value)}
-                                        dir={__('ltr')}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
                                     />
                                 </div>
 
@@ -294,7 +297,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         value={data.description_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('description', e.target.value)}
                                         rows={6}
-                                        dir={__('ltr')}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
                                     />
                                 </div>
 
@@ -305,7 +308,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                         value={data.auto_reply_translations[locale] || ''}
                                         onChange={(e) => handleTranslationChange('auto_reply', e.target.value)}
                                         rows={3}
-                                        dir={__('ltr')}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
                                     />
                                 </div>
                             </div>
@@ -329,13 +332,15 @@ export default function Edit({ auth, service, categories }: Props) {
                                             <Button 
                                                 type="button" 
                                                 onClick={() => removePackage(index)}
+                                                aria-label={__('general.remove_package')}
+                                                title={__('general.remove_package')}
                                                 className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         )}
                                         
-                                        <h3 className="font-semibold text-slate-700 mb-4 pe-10 text-sm uppercase tracking-wider">Package {index + 1}</h3>
+                                        <h3 className="font-semibold text-slate-700 mb-4 pe-10 text-sm uppercase tracking-wider">{__('admin.marketplace_package_number', { number: index + 1 })}</h3>
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
@@ -415,7 +420,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                 onChange={(e) => updateExtra(index, 'duration_days', e.target.value)} 
                                             />
                                         </div>
-                                        <Button type="button" variant="ghost" className="text-red-500 mt-0" onClick={() => removeExtra(index)}>
+                                        <Button type="button" variant="ghost" className="text-red-500 mt-0" onClick={() => removeExtra(index)} aria-label={__('admin.marketplace_remove_extra')} title={__('admin.marketplace_remove_extra')}>
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -441,6 +446,8 @@ export default function Edit({ auth, service, categories }: Props) {
                                         <Button 
                                             type="button" 
                                             onClick={() => removeFaq(index)}
+                                            aria-label={__('admin.marketplace_remove_faq')}
+                                            title={__('admin.marketplace_remove_faq')}
                                             className="absolute top-3 end-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -472,20 +479,20 @@ export default function Edit({ auth, service, categories }: Props) {
 
                         {/* Gallery */}
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                            <h2 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">{__('general.gallery')} (Max 5)</h2>
+                            <h2 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">{__('general.gallery')} ({__('admin.marketplace_gallery_max_images', { max: 5 })})</h2>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                 {data.kept_gallery.map((path, index) => (
                                     <div key={`kept-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                                        <img src={path.startsWith('http') ? path : (path.startsWith('/') ? path : `/uploads/${path.replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Gallery" className="w-full h-full object-cover" />
-                                        <Button type="button" onClick={() => removeKeptImage(path)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
+                                        <img src={path.startsWith('http') ? path : (path.startsWith('/') ? path : `/uploads/${path.replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt={__('admin.marketplace_gallery_image_alt')} className="w-full h-full object-cover" />
+                                        <Button type="button" onClick={() => removeKeptImage(path)} aria-label={__('admin.marketplace_remove_image')} title={__('admin.marketplace_remove_image')} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 ))}
                                 {data.gallery.map((file, index) => (
                                     <div key={`new-${index}`} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                                        <img src={URL.createObjectURL(file)} alt="New Gallery" className="w-full h-full object-cover opacity-70" />
-                                        <Button type="button" onClick={() => removeNewImage(index)} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
+                                        <img src={URL.createObjectURL(file)} alt={__('admin.marketplace_new_gallery_image_alt')} className="w-full h-full object-cover opacity-70" />
+                                        <Button type="button" onClick={() => removeNewImage(index)} aria-label={__('admin.marketplace_remove_image')} title={__('admin.marketplace_remove_image')} className="absolute top-1 end-1 bg-white p-1 rounded shadow text-red-500">
                                             <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>

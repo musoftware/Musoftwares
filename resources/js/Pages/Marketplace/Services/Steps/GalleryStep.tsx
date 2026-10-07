@@ -222,10 +222,10 @@ export default function GalleryStep({ data, setData, errors }: any) {
                     setPromptText(response.data.prompt);
                 }
             } else {
-                setAiError(response.data?.error || 'فشل في توليد الصورة. يرجى المحاولة لاحقاً.');
+                setAiError(response.data?.error || __('marketplace.gallery_ai_generate_failed'));
             }
         } catch (err: any) {
-            setAiError(err?.response?.data?.error || err?.message || 'حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي.');
+            setAiError(err?.response?.data?.error || err?.message || __('marketplace.gallery_ai_connection_error'));
         } finally {
             setGeneratingAi(false);
         }
@@ -246,7 +246,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                 setShowPromptBox(true);
             }
         } catch (err: any) {
-            setAiError(err?.response?.data?.error || err?.message || 'تعذر جلب البرومبت المحسن.');
+            setAiError(err?.response?.data?.error || err?.message || __('marketplace.gallery_ai_prompt_failed'));
         } finally {
             setFetchingPrompt(false);
         }
@@ -300,11 +300,11 @@ export default function GalleryStep({ data, setData, errors }: any) {
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold flex items-center gap-2 text-white">
-                                    أدوات غلاف الخدمة بالذكاء الاصطناعي (أدمن فقط)
-                                    <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">Admin Only</span>
+                                    {__('marketplace.gallery_ai_tools_title')}
+                                    <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">{__('marketplace.admin_only')}</span>
                                 </h4>
                                 <p className="text-xs text-slate-300 mt-0.5">
-                                    توليد صورة تلقائية مباشرة أو إظهار البرومبت المخصص لنسخه وإرساله لـ ChatGPT يدويًا.
+                                    {__('marketplace.gallery_ai_tools_desc')}
                                 </p>
                             </div>
                         </div>
@@ -320,12 +320,12 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                 {generatingAi ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
-                                        <span>جاري التصميم...</span>
+                                        <span>{__('marketplace.gallery_ai_designing')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Sparkles className="w-4 h-4 text-amber-300" />
-                                        <span>توليد صورة تلقائياً</span>
+                                        <span>{__('marketplace.gallery_ai_generate_image')}</span>
                                     </>
                                 )}
                             </button>
@@ -342,7 +342,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                 ) : (
                                     <FileText className="w-4 h-4 text-emerald-400" />
                                 )}
-                                <span>نسخ البرومبت لـ ChatGPT 📋</span>
+                                <span>{__('marketplace.gallery_ai_copy_prompt_chatgpt')}</span>
                             </button>
                         </div>
                     </div>
@@ -352,7 +352,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                         <div className="mt-3 bg-slate-950/80 border border-indigo-500/30 rounded-xl p-4 space-y-3 transition-all">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                                    <FileText className="w-4 h-4" /> البرومبت المحسن الجاهز لـ ChatGPT (Single SaaS Hero Dashboard)
+                                    <FileText className="w-4 h-4" /> {__('marketplace.gallery_ai_prompt_box_title')}
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <button
@@ -363,12 +363,12 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                         {copiedPrompt ? (
                                             <>
                                                 <Check className="w-3.5 h-3.5 text-white" />
-                                                <span>تم النسخ!</span>
+                                                <span>{__('general.copied')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <Copy className="w-3.5 h-3.5" />
-                                                <span>نسخ البرومبت</span>
+                                                <span>{__('marketplace.gallery_ai_copy_prompt')}</span>
                                             </>
                                         )}
                                     </button>
@@ -379,7 +379,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition-all border border-slate-700"
                                     >
                                         <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
-                                        <span>فتح ChatGPT</span>
+                                        <span>{__('marketplace.gallery_ai_open_chatgpt')}</span>
                                     </a>
                                 </div>
                             </div>
@@ -387,7 +387,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                 {promptText}
                             </div>
                             <p className="text-[11px] text-slate-400 dir-rtl">
-                                💡 **طريقة الاستخدام**: انسخ هذا النص أعلاه، ثم افتح ChatGPT والصقه مباشرة ليولد لك أحدث وأفضل صورة غلاف عالية الدقة، ثم ارفع الصورة الناتجة في المربع أدناه يدويًا.
+                                {__('marketplace.gallery_ai_usage_hint')}
                             </p>
                         </div>
                     )}
@@ -401,7 +401,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
             <div className="space-y-4">
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
-                        <ImageIcon className="w-5 h-5 text-indigo-500" /> Images (up to 5)
+                        <ImageIcon className="w-5 h-5 text-indigo-500" /> {__('marketplace.gallery_images_up_to_5')}
                     </h3>
                     <p className="text-sm text-slate-500 mb-4">{__('general.get_noticed_by_the_right_buyers_with_visual_examples_of_your_services')}</p>
                 </div>
@@ -445,7 +445,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                     isDragging ? 'opacity-40 scale-95 border-indigo-400' : 'opacity-100 border-slate-200 shadow-sm hover:shadow-md'
                                 } ${isDragOver ? 'ring-4 ring-indigo-500/40 border-indigo-500 scale-[1.02]' : ''}`}
                             >
-                                <img src={item.src} alt={`Service visual ${idx + 1}`} className="w-full h-full object-cover" />
+                                <img src={item.src} alt={__('marketplace.gallery_image_alt', { number: idx + 1 })} className="w-full h-full object-cover" />
 
                                 {/* Primary Badge */}
                                 {isPrimary && (
@@ -463,9 +463,9 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                                 type="button"
                                                 onClick={() => handleMakePrimary(idx)}
                                                 className="inline-flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm transition-transform active:scale-95 cursor-pointer"
-                                                title="Set as Primary cover image"
+                                                title={__('marketplace.gallery_set_primary_title')}
                                             >
-                                                <Star className="w-3 h-3" /> Make Primary
+                                                <Star className="w-3 h-3" /> {__('marketplace.gallery_make_primary')}
                                             </button>
                                         ) : (
                                             <div />
@@ -475,7 +475,8 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                             type="button"
                                             onClick={() => handleRemoveItem(idx)}
                                             className="p-1.5 bg-white/90 hover:bg-red-500 text-slate-700 hover:text-white rounded-lg transition-colors shadow-sm ms-auto cursor-pointer"
-                                            title="Remove image"
+                                            title={__('marketplace.gallery_remove_image')}
+                                            aria-label={__('marketplace.gallery_remove_image')}
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -493,7 +494,8 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                                 disabled={idx === 0}
                                                 onClick={() => handleReorder(idx, idx - 1)}
                                                 className="p-1 hover:bg-slate-200 text-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
-                                                title="Move left"
+                                                title={__('marketplace.gallery_move_left')}
+                                                aria-label={__('marketplace.gallery_move_left')}
                                             >
                                                 <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                                             </button>
@@ -502,7 +504,8 @@ export default function GalleryStep({ data, setData, errors }: any) {
                                                 disabled={idx === unifiedItems.length - 1}
                                                 onClick={() => handleReorder(idx, idx + 1)}
                                                 className="p-1 hover:bg-slate-200 text-slate-700 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed"
-                                                title="Move right"
+                                                title={__('marketplace.gallery_move_right')}
+                                                aria-label={__('marketplace.gallery_move_right')}
                                             >
                                                 <ChevronRight className="w-4 h-4 rtl:rotate-180" />
                                             </button>
@@ -536,7 +539,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
             <div className="border-t border-slate-200 pt-10 space-y-4">
                 <div>
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
-                        <Video className="w-5 h-5 text-indigo-500" /> Video (Optional)
+                        <Video className="w-5 h-5 text-indigo-500" /> {__('marketplace.gallery_video_optional')}
                     </h3>
                     <p className="text-sm text-slate-500">{__('general.capture_buyers_attention_with_a_video_that_showcases_your_service')}</p>
                 </div>
@@ -547,6 +550,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                         value={data.video_url || ''}
                         onChange={e => setData('video_url', e.target.value)}
                         placeholder={__('general.https_youtube_com_watch_v')}
+                        aria-label={__('general.youtube_or_vimeo_url')}
                         className="h-12"
                     />
                     {errors.video_url && <p className="text-xs text-red-500 font-medium">{errors.video_url}</p>}

@@ -25,6 +25,7 @@ use Carbon\Carbon;
 class FiverrCloneWorkflowTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $seller;
     protected User $buyer;
@@ -34,6 +35,7 @@ class FiverrCloneWorkflowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates(); // escrow converts USD orders to the EGP business currency
 
         // Register the roles if they do not exist
         Role::firstOrCreate(['name' => 'seller']);

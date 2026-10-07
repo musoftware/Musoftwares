@@ -3,8 +3,9 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { SeoHead } from '@/Components/ui/SeoHead';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import { formatMoney as formatCurrency } from '@/lib/utils';
-import { HelpCircle, Zap, ClipboardList, CheckCircle2, Tag, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { HelpCircle, Zap, ClipboardList, CheckCircle2, Tag, ZoomIn, X, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 
 export default function Show({ service }: any) {
     const { auth, wallet } = usePage().props as any;
@@ -14,6 +15,18 @@ export default function Show({ service }: any) {
         'overview',
     );
     const [isZoomOpen, setIsZoomOpen] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
+
+    const handleDeleteService = async () => {
+        const accepted = await confirm({
+            title: __('marketplace.delete_service_title'),
+            description: __('marketplace.delete_service_desc', { title: service.title }),
+            confirmLabel: __('general.delete'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('marketplace.services.destroy', service.id));
+    };
 
     // Sort packages Basic, Standard, Premium if names match, otherwise just take what's given.
     const packages = service.packages || [];
@@ -22,8 +35,8 @@ export default function Show({ service }: any) {
         : [
             {
                 id: 0,
-                name: __('general.standard') || 'Standard',
-                description: service.description || __('general.no_description_available') || 'No description available.',
+                name: __('general.standard'),
+                description: service.description || __('general.no_description_available'),
                 price: service.is_free ? 0 : 5,
                 currency: 'USD',
                 delivery_days: 3,
@@ -146,6 +159,7 @@ export default function Show({ service }: any) {
 
     return (
         <MarketplaceLayout>
+            {confirmDialog}
             <SeoHead
                 title={`${service.title} | MuSoftwares Marketplace`}
                 description={service.tagline || service.description?.substring(0, 160)}
@@ -172,7 +186,7 @@ export default function Show({ service }: any) {
                             })}
                             className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                         >
-                            {service.category?.name || 'Category'}
+                            {service.category?.name || __('general.category')}
                         </Link>
                         <span className="mx-2">/</span>
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -190,14 +204,10 @@ export default function Show({ service }: any) {
                             </Link>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || 'Are you sure you want to delete this service?')) {
-                                        router.delete(route('marketplace.services.destroy', service.id));
-                                    }
-                                }}
+                                onClick={handleDeleteService}
                                 className="px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-950/40 dark:border-rose-500/30 dark:text-rose-300 text-xs font-bold transition-colors"
                             >
-                                {__('general.delete') || 'Delete'}
+                                {__('general.delete')}
                             </button>
                         </div>
                     )}
@@ -237,7 +247,7 @@ export default function Show({ service }: any) {
                                         </span>
                                     </span>
                                     <span className="ms-1 text-gray-500 dark:text-slate-400">
-                                        ({service.review_count || 0} reviews)
+                                        {__('marketplace.service_reviews_count', { count: service.review_count || 0 })}
                                     </span>
                                 </div>
                             </div>
@@ -249,7 +259,7 @@ export default function Show({ service }: any) {
                                 <svg className={`w-4 h-4 ${service.is_favorited ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                 </svg>
-                                {service.is_favorited ? 'Saved to Wishlist' : 'Save to Wishlist'}
+                                {service.is_favorited ? __('marketplace.service_saved_to_wishlist') : __('marketplace.service_save_to_wishlist')}
                             </button>
                         </div>
 
@@ -277,13 +287,13 @@ export default function Show({ service }: any) {
                                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                             <div className="bg-white/95 backdrop-blur-md text-slate-900 px-4 py-2 rounded-full text-xs font-bold shadow-xl flex items-center gap-2 border border-white/40">
                                                 <ZoomIn className="w-4 h-4 text-indigo-600" />
-                                                <span>Click to Zoom</span>
+                                                <span>{__('marketplace.service_click_to_zoom')}</span>
                                             </div>
                                         </div>
                                     </>
                                 ) : (
                                     <div className="text-gray-400 text-sm">
-                                        [No Media Preview]
+                                        {__('marketplace.service_no_media_preview')}
                                     </div>
                                 )}
                             </div>
@@ -301,7 +311,7 @@ export default function Show({ service }: any) {
                                                     : 'border-gray-200 dark:border-white/10 opacity-70 hover:opacity-100'
                                                 }`}
                                         >
-                                            <img src={item.thumbnail} alt={`Media ${idx}`} className="h-full w-full object-cover" />
+                                            <img src={item.thumbnail} alt={__('marketplace.service_media_alt', { number: idx + 1 })} className="h-full w-full object-cover" />
                                             {item.type === 'video' && (
                                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                                                     <div className="w-6 h-6 rounded-full bg-white/90 dark:bg-slate-900/90 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow">
@@ -353,7 +363,7 @@ export default function Show({ service }: any) {
                                     <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 shadow-sm space-y-4">
                                         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                             <Zap className="w-5 h-5 text-amber-500" />
-                                            {__('general.service_extras') || 'Available Extras & Upgrades'}
+                                            {__('general.service_extras')}
                                         </h3>
                                         <div className="space-y-3">
                                             {service.extras.map((extra: any) => (
@@ -361,7 +371,7 @@ export default function Show({ service }: any) {
                                                     <div>
                                                         <h4 className="font-bold text-slate-900 dark:text-white text-sm">{extra.title}</h4>
                                                         {extra.duration_days > 0 && (
-                                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">+ {extra.duration_days} {extra.duration_days === 1 ? 'day' : 'days'} delivery</span>
+                                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{__('marketplace.service_extra_days_delivery', { days: extra.duration_days })}</span>
                                                         )}
                                                     </div>
                                                     <span className="font-bold text-indigo-600 dark:text-indigo-400 text-sm bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-md border border-indigo-100 dark:border-indigo-500/20">
@@ -378,13 +388,13 @@ export default function Show({ service }: any) {
                                     <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 shadow-sm space-y-4">
                                         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                             <HelpCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                                            {__('general.frequently_asked_questions') || 'Frequently Asked Questions'}
+                                            {__('general.frequently_asked_questions')}
                                         </h3>
                                         <div className="divide-y divide-gray-100 dark:divide-white/5">
                                             {service.faq.map((item: any, idx: number) => (
                                                 <div key={idx} className="py-3.5 first:pt-0 last:pb-0">
                                                     <h4 className="font-semibold text-gray-900 dark:text-white text-sm mb-1 flex items-start gap-2">
-                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold shrink-0">Q:</span>
+                                                        <span className="text-indigo-600 dark:text-indigo-400 font-bold shrink-0">{__('marketplace.service_faq_q')}</span>
                                                         <span>{item.question}</span>
                                                     </h4>
                                                     <p className="text-sm text-gray-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap ps-6">
@@ -401,7 +411,7 @@ export default function Show({ service }: any) {
                                     <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 shadow-sm space-y-4">
                                         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                             <ClipboardList className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                                            {__('general.requirements_from_buyer') || 'Requirements Needed From Buyer'}
+                                            {__('general.requirements_from_buyer')}
                                         </h3>
                                         <ul className="space-y-2">
                                             {service.requirements.map((req: string, idx: number) => (
@@ -417,7 +427,7 @@ export default function Show({ service }: any) {
                                 {/* Tags */}
                                 {service.tags && service.tags.length > 0 && (
                                     <div className="pt-4 border-t border-gray-200 dark:border-white/10">
-                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{__('general.tags') || 'Tags'}</h4>
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{__('general.tags')}</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {service.tags.map((tag: string, idx: number) => (
                                                 <span key={idx} className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-md">
@@ -453,11 +463,11 @@ export default function Show({ service }: any) {
                                                     {service.avg_rating || '5.0'}
                                                 </span>
                                                 <span className="text-gray-500 dark:text-slate-400">
-                                                    ({service.review_count || 0} reviews)
+                                                    {__('marketplace.service_reviews_count', { count: service.review_count || 0 })}
                                                 </span>
                                             </div>
                                             <p className="mb-4 text-sm text-gray-500 dark:text-slate-400">
-                                                Member since{' '}
+                                                {__('marketplace.service_member_since')}{' '}
                                                 {service.seller?.created_at
                                                     ? new Date(service.seller.created_at).getFullYear()
                                                     : '2026'}
@@ -473,7 +483,7 @@ export default function Show({ service }: any) {
                             <div className="space-y-4 py-4">
                                 {(!service.reviews || service.reviews.length === 0) ? (
                                     <div className="py-8 text-center text-gray-500 dark:text-slate-400">
-                                        No customer reviews for this service yet.
+                                        {__('marketplace.service_no_reviews')}
                                     </div>
                                 ) : (
                                     service.reviews.map((rev: any) => (
@@ -483,13 +493,13 @@ export default function Show({ service }: any) {
                                                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 font-bold text-xs flex items-center justify-center text-slate-700 dark:text-slate-300">
                                                         {rev.reviewer?.name?.charAt(0) || 'U'}
                                                     </div>
-                                                    <span className="font-semibold text-slate-900 dark:text-white text-sm">{rev.reviewer?.name || 'Verified Buyer'}</span>
+                                                    <span className="font-semibold text-slate-900 dark:text-white text-sm">{rev.reviewer?.name || __('marketplace.service_verified_buyer')}</span>
                                                 </div>
                                                 <span className="text-amber-500 font-bold text-xs flex items-center gap-1">
-                                                    ★ {rev.rating}/5
+                                                    <Star className="w-3.5 h-3.5 fill-current" aria-hidden="true" /> {rev.rating}/5
                                                 </span>
                                             </div>
-                                            <p className="text-slate-600 dark:text-slate-300 text-sm">{rev.review || 'Great seller and high quality deliverable!'}</p>
+                                            {rev.review && <p className="text-slate-600 dark:text-slate-300 text-sm">{rev.review}</p>}
                                         </div>
                                     ))
                                 )}
@@ -525,8 +535,7 @@ export default function Show({ service }: any) {
                                             <div className="p-6">
                                                 <div className="mb-4 flex items-start justify-between">
                                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                                                        {selectedPackage.name}{' '}
-                                                        Package
+                                                        {__('marketplace.service_package_name', { name: selectedPackage.name })}
                                                     </h3>
                                                     <div className="text-end">
                                                         <div className="flex items-center gap-2 justify-end">
@@ -541,7 +550,7 @@ export default function Show({ service }: any) {
                                                         </div>
                                                         {Number(selectedPackage.old_price) > Number(selectedPackage.price) && (
                                                             <span className="inline-block bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400 font-bold text-[11px] px-2 py-0.5 rounded mt-0.5">
-                                                                -{Math.round(((Number(selectedPackage.old_price) - Number(selectedPackage.price)) / Number(selectedPackage.old_price)) * 100)}% OFF
+                                                                {__('marketplace.discount_percent_off', { percent: Math.round(((Number(selectedPackage.old_price) - Number(selectedPackage.price)) / Number(selectedPackage.old_price)) * 100) })}
                                                             </span>
                                                         )}
                                                     </div>
@@ -571,7 +580,7 @@ export default function Show({ service }: any) {
                                                             {
                                                                 selectedPackage.delivery_days
                                                             }{' '}
-                                                            Days Delivery
+                                                            {__('marketplace.service_days_delivery')}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-1">
@@ -621,7 +630,7 @@ export default function Show({ service }: any) {
                                                             href={service.seller?.id ? route('messages.index', { recipient_id: service.seller.id }) : route('messages.index')}
                                                             className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 px-4 py-2.5 font-semibold text-slate-700 dark:text-slate-300 transition shadow-none text-sm"
                                                         >
-                                                            {__('general.contact_seller') || 'Contact Seller'}
+                                                            {__('general.contact_seller')}
                                                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                                             </svg>
@@ -642,7 +651,7 @@ export default function Show({ service }: any) {
                                                             href={service.seller?.id ? route('messages.index', { recipient_id: service.seller.id }) : route('messages.index')}
                                                             className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0f172a] hover:bg-slate-50 dark:hover:bg-white/5 px-4 py-2.5 font-semibold text-slate-700 dark:text-slate-300 transition shadow-none text-sm"
                                                         >
-                                                            {__('general.contact_seller') || 'Contact Seller'}
+                                                            {__('general.contact_seller')}
                                                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                                             </svg>
@@ -677,6 +686,7 @@ export default function Show({ service }: any) {
                         <button
                             type="button"
                             onClick={() => setIsZoomOpen(false)}
+                            aria-label={__('general.close')}
                             className="absolute top-4 end-4 z-20 p-2.5 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
                         >
                             <X className="w-6 h-6" />
@@ -690,6 +700,7 @@ export default function Show({ service }: any) {
                                     e.stopPropagation();
                                     setActiveMediaIndex((prev) => (prev > 0 ? prev - 1 : mediaItems.length - 1));
                                 }}
+                                aria-label={__('general.previous_image')}
                                 className="absolute start-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
                             >
                                 <ChevronLeft className="w-6 h-6" />
@@ -704,6 +715,7 @@ export default function Show({ service }: any) {
                                     e.stopPropagation();
                                     setActiveMediaIndex((prev) => (prev < mediaItems.length - 1 ? prev + 1 : 0));
                                 }}
+                                aria-label={__('general.next_image')}
                                 className="absolute end-4 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-lg border border-white/10"
                             >
                                 <ChevronRight className="w-6 h-6" />

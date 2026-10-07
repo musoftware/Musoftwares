@@ -12,6 +12,13 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useConfirm } from '@/hooks/useConfirm';
+
+const BILLING_CYCLE_KEYS: Record<string, string> = {
+    monthly: 'client.subs_cycle_monthly',
+    yearly: 'client.subs_cycle_yearly',
+};
 
 interface Subscription {
     id: number;
@@ -46,6 +53,7 @@ interface ManageProps {
 }
 
 export default function Manage({ subscriptions, invoices, walletBalance, currency }: ManageProps) {
+    const { confirm, confirmDialog } = useConfirm();
 
     const formatMoney = (amount: number, customCurr?: string) => {
         return new Intl.NumberFormat('en-US', {
@@ -54,36 +62,43 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
         }).format(amount);
     };
 
-    const handleCancel = (subId: number) => {
-        if (confirm("Are you sure you want to cancel the auto-renewal for this subscription? You will retain access until the end of the billing cycle.")) {
-            router.post(route('subscriptions.cancel'), { id: subId });
-        }
+    const handleCancel = async (subId: number) => {
+        const accepted = await confirm({
+            title: __('client.subs_cancel_title'),
+            description: __('client.subs_cancel_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.post(route('subscriptions.cancel'), { id: subId });
     };
 
-    const handleRenew = (subId: number, price: number) => {
+    const handleRenew = async (subId: number, price: number) => {
         if (walletBalance < price) {
-            alert(`Insufficient wallet balance to renew. Price is ${formatMoney(price)}. Please add funds first.`);
+            toast.error(__('client.subs_insufficient_balance', { price: formatMoney(price) }));
             return;
         }
-        if (confirm(`Renew subscription for ${formatMoney(price)} using your wallet balance?`)) {
-            router.post(route('subscriptions.renew'), { id: subId });
-        }
+        const accepted = await confirm({
+            title: __('client.subs_renew_title'),
+            description: __('client.subs_renew_confirm', { price: formatMoney(price) }),
+        });
+        if (!accepted) return;
+        router.post(route('subscriptions.renew'), { id: subId });
     };
 
     const invoiceColumns: any[] = [
-        { key: 'invoice_number', label: 'Invoice #', render: (row: any) => <span className="font-mono font-medium">{row.invoice_number}</span> },
-        { key: 'amount', label: 'Amount Paid', render: (row: any) => <CurrencyDisplay amount={row.amount} currency={row.currency} className="font-semibold" /> },
-        { key: 'payment_method', label: 'Payment Method', render: (row: any) => <span className="text-xs">{row.payment_method}</span> },
-        { key: 'paid_at', label: 'Date', render: (row: any) => <span className="text-xs text-text-muted">{row.paid_at}</span> },
-        { key: 'status', label: 'Status', render: (row: any) => <StatusBadge status={row.status} size="sm" /> }
+        { key: 'invoice_number', label: __('client.subs_invoice_no'), render: (row: any) => <span className="font-mono font-medium">{row.invoice_number}</span> },
+        { key: 'amount', label: __('client.subs_amount_paid'), render: (row: any) => <CurrencyDisplay amount={row.amount} currency={row.currency} className="font-semibold" /> },
+        { key: 'payment_method', label: __('general.payment_method'), render: (row: any) => <span className="text-xs">{row.payment_method}</span> },
+        { key: 'paid_at', label: __('general.date'), render: (row: any) => <span className="text-xs text-text-muted">{row.paid_at}</span> },
+        { key: 'status', label: __('general.status'), render: (row: any) => <StatusBadge status={row.status} size="sm" /> }
     ];
 
     const menuItems = [
-        { id: 'dashboard', label: 'Overview', icon: Building2, href: '/dashboard', isActive: false },
-        { id: 'wallet', label: 'Wallet', icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
-        { id: 'subscriptions', label: 'Subscriptions', icon: Crown, href: '/subscriptions/manage', isActive: true },
-        { id: 'plans', label: 'Browse Plans', icon: Sparkles, href: '/subscriptions/plans', isActive: false },
-        { id: 'settings', label: 'Settings', icon: Settings, href: '/profile', isActive: false },
+        { id: 'dashboard', label: __('general.overview'), icon: Building2, href: '/dashboard', isActive: false },
+        { id: 'wallet', label: __('general.wallet'), icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
+        { id: 'subscriptions', label: __('general.subscriptions'), icon: Crown, href: '/subscriptions/manage', isActive: true },
+        { id: 'plans', label: __('client.subs_browse_plans'), icon: Sparkles, href: '/subscriptions/plans', isActive: false },
+        { id: 'settings', label: __('general.settings'), icon: Settings, href: '/profile', isActive: false },
     ];
 
     const activeCount = subscriptions.filter(s => s.status === 'active').length;
@@ -97,7 +112,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
     return (
         <WorkspaceLayout 
             title={__('general.my_subscriptions')}
-            workspaceName="Musoftware Portal"
+            workspaceName={__('client.subs_workspace_name')}
             tenantId="CUST-PORTAL"
             menuItems={menuItems}
         >
@@ -116,12 +131,12 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <MetricCard 
                         label={__('general.active_subscription')}
-                        value={activeCount > 0 ? subscriptions.find(s => s.status === 'active')?.plan_name ?? 'None' : 'None'}
+                        value={activeCount > 0 ? subscriptions.find(s => s.status === 'active')?.plan_name ?? __('general.none') : __('general.none')}
                         icon={Layers}
                     />
                     <MetricCard 
                         label={__('general.monthly_run_rate')}
-                        value={`${formatMoney(monthlySpend)}/mo`}
+                        value={__('client.subs_per_month_value', { amount: formatMoney(monthlySpend) })}
                         icon={Receipt}
                     />
                     <MetricCard 
@@ -141,7 +156,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                 icon={Clock}
                                 title={__('general.no_subscriptions_yet')}
                                 description={__('general.subscribe_to_a_plan_to_unlock_platform_features_build_your_own_or_pick_from_our_curated_tiers')}
-                                action={{ label: "Explore Plans", href: route('subscriptions.plans') }}
+                                action={{ label: __('general.explore_plans'), href: route('subscriptions.plans') }}
                             />
                         </OperationalCard>
                     ) : (
@@ -163,15 +178,15 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] uppercase font-bold text-text-muted bg-surface-raised px-2 py-1 rounded">
-                                                            {sub.is_custom ? 'CUSTOM' : sub.plan_slug.toUpperCase().replace('_', ' ')}
+                                                            {sub.is_custom ? __('client.subs_custom') : sub.plan_slug.toUpperCase().replace('_', ' ')}
                                                         </span>
                                                         <span className="text-[10px] uppercase font-medium text-slate-400">
-                                                            {sub.billing_cycle}
+                                                            {BILLING_CYCLE_KEYS[sub.billing_cycle] ? __(BILLING_CYCLE_KEYS[sub.billing_cycle]) : sub.billing_cycle}
                                                         </span>
                                                     </div>
                                                     <h4 className="text-lg font-bold tracking-tight mt-1 text-text-primary">{sub.plan_name}</h4>
                                                     <div className="text-sm font-semibold text-primary">
-                                                        <CurrencyDisplay amount={sub.amount} currency={sub.currency} /> /{sub.billing_cycle === 'yearly' ? 'year' : 'month'}
+                                                        <CurrencyDisplay amount={sub.amount} currency={sub.currency} /> {sub.billing_cycle === 'yearly' ? __('client.subs_per_year') : __('client.subs_per_month')}
                                                     </div>
                                                 </div>
 
@@ -196,11 +211,11 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                             <div className="grid grid-cols-2 gap-4 text-xs font-medium text-text-muted border-t border-b border-border/40 py-3">
                                                 <div className="flex items-center gap-2">
                                                     <Calendar className="h-4 w-4" />
-                                                    <span>Started: {sub.started_at}</span>
+                                                    <span>{__('client.subs_started', { date: sub.started_at })}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Clock className="h-4 w-4" />
-                                                    <span>Expires: {sub.expires_at}</span>
+                                                    <span>{__('client.subs_expires', { date: sub.expires_at })}</span>
                                                 </div>
                                             </div>
 
@@ -251,6 +266,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                     </OperationalCard>
                 </div>
             </div>
+            {confirmDialog}
         </WorkspaceLayout>
     );
 }

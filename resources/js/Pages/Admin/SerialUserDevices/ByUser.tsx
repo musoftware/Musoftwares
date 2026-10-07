@@ -27,6 +27,11 @@ interface Props {
     filters: Record<string, any>;
 }
 
+const STATUS_CONFIRM_KEYS: Record<string, string> = {
+    active: 'admin.serial_user_devices_confirm_activate_all',
+    inactive: 'admin.serial_user_devices_confirm_deactivate_all',
+};
+
 export default function SerialUserDevicesByUser({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search ?? '');
     const [pendingStatus, setPendingStatus] = useState<{ user: UserRow; status: string } | null>(null);
@@ -40,18 +45,18 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
         const { user, status } = pendingStatus;
         setPendingStatus(null);
         router.patch(route('admin.serial-user-devices.update-user-status', user.id), { status }, {
-            onSuccess: () => toastSuccess(__('general.user_devices_updated') || `All devices for ${user.name} updated to ${status}.`),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.user_devices_updated')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
     return (
-        <AdminSidebarLayout title={__('general.devices_by_user_1')} header="Devices By User">
+        <AdminSidebarLayout title={__('general.devices_by_user_1')} header={__('general.devices_by_user_1')}>
             <Head title={__('general.devices_by_user_1')} />
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                    <Link href={route('admin.serial-user-devices.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
+                    <Link href={route('admin.serial-user-devices.index')} className="text-slate-500 hover:text-slate-900 transition-colors" aria-label={__('general.back')}>
+                        <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                     </Link>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900">{__('general.devices_by_user')}</h1>
@@ -121,10 +126,10 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
 
             <ConfirmModal
                 isOpen={pendingStatus !== null}
-                title={__('general.confirm_update_all_devices') || 'Update all devices?'}
+                title={__('general.confirm_update_all_devices')}
                 description={
                     pendingStatus
-                        ? `Set all devices for "${pendingStatus.user.name}" to ${pendingStatus.status}?`
+                        ? __(STATUS_CONFIRM_KEYS[pendingStatus.status] ?? 'general.confirm_update_all_devices', { name: pendingStatus.user.name })
                         : ''
                 }
                 confirmLabel={__('general.confirm')}

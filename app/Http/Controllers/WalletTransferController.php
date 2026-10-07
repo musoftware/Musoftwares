@@ -11,6 +11,7 @@ use App\Traits\ConvertsCurrency;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -24,7 +25,6 @@ class WalletTransferController extends Controller
     public function __construct(WalletTransferService $transferService)
     {
         $this->transferService = $transferService;
-        $this->middleware('auth');
     }
 
     /**
@@ -212,34 +212,32 @@ class WalletTransferController extends Controller
             ]);
 
         } catch (Exception $e) {
+            Log::error('Wallet transfer fee preview failed', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => __('errors.database_error'),
             ], 500);
         }
     }
 
     /**
-     * Search user emails/names for recipient auto-complete.
-     * Guarded to minimum 5 characters for user privacy/system security.
+     * Find a transfer recipient by exact email (case-insensitive).
+     * Partial search is not allowed so users cannot list other accounts.
      */
     public function searchUsers(Request $request)
     {
-        $query = $request->get('q', '');
+        $email = strtolower(trim((string) $request->get('q', '')));
 
-        if (strlen($query) < 5) {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             return response()->json(['users' => []]);
         }
 
         $users = User::where('id', '!=', Auth::id())
-            ->where(function ($q) use ($query) {
-                $q->where('email', 'like', "%{$query}%")
-                    ->orWhere('name', 'like', "%{$query}%");
-            })
-            ->select('id', 'name', 'email')
-            ->limit(8)
-            ->get();
+            ->whereRaw('LOWER(email) = ?', [$email])
+            ->limit(1)
+            ->get(['name', 'email']);
 
-        return response()->json(['users' => $users]);
+        return response()->json(['users' => $users->map->only(['name', 'email'])->values()]);
     }
 }

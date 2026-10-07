@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -64,6 +65,8 @@ import {
     Legend
 } from 'recharts';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
+import { ChartTooltip, PERIOD_PRESETS, SortHeader, monthLabel, presetLabel } from './Components/LedgerParts';
 import {
     Table,
     TableBody,
@@ -73,7 +76,6 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 
-const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const PIE_COLORS = ['#0f172a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'];
 
 const ALL_VALUE = '__all__';
@@ -191,58 +193,26 @@ export default function Costs() {
 
     const tooltipFormatter = (value: number) => formatCurrency(value, stats.business_currency_code);
 
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
-                    <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label}</p>
-                    {payload.map((entry: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
-                            <span className="text-slate-400 capitalize">{entry.name || entry.payload?.name}:</span>
-                            <span className="font-mono font-semibold">
-                                {typeof entry.value === 'number' ? tooltipFormatter(entry.value) : entry.value}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
-    const SortHeader = ({ field, children, align = 'start' }: { field: string; children: React.ReactNode; align?: 'start' | 'end' | 'center' }) => (
-        <button
-            type="button"
-            onClick={() => handleSort(field)}
-            className={`inline-flex items-center gap-1 font-semibold text-${align} w-full`}
-        >
-            {children}
-            {filters?.sort_by === field && (
-                <span className="text-slate-400">{filters.sort_dir === 'asc' ? '▲' : '▼'}</span>
-            )}
-        </button>
-    );
-
     const preset = filters?.preset || '';
     const activeFilterPills: { key: string; label: string; value: string }[] = [];
-    if (preset && preset !== '') activeFilterPills.push({ key: 'preset', label: 'Preset', value: preset });
+    if (preset && preset !== '') activeFilterPills.push({ key: 'preset', label: __('admin.ledger_filter_period'), value: presetLabel(preset) });
     if (filters?.project_id) {
         const p = options?.projects?.find((x: any) => String(x.id) === String(filters.project_id));
-        if (p) activeFilterPills.push({ key: 'project_id', label: 'Project', value: p.name });
+        if (p) activeFilterPills.push({ key: 'project_id', label: __('general.project'), value: p.name });
     }
     if (filters?.user_id) {
-        const u = options?.users?.find((x: any) => String(x.id) === String(filters.user_id));
-        if (u) activeFilterPills.push({ key: 'user_id', label: 'Client', value: u.name });
+        const u = options?.selected_user;
+        if (u) activeFilterPills.push({ key: 'user_id', label: __('general.client'), value: u.name });
     }
     if (filters?.currency_id) {
         const c = options?.currencies?.find((x: any) => String(x.id) === String(filters.currency_id));
-        if (c) activeFilterPills.push({ key: 'currency_id', label: 'Currency', value: c.code });
+        if (c) activeFilterPills.push({ key: 'currency_id', label: __('general.currency'), value: c.code });
     }
-    if (filters?.category) activeFilterPills.push({ key: 'category', label: 'Category', value: filters.category });
-    if (filters?.recurring_only) activeFilterPills.push({ key: 'recurring_only', label: 'Type', value: 'Recurring' });
-    if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: 'Min', value: filters.min_amount });
-    if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: 'Max', value: filters.max_amount });
-    if (filters?.with_trashed) activeFilterPills.push({ key: 'with_trashed', label: 'View', value: 'With deleted' });
+    if (filters?.category) activeFilterPills.push({ key: 'category', label: __('general.category'), value: filters.category });
+    if (filters?.recurring_only) activeFilterPills.push({ key: 'recurring_only', label: __('general.type'), value: __('general.recurring') });
+    if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: __('general.min'), value: filters.min_amount });
+    if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: __('general.max'), value: filters.max_amount });
+    if (filters?.with_trashed) activeFilterPills.push({ key: 'with_trashed', label: __('general.view'), value: __('admin.ledger_with_deleted') });
 
     const allSelected = entries?.data?.length > 0 && selected.length === entries.data.length;
 
@@ -254,7 +224,7 @@ export default function Costs() {
                 <Link href={route('admin.business.reports')}>
                     <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
                         <Activity className="h-4 w-4 text-slate-800" />
-                        <span>{__('general.business_reports') || 'Business Reports'}</span>
+                        <span>{__('general.business_reports')}</span>
                     </Button>
                 </Link>
             }
@@ -342,7 +312,7 @@ export default function Costs() {
                     <div className="flex items-center gap-3 flex-wrap">
                         <div className="flex items-center gap-2 text-slate-500">
                             <Filter className="h-4 w-4" />
-                            <span className="text-sm font-medium">Filters:</span>
+                            <span className="text-sm font-medium">{__('admin.ledger_filters_label')}</span>
                         </div>
                         <Select
                             value={preset || 'month'}
@@ -358,11 +328,9 @@ export default function Costs() {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="month">This month</SelectItem>
-                                <SelectItem value="last_30">Last 30 days</SelectItem>
-                                <SelectItem value="last_90">Last 90 days</SelectItem>
-                                <SelectItem value="ytd">Year to date</SelectItem>
-                                <SelectItem value="all">All time</SelectItem>
+                                {PERIOD_PRESETS.map((item) => (
+                                    <SelectItem key={item.value} value={item.value}>{__(item.labelKey)}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                         {(!preset || preset === '') && (
@@ -372,7 +340,7 @@ export default function Costs() {
                                     onValueChange={(val) => { if (val) handleFilterChange('year', val); }}
                                 >
                                     <SelectTrigger className="w-[110px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder="Year" />
+                                        <SelectValue placeholder={__('admin.ledger_year')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {(filters?.available_years || [new Date().getFullYear()]).map((y: number) => (
@@ -385,11 +353,11 @@ export default function Costs() {
                                     onValueChange={(val) => { if (val) handleFilterChange('month', val); }}
                                 >
                                     <SelectTrigger className="w-[130px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder="Month" />
+                                        <SelectValue placeholder={__('admin.ledger_month')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {(filters?.available_months || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).map((m: number) => (
-                                            <SelectItem key={m} value={String(m)}>{MONTH_NAMES[m]}</SelectItem>
+                                            <SelectItem key={m} value={String(m)}>{monthLabel(m)}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -399,25 +367,24 @@ export default function Costs() {
                             value={filters?.project_id ? String(filters.project_id) : ''}
                             onChange={(val) => handleFilterChange('project_id', (val as string) || '')}
                             options={(options?.projects || []).map((p: any) => ({ value: String(p.id), label: p.name }))}
-                            placeholder="Project"
+                            placeholder={__('general.project')}
                         />
-                        <PremiumCombobox
+                        <UserSearchCombobox
                             value={filters?.user_id ? String(filters.user_id) : ''}
                             onChange={(val) => handleFilterChange('user_id', (val as string) || '')}
-                            options={(options?.users || []).map((u: any) => ({ value: String(u.id), label: u.name }))}
-                            placeholder="Client"
+                            placeholder={__('general.client')}
                         />
                         <PremiumCombobox
                             value={filters?.currency_id ? String(filters.currency_id) : ''}
                             onChange={(val) => handleFilterChange('currency_id', (val as string) || '')}
                             options={(options?.currencies || []).map((c: any) => ({ value: String(c.id), label: `${c.code} (${c.symbol})` }))}
-                            placeholder="Currency"
+                            placeholder={__('general.currency')}
                         />
                         <PremiumCombobox
                             value={filters?.category ? String(filters.category) : ''}
                             onChange={(val) => handleFilterChange('category', (val as string) || '')}
                             options={(options?.categories || []).map((c: any) => ({ value: String(c.value), label: c.label }))}
-                            placeholder="Category"
+                            placeholder={__('general.category')}
                         />
                         <Button
                             type="button"
@@ -453,7 +420,7 @@ export default function Costs() {
                                 className="h-9 ms-auto text-slate-500"
                                 onClick={() => router.get(route('admin.costs.index'), {}, { preserveState: false, preserveScroll: true })}
                             >
-                                <X className="h-3 w-3 me-1" /> Clear all
+                                <X className="h-3 w-3 me-1" /> {__('admin.ledger_clear_all')}
                             </Button>
                         )}
                     </div>
@@ -462,7 +429,7 @@ export default function Costs() {
                             {activeFilterPills.map((p) => (
                                 <span key={p.key} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
                                     <span className="text-slate-500">{p.label}:</span> {typeof p.value === 'object' ? JSON.stringify(p.value) : String(p.value)}
-                                    <button onClick={() => clearFilter(p.key)} className="ms-1 text-slate-400 hover:text-slate-700">
+                                    <button type="button" onClick={() => clearFilter(p.key)} aria-label={__('admin.ledger_remove_filter', { name: p.label })} className="ms-1 text-slate-400 hover:text-slate-700">
                                         <X className="h-3 w-3" />
                                     </button>
                                 </span>
@@ -494,7 +461,7 @@ export default function Costs() {
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
                                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={formatYAxis} dx={-10} />
-                                    <RechartsTooltip content={<CustomTooltip />} />
+                                    <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                     <Area type="monotone" dataKey="costs" name="Costs" stroke="#e11d48" strokeWidth={3} fillOpacity={1} fill="url(#colorCosts)" />
                                 </AreaChart>
                             </ResponsiveContainer>
@@ -519,7 +486,7 @@ export default function Costs() {
                                                 <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <RechartsTooltip content={<CustomTooltip />} />
+                                        <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                         <Legend wrapperStyle={{ fontSize: 11 }} />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -549,7 +516,7 @@ export default function Costs() {
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                             <XAxis type="number" hide />
                                             <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} width={120} />
-                                            <RechartsTooltip content={<CustomTooltip />} />
+                                            <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                             <Bar dataKey="value" fill="#3b82f6" radius={[0, 6, 6, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
@@ -571,7 +538,7 @@ export default function Costs() {
                                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                             <XAxis type="number" hide />
                                             <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} width={120} />
-                                            <RechartsTooltip content={<CustomTooltip />} />
+                                            <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                             <Bar dataKey="value" fill="#10b981" radius={[0, 6, 6, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
@@ -621,7 +588,7 @@ export default function Costs() {
                             className="h-9 w-full sm:w-auto"
                             onClick={handleExport}
                         >
-                            <Download className="h-4 w-4 me-1" /> CSV
+                            <Download className="h-4 w-4 me-1" /> {__('admin.export_csv')}
                         </Button>
                         <Button
                             size="sm"
@@ -640,19 +607,19 @@ export default function Costs() {
                                     <Checkbox
                                         checked={allSelected}
                                         onCheckedChange={(v) => handleSelectAll(!!v)}
-                                        aria-label="Select all"
+                                        aria-label={__('general.select_all')}
                                     />
                                 </TableHead>
                                 <TableHead className="w-[120px] font-semibold">
-                                    <SortHeader field="created_at">{__('general.date')}</SortHeader>
+                                    <SortHeader field="created_at" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort}>{__('general.date')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="font-semibold">
-                                    <SortHeader field="reason">{__('general.reason')}</SortHeader>
+                                    <SortHeader field="reason" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort}>{__('general.reason')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="font-semibold">{__('general.category')}</TableHead>
                                 <TableHead className="font-semibold">{__('general.project_client')}</TableHead>
                                 <TableHead className="text-end font-semibold">
-                                    <SortHeader field="amount" align="end">{__('general.amount')}</SortHeader>
+                                    <SortHeader field="amount" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort} align="end">{__('general.amount')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="w-[60px]"></TableHead>
                             </TableRow>
@@ -796,17 +763,7 @@ export default function Costs() {
                         <div className="text-xs text-slate-500">
                             {__('general.showing')} {entries.from}–{entries.to} {__('general.of')} {entries.total} {__('general.entries')}
                         </div>
-                        <div className="flex items-center gap-1">
-                            {entries.links.map((link: any, idx: number) => (
-                                <Link
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    preserveScroll
-                                    className={`px-3 py-1.5 rounded border text-xs ${link.active ? 'bg-slate-900 text-white border-slate-900 font-semibold' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'} ${!link.url ? 'opacity-50 pointer-events-none' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
+                        <Pagination links={entries.links} />
                     </div>
                 )}
             </Card>

@@ -10,8 +10,8 @@ import { Badge } from '@/Components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import MDEditor from '@uiw/react-md-editor';
 import { 
-    ArrowRight, Save, Plus, Trash2, Code, Server, 
-    Sparkles, DollarSign, CheckCircle2,
+    ArrowLeft, Save, Plus, Trash2, Code, Server, 
+    DollarSign, CheckCircle2,
     FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -140,7 +140,7 @@ export default function Edit({ quotation, currencies }: EditProps) {
 
     const handleRemoveItem = (index: number) => {
         if (data.items.length <= 1) {
-            toast.error(__('validation.required'));
+            toast.error(__('admin.quotations_min_one_item'));
             return;
         }
         const updated = data.items.filter((_, i) => i !== index);
@@ -169,13 +169,13 @@ export default function Edit({ quotation, currencies }: EditProps) {
         e.preventDefault();
 
         if (!data.title.trim()) {
-            toast.error(__('validation.required'));
+            toast.error(__('admin.quotations_title_required'));
             return;
         }
 
         put(`/admin/marketplace/quotations/${quotation.id}`, {
             onSuccess: () => toast.success(__('quotations.updated_success')),
-            onError: () => toast.error(__('validation.required')),
+            onError: () => toast.error(__('admin.quotations_save_failed')),
         });
     };
 
@@ -193,8 +193,10 @@ export default function Edit({ quotation, currencies }: EditProps) {
                         <Link
                             href={`/admin/marketplace/quotations/${quotation.id}`}
                             className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                            aria-label={__('general.back')}
+                            title={__('general.back')}
                         >
-                            <ArrowRight className="w-5 h-5" />
+                            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                         </Link>
                         <div>
                             <div className="flex items-center gap-2">
@@ -425,6 +427,8 @@ export default function Edit({ quotation, currencies }: EditProps) {
                                                 variant="ghost"
                                                 onClick={() => handleRemoveItem(item.originalIndex)}
                                                 className="text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0 h-9 px-2"
+                                                aria-label={__('admin.quotations_remove_item')}
+                                                title={__('admin.quotations_remove_item')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -521,6 +525,8 @@ export default function Edit({ quotation, currencies }: EditProps) {
                                                     variant="ghost"
                                                     onClick={() => handleRemoveItem(item.originalIndex)}
                                                     className="text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0 h-9 px-2"
+                                                    aria-label={__('admin.quotations_remove_item')}
+                                                    title={__('admin.quotations_remove_item')}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>

@@ -91,9 +91,13 @@ class CurrencyStrictnessTest extends TestCase
 
     public function test_invoice_creation_fails_without_client_currency()
     {
-        $this->expectException(QueryException::class);
+        // New users always get a default currency (User::creating), so simulate a legacy
+        // row with no currency. createInvoice() must refuse it explicitly, not rely on the DB.
+        $client = User::factory()->create();
+        $client->currency_id = null;
 
-        $client = User::factory()->create(['currency_id' => null]);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('missing a currency configuration');
 
         // Mock authentication
         $this->actingAs(User::factory()->create(['currency_id' => 1]));

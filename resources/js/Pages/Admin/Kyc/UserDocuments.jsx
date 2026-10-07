@@ -9,24 +9,30 @@ import { useToast } from '@/Components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function AdminKycUserDocuments({ auth, user }) {
     const { toast } = useToast();
     const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
     
     const { data, setData, post, processing, reset, errors } = useForm({
         reason: ''
     });
 
-    const handleApprove = () => {
-        if (confirm("Are you sure you want to approve this KYC application? This will grant the user full financial capabilities.")) {
-            router.post(route('admin.kyc.approve', user.id), {}, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast({ title: "Approved", description: "User KYC verified successfully." });
-                }
-            });
-        }
+    const handleApprove = async () => {
+        const accepted = await confirm({
+            title: __('admin.kyc_approve_confirm_title'),
+            description: __('admin.kyc_approve_confirm_body'),
+            confirmLabel: __('general.approve_verification'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.kyc.approve', user.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({ title: __('admin.kyc_approved_title'), description: __('admin.kyc_approved_body') });
+            }
+        });
     };
 
     const handleReject = (e) => {
@@ -34,7 +40,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
         post(route('admin.kyc.reject', user.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: "Rejected", description: "Application rejected.", variant: "destructive" });
+                toast({ title: __('admin.kyc_rejected_title'), description: __('admin.kyc_rejected_body'), variant: "destructive" });
                 setIsRejectDialogOpen(false);
                 reset();
             }
@@ -42,17 +48,17 @@ export default function AdminKycUserDocuments({ auth, user }) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title={`KYC Documents - ${user.name}`} header="KYC Documents">
+        <AdminSidebarLayout user={auth?.user} title={__('admin.kyc_documents_title', { name: user.name })} header={__('admin.kyc_documents_header')}>
             <div className="space-y-6 pb-20 p-6">
                 <div className="flex items-center gap-4 mb-6">
                     <Button variant="outline" size="icon" asChild>
-                        <Link href={route('admin.users.edit', user.id)}>
-                            <ArrowLeft className="w-4 h-4" />
+                        <Link href={route('admin.users.edit', user.id)} aria-label={__('general.back')} title={__('general.back')}>
+                            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                         </Link>
                     </Button>
                     <div>
                         <h1 className="text-3xl font-bold font-sora tracking-tight">{__('general.kyc_documents')}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Reviewing documents for {user.name}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{__('admin.kyc_reviewing_documents_for', { name: user.name })}</p>
                     </div>
                 </div>
 
@@ -146,6 +152,7 @@ export default function AdminKycUserDocuments({ auth, user }) {
                         </form>
                     </DialogContent>
                 </Dialog>
+                {confirmDialog}
             </div>
         </AdminSidebarLayout>
     );

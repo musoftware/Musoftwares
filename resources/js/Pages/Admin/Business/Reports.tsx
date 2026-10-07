@@ -28,6 +28,7 @@ import { MetricCard } from '@/Components/ui/MetricCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Button } from '@/Components/ui/button';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { formatMoney, cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import {
@@ -129,7 +130,7 @@ function CategoryPieChart({ title, data, currency }: { title: string; data: any[
                     ) : (
                         <div className="text-center">
                             <Tag className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                            <p className="text-xs text-slate-400 font-medium">{__('general.no_data_yet') || 'No data recorded'}</p>
+                            <p className="text-xs text-slate-400 font-medium">{__('general.no_data_yet')}</p>
                         </div>
                     )}
                 </div>
@@ -138,10 +139,40 @@ function CategoryPieChart({ title, data, currency }: { title: string; data: any[
     );
 }
 
+interface ProfitTooltipProps {
+    active?: boolean;
+    payload?: any[];
+    label?: any;
+    currencyCode: string;
+}
+
+function ProfitTooltip({ active, payload, label, currencyCode }: ProfitTooltipProps) {
+    if (!active || !payload || payload.length === 0) return null;
+
+    const profitLabel = __('general.profit');
+    const valueColor = (entry: any) => {
+        if (entry.name !== profitLabel) return 'text-white';
+        return entry.value < 0 ? 'text-rose-500' : 'text-emerald-500';
+    };
+
+    return (
+        <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
+            <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label}</p>
+            {payload.map((entry: any, idx: number) => (
+                <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
+                    <span className="text-slate-400 capitalize">{entry.name}:</span>
+                    <span className={cn('font-mono font-semibold', valueColor(entry))}>
+                        {formatMoney(entry.value, currencyCode)}
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function Reports({
     stats,
     charts,
-    clients = [],
     projects = [],
     categories = [],
     current_year_months = [],
@@ -151,7 +182,6 @@ export default function Reports({
 }: {
     stats: any;
     charts: any;
-    clients?: any[];
     projects?: any[];
     categories?: string[];
     current_year_months?: any[];
@@ -195,8 +225,8 @@ export default function Reports({
                 <Head title={__('general.system_reports')} />
                 <EmptyState
                     icon={Activity}
-                    title={__('general.no_reports_data_yet') || 'No data yet'}
-                    description={__('general.reports_will_populate_as_data_is_created') || 'Reports will populate as soon as activity is recorded.'}
+                    title={__('general.no_reports_data_yet')}
+                    description={__('general.reports_will_populate_as_data_is_created')}
                 />
             </AdminSidebarLayout>
         );
@@ -211,33 +241,14 @@ export default function Reports({
         return String(value);
     };
 
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
-                    <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label}</p>
-                    {payload.map((entry: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
-                            <span className="text-slate-400 capitalize">{entry.name}:</span>
-                            <span className={cn('font-mono font-semibold', entry.name === __('general.profit') && entry.value < 0 ? 'text-rose-500' : entry.name === __('general.profit') ? 'text-emerald-500' : 'text-white')}>
-                                {formatMoney(entry.value, businessCurrency)}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
     const hasFiltersActive = from || to || clientId || projectId || category;
 
     // Accounts Receivable Aging chart data
     const arAgingData = [
-        { name: __('general.ar_0_30') || '0–30 Days', amount: stats.ar_aging?.['0_30'] || 0, color: '#10b981' },
-        { name: __('general.ar_31_60') || '31–60 Days', amount: stats.ar_aging?.['31_60'] || 0, color: '#f59e0b' },
-        { name: __('general.ar_61_90') || '61–90 Days', amount: stats.ar_aging?.['61_90'] || 0, color: '#f97316' },
-        { name: __('general.ar_90_plus') || '90+ Days', amount: stats.ar_aging?.['90_plus'] || 0, color: '#ef4444' },
+        { name: __('general.ar_0_30'), amount: stats.ar_aging?.['0_30'] || 0, color: '#10b981' },
+        { name: __('general.ar_31_60'), amount: stats.ar_aging?.['31_60'] || 0, color: '#f59e0b' },
+        { name: __('general.ar_61_90'), amount: stats.ar_aging?.['61_90'] || 0, color: '#f97316' },
+        { name: __('general.ar_90_plus'), amount: stats.ar_aging?.['90_plus'] || 0, color: '#ef4444' },
     ];
 
     return (
@@ -248,7 +259,7 @@ export default function Reports({
                 <Link href={route('admin.reports.balance')}>
                     <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
                         <Activity className="h-4 w-4 text-slate-800" />
-                        <span>{__('general.balance_report') || 'Balance Report'}</span>
+                        <span>{__('general.balance_report')}</span>
                     </Button>
                 </Link>
             }
@@ -262,7 +273,7 @@ export default function Reports({
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Calendar className="w-3.5 h-3.5" />
-                                {__('general.from_date') || 'Start Date'}
+                                {__('general.from_date')}
                             </label>
                             <input
                                 type="date"
@@ -274,7 +285,7 @@ export default function Reports({
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Calendar className="w-3.5 h-3.5" />
-                                {__('general.to_date') || 'End Date'}
+                                {__('general.to_date')}
                             </label>
                             <input
                                 type="date"
@@ -286,9 +297,9 @@ export default function Reports({
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Users className="w-3.5 h-3.5" />
-                                {__('general.client') || 'Client'}
+                                {__('general.client')}
                             </label>
-                            <PremiumCombobox
+                            <UserSearchCombobox
                                 value={clientId ? String(clientId) : ''}
                                 onChange={(val) => {
                                     const newClientId = val ? String(val) : '';
@@ -300,28 +311,22 @@ export default function Reports({
                                         }
                                     }
                                 }}
-                                options={[
-                                    { value: '', label: __('general.all_clients') || 'All Clients' },
-                                    ...clients.map((c: any) => ({
-                                        value: String(c.id),
-                                        label: c.email ? `${c.name} (${c.email})` : c.name,
-                                    }))
-                                ]}
-                                placeholder={__('general.all_clients') || 'All Clients'}
-                                searchPlaceholder={__('general.search_users') || 'Search clients...'}
+                                emptyOptionLabel={__('general.all_clients')}
+                                placeholder={__('general.all_clients')}
+                                searchPlaceholder={__('general.search_users')}
                             />
                         </div>
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Briefcase className="w-3.5 h-3.5" />
-                                {__('general.project') || 'Project'}
+                                {__('general.project')}
                             </label>
                             <select
                                 value={projectId}
                                 onChange={e => setProjectId(e.target.value)}
                                 className="w-full text-slate-800 text-sm border border-slate-200 rounded-lg p-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
                             >
-                                <option value="">{__('general.all_projects') || 'All Projects'}</option>
+                                <option value="">{__('general.all_projects')}</option>
                                 {filteredProjects.map((p: any) => (
                                     <option key={p.id} value={p.id}>{p.name}</option>
                                 ))}
@@ -330,14 +335,14 @@ export default function Reports({
                         <div>
                             <label className="text-xs font-semibold text-slate-500 block mb-1.5 flex items-center gap-1">
                                 <Tag className="w-3.5 h-3.5" />
-                                {__('general.category') || 'Category'}
+                                {__('general.category')}
                             </label>
                             <select
                                 value={category}
                                 onChange={e => setCategory(e.target.value)}
                                 className="w-full text-slate-800 text-sm border border-slate-200 rounded-lg p-2.5 bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
                             >
-                                <option value="">{__('general.all_categories') || 'All Categories'}</option>
+                                <option value="">{__('general.all_categories')}</option>
                                 {categories.map((c: string) => (
                                     <option key={c} value={c}>{c}</option>
                                 ))}
@@ -346,11 +351,11 @@ export default function Reports({
                     </div>
                     <div className="flex items-center gap-2 justify-end">
                         <Button onClick={handleApplyFilters} className="bg-slate-900 text-white hover:bg-black h-10 px-4">
-                            {__('general.filter') || 'Filter'}
+                            {__('general.filter')}
                         </Button>
                         {hasFiltersActive && (
                             <Button variant="outline" onClick={handleResetFilters} className="h-10 px-4">
-                                {__('general.reset') || 'Reset'}
+                                {__('general.reset')}
                             </Button>
                         )}
                     </div>
@@ -363,7 +368,7 @@ export default function Reports({
                     <div className="flex items-center justify-between mb-3 px-1">
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                             <Calendar className="w-4 h-4 text-slate-700" />
-                            {__('general.current_year_months') || 'Current Year Months'} ({current_year_months[0]?.year})
+                            {__('general.current_year_months')} ({current_year_months[0]?.year})
                         </span>
                         {from && to && (
                             <span className="text-xs text-slate-500 font-mono">
@@ -405,7 +410,7 @@ export default function Reports({
                                             ? 'bg-slate-50 hover:bg-slate-900 hover:text-white border-slate-200 text-slate-800 hover:border-slate-900'
                                             : 'bg-slate-100/60 text-slate-400 border-slate-100 cursor-not-allowed opacity-40'
                                     )}
-                                    title={!isActiveMonth ? __('general.future_month_disabled') || 'Future month (disabled)' : `${m.full_name} (${m.from} to ${m.to})`}
+                                    title={!isActiveMonth ? __('general.future_month_disabled') : `${m.full_name} (${m.from} to ${m.to})`}
                                 >
                                     <span>{m.name}</span>
                                 </button>
@@ -455,7 +460,7 @@ export default function Reports({
                     )}
                 >
                     <Layers className="w-4 h-4" />
-                    <span>{__('general.financial_overview_tab') || 'Financial Overview & Margins'}</span>
+                    <span>{__('general.financial_overview_tab')}</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('hourly')}
@@ -467,7 +472,7 @@ export default function Reports({
                     )}
                 >
                     <Clock className="w-4 h-4" />
-                    <span>{__('general.hourly_yield_tab') || 'Hourly Yield & Rates'}</span>
+                    <span>{__('general.hourly_yield_tab')}</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('invoices')}
@@ -479,7 +484,7 @@ export default function Reports({
                     )}
                 >
                     <Receipt className="w-4 h-4" />
-                    <span>{__('general.invoices_dso_tab') || 'Invoices & Collection (DSO)'}</span>
+                    <span>{__('general.invoices_dso_tab')}</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('clients')}
@@ -491,7 +496,7 @@ export default function Reports({
                     )}
                 >
                     <Users className="w-4 h-4" />
-                    <span>{__('general.clients_worked_with_tab') || 'Clients Worked With'}</span>
+                    <span>{__('general.clients_worked_with_tab')}</span>
                     {clients_worked_with && clients_worked_with.length > 0 && (
                         <span className="ml-1 px-2 py-0.5 text-xs bg-slate-200 text-slate-800 rounded-full font-mono font-bold">
                             {clients_worked_with.length}
@@ -505,9 +510,9 @@ export default function Reports({
                 <div>
                     <div className="flex items-end justify-between mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">{__('general.financial_overview') || 'Financial Overview'}</h3>
+                            <h3 className="text-lg font-semibold text-slate-900">{__('general.financial_overview')}</h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                {__('general.all_amounts_in') || 'All amounts in'} {businessCurrency} {hasFiltersActive && `(${__('general.filtered') || 'Filtered'})`}
+                                {__('general.all_amounts_in')} {businessCurrency} {hasFiltersActive && `(${__('general.filtered')})`}
                             </p>
                         </div>
                         <Link
@@ -522,7 +527,7 @@ export default function Reports({
                             rel="noreferrer"
                             className="text-sm text-slate-600 hover:text-black flex items-center gap-1 font-medium"
                         >
-                            {__('general.export_csv') || 'Export CSV'}
+                            {__('general.export_csv')}
                             <ArrowUpRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>
@@ -530,18 +535,18 @@ export default function Reports({
                     {/* Financial Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         <MetricCard
-                            label={__('general.lifetime_income') || 'Lifetime Income'}
+                            label={__('general.lifetime_income')}
                             value={formatMoney(stats.lifetime_income ?? 0, businessCurrency)}
                             icon={TrendingUp}
                         />
                         <MetricCard
-                            label={__('general.lifetime_expenses') || 'Lifetime Expenses'}
+                            label={__('general.lifetime_expenses')}
                             value={formatMoney(stats.lifetime_expenses ?? 0, businessCurrency)}
                             icon={TrendingDown}
                         />
                         <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
                             <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-slate-500">{__('general.net_profit') || 'Net Profit'}</p>
+                                <p className="text-sm font-medium text-slate-500">{__('general.net_profit')}</p>
                                 {isPositiveProfit ? (
                                     <ArrowUpRight className="h-4 w-4 text-emerald-500" />
                                 ) : (
@@ -557,7 +562,7 @@ export default function Reports({
                         </div>
                         <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
                             <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-slate-500">{__('general.operating_margin') || 'Operating Margin %'}</p>
+                                <p className="text-sm font-medium text-slate-500">{__('general.operating_margin')}</p>
                                 <Percent className="h-4 w-4 text-slate-400" />
                             </div>
                             <div className={cn(
@@ -566,7 +571,7 @@ export default function Reports({
                             )}>
                                 {(stats.operating_margin_percent ?? 0) >= 0 ? '+' : ''}{stats.operating_margin_percent ?? 0}%
                             </div>
-                            <p className="text-xs text-slate-400 mt-1.5">{__('general.profit_over_income') || 'Net Profit ÷ Income'}</p>
+                            <p className="text-xs text-slate-400 mt-1.5">{__('general.profit_over_income')}</p>
                         </div>
                     </div>
 
@@ -575,7 +580,7 @@ export default function Reports({
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between pb-2">
-                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_income') || 'Avg. Monthly Income'}</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_income')}</p>
                                     <div className="p-2 bg-emerald-50 rounded-lg">
                                         <TrendingUp className="h-4 w-4 text-emerald-600" />
                                     </div>
@@ -583,13 +588,13 @@ export default function Reports({
                                 <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono">
                                     {formatMoney(stats.avg_monthly_income ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month') || 'Average per month'}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month')}</p>
                             </CardContent>
                         </Card>
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between pb-2">
-                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_costs') || 'Avg. Monthly Costs'}</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_costs')}</p>
                                     <div className="p-2 bg-rose-50 rounded-lg">
                                         <TrendingDown className="h-4 w-4 text-rose-600" />
                                     </div>
@@ -597,13 +602,13 @@ export default function Reports({
                                 <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono">
                                     {formatMoney(stats.avg_monthly_costs ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month') || 'Average per month'}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month')}</p>
                             </CardContent>
                         </Card>
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between pb-2">
-                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_profit') || 'Avg. Monthly Profit'}</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.avg_monthly_profit')}</p>
                                     <div className={`p-2 rounded-lg ${(stats.avg_monthly_profit ?? 0) >= 0 ? 'bg-indigo-50' : 'bg-rose-50'}`}>
                                         {(stats.avg_monthly_profit ?? 0) >= 0
                                             ? <ArrowUpRight className="h-4 w-4 text-indigo-600" />
@@ -613,13 +618,13 @@ export default function Reports({
                                 <div className={cn('text-2xl font-bold tracking-tight font-mono', (stats.avg_monthly_profit ?? 0) >= 0 ? 'text-indigo-600' : 'text-rose-600')}>
                                     {formatMoney(stats.avg_monthly_profit ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month') || 'Average per month'}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">{__('general.avg_per_month')}</p>
                             </CardContent>
                         </Card>
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between pb-2">
-                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.monthly_break_even') || 'Monthly Break-Even'}</p>
+                                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.monthly_break_even')}</p>
                                     <div className="p-2 bg-amber-50 rounded-lg">
                                         <Scale className="h-4 w-4 text-amber-600" />
                                     </div>
@@ -627,7 +632,7 @@ export default function Reports({
                                 <div className="text-2xl font-bold text-amber-600 tracking-tight font-mono">
                                     {formatMoney(stats.monthly_break_even_revenue ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1.5">{__('general.min_monthly_revenue') || 'Required monthly revenue'}</p>
+                                <p className="text-xs text-slate-500 mt-1.5">{__('general.min_monthly_revenue')}</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -636,8 +641,8 @@ export default function Reports({
                     {charts?.monthly_trends && charts.monthly_trends.length > 0 && (
                         <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
                             <CardContent className="p-6">
-                                <h4 className="text-sm font-semibold text-slate-900 mb-1">{__('general.profit_loss_trends') || 'Income & Expense Trends'}</h4>
-                                <p className="text-xs text-slate-500 mb-4">{__('general.dashed_lines_show_averages') || 'Dashed lines show monthly averages'}</p>
+                                <h4 className="text-sm font-semibold text-slate-900 mb-1">{__('general.profit_loss_trends')}</h4>
+                                <p className="text-xs text-slate-500 mb-4">{__('general.dashed_lines_show_averages')}</p>
                                 <div className="h-[350px]">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={charts.monthly_trends}>
@@ -658,14 +663,14 @@ export default function Reports({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#64748b'}} dy={10} />
                                             <YAxis axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#64748b'}} tickFormatter={formatYAxis} dx={-10} />
-                                            <RechartsTooltip content={<CustomTooltip />} />
+                                            <RechartsTooltip content={<ProfitTooltip currencyCode={businessCurrency} />} />
                                             {(stats.avg_monthly_income ?? 0) > 0 && (
-                                                <ReferenceLine y={stats.avg_monthly_income} stroke="#10b981" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg Income`, position: 'insideTopRight', fontSize: 10, fill: '#10b981' }} />
+                                                <ReferenceLine y={stats.avg_monthly_income} stroke="#10b981" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: __('admin.reports_avg_income'), position: 'insideTopRight', fontSize: 10, fill: '#10b981' }} />
                                             )}
                                             {(stats.avg_monthly_costs ?? 0) > 0 && (
-                                                <ReferenceLine y={stats.avg_monthly_costs} stroke="#ef4444" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg Costs`, position: 'insideTopRight', fontSize: 10, fill: '#ef4444' }} />
+                                                <ReferenceLine y={stats.avg_monthly_costs} stroke="#ef4444" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: __('admin.reports_avg_costs'), position: 'insideTopRight', fontSize: 10, fill: '#ef4444' }} />
                                             )}
-                                            <ReferenceLine y={stats.avg_monthly_profit ?? 0} stroke="#6366f1" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg Profit`, position: 'insideTopRight', fontSize: 10, fill: '#6366f1' }} />
+                                            <ReferenceLine y={stats.avg_monthly_profit ?? 0} stroke="#6366f1" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: __('admin.reports_avg_profit'), position: 'insideTopRight', fontSize: 10, fill: '#6366f1' }} />
                                             <Area type="monotone" dataKey="income" name={__('general.income')} stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
                                             <Area type="monotone" dataKey="costs" name={__('general.costs')} stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorCosts)" />
                                             <Area type="monotone" dataKey="profit" name={__('general.profit')} stroke="#6366f1" strokeWidth={2.5} fillOpacity={1} fill="url(#colorProfit)" />
@@ -679,12 +684,12 @@ export default function Reports({
                     {/* Category Breakdown Charts */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <CategoryPieChart
-                            title={__('general.income_by_category') || 'Income by Category'}
+                            title={__('general.income_by_category')}
                             data={charts?.income_by_category}
                             currency={businessCurrency}
                         />
                         <CategoryPieChart
-                            title={__('general.expense_by_category') || 'Expenses by Category'}
+                            title={__('general.expense_by_category')}
                             data={charts?.expenses_by_category}
                             currency={businessCurrency}
                         />
@@ -699,10 +704,10 @@ export default function Reports({
                         <div>
                             <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-indigo-600" />
-                                {__('general.hourly_yield_tab') || 'Hourly Yield & Rates (EHR)'}
+                                {__('general.hourly_yield_tab')}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                {__('general.academic_hourly_rate_calculations') || 'Academic yield analysis based on recorded timer sessions'}
+                                {__('general.academic_hourly_rate_calculations')}
                             </p>
                         </div>
                     </div>
@@ -711,54 +716,54 @@ export default function Reports({
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_worked_hours') || 'Worked Hours'}</p>
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_worked_hours')}</p>
                                 <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono mt-2">
-                                    {stats.total_worked_hours ?? 0} <span className="text-xs text-slate-400 font-normal">hrs</span>
+                                    {stats.total_worked_hours ?? 0} <span className="text-xs text-slate-400 font-normal">{__('admin.unit_hours_short')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.from_timer_logs') || 'Logged in timers'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.from_timer_logs')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-emerald-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">{__('general.effective_hourly_rate') || 'Effective Rate (EHR)'}</p>
+                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">{__('general.effective_hourly_rate')}</p>
                                 <div className="text-2xl font-bold text-emerald-700 tracking-tight font-mono mt-2">
-                                    {formatMoney(stats.effective_hourly_rate ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">/hr</span>
+                                    {formatMoney(stats.effective_hourly_rate ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">{__('admin.unit_per_hour')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.realized_income_per_hr') || 'Net Income ÷ Worked Hrs'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.realized_income_per_hr')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-rose-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-rose-700 uppercase tracking-wide">{__('general.cost_per_worked_hour') || 'Cost Per Hour'}</p>
+                                <p className="text-xs font-medium text-rose-700 uppercase tracking-wide">{__('general.cost_per_worked_hour')}</p>
                                 <div className="text-2xl font-bold text-rose-700 tracking-tight font-mono mt-2">
-                                    {formatMoney(stats.cost_per_worked_hour ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">/hr</span>
+                                    {formatMoney(stats.cost_per_worked_hour ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">{__('admin.unit_per_hour')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.operating_cost_per_hr') || 'Operating Costs ÷ Worked Hrs'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.operating_cost_per_hr')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-blue-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">{__('general.market_hourly_rate') || 'Market Rate'}</p>
+                                <p className="text-xs font-medium text-blue-700 uppercase tracking-wide">{__('general.market_hourly_rate')}</p>
                                 <div className="text-2xl font-bold text-blue-700 tracking-tight font-mono mt-2">
-                                    {formatMoney(stats.market_hourly_rate ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">/hr</span>
+                                    {formatMoney(stats.market_hourly_rate ?? 0, businessCurrency)}<span className="text-xs text-slate-500 font-normal">{__('admin.unit_per_hour')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.system_benchmark_rate') || 'System standard benchmark'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.system_benchmark_rate')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.rate_variance') || 'Rate Variance'}</p>
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.rate_variance')}</p>
                                 <div className={cn(
                                     'text-2xl font-bold tracking-tight font-mono mt-2',
                                     (stats.rate_variance ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
                                 )}>
-                                    {(stats.rate_variance ?? 0) >= 0 ? '+' : ''}{formatMoney(stats.rate_variance ?? 0, businessCurrency)}<span className="text-xs font-normal text-slate-500">/hr</span>
+                                    {(stats.rate_variance ?? 0) >= 0 ? '+' : ''}{formatMoney(stats.rate_variance ?? 0, businessCurrency)}<span className="text-xs font-normal text-slate-500">{__('admin.unit_per_hour')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.ehr_vs_market') || 'EHR vs Market Rate'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.ehr_vs_market')}</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -770,10 +775,10 @@ export default function Reports({
                                 <div>
                                     <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                                         <BarChart2 className="w-4 h-4 text-slate-500" />
-                                        {__('general.monthly_profit_margin') || 'Monthly Profit Margin %'}
+                                        {__('general.monthly_profit_margin')}
                                     </h4>
                                     <p className="text-xs text-slate-500 mt-0.5">
-                                        {__('general.profit_margin_formula') || 'Profit ÷ Income × 100'}
+                                        {__('general.profit_margin_formula')}
                                     </p>
                                 </div>
                                 <div className="text-right">
@@ -781,7 +786,7 @@ export default function Reports({
                                         'text-sm font-semibold font-mono',
                                         (stats.avg_profit_margin ?? 0) >= 0 ? 'text-amber-600' : 'text-rose-600'
                                     )}>
-                                        {__('general.avg') || 'Avg'}: {stats.avg_profit_margin ?? 0}%
+                                        {__('general.avg')}: {stats.avg_profit_margin ?? 0}%
                                     </div>
                                 </div>
                             </div>
@@ -799,7 +804,7 @@ export default function Reports({
                                                         <div className="bg-black text-white p-3 rounded-lg border border-slate-800 shadow-xl text-xs">
                                                             <p className="font-semibold mb-1 border-b border-slate-700 pb-1">{label}</p>
                                                             <div className="flex justify-between items-center gap-4">
-                                                                <span className="text-slate-400">{__('general.profit_margin') || 'Profit Margin'}:</span>
+                                                                <span className="text-slate-400">{__('general.profit_margin')}:</span>
                                                                 <span className={cn('font-mono font-semibold', val >= 0 ? 'text-amber-400' : 'text-rose-400')}>
                                                                     {val}%
                                                                 </span>
@@ -810,9 +815,9 @@ export default function Reports({
                                                 return null;
                                             }}
                                         />
-                                        <ReferenceLine y={stats.avg_profit_margin ?? 0} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: `Avg ${stats.avg_profit_margin ?? 0}%`, position: 'insideTopRight', fontSize: 10, fill: '#f59e0b' }} />
+                                        <ReferenceLine y={stats.avg_profit_margin ?? 0} stroke="#f59e0b" strokeDasharray="6 3" strokeWidth={1.5} label={{ value: __('admin.reports_avg_margin', { value: stats.avg_profit_margin ?? 0 }), position: 'insideTopRight', fontSize: 10, fill: '#f59e0b' }} />
                                         <ReferenceLine y={0} stroke="#e2e8f0" strokeWidth={1} />
-                                        <Bar dataKey="profit_margin" name={__('general.profit_margin') || 'Profit Margin %'} radius={[4, 4, 0, 0]}>
+                                        <Bar dataKey="profit_margin" name={__('general.profit_margin')} radius={[4, 4, 0, 0]}>
                                             {charts.monthly_trends.map((entry: any, index: number) => (
                                                 <Cell key={`cell-${index}`} fill={entry.profit_margin >= 0 ? '#10b981' : '#ef4444'} fillOpacity={0.85} />
                                             ))}
@@ -832,10 +837,10 @@ export default function Reports({
                         <div>
                             <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                                 <Receipt className="w-5 h-5 text-emerald-600" />
-                                {__('general.invoices_dso_tab') || 'Invoices & Collection Analytics (DSO)'}
+                                {__('general.invoices_dso_tab')}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5">
-                                {__('general.accounts_receivable_and_dso_metrics') || 'Days Sales Outstanding and Accounts Receivable Aging analysis'}
+                                {__('general.accounts_receivable_and_dso_metrics')}
                             </p>
                         </div>
                     </div>
@@ -844,41 +849,41 @@ export default function Reports({
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-indigo-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">{__('general.days_sales_outstanding') || 'DSO (Collection Speed)'}</p>
+                                <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">{__('general.days_sales_outstanding')}</p>
                                 <div className="text-3xl font-bold text-indigo-700 tracking-tight font-mono mt-2">
-                                    {stats.dso_days ?? 0} <span className="text-xs text-slate-400 font-normal">days</span>
+                                    {stats.dso_days ?? 0} <span className="text-xs text-slate-400 font-normal">{__('admin.unit_days')}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.avg_days_to_collect') || 'Average days to collect invoice payment'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.avg_days_to_collect')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-emerald-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">{__('general.collection_realization_rate') || 'Collection Rate %'}</p>
+                                <p className="text-xs font-medium text-emerald-700 uppercase tracking-wide">{__('general.collection_realization_rate')}</p>
                                 <div className="text-3xl font-bold text-emerald-700 tracking-tight font-mono mt-2">
                                     {stats.collection_rate_percent ?? 0}%
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.paid_vs_invoiced') || 'Paid Invoices ÷ Total Invoiced Amount'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.paid_vs_invoiced')}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_invoiced') || 'Total Invoiced'}</p>
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_invoiced')}</p>
                                 <div className="text-2xl font-bold text-slate-900 tracking-tight font-mono mt-2">
                                     {formatMoney(stats.total_invoiced_amount ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.paid_so_far') || 'Paid'}: {formatMoney(stats.total_paid_invoices ?? 0, businessCurrency)}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.paid_so_far')}: {formatMoney(stats.total_paid_invoices ?? 0, businessCurrency)}</p>
                             </CardContent>
                         </Card>
 
                         <Card className="border-none shadow-sm shadow-slate-200/50 border-s-4 border-s-rose-500">
                             <CardContent className="p-5">
-                                <p className="text-xs font-medium text-rose-700 uppercase tracking-wide">{__('general.total_unpaid') || 'Unpaid Receivables'}</p>
+                                <p className="text-xs font-medium text-rose-700 uppercase tracking-wide">{__('general.total_unpaid')}</p>
                                 <div className="text-2xl font-bold text-rose-700 tracking-tight font-mono mt-2">
                                     {formatMoney(stats.total_unpaid_invoices ?? 0, businessCurrency)}
                                 </div>
-                                <p className="text-xs text-slate-500 mt-1">{__('general.awaiting_collection') || 'Awaiting collection'}</p>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.awaiting_collection')}</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -889,9 +894,9 @@ export default function Reports({
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
                                     <AlertCircle className="w-4 h-4 text-amber-500" />
-                                    {__('general.ar_aging_breakdown') || 'Accounts Receivable Aging Breakdown'}
+                                    {__('general.ar_aging_breakdown')}
                                 </CardTitle>
-                                <CardDescription>{__('general.unpaid_invoices_grouped_by_days') || 'Unpaid balance categorized by days overdue'}</CardDescription>
+                                <CardDescription>{__('general.unpaid_invoices_grouped_by_days')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[260px] mt-2">
@@ -900,7 +905,7 @@ export default function Reports({
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
                                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={formatYAxis} />
-                                            <RechartsTooltip formatter={(val: any) => [formatMoney(val, businessCurrency), __('general.amount') || 'Amount']} />
+                                            <RechartsTooltip formatter={(val: any) => [formatMoney(val, businessCurrency), __('general.amount')]} />
                                             <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                                                 {arAgingData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -915,23 +920,23 @@ export default function Reports({
                         {/* AR Aging Summary Cards */}
                         <Card className="border-none shadow-sm shadow-slate-200/50 flex flex-col justify-between">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-base font-semibold text-slate-900">{__('general.aging_categories') || 'Aging Details'}</CardTitle>
+                                <CardTitle className="text-base font-semibold text-slate-900">{__('general.aging_categories')}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 flex-1 flex flex-col justify-center">
                                 <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50/50 border border-emerald-100">
-                                    <span className="text-xs font-medium text-emerald-800">{__('general.ar_0_30') || '0–30 Days'}</span>
+                                    <span className="text-xs font-medium text-emerald-800">{__('general.ar_0_30')}</span>
                                     <span className="text-sm font-bold font-mono text-emerald-700">{formatMoney(stats.ar_aging?.['0_30'] || 0, businessCurrency)}</span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50/50 border border-amber-100">
-                                    <span className="text-xs font-medium text-amber-800">{__('general.ar_31_60') || '31–60 Days'}</span>
+                                    <span className="text-xs font-medium text-amber-800">{__('general.ar_31_60')}</span>
                                     <span className="text-sm font-bold font-mono text-amber-700">{formatMoney(stats.ar_aging?.['31_60'] || 0, businessCurrency)}</span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg bg-orange-50/50 border border-orange-100">
-                                    <span className="text-xs font-medium text-orange-800">{__('general.ar_61_90') || '61–90 Days'}</span>
+                                    <span className="text-xs font-medium text-orange-800">{__('general.ar_61_90')}</span>
                                     <span className="text-sm font-bold font-mono text-orange-700">{formatMoney(stats.ar_aging?.['61_90'] || 0, businessCurrency)}</span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-lg bg-rose-50/50 border border-rose-100">
-                                    <span className="text-xs font-medium text-rose-800">{__('general.ar_90_plus') || '90+ Days'}</span>
+                                    <span className="text-xs font-medium text-rose-800">{__('general.ar_90_plus')}</span>
                                     <span className="text-sm font-bold font-mono text-rose-700">{formatMoney(stats.ar_aging?.['90_plus'] || 0, businessCurrency)}</span>
                                 </div>
                             </CardContent>
@@ -948,14 +953,14 @@ export default function Reports({
                             <div>
                                 <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
                                     <Users className="w-5 h-5 text-slate-700" />
-                                    {__('general.clients_worked_with') || 'Clients Worked With'}
+                                    {__('general.clients_worked_with')}
                                 </CardTitle>
                                 <CardDescription className="text-xs text-slate-500 mt-1">
-                                    {__('general.clients_worked_with_desc') || 'List of clients with active projects, logged hours, or invoices in the selected date range.'}
+                                    {__('general.clients_worked_with_desc')}
                                 </CardDescription>
                             </div>
                             <span className="text-xs font-mono text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 font-bold">
-                                {clients_worked_with.length} {__('general.clients') || 'clients'}
+                                {clients_worked_with.length} {__('general.clients')}
                             </span>
                         </div>
                     </CardHeader>
@@ -965,13 +970,13 @@ export default function Reports({
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-slate-50/80 text-xs text-slate-500 border-b border-slate-200 uppercase tracking-wider font-semibold">
                                         <tr>
-                                            <th className="py-3.5 px-6">{__('general.client') || 'Client'}</th>
-                                            <th className="py-3.5 px-6 text-right">{__('general.worked_hours') || 'Worked Hours'}</th>
-                                            <th className="py-3.5 px-6 text-right">{__('general.total_invoiced') || 'Total Invoiced'}</th>
-                                            <th className="py-3.5 px-6 text-right">{__('general.total_paid') || 'Total Paid'}</th>
-                                            <th className="py-3.5 px-6 text-center">{__('general.active_projects') || 'Active Projects'}</th>
-                                            <th className="py-3.5 px-6 text-right">{__('general.last_activity') || 'Last Activity'}</th>
-                                            <th className="py-3.5 px-6 text-center">{__('general.actions') || 'Action'}</th>
+                                            <th className="py-3.5 px-6">{__('general.client')}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.worked_hours')}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.total_invoiced')}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.total_paid')}</th>
+                                            <th className="py-3.5 px-6 text-center">{__('general.active_projects')}</th>
+                                            <th className="py-3.5 px-6 text-right">{__('general.last_activity')}</th>
+                                            <th className="py-3.5 px-6 text-center">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 font-mono text-xs">
@@ -1031,7 +1036,7 @@ export default function Reports({
                                                         href={route('admin.users.show', client.id)}
                                                         className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors"
                                                     >
-                                                        <span>{__('general.view_profile') || 'View'}</span>
+                                                        <span>{__('general.view_profile')}</span>
                                                         <ArrowUpRight className="w-3.5 h-3.5" />
                                                     </Link>
                                                 </td>
@@ -1043,8 +1048,8 @@ export default function Reports({
                         ) : (
                             <div className="py-12 text-center">
                                 <Users className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                                <p className="text-sm font-semibold text-slate-700">{__('general.no_clients_worked_in_period') || 'No clients worked with in the selected date range.'}</p>
-                                <p className="text-xs text-slate-400 mt-1">{__('general.try_changing_date_range') || 'Try selecting a different date range or project filter.'}</p>
+                                <p className="text-sm font-semibold text-slate-700">{__('general.no_clients_worked_in_period')}</p>
+                                <p className="text-xs text-slate-400 mt-1">{__('general.try_changing_date_range')}</p>
                             </div>
                         )}
                     </CardContent>

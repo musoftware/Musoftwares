@@ -22,7 +22,7 @@ class WishlistController extends Controller
             ->where('favoritable_type', Service::class)
             ->with('favoritable.seller')
             ->latest()
-            ->paginate(15);
+            ->paginate(15)->withQueryString();
 
         if ($request->wantsJson()) {
             return response()->json(['favorites' => $favorites]);

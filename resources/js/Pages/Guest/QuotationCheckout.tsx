@@ -13,6 +13,7 @@ import {
     CreditCard, Sparkles, User, Mail, Phone, Building2, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 interface Quotation {
     id: number;
@@ -46,21 +47,21 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
         e.preventDefault();
 
         if (!data.client_name.trim() || !data.client_email.trim()) {
-            toast.error('يرجى إدخال الاسم والبريد الإلكتروني بشكل صحيح.');
+            toast.error(__('quotations.guest_checkout_name_email_required'));
             return;
         }
 
         post(payUrl, {
             onError: (errs) => {
                 console.error(errs);
-                toast.error('يرجى مراجعة البيانات والتأكد من صحتها.');
+                toast.error(__('quotations.guest_checkout_check_data'));
             },
         });
     };
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white pb-24 transition-colors duration-200">
-            <Head title={`استكمال البيانات وسداد الدفعة - ${quotation.title}`} />
+            <Head title={__('quotations.guest_checkout_page_title', { title: quotation.title })} />
 
             {/* Header */}
             <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
@@ -72,7 +73,7 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                 MUSOFTWARE
                             </span>
                             <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
-                                Secure Checkout
+                                {__('quotations.guest_checkout_secure')}
                             </span>
                         </div>
                     </div>
@@ -80,8 +81,8 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                     <div className="flex items-center gap-3">
                         <ThemeToggle className="h-8 w-8" />
                         <Link href={backUrl} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium">
-                            <ArrowRight className="w-4 h-4" />
-                            العودة لتفاصيل العرض
+                            <ArrowRight className="w-4 h-4 rotate-180 rtl:rotate-0" />
+                            {__('quotations.guest_checkout_back')}
                         </Link>
                     </div>
                 </div>
@@ -92,17 +93,17 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                 <div className="mb-8 flex items-center justify-center gap-2 sm:gap-4 text-xs font-semibold">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                         <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground">1</span>
-                        <span>مراجعة العرض</span>
+                        <span>{__('quotations.guest_checkout_step_review')}</span>
                     </div>
                     <div className="w-8 h-0.5 bg-border" />
                     <div className="flex items-center gap-1.5 text-primary">
                         <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">2</span>
-                        <span className="font-bold">بيانات العميل والسداد</span>
+                        <span className="font-bold">{__('quotations.guest_checkout_step_details')}</span>
                     </div>
                     <div className="w-8 h-0.5 bg-border" />
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                         <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground">3</span>
-                        <span>تأكيد البدء</span>
+                        <span>{__('quotations.guest_checkout_step_confirm')}</span>
                     </div>
                 </div>
 
@@ -113,10 +114,10 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                             <CardHeader className="border-b border-border pb-4">
                                 <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                                     <User className="w-5 h-5 text-primary" />
-                                    بيانات التواصل والحساب
+                                    {__('quotations.guest_checkout_contact_title')}
                                 </CardTitle>
                                 <CardDescription className="text-muted-foreground">
-                                    سيتم إنشاء حسابك التلقائي وإصدار الفاتورة الرسمية باسم هذه البيانات فور إتمام السداد.
+                                    {__('quotations.guest_checkout_contact_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="pt-6">
@@ -124,13 +125,13 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                     {/* Full Name */}
                                     <div className="space-y-1.5">
                                         <Label htmlFor="client_name" className="text-xs font-bold text-foreground">
-                                            الاسم الكامل <span className="text-destructive">*</span>
+                                            {__('quotations.guest_checkout_full_name')} <span className="text-destructive">*</span>
                                         </Label>
                                         <div className="relative">
                                             <Input
                                                 id="client_name"
                                                 type="text"
-                                                placeholder="مثال: أحمد محمود"
+                                                placeholder={__('quotations.guest_checkout_name_placeholder')}
                                                 value={data.client_name}
                                                 onChange={(e) => setData('client_name', e.target.value)}
                                                 className="bg-background text-foreground border-input focus-visible:ring-primary"
@@ -143,7 +144,7 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                     {/* Email */}
                                     <div className="space-y-1.5">
                                         <Label htmlFor="client_email" className="text-xs font-bold text-foreground">
-                                            البريد الإلكتروني <span className="text-destructive">*</span>
+                                            {__('quotations.guest_checkout_email')} <span className="text-destructive">*</span>
                                         </Label>
                                         <Input
                                             id="client_email"
@@ -155,14 +156,14 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                             required
                                         />
                                         {errors.client_email && <p className="text-xs text-destructive">{errors.client_email}</p>}
-                                        <span className="text-[11px] text-muted-foreground">ستصلك بيانات الدخول والفاتورة وإشعارات المشروع على هذا البريد.</span>
+                                        <span className="text-[11px] text-muted-foreground">{__('quotations.guest_checkout_email_hint')}</span>
                                     </div>
 
                                     {/* Phone & WhatsApp */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <Label htmlFor="client_phone" className="text-xs font-bold text-foreground">
-                                                رقم الهاتف / الموبايل
+                                                {__('quotations.guest_checkout_phone')}
                                             </Label>
                                             <Input
                                                 id="client_phone"
@@ -183,7 +184,7 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
 
                                         <div className="space-y-1.5">
                                             <Label htmlFor="client_whatsapp" className="text-xs font-bold text-foreground">
-                                                رقم الواتساب (WhatsApp)
+                                                {__('quotations.guest_checkout_whatsapp')}
                                             </Label>
                                             <Input
                                                 id="client_whatsapp"
@@ -199,12 +200,12 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                     {/* Company Name */}
                                     <div className="space-y-1.5">
                                         <Label htmlFor="company_name" className="text-xs font-bold text-foreground">
-                                            اسم الشركة / المؤسسة (اختياري)
+                                            {__('quotations.guest_checkout_company')}
                                         </Label>
                                         <Input
                                             id="company_name"
                                             type="text"
-                                            placeholder="اسم شركتك أو علامتك التجارية"
+                                            placeholder={__('quotations.guest_checkout_company_placeholder')}
                                             value={data.company_name}
                                             onChange={(e) => setData('company_name', e.target.value)}
                                             className="bg-background text-foreground border-input focus-visible:ring-primary"
@@ -214,11 +215,11 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                     {/* Notes */}
                                     <div className="space-y-1.5">
                                         <Label htmlFor="notes" className="text-xs font-bold text-foreground">
-                                            ملاحظات أو متطلبات إضافية (اختياري)
+                                            {__('quotations.guest_checkout_notes')}
                                         </Label>
                                         <Textarea
                                             id="notes"
-                                            placeholder="أي تفاصيل أو ملاحظات تود إضافتها لفريق العمل..."
+                                            placeholder={__('quotations.guest_checkout_notes_placeholder')}
                                             value={data.notes}
                                             onChange={(e) => setData('notes', e.target.value)}
                                             rows={3}
@@ -242,22 +243,22 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                             <CardContent className="p-6 space-y-4">
                                 <div className="space-y-2.5 pb-4 border-b border-border text-sm">
                                     <div className="flex items-center justify-between text-muted-foreground">
-                                        <span>إجمالي أعمال المشروع:</span>
+                                        <span>{__('quotations.guest_checkout_project_total')}</span>
                                         <span className="font-mono font-bold text-foreground">{quotation.development_total} {quotation.currency}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-muted-foreground">
-                                        <span>نسبة الدفعة المقدمة:</span>
+                                        <span>{__('quotations.guest_checkout_deposit_rate')}</span>
                                         <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">{quotation.deposit_percentage}%</span>
                                     </div>
                                     <div className="flex items-center justify-between text-muted-foreground">
-                                        <span>المتبقي عند التسليم:</span>
+                                        <span>{__('quotations.guest_checkout_remaining')}</span>
                                         <span className="font-mono text-muted-foreground">{quotation.remaining_amount} {quotation.currency}</span>
                                     </div>
                                 </div>
 
                                 <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1 text-center">
                                     <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wider block">
-                                        المبلغ المستحق للدفع الآن ({quotation.deposit_percentage}%)
+                                        {__('quotations.guest_checkout_due_now', { pct: quotation.deposit_percentage })}
                                     </span>
                                     <div className="text-3xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
                                         {quotation.deposit_amount} <span className="text-sm font-normal text-muted-foreground">{quotation.currency}</span>
@@ -272,21 +273,21 @@ export default function QuotationCheckout({ quotation, payUrl, backUrl }: Quotat
                                         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base font-bold py-6 rounded-2xl shadow-lg hover:shadow-xl transition-all gap-2"
                                     >
                                         <Lock className="w-4 h-4 text-emerald-300" />
-                                        {processing ? 'جاري التوجيه لبوابة الدفع...' : 'الانتقال للدفع الآمن الآن'}
+                                        {processing ? __('quotations.guest_checkout_redirecting') : __('quotations.guest_checkout_pay_now')}
                                     </Button>
                                     <p className="text-[11px] text-center text-muted-foreground">
-                                        سيتم نقلك بأمان إلى بوابة الدفع لإتمام العملية بواسطة البطاقة البنكية أو المحافظ.
+                                        {__('quotations.guest_checkout_redirect_hint')}
                                     </p>
                                 </div>
 
                                 <div className="pt-4 border-t border-border flex items-center justify-center gap-3 text-xs text-muted-foreground font-medium">
                                     <span className="flex items-center gap-1">
                                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                                        تشفير 256-bit SSL
+                                        {__('quotations.guest_checkout_ssl')}
                                     </span>
                                     <span className="flex items-center gap-1">
                                         <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                                        فاتورة رسمية فورية
+                                        {__('quotations.guest_checkout_instant_invoice')}
                                     </span>
                                 </div>
                             </CardContent>

@@ -49,15 +49,15 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
         }).then(({ data }) => {
             if (data.ok) {
                 if (data.new_cards.length === 0) {
-                    toast.info(__('general.no_undone_work_found') || 'No incomplete work was found in past days.');
+                    toast.info(__('general.no_undone_work_found'));
                 } else {
-                    toast.success(__('general.undone_cards_brought') || `Brought ${data.new_cards.length} incomplete tasks forward!`);
+                    toast.success(__('general.undone_cards_brought', { count: data.new_cards.length }));
                     const customEvent = new CustomEvent('board-undone-brought', { detail: { cards: data.new_cards } });
                     window.dispatchEvent(customEvent);
                 }
             }
         }).catch(() => {
-            toast.error(__('general.error') || 'Failed to bring undone work.');
+            toast.error(__('general.error'));
         }).finally(() => {
             setBringingUndone(false);
         });
@@ -107,7 +107,7 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
                                 </span>
                                 {project.status && (
                                     <span className={cn('rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ring-1 ring-inset', STATUS_STYLES[project.status] ?? 'bg-slate-100 text-slate-600 ring-slate-200')}>
-                                        {project.status?.replace('_', ' ')}
+                                        {__(`general.status_${project.status}`)}
                                     </span>
                                 )}
                                 {project.archived && (
@@ -169,7 +169,7 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
                                 className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50"
                             >
                                 <Sparkles className={cn("h-4 w-4 text-amber-500", bringingUndone && "animate-spin")} />
-                                <span>{bringingUndone ? 'Bringing...' : __('general.bring_undone') || 'Bring Undone Yet'}</span>
+                                <span>{bringingUndone ? __('client.projects_bringing') : __('general.bring_undone')}</span>
                             </button>
 
                             {!isToday && (
@@ -197,6 +197,7 @@ export default function ProjectCalendarDate({ project, date, lanes, cards, hideF
                                         id={dateInputKey}
                                         type="date"
                                         defaultValue={date}
+                                        aria-label={__('general.date')}
                                         className="h-10 rounded-xl border border-slate-200 bg-white px-2 text-xs text-slate-700 focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300"
                                     />
                                 </form>

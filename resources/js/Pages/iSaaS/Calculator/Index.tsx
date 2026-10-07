@@ -7,16 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Calculator, Save, CheckCircle2, Play, Loader2 } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function Index({ proposals }) {
     const [projectDetails, setProjectDetails] = useState('');
     const [isCalculating, setIsCalculating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [aiResult, setAiResult] = useState<any>(null);
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleCalculate = async () => {
         if (!projectDetails || projectDetails.length < 20) {
-            alert('Please enter at least 20 characters of project details.');
+            toast.error(__('general.isaas_calc_min_details'));
             return;
         }
 
@@ -30,7 +33,7 @@ export default function Index({ proposals }) {
             
             setAiResult(response.data);
         } catch (error: any) {
-            alert('Failed to calculate: ' + ((error as any).response?.data?.error || error.message));
+            toast.error(__('general.isaas_calc_failed', { error: error.response?.data?.error || error.message }));
         } finally {
             setIsCalculating(false);
         }
@@ -49,19 +52,18 @@ export default function Index({ proposals }) {
         }, {
             onSuccess: () => {
                 setIsSaving(false);
-                alert('Proposal Saved!');
+                toast.success(__('general.isaas_proposal_saved'));
             },
             onError: () => {
                 setIsSaving(false);
-                alert('Failed to save proposal.');
+                toast.error(__('general.isaas_proposal_save_failed'));
             }
         });
     };
 
-    const handleConvertToContract = (id) => {
-        if (confirm('Are you sure you want to convert this proposal into a Contract?')) {
-            router.post(route('isaas.calculator.convert', id));
-        }
+    const handleConvertToContract = async (id) => {
+        if (!(await confirm({ title: __('general.convert_to_contract'), description: __('general.isaas_convert_proposal_confirm') }))) return;
+        router.post(route('isaas.calculator.convert', id));
     };
 
     return (
@@ -73,7 +75,7 @@ export default function Index({ proposals }) {
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground mb-3 border border-border">{__('general.freelance_tools')}</span>
                     <div className="flex items-baseline gap-3">
                         <h1 className="text-3xl font-bold tracking-tight text-foreground">{__('general.smart_price_calculator')}</h1>
-                        <span className="text-muted-foreground font-medium">/ AI Proposals</span>
+                        <span className="text-muted-foreground font-medium">/ {__('general.isaas_ai_proposals')}</span>
                     </div>
                 </div>
 
@@ -157,7 +159,7 @@ export default function Index({ proposals }) {
                                 {aiResult && (
                                     <Button onClick={handleSaveProposal} disabled={isSaving} variant="default">
                                         {isSaving ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : <Save className="me-2 h-4 w-4" />}
-                                        Save Proposal
+                                        {__('general.isaas_save_proposal')}
                                     </Button>
                                 )}
                             </CardHeader>
@@ -167,7 +169,7 @@ export default function Index({ proposals }) {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="p-4 rounded-lg border border-border bg-muted/40">
                                                 <div className="text-sm text-muted-foreground font-medium">{__('general.estimated_duration')}</div>
-                                                <div className="text-2xl font-bold text-foreground">{aiResult.parsed_data.total_duration_days} Days</div>
+                                                <div className="text-2xl font-bold text-foreground">{__('general.isaas_days_count', { count: aiResult.parsed_data.total_duration_days })}</div>
                                             </div>
                                             <div className="p-4 rounded-lg border border-border bg-muted/40">
                                                 <div className="text-sm text-muted-foreground font-medium">{__('general.estimated_cost')}</div>
@@ -196,6 +198,7 @@ export default function Index({ proposals }) {
 
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

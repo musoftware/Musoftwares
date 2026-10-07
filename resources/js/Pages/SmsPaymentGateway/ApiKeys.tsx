@@ -288,6 +288,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                             variant="outline"
                                             size="icon-sm"
                                             onClick={() => handleCopy(revealedPublishableKey, 'reveal-pk')}
+                                            aria-label={__('general.copy')}
                                             className="shrink-0"
                                         >
                                             {copiedField === 'reveal-pk' ? (
@@ -312,6 +313,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                             variant="outline"
                                             size="icon-sm"
                                             onClick={() => handleCopy(revealedSecretKey, 'reveal-sk')}
+                                            aria-label={__('general.copy')}
                                             className="shrink-0"
                                         >
                                             {copiedField === 'reveal-sk' ? (
@@ -500,6 +502,7 @@ export default function ApiKeys({ apiKeys }: Props) {
                                                                 variant="ghost"
                                                                 className="h-8 w-8 p-0"
                                                                 onClick={() => openActionMenu(key)}
+                                                                aria-label={__('general.open_menu')}
                                                             />
                                                         }>
                                                             <MoreHorizontal className="h-4 w-4" />

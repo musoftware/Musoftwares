@@ -11,13 +11,13 @@ export function SellerNav() {
         { name: __('general.dashboard'), href: '/seller/dashboard', icon: LayoutDashboard },
         { name: __('general.my_products'), href: '/seller/products', icon: Package },
         { name: __('general.my_payouts'), href: '/seller/payouts', icon: Wallet },
-        { name: __('general.digital_keys') || 'Digital Serials', href: '/seller/serials', icon: Key },
-        { name: __('general.landing_pages') || 'Landing Pages', href: '/marketplace/landing-pages', icon: Globe },
+        { name: __('general.digital_keys'), href: '/seller/serials', icon: Key },
+        { name: __('general.landing_pages'), href: '/marketplace/landing-pages', icon: Globe },
     ];
 
     return (
         <div className="mb-6 border-b border-slate-200">
-            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <nav className="-mb-px flex space-x-6" aria-label={__('marketplace.seller_nav_label')}>
                 {tabs.map((tab) => {
                     const isActive = url.startsWith(tab.href);
                     return (

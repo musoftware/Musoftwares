@@ -19,6 +19,8 @@ import {
     ShieldCheck,
     Trash2,
     PlusCircle,
+    Pin,
+    ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -27,6 +29,7 @@ import { Badge } from '@/Components/ui/badge';
 import { toast } from 'sonner';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface Client {
     id: number;
@@ -85,6 +88,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
     const [search, setSearch] = useState(filters.search || '');
     const [refundingId, setRefundingId] = useState<number | null>(null);
     const [newTodoTitle, setNewTodoTitle] = useState('');
+    const { confirm, confirmDialog } = useConfirm();
 
     const [scheduleData, setScheduleData] = useState({
         title: '',
@@ -128,7 +132,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Scheduled task booked successfully!');
+                toast.success(__('admin.client_tasks_booked'));
                 setScheduleData({ ...scheduleData, title: '', start_time: '', end_time: '' });
                 setSubmittingFocus(false);
             },
@@ -136,7 +140,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                 setScheduleErrors(errs);
                 if (errs.error) toast.error(errs.error);
                 else if (errs.start_at) toast.error(errs.start_at);
-                else toast.error('Please fix the validation errors.');
+                else toast.error(__('admin.client_tasks_fix_errors'));
                 setSubmittingFocus(false);
             }
         });
@@ -164,46 +168,58 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
         router.get(route('admin.tasks.client-tasks'), { search: '', client_id: '' });
     };
 
-    const handleRefund = (todoId: number) => {
-        if (confirm('Are you sure you want to process a refund for the remaining time of this item?')) {
-            setRefundingId(todoId);
-            router.post(route('admin.tasks.todos.refund', todoId), {}, {
-                onSuccess: () => {
-                    toast.success('Refund processed successfully!');
-                    setRefundingId(null);
-                },
-                onError: (errors: any) => {
-                    const errMsg = errors.error || 'Failed to process refund.';
-                    toast.error(errMsg);
-                    setRefundingId(null);
-                }
-            });
-        }
+    const handleRefund = async (todoId: number) => {
+        const accepted = await confirm({
+            title: __('admin.client_tasks_refund_title'),
+            description: __('admin.client_tasks_refund_confirm'),
+            variant: 'danger',
+            confirmLabel: __('admin.client_tasks_refund'),
+        });
+        if (!accepted) return;
+        setRefundingId(todoId);
+        router.post(route('admin.tasks.todos.refund', todoId), {}, {
+            onSuccess: () => {
+                toast.success(__('admin.client_tasks_refund_success'));
+                setRefundingId(null);
+            },
+            onError: (errors: any) => {
+                toast.error(errors.error || __('admin.client_tasks_refund_failed'));
+                setRefundingId(null);
+            }
+        });
     };
 
-    const handleDeleteTodo = (todoId: number) => {
-        if (confirm('Are you sure you want to remove this item from the queue?')) {
-            router.delete(route('admin.tasks.todos.destroy', todoId), {
-                onSuccess: () => toast.success('Task removed from queue.'),
-                onError: (errors: any) => toast.error(errors.error || 'Failed to delete task.')
-            });
-        }
+    const handleDeleteTodo = async (todoId: number) => {
+        const accepted = await confirm({
+            title: __('admin.client_tasks_delete_confirm'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.tasks.todos.destroy', todoId), {
+            onSuccess: () => toast.success(__('admin.client_tasks_delete_success')),
+            onError: (errors: any) => toast.error(errors.error || __('admin.client_tasks_delete_failed'))
+        });
     };
 
-    const handlePayTodo = (todoId: number) => {
-        if (confirm('Are you sure you want to confirm and schedule this task? The amount will be deducted from the client balance.')) {
-            router.post(route('admin.tasks.todos.pay-schedule', todoId), {}, {
-                onSuccess: () => toast.success('Task scheduled and billed successfully!'),
-                onError: (errors: any) => toast.error(errors.error || 'Failed to process task payment.')
-            });
-        }
+    const handlePayTodo = async (todoId: number) => {
+        const accepted = await confirm({
+            title: __('admin.client_tasks_pay_title'),
+            description: __('admin.client_tasks_pay_confirm'),
+            confirmLabel: __('general.confirm'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.tasks.todos.pay-schedule', todoId), {}, {
+            onSuccess: () => toast.success(__('admin.client_tasks_pay_success')),
+            onError: (errors: any) => toast.error(errors.error || __('admin.client_tasks_pay_failed'))
+        });
     };
 
     const handleToggleComplete = (todoId: number, currentStatus: boolean) => {
         router.post(route('admin.tasks.todos.complete', todoId), { completed: !currentStatus }, {
             preserveScroll: true,
-            onSuccess: () => toast.success('Task status updated.'),
-            onError: () => toast.error('Failed to update task status.')
+            onSuccess: () => toast.success(__('admin.client_tasks_status_updated')),
+            onError: () => toast.error(__('admin.client_tasks_status_failed'))
         });
     };
 
@@ -214,18 +230,21 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
         router.post(route('admin.tasks.client-tasks.store-unpaid', selectedClient.id), { title: newTodoTitle }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Task added to the queue.');
+                toast.success(__('admin.client_tasks_added'));
                 setNewTodoTitle('');
             },
-            onError: (errors: any) => toast.error(errors.error || 'Failed to add task.')
+            onError: (errors: any) => toast.error(errors.error || __('admin.client_tasks_add_failed'))
         });
     };
 
     const filteredClients = clients;
+    const pageHeading = selectedClient
+        ? __('admin.client_tasks_tasks_for', { name: selectedClient.name })
+        : __('admin.client_tasks_select_client');
 
     return (
-        <AdminSidebarLayout title={__('general.client_tasks')} header="Client Tasks">
-            <Head title={selectedClient ? `Tasks for ${selectedClient.name}` : "Select Client — Admin"} />
+        <AdminSidebarLayout title={__('general.client_tasks')} header={__('general.client_tasks')}>
+            <Head title={pageHeading} />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -233,22 +252,22 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                             <ListTodo className="h-6 w-6 text-slate-900" />
-                            {selectedClient ? `Tasks for ${selectedClient.name}` : "Select Client"}
+                            {pageHeading}
                         </h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            {selectedClient 
-                                ? `Manage checklist items, scheduling, and process refunds for ${selectedClient.name}.`
-                                : "Choose a client to view and manage their checklist items and process refunds."}
+                            {selectedClient
+                                ? __('admin.client_tasks_subtitle_selected', { name: selectedClient.name })
+                                : __('admin.client_tasks_subtitle')}
                         </p>
                     </div>
                     {selectedClient && (
-                        <Button 
+                        <Button
                             onClick={handleBackToSelection}
-                            variant="outline" 
+                            variant="outline"
                             size="sm"
                             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 border-slate-200"
                         >
-                            <ArrowLeft className="h-4 w-4" />{__('general.back_to_selection')}</Button>
+                            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />{__('general.back_to_selection')}</Button>
                     )}
                 </div>
 
@@ -270,7 +289,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                         />
                                     </div>
                                     <Button type="submit" variant="outline" className="h-10 text-slate-800 hover:text-black">
-                                        {__('general.search') || 'Search'}
+                                        {__('general.search')}
                                     </Button>
                                     {filters.search && (
                                         <Button
@@ -279,7 +298,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                             onClick={handleClearSearch}
                                             className="h-10 text-slate-500 hover:text-slate-900"
                                         >
-                                            {__('general.clear') || 'Clear'}
+                                            {__('general.clear')}
                                         </Button>
                                     )}
                                 </form>
@@ -291,12 +310,12 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                 <CardContent className="flex flex-col items-center justify-center p-16 text-center">
                                     <User className="h-12 w-12 text-slate-300 mb-4" />
                                     <h3 className="font-semibold text-slate-700 text-sm">
-                                        {search ? 'No Clients Match Your Search' : 'No Clients Found'}
+                                        {search ? __('admin.client_tasks_no_match') : __('admin.client_tasks_no_clients')}
                                     </h3>
                                     <p className="text-xs text-slate-400 max-w-xs mt-1">
                                         {search
-                                            ? `No client records match "${search}". Try a different name or email.`
-                                            : 'No platform clients are registered yet.'}
+                                            ? __('admin.client_tasks_no_match_hint', { search })
+                                            : __('admin.client_tasks_no_clients_hint')}
                                     </p>
                                     {search && (
                                         <button
@@ -324,17 +343,17 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
 
                                                 <div className="flex items-center justify-end gap-4 text-xs pt-2 border-t border-slate-100">
                                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-slate-50 text-slate-900">
-                                                        <ListTodo className="h-3 w-3" /> {client.total_tasks} Tasks
+                                                        <ListTodo className="h-3 w-3" /> {__('admin.client_tasks_tasks_count', { count: client.total_tasks })}
                                                     </span>
                                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold bg-green-50 text-slate-900">
-                                                        <CheckCircle2 className="h-3 w-3" /> {client.completed_tasks} Completed
+                                                        <CheckCircle2 className="h-3 w-3" /> {__('admin.client_tasks_completed_count', { count: client.completed_tasks })}
                                                     </span>
                                                 </div>
 
-                                                <Button 
+                                                <Button
                                                     onClick={() => handleSelectClient(client.id)}
                                                     className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg"
-                                                >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ms-1" />
+                                                >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ms-1 rtl:rotate-180" />
                                                 </Button>
                                             </CardContent>
                                         </Card>
@@ -352,18 +371,18 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                 size="sm"
                                                 disabled={pagination.current_page <= 1}
                                                 onClick={() => router.get(route('admin.tasks.client-tasks'), { search, page: pagination.current_page - 1 }, { preserveState: true })}
-                                                aria-label="Previous Page"
+                                                aria-label={__('general.previous_page')}
                                             >
-                                                <ChevronLeft className="h-4 w-4 text-slate-800" />
+                                                <ChevronLeft className="h-4 w-4 text-slate-800 rtl:rotate-180" />
                                             </Button>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 disabled={pagination.current_page >= pagination.last_page}
                                                 onClick={() => router.get(route('admin.tasks.client-tasks'), { search, page: pagination.current_page + 1 }, { preserveState: true })}
-                                                aria-label="Next Page"
+                                                aria-label={__('general.next_page')}
                                             >
-                                                <ChevronRight className="h-4 w-4 text-slate-800" />
+                                                <ChevronRight className="h-4 w-4 text-slate-800 rtl:rotate-180" />
                                             </Button>
                                         </div>
                                     </div>
@@ -382,7 +401,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                     <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                         <CalendarCheck className="h-4 w-4 text-slate-900" />{__('general.schedule_focus_time')}</h3>
                                     <span className="text-xs font-semibold bg-slate-50 text-slate-900 px-2 py-0.5 rounded-full">
-                                        Hourly Rate: {formatCurrency(selectedClient.hourly_rate || 0, selectedClient.currency)}/hr
+                                        {__('admin.client_tasks_hourly_rate', { rate: formatCurrency(selectedClient.hourly_rate || 0, selectedClient.currency) })}
                                     </span>
                                 </div>
                                 <CardContent className="p-5">
@@ -390,8 +409,8 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="space-y-1.5">
                                                 <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.target_date')}</label>
-                                                <Input 
-                                                    type="date" 
+                                                <Input
+                                                    type="date"
                                                     value={scheduleData.date}
                                                     onChange={e => setScheduleData({...scheduleData, date: e.target.value})}
                                                     className="border-slate-200 h-9"
@@ -400,8 +419,8 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                             </div>
                                             <div className="space-y-1.5">
                                                 <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.start_time')}</label>
-                                                <Input 
-                                                    type="time" 
+                                                <Input
+                                                    type="time"
                                                     value={scheduleData.start_time}
                                                     onChange={e => setScheduleData({...scheduleData, start_time: e.target.value})}
                                                     className="border-slate-200 h-9"
@@ -410,8 +429,8 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                             </div>
                                             <div className="space-y-1.5">
                                                 <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.end_time')}</label>
-                                                <Input 
-                                                    type="time" 
+                                                <Input
+                                                    type="time"
                                                     value={scheduleData.end_time}
                                                     onChange={e => setScheduleData({...scheduleData, end_time: e.target.value})}
                                                     className="border-slate-200 h-9"
@@ -422,13 +441,13 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
 
                                         {estimatedCost > 0 && (
                                             <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center justify-between">
-                                                <span className="text-sm text-slate-600 font-semibold">Estimated Investment:</span>
+                                                <span className="text-sm text-slate-600 font-semibold">{__('admin.client_tasks_estimated_cost')}</span>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-lg font-bold text-slate-900">
                                                         {formatCurrency(estimatedCost, selectedClient.currency)}
                                                     </span>
                                                     <span className={`text-xs font-bold px-2 py-1 rounded ${selectedClient.balance >= estimatedCost ? 'bg-green-100 text-slate-900' : 'bg-red-100 text-slate-900'}`}>
-                                                        Available: {formatCurrency(selectedClient.balance, selectedClient.currency)}
+                                                        {__('admin.client_tasks_available', { amount: formatCurrency(selectedClient.balance, selectedClient.currency) })}
                                                     </span>
                                                 </div>
                                             </div>
@@ -436,8 +455,8 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
 
                                         <div className="flex gap-2">
                                             <div className="flex-grow space-y-1.5">
-                                                <Input 
-                                                    type="text" 
+                                                <Input
+                                                    type="text"
                                                     value={scheduleData.title}
                                                     onChange={e => setScheduleData({...scheduleData, title: e.target.value})}
                                                     placeholder={__('general.describe_the_specific_engineering_outcome')}
@@ -446,12 +465,12 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                 />
                                                 {scheduleErrors?.title && <p className="text-xs text-slate-900">{scheduleErrors.title}</p>}
                                             </div>
-                                            <Button 
-                                                type="submit" 
+                                            <Button
+                                                type="submit"
                                                 disabled={submittingFocus || (estimatedCost > 0 && selectedClient.balance < estimatedCost)}
                                                 className="bg-slate-900 hover:bg-slate-900 text-white font-semibold h-10 px-6 shrink-0"
                                             >
-                                                {submittingFocus ? 'Booking...' : 'Book Time'}
+                                                {submittingFocus ? __('admin.client_tasks_booking') : __('admin.client_tasks_book_time')}
                                             </Button>
                                         </div>
                                     </form>
@@ -487,7 +506,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                             <CheckCircle2 className="h-12 w-12 text-slate-300 mb-4" />
                                             <h3 className="font-semibold text-slate-700 text-sm">{__('general.the_queue_is_empty')}</h3>
                                             <p className="text-xs text-slate-400 max-w-xs mt-1 mb-4">{__('general.create_the_first_task_for_this_client_to_get_started')}</p>
-                                            <Link 
+                                            <Link
                                                 href={`/admin/projects?client_id=${selectedClient.id}`}
                                                 className="inline-flex items-center justify-center px-4 h-9 rounded-lg bg-slate-900 hover:bg-slate-900 text-white text-xs font-semibold"
                                             >
@@ -511,7 +530,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                             ) : (
                                                                 <>
                                                                     <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 text-[10px] font-bold px-1.5 py-0.5">
-                                                                        📌 {todo.task_name}
+                                                                        <Pin className="h-2.5 w-2.5 me-0.5 inline" aria-hidden="true" />{todo.task_name}
                                                                     </Badge>
                                                                     <Badge className="bg-green-100 text-slate-900 border border-green-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-green-100">
                                                                         {__('general.paid')}</Badge>
@@ -540,7 +559,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                                 {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
                                                             </span>
                                                         </div>
-                                                        
+
                                                         {todo.description && (
                                                             <p className="text-xs text-slate-500 leading-relaxed max-w-xl">
                                                                 {todo.description}
@@ -552,7 +571,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                                 <span className="flex items-center gap-1">
                                                                     <Calendar className="h-3.5 w-3.5" />
                                                                     {todo.start_at ? new Date(todo.start_at).toLocaleString() : '—'}
-                                                                    {' → '}
+                                                                    <ArrowRight className="h-3 w-3 rtl:rotate-180" aria-hidden="true" />
                                                                     {todo.end_at ? new Date(todo.end_at).toLocaleString() : '—'}
                                                                 </span>
                                                             )}
@@ -572,7 +591,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                                 className={`font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border shadow-sm mt-1 ${todo.completed ? 'bg-green-50 text-slate-900 hover:bg-green-100 border-green-200' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'}`}
                                                             >
                                                                 <CheckCircle2 className="h-3.5 w-3.5" />
-                                                                {todo.completed ? 'Completed' : 'Mark Complete'}
+                                                                {todo.completed ? __('admin.client_tasks_completed') : __('admin.client_tasks_mark_complete')}
                                                             </Button>
                                                         )}
                                                         {todo.is_paid && !todo.refunded && todo.show_refund && (
@@ -582,7 +601,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                                                 className="bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border shadow-sm mt-1"
                                                             >
                                                                 <RotateCcw className="h-3.5 w-3.5" />
-                                                                {refundingId === todo.id ? 'Refunding...' : 'Refund'}
+                                                                {refundingId === todo.id ? __('admin.client_tasks_refunding') : __('admin.client_tasks_refund')}
                                                             </Button>
                                                         )}
                                                         {!todo.is_paid && (
@@ -616,7 +635,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                     <ShieldCheck className="h-5 w-5 text-slate-700" />
                                     <div>
                                         <h3 className="font-bold text-[10px] uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mb-1">{__('general.admin_view')}</h3>
-                                        <h2 className="font-bold text-sm text-slate-800 leading-none">Managing Tasks for: {selectedClient.name}</h2>
+                                        <h2 className="font-bold text-sm text-slate-800 leading-none">{__('admin.client_tasks_managing_for', { name: selectedClient.name })}</h2>
                                     </div>
                                 </div>
                                 <CardContent className="p-5 space-y-4">
@@ -642,7 +661,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                                     </div>
 
                                     <div className="pt-4 flex flex-col gap-2">
-                                        <Link 
+                                        <Link
                                             href={`/admin/projects?client_id=${selectedClient.id}`}
                                             className="inline-flex items-center justify-center w-full h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors text-xs font-semibold text-slate-700 uppercase"
                                         >
@@ -654,6 +673,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters, p
                     </div>
                 )}
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

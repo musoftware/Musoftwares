@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Eye, Trash2, MessageCircle } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 interface Props {
     tickets: {
@@ -28,6 +30,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default function Index({ tickets, filters, statuses }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || '');
+    const { confirm, confirmDialog } = useConfirm();
 
     const applyFilters = (next?: { search?: string; status?: string }) => {
         const q = {
@@ -37,8 +40,14 @@ export default function Index({ tickets, filters, statuses }: Props) {
         router.get(route('admin.guest-tickets.index'), q, { preserveState: true, replace: true });
     };
 
-    const onDelete = (id: number) => {
-        if (! confirm(__('general.are_you_sure') || 'Are you sure?')) return;
+    const onDelete = async (id: number) => {
+        const accepted = await confirm({
+            title: __('admin.guest_tickets_delete_title'),
+            description: __('admin.guest_tickets_delete_body'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         router.delete(route('admin.guest-tickets.destroy', id));
     };
 
@@ -54,7 +63,7 @@ export default function Index({ tickets, filters, statuses }: Props) {
                         <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder={__('general.search_by_name_email_subject') || 'Search...'}
+                            placeholder={__('general.search_by_name_email_subject')}
                             className="max-w-sm"
                         />
                         <Select value={status || 'all'} onValueChange={(v) => { const nv = v === 'all' ? '' : (v ?? ''); setStatus(nv); applyFilters({ status: nv }); }}>
@@ -68,7 +77,7 @@ export default function Index({ tickets, filters, statuses }: Props) {
                                 ))}
                             </SelectContent>
                         </Select>
-                        <Button type="submit" variant="outline">{__('general.search') || 'Search'}</Button>
+                        <Button type="submit" variant="outline">{__('general.search')}</Button>
                     </form>
                 </div>
                 <Table>
@@ -109,13 +118,13 @@ export default function Index({ tickets, filters, statuses }: Props) {
                                         <div className="flex items-center justify-end gap-1">
                                             {ticket.mobile && (
                                                 <a href={`https://wa.me/${String(ticket.mobile).replace(/\D/g, '')}`} target="_blank" rel="noreferrer">
-                                                    <Button variant="ghost" size="sm" aria-label="WhatsApp">
+                                                    <Button variant="ghost" size="sm" aria-label={__('admin.guest_tickets_whatsapp')} title={__('admin.guest_tickets_whatsapp')}>
                                                         <MessageCircle className="w-4 h-4 text-[#25D366]" />
                                                     </Button>
                                                 </a>
                                             )}
                                             <Link href={route('admin.guest-tickets.show', ticket.id)}>
-                                                <Button variant="ghost" size="sm" aria-label={__('general.view') || 'View'}>
+                                                <Button variant="ghost" size="sm" aria-label={__('general.view')}>
                                                     <Eye className="w-4 h-4" />
                                                 </Button>
                                             </Link>
@@ -123,7 +132,7 @@ export default function Index({ tickets, filters, statuses }: Props) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => onDelete(ticket.id)}
-                                                aria-label={__('general.delete') || 'Delete'}
+                                                aria-label={__('general.delete')}
                                             >
                                                 <Trash2 className="w-4 h-4 text-rose-600" />
                                             </Button>
@@ -135,19 +144,12 @@ export default function Index({ tickets, filters, statuses }: Props) {
                     </TableBody>
                 </Table>
                 {tickets.last_page > 1 && (
-                    <nav className="flex items-center justify-center gap-2 p-4 border-t border-slate-100" aria-label="Pagination">
-                        {tickets.links?.map((l: any, i: number) => (
-                            <Link
-                                key={i}
-                                href={l.url ?? '#'}
-                                preserveState
-                                className={`px-3 py-1 rounded text-sm ${l.active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-                                dangerouslySetInnerHTML={{ __html: l.label }}
-                            />
-                        ))}
-                    </nav>
+                    <div className="border-t border-slate-100 px-4 pb-4">
+                        <Pagination links={tickets.links ?? []} />
+                    </div>
                 )}
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

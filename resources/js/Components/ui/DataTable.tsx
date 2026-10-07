@@ -1,3 +1,4 @@
+import { toPlainLabel } from '@/Components/Pagination';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -137,7 +138,7 @@ export function DataTable({
                                     </PopoverTrigger>
                                     <PopoverContent align="end" className="w-[280px]">
                                         <div className="space-y-4">
-                                            <h4 className="font-medium text-sm text-slate-900 dark:text-zinc-100">{__('general.filters') || 'Filters'}</h4>
+                                            <h4 className="font-medium text-sm text-slate-900 dark:text-zinc-100">{__('general.filters')}</h4>
                                             <div className="flex flex-col gap-3 [&_select]:w-full [&_.flex]:flex-col [&_.flex]:items-start [&_.flex]:w-full">
                                                 {filters.extra}
                                             </div>
@@ -245,7 +246,7 @@ export function DataTable({
                     </div>
 
                     <div className="flex-1 text-center text-slate-400 text-xs">
-                        {pagination.from || 0}–{pagination.to || 0} of{' '}
+                        {pagination.from || 0}–{pagination.to || 0} {__('general.of')}{' '}
                         <span className="font-medium text-slate-700">{pagination.total}</span>
                     </div>
 
@@ -263,14 +264,16 @@ export function DataTable({
                                                     ? 'bg-slate-900 dark:bg-white font-medium text-white dark:text-slate-900 shadow-sm'
                                                     : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-zinc-100'
                                             )}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                        >
+                                            {toPlainLabel(link.label, idx, pagination.links.length)}
+                                        </Link>
                                     ) : (
                                         <span
                                             key={idx}
                                             className="rounded-md px-2.5 py-1 text-[12px] text-slate-300 dark:text-zinc-600 cursor-not-allowed min-w-[28px] text-center"
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                        >
+                                            {toPlainLabel(link.label, idx, pagination.links.length)}
+                                        </span>
                                     )
                                 ))}
                             </div>

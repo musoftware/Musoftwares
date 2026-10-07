@@ -94,27 +94,27 @@ export default function Appointments({ bookings, providers, filters }: any) {
             completed: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
             cancelled: 'bg-slate-100 text-slate-800 hover:bg-slate-100',
         };
-        return <Badge className={`font-medium ${variants[status] || 'bg-slate-100'}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
+        return <Badge className={`font-medium ${variants[status] || 'bg-slate-100'}`}>{variants[status] ? __(`booking.status_${status}`) : status}</Badge>;
     };
 
     const getPaymentBadge = (status: string, method?: string) => {
         if (status === 'free') return <Badge variant="outline" className="text-slate-500">{__('general.free')}</Badge>;
         if (status === 'pending') return <Badge variant="outline" className="text-amber-600 border-amber-200">{__('general.payment_pending')}</Badge>;
-        if (status === 'paid') return <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">Paid via {method}</Badge>;
+        if (status === 'paid') return <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">{__('booking.paid_via', { method: method ?? '' })}</Badge>;
         return null;
     };
 
     return (
         <WorkspaceLayout
             title={__('general.appointments')}
-            workspaceName="Booking Settings"
+            workspaceName={__('booking.settings_workspace')}
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
-                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: true },
-                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
-                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
-                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
+                { id: 'dashboard', label: __('general.dashboard'), icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: __('booking.nav_appointments'), icon: Clock, href: '/booking/appointments', isActive: true },
+                { id: 'events', label: __('booking.nav_event_types'), icon: Calendar, href: '/booking/events', isActive: false },
+                { id: 'providers', label: __('booking.nav_providers'), icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: __('booking.nav_exceptions'), icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title={__('general.appointments')} />
@@ -128,6 +128,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                     
                     <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <select
+                            aria-label={__('general.all_providers')}
                             className="w-full sm:w-48 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             value={providerId}
                             onChange={(e) => setProviderId(e.target.value)}
@@ -141,7 +142,8 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         <div className="relative w-full sm:w-64">
                             <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input 
-                                placeholder={__('general.search_guest_name_or_email')} 
+                                aria-label={__('general.search_guest_name_or_email')}
+                                placeholder={__('general.search_guest_name_or_email')}
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
                                 className="ps-9 bg-white"
@@ -169,7 +171,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         title={__('general.no_appointments_yet')}
                         description={__('general.share_your_booking_links_to_start_receiving_appointments_from_clients')}
                         action={{
-                            label: "View Event Types",
+                            label: __('booking.view_event_types'),
                             href: route('booking.index')
                         }}
                     />
@@ -177,8 +179,6 @@ export default function Appointments({ bookings, providers, filters }: any) {
                     <SimpleCalendar 
                         bookings={bookings.data}
                         onBookingClick={(booking: any) => {
-                            // You could open a detailed modal here, for now we just log or we can open notes
-                            console.log('Clicked booking', booking);
                             openNotesModal(booking);
                         }}
                     />
@@ -216,20 +216,20 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                                 {booking.provider && (
                                                     <div className="flex items-center text-sm text-slate-500 mb-2">
                                                         <Users className="h-4 w-4 me-2 text-slate-400" />
-                                                        Provider: <span className="font-medium ms-1 text-slate-700">{booking.provider.name}</span>
+                                                        {__('booking.provider_label')} <span className="font-medium ms-1 text-slate-700">{booking.provider.name}</span>
                                                     </div>
                                                 )}
                                                 
                                                 {booking.notes && (
                                                     <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-600 border border-slate-100 mt-2">
-                                                        <span className="font-medium block text-slate-700 mb-1">Guest Notes:</span>
+                                                        <span className="font-medium block text-slate-700 mb-1">{__('booking.guest_notes')}</span>
                                                         {booking.notes}
                                                     </div>
                                                 )}
                                                 
                                                 {booking.internal_notes && (
                                                     <div className="bg-amber-50 rounded-lg p-3 text-sm text-amber-800 border border-amber-100 mt-2">
-                                                        <span className="font-medium block mb-1">Internal Notes:</span>
+                                                        <span className="font-medium block mb-1">{__('booking.internal_notes')}</span>
                                                         {booking.internal_notes}
                                                     </div>
                                                 )}
@@ -237,7 +237,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                             
                                             <div className="flex flex-col items-end gap-2 text-sm text-slate-500">
                                                 <div className="flex items-center">
-                                                    <Clock className="h-4 w-4 me-1.5" /> {booking.eventType.duration_minutes}m
+                                                    <Clock className="h-4 w-4 me-1.5" /> {__('booking.minutes_count', { count: booking.eventType.duration_minutes })}
                                                 </div>
                                                 {booking.price && (
                                                     <div className="flex items-center">
@@ -251,7 +251,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                                     {/* Right Actions */}
                                     <div className="p-4 md:p-6 bg-white border-t md:border-t-0 md:border-s border-slate-100 flex md:flex-col items-center justify-end gap-2 md:w-16">
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8">
+                                            <DropdownMenuTrigger aria-label={__('general.manage_appointment')} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8">
                                                 <MoreVertical className="h-4 w-4 text-slate-500" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-56">
@@ -306,6 +306,7 @@ export default function Appointments({ bookings, providers, filters }: any) {
                         <Textarea 
                             value={notesData.internal_notes}
                             onChange={e => setNotesData('internal_notes', e.target.value)}
+                            aria-label={__('general.internal_notes_1')}
                             placeholder={__('general.add_your_notes_here')}
                             rows={5}
                         />

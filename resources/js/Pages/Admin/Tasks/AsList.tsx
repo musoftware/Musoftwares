@@ -20,6 +20,8 @@ import {
     ChevronLeft,
     ChevronRight as ChevronRightIcon,
     Edit,
+    Pin,
+    ArrowRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
@@ -148,7 +150,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const SORT_LABEL: Record<string, string> = {
-    created_desc: 'Newest first',
+    created_desc: 'general.newest_first',
     created_asc:  'general.oldest_first',
     priority:     'general.highest_priority',
     due_asc:      'general.soonest_due',
@@ -223,7 +225,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
         } catch (err: any) {
             setBanner({
                 type: 'error',
-                text: err?.response?.data?.message || 'Failed to update todo details.',
+                text: err?.response?.data?.message || __('admin.as_list_update_failed'),
             });
         } finally {
             setIsSaving(false);
@@ -455,7 +457,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                         className="h-9 w-[150px] text-xs"
                                         aria-label={__('general.from')}
                                     />
-                                    <span className="text-xs text-slate-400">→</span>
+                                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 rtl:rotate-180" aria-hidden="true" />
                                     <Input
                                         type="date"
                                         value={dateTo}
@@ -547,7 +549,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                             <p className="text-xs text-slate-400 max-w-xs mt-1">
                                 {isAnyFilterActive
                                     ? __('general.no_items_match_filters')
-                                    : 'All checklist items have been completed or are paused across all platform clients.'}
+                                    : __('admin.as_list_all_done')}
                             </p>
                             {isAnyFilterActive && (
                                 <Button variant="outline" size="sm" className="mt-4 text-xs" onClick={handleClear}>
@@ -602,20 +604,20 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
             <Dialog open={editingTodo !== null} onOpenChange={(open) => !open && setEditingTodo(null)}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>{__('general.edit_todo') || 'Edit Todo'}</DialogTitle>
+                        <DialogTitle>{__('general.edit_todo')}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit-title">{__('general.title') || 'Title'}</Label>
+                            <Label htmlFor="edit-title">{__('general.title')}</Label>
                             <Input
                                 id="edit-title"
                                 value={editForm.title}
                                 onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
                             />
                         </div>
-                        
+
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit-desc">{__('general.description') || 'Description'}</Label>
+                            <Label htmlFor="edit-desc">{__('general.description')}</Label>
                             <Textarea
                                 id="edit-desc"
                                 value={editForm.description}
@@ -626,27 +628,27 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <Label htmlFor="edit-priority">{__('general.priority') || 'Priority'}</Label>
+                                <Label htmlFor="edit-priority">{__('general.priority')}</Label>
                                 <SimpleSelect
                                     value={editForm.priority}
                                     onChange={(val: any) => setEditForm({ ...editForm, priority: val })}
                                     options={[
-                                        { value: 'low', label: __('general.low') || 'Low' },
-                                        { value: 'normal', label: __('general.normal') || 'Normal' },
-                                        { value: 'high', label: __('general.high') || 'High' },
-                                        { value: 'urgent', label: __('general.urgent') || 'Urgent' },
+                                        { value: 'low', label: __('general.low') },
+                                        { value: 'normal', label: __('general.normal') },
+                                        { value: 'high', label: __('general.high') },
+                                        { value: 'urgent', label: __('general.urgent') },
                                     ]}
                                 />
                             </div>
-                            
+
                             <div className="space-y-1.5">
-                                <Label htmlFor="edit-paused">{__('general.status') || 'Status'}</Label>
+                                <Label htmlFor="edit-paused">{__('general.status')}</Label>
                                 <SimpleSelect
                                     value={editForm.paused ? 'paused' : 'active'}
                                     onChange={(val) => setEditForm({ ...editForm, paused: val === 'paused' })}
                                     options={[
-                                        { value: 'active', label: __('general.active') || 'Active' },
-                                        { value: 'paused', label: __('general.paused') || 'Paused' },
+                                        { value: 'active', label: __('general.active') },
+                                        { value: 'paused', label: __('general.paused') },
                                     ]}
                                 />
                             </div>
@@ -654,7 +656,7 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <Label htmlFor="edit-start">{__('general.start_date') || 'Start Date'}</Label>
+                                <Label htmlFor="edit-start">{__('general.start_date')}</Label>
                                 <Input
                                     id="edit-start"
                                     type="date"
@@ -662,9 +664,9 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                                     onChange={(e) => setEditForm({ ...editForm, start_at: e.target.value })}
                                 />
                             </div>
-                            
+
                             <div className="space-y-1.5">
-                                <Label htmlFor="edit-end">{__('general.end_date') || 'End Date'}</Label>
+                                <Label htmlFor="edit-end">{__('general.end_date')}</Label>
                                 <Input
                                     id="edit-end"
                                     type="date"
@@ -676,10 +678,10 @@ export default function AsList({ arrangedClients, clients, filters, pagination, 
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setEditingTodo(null)}>
-                            {__('general.cancel') || 'Cancel'}
+                            {__('general.cancel')}
                         </Button>
                         <Button onClick={handleUpdateSubmit} disabled={isSaving}>
-                            {isSaving ? __('general.saving') || 'Saving...' : __('general.save_changes') || 'Save Changes'}
+                            {isSaving ? __('general.saving') : __('general.save_changes')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -803,7 +805,7 @@ function TaskCard({
             <div className="bg-slate-50 border-b border-slate-100 px-4 py-2.5 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                     <span className="font-semibold text-sm text-slate-800 truncate">
-                        📌 {task.task_name}
+                        <Pin className="h-3.5 w-3.5 me-1 inline text-slate-400" aria-hidden="true" />{task.task_name}
                     </span>
                     <span
                         className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase whitespace-nowrap ${
@@ -948,7 +950,7 @@ function TodoRow({
                         <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             {todo.start_at ? formatDate(todo.start_at) : '—'}
-                            {' → '}
+                            <ArrowRight className="h-3 w-3 rtl:rotate-180" aria-hidden="true" />
                             {todo.end_at ? formatDate(todo.end_at) : '—'}
                         </span>
                     )}
@@ -964,11 +966,11 @@ function TodoRow({
                             variant="ghost"
                             size="sm"
                             className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
-                            title={__('general.go_to_board') || 'Go to Board'}
+                            title={__('general.go_to_board')}
                         >
                             <Link href={route('admin.projects.board', { project: todo.project_id, date: todo.in_date })}>
                                 <Briefcase className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
-                                <span className="sr-only sm:not-sr-only sm:ms-1">Board</span>
+                                <span className="sr-only sm:not-sr-only sm:ms-1">{__('general.board')}</span>
                             </Link>
                         </Button>
 
@@ -977,11 +979,11 @@ function TodoRow({
                             variant="ghost"
                             size="sm"
                             className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
-                            title={__('general.go_to_card') || 'Go to Card'}
+                            title={__('general.go_to_card')}
                         >
                             <Link href={route('admin.projects.board', { project: todo.project_id, date: todo.in_date }) + `?card_type=todo&card_id=${todo.id}`}>
                                 <ListTodo className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
-                                <span className="sr-only sm:not-sr-only sm:ms-1">Card</span>
+                                <span className="sr-only sm:not-sr-only sm:ms-1">{__('admin.as_list_card')}</span>
                             </Link>
                         </Button>
                     </>
@@ -992,10 +994,10 @@ function TodoRow({
                     size="sm"
                     className="h-8 px-2 text-xs text-slate-500 hover:text-slate-900 hover:bg-slate-100/80"
                     onClick={() => onEdit?.(todo)}
-                    title={__('general.edit') || 'Edit'}
+                    title={__('general.edit')}
                 >
                     <Edit className="h-3.5 w-3.5 text-slate-400 group-hover/row:text-slate-500" />
-                    <span className="sr-only sm:not-sr-only sm:ms-1">{__('general.edit') || 'Edit'}</span>
+                    <span className="sr-only sm:not-sr-only sm:ms-1">{__('general.edit')}</span>
                 </Button>
             </div>
         </div>

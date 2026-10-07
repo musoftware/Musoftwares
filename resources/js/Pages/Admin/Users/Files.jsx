@@ -50,10 +50,10 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: 'File uploaded successfully' });
+                toast({ title: __('admin.file_uploaded_successfully') });
             },
             onError: (errors) => {
-                toast({ title: 'Upload failed', description: errors.file || 'An error occurred', variant: 'destructive' });
+                toast({ title: __('admin.file_upload_failed'), description: errors.file || __('general.error_occurred'), variant: 'destructive' });
             },
             onFinish: () => {
                 setIsLoading(false);
@@ -70,7 +70,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: 'Folder created' });
+                toast({ title: __('admin.folder_created') });
                 setIsNewFolderOpen(false);
             },
             onFinish: () => setIsLoading(false)
@@ -86,7 +86,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: 'Item renamed successfully' });
+                toast({ title: __('admin.file_item_renamed') });
                 setRenameItem(null);
             },
             onFinish: () => setIsLoading(false)
@@ -100,7 +100,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             data: { paths: [deleteItem.path] },
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: 'Item deleted successfully' });
+                toast({ title: __('admin.file_item_deleted') });
                 setDeleteItem(null);
             },
             onFinish: () => setIsLoading(false)
@@ -139,19 +139,19 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
     };
 
     return (
-        <AdminSidebarLayout title={__('general.user_files', 'User Files')} header="User Files">
-            <Head title={`Files - ${user.name}`} />
+        <AdminSidebarLayout title={__('general.user_files')} header={__('general.user_files')}>
+            <Head title={__('admin.user_files_title', { name: user.name })} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center space-x-4">
-                        <Link href={route('admin.users.show', user.id)} className="text-gray-500 hover:text-gray-700">
-                            <ArrowLeft className="h-6 w-6" />
+                        <Link href={route('admin.users.show', user.id)} className="text-gray-500 hover:text-gray-700" aria-label={__('general.back_to_user')} title={__('general.back_to_user')}>
+                            <ArrowLeft className="h-6 w-6 rtl:rotate-180" />
                         </Link>
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">{__('general.files_gallery', 'Files Gallery')}</h2>
-                            <p className="text-sm text-gray-500">Manage files and documents for {user.name}</p>
+                            <h2 className="text-2xl font-bold text-gray-900">{__('general.files_gallery')}</h2>
+                            <p className="text-sm text-gray-500">{__('admin.user_files_description', { name: user.name })}</p>
                         </div>
                     </div>
                     
@@ -166,7 +166,8 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                             type="file" 
                             ref={fileInputRef} 
                             className="hidden" 
-                            onChange={handleFileChange} 
+                            onChange={handleFileChange}
+                            aria-label={__('general.upload')}
                         />
                     </div>
                 </div>
@@ -210,7 +211,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                         <div className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()} aria-label={__('general.open_menu')} title={__('general.open_menu')}>
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -242,7 +243,7 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                                         <div className="absolute top-2 end-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={__('general.open_menu')} title={__('general.open_menu')}>
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -283,7 +284,9 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
                 isOpen={isNewFolderOpen}
                 title={__('general.create_new_folder')}
                 label={__('general.folder_name')}
-                placeholder="e.g. Documents"
+                placeholder={__('admin.folder_name_placeholder')}
+                confirmLabel={__('general.create')}
+                cancelLabel={__('general.cancel')}
                 onConfirm={handleNewFolder}
                 onCancel={() => setIsNewFolderOpen(false)}
                 loading={isLoading}
@@ -292,9 +295,11 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             {/* Rename Modal */}
             <PromptModal
                 isOpen={!!renameItem}
-                title={`Rename ${renameItem?.type === 'folder' ? 'Folder' : 'File'}`}
+                title={renameItem?.type === 'folder' ? __('admin.rename_folder') : __('admin.rename_file')}
                 label={__('general.new_name')}
                 placeholder={renameItem?.name || ''}
+                confirmLabel={__('general.rename')}
+                cancelLabel={__('general.cancel')}
                 onConfirm={handleRename}
                 onCancel={() => setRenameItem(null)}
                 loading={isLoading}
@@ -303,10 +308,11 @@ export default function Files({ user, files = [], folders = [], breadcrumbs = []
             {/* Delete Confirmation */}
             <ConfirmModal
                 isOpen={!!deleteItem}
-                title={`Delete ${deleteItem?.type === 'folder' ? 'Folder' : 'File'}`}
-                description={`Are you sure you want to permanently delete "${deleteItem?.name}"? This action cannot be undone.`}
+                title={deleteItem?.type === 'folder' ? __('admin.delete_folder') : __('admin.delete_file')}
+                description={__('admin.file_delete_confirm', { name: deleteItem?.name ?? '' })}
                 variant="danger"
-                confirmLabel="Delete"
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
                 onConfirm={handleDelete}
                 onCancel={() => setDeleteItem(null)}
                 loading={isLoading}

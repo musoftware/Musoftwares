@@ -96,11 +96,17 @@ const recurringColors: Record<string, string> = {
     year:  'bg-slate-100 text-slate-700',
 };
 
-const recurringLabel: Record<string, string> = {
-    day:   'Daily',
-    week:  'Weekly',
-    month: 'Monthly',
-    year:  'Yearly',
+const recurringLabelKeys: Record<string, string> = {
+    day:   'admin.employee_todos_daily',
+    week:  'admin.employee_todos_weekly',
+    month: 'admin.employee_todos_monthly',
+    year:  'admin.employee_todos_yearly',
+};
+
+const priorityLabelKeys: Record<string, string> = {
+    high:   'general.priority_high',
+    medium: 'general.priority_medium',
+    low:    'general.priority_low',
 };
 
 // ─── Default form values ──────────────────────────────────────────────────────
@@ -185,17 +191,17 @@ export default function Index({ todos, filters, stats, users }: Props) {
             put(route('admin.employee-todos.update', editingId), {
                 onSuccess: () => {
                     setShowModal(false);
-                    toastSuccess(__('general.todo_updated') || 'Todo updated successfully.');
+                    toastSuccess(__('general.todo_updated'));
                 },
-                onError: () => toastError(__('general.failed_update_todo') || 'Failed to update todo.'),
+                onError: () => toastError(__('general.failed_update_todo')),
             });
         } else {
             post(route('admin.employee-todos.store'), {
                 onSuccess: () => {
                     setShowModal(false);
-                    toastSuccess(__('general.todo_created') || 'Todo created successfully.');
+                    toastSuccess(__('general.todo_created'));
                 },
-                onError: () => toastError(__('general.failed_create_todo') || 'Failed to create todo.'),
+                onError: () => toastError(__('general.failed_create_todo')),
             });
         }
     };
@@ -207,9 +213,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
         router.delete(route('admin.employee-todos.destroy', deleteId), {
             onSuccess: () => {
                 setDeleteId(null);
-                toastSuccess(__('general.todo_deleted') || 'Todo deleted.');
+                toastSuccess(__('general.todo_deleted'));
             },
-            onError: () => toastError(__('general.failed_delete') || 'Failed to delete.'),
+            onError: () => toastError(__('general.failed_delete')),
         });
     };
 
@@ -218,7 +224,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
     const columns = [
         {
             key: 'id',
-            label: 'ID',
+            label: __('admin.employee_todos_col_id'),
             className: 'w-[60px]',
             render: (t: EmployeeTodo) => (
                 <span className="text-slate-400 font-mono text-xs">#{t.id}</span>
@@ -226,7 +232,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
         },
         {
             key: 'title',
-            label: 'Title',
+            label: __('general.title'),
             sortable: true,
             render: (t: EmployeeTodo) => (
                 <div>
@@ -239,7 +245,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
         },
         {
             key: 'user',
-            label: 'Employee',
+            label: __('general.employee'),
             render: (t: EmployeeTodo) =>
                 t.user ? (
                     <div className="flex items-center gap-2">
@@ -257,21 +263,21 @@ export default function Index({ todos, filters, stats, users }: Props) {
         },
         {
             key: 'priority',
-            label: 'Priority',
+            label: __('general.priority'),
             render: (t: EmployeeTodo) => (
                 <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${priorityColors[t.priority] ?? 'bg-slate-100 text-slate-700'}`}>
-                    {t.priority}
+                    {priorityLabelKeys[t.priority] ? __(priorityLabelKeys[t.priority]) : t.priority}
                 </span>
             ),
         },
         {
             key: 'recurring',
-            label: 'Recurs',
+            label: __('admin.employee_todos_col_recurs'),
             render: (t: EmployeeTodo) => (
                 <div className="flex items-center gap-1.5">
                     <RefreshCw className="h-3.5 w-3.5 text-slate-400" />
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${recurringColors[t.recurring] ?? 'bg-slate-100 text-slate-700'}`}>
-                        {recurringLabel[t.recurring]}
+                        {recurringLabelKeys[t.recurring] ? __(recurringLabelKeys[t.recurring]) : t.recurring}
                         {t.recurring_times > 1 ? ` ×${t.recurring_times}` : ''}
                     </span>
                 </div>
@@ -279,7 +285,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
         },
         {
             key: 'transactions_count',
-            label: 'Applied',
+            label: __('admin.employee_todos_col_applied'),
             render: (t: EmployeeTodo) => (
                 <span className="inline-flex items-center gap-1 text-sm text-slate-600">
                     <Calendar className="h-3.5 w-3.5 text-slate-400" />
@@ -289,7 +295,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
         },
         {
             key: 'current_date',
-            label: 'Start Date',
+            label: __('general.start_date'),
             sortable: true,
             render: (t: EmployeeTodo) => (
                 <span className="text-sm text-slate-500 whitespace-nowrap">{t.current_date}</span>
@@ -345,9 +351,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">{__('general.all_priorities')}</SelectItem>
-                    <SelectItem value="high">{__('general.high')}</SelectItem>
-                    <SelectItem value="medium">{__('general.medium')}</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="high">{__('general.priority_high')}</SelectItem>
+                    <SelectItem value="medium">{__('general.priority_medium')}</SelectItem>
+                    <SelectItem value="low">{__('general.priority_low')}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -369,17 +375,17 @@ export default function Index({ todos, filters, stats, users }: Props) {
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <AdminSidebarLayout title={__('general.employee_todos')} header="Employee Recurring Todos">
+        <AdminSidebarLayout title={__('general.employee_todos')} header={__('admin.employee_todos_header')}>
             <Head title={__('general.employee_todos')} />
 
             {/* Stats */}
             <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {[
-                    { label: 'Total',   value: stats.total,   color: 'text-slate-800' },
-                    { label: 'Daily',   value: stats.daily,   color: 'text-slate-900' },
-                    { label: 'Weekly',  value: stats.weekly,  color: 'text-slate-900' },
-                    { label: 'Monthly', value: stats.monthly, color: 'text-slate-900' },
-                    { label: 'Yearly',  value: stats.yearly,  color: 'text-slate-600' },
+                    { label: __('admin.employee_todos_total'),   value: stats.total,   color: 'text-slate-800' },
+                    { label: __('admin.employee_todos_daily'),   value: stats.daily,   color: 'text-slate-900' },
+                    { label: __('admin.employee_todos_weekly'),  value: stats.weekly,  color: 'text-slate-900' },
+                    { label: __('admin.employee_todos_monthly'), value: stats.monthly, color: 'text-slate-900' },
+                    { label: __('admin.employee_todos_yearly'),  value: stats.yearly,  color: 'text-slate-600' },
                 ].map((s) => (
                     <div
                         key={s.label}
@@ -400,8 +406,8 @@ export default function Index({ todos, filters, stats, users }: Props) {
                     filters={{ ...filters, extra: advancedFilters }}
                     onSearch={handleSearch}
                     onSort={handleSort}
-                    emptyTitle="No recurring todos found"
-                    emptyDescription="Create a recurring todo to automatically assign tasks to employees on a schedule."
+                    emptyTitle={__('admin.employee_todos_empty_title')}
+                    emptyDescription={__('admin.employee_todos_empty_description')}
                 />
             </div>
 
@@ -409,7 +415,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
             <Dialog open={showModal} onOpenChange={setShowModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>{editingId ? 'Edit Recurring Todo' : 'New Recurring Todo'}</DialogTitle>
+                        <DialogTitle>{editingId ? __('admin.employee_todos_edit_title') : __('admin.employee_todos_new_title')}</DialogTitle>
                     </DialogHeader>
 
                     <form onSubmit={handleSubmit} className="space-y-4 mt-2">
@@ -442,7 +448,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {/* Description */}
                         <div className="space-y-1">
-                            <Label htmlFor="et-description">{__('general.description')}<span className="text-slate-400 font-normal">(optional)</span></Label>
+                            <Label htmlFor="et-description">{__('general.description')} <span className="text-slate-400 font-normal">{__('admin.employee_todos_optional')}</span></Label>
                             <Textarea
                                 id="et-description"
                                 value={data.description}
@@ -462,9 +468,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                         <SelectValue placeholder={__('general.select_priority')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="low">Low</SelectItem>
-                                        <SelectItem value="medium">{__('general.medium')}</SelectItem>
-                                        <SelectItem value="high">{__('general.high')}</SelectItem>
+                                        <SelectItem value="low">{__('general.priority_low')}</SelectItem>
+                                        <SelectItem value="medium">{__('general.priority_medium')}</SelectItem>
+                                        <SelectItem value="high">{__('general.priority_high')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.priority && <p className="text-xs text-red-500">{errors.priority}</p>}
@@ -477,7 +483,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                         <SelectValue placeholder={__('general.select_frequency')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="day">Day</SelectItem>
+                                        <SelectItem value="day">{__('admin.employee_todos_day')}</SelectItem>
                                         <SelectItem value="week">{__('general.week')}</SelectItem>
                                         <SelectItem value="month">{__('general.month')}</SelectItem>
                                         <SelectItem value="year">{__('general.year')}</SelectItem>
@@ -490,7 +496,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         {/* Interval + Start Date */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                                <Label htmlFor="et-recurring_times">Every N {data.recurring}(s)</Label>
+                                <Label htmlFor="et-recurring_times">{__('admin.employee_todos_interval_label')}</Label>
                                 <Input
                                     id="et-recurring_times"
                                     type="number"
@@ -520,7 +526,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         {/* Conditional fields */}
                         {data.recurring === 'week' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-week">{__('general.days_of_week')}<span className="text-slate-400 font-normal">(comma-separated, e.g. Monday,Wednesday)</span></Label>
+                                <Label htmlFor="et-week">{__('general.days_of_week')} <span className="text-slate-400 font-normal">{__('admin.employee_todos_week_hint')}</span></Label>
                                 <Input
                                     id="et-week"
                                     value={data.recurring_times_week}
@@ -533,7 +539,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {data.recurring === 'month' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-month">{__('general.days_of_month')}<span className="text-slate-400 font-normal">(comma-separated, e.g. 1,15)</span></Label>
+                                <Label htmlFor="et-month">{__('general.days_of_month')} <span className="text-slate-400 font-normal">{__('admin.employee_todos_month_hint')}</span></Label>
                                 <Input
                                     id="et-month"
                                     value={data.recurring_times_month}
@@ -546,7 +552,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {data.recurring === 'year' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-year">{__('general.day_month_pairs')}<span className="text-slate-400 font-normal">(comma-separated, e.g. 1-1,25-12)</span></Label>
+                                <Label htmlFor="et-year">{__('general.day_month_pairs')} <span className="text-slate-400 font-normal">{__('admin.employee_todos_year_hint')}</span></Label>
                                 <Input
                                     id="et-year"
                                     value={data.recurring_times_year}
@@ -561,7 +567,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                             <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
                                 {__('general.cancel')}</Button>
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Saving…' : editingId ? 'Save Changes' : 'Create Todo'}
+                                {processing ? __('general.saving') : editingId ? __('general.save_changes') : __('admin.employee_todos_create')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -575,8 +581,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         <DialogTitle className="flex items-center gap-2 text-red-600">
                             <AlertTriangle className="h-5 w-5" />{__('general.delete_recurring_todo')}</DialogTitle>
                     </DialogHeader>
-                    <p className="text-sm text-slate-600 mt-2">{__('general.this_will_permanently_delete_the_recurring_todo')}<strong>{__('general.and_all_its_transaction_history')}</strong>. This action cannot be undone.
-                    </p>
+                    <p className="text-sm text-slate-600 mt-2">{__('admin.employee_todos_delete_description')}</p>
                     <DialogFooter className="mt-4">
                         <Button variant="outline" onClick={() => setDeleteId(null)}>{__('general.cancel')}</Button>
                         <Button variant="destructive" onClick={handleDelete}>{__('general.delete')}</Button>

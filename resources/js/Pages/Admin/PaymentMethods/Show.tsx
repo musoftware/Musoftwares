@@ -6,6 +6,7 @@ import { useToast, toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { __ } from '@/lib/i18n';
 import {
     ArrowLeft,
+    ArrowRight,
     CheckCircle,
     XCircle,
     CreditCard,
@@ -65,11 +66,14 @@ const statusStyles: Record<string, string> = {
     declined: 'bg-red-100 text-red-700 border-red-200',
 };
 
-const statusLabel: Record<string, string> = {
-    pending:  'Pending Review',
-    active:   'Approved',
-    declined: 'Declined',
+const statusLabelKeys: Record<string, string> = {
+    pending:  'admin.payment_methods_pending_review',
+    active:   'general.approved',
+    declined: 'general.declined',
 };
+
+const statusLabel = (status: string): string =>
+    statusLabelKeys[status] ? __(statusLabelKeys[status]) : status;
 
 // ─── Detail row helper ────────────────────────────────────────────────────────
 
@@ -103,8 +107,8 @@ export default function Show({ paymentMethod }: Props) {
             { status },
             {
                 preserveScroll: true,
-                onSuccess: () => toastSuccess(__('general.payment_method_marked_as', { status: statusLabel[status] ?? status }) || `Payment method marked as ${statusLabel[status] ?? status}.`),
-                onError:   () => toastError(__('general.update_failed') || 'Update failed.'),
+                onSuccess: () => toastSuccess(__('admin.payment_methods_marked_as', { status: statusLabel(status) })),
+                onError:   () => toastError(__('general.update_failed')),
             }
         );
     };
@@ -116,8 +120,8 @@ export default function Show({ paymentMethod }: Props) {
     const isInstapay    = paymentMethod.type?.toLowerCase() === 'instapay';
 
     return (
-        <AdminSidebarLayout title={__('general.payment_method_detail')} header="Payment Method Detail">
-            <Head title={`Payment Method #${paymentMethod.id}`} />
+        <AdminSidebarLayout title={__('general.payment_method_detail')} header={__('general.payment_method_detail')}>
+            <Head title={__('admin.payment_methods_show_title', { id: paymentMethod.id })} />
 
             {/* Back */}
             <div className="mb-6">
@@ -141,7 +145,7 @@ export default function Show({ paymentMethod }: Props) {
                             </div>
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-800">
-                                    {paymentMethod.type_name ?? paymentMethod.type ?? 'Payment Method'}
+                                    {paymentMethod.type_name ?? paymentMethod.type ?? __('admin.payment_methods_fallback_name')}
                                     <span className="ms-2 text-slate-400 text-sm font-normal">#{paymentMethod.id}</span>
                                 </h2>
                                 {paymentMethod.name && (
@@ -150,7 +154,7 @@ export default function Show({ paymentMethod }: Props) {
                             </div>
                         </div>
                         <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold border ${statusStyles[paymentMethod.status] ?? 'bg-slate-100 text-slate-600 border-slate-200'}`}>
-                            {statusLabel[paymentMethod.status] ?? paymentMethod.status}
+                            {statusLabel(paymentMethod.status)}
                         </span>
                     </div>
 
@@ -206,11 +210,11 @@ export default function Show({ paymentMethod }: Props) {
                     <div className="flex items-center gap-6 text-sm text-slate-400 pt-4 border-t border-slate-100">
                         <span className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5" />
-                            Submitted {new Date(paymentMethod.created_at).toLocaleDateString()}
+                            {__('admin.payment_methods_submitted_on', { date: new Date(paymentMethod.created_at).toLocaleDateString() })}
                         </span>
                         <span className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5" />
-                            Updated {new Date(paymentMethod.updated_at).toLocaleDateString()}
+                            {__('admin.payment_methods_updated_on', { date: new Date(paymentMethod.updated_at).toLocaleDateString() })}
                         </span>
                     </div>
                 </div>
@@ -234,9 +238,10 @@ export default function Show({ paymentMethod }: Props) {
                                 </div>
                                 <Link
                                     href={route('admin.users.show', paymentMethod.user.id)}
-                                    className="mt-3 block text-center text-xs text-slate-900 hover:text-slate-900 transition-colors"
+                                    className="mt-3 flex items-center justify-center gap-1 text-xs text-slate-900 hover:text-slate-900 transition-colors"
                                 >
-                                    View User Profile →
+                                    {__('admin.payment_methods_view_user_profile')}
+                                    <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
                                 </Link>
                             </>
                         ) : (

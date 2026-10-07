@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Events\LoyaltyPointsAwarded;
+use App\Events\LoyaltyTierDowngraded;
 use App\Events\LoyaltyTierUpgraded;
+use App\Exceptions\MissingExchangeRateException;
 use App\Jobs\SendLoyaltyProgressEmailJob;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
@@ -17,7 +19,10 @@ use App\Models\LoyaltyTier;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class LoyaltyService extends BaseService
@@ -43,12 +48,7 @@ class LoyaltyService extends BaseService
             return null;
         }
 
-        $idempotencyKey = $context['idempotency_key'] ?? $this->buildIdempotencyKey($eventType, $reference);
-
-        // Guard: prevent duplicate awards for the same event instance
-        if (LoyaltyPointTransaction::where('idempotency_key', $idempotencyKey)->exists()) {
-            return null;
-        }
+        $idempotencyKey = $context['idempotency_key'] ?? $this->buildIdempotencyKey($user, $eventType, $reference);
 
         $points = $this->calculatePoints($rule, $context);
 
@@ -56,9 +56,15 @@ class LoyaltyService extends BaseService
             return null;
         }
 
-        $transaction = DB::transaction(function () use ($user, $rule, $eventType, $points, $reference, $context, $idempotencyKey) {
-            $balanceAfter = ((int) $user->loyalty_points_balance) + $points;
-            $lifetimeAfter = ((int) $user->loyalty_lifetime_points) + $points;
+        $transaction = $this->runLedgerWriteOnce(function () use ($user, $rule, $eventType, $points, $reference, $context, $idempotencyKey) {
+            $locked = User::lockForUpdate()->findOrFail($user->id);
+
+            // Checked under the user lock; the unique idempotency_key index is the final guard.
+            if (LoyaltyPointTransaction::where('idempotency_key', $idempotencyKey)->exists()) {
+                return null;
+            }
+
+            $balanceAfter = ((int) $locked->loyalty_points_balance) + $points;
 
             $txn = LoyaltyPointTransaction::create([
                 'user_id'          => $user->id,
@@ -73,19 +79,47 @@ class LoyaltyService extends BaseService
                 'metadata'         => $context,
             ]);
 
-            $user->increment('loyalty_points_balance', $points);
-            $user->increment('loyalty_lifetime_points', $points);
+            $locked->increment('loyalty_points_balance', $points);
+            $locked->increment('loyalty_lifetime_points', $points);
 
             return $txn;
-        });
+        }, ['user_id' => $user->id, 'idempotency_key' => $idempotencyKey]);
 
-        event(new LoyaltyPointsAwarded($user, $transaction));
+        if ($transaction === null) {
+            return null;
+        }
+
+        $this->dispatchAfterCommit(new LoyaltyPointsAwarded($user, $transaction));
 
         // Reload user to get fresh lifetime points for tier evaluation
         $user->refresh();
         $this->syncLoyaltyTier($user);
 
         return $transaction;
+    }
+
+    /**
+     * Run a ledger write in a transaction. A unique-key violation means the entry was already
+     * written by a concurrent or repeated call, so it is treated as "already done" (returns null).
+     */
+    private function runLedgerWriteOnce(callable $work, array $logContext = []): mixed
+    {
+        try {
+            return DB::transaction($work);
+        } catch (UniqueConstraintViolationException $e) {
+            Log::info('Loyalty ledger entry already recorded, duplicate skipped.', $logContext + ['error' => $e->getMessage()]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Fire an event only after the surrounding transaction commits (immediately when there is none),
+     * so listeners and mails never act on rolled-back points or tiers.
+     */
+    private function dispatchAfterCommit(object $event): void
+    {
+        DB::afterCommit(fn () => event($event));
     }
 
     /**
@@ -252,7 +286,7 @@ class LoyaltyService extends BaseService
      * Compare user's lifetime points against loyalty_tiers and upgrade if needed.
      * Also checks and dispatches the 75% progress threshold notification.
      */
-    public function syncLoyaltyTier(User $user): void
+    public function syncLoyaltyTier(User $user, ?string $reason = null): void
     {
         $balance = (int) ($user->loyalty_points_balance ?? 0);
         $lifetimePoints = (int) ($user->loyalty_lifetime_points ?? 0);
@@ -277,7 +311,11 @@ class LoyaltyService extends BaseService
             $user->tier = strtolower($correctTier->slug);
             $user->save();
 
-            event(new LoyaltyTierUpgraded($user, $correctTier, $previousTier));
+            if (! $previousTier || $correctTier->min_lifetime_points > $previousTier->min_lifetime_points) {
+                $this->dispatchAfterCommit(new LoyaltyTierUpgraded($user, $correctTier, $previousTier));
+            } elseif ($correctTier->min_lifetime_points < $previousTier->min_lifetime_points) {
+                $this->dispatchAfterCommit(new LoyaltyTierDowngraded($user, $correctTier, $previousTier, $reason));
+            }
         } elseif ($user->tier !== strtolower($correctTier->slug)) {
             $user->tier = strtolower($correctTier->slug);
             $user->saveQuietly();
@@ -332,34 +370,47 @@ class LoyaltyService extends BaseService
             throw new InvalidArgumentException('This reward is currently inactive.');
         }
 
-        if ((int) $user->loyalty_points_balance < (int) $reward->points_cost) {
-            throw new InvalidArgumentException('Insufficient loyalty points balance.');
-        }
+        $cost = (int) $reward->points_cost;
 
-        return DB::transaction(function () use ($user, $reward, $appliedModel) {
-            $user->decrement('loyalty_points_balance', $reward->points_cost);
+        $redemption = DB::transaction(function () use ($user, $reward, $appliedModel, $cost) {
+            // Balance is read from the locked row, so two parallel redeems cannot both pass the check.
+            $locked = User::lockForUpdate()->findOrFail($user->id);
+            $balanceAfter = (int) $locked->loyalty_points_balance - $cost;
 
-            LoyaltyPointTransaction::create([
-                'user_id'         => $user->id,
-                'event_type'      => 'reward_redemption',
-                'points'          => -((int) $reward->points_cost),
-                'balance_after'   => (int) $user->loyalty_points_balance,
-                'source_channel'  => 'web_portal',
-                'idempotency_key' => 'redemption:' . $user->id . ':' . $reward->id . ':' . time(),
-                'reference_type'  => get_class($reward),
-                'reference_id'    => $reward->id,
-            ]);
+            if ($balanceAfter < 0) {
+                throw new InvalidArgumentException('Insufficient loyalty points balance.');
+            }
 
-            return LoyaltyRedemption::create([
+            $redemption = LoyaltyRedemption::create([
                 'user_id'           => $user->id,
                 'loyalty_reward_id' => $reward->id,
-                'points_spent'      => $reward->points_cost,
+                'points_spent'      => $cost,
                 'status'            => 'completed',
                 'applied_to_type'   => $appliedModel ? get_class($appliedModel) : null,
                 'applied_to_id'     => $appliedModel ? $appliedModel->id : null,
                 'applied_at'        => now(),
             ]);
+
+            LoyaltyPointTransaction::create([
+                'user_id'         => $user->id,
+                'event_type'      => 'reward_redemption',
+                'points'          => -$cost,
+                'balance_after'   => $balanceAfter,
+                'source_channel'  => 'web_portal',
+                'idempotency_key' => 'redemption:' . $redemption->id,
+                'reference_type'  => get_class($reward),
+                'reference_id'    => $reward->id,
+            ]);
+
+            $locked->loyalty_points_balance = $balanceAfter;
+            $locked->save();
+
+            return $redemption;
         });
+
+        $user->refresh();
+
+        return $redemption;
     }
 
     /**
@@ -441,47 +492,58 @@ class LoyaltyService extends BaseService
     /**
      * Manually adjust a user's points (admin override / courtesy grace points).
      * Creates a fully transparent ledger transaction with the admin's mandatory reason.
+     * $idempotencyKey should identify the admin action (e.g. its legacy PointTransaction id) so a retry
+     * cannot apply it twice; a repeated key throws UniqueConstraintViolationException.
+     * A deduction larger than the balance is clamped to zero; the ledger records the delta actually applied.
      */
-    public function adjustPointsManually(User $user, int $points, string $reason, ?User $admin = null): LoyaltyPointTransaction
+    public function adjustPointsManually(User $user, int $points, string $reason, ?User $admin = null, ?string $idempotencyKey = null): LoyaltyPointTransaction
     {
         if ($points === 0) {
             throw new InvalidArgumentException('Points adjustment cannot be zero.');
         }
 
-        return DB::transaction(function () use ($user, $points, $reason, $admin) {
-            $newBalance = max(0, ((int) $user->loyalty_points_balance) + $points);
-            $newLifetime = $points > 0 ? ((int) $user->loyalty_lifetime_points) + $points : (int) $user->loyalty_lifetime_points;
+        $idempotencyKey ??= 'manual_adj:' . $user->id . ':' . Str::uuid();
+
+        $txn = DB::transaction(function () use ($user, $points, $reason, $admin, $idempotencyKey) {
+            $locked = User::lockForUpdate()->findOrFail($user->id);
+            $prevBalance = (int) $locked->loyalty_points_balance;
+            $newBalance = max(0, $prevBalance + $points);
 
             $txn = LoyaltyPointTransaction::create([
                 'user_id'          => $user->id,
                 'loyalty_rule_id'  => null,
                 'event_type'       => $points > 0 ? 'admin_manual_grant' : 'admin_manual_deduction',
-                'points'           => $points,
+                'points'           => $newBalance - $prevBalance,
                 'balance_after'    => $newBalance,
                 'source_channel'   => 'admin',
-                'idempotency_key'  => 'manual_adj:' . $user->id . ':' . uniqid() . ':' . time(),
+                'idempotency_key'  => $idempotencyKey,
                 'reference_type'   => $admin ? get_class($admin) : null,
                 'reference_id'     => $admin ? $admin->id : null,
                 'metadata'         => [
-                    'reason'       => $reason,
-                    'admin_name'   => $admin?->name ?? 'Administrator',
-                    'admin_id'     => $admin?->id,
-                    'adjusted_at'  => now()->toISOString(),
+                    'reason'           => $reason,
+                    'requested_points' => $points,
+                    'admin_name'       => $admin?->name ?? 'Administrator',
+                    'admin_id'         => $admin?->id,
+                    'adjusted_at'      => now()->toISOString(),
                 ],
             ]);
 
-            $user->loyalty_points_balance = $newBalance;
+            $locked->loyalty_points_balance = $newBalance;
             if ($points > 0) {
-                $user->loyalty_lifetime_points = $newLifetime;
+                $locked->loyalty_lifetime_points = (int) $locked->loyalty_lifetime_points + $points;
             }
-            $user->save();
+            $locked->save();
 
             if ($points > 0) {
-                $this->syncLoyaltyTier($user);
+                $this->syncLoyaltyTier($locked);
             }
 
             return $txn;
         });
+
+        $user->refresh();
+
+        return $txn;
     }
 
     /**
@@ -544,6 +606,11 @@ class LoyaltyService extends BaseService
                 return "Admin Correction: {$reason}";
             case 'points_quarterly_expired':
                 return 'Quarterly Points Expiration & Periodic Reset';
+            case 'invoice_overdue_penalty':
+                $invId = $txn->reference_id ?? $meta['invoice_id'] ?? '';
+                $days = $meta['days_overdue'] ?? null;
+                $suffix = $days ? " ({$days}d overdue)" : '';
+                return $invId ? "Overdue Done Invoice Penalty #{$invId}{$suffix}" : "Overdue Done Invoice Penalty{$suffix}";
             default:
                 return ucwords(str_replace('_', ' ', $txn->event_type));
         }
@@ -652,39 +719,227 @@ class LoyaltyService extends BaseService
     {
         $quarterLabel = $quarterLabel ?? ('Q' . Carbon::now('Africa/Cairo')->quarter . ' ' . Carbon::now('Africa/Cairo')->year);
 
-        $users = User::where('loyalty_points_balance', '>', 0)->get();
+        $userIds = User::where('loyalty_points_balance', '>', 0)->pluck('id');
         $expiredCount = 0;
 
-        foreach ($users as $user) {
-            $unspent = (int) $user->loyalty_points_balance;
-            if ($unspent <= 0) {
-                continue;
-            }
+        foreach ($userIds as $userId) {
+            $idempotencyKey = "expiry:{$userId}:{$quarterLabel}";
+            $expired = $this->runLedgerWriteOnce(
+                fn () => $this->expireUserBalance($userId, $quarterLabel, $idempotencyKey),
+                ['user_id' => $userId, 'idempotency_key' => $idempotencyKey]
+            );
 
-            DB::transaction(function () use ($user, $unspent, $quarterLabel) {
-                LoyaltyPointTransaction::create([
-                    'user_id'         => $user->id,
-                    'event_type'      => 'points_quarterly_expired',
-                    'points'          => -$unspent,
-                    'balance_after'   => 0,
-                    'source_channel'  => 'system',
-                    'idempotency_key' => "expiry:{$user->id}:{$quarterLabel}:" . time(),
-                    'metadata'        => [
-                        'reason'       => "Quarterly points expiration for {$quarterLabel}",
-                        'points_lost'  => $unspent,
-                        'quarter_name' => $quarterLabel,
-                        'expired_at'   => now()->toISOString(),
-                    ],
-                ]);
-
-                $user->loyalty_points_balance = 0;
-                $user->saveQuietly();
-            });
-
-            $expiredCount++;
+            $expiredCount += $expired ? 1 : 0;
         }
 
         return $expiredCount;
+    }
+
+    /**
+     * Zero one user's spendable balance from the locked row. Returns false when nothing was expired.
+     * The key has no timestamp, so re-running the command in the same quarter cannot expire twice.
+     */
+    private function expireUserBalance(int $userId, string $quarterLabel, string $idempotencyKey): bool
+    {
+        $user = User::lockForUpdate()->findOrFail($userId);
+        $unspent = (int) $user->loyalty_points_balance;
+
+        if ($unspent <= 0 || LoyaltyPointTransaction::where('idempotency_key', $idempotencyKey)->exists()) {
+            return false;
+        }
+
+        LoyaltyPointTransaction::create([
+            'user_id'         => $user->id,
+            'event_type'      => 'points_quarterly_expired',
+            'points'          => -$unspent,
+            'balance_after'   => 0,
+            'source_channel'  => 'system',
+            'idempotency_key' => $idempotencyKey,
+            'metadata'        => [
+                'reason'       => "Quarterly points expiration for {$quarterLabel}",
+                'points_lost'  => $unspent,
+                'quarter_name' => $quarterLabel,
+                'expired_at'   => now()->toISOString(),
+            ],
+        ]);
+
+        $user->loyalty_points_balance = 0;
+        $user->saveQuietly();
+
+        return true;
+    }
+
+    /**
+     * Deduct loyalty points daily for overdue unpaid invoices marked as done (job_status = 'done').
+     * Rate: 1 point per 100 EGP per day (or as configured in LoyaltyRule).
+     * Deducts from both available balance and lifetime points (can cause tier demotion).
+     * Idempotency is enforced per invoice per day in Cairo timezone.
+     *
+     * @return array{processed_count: int, penalized_invoices: int, total_points_deducted: int, dry_run: bool}
+     */
+    public function deductOverdueInvoicePenalties(bool $dryRun = false, ?Carbon $asOfDate = null): array
+    {
+        $cairoNow = ($asOfDate ?? Carbon::now('Africa/Cairo'))->copy()->setTimezone('Africa/Cairo');
+        $today = $cairoNow->copy()->startOfDay();
+        $todayStr = $today->toDateString();
+
+        $rule = LoyaltyRule::forEvent('invoice_overdue_penalty');
+        if ($rule && ! $rule->is_active) {
+            return [
+                'processed_count'       => 0,
+                'penalized_invoices'    => 0,
+                'total_points_deducted' => 0,
+                'dry_run'               => $dryRun,
+                'status'                => 'rule_inactive',
+            ];
+        }
+
+        $conditions = $rule?->conditions_payload ?? [];
+        $egpPerPoint = (float) ($conditions['egp_per_point'] ?? 100.0);
+        if ($egpPerPoint <= 0) {
+            $egpPerPoint = 100.0;
+        }
+        $minPoints = (int) ($conditions['min_points_per_day'] ?? 1);
+        $affectLifetime = (bool) ($conditions['affect_lifetime_points'] ?? true);
+
+        $egpCurrency = Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency?->id;
+
+        $invoices = Invoice::with(['user'])
+            ->where('job_status', 'done')
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->whereNull('deleted_at')
+            ->whereNotNull('user_id')
+            ->get();
+
+        $processedCount = 0;
+        $penalizedInvoices = 0;
+        $totalPointsDeducted = 0;
+
+        foreach ($invoices as $invoice) {
+            $user = $invoice->user;
+            if ($user === null) {
+                continue;
+            }
+
+            $dueDate = Carbon::parse($invoice->due_date ?? $invoice->created_at, 'Africa/Cairo')->startOfDay();
+
+            if (! $today->greaterThan($dueDate)) {
+                continue;
+            }
+
+            $daysOverdue = max(1, (int) $dueDate->diffInDays($today));
+
+            $idempotencyKey = "invoice_overdue_penalty:{$invoice->id}:{$todayStr}";
+            if (LoyaltyPointTransaction::where('idempotency_key', $idempotencyKey)->exists()) {
+                continue;
+            }
+
+            $unpaidAmount = (float) ($invoice->unpaid > 0 ? $invoice->unpaid : $invoice->total());
+            if ($unpaidAmount <= 0) {
+                continue;
+            }
+
+            $unpaidEgp = $this->unpaidAmountInEgp($invoice, $unpaidAmount, $egpCurrencyId);
+            if ($unpaidEgp === null) {
+                continue;
+            }
+
+            $penaltyPoints = max($minPoints, (int) round($unpaidEgp / $egpPerPoint));
+            $processedCount++;
+
+            if ($dryRun) {
+                $penalizedInvoices++;
+                $totalPointsDeducted += $penaltyPoints;
+                continue;
+            }
+
+            DB::transaction(function () use (
+                $user,
+                $invoice,
+                $rule,
+                $penaltyPoints,
+                $affectLifetime,
+                $idempotencyKey,
+                $daysOverdue,
+                $unpaidAmount,
+                $unpaidEgp,
+                $egpPerPoint,
+                $todayStr
+            ) {
+                $user = User::lockForUpdate()->findOrFail($user->id);
+                $prevBalance = (int) ($user->loyalty_points_balance ?? 0);
+                $prevLifetime = (int) ($user->loyalty_lifetime_points ?? 0);
+
+                $newBalance = max(0, $prevBalance - $penaltyPoints);
+                $newLifetime = $affectLifetime ? max(0, $prevLifetime - $penaltyPoints) : $prevLifetime;
+
+                LoyaltyPointTransaction::create([
+                    'user_id'          => $user->id,
+                    'loyalty_rule_id'  => $rule?->id,
+                    'event_type'       => 'invoice_overdue_penalty',
+                    'points'           => -$penaltyPoints,
+                    'balance_after'    => $newBalance,
+                    'source_channel'   => 'system',
+                    'idempotency_key'  => $idempotencyKey,
+                    'reference_type'   => Invoice::class,
+                    'reference_id'     => $invoice->id,
+                    'metadata'         => [
+                        'invoice_id'     => $invoice->id,
+                        'days_overdue'   => $daysOverdue,
+                        'unpaid_amount'  => $unpaidAmount,
+                        'unpaid_egp'     => round($unpaidEgp, 2),
+                        'rate'           => "1 pt / {$egpPerPoint} EGP",
+                        'penalty_points' => $penaltyPoints,
+                        'cairo_date'     => $todayStr,
+                        'prev_balance'   => $prevBalance,
+                        'prev_lifetime'  => $prevLifetime,
+                        'balance_after'  => $newBalance,
+                        'lifetime_after' => $newLifetime,
+                    ],
+                ]);
+
+                $user->loyalty_points_balance = $newBalance;
+                $user->loyalty_lifetime_points = $newLifetime;
+                $user->save();
+
+                $this->syncLoyaltyTier($user, "Delayed settlement of finished Invoice #{$invoice->id}");
+            });
+
+            $penalizedInvoices++;
+            $totalPointsDeducted += $penaltyPoints;
+        }
+
+        return [
+            'processed_count'       => $processedCount,
+            'penalized_invoices'    => $penalizedInvoices,
+            'total_points_deducted' => $totalPointsDeducted,
+            'dry_run'               => $dryRun,
+        ];
+    }
+
+    /**
+     * Unpaid amount in EGP for the overdue penalty. Returns null (and logs) when the invoice's
+     * currency has no rate, so one bad currency pair skips that invoice instead of stopping the run.
+     */
+    private function unpaidAmountInEgp(Invoice $invoice, float $unpaidAmount, ?int $egpCurrencyId): ?float
+    {
+        $invCurrencyId = $invoice->currency_id ?? $invoice->currency;
+        if (! $egpCurrencyId || ! $invCurrencyId || (int) $invCurrencyId === $egpCurrencyId) {
+            return $unpaidAmount;
+        }
+
+        try {
+            return (float) CurrenciesExchange::RateToday($unpaidAmount, $invCurrencyId, $egpCurrencyId);
+        } catch (MissingExchangeRateException $e) {
+            Log::error('Overdue penalty skipped for invoice: missing exchange rate.', [
+                'invoice_id' => $invoice->id,
+                'currency_id' => $invCurrencyId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /**
@@ -698,10 +953,12 @@ class LoyaltyService extends BaseService
     /**
      * Build a deterministic idempotency key for a given event + reference.
      */
-    private function buildIdempotencyKey(string $eventType, mixed $reference): string
+    private function buildIdempotencyKey(User $user, string $eventType, mixed $reference): string
     {
+        // Without a reference the event is once per user (e.g. user_welcome, profile_completed).
+        // A bare event name would make it once per whole platform: only the first user ever got it.
         if ($reference === null) {
-            return $eventType;
+            return $eventType . ':User:' . $user->id;
         }
 
         return $eventType . ':' . class_basename($reference) . ':' . $reference->id;

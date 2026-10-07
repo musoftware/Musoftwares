@@ -20,6 +20,7 @@ use Tests\TestCase;
 class ResellerDeviceWalletAndTrialTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected ResellerDeviceService $service;
     protected User $reseller;
@@ -29,6 +30,7 @@ class ResellerDeviceWalletAndTrialTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
         app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
         Role::firstOrCreate(['name' => 'software_reseller', 'guard_name' => 'web']);

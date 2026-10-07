@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -77,7 +78,7 @@ export function AvatarStack({
         <div
             className={cn('inline-flex items-center', className)}
             role="group"
-            aria-label="Project team"
+            aria-label={__('general.project_team')}
         >
             <div className="flex -space-x-2">
                 {visible.map((member) => {

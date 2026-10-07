@@ -41,11 +41,11 @@ export default function ThemeToggle({
     const getLabel = () => {
         switch (theme) {
             case 'light':
-                return __('general.light') || 'Light';
+                return __('general.light');
             case 'dark':
-                return __('general.dark') || 'Dark';
+                return __('general.dark');
             default:
-                return __('general.system_auto') || 'Auto (System)';
+                return __('general.system_auto');
         }
     };
 
@@ -55,7 +55,7 @@ export default function ThemeToggle({
                 <Button
                     variant={variant}
                     size={size}
-                    aria-label="Select theme mode"
+                    aria-label={__('general.select_theme_mode')}
                     className={cn(
                         "rounded-full border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/10 transition-all focus-visible:ring-1 focus-visible:ring-indigo-500",
                         showLabel && "px-3 gap-2 w-auto",
@@ -78,7 +78,7 @@ export default function ThemeToggle({
                 >
                     <div className="flex items-center gap-2">
                         <Sun className="h-3.5 w-3.5 text-amber-500" />
-                        <span>{__('general.light') || 'Light'}</span>
+                        <span>{__('general.light')}</span>
                     </div>
                     {theme === 'light' && <Check className="h-3.5 w-3.5 text-amber-500" />}
                 </DropdownMenuItem>
@@ -94,7 +94,7 @@ export default function ThemeToggle({
                 >
                     <div className="flex items-center gap-2">
                         <Moon className="h-3.5 w-3.5 text-indigo-400" />
-                        <span>{__('general.dark') || 'Dark'}</span>
+                        <span>{__('general.dark')}</span>
                     </div>
                     {theme === 'dark' && <Check className="h-3.5 w-3.5 text-indigo-400" />}
                 </DropdownMenuItem>
@@ -110,7 +110,7 @@ export default function ThemeToggle({
                 >
                     <div className="flex items-center gap-2">
                         <Laptop className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
-                        <span>{__('general.system_auto') || 'Auto (System)'}</span>
+                        <span>{__('general.system_auto')}</span>
                     </div>
                     {theme === 'system' && <Check className="h-3.5 w-3.5 text-emerald-500" />}
                 </DropdownMenuItem>

@@ -48,7 +48,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                                 {project.project_name}
                             </DialogTitle>
                             <DialogDescription className="text-slate-400 text-sm truncate">
-                                {project.client?.name || 'No Client'}
+                                {project.client?.name || __('admin.project_actions_no_client')}
                             </DialogDescription>
                         </div>
                     </div>
@@ -182,7 +182,7 @@ export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
                                 <Link href={`/admin/projects/${project.id}/vault`}>
                                     <Lock className="h-4 w-4 text-[#0071e3]" /> 
-                                    <span className="font-normal text-slate-700">{__('general.client_vault') || 'Client Vault'}</span>
+                                    <span className="font-normal text-slate-700">{__('general.client_vault')}</span>
                                 </Link>
                             </Button>
                         </div>

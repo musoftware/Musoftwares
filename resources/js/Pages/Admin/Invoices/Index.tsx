@@ -53,6 +53,7 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { __ } from '@/lib/i18n';
 import {
     Dialog,
@@ -63,6 +64,7 @@ import {
 } from '@/Components/ui/dialog';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { toast } from 'sonner';
+import Pagination from '@/Components/Pagination';
 
 const perPageOptions = [
     { value: '12', label: '12' },
@@ -72,30 +74,30 @@ const perPageOptions = [
 ];
 
 const bulkActionOptions = [
-    { value: 'bill_invoice', label: 'Bill Invoice' },
-    { value: 'fix_calc', label: 'Fix Calc' },
-    { value: 'merge', label: 'Merge' },
-    { value: 'split', label: 'Split Invoice' },
-    { value: 'change_project', label: 'Change Project' },
-    { value: 'suspend', label: 'Suspend' },
-    { value: 'unsuspend', label: 'Unsuspend' },
-    { value: 'archive', label: 'Archive' },
-    { value: 'unarchive', label: 'Unarchive' },
-    { value: 'convert_to_transaction', label: 'Convert to Transaction' },
-    { value: 'send_whatsapp_reminder', label: 'Send WhatsApp Reminder' },
-    { value: 'delete', label: 'Delete' }
+    { value: 'bill_invoice', labelKey: 'admin.bulk_bill_invoice' },
+    { value: 'fix_calc', labelKey: 'admin.bulk_fix_calc' },
+    { value: 'merge', labelKey: 'general.merge' },
+    { value: 'split', labelKey: 'admin.bulk_split_invoice' },
+    { value: 'change_project', labelKey: 'admin.bulk_change_project' },
+    { value: 'suspend', labelKey: 'admin.suspend' },
+    { value: 'unsuspend', labelKey: 'admin.unsuspend' },
+    { value: 'archive', labelKey: 'admin.bulk_archive' },
+    { value: 'unarchive', labelKey: 'general.unarchive' },
+    { value: 'convert_to_transaction', labelKey: 'admin.bulk_convert_to_transaction' },
+    { value: 'send_whatsapp_reminder', labelKey: 'admin.bulk_send_whatsapp_reminder' },
+    { value: 'delete', labelKey: 'general.delete' }
 ];
 
-export default function Index({ invoices, currentTab, filters = {}, stats, projects = [], clients = [] }: any) {
+export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }: any) {
     const filterByOptions = [
-        { value: 'all', label: __('general.all') || 'All' },
-        { value: 'id', label: 'ID' },
-        { value: 'client_name', label: __('general.customer_or_username') || 'Customer / Username' },
-        { value: 'item_title', label: __('general.item_title') || 'Item Title' },
-        { value: 'project_name', label: __('general.project_name') || 'Project Name' },
-        { value: 'date', label: __('general.date') || 'Date' },
-        { value: 'status', label: __('general.invoice_status') || 'Invoice Status' },
-        { value: 'unlinked', label: __('general.unlinked_projects') || 'Unlinked Projects' }
+        { value: 'all', label: __('general.all') },
+        { value: 'id', label: __('general.id') },
+        { value: 'client_name', label: __('general.customer_or_username') },
+        { value: 'item_title', label: __('general.item_title') },
+        { value: 'project_name', label: __('general.project_name') },
+        { value: 'date', label: __('general.date') },
+        { value: 'status', label: __('general.invoice_status') },
+        { value: 'unlinked', label: __('general.unlinked_projects') }
     ];
 
     const [selectedClient, setSelectedClient] = React.useState(null);
@@ -272,16 +274,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         ? (projects as any[]).filter((p: any) => String(p.user_id) === String(clientId))
         : (projects as any[]);
 
-    const clientOptions = [
-        { value: '', label: __('general.all_clients') || 'All Clients' },
-        ...(clients as any[]).map((c: any) => ({
-            value: String(c.id),
-            label: `${c.name}${c.email ? ` (${c.email})` : ''}`,
-        })),
-    ];
-
     const projectOptions = [
-        { value: '', label: __('general.all_projects') || 'All Projects' },
+        { value: '', label: __('general.all_projects') },
         ...availableProjects.map((p: any) => ({
             value: String(p.id),
             label: p.project_name,
@@ -290,23 +284,23 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
     const statusOptions = currentTab === 'unpaid'
         ? [
-            { value: 'all', label: __('admin.all_unpaid_partial') || 'All Unpaid & Partial' },
-            { value: 'unpaid', label: __('admin.unpaid_only') || 'Unpaid Only' },
-            { value: 'partially_paid', label: __('admin.partially_paid_only') || 'Partially Paid Only' },
+            { value: 'all', label: __('admin.all_unpaid_partial') },
+            { value: 'unpaid', label: __('admin.unpaid_only') },
+            { value: 'partially_paid', label: __('admin.partially_paid_only') },
         ]
         : [
-            { value: 'all', label: __('admin.all_statuses') || __('general.all_statuses') || 'All Statuses' },
-            { value: 'unpaid', label: __('general.unpaid') || 'Unpaid' },
-            { value: 'partially_paid', label: __('general.partially_paid') || 'Partially Paid' },
-            { value: 'paid', label: __('general.paid') || 'Paid' },
-            { value: 'cancelled', label: __('general.archived_cancelled') || 'Cancelled / Archived' },
+            { value: 'all', label: __('admin.all_statuses') || __('general.all_statuses') },
+            { value: 'unpaid', label: __('general.unpaid') },
+            { value: 'partially_paid', label: __('general.partially_paid') },
+            { value: 'paid', label: __('general.paid') },
+            { value: 'cancelled', label: __('general.archived_cancelled') },
         ];
 
     const jobStatusOptions = [
-        { value: 'all', label: __('general.all_job_statuses') || 'All Job Statuses' },
-        { value: 'pending', label: __('general.pending') || 'Pending' },
-        { value: 'processing', label: __('general.processing') || 'Processing' },
-        { value: 'done', label: __('general.done') || 'Done' },
+        { value: 'all', label: __('general.all_job_statuses') },
+        { value: 'pending', label: __('general.pending') },
+        { value: 'processing', label: __('general.processing') },
+        { value: 'done', label: __('general.done') },
     ];
 
     const handleLoginAs = (id: any) => {
@@ -324,7 +318,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         e?.stopPropagation();
         if (invoice.public_url) {
             navigator.clipboard.writeText(invoice.public_url);
-            toast.success(__('admin.invoice_link_copied') || 'Invoice link copied to clipboard');
+            toast.success(__('admin.invoice_link_copied'));
         }
     };
 
@@ -332,7 +326,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         e?.stopPropagation();
         const phone = invoice.user?.phone_number || invoice.user?.phone;
         if (!phone) {
-            toast.error(__('general.no_phone_number') || 'Client has no phone number recorded');
+            toast.error(__('general.no_phone_number'));
             return;
         }
         const cleanPhone = phone.replace(/[^0-9]/g, '');
@@ -348,11 +342,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         router.post(route('admin.invoices.external-pay', pendingAction.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.invoice_marked_paid') || 'Invoice marked as paid');
+                toast.success(__('general.invoice_marked_paid'));
                 setPendingAction(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingAction(null);
             },
         });
@@ -363,7 +357,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         router.post(route('admin.invoices.mark-paid', pendingAction.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.invoice_marked_paid') || 'Invoice marked as paid');
+                toast.success(__('general.invoice_marked_paid'));
                 setPendingAction(null);
             },
             onError: (errors: any) => {
@@ -380,10 +374,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         router.post(route('admin.invoices.toggle-suspend', id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('admin.invoice_updated') || 'Invoice updated');
+                toast.success(__('admin.invoice_updated'));
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
             },
         });
     };
@@ -393,11 +387,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         router.post(route('admin.invoices.cancel', pendingAction.id), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.invoice_cancelled') || 'Invoice cancelled');
+                toast.success(__('general.invoice_cancelled'));
                 setPendingAction(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingAction(null);
             },
         });
@@ -418,24 +412,24 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
     const applyBulkAction = () => {
         if (selectedInvoiceIds.length === 0) {
-            toast.error(__('general.select_at_least_one_invoice') || 'Please select at least one invoice.');
+            toast.error(__('general.select_at_least_one_invoice'));
             return;
         }
         if (!bulkAction) {
-            toast.error(__('general.select_bulk_action_first') || 'Select a bulk action first.');
+            toast.error(__('general.select_bulk_action_first'));
             return;
         }
 
         const messages: Record<string, string> = {
-            convert_to_transaction: __('general.confirm_convert_to_transactions') || 'Convert these invoices to transactions?',
-            delete: __('general.confirm_delete_invoices') || 'Permanently delete the selected invoices?',
-            send_whatsapp_reminder: __('general.confirm_send_whatsapp_reminders') || 'Send WhatsApp reminders for the selected invoices?',
-            suspend: __('admin.confirm_suspend_invoices') || 'Are you sure you want to suspend the selected invoices?',
-            unsuspend: __('admin.confirm_unsuspend_invoices') || 'Are you sure you want to unsuspend the selected invoices?',
-            bill_invoice: __('general.confirm_bill_balance') || 'Bill selected invoices from client balance?',
+            convert_to_transaction: __('general.confirm_convert_to_transactions'),
+            delete: __('general.confirm_delete_invoices'),
+            send_whatsapp_reminder: __('general.confirm_send_whatsapp_reminders'),
+            suspend: __('admin.confirm_suspend_invoices'),
+            unsuspend: __('admin.confirm_unsuspend_invoices'),
+            bill_invoice: __('general.confirm_bill_balance'),
         };
 
-        setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedInvoiceIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') || 'Apply this bulk action?' } });
+        setPendingAction({ type: 'bulk', id: { action: bulkAction, ids: selectedInvoiceIds, projectId: bulkActionProject, message: messages[bulkAction] || __('general.confirm_bulk_action') } });
     };
 
     const confirmBulkAction = () => {
@@ -448,7 +442,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.bulk_action_applied') || 'Bulk action applied');
+                toast.success(__('general.bulk_action_applied'));
                 setSelectedInvoices({});
                 setSelectAll(false);
                 setBulkAction('');
@@ -456,7 +450,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 setPendingAction(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingAction(null);
             },
         });
@@ -496,7 +490,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     };
 
     return (
-        <AdminSidebarLayout title={__('general.platform_invoices')} header="Invoices Manager">
+        <AdminSidebarLayout title={__('general.platform_invoices')} header={__('admin.invoices_manager')}>
             
             {/* Always-on Stats Cards */}
             {stats && (
@@ -515,7 +509,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </Card>
                     <Card className="border-amber-200 bg-amber-50/30 shadow-sm">
                         <CardContent className="p-4">
-                            <dt className="text-xs font-semibold text-amber-800 uppercase tracking-wider">{__('admin.total_outstanding_amount') || 'Total Outstanding'}</dt>
+                            <dt className="text-xs font-semibold text-amber-800 uppercase tracking-wider">{__('admin.total_outstanding_amount')}</dt>
                             <dd className="mt-1 text-2xl font-bold text-amber-900">
                                 {stats.total_unpaid_amount_str || stats.total_unpaid_amount || '0.00'}
                             </dd>
@@ -529,7 +523,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </Card>
                     <Card className="border-slate-200 shadow-sm">
                         <CardContent className="p-4">
-                            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('admin.suspended_invoices') || 'Suspended Invoices'}</dt>
+                            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('admin.suspended_invoices')}</dt>
                             <dd className="mt-1 text-2xl font-bold text-slate-900">{stats.suspended || 0}</dd>
                         </CardContent>
                     </Card>
@@ -551,7 +545,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         href={buildTabUrl('suspended')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'suspended' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
                     >
-                        {__('admin.suspended_invoices') || 'Suspended Invoices'}</Link>
+                        {__('admin.suspended_invoices')}</Link>
                     <Link
                         href={buildTabUrl('archive')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
@@ -566,8 +560,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         {/* Client Selector */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.customer') || 'Client'}</Label>
-                            <PremiumCombobox
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.customer')}</Label>
+                            <UserSearchCombobox
                                 value={clientId}
                                 onChange={(val) => {
                                     const nextClientId = String(val || '');
@@ -582,15 +576,15 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     }
                                     setTimeout(() => handleFilter({ client_id: nextClientId, project_id: nextProjectId }), 50);
                                 }}
-                                options={clientOptions}
-                                placeholder={__('general.all_clients') || 'All Clients'}
-                                searchPlaceholder={__('general.search') || 'Search clients...'}
+                                emptyOptionLabel={__('general.all_clients')}
+                                placeholder={__('general.all_clients')}
+                                searchPlaceholder={__('general.search')}
                             />
                         </div>
 
                         {/* Project Selector */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.project') || 'Project'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.project')}</Label>
                             <PremiumCombobox
                                 value={projectId}
                                 onChange={(val) => {
@@ -599,14 +593,14 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     setTimeout(() => handleFilter({ project_id: nextProjectId }), 50);
                                 }}
                                 options={projectOptions}
-                                placeholder={__('general.all_projects') || 'All Projects'}
-                                searchPlaceholder={__('general.search') || 'Search projects...'}
+                                placeholder={__('general.all_projects')}
+                                searchPlaceholder={__('general.search')}
                             />
                         </div>
 
                         {/* Status Selector */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.invoice_status') || 'Status'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.invoice_status')}</Label>
                             <PremiumCombobox
                                 value={status}
                                 onChange={(val) => {
@@ -615,13 +609,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     setTimeout(() => handleFilter({ status: nextStatus }), 50);
                                 }}
                                 options={statusOptions}
-                                placeholder={__('admin.all_statuses') || 'All Statuses'}
+                                placeholder={__('admin.all_statuses')}
                             />
                         </div>
 
                         {/* Job Status Selector */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.job_status') || 'Job Status'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.job_status')}</Label>
                             <PremiumCombobox
                                 value={jobStatus}
                                 onChange={(val) => {
@@ -630,7 +624,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     setTimeout(() => handleFilter({ job_status: nextJobStatus }), 50);
                                 }}
                                 options={jobStatusOptions}
-                                placeholder={__('general.all_job_statuses') || 'All Job Statuses'}
+                                placeholder={__('general.all_job_statuses')}
                             />
                         </div>
                     </div>
@@ -639,7 +633,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end pt-1">
                         {/* Date Range: From */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_from') || 'Date From'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_from')}</Label>
                             <Input
                                 type="date"
                                 className="h-9 text-xs"
@@ -651,7 +645,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
                         {/* Date Range: To */}
                         <div>
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_to') || 'Date To'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('admin.date_to')}</Label>
                             <Input
                                 type="date"
                                 className="h-9 text-xs"
@@ -663,12 +657,12 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
                         {/* Amount Range: Min & Max */}
                         <div className="lg:col-span-2">
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.amount') || 'Amount Range'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.amount')}</Label>
                             <div className="flex items-center gap-2">
                                 <Input
                                     type="number"
                                     step="any"
-                                    placeholder={__('general.min') || 'Min'}
+                                    placeholder={__('general.min')}
                                     className="h-9 text-xs"
                                     value={minAmount}
                                     onChange={(e) => setMinAmount(e.target.value)}
@@ -678,7 +672,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 <Input
                                     type="number"
                                     step="any"
-                                    placeholder={__('general.max') || 'Max'}
+                                    placeholder={__('general.max')}
                                     className="h-9 text-xs"
                                     value={maxAmount}
                                     onChange={(e) => setMaxAmount(e.target.value)}
@@ -692,7 +686,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 pt-1">
                         {/* Filter by field + Search */}
                         <div className="flex-1 max-w-xl">
-                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.search') || 'Search'}</Label>
+                            <Label className="mb-1.5 block text-xs font-semibold text-slate-700">{__('general.search')}</Label>
                             <div className="flex items-center gap-2">
                                 <div className="w-36 sm:w-44 flex-shrink-0">
                                     <PremiumCombobox
@@ -706,7 +700,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <Input
                                         type="text"
                                         className="h-9 text-xs pe-7"
-                                        placeholder={__('general.search_invoices') || 'Search...'}
+                                        placeholder={__('general.search_invoices')}
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         onKeyDown={(e) => {
@@ -719,6 +713,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <button
                                             type="button"
                                             onClick={() => { setSearchTerm(''); setTimeout(() => handleFilter({ search: '' }), 50); }}
+                                            aria-label={__('general.clear_search')}
                                             className="absolute end-2 top-2.5 text-muted-foreground hover:text-foreground"
                                         >
                                             <XCircle className="h-4 w-4" />
@@ -739,13 +734,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 />
                             </div>
 
-                            <Button size="sm" className="h-9 px-3.5" onClick={() => handleFilter()} title={__('general.filter') || 'Filter'}>
+                            <Button size="sm" className="h-9 px-3.5" onClick={() => handleFilter()} title={__('general.filter')}>
                                 <Filter className="h-4 w-4 me-1.5" />
-                                {__('general.filter') || 'Filter'}
+                                {__('general.filter')}
                             </Button>
 
                             {hasActiveFilters && (
-                                <Button variant="outline" size="sm" className="h-9 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={handleClearFilters} title={__('general.clear_filters') || 'Clear Filters'}>
+                                <Button variant="outline" size="sm" className="h-9 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={handleClearFilters} title={__('general.clear_filters')} aria-label={__('general.clear_filters')}>
                                     <RotateCcw className="h-4 w-4" />
                                 </Button>
                             )}
@@ -753,7 +748,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             <Link href={`/admin/invoices/create${clientId ? `?client_id=${clientId}${projectId ? `&project_id=${projectId}` : ''}` : ''}`}>
                                 <Button size="sm" variant="secondary" className="h-9 px-3.5 whitespace-nowrap" title={__('general.add_invoice')}>
                                     <Plus className="h-4 w-4 me-1" />
-                                    {__('general.add_invoice') || 'Add Invoice'}
+                                    {__('general.add_invoice')}
                                 </Button>
                             </Link>
                         </div>
@@ -786,19 +781,19 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <span className="uppercase text-xs font-semibold">{__('general.project')}</span>
                                     </TableHead>
                                     <TableHead>
-                                        {renderSortHeader(__('general.date') || 'Date', 'created_at')}
+                                        {renderSortHeader(__('general.date'), 'created_at')}
                                     </TableHead>
                                     <TableHead>
-                                        {renderSortHeader(__('admin.due_date') || 'Due Date', 'due_date')}
+                                        {renderSortHeader(__('admin.due_date'), 'due_date')}
                                     </TableHead>
                                     <TableHead className="text-end">
-                                        {renderSortHeader(__('general.total') || 'Total', 'amount', 'justify-end')}
+                                        {renderSortHeader(__('general.total'), 'amount', 'justify-end')}
                                     </TableHead>
                                     <TableHead className="text-center">
                                         <span className="uppercase text-xs font-semibold">{__('general.job_status')}</span>
                                     </TableHead>
                                     <TableHead className="text-center">
-                                        {renderSortHeader(__('general.invoice_status') || 'Status', 'status', 'justify-center')}
+                                        {renderSortHeader(__('general.invoice_status'), 'status', 'justify-center')}
                                     </TableHead>
                                     <TableHead className="text-end">
                                         <span className="uppercase text-xs font-semibold">{__('general.actions')}</span>
@@ -816,7 +811,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 onChange={(e) => handleSelectInvoice(invoice.id, e.target.checked)}
                                             />
                                         </TableCell>
-                                        <TableCell className="font-medium hidden sm:table-cell" data-label="ID">
+                                        <TableCell className="font-medium hidden sm:table-cell" data-label={__('general.id')}>
                                             <Link href={route('admin.invoices.show', invoice.id)} className="text-primary hover:underline font-semibold">
                                                 {invoice.invoice_number}
                                             </Link>
@@ -846,10 +841,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                             <div className="mt-1">
                                                                 <span 
                                                                     className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded shadow-xs" 
-                                                                    title={__('admin.sufficient_balance') || 'Client Wallet Balance'}
+                                                                    title={__('admin.sufficient_balance')}
                                                                 >
                                                                     <Wallet className="h-2.5 w-2.5" />
-                                                                    {__('admin.client_wallet') || 'Wallet'}: {invoice.user.balance_str || formatCurrency(invoice.user.balance, invoice.currency)}
+                                                                    {__('admin.client_wallet')}: {invoice.user.balance_str || formatCurrency(invoice.user.balance, invoice.currency)}
                                                                 </span>
                                                             </div>
                                                         )}
@@ -882,8 +877,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
                                                             <AlertCircle className="h-2.5 w-2.5" />
                                                             {invoice.days_overdue > 0 
-                                                                ? (__('admin.overdue_by_days', { days: invoice.days_overdue }) || `Overdue ${invoice.days_overdue}d`)
-                                                                : (__('admin.overdue') || 'Overdue')}
+                                                                ? __('admin.overdue_by_days', { days: invoice.days_overdue })
+                                                                : (__('admin.overdue'))}
                                                         </span>
                                                     )}
                                                 </div>
@@ -899,13 +894,14 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 
                                                 {(invoice.status === 'unpaid' || invoice.status === 'partially_paid') && (
                                                     <span className="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
-                                                        {__('admin.remaining_due') || 'Due'}: {invoice.unpaid_amount_str || formatCurrency(invoice.unpaid_amount, invoice.currency)}
+                                                        {__('admin.remaining_due')}: {invoice.unpaid_amount_str || formatCurrency(invoice.unpaid_amount, invoice.currency)}
                                                     </span>
                                                 )}
 
                                                 {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
                                                     <span className="text-[10px] text-muted-foreground font-medium" title={__('general.business_currency')}>
-                                                        ~ {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency)}
+                                                        {/* business_amount is null when no exchange rate exists: show a dash, never the unconverted amount */}
+                                                        ~ {invoice.business_amount == null ? '-' : formatCurrency(invoice.business_amount, invoice.business_currency)}
                                                     </span>
                                                 )}
                                             </div>
@@ -927,7 +923,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 {getStatusBadge(invoice.status)}
                                                 {invoice.is_suspended && (
                                                     <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded uppercase leading-none">
-                                                        {__('admin.suspended') || 'Suspended'}
+                                                        {__('admin.suspended')}
                                                     </span>
                                                 )}
                                             </div>
@@ -943,7 +939,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         size="icon"
                                                         variant="outline"
                                                         className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
-                                                        title={__('admin.bill_now') || 'Bill from Wallet Balance'}
+                                                        title={__('admin.bill_now')}
+                                                        aria-label={__('admin.bill_now')}
                                                         onClick={(e) => { e.stopPropagation(); handleBillBalance(invoice.id); }}
                                                     >
                                                         <CreditCard className="h-3.5 w-3.5" />
@@ -956,7 +953,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         size="icon"
                                                         variant="ghost"
                                                         className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                                                        title={__('admin.send_whatsapp') || 'Send WhatsApp Reminder'}
+                                                        title={__('admin.send_whatsapp')}
+                                                        aria-label={__('admin.send_whatsapp')}
                                                         onClick={(e) => handleWhatsAppReminder(invoice, e)}
                                                     >
                                                         <MessageSquare className="h-3.5 w-3.5" />
@@ -968,7 +966,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     size="icon"
                                                     variant="ghost"
                                                     className="h-8 w-8 text-slate-500 hover:text-slate-900"
-                                                    title={__('admin.copy_invoice_link') || 'Copy Public Invoice Link'}
+                                                    title={__('admin.copy_invoice_link')}
+                                                    aria-label={__('admin.copy_invoice_link')}
                                                     onClick={(e) => handleCopyLink(invoice, e)}
                                                 >
                                                     <Copy className="h-3.5 w-3.5" />
@@ -992,7 +991,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         {invoice.public_url && (
                                                             <DropdownMenuItem onClick={() => window.open(invoice.public_url, '_blank')}>
                                                                 <ExternalLink className="me-2 h-4 w-4 text-slate-700" />
-                                                                {__('admin.view_link') || 'Open Public Link'}
+                                                                {__('admin.view_link')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         
@@ -1037,11 +1036,11 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                                 <DropdownMenuItem onClick={() => handleToggleSuspend(invoice.id)}>
                                                                     {invoice.is_suspended ? (
                                                                         <>
-                                                                            <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.unsuspend') || 'Unsuspend'}
+                                                                            <CheckCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.unsuspend')}
                                                                         </>
                                                                     ) : (
                                                                         <>
-                                                                            <XCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.suspend') || 'Suspend'}
+                                                                            <XCircle className="me-2 h-4 w-4 text-slate-900" />{__('admin.suspend')}
                                                                         </>
                                                                     )}
                                                                 </DropdownMenuItem>
@@ -1066,7 +1065,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 {(invoices.data as any).length > 0 && (
                                     <TableRow className="bg-slate-50 font-bold border-t border-slate-200">
                                         <TableCell colSpan={6} className="text-end hidden sm:table-cell pe-4 text-xs uppercase text-slate-600">
-                                            {__('general.total')} ({__('general.page') || 'Page'})
+                                            {__('general.total')} ({__('general.page')})
                                         </TableCell>
                                         <TableCell className="text-end sm:hidden text-xs uppercase text-slate-600">
                                             {__('general.total')}
@@ -1075,12 +1074,12 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             <div className="flex flex-col items-end">
                                                 <span>
                                                     {formatCurrency(
-                                                        invoices.data.reduce((sum: number, inv: any) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
+                                                        invoices.data.reduce((sum: number, inv: any) => sum + Number(inv.business_amount ?? 0), 0),
                                                         invoices.data[0]?.business_currency || invoices.data[0]?.currency
                                                     )}
                                                 </span>
                                                 <span className="text-xs text-red-600 font-bold">
-                                                    {__('admin.remaining_due') || 'Due'}: {formatCurrency(
+                                                    {__('admin.remaining_due')}: {formatCurrency(
                                                         invoices.data.reduce((sum: number, inv: any) => sum + (Number(inv.unpaid_amount) || 0), 0),
                                                         invoices.data[0]?.business_currency || invoices.data[0]?.currency
                                                     )}
@@ -1115,7 +1114,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <SelectContent>
                                         {bulkActionOptions.map((opt) => (
                                             <SelectItem key={opt.value} value={opt.value}>
-                                                {opt.label}
+                                                {__(opt.labelKey)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -1139,24 +1138,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         </div>
 
                         <div className="w-full md:ms-auto md:w-auto">
-                            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                                <div className="flex justify-center md:justify-end">
-                                    <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                                        {paginationLinks.map((link: any, i: number) => (
-                                            <Link
-                                                key={i}
-                                                href={link.url || '#'}
-                                                className={`px-3 py-2 text-sm border ${
-                                                    link.active 
-                                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium' 
-                                                        : 'bg-background border-input text-muted-foreground hover:bg-muted'
-                                                } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            {Array.isArray(paginationLinks) && <Pagination links={paginationLinks} />}
                         </div>
                     </div>
                 </CardContent>
@@ -1166,10 +1148,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             {selectedCount > 0 && (
                 <div className="fixed bottom-6 start-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl border border-slate-700 animate-in fade-in slide-in-from-bottom-5">
                     <span className="text-xs font-semibold whitespace-nowrap">
-                        {__('admin.selected_invoices_count', { count: selectedCount }) || `${selectedCount} invoices selected`}
+                        {__('admin.selected_invoices_count', { count: selectedCount })}
                     </span>
                     <span className="text-xs text-slate-300 font-medium whitespace-nowrap hidden sm:inline">
-                        ({__('admin.selected_total_amount') || 'Total:'} {formatCurrency(selectedTotalAmount, invoices.data[0]?.business_currency || invoices.data[0]?.currency)})
+                        ({__('admin.selected_total_amount')} {formatCurrency(selectedTotalAmount, invoices.data[0]?.business_currency || invoices.data[0]?.currency)})
                     </span>
                     <div className="h-4 w-px bg-slate-700 mx-1 hidden sm:block" />
                     <div className="w-40 sm:w-48 text-slate-900">
@@ -1180,7 +1162,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             <SelectContent>
                                 {bulkActionOptions.map((opt) => (
                                     <SelectItem key={opt.value} value={opt.value}>
-                                        {opt.label}
+                                        {__(opt.labelKey)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -1204,7 +1186,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         onClick={() => { setSelectedInvoices({}); setSelectAll(false); }} 
                         className="text-xs text-slate-400 hover:text-white underline ms-1"
                     >
-                        {__('admin.clear_selection') || 'Clear'}
+                        {__('admin.clear_selection')}
                     </button>
                 </div>
             )}
@@ -1245,8 +1227,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
             <ConfirmModal
                 isOpen={pendingAction?.type === 'mark_paid'}
-                title={__('general.mark_as_paid') || 'Mark as paid?'}
-                description={__('general.confirm_mark_paid_desc') || 'This will adjust balances directly.'}
+                title={__('general.mark_as_paid')}
+                description={__('general.confirm_mark_paid_desc')}
                 confirmLabel={__('general.mark_as_paid')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={confirmMarkPaid}
@@ -1255,9 +1237,9 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
             <ConfirmModal
                 isOpen={pendingAction?.type === 'bill_balance'}
-                title={__('general.bill_from_balance') || 'Bill from balance?'}
-                description={__('general.confirm_bill_balance') || 'Are you sure you want to bill this invoice from the client\'s balance?'}
-                confirmLabel={__('general.bill_from_balance') || 'Bill from Balance'}
+                title={__('general.bill_from_balance')}
+                description={__('general.confirm_bill_balance')}
+                confirmLabel={__('general.bill_from_balance')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={confirmBillBalance}
                 onCancel={() => setPendingAction(null)}
@@ -1265,8 +1247,8 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
             <ConfirmModal
                 isOpen={pendingAction?.type === 'cancel'}
-                title={__('general.cancel_invoice') || 'Cancel invoice?'}
-                description={__('general.confirm_cancel_invoice_desc') || 'If it was partially paid, the user will be refunded their wallet balance.'}
+                title={__('general.cancel_invoice')}
+                description={__('general.confirm_cancel_invoice_desc')}
                 confirmLabel={__('general.cancel_invoice')}
                 cancelLabel={__('general.keep_invoice')}
                 variant="danger"
@@ -1276,7 +1258,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
             <ConfirmModal
                 isOpen={pendingAction?.type === 'bulk'}
-                title={__('general.confirm_bulk_action_title') || 'Confirm bulk action'}
+                title={__('general.confirm_bulk_action_title')}
                 description={pendingAction?.type === 'bulk' ? pendingAction.id?.message : ''}
                 confirmLabel={__('general.apply')}
                 cancelLabel={__('general.cancel')}

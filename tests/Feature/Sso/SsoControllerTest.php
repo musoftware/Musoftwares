@@ -12,6 +12,65 @@ class SsoControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const TEST_SECRET = 'sso-test-secret';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config([
+            'services.goldsaversys.shared_secret' => self::TEST_SECRET,
+            'services.erp.shared_secret' => self::TEST_SECRET,
+        ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function signedHeaders(string $token): array
+    {
+        $timestamp = (string) now()->timestamp;
+
+        return [
+            'X-Sso-Signature' => hash_hmac('sha256', $timestamp.'.'.$token, self::TEST_SECRET),
+            'X-Sso-Timestamp' => $timestamp,
+        ];
+    }
+
+    public function test_verify_rejects_unsigned_request_and_keeps_token(): void
+    {
+        $user = User::factory()->create();
+        SsoToken::create([
+            'user_id' => $user->id,
+            'token' => 'unsigned-token-1',
+            'target_system' => 'goldsaversys',
+            'expires_at' => now()->addMinute(),
+        ]);
+
+        $this->postJson('/api/sso/verify', ['token' => 'unsigned-token-1'])
+            ->assertStatus(401)
+            ->assertJson(['error' => 'invalid_signature']);
+
+        $this->assertNull(SsoToken::where('token', 'unsigned-token-1')->value('used_at'));
+    }
+
+    public function test_verify_rejects_system_without_configured_secret(): void
+    {
+        config(['services.erp.shared_secret' => null]);
+
+        $user = User::factory()->create();
+        SsoToken::create([
+            'user_id' => $user->id,
+            'token' => 'erp-no-secret',
+            'target_system' => 'erp',
+            'expires_at' => now()->addMinute(),
+        ]);
+
+        $this->withHeaders($this->signedHeaders('erp-no-secret'))
+            ->postJson('/api/sso/verify', ['token' => 'erp-no-secret'])
+            ->assertStatus(401);
+    }
+
     public function test_guest_is_redirected_to_login_for_protected_systems(): void
     {
         $response = $this->get('/sso/erp');
@@ -96,7 +155,7 @@ class SsoControllerTest extends TestCase
             'expires_at' => now()->addMinute(),
         ]);
 
-        $response = $this->postJson('/api/sso/verify', [
+        $response = $this->withHeaders($this->signedHeaders('secure-test-token-456'))->postJson('/api/sso/verify', [
             'token' => 'secure-test-token-456',
         ]);
 
@@ -114,7 +173,7 @@ class SsoControllerTest extends TestCase
         $this->assertNotNull($token->used_at);
 
         // Attempting to reuse the token must immediately fail
-        $secondResponse = $this->postJson('/api/sso/verify', [
+        $secondResponse = $this->withHeaders($this->signedHeaders('secure-test-token-456'))->postJson('/api/sso/verify', [
             'token' => 'secure-test-token-456',
         ]);
         $secondResponse->assertStatus(401);
@@ -139,7 +198,7 @@ class SsoControllerTest extends TestCase
             'expires_at' => now()->addMinute(),
         ]);
 
-        $response = $this->postJson('/api/sso/verify', [
+        $response = $this->withHeaders($this->signedHeaders('erp-token-789'))->postJson('/api/sso/verify', [
             'token' => 'erp-token-789',
         ]);
 

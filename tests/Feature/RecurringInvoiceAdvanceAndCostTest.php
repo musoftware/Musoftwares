@@ -15,6 +15,7 @@ use Tests\TestCase;
 class RecurringInvoiceAdvanceAndCostTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected Currency $currency;
     protected User $admin;
@@ -22,6 +23,7 @@ class RecurringInvoiceAdvanceAndCostTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->currency = Currency::where('currency', 'USD')->first() ?? Currency::create([
             'currency' => 'USD',
@@ -68,7 +70,7 @@ class RecurringInvoiceAdvanceAndCostTest extends TestCase
         ]);
 
         $this->assertEquals(150.00, (float) $recurring->current_cost());
-        $this->assertStringContainsString('150.00', $recurring->current_cost_str());
+        $this->assertStringContainsString('150', $recurring->current_cost_str());
     }
 
     public function test_recurring_invoice_fires_3_days_in_advance_automatically_via_apply(): void

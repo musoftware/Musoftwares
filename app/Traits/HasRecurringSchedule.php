@@ -11,12 +11,10 @@ trait HasRecurringSchedule
      */
     public function getNextExecutionDate(?Carbon $from = null): ?Carbon
     {
-        $timezone = config('app.timezone', 'Africa/Cairo');
-        $today = Carbon::today($timezone);
-        $from = $from ? $from->copy()->setTimezone($timezone)->startOfDay() : $today;
+        $from = $from ? static::toBusinessDate($from) : static::businessToday();
 
         if (! empty($this->start_date)) {
-            $startDate = Carbon::parse($this->start_date)->setTimezone($timezone)->startOfDay();
+            $startDate = Carbon::parse($this->start_date)->startOfDay();
             if ($from->lt($startDate)) {
                 $from = $startDate->copy();
             }
@@ -37,5 +35,25 @@ trait HasRecurringSchedule
         }
 
         return null;
+    }
+
+    /**
+     * Today's date on the business calendar (config app.business_timezone).
+     */
+    protected static function businessToday(): Carbon
+    {
+        return static::toBusinessDate(Carbon::now());
+    }
+
+    /**
+     * The business calendar date of a moment, returned as midnight in the app
+     * timezone. Keeping every schedule date at app-timezone midnight keeps day,
+     * week and month differences whole when compared with stored dates.
+     */
+    protected static function toBusinessDate(Carbon $moment): Carbon
+    {
+        $businessTimezone = config('app.business_timezone', 'Africa/Cairo');
+
+        return Carbon::parse($moment->copy()->setTimezone($businessTimezone)->toDateString());
     }
 }

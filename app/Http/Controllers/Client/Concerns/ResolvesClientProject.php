@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client\Concerns;
 use App\Models\Project;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Shared helpers for client-facing project controllers: ownership enforcement,
@@ -27,16 +28,32 @@ trait ResolvesClientProject
                 ?? request()->input('date')
                 ?? request()->input('inDate');
 
-            if ($date) {
-                try {
-                    $dateCarbon = is_string($date) ? Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo') : $date->copy()->setTimezone('Africa/Cairo');
-                    if ($dateCarbon->startOfDay()->isAfter(Carbon::today('Africa/Cairo'))) {
-                        abort(403, 'Access to future dates is restricted on shared boards.');
-                    }
-                } catch (\Throwable $e) {
-                    // Fail-safe: if date parsing fails, let the controller handle validation.
-                }
+            $dateCarbon = $date ? $this->parseSharedBoardDate($date) : null;
+
+            // abort() must stay outside any try/catch, or the 403 would be swallowed.
+            if ($dateCarbon && $dateCarbon->startOfDay()->isAfter(Carbon::today('Africa/Cairo'))) {
+                abort(403, 'Access to future dates is restricted on shared boards.');
             }
+        }
+    }
+
+    /**
+     * Parses a board date in Cairo time. Returns null when it cannot be parsed,
+     * so the controller's own validation can report the bad input.
+     */
+    private function parseSharedBoardDate(mixed $date): ?Carbon
+    {
+        try {
+            return is_string($date)
+                ? Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo')
+                : Carbon::instance($date)->setTimezone('Africa/Cairo');
+        } catch (\Throwable $e) {
+            Log::debug('Shared board: unparseable date, leaving validation to the controller', [
+                'date' => is_string($date) ? $date : get_debug_type($date),
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
         }
     }
 

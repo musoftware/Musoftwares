@@ -3,14 +3,17 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\CostTransaction;
+use App\Models\CurrenciesExchange;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class FinancialOperationsTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected User $admin;
 
@@ -19,6 +22,8 @@ class FinancialOperationsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // This suite writes wallet/cost ledger rows, which convert amounts to the business currency.
+        $this->seedUsdEgpRates();
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
@@ -33,6 +38,21 @@ class FinancialOperationsTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.finance.index'));
         $response->assertStatus(200);
+    }
+
+    public function test_finance_index_renders_when_exchange_rates_are_missing(): void
+    {
+        $cost = new CostTransaction;
+        $cost->reason = 'server';
+        $cost->amount = 100;
+        $cost->currency_id = 1;
+        $cost->status = 'pending';
+        $cost->save();
+
+        CurrenciesExchange::query()->delete();
+        CurrenciesExchange::flushCache();
+
+        $this->actingAs($this->admin)->get(route('admin.finance.index'))->assertOk();
     }
 
     public function test_non_admin_cannot_view_finance_index(): void

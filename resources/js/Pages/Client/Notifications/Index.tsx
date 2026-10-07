@@ -4,6 +4,7 @@ import { PageProps } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Bell, CheckCheck, ArrowLeft, Clock } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 export default function NotificationsIndex({
     auth,
@@ -38,7 +39,7 @@ export default function NotificationsIndex({
                                 {__('general.notifications')}
                             </h1>
                             <p className="text-xs sm:text-sm text-[#1d1d1f]/60 dark:text-white/60 font-sans">
-                                Real-time system updates, project activities, and transaction logs.
+                                {__('client.notif_subtitle')}
                             </p>
                         </div>
 
@@ -67,7 +68,7 @@ export default function NotificationsIndex({
                                 {__('general.no_notifications_found')}
                             </h3>
                             <p className="text-xs text-[#1d1d1f]/60 dark:text-white/60 max-w-md mx-auto mt-1 leading-relaxed">
-                                You're completely up to date. New updates and alerts will appear here.
+                                {__('client.notif_up_to_date')}
                             </p>
                         </div>
                     ) : (
@@ -137,24 +138,7 @@ export default function NotificationsIndex({
                     )}
 
                     {/* Pagination */}
-                    {notifications?.links && notifications.links.length > 3 && (
-                        <div className="flex justify-center gap-1 pt-4">
-                            {notifications.links.map((link: any, key: number) => (
-                                <Link
-                                    key={key}
-                                    href={link.url || '#'}
-                                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                        link.active
-                                            ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#090d16] shadow-xs'
-                                            : link.url
-                                                ? 'bg-white dark:bg-[#0f172a] border border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-white/5'
-                                                : 'cursor-not-allowed opacity-40 pointer-events-none bg-white dark:bg-[#0f172a] text-[#1d1d1f]/40 dark:text-white/40'
-                                    }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    <Pagination links={notifications?.links} />
 
                 </div>
 

@@ -10,7 +10,7 @@ import { __ } from '@/lib/i18n';
 export default function Index({ services }: { services: any[] }) {
     return (
         <AdminSidebarLayout
-            header="Website Services"
+            header={__('general.website_services')}
             actions={
                 <Link href={route('admin.website-services.create')}>
                     <Button><Plus className="w-4 h-4 me-2" /> {__('general.add_service')}</Button>
@@ -22,7 +22,7 @@ export default function Index({ services }: { services: any[] }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Icon/Image</TableHead>
+                            <TableHead>{__('admin.website_services_image_column')}</TableHead>
                             <TableHead>{__('general.title')}</TableHead>
                             <TableHead>{__('general.subtitle')}</TableHead>
                             <TableHead className="text-end">{__('general.actions')}</TableHead>
@@ -40,7 +40,7 @@ export default function Index({ services }: { services: any[] }) {
                                         {service.primary_image_en ? (
                                             <img src={`/${service.primary_image_en}`} alt={service.title_en} className="w-10 h-10 rounded object-cover" />
                                         ) : (
-                                            <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-slate-400">N/A</div>
+                                            <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-slate-400">{__('general.n_a')}</div>
                                         )}
                                     </TableCell>
                                     <TableCell className="font-medium">{service.title_en}</TableCell>

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\FinanceHelper;
 use App\Models\AdminSettings;
 use App\Models\CostTransaction;
@@ -20,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class DashboardService extends BaseService
 {
@@ -193,6 +195,7 @@ class DashboardService extends BaseService
                     ->whereYear('created_at', $year)
                     ->sum('business_amount');
             } catch (\Exception $e) {
+                Log::warning('Dashboard: monthly expenses query failed', ['month' => $month, 'year' => $year, 'error' => $e->getMessage()]);
             }
 
             $chartData[] = [
@@ -222,6 +225,7 @@ class DashboardService extends BaseService
                 $breakdown[] = ['name' => 'Marketplace', 'value' => round($marketplaceRevenue, 2), 'color' => '#06b6d4'];
             }
         } catch (\Exception $e) {
+            Log::warning('Dashboard: marketplace revenue query failed', ['error' => $e->getMessage()]);
         }
 
         try {
@@ -232,6 +236,7 @@ class DashboardService extends BaseService
                 $breakdown[] = ['name' => 'Points', 'value' => round($pointsRevenue, 2), 'color' => '#eab308'];
             }
         } catch (\Exception $e) {
+            Log::warning('Dashboard: points revenue query failed', ['error' => $e->getMessage()]);
         }
 
         if (empty($breakdown)) {
@@ -360,7 +365,9 @@ class DashboardService extends BaseService
                         'link' => $data['url'] ?? url('/notifications')
                     ]);
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+                Log::warning('Dashboard: notification alerts query failed', ['error' => $e->getMessage()]);
+            }
         }
 
         // 2. Real Unpaid Invoice Alerts
@@ -385,7 +392,9 @@ class DashboardService extends BaseService
                         'link' => url('/billing/invoices/' . $inv->id)
                     ]);
                 }
-            } catch (\Throwable $e) {}
+            } catch (\Throwable $e) {
+                Log::warning('Dashboard: unpaid invoice alerts query failed', ['error' => $e->getMessage()]);
+            }
         }
 
         // 3. Real Wallet Balance Notification
@@ -445,7 +454,7 @@ class DashboardService extends BaseService
             throw new \Exception("User {$user->id} is missing an associated currency relation.");
         }
 
-        $totalMonthlySubscription = $this->calculateTotalMonthlySubscription($user, $userCurrency);
+        $totalMonthlySubscription = $this->monthlySubscriptionForDisplay($user, $userCurrency);
 
         return [
             'walletBalance' => $walletBalance,
@@ -460,6 +469,20 @@ class DashboardService extends BaseService
             'pendingWithdrawals' => $pendingWithdrawals,
             'currency' => $userCurrency,
         ];
+    }
+
+    /**
+     * Dashboard figure only: a missing exchange rate shows a dash (null) instead of a 500 page.
+     */
+    private function monthlySubscriptionForDisplay(User $user, Currency $userCurrency): ?float
+    {
+        try {
+            return $this->calculateTotalMonthlySubscription($user, $userCurrency);
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Client monthly subscription total unavailable: missing exchange rate.', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     private function calculateTotalMonthlySubscription(User $user, $userCurrency): float
@@ -512,6 +535,7 @@ class DashboardService extends BaseService
                 ->where('status', 'active')
                 ->sum('amount_paid');
         } catch (\Throwable $e) {
+            Log::warning('Dashboard: tool subscriptions query failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
 
         return (float) $erpMonthly + (float) $toolsMonthly;

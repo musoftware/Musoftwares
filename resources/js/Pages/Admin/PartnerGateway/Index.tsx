@@ -13,6 +13,8 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { useConfirm } from '@/hooks/useConfirm';
+import { __ } from '@/lib/i18n';
 import {
   Key,
   Plus,
@@ -93,6 +95,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
   const [revealedSecrets, setRevealedSecrets] = useState<Record<number, boolean>>({});
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const { confirm, confirmDialog } = useConfirm();
 
   const toggleSecretReveal = (id: number) => {
     setRevealedSecrets(prev => ({ ...prev, [id]: !prev[id] }));
@@ -192,34 +195,44 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
     });
   };
 
-  const handleRotateSecret = (client: PartnerClientItem) => {
-    if (confirm(`Are you sure you want to regenerate the API secret for "${client.client_name}"? Existing integrations will need to update their secret.`)) {
-      router.post(route('admin.partner-gateway.regenerate-secret', client.id));
-    }
+  const handleRotateSecret = async (client: PartnerClientItem) => {
+    const accepted = await confirm({
+      title: __('admin.partner_gateway_rotate_confirm_title'),
+      description: __('admin.partner_gateway_rotate_confirm_body', { name: client.client_name }),
+      variant: 'danger',
+      confirmLabel: __('admin.partner_gateway_rotate_confirm_button'),
+    });
+    if (!accepted) return;
+    router.post(route('admin.partner-gateway.regenerate-secret', client.id));
   };
 
-  const handleDelete = (client: PartnerClientItem) => {
-    if (confirm(`Are you sure you want to delete "${client.client_name}"?`)) {
-      router.delete(route('admin.partner-gateway.destroy', client.id));
-    }
+  const handleDelete = async (client: PartnerClientItem) => {
+    const accepted = await confirm({
+      title: __('admin.partner_gateway_delete_confirm_title'),
+      description: __('admin.partner_gateway_delete_confirm_body', { name: client.client_name }),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
+    router.delete(route('admin.partner-gateway.destroy', client.id));
   };
 
   return (
     <AdminSidebarLayout>
-      <Head title="Partner Gateway (B2B SaaS Metering)" />
+      <Head title={__('admin.partner_gateway_page_title')} />
 
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Partner Gateway Management</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{__('admin.partner_gateway_heading')}</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Activate and manage B2B partner API credentials, credit leases, and message metering.
+              {__('admin.partner_gateway_subheading')}
             </p>
           </div>
           <Button onClick={() => setCreateModalOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
-            Activate Partner Account
+            {__('admin.partner_gateway_activate_account')}
           </Button>
         </div>
 
@@ -227,7 +240,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 rounded-xl border bg-card text-card-foreground shadow-sm">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Total Partners</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">{__('admin.partner_gateway_total_partners')}</span>
               <Users className="w-4 h-4" />
             </div>
             <div className="text-2xl font-bold">{totals.total_clients}</div>
@@ -235,7 +248,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
           <div className="p-4 rounded-xl border bg-card text-card-foreground shadow-sm">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Active Partners</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">{__('admin.partner_gateway_active_partners')}</span>
               <CheckCircle className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="text-2xl font-bold">{totals.active_clients}</div>
@@ -243,7 +256,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
           <div className="p-4 rounded-xl border bg-card text-card-foreground shadow-sm">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Total Balances (USD)</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">{__('admin.partner_gateway_total_balances_usd')}</span>
               <DollarSign className="w-4 h-4 text-primary" />
             </div>
             <div className="text-2xl font-bold">
@@ -253,7 +266,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
           <div className="p-4 rounded-xl border bg-card text-card-foreground shadow-sm">
             <div className="flex items-center justify-between text-muted-foreground mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Active Credit Leases</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">{__('admin.partner_gateway_active_credit_leases')}</span>
               <Layers className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-2xl font-bold">{totals.active_leases_count}</div>
@@ -265,14 +278,14 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by client name, key, user..."
+              placeholder={__('admin.partner_gateway_search_placeholder')}
               className="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <Button type="submit" variant="secondary">
-            Search
+            {__('general.search')}
           </Button>
         </form>
 
@@ -282,21 +295,21 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
             <table className="w-full text-sm text-left">
               <thead className="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider border-b">
                 <tr>
-                  <th className="px-4 py-3">Partner Client</th>
-                  <th className="px-4 py-3">Owner User</th>
-                  <th className="px-4 py-3">API Credentials (Key & Secret)</th>
-                  <th className="px-4 py-3">Rate / Msg</th>
-                  <th className="px-4 py-3">Wallet Balance</th>
-                  <th className="px-4 py-3">Active Leases</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_partner_client')}</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_owner_user')}</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_api_credentials')}</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_rate_per_msg')}</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_wallet_balance')}</th>
+                  <th className="px-4 py-3">{__('admin.partner_gateway_col_active_leases')}</th>
+                  <th className="px-4 py-3">{__('general.status')}</th>
+                  <th className="px-4 py-3 text-right">{__('general.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {clients.data.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
-                      No partner clients found. Click "Activate Partner Account" to create one.
+                      {__('admin.partner_gateway_empty_state')}
                     </td>
                   </tr>
                 ) : (
@@ -313,19 +326,20 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                             <div className="text-xs text-muted-foreground">{client.user.email}</div>
                           </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground italic">System / Direct</span>
+                          <span className="text-xs text-muted-foreground italic">{__('admin.partner_gateway_system_direct')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3 font-mono text-xs space-y-1 min-w-[220px]">
                         {/* Client Key */}
                         <div className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded border">
-                          <span className="text-[10px] font-bold text-muted-foreground tracking-wider shrink-0">KEY:</span>
+                          <span className="text-[10px] font-bold text-muted-foreground tracking-wider shrink-0">{__('admin.partner_gateway_key_label')}</span>
                           <span className="truncate max-w-[130px] select-all">{client.client_key.substring(0, 14)}...</span>
                           <button
                             type="button"
                             onClick={() => handleCopyNamed(client.client_key, `key-${client.id}`)}
                             className="p-1 rounded hover:bg-background text-muted-foreground ms-auto shrink-0"
-                            title="Copy Client Key (pk_live_...)"
+                            title={__('admin.partner_gateway_copy_client_key')}
+                            aria-label={__('admin.partner_gateway_copy_client_key')}
                           >
                             {copiedSection === `key-${client.id}` ? (
                               <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -336,7 +350,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                         </div>
                         {/* Client Secret */}
                         <div className="flex items-center gap-1.5 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/20">
-                          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wider shrink-0">SECRET:</span>
+                          <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-wider shrink-0">{__('admin.partner_gateway_secret_label')}</span>
                           <span className="truncate max-w-[130px] text-amber-600 dark:text-amber-400 select-all">
                             {revealedSecrets[client.id] ? client.client_secret : '••••••••••••••••'}
                           </span>
@@ -345,7 +359,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                               type="button"
                               onClick={() => toggleSecretReveal(client.id)}
                               className="p-1 rounded hover:bg-background text-muted-foreground"
-                              title={revealedSecrets[client.id] ? "Hide Secret" : "Reveal Secret"}
+                              title={revealedSecrets[client.id] ? __('admin.partner_gateway_hide_secret') : __('admin.partner_gateway_reveal_secret')}
+                              aria-label={revealedSecrets[client.id] ? __('admin.partner_gateway_hide_secret') : __('admin.partner_gateway_reveal_secret')}
                             >
                               {revealedSecrets[client.id] ? <EyeOff className="w-3.5 h-3.5 text-amber-500" /> : <Eye className="w-3.5 h-3.5" />}
                             </button>
@@ -353,7 +368,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                               type="button"
                               onClick={() => handleCopyNamed(client.client_secret, `secret-${client.id}`)}
                               className="p-1 rounded hover:bg-background text-muted-foreground"
-                              title="Copy Secret Key (sk_live_...)"
+                              title={__('admin.partner_gateway_copy_secret_key')}
+                              aria-label={__('admin.partner_gateway_copy_secret_key')}
                             >
                               {copiedSection === `secret-${client.id}` ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -374,17 +390,17 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-500">
-                          {client.active_leases_count || 0} active
+                          {__('admin.partner_gateway_active_leases_count', { count: client.active_leases_count || 0 })}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         {client.is_active ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500">
-                            <CheckCircle className="w-3 h-3" /> Active
+                            <CheckCircle className="w-3 h-3" /> {__('general.active')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
-                            <XCircle className="w-3 h-3" /> Inactive
+                            <XCircle className="w-3 h-3" /> {__('general.inactive')}
                           </span>
                         )}
                       </td>
@@ -398,7 +414,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                               setCredentialsModalClient(client);
                               setShowModalSecret(false);
                             }}
-                            title="View Full API Credentials & .env config"
+                            title={__('admin.partner_gateway_view_credentials')}
+                            aria-label={__('admin.partner_gateway_view_credentials')}
                           >
                             <Key className="w-3.5 h-3.5" />
                           </Button>
@@ -406,7 +423,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                             size="sm"
                             variant="outline"
                             onClick={() => openAdjustModal(client)}
-                            title="Adjust / Top-Up Balance"
+                            title={__('admin.partner_gateway_adjust_balance_action')}
+                            aria-label={__('admin.partner_gateway_adjust_balance_action')}
                           >
                             <DollarSign className="w-3.5 h-3.5" />
                           </Button>
@@ -414,7 +432,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                             size="sm"
                             variant="outline"
                             onClick={() => openEditModal(client)}
-                            title="Edit Settings"
+                            title={__('admin.edit_settings')}
+                            aria-label={__('admin.edit_settings')}
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Button>
@@ -422,7 +441,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                             size="sm"
                             variant="outline"
                             onClick={() => handleRotateSecret(client)}
-                            title="Rotate Secret Key"
+                            title={__('admin.partner_gateway_rotate_secret')}
+                            aria-label={__('admin.partner_gateway_rotate_secret')}
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
                           </Button>
@@ -431,7 +451,8 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                             variant="ghost"
                             className="text-destructive hover:text-destructive"
                             onClick={() => handleDelete(client)}
-                            title="Delete Partner Client"
+                            title={__('admin.partner_gateway_delete_client')}
+                            aria-label={__('admin.partner_gateway_delete_client')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
@@ -451,15 +472,15 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
         <DialogContent className="sm:max-w-[500px]">
           <form onSubmit={submitCreate}>
             <DialogHeader>
-              <DialogTitle>Activate Partner Account</DialogTitle>
+              <DialogTitle>{__('admin.partner_gateway_activate_account')}</DialogTitle>
               <DialogDescription>
-                Generate API credentials and set pricing parameters for a client user.
+                {__('admin.partner_gateway_create_description')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
               <div className="space-y-1.5">
-                <Label htmlFor="user_id">Select User / Client *</Label>
+                <Label htmlFor="user_id">{__('admin.partner_gateway_select_user')}</Label>
                 <PremiumCombobox
                   value={createForm.data.user_id}
                   onChange={(val) => {
@@ -471,14 +492,14 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                         createForm.setData(prev => ({
                           ...prev,
                           user_id: strVal,
-                          client_name: prev.client_name || `${u.name} Partner Client`
+                          client_name: prev.client_name || __('admin.partner_gateway_default_client_name', { name: u.name })
                         }));
                       }
                     }
                   }}
                   options={users.map((u) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))}
-                  placeholder="-- Choose User --"
-                  searchPlaceholder="Search user by name or email..."
+                  placeholder={__('admin.partner_gateway_choose_user')}
+                  searchPlaceholder={__('admin.partner_gateway_search_user')}
                 />
                 {createForm.errors.user_id && (
                   <p className="text-xs text-destructive mt-1">{createForm.errors.user_id}</p>
@@ -486,10 +507,10 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
               </div>
 
               <div>
-                <Label htmlFor="client_name">Application / Client Name *</Label>
+                <Label htmlFor="client_name">{__('admin.partner_gateway_app_client_name')}</Label>
                 <Input
                   id="client_name"
-                  placeholder="e.g. Trenz Agency CRM"
+                  placeholder={__('admin.partner_gateway_app_client_name_placeholder')}
                   value={createForm.data.client_name}
                   onChange={(e) => createForm.setData('client_name', e.target.value)}
                   required
@@ -501,7 +522,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="cost_per_message">Rate per Msg (USD) *</Label>
+                  <Label htmlFor="cost_per_message">{__('admin.partner_gateway_rate_per_msg_usd')}</Label>
                   <Input
                     id="cost_per_message"
                     type="number"
@@ -514,7 +535,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                 </div>
 
                 <div>
-                  <Label htmlFor="initial_balance">Initial Balance ($)</Label>
+                  <Label htmlFor="initial_balance">{__('admin.partner_gateway_initial_balance')}</Label>
                   <Input
                     id="initial_balance"
                     type="number"
@@ -528,21 +549,21 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="pricing_model">Pricing Model</Label>
+                  <Label htmlFor="pricing_model">{__('admin.partner_gateway_pricing_model')}</Label>
                   <select
                     id="pricing_model"
                     className="w-full mt-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                     value={createForm.data.pricing_model}
                     onChange={(e) => createForm.setData('pricing_model', e.target.value)}
                   >
-                    <option value="PAYG_PER_MSG">Pay As You Go</option>
-                    <option value="SUBSCRIPTION">Subscription</option>
-                    <option value="HYBRID">Hybrid</option>
+                    <option value="PAYG_PER_MSG">{__('admin.partner_gateway_pricing_payg')}</option>
+                    <option value="SUBSCRIPTION">{__('admin.partner_gateway_pricing_subscription')}</option>
+                    <option value="HYBRID">{__('admin.partner_gateway_pricing_hybrid')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <Label htmlFor="low_balance_threshold">Low Balance Alert ($)</Label>
+                  <Label htmlFor="low_balance_threshold">{__('admin.partner_gateway_low_balance_alert')}</Label>
                   <Input
                     id="low_balance_threshold"
                     type="number"
@@ -557,10 +578,10 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateModalOpen(false)}>
-                Cancel
+                {__('general.cancel')}
               </Button>
               <Button type="submit" disabled={createForm.processing}>
-                Generate & Activate
+                {__('admin.partner_gateway_generate_activate')}
               </Button>
             </DialogFooter>
           </form>
@@ -572,15 +593,15 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
         <DialogContent className="sm:max-w-[500px]">
           <form onSubmit={submitEdit}>
             <DialogHeader>
-              <DialogTitle>Edit Partner Settings</DialogTitle>
+              <DialogTitle>{__('admin.partner_gateway_edit_title')}</DialogTitle>
               <DialogDescription>
-                Update rate per message, pricing model, and active state.
+                {__('admin.partner_gateway_edit_description')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
               <div>
-                <Label htmlFor="edit_client_name">Client Name *</Label>
+                <Label htmlFor="edit_client_name">{__('admin.partner_gateway_client_name_required')}</Label>
                 <Input
                   id="edit_client_name"
                   value={editForm.data.client_name}
@@ -591,7 +612,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="edit_cost">Rate per Msg ($)</Label>
+                  <Label htmlFor="edit_cost">{__('admin.partner_gateway_rate_per_msg')}</Label>
                   <Input
                     id="edit_cost"
                     type="number"
@@ -604,7 +625,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                 </div>
 
                 <div>
-                  <Label htmlFor="edit_threshold">Low Balance Alert ($)</Label>
+                  <Label htmlFor="edit_threshold">{__('admin.partner_gateway_low_balance_alert')}</Label>
                   <Input
                     id="edit_threshold"
                     type="number"
@@ -618,16 +639,16 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
               </div>
 
               <div>
-                <Label htmlFor="edit_pricing">Pricing Model</Label>
+                <Label htmlFor="edit_pricing">{__('admin.partner_gateway_pricing_model')}</Label>
                 <select
                   id="edit_pricing"
                   className="w-full mt-1.5 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
                   value={editForm.data.pricing_model}
                   onChange={(e) => editForm.setData('pricing_model', e.target.value)}
                 >
-                  <option value="PAYG_PER_MSG">Pay As You Go</option>
-                  <option value="SUBSCRIPTION">Subscription</option>
-                  <option value="HYBRID">Hybrid</option>
+                  <option value="PAYG_PER_MSG">{__('admin.partner_gateway_pricing_payg')}</option>
+                  <option value="SUBSCRIPTION">{__('admin.partner_gateway_pricing_subscription')}</option>
+                  <option value="HYBRID">{__('admin.partner_gateway_pricing_hybrid')}</option>
                 </select>
               </div>
 
@@ -640,17 +661,17 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                   onChange={(e) => editForm.setData('is_active', e.target.checked)}
                 />
                 <Label htmlFor="edit_is_active" className="cursor-pointer">
-                  Active (Allow API Requests & Credit Leases)
+                  {__('admin.partner_gateway_active_checkbox')}
                 </Label>
               </div>
             </div>
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setEditModalOpen(false)}>
-                Cancel
+                {__('general.cancel')}
               </Button>
               <Button type="submit" disabled={editForm.processing}>
-                Save Changes
+                {__('general.save_changes')}
               </Button>
             </DialogFooter>
           </form>
@@ -662,34 +683,34 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
         <DialogContent className="sm:max-w-[450px]">
           <form onSubmit={submitAdjust}>
             <DialogHeader>
-              <DialogTitle>Adjust Partner Balance</DialogTitle>
+              <DialogTitle>{__('admin.partner_gateway_adjust_title')}</DialogTitle>
               <DialogDescription>
-                Credit or debit balance manually for {selectedClient?.client_name}. (Use negative amount to deduct).
+                {__('admin.partner_gateway_adjust_description', { name: selectedClient?.client_name ?? '' })}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
               <div>
-                <Label htmlFor="adjust_amount">Adjustment Amount ($ USD) *</Label>
+                <Label htmlFor="adjust_amount">{__('admin.partner_gateway_adjust_amount')}</Label>
                 <Input
                   id="adjust_amount"
                   type="number"
                   step="0.0001"
-                  placeholder="e.g. 50.00 or -10.00"
+                  placeholder={__('admin.partner_gateway_adjust_amount_placeholder')}
                   value={adjustForm.data.amount}
                   onChange={(e) => adjustForm.setData('amount', e.target.value)}
                   required
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Current Balance: ${Number(selectedClient?.wallet_balance || 0).toFixed(4)}
+                  {__('admin.partner_gateway_current_balance', { amount: `$${Number(selectedClient?.wallet_balance || 0).toFixed(4)}` })}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="adjust_reason">Reason / Reference Note *</Label>
+                <Label htmlFor="adjust_reason">{__('admin.partner_gateway_adjust_reason')}</Label>
                 <Input
                   id="adjust_reason"
-                  placeholder="e.g. Manual bank transfer deposit, promotional credit"
+                  placeholder={__('admin.partner_gateway_adjust_reason_placeholder')}
                   value={adjustForm.data.reason}
                   onChange={(e) => adjustForm.setData('reason', e.target.value)}
                   required
@@ -699,10 +720,10 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setAdjustModalOpen(false)}>
-                Cancel
+                {__('general.cancel')}
               </Button>
               <Button type="submit" disabled={adjustForm.processing}>
-                Apply Adjustment
+                {__('admin.partner_gateway_apply_adjustment')}
               </Button>
             </DialogFooter>
           </form>
@@ -717,23 +738,24 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
               <DialogHeader>
                 <div className="flex items-center gap-2 text-primary">
                   <Key className="w-5 h-5" />
-                  <DialogTitle>Partner API Credentials</DialogTitle>
+                  <DialogTitle>{__('admin.partner_gateway_credentials_title')}</DialogTitle>
                 </div>
                 <DialogDescription>
-                  Credentials and .env configuration snippet for <strong>{credentialsModalClient.client_name}</strong>.
+                  {__('admin.partner_gateway_credentials_description')} <strong>{credentialsModalClient.client_name}</strong>.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 py-4 text-xs font-mono">
                 {/* Base URL */}
                 <div className="space-y-1">
-                  <div className="text-muted-foreground font-sans font-medium text-xs">Gateway API Base URL:</div>
+                  <div className="text-muted-foreground font-sans font-medium text-xs">{__('admin.partner_gateway_base_url_label')}</div>
                   <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
                     <span className="text-foreground select-all">https://musoftwares.com/api/v1/partner</span>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="h-7 px-2"
+                      aria-label={__('admin.partner_gateway_copy_base_url')}
                       onClick={() => handleCopyNamed('https://musoftwares.com/api/v1/partner', 'env-base-url')}
                     >
                       {copiedSection === 'env-base-url' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -743,13 +765,14 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
 
                 {/* Client Key */}
                 <div className="space-y-1">
-                  <div className="text-muted-foreground font-sans font-medium text-xs">MUSOFTWARES_CLIENT_KEY (Public Key):</div>
+                  <div className="text-muted-foreground font-sans font-medium text-xs">MUSOFTWARES_CLIENT_KEY ({__('admin.partner_gateway_public_key')}):</div>
                   <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
                     <span className="text-foreground break-all select-all">{credentialsModalClient.client_key}</span>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="h-7 px-2 shrink-0 ms-2"
+                      aria-label={__('admin.partner_gateway_copy_client_key')}
                       onClick={() => handleCopyNamed(credentialsModalClient.client_key, 'env-client-key')}
                     >
                       {copiedSection === 'env-client-key' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -760,14 +783,14 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                 {/* Secret Key */}
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-muted-foreground font-sans font-medium text-xs">
-                    <span>MUSOFTWARES_CLIENT_SECRET (Secret Key):</span>
+                    <span>MUSOFTWARES_CLIENT_SECRET ({__('admin.partner_gateway_secret_key')}):</span>
                     <button
                       type="button"
                       onClick={() => setShowModalSecret(!showModalSecret)}
                       className="text-primary hover:underline flex items-center gap-1 font-sans text-xs"
                     >
                       {showModalSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      {showModalSecret ? 'Hide' : 'Reveal'}
+                      {showModalSecret ? __('general.hide') : __('admin.partner_gateway_reveal')}
                     </button>
                   </div>
                   <div className="flex items-center justify-between bg-muted p-2 rounded-lg border">
@@ -778,6 +801,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                       size="sm"
                       variant="ghost"
                       className="h-7 px-2 shrink-0 ms-2"
+                      aria-label={__('admin.partner_gateway_copy_secret_key')}
                       onClick={() => handleCopyNamed(credentialsModalClient.client_secret, 'env-client-secret')}
                     >
                       {copiedSection === 'env-client-secret' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -788,7 +812,7 @@ export default function AdminPartnerGatewayIndex({ clients, totals, users, filte
                 {/* .env snippet */}
                 <div className="space-y-1 pt-2">
                   <div className="flex items-center justify-between text-muted-foreground font-sans font-medium text-xs">
-                    <span className="flex items-center gap-1.5"><Terminal className="w-3.5 h-3.5" /> Ready .env Snippet:</span>
+                    <span className="flex items-center gap-1.5"><Terminal className="w-3.5 h-3.5" /> {__('admin.partner_gateway_ready_env_snippet')}</span>
                   </div>
                   <div className="relative bg-slate-950 text-emerald-400 p-3 rounded-lg border font-mono text-[11px] overflow-x-auto">
                     <pre>{`MUSOFTWARES_GATEWAY_URL=https://musoftwares.com/api/v1/partner
@@ -810,22 +834,23 @@ MUSOFTWARES_CLIENT_SECRET=${credentialsModalClient.client_secret}`}</pre>
                 >
                   {copiedSection === 'all-env' ? (
                     <>
-                      <Check className="w-4 h-4 mr-1.5 text-emerald-300" /> Copied .env Configuration!
+                      <Check className="w-4 h-4 mr-1.5 text-emerald-300" /> {__('admin.partner_gateway_copied_env')}
                     </>
                   ) : (
                     <>
-                      <Copy className="w-4 h-4 mr-1.5" /> Copy Complete .env Snippet
+                      <Copy className="w-4 h-4 mr-1.5" /> {__('admin.partner_gateway_copy_env_snippet')}
                     </>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setCredentialsModalClient(null)}>
-                  Close
+                  {__('general.close')}
                 </Button>
               </DialogFooter>
             </div>
           )}
         </DialogContent>
       </Dialog>
+      {confirmDialog}
     </AdminSidebarLayout>
   );
 }

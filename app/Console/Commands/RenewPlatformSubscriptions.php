@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CurrenciesExchange;
 use App\Models\PlatformSubscription;
 use App\Models\User;
 use App\Notifications\SubscriptionPaymentFailedNotification;
@@ -57,8 +58,9 @@ class RenewPlatformSubscriptions extends Command
                 $user = $subscription->user;
                 $plan = $subscription->plan;
 
-                // Check plan price
-                $price = (float) $subscription->amount;
+                // Plan price is stored in the subscription currency; convert it to the wallet currency.
+                $price = (float) CurrenciesExchange::RateToday((float) $subscription->amount, $subscription->currency_id, $user->currency_id);
+                $walletCurrency = $user->currency_name();
 
                 if ($price <= 0 || $plan->plan_name === 'Trial') {
                     // Free plan or Trial - should not auto renew usually, but if it does:
@@ -91,7 +93,7 @@ class RenewPlatformSubscriptions extends Command
                                     $user->add_balance(-1 * $proratedPrice, 'Prorated Platform Subscription Renewal: '.$plan->plan_name, 'used');
                                     $this->renewSubscription($subscription, $plan, $user, $proratedPrice, $proratedDays);
                                 });
-                                $this->info("Subscription ID: {$subscription->id} prorated renewed for {$proratedDays} days via balance debit of {$proratedPrice} USD.");
+                                $this->info("Subscription ID: {$subscription->id} prorated renewed for {$proratedDays} days via balance debit of {$proratedPrice} {$walletCurrency}.");
 
                                 continue;
                             }
@@ -104,7 +106,7 @@ class RenewPlatformSubscriptions extends Command
                         $this->renewSubscription($subscription, $plan, $user, $price);
                     });
 
-                    $this->info("Subscription ID: {$subscription->id} renewed successfully via balance debit of {$price} USD.");
+                    $this->info("Subscription ID: {$subscription->id} renewed successfully via balance debit of {$price} {$walletCurrency}.");
                 } catch (Exception $balanceException) {
                     $this->warn("Failed to debit balance for Subscription ID: {$subscription->id}. Reason: ".$balanceException->getMessage());
 

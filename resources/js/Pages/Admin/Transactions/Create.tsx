@@ -87,8 +87,8 @@ export default function Create({ user, selectedProject, type, currencies, busine
     const { auth } = usePage().props as any;
 
     return (
-        <AdminSidebarLayout title={__('general.new_transaction')} header="New Transaction" user={auth?.user}>
-            <Head title={`Adjust Wallet: ${user.name}`} />
+        <AdminSidebarLayout title={__('general.new_transaction')} header={__('general.new_transaction')} user={auth?.user}>
+            <Head title={__('admin.adjust_wallet_title', { name: user.name })} />
 
             <div className="w-full w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4">
@@ -194,7 +194,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </TabsTrigger>
                         <TabsTrigger value="used" className="flex items-center gap-2">
                             <ArrowUpRight className="h-4 w-4 text-gray-500" />
-                            <span className="hidden sm:inline">{__('general.used') || 'Used'}</span>
+                            <span className="hidden sm:inline">{__('general.used')}</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -229,15 +229,15 @@ export default function Create({ user, selectedProject, type, currencies, busine
                     </div>
                     {(hourRate !== undefined || recommendedHourRate !== undefined) && (
                         <div className="flex items-center gap-4 text-sm bg-muted/30 px-4 py-2 rounded-full border">
-                            <span className="font-semibold text-muted-foreground uppercase tracking-wider text-xs">Rates Info:</span>
+                            <span className="font-semibold text-muted-foreground uppercase tracking-wider text-xs">{__('admin.transaction_rates_info')}</span>
                             {hourRate !== undefined && (
-                                <span className="flex items-center gap-1">Client Rate: <strong className="text-foreground"><CurrencyDisplay amount={hourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
+                                <span className="flex items-center gap-1">{__('admin.transaction_client_rate')} <strong className="text-foreground"><CurrencyDisplay amount={hourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
                             )}
                             {hourRate !== undefined && recommendedHourRate !== undefined && (
                                 <span className="text-muted-foreground/50">|</span>
                             )}
                             {recommendedHourRate !== undefined && (
-                                <span className="flex items-center gap-1">Recommended: <strong className="text-foreground"><CurrencyDisplay amount={recommendedHourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
+                                <span className="flex items-center gap-1">{__('admin.transaction_recommended_rate')} <strong className="text-foreground"><CurrencyDisplay amount={recommendedHourRate} currency={user.currency_obj || businessCurrency} /></strong></span>
                             )}
                         </div>
                     )}

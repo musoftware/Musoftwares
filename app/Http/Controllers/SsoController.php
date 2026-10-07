@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\SsoToken;
 use App\Models\UserSubscription;
+use App\Support\SsoSignature;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,7 +86,7 @@ class SsoController extends Controller
 
         $system = $this->resolveSystem((string) $ssoToken->target_system) ?? (string) $ssoToken->target_system;
 
-        // Verify HMAC signature if configured for the target system BEFORE consuming token
+        // Require a valid HMAC signature for the target system BEFORE consuming token
         if (! $this->verifySignature($request, $system, (string) $tokenString)) {
             return response()->json(['error' => 'invalid_signature'], 401);
         }
@@ -167,42 +167,11 @@ class SsoController extends Controller
     }
 
     /**
-     * Verify HMAC signature from incoming server-to-server request.
+     * Verify the required HMAC signature from an incoming server-to-server request.
      */
     protected function verifySignature(Request $request, string $system, string $token): bool
     {
-        $signature = $request->header('X-GoldSaver-Signature')
-            ?? $request->header('X-ToolSys-Signature')
-            ?? $request->header('X-Investor-Signature')
-            ?? $request->header('X-Sso-Signature');
-
-        $timestamp = $request->header('X-GoldSaver-Timestamp')
-            ?? $request->header('X-ToolSys-Timestamp')
-            ?? $request->header('X-Investor-Timestamp')
-            ?? $request->header('X-Sso-Timestamp');
-
-        $secret = (string) config("services.{$system}.shared_secret", '');
-
-        // If secret is configured and signature headers are sent, verify strictly
-        if ($secret !== '' && $signature) {
-            if (! $timestamp || abs(now()->timestamp - (int) $timestamp) > 300) {
-                Log::warning('[SSO] Verification timestamp expired or missing for system: '.$system);
-
-                return false;
-            }
-
-            $expected = hash_hmac('sha256', $timestamp.'.'.$token, $secret);
-            if (! hash_equals($expected, $signature)) {
-                Log::warning('[SSO] Signature mismatch for system: '.$system, [
-                    'received' => $signature,
-                    'expected' => $expected,
-                ]);
-
-                return false;
-            }
-        }
-
-        return true;
+        return SsoSignature::verify($request, $system, $token) === null;
     }
 
     /**

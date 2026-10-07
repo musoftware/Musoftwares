@@ -113,7 +113,7 @@ export default function Index({ auth, vouchers, redemptions }: Props) {
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
                                                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#2997ff] block mb-1">
-                                                    Studio Promo Reward
+                                                    {__('client.voucher_promo_reward')}
                                                 </span>
                                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-white font-sans">
                                                     {voucher.name}

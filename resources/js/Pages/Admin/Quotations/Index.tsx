@@ -7,20 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { 
     FileText, Plus, Search, Eye, Edit3, Trash2, Copy, Check, 
-    Share2, MessageCircle, DollarSign,
+    Share2, DollarSign,
     CheckCircle2, Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
-
-interface QuotationItem {
-    id: number;
-    type: 'our_work' | 'indicative_cost';
-    title: string;
-    price: number;
-    quantity: number;
-    total: number;
-}
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 interface Quotation {
     id: number;
@@ -78,6 +71,7 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
     const [statusFilter, setStatusFilter] = useState(filters.status || 'all');
     const [currencyFilter, setCurrencyFilter] = useState(filters.currency || 'all');
     const [copiedId, setCopiedId] = useState<number | null>(null);
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,12 +109,17 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
         });
     };
 
-    const handleDelete = (id: number, title: string) => {
-        if (confirm(__('quotations.delete_confirm', { title }))) {
-            router.delete(`/admin/marketplace/quotations/${id}`, {
-                onSuccess: () => toast.success(__('quotations.deleted_success')),
-            });
-        }
+    const handleDelete = async (id: number, title: string) => {
+        const accepted = await confirm({
+            title: __('quotations.delete'),
+            description: __('quotations.delete_confirm', { title }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/marketplace/quotations/${id}`, {
+            onSuccess: () => toast.success(__('quotations.deleted_success')),
+        });
     };
 
     const getStatusBadge = (status: string) => {
@@ -139,6 +138,7 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
     return (
         <AdminSidebarLayout header={__('quotations.title')}>
             <Head title={__('quotations.admin_title')} />
+            {confirmDialog}
 
             <div className="space-y-6 max-w-7xl mx-auto pb-12">
                 {/* Header & Actions */}
@@ -360,18 +360,19 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
                                                         onClick={() => copyShareLink(quote)}
                                                         className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900"
                                                         title={__('quotations.copy_shortlink')}
+                                                        aria-label={__('quotations.copy_shortlink')}
                                                     >
                                                         {copiedId === quote.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
                                                     </Button>
 
                                                     <Link href={`/admin/marketplace/quotations/${quote.id}`}>
-                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('quotations.view_details')}>
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('quotations.view_details')} aria-label={__('quotations.view_details')}>
                                                             <Eye className="w-4 h-4" />
                                                         </Button>
                                                     </Link>
 
                                                     <Link href={`/admin/marketplace/quotations/${quote.id}/edit`}>
-                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('quotations.save_changes')}>
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('general.edit')} aria-label={__('general.edit')}>
                                                             <Edit3 className="w-4 h-4" />
                                                         </Button>
                                                     </Link>
@@ -382,6 +383,7 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
                                                         onClick={() => handleDuplicate(quote.id)}
                                                         className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900"
                                                         title={__('quotations.duplicate')}
+                                                        aria-label={__('quotations.duplicate')}
                                                     >
                                                         <Copy className="w-4 h-4" />
                                                     </Button>
@@ -392,6 +394,7 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
                                                         onClick={() => handleDelete(quote.id, quote.title)}
                                                         className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                                                         title={__('quotations.delete')}
+                                                        aria-label={__('quotations.delete')}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </Button>
@@ -404,6 +407,8 @@ export default function Index({ quotations, filters, metrics, currencies }: Inde
                         </div>
                     </div>
                 )}
+
+                <Pagination links={quotations.links} />
             </div>
         </AdminSidebarLayout>
     );

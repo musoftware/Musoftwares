@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use RuntimeException;
+use Illuminate\Support\Facades\Log;
 
 class ClientPartnerGatewayController extends Controller
 {
@@ -130,7 +131,7 @@ class ClientPartnerGatewayController extends Controller
                 return Inertia::location($paymentUrl);
             }
         } catch (\Throwable $e) {
-            // If online gateway is in test mode or unavailable, credit test topup or show error
+            Log::error('Partner gateway top-up: online payment redirect failed', ['user_id' => auth()->id(), 'error' => $e->getMessage()]);
         }
 
         return redirect()->back()->with('error', 'Online payment gateway is temporarily unavailable. Please use wallet balance or contact support.');

@@ -31,6 +31,8 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface PartnerClient {
   id: number;
@@ -83,6 +85,7 @@ export default function ClientPartnerGatewayIndex({
   userCurrency = 'USD',
   userCurrencySymbol = '$',
 }: Props) {
+  const { confirm, confirmDialog } = useConfirm();
   const [showSecret, setShowSecret] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [topUpModalOpen, setTopUpModalOpen] = useState(false);
@@ -102,10 +105,14 @@ export default function ClientPartnerGatewayIndex({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleRegenerateSecret = () => {
-    if (confirm("Are you sure you want to regenerate your Partner Secret? Any active server or CRM integration using the old secret will be immediately disconnected.")) {
-      router.post(route('client.partner-gateway.regenerate-secret'));
-    }
+  const handleRegenerateSecret = async () => {
+    const accepted = await confirm({
+      title: __('client.partner_regenerate_title'),
+      description: __('client.partner_regenerate_confirm'),
+      variant: 'danger',
+    });
+    if (!accepted) return;
+    router.post(route('client.partner-gateway.regenerate-secret'));
   };
 
   const handleWalletTopUp = (e: React.FormEvent) => {
@@ -128,15 +135,15 @@ export default function ClientPartnerGatewayIndex({
 
   if (!partnerClient) {
     return (
-      <WorkspaceLayout title="Partner Gateway API">
-        <Head title="Partner Gateway - Developer API" />
+      <WorkspaceLayout title={__('general.partner_gateway_api')}>
+        <Head title={__('client.partner_page_title')} />
         <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 text-center space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
             <Zap className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl font-bold">Partner Gateway API Not Activated</h2>
+          <h2 className="text-2xl font-bold">{__('client.partner_not_activated')}</h2>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
-            Your account does not have an active Partner Gateway integration. Please contact our support or account manager to enable high-throughput B2B message metering for your application.
+            {__('client.partner_not_activated_desc')}
           </p>
         </div>
       </WorkspaceLayout>
@@ -146,27 +153,27 @@ export default function ClientPartnerGatewayIndex({
   const isLowBalance = Number(partnerClient.wallet_balance) <= Number(partnerClient.low_balance_threshold);
 
   return (
-    <WorkspaceLayout title="Partner Gateway API">
-      <Head title="Partner Gateway - Developer API" />
+    <WorkspaceLayout title={__('general.partner_gateway_api')}>
+      <Head title={__('client.partner_page_title')} />
 
       <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6 space-y-8">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">Partner Gateway API</h1>
+              <h1 className="text-2xl font-bold tracking-tight">{__('general.partner_gateway_api')}</h1>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-500">
-                Live Production
+                {__('client.partner_live_production')}
               </span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
-              High-throughput B2B message metering, credit leases, and server-to-server HMAC authentication.
+              {__('client.partner_subtitle')}
             </p>
           </div>
 
           <Button onClick={() => setTopUpModalOpen(true)} className="gap-2 shadow-md">
             <Wallet className="w-4 h-4" />
-            Top Up Partner Credits
+            {__('client.partner_top_up_credits')}
           </Button>
         </div>
 
@@ -175,13 +182,13 @@ export default function ClientPartnerGatewayIndex({
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <div className="flex-1 text-sm">
-              <div className="font-semibold text-amber-600 dark:text-amber-400">Low Balance Warning</div>
+              <div className="font-semibold text-amber-600 dark:text-amber-400">{__('client.partner_low_balance_title')}</div>
               <div className="text-muted-foreground mt-0.5">
-                Your remaining partner balance is below the ${Number(partnerClient.low_balance_threshold).toFixed(2)} threshold. Please recharge your balance to prevent automated lease acquisition rejections.
+                {__('client.partner_low_balance_desc', { threshold: `$${Number(partnerClient.low_balance_threshold).toFixed(2)}` })}
               </div>
             </div>
             <Button size="sm" variant="outline" className="border-amber-500/40 text-amber-600 hover:bg-amber-500/20" onClick={() => setTopUpModalOpen(true)}>
-              Recharge Now
+              {__('client.partner_recharge_now')}
             </Button>
           </div>
         )}
@@ -191,14 +198,14 @@ export default function ClientPartnerGatewayIndex({
           {/* Partner Balance Card */}
           <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-3">
             <div className="flex items-center justify-between text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-              <span>Partner Wallet Balance</span>
+              <span>{__('client.partner_wallet_balance')}</span>
               <Wallet className="w-4 h-4 text-emerald-500" />
             </div>
             <div className="text-3xl font-extrabold font-mono text-emerald-500">
               ${Number(partnerClient.wallet_balance).toFixed(4)} <span className="text-xs text-muted-foreground font-normal">USD</span>
             </div>
             <div className="text-xs text-muted-foreground flex items-center justify-between pt-1 border-t">
-              <span>Rate per Message:</span>
+              <span>{__('client.partner_rate_per_message')}</span>
               <span className="font-mono font-semibold text-foreground">${Number(partnerClient.cost_per_message).toFixed(4)}</span>
             </div>
           </div>
@@ -206,29 +213,29 @@ export default function ClientPartnerGatewayIndex({
           {/* User Main Balance Card */}
           <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-3">
             <div className="flex items-center justify-between text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-              <span>Main Account Balance</span>
+              <span>{__('client.partner_main_balance')}</span>
               <CreditCard className="w-4 h-4 text-primary" />
             </div>
             <div className="text-3xl font-extrabold font-mono text-foreground">
               {userCurrencySymbol}{Number(userWalletBalance).toFixed(2)} <span className="text-xs text-muted-foreground font-normal">{userCurrency}</span>
             </div>
             <div className="text-xs text-muted-foreground flex items-center justify-between pt-1 border-t">
-              <span>Instant Transfer Available:</span>
-              <span className="text-emerald-500 font-medium">Ready</span>
+              <span>{__('client.partner_instant_transfer_available')}</span>
+              <span className="text-emerald-500 font-medium">{__('client.partner_ready')}</span>
             </div>
           </div>
 
           {/* Active Leases Card */}
           <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-3">
             <div className="flex items-center justify-between text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-              <span>Active Leases</span>
+              <span>{__('client.partner_active_leases')}</span>
               <Layers className="w-4 h-4 text-blue-500" />
             </div>
             <div className="text-3xl font-extrabold font-mono text-blue-500">
-              {activeLeases.filter((l) => l.status === 'ACTIVE').length} <span className="text-xs text-muted-foreground font-normal">Active</span>
+              {activeLeases.filter((l) => l.status === 'ACTIVE').length} <span className="text-xs text-muted-foreground font-normal">{__('general.active')}</span>
             </div>
             <div className="text-xs text-muted-foreground flex items-center justify-between pt-1 border-t">
-              <span>Pricing Model:</span>
+              <span>{__('client.partner_pricing_model')}</span>
               <span className="font-semibold text-foreground">{partnerClient.pricing_model}</span>
             </div>
           </div>
@@ -239,7 +246,7 @@ export default function ClientPartnerGatewayIndex({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Key className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-bold">API Credentials</h2>
+              <h2 className="text-lg font-bold">{__('client.partner_api_credentials')}</h2>
             </div>
             <Button
               size="sm"
@@ -248,17 +255,18 @@ export default function ClientPartnerGatewayIndex({
               className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              Regenerate Secret
+              {__('client.partner_regenerate_secret')}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Client Key */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Partner Client Key (Public)</Label>
+              <Label className="text-xs text-muted-foreground">{__('client.partner_client_key')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   readOnly
+                  aria-label={__('client.partner_client_key')}
                   value={partnerClient.client_key}
                   className="font-mono text-xs bg-muted/40 cursor-text"
                 />
@@ -267,6 +275,7 @@ export default function ClientPartnerGatewayIndex({
                   variant="outline"
                   onClick={() => handleCopy(partnerClient.client_key, 'key')}
                   className="shrink-0"
+                  aria-label={__('client.partner_copy_key')}
                 >
                   {copiedField === 'key' ? (
                     <Check className="w-4 h-4 text-emerald-500" />
@@ -279,11 +288,12 @@ export default function ClientPartnerGatewayIndex({
 
             {/* Client Secret */}
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Partner Client Secret (HMAC Signing Secret)</Label>
+              <Label className="text-xs text-muted-foreground">{__('client.partner_client_secret')}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   readOnly
                   type={showSecret ? 'text' : 'password'}
+                  aria-label={__('client.partner_client_secret')}
                   value={partnerClient.client_secret}
                   className="font-mono text-xs bg-muted/40 cursor-text"
                 />
@@ -292,7 +302,8 @@ export default function ClientPartnerGatewayIndex({
                   variant="outline"
                   onClick={() => setShowSecret(!showSecret)}
                   className="shrink-0"
-                  title={showSecret ? 'Hide secret' : 'Reveal secret'}
+                  title={showSecret ? __('client.partner_hide_secret') : __('client.partner_reveal_secret')}
+                  aria-label={showSecret ? __('client.partner_hide_secret') : __('client.partner_reveal_secret')}
                 >
                   {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
@@ -301,6 +312,7 @@ export default function ClientPartnerGatewayIndex({
                   variant="outline"
                   onClick={() => handleCopy(partnerClient.client_secret, 'secret')}
                   className="shrink-0"
+                  aria-label={__('client.partner_copy_secret')}
                 >
                   {copiedField === 'secret' ? (
                     <Check className="w-4 h-4 text-emerald-500" />
@@ -313,7 +325,13 @@ export default function ClientPartnerGatewayIndex({
           </div>
 
           <div className="p-3.5 rounded-xl bg-muted/40 border text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">Authentication Protocol:</span> Requests must include headers <code className="text-foreground">x-partner-key</code>, <code className="text-foreground">x-partner-timestamp</code> (Unix seconds), and <code className="text-foreground">x-partner-signature</code> (SHA256 HMAC of <code className="text-foreground">timestamp.body</code> using your secret).
+            <span className="font-semibold text-foreground">{__('client.partner_auth_protocol')}</span>{' '}
+            {__('client.partner_auth_protocol_desc', {
+              key: 'x-partner-key',
+              timestamp: 'x-partner-timestamp',
+              signature: 'x-partner-signature',
+              payload: 'timestamp.body',
+            })}
           </div>
         </div>
 
@@ -324,7 +342,7 @@ export default function ClientPartnerGatewayIndex({
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-sm flex items-center gap-2">
                 <Layers className="w-4 h-4 text-primary" />
-                Credit Leases History
+                {__('client.partner_leases_history')}
               </h3>
             </div>
 
@@ -332,17 +350,17 @@ export default function ClientPartnerGatewayIndex({
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 text-muted-foreground uppercase border-b">
                   <tr>
-                    <th className="px-3 py-2">Lease ID</th>
-                    <th className="px-3 py-2">Messages</th>
-                    <th className="px-3 py-2">Reserved</th>
-                    <th className="px-3 py-2">Status</th>
+                    <th className="px-3 py-2">{__('client.partner_lease_id')}</th>
+                    <th className="px-3 py-2">{__('general.messages')}</th>
+                    <th className="px-3 py-2">{__('client.partner_reserved')}</th>
+                    <th className="px-3 py-2">{__('general.status')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {activeLeases.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-3 py-6 text-center text-muted-foreground">
-                        No credit leases recorded yet.
+                        {__('client.partner_no_leases')}
                       </td>
                     </tr>
                   ) : (
@@ -379,7 +397,7 @@ export default function ClientPartnerGatewayIndex({
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-sm flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
-                Partner Audit & Top-up Log
+                {__('client.partner_audit_log')}
               </h3>
             </div>
 
@@ -387,17 +405,17 @@ export default function ClientPartnerGatewayIndex({
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 text-muted-foreground uppercase border-b">
                   <tr>
-                    <th className="px-3 py-2">Type</th>
-                    <th className="px-3 py-2">Amount</th>
-                    <th className="px-3 py-2">Balance After</th>
-                    <th className="px-3 py-2">Date</th>
+                    <th className="px-3 py-2">{__('general.type')}</th>
+                    <th className="px-3 py-2">{__('general.amount')}</th>
+                    <th className="px-3 py-2">{__('client.partner_balance_after')}</th>
+                    <th className="px-3 py-2">{__('general.date')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {usageLogs.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-3 py-6 text-center text-muted-foreground">
-                        No transactions recorded yet.
+                        {__('client.partner_no_transactions')}
                       </td>
                     </tr>
                   ) : (
@@ -441,9 +459,9 @@ export default function ClientPartnerGatewayIndex({
       <Dialog open={topUpModalOpen} onOpenChange={setTopUpModalOpen}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle>Top Up Partner Balance</DialogTitle>
+            <DialogTitle>{__('client.partner_top_up_title')}</DialogTitle>
             <DialogDescription>
-              Recharge your Partner Gateway credits using your account wallet or direct online payment.
+              {__('client.partner_top_up_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -458,7 +476,7 @@ export default function ClientPartnerGatewayIndex({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Account Wallet
+              {__('client.partner_tab_wallet')}
             </button>
             <button
               type="button"
@@ -469,7 +487,7 @@ export default function ClientPartnerGatewayIndex({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Online Payment (Card/InstaPay)
+              {__('client.partner_tab_online')}
             </button>
           </div>
 
@@ -478,13 +496,13 @@ export default function ClientPartnerGatewayIndex({
             <form onSubmit={handleWalletTopUp} className="space-y-4 py-3">
               <div className="p-3 rounded-xl bg-muted/40 border text-xs space-y-1">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Available Account Balance:</span>
+                  <span>{__('client.partner_available_balance')}</span>
                   <span className="font-bold text-foreground font-mono">
                     {userCurrencySymbol}{Number(userWalletBalance).toFixed(2)} {userCurrency}
                   </span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Current Partner Balance:</span>
+                  <span>{__('client.partner_current_balance')}</span>
                   <span className="font-bold text-emerald-500 font-mono">
                     ${Number(partnerClient.wallet_balance).toFixed(4)} USD
                   </span>
@@ -492,7 +510,7 @@ export default function ClientPartnerGatewayIndex({
               </div>
 
               <div>
-                <Label htmlFor="wallet_amount_usd">Recharge Amount ($ USD) *</Label>
+                <Label htmlFor="wallet_amount_usd">{__('client.partner_recharge_amount')}</Label>
                 <Input
                   id="wallet_amount_usd"
                   type="number"
@@ -526,11 +544,11 @@ export default function ClientPartnerGatewayIndex({
 
               <DialogFooter className="pt-2">
                 <Button type="button" variant="outline" onClick={() => setTopUpModalOpen(false)}>
-                  Cancel
+                  {__('general.cancel')}
                 </Button>
                 <Button type="submit" disabled={walletTopUpForm.processing} className="gap-2">
                   <Check className="w-4 h-4" />
-                  Instant Transfer (${walletTopUpForm.data.amount_usd} USD)
+                  {__('client.partner_instant_transfer', { amount: `$${walletTopUpForm.data.amount_usd}` })}
                 </Button>
               </DialogFooter>
             </form>
@@ -538,11 +556,11 @@ export default function ClientPartnerGatewayIndex({
             /* Online Direct Checkout Form */
             <form onSubmit={handleOnlineTopUp} className="space-y-4 py-3">
               <div className="p-3 rounded-xl bg-muted/40 border text-xs text-muted-foreground">
-                Pay securely using Credit/Debit Card, Vodafone Cash, or InstaPay. Credits are added immediately upon successful payment.
+                {__('client.partner_online_desc')}
               </div>
 
               <div>
-                <Label htmlFor="online_amount_usd">Recharge Amount ($ USD) *</Label>
+                <Label htmlFor="online_amount_usd">{__('client.partner_recharge_amount')}</Label>
                 <Input
                   id="online_amount_usd"
                   type="number"
@@ -576,17 +594,18 @@ export default function ClientPartnerGatewayIndex({
 
               <DialogFooter className="pt-2">
                 <Button type="button" variant="outline" onClick={() => setTopUpModalOpen(false)}>
-                  Cancel
+                  {__('general.cancel')}
                 </Button>
                 <Button type="submit" disabled={onlineTopUpForm.processing} className="gap-2">
                   <CreditCard className="w-4 h-4" />
-                  Proceed to Checkout (${onlineTopUpForm.data.amount_usd} USD)
+                  {__('client.partner_proceed_checkout', { amount: `$${onlineTopUpForm.data.amount_usd}` })}
                 </Button>
               </DialogFooter>
             </form>
           )}
         </DialogContent>
       </Dialog>
+      {confirmDialog}
     </WorkspaceLayout>
   );
 }

@@ -9,8 +9,10 @@ import Modal from '@/Components/Modal';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function PayoutMethods({ payoutMethods }) {
+    const { confirm, confirmDialog } = useConfirm();
     const [isCreating, setIsCreating] = useState(false);
     const [editingMethod, setEditingMethod] = useState(null);
 
@@ -66,15 +68,19 @@ export default function PayoutMethods({ payoutMethods }) {
         }
     };
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to remove this payout method?')) {
-            router.delete(route('financial.payout-methods.destroy', id));
-        }
+    const handleDelete = async (id) => {
+        const accepted = await confirm({
+            title: __('client.payout_delete_title'),
+            description: __('client.payout_delete_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('financial.payout-methods.destroy', id));
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${__('general.payout_methods')} — Musoftwares Studio`} />
+            <Head title={__('client.payout_page_title')} />
 
             <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
                 
@@ -160,28 +166,28 @@ export default function PayoutMethods({ payoutMethods }) {
                                         </div>
 
                                         <h3 className="text-base font-bold text-[#1d1d1f] font-sans capitalize mb-3">
-                                            {pm.type.replace('_', ' ')}
+                                            {__(`client.payout_type_${pm.type}`)}
                                         </h3>
 
                                         <div className="space-y-1.5 p-4 bg-[#f5f5f7] rounded-[16px] border border-black/5 text-xs text-[#1d1d1f]/70 font-sans">
                                             {pm.type === 'bank_transfer' && (
                                                 <>
-                                                    <div className="flex justify-between"><span>Name:</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.full_name}</span></div>
-                                                    <div className="flex justify-between"><span>Bank:</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.bank_name}</span></div>
-                                                    <div className="flex justify-between"><span>Acc:</span> <span className="font-mono font-semibold text-[#1d1d1f]">••••{pm.details?.account_number?.slice(-4)}</span></div>
+                                                    <div className="flex justify-between"><span>{__('client.payout_label_name')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.full_name}</span></div>
+                                                    <div className="flex justify-between"><span>{__('client.payout_label_bank')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.bank_name}</span></div>
+                                                    <div className="flex justify-between"><span>{__('client.payout_label_account')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">••••{pm.details?.account_number?.slice(-4)}</span></div>
                                                 </>
                                             )}
                                             {pm.type === 'paypal' && (
-                                                <div className="flex flex-col gap-0.5"><span>Email:</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.paypal_email}</span></div>
+                                                <div className="flex flex-col gap-0.5"><span>{__('client.payout_label_email')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.paypal_email}</span></div>
                                             )}
                                             {pm.type === 'vodafone_cash' && (
-                                                <div className="flex justify-between"><span>Mobile:</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
+                                                <div className="flex justify-between"><span>{__('client.payout_label_mobile')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
                                             )}
                                             {pm.type === 'instapay' && (
                                                 <>
-                                                    <div className="flex justify-between"><span>IPA:</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.instapay_username}</span></div>
+                                                    <div className="flex justify-between"><span>{__('client.payout_label_ipa')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.instapay_username}</span></div>
                                                     {pm.details?.mobile_number && (
-                                                        <div className="flex justify-between"><span>Mobile:</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
+                                                        <div className="flex justify-between"><span>{__('client.payout_label_mobile')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
                                                     )}
                                                 </>
                                             )}
@@ -192,14 +198,16 @@ export default function PayoutMethods({ payoutMethods }) {
                                         <button
                                             onClick={() => openEdit(pm)}
                                             className="w-8 h-8 rounded-full bg-[#f5f5f7] hover:bg-black/5 text-[#1d1d1f]/70 hover:text-[#1d1d1f] flex items-center justify-center transition-colors cursor-pointer"
-                                            title={__('general.edit_method')}
+                                            title={__('client.payout_edit_method')}
+                                            aria-label={__('client.payout_edit_method')}
                                         >
                                             <Edit2 className="w-3.5 h-3.5" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(pm.id)}
                                             className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
-                                            title={__('general.delete_method')}
+                                            title={__('client.payout_delete_method')}
+                                            aria-label={__('client.payout_delete_method')}
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </button>
@@ -218,20 +226,20 @@ export default function PayoutMethods({ payoutMethods }) {
                                 <CreditCard className="w-5 h-5" />
                             </div>
                             <h2 className="text-lg font-bold text-[#1d1d1f] font-sans">
-                                {editingMethod ? 'Edit Payout Method' : 'Add Payout Method'}
+                                {editingMethod ? __('client.payout_edit_title') : __('client.payout_add_title')}
                             </h2>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {!editingMethod && (
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-semibold text-[#1d1d1f]">Payout Method Type</Label>
+                                    <Label className="text-xs font-semibold text-[#1d1d1f]">{__('client.payout_method_type')}</Label>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                                         {[
-                                            { id: 'bank_transfer', label: 'Bank', icon: Building },
-                                            { id: 'vodafone_cash', label: 'Vodafone', icon: Smartphone },
-                                            { id: 'instapay', label: 'Instapay', icon: Send },
-                                            { id: 'paypal', label: 'PayPal', icon: DollarSign },
+                                            { id: 'bank_transfer', label: __('client.payout_tab_bank'), icon: Building },
+                                            { id: 'vodafone_cash', label: __('client.payout_tab_vodafone'), icon: Smartphone },
+                                            { id: 'instapay', label: __('client.payout_type_instapay'), icon: Send },
+                                            { id: 'paypal', label: __('client.payout_type_paypal'), icon: DollarSign },
                                         ].map((opt) => {
                                             const Icon = opt.icon;
                                             const isSelected = data.type === opt.id;
@@ -258,7 +266,7 @@ export default function PayoutMethods({ payoutMethods }) {
                             {data.type === 'bank_transfer' && (
                                 <div className="space-y-3">
                                     <div className="space-y-1">
-                                        <Label htmlFor="full_name" className="text-xs font-semibold">Full Name</Label>
+                                        <Label htmlFor="full_name" className="text-xs font-semibold">{__('client.payout_full_name')}</Label>
                                         <Input
                                             id="full_name"
                                             value={data.details.full_name || ''}
@@ -268,7 +276,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="bank_name" className="text-xs font-semibold">Bank Name</Label>
+                                        <Label htmlFor="bank_name" className="text-xs font-semibold">{__('client.payout_bank_name')}</Label>
                                         <Input
                                             id="bank_name"
                                             value={data.details.bank_name || ''}
@@ -278,7 +286,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="account_number" className="text-xs font-semibold">Account Number / IBAN</Label>
+                                        <Label htmlFor="account_number" className="text-xs font-semibold">{__('client.payout_account_number')}</Label>
                                         <Input
                                             id="account_number"
                                             value={data.details.account_number || ''}
@@ -288,7 +296,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="routing_number" className="text-xs font-semibold">Routing Number / BIC / SWIFT</Label>
+                                        <Label htmlFor="routing_number" className="text-xs font-semibold">{__('client.payout_routing_number')}</Label>
                                         <Input
                                             id="routing_number"
                                             value={data.details.routing_number || ''}
@@ -302,7 +310,7 @@ export default function PayoutMethods({ payoutMethods }) {
 
                             {data.type === 'paypal' && (
                                 <div className="space-y-1">
-                                    <Label htmlFor="paypal_email" className="text-xs font-semibold">PayPal Email Address</Label>
+                                    <Label htmlFor="paypal_email" className="text-xs font-semibold">{__('client.payout_paypal_email')}</Label>
                                     <Input
                                         id="paypal_email"
                                         type="email"
@@ -316,7 +324,7 @@ export default function PayoutMethods({ payoutMethods }) {
 
                             {data.type === 'vodafone_cash' && (
                                 <div className="space-y-1">
-                                    <Label htmlFor="mobile_number" className="text-xs font-semibold">Vodafone Cash Mobile Number</Label>
+                                    <Label htmlFor="mobile_number" className="text-xs font-semibold">{__('client.payout_vodafone_mobile')}</Label>
                                     <Input
                                         id="mobile_number"
                                         type="tel"
@@ -331,7 +339,7 @@ export default function PayoutMethods({ payoutMethods }) {
                             {data.type === 'instapay' && (
                                 <div className="space-y-3">
                                     <div className="space-y-1">
-                                        <Label htmlFor="instapay_username" className="text-xs font-semibold">Instapay Username (IPA)</Label>
+                                        <Label htmlFor="instapay_username" className="text-xs font-semibold">{__('client.payout_instapay_username')}</Label>
                                         <Input
                                             id="instapay_username"
                                             value={data.details.instapay_username || ''}
@@ -341,7 +349,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <Label htmlFor="mobile_number" className="text-xs font-semibold">Mobile Number (Optional)</Label>
+                                        <Label htmlFor="mobile_number" className="text-xs font-semibold">{__('client.payout_mobile_optional')}</Label>
                                         <Input
                                             id="mobile_number"
                                             type="tel"
@@ -378,12 +386,13 @@ export default function PayoutMethods({ payoutMethods }) {
                                     disabled={processing}
                                     className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all cursor-pointer"
                                 >
-                                    {editingMethod ? 'Save Changes' : 'Save Payout Method'}
+                                    {editingMethod ? __('client.payout_save_changes') : __('client.payout_save_method')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </Modal>
+                {confirmDialog}
 
             </div>
         </AuthenticatedLayout>

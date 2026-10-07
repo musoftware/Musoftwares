@@ -49,5 +49,7 @@ return [
         'referrals_desc'        => 'Earn +100 PTS when a referred contact creates an account, plus +250 PTS when they settle their first invoice.',
         'admin_courtesy'        => 'Admin Courtesy & Goodwill',
         'admin_courtesy_desc'   => 'Dedicated human engineers may grant courtesy bonus points for cooperation, feedback, or custom milestones.',
+        'overdue_penalty'       => 'Overdue Finished Invoice Penalty',
+        'overdue_penalty_desc'  => 'Unpaid invoices marked as completed deduct 1 point per 100 EGP of unpaid balance daily after the due date.',
     ],
 ];

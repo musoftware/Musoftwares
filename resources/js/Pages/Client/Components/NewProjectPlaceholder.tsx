@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { FolderPlus, ArrowRight, Sparkles, Calculator, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export interface CompletedProjectItem {
     id: number;
@@ -30,21 +31,21 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0071e3]" />
                         </span>
                         <h2 className="text-lg sm:text-xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight font-sans break-words min-w-0">
-                            Ready for Your Next Project
+                            {__('client.new_project_ready_title')}
                         </h2>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 shrink-0">
-                            Studio Available
+                            {__('client.new_project_studio_available')}
                         </span>
                     </div>
                     <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
-                        All prior sprint deliverables are successfully finalized and signed off. Launch a new project to start engineering specifications, continuous sprint tracking, and zero-loss delivery.
+                        {__('client.new_project_ready_desc')}
                     </p>
                 </div>
 
                 <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-xs font-mono font-medium text-amber-900 dark:text-amber-300">
                         <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                        <span>+100 Loyalty PTS on Scope Setup</span>
+                        <span>{__('client.new_project_points_badge')}</span>
                     </div>
                 </div>
             </div>
@@ -60,15 +61,15 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                             </div>
                             <div>
                                 <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">
-                                    Start New Project Workspace
+                                    {__('client.new_project_start_title')}
                                 </h3>
                                 <span className="text-[11px] font-mono uppercase text-zinc-400 dark:text-zinc-500">
-                                    Engineering & Architecture
+                                    {__('client.new_project_start_tag')}
                                 </span>
                             </div>
                         </div>
                         <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                            Define functional goals, database schemas, and milestone deliverables. Our studio team and AI workspace will structure your sprints immediately.
+                            {__('client.new_project_start_desc')}
                         </p>
                     </div>
 
@@ -77,7 +78,7 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                             href="/projects/create-new"
                             className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold transition-all shadow-sm shadow-blue-500/20 active:scale-[0.98] cursor-pointer"
                         >
-                            <span>Launch New Project</span>
+                            <span>{__('client.new_project_launch')}</span>
                             <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -92,15 +93,15 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                             </div>
                             <div>
                                 <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">
-                                    Project Scope & Cost Estimator
+                                    {__('client.new_project_estimator_title')}
                                 </h3>
                                 <span className="text-[11px] font-mono uppercase text-zinc-400 dark:text-zinc-500">
-                                    Interactive Cost Calculator
+                                    {__('client.new_project_estimator_tag')}
                                 </span>
                             </div>
                         </div>
                         <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                            Estimate architecture models, engineering hours, and stack parameters before starting. Generate budget benchmarks in real time.
+                            {__('client.new_project_estimator_desc')}
                         </p>
                     </div>
 
@@ -109,7 +110,7 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                             href="/estimator"
                             className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-[#1d1d1f] dark:text-white text-xs font-semibold transition-all shadow-xs active:scale-[0.98] cursor-pointer"
                         >
-                            <span>Open Scope Estimator</span>
+                            <span>{__('client.new_project_open_estimator')}</span>
                             <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
@@ -122,14 +123,14 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                     <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                         <span>
-                            {completedProjects.length} project(s) delivered and archived
+                            {__('client.new_project_archived_count', { count: completedProjects.length })}
                             {latestDelivered?.name && (
                                 <>
                                     {' — '}
                                     <strong className="text-zinc-800 dark:text-zinc-200 font-medium">
                                         {latestDelivered.name}
                                     </strong>{' '}
-                                    verified
+                                    {__('client.new_project_verified')}
                                 </>
                             )}
                         </span>
@@ -138,7 +139,7 @@ export const NewProjectPlaceholder: React.FC<NewProjectPlaceholderProps> = ({
                         href="/projects"
                         className="inline-flex items-center gap-1 text-xs font-semibold text-[#0071e3] dark:text-sky-400 hover:underline"
                     >
-                        <span>View Deliverables & Archive</span>
+                        <span>{__('client.new_project_view_archive')}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                 </div>

@@ -46,7 +46,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
             const data = await response.json();
             setResult(data);
         } catch (error: any) {
-            setResult({ success: false, message: 'Network error or invalid response from server.' });
+            setResult({ success: false, message: __('sms_gateway.tester_network_error') });
         } finally {
             setTesting(false);
         }
@@ -103,7 +103,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="auth">Bearer Token (Optional)</Label>
+                                        <Label htmlFor="auth">{__('sms_gateway.tester_bearer_optional')}</Label>
                                         <Input
                                             id="auth"
                                             type="text"
@@ -116,7 +116,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                                     <Alert className="bg-slate-50 border-slate-200 mt-6">
                                         <Code className="h-4 w-4 text-slate-600" />
                                         <AlertDescription className="text-slate-600 font-mono text-xs mt-2 space-y-2">
-                                            <p className="font-semibold text-slate-900 mb-1">Generated Request Headers:</p>
+                                            <p className="font-semibold text-slate-900 mb-1">{__('sms_gateway.tester_generated_headers')}</p>
                                             <p>{__('general.content_type_application_json')}</p>
                                             <p>User-Agent: Text Payment Gateway-Integration-Tester/1.0</p>
                                             {authToken && <p>Authorization: Bearer {authToken.substring(0, 10)}...</p>}

@@ -120,22 +120,16 @@ class TransactionService extends BaseService
             $query->where('currency_id', $filters['currency']);
         }
 
+        // Dates are validated by the caller; an invalid date must fail loudly instead of
+        // silently returning unfiltered money totals.
         if (! empty($filters['from_date'])) {
-            try {
-                $from = Carbon::parse($filters['from_date'], 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
-                $query->where('created_at', '>=', $from);
-            } catch (\Throwable $e) {
-                // Ignore parse errors
-            }
+            $from = Carbon::parse($filters['from_date'], 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
+            $query->where('created_at', '>=', $from);
         }
 
         if (! empty($filters['to_date'])) {
-            try {
-                $to = Carbon::parse($filters['to_date'], 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
-                $query->where('created_at', '<=', $to);
-            } catch (\Throwable $e) {
-                // Ignore parse errors
-            }
+            $to = Carbon::parse($filters['to_date'], 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
+            $query->where('created_at', '<=', $to);
         }
 
         if (! empty($filters['month'])) {

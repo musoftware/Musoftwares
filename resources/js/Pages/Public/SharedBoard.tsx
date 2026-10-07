@@ -59,7 +59,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                                 </h1>
                                 {project.client_name && (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground ring-1 ring-inset ring-border">
-                                        {__('general.board_client') || 'Client'}: {project.client_name}
+                                        {__('general.board_client')}: {project.client_name}
                                     </span>
                                 )}
                                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary ring-1 ring-inset ring-primary/20">
@@ -80,7 +80,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                                     className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-sm hover:bg-muted transition-colors"
                                 >
                                     <LucideCalendar className="h-3.5 w-3.5 text-primary" />
-                                    <span>{__('general.calendar') || 'Calendar'}</span>
+                                    <span>{__('general.calendar')}</span>
                                 </button>
                             )}
 
@@ -93,7 +93,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                                     className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition-colors"
                                 >
                                     <LayoutDashboard className="h-3.5 w-3.5" />
-                                    <span>{__('general.board_go_to_panel') || 'Go to Dashboard'}</span>
+                                    <span>{__('general.board_go_to_panel')}</span>
                                 </Link>
                             ) : (
                                 <Link
@@ -101,7 +101,7 @@ export default function SharedBoard({ project, date, lanes, cards, activeDates =
                                     className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition-colors"
                                 >
                                     <LogIn className="h-3.5 w-3.5" />
-                                    <span>{__('general.board_login_cta') || 'Login to Control Fully'}</span>
+                                    <span>{__('general.board_login_cta')}</span>
                                 </Link>
                             )}
 

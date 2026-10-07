@@ -34,7 +34,6 @@ import {
     Sparkles,
     MoreVertical,
     Layers,
-    Share2,
     Bookmark,
     SlidersHorizontal,
     TrendingUp,
@@ -200,9 +199,9 @@ export default function PromptGallery({
                     .catch(() => {});
             }
 
-            toastSuccess(`Copied "${promptItem.title}" to clipboard!`, 'Copied to Clipboard');
+            toastSuccess(__('admin.prompts_copied_toast', { title: promptItem.title }), __('admin.copied_to_clipboard'));
         } catch {
-            toastError('Failed to copy prompt to clipboard.');
+            toastError(__('admin.prompts_copy_failed'));
         }
     };
 
@@ -251,10 +250,10 @@ export default function PromptGallery({
             onSuccess: () => {
                 setIsCreateOpen(false);
                 form.reset();
-                toastSuccess('Prompt created successfully.');
+                toastSuccess(__('admin.prompts_created'));
             },
             onError: () => {
-                toastError('Please fix the errors in the form.');
+                toastError(__('admin.prompts_fix_form_errors'));
             },
         });
     };
@@ -278,10 +277,10 @@ export default function PromptGallery({
             onSuccess: () => {
                 setEditingPrompt(null);
                 form.reset();
-                toastSuccess('Prompt updated successfully.');
+                toastSuccess(__('admin.prompts_updated'));
             },
             onError: () => {
-                toastError('Please check the form inputs.');
+                toastError(__('admin.prompts_fix_form_errors'));
             },
         });
     };
@@ -293,17 +292,17 @@ export default function PromptGallery({
             preserveScroll: true,
             onSuccess: () => {
                 setDeletingPrompt(null);
-                toastSuccess('Prompt removed successfully.');
+                toastSuccess(__('admin.prompts_deleted'));
             },
             onError: () => {
-                toastError('Failed to delete prompt.');
+                toastError(__('admin.prompts_delete_failed'));
             },
         });
     };
 
     return (
         <AdminSidebarLayout
-            title="Prompt Gallery — Admin"
+            title={__('admin.prompts_gallery')}
             header={
                 <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-slate-100">
@@ -311,10 +310,10 @@ export default function PromptGallery({
                     </div>
                     <div>
                         <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                            Prompt Gallery
+                            {__('admin.prompts_gallery')}
                         </h1>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                            Curated AI and architecture prompts with one-click clipboard copying.
+                            {__('admin.prompts_gallery_subheading')}
                         </p>
                     </div>
                 </div>
@@ -325,18 +324,18 @@ export default function PromptGallery({
                     className="h-9 gap-2 bg-slate-900 hover:bg-black text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 font-medium shadow-sm transition-all"
                 >
                     <Plus className="h-4 w-4" />
-                    <span>New Prompt</span>
+                    <span>{__('admin.prompts_new_prompt')}</span>
                 </Button>
             }
         >
-            <Head title="Prompt Gallery" />
+            <Head title={__('admin.prompts_gallery')} />
 
             <div className="space-y-6">
                 {/* ─── Metric Summary Strip ─────────────────────────────────────── */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900/70 shadow-xs">
                         <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
-                            <span className="text-xs font-medium uppercase tracking-wider">Total Prompts</span>
+                            <span className="text-xs font-medium uppercase tracking-wider">{__('admin.prompts_total_prompts')}</span>
                             <FolderKanban className="h-4 w-4 text-slate-400" />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -346,7 +345,7 @@ export default function PromptGallery({
 
                     <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900/70 shadow-xs">
                         <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
-                            <span className="text-xs font-medium uppercase tracking-wider">Total Copies</span>
+                            <span className="text-xs font-medium uppercase tracking-wider">{__('admin.prompts_total_copies')}</span>
                             <TrendingUp className="h-4 w-4 text-slate-400" />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -356,7 +355,7 @@ export default function PromptGallery({
 
                     <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900/70 shadow-xs">
                         <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
-                            <span className="text-xs font-medium uppercase tracking-wider">Featured Prompts</span>
+                            <span className="text-xs font-medium uppercase tracking-wider">{__('admin.prompts_featured_prompts')}</span>
                             <Bookmark className="h-4 w-4 text-slate-400" />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -366,7 +365,7 @@ export default function PromptGallery({
 
                     <div className="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900/70 shadow-xs">
                         <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
-                            <span className="text-xs font-medium uppercase tracking-wider">Categories</span>
+                            <span className="text-xs font-medium uppercase tracking-wider">{__('general.categories')}</span>
                             <Layers className="h-4 w-4 text-slate-400" />
                         </div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -383,15 +382,17 @@ export default function PromptGallery({
                             <Input
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search by title, prompt contents, category, or tags..."
+                                placeholder={__('admin.prompts_search_placeholder')}
                                 className="pl-10 h-10 bg-slate-50/70 dark:bg-zinc-800/50 border-slate-200 dark:border-white/10 text-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-white/20"
                             />
                             {searchQuery && (
                                 <button
+                                    type="button"
                                     onClick={() => setSearchQuery('')}
+                                    aria-label={__('admin.prompts_clear_search')}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs font-medium"
                                 >
-                                    Clear
+                                    {__('general.clear')}
                                 </button>
                             )}
                         </div>
@@ -402,11 +403,12 @@ export default function PromptGallery({
                             <select
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
+                                aria-label={__('admin.sort_by')}
                                 className="h-10 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400"
                             >
-                                <option value="latest">Sort: Latest</option>
-                                <option value="popular">Sort: Most Copied</option>
-                                <option value="title">Sort: Alphabetical</option>
+                                <option value="latest">{__('admin.prompts_sort_latest')}</option>
+                                <option value="popular">{__('admin.prompts_sort_popular')}</option>
+                                <option value="title">{__('admin.prompts_sort_title')}</option>
                             </select>
                         </div>
                     </div>
@@ -422,7 +424,7 @@ export default function PromptGallery({
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-zinc-800 dark:text-slate-300 dark:hover:bg-zinc-700'
                             }`}
                         >
-                            All ({stats.total_prompts})
+                            {__('admin.prompts_all_count', { count: stats.total_prompts })}
                         </button>
 
                         {Object.entries(categoryCounts).map(([catName, count]) => {
@@ -461,12 +463,12 @@ export default function PromptGallery({
                             <FilterX className="h-6 w-6" />
                         </div>
                         <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-                            No prompts found
+                            {__('admin.prompts_empty_title')}
                         </h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                             {searchQuery || selectedCategory !== 'all'
-                                ? 'No prompts matched your active search or category filters. Try clearing filters.'
-                                : 'No prompts have been added to the gallery yet. Click "New Prompt" to create one.'}
+                                ? __('admin.prompts_empty_filtered')
+                                : __('admin.prompts_empty_gallery')}
                         </p>
                         <div className="mt-5 flex justify-center gap-3">
                             {(searchQuery || selectedCategory !== 'all') && (
@@ -478,12 +480,12 @@ export default function PromptGallery({
                                     }}
                                     className="text-xs"
                                 >
-                                    Clear Filters
+                                    {__('admin.clear_filters')}
                                 </Button>
                             )}
                             <Button onClick={openCreateDialog} className="text-xs gap-1.5">
                                 <Plus className="h-3.5 w-3.5" />
-                                Add Prompt
+                                {__('admin.prompts_add_prompt')}
                             </Button>
                         </div>
                     </div>
@@ -506,14 +508,14 @@ export default function PromptGallery({
                                                 {item.is_featured && (
                                                     <span className="flex items-center gap-1 text-[11px] font-medium text-slate-800 dark:text-slate-200">
                                                         <Sparkles className="h-3 w-3" />
-                                                        Featured
+                                                        {__('admin.featured')}
                                                     </span>
                                                 )}
                                             </div>
 
                                             {/* Action Dropdown Menu */}
                                             <DropdownMenu>
-                                                <DropdownMenuTrigger className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors">
+                                                <DropdownMenuTrigger aria-label={__('general.actions')} className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors">
                                                     <MoreVertical className="h-4 w-4" />
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent
@@ -525,21 +527,21 @@ export default function PromptGallery({
                                                         className="gap-2 text-xs cursor-pointer text-slate-700 dark:text-slate-300"
                                                     >
                                                         <Eye className="h-3.5 w-3.5" />
-                                                        View Full
+                                                        {__('admin.prompts_view_full')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => openEditDialog(item)}
                                                         className="gap-2 text-xs cursor-pointer text-slate-700 dark:text-slate-300"
                                                     >
                                                         <Pencil className="h-3.5 w-3.5" />
-                                                        Edit Prompt
+                                                        {__('admin.prompts_edit_prompt')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => setDeletingPrompt(item)}
                                                         className="gap-2 text-xs cursor-pointer text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/30"
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
-                                                        Delete
+                                                        {__('general.delete')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -561,13 +563,13 @@ export default function PromptGallery({
                                         <div
                                             onClick={() => setViewingPrompt(item)}
                                             className="mt-3.5 relative rounded-lg border border-slate-200/90 dark:border-white/10 bg-slate-50 dark:bg-black/40 p-3 font-mono text-[11.5px] leading-relaxed text-slate-700 dark:text-slate-300 cursor-pointer hover:border-slate-300 dark:hover:border-white/20 transition-all select-none"
-                                            title="Click to view full prompt"
+                                            title={__('admin.prompts_click_to_view_full')}
                                         >
                                             <div className="line-clamp-4 whitespace-pre-line font-mono">
                                                 {item.prompt}
                                             </div>
                                             <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200/60 dark:border-white/5 font-sans">
-                                                <span>Click to inspect code</span>
+                                                <span>{__('admin.prompts_click_to_inspect')}</span>
                                                 <Eye className="h-3 w-3" />
                                             </div>
                                         </div>
@@ -597,8 +599,7 @@ export default function PromptGallery({
                                         <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                                             <Copy className="h-3.5 w-3.5 text-slate-400" />
                                             <span>
-                                                {item.copy_count}{' '}
-                                                {item.copy_count === 1 ? 'copy' : 'copies'}
+                                                {__(item.copy_count === 1 ? 'admin.prompts_copy_count_one' : 'admin.prompts_copy_count_other', { count: item.copy_count })}
                                             </span>
                                         </div>
 
@@ -615,12 +616,12 @@ export default function PromptGallery({
                                             {isCopied ? (
                                                 <>
                                                     <Check className="h-3.5 w-3.5" />
-                                                    <span>Copied!</span>
+                                                    <span>{__('general.copied')}</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Copy className="h-3.5 w-3.5" />
-                                                    <span>Copy Prompt</span>
+                                                    <span>{__('admin.prompts_copy_prompt')}</span>
                                                 </>
                                             )}
                                         </Button>
@@ -637,10 +638,10 @@ export default function PromptGallery({
                 <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-                            Create New Prompt
+                            {__('admin.prompts_create_title')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-                            Add a reusable prompt template to the gallery for quick one-click extraction.
+                            {__('admin.prompts_create_description')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -648,13 +649,13 @@ export default function PromptGallery({
                         {/* Title */}
                         <div className="space-y-1.5">
                             <Label htmlFor="title" className="text-xs font-semibold">
-                                Title <span className="text-red-500">*</span>
+                                {__('general.title')} <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="title"
                                 value={form.data.title}
                                 onChange={(e) => form.setData('title', e.target.value)}
-                                placeholder="e.g. World-Class UI/UX Auditor"
+                                placeholder={__('admin.prompts_title_placeholder')}
                                 className="h-9 text-sm"
                                 required
                             />
@@ -667,14 +668,14 @@ export default function PromptGallery({
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <Label htmlFor="category" className="text-xs font-semibold">
-                                    Category <span className="text-red-500">*</span>
+                                    {__('general.category')} <span className="text-red-500">*</span>
                                 </Label>
                                 <div className="flex gap-2">
                                     <Input
                                         id="category"
                                         value={form.data.category}
                                         onChange={(e) => form.setData('category', e.target.value)}
-                                        placeholder="UI, Backend, Security..."
+                                        placeholder={__('admin.prompts_category_placeholder')}
                                         className="h-9 text-sm"
                                         required
                                     />
@@ -701,10 +702,10 @@ export default function PromptGallery({
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-semibold">Prompt Settings</Label>
+                                <Label className="text-xs font-semibold">{__('admin.prompts_settings_label')}</Label>
                                 <div className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-white/10 p-2.5 h-9">
                                     <span className="text-xs text-slate-700 dark:text-slate-300">
-                                        Mark as Featured
+                                        {__('admin.prompts_mark_featured')}
                                     </span>
                                     <Switch
                                         checked={form.data.is_featured}
@@ -717,13 +718,13 @@ export default function PromptGallery({
                         {/* Description */}
                         <div className="space-y-1.5">
                             <Label htmlFor="description" className="text-xs font-semibold">
-                                Description / Notes
+                                {__('admin.prompts_description_label')}
                             </Label>
                             <Input
                                 id="description"
                                 value={form.data.description}
                                 onChange={(e) => form.setData('description', e.target.value)}
-                                placeholder="Brief summary of when to use this prompt..."
+                                placeholder={__('admin.prompts_description_placeholder')}
                                 className="h-9 text-sm"
                             />
                             {form.errors.description && (
@@ -734,14 +735,14 @@ export default function PromptGallery({
                         {/* Prompt Body */}
                         <div className="space-y-1.5">
                             <Label htmlFor="prompt_body" className="text-xs font-semibold">
-                                Prompt Content <span className="text-red-500">*</span>
+                                {__('admin.prompts_content_label')} <span className="text-red-500">*</span>
                             </Label>
                             <Textarea
                                 id="prompt_body"
                                 rows={8}
                                 value={form.data.prompt}
                                 onChange={(e) => form.setData('prompt', e.target.value)}
-                                placeholder="Enter the system instructions, guidelines, or template..."
+                                placeholder={__('admin.prompts_content_placeholder')}
                                 className="font-mono text-xs leading-relaxed"
                                 required
                             />
@@ -753,13 +754,13 @@ export default function PromptGallery({
                         {/* Tags */}
                         <div className="space-y-1.5">
                             <Label htmlFor="tags_input" className="text-xs font-semibold">
-                                Tags (comma-separated)
+                                {__('admin.prompts_tags_label')}
                             </Label>
                             <Input
                                 id="tags_input"
                                 value={form.data.tags_input}
                                 onChange={(e) => form.setData('tags_input', e.target.value)}
-                                placeholder="e.g. react, tailwind, security, laravel"
+                                placeholder={__('admin.prompts_tags_placeholder')}
                                 className="h-9 text-sm"
                             />
                         </div>
@@ -771,14 +772,14 @@ export default function PromptGallery({
                                 onClick={() => setIsCreateOpen(false)}
                                 className="text-xs"
                             >
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={form.processing}
                                 className="text-xs bg-slate-900 text-white hover:bg-black dark:bg-white dark:text-slate-900"
                             >
-                                {form.processing ? 'Creating...' : 'Save Prompt'}
+                                {form.processing ? __('general.creating') : __('admin.prompts_save_prompt')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -790,10 +791,10 @@ export default function PromptGallery({
                 <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
-                            Edit Prompt
+                            {__('admin.prompts_edit_prompt')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-                            Update prompt specifications and template body.
+                            {__('admin.prompts_edit_description')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -801,7 +802,7 @@ export default function PromptGallery({
                         <form onSubmit={handleEditSubmit} className="space-y-4 py-2">
                             <div className="space-y-1.5">
                                 <Label htmlFor="edit_title" className="text-xs font-semibold">
-                                    Title <span className="text-red-500">*</span>
+                                    {__('general.title')} <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     id="edit_title"
@@ -818,7 +819,7 @@ export default function PromptGallery({
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
                                     <Label htmlFor="edit_category" className="text-xs font-semibold">
-                                        Category <span className="text-red-500">*</span>
+                                        {__('general.category')} <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="edit_category"
@@ -849,10 +850,10 @@ export default function PromptGallery({
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-semibold">Prompt Settings</Label>
+                                    <Label className="text-xs font-semibold">{__('admin.prompts_settings_label')}</Label>
                                     <div className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-white/10 p-2.5 h-9">
                                         <span className="text-xs text-slate-700 dark:text-slate-300">
-                                            Mark as Featured
+                                            {__('admin.prompts_mark_featured')}
                                         </span>
                                         <Switch
                                             checked={form.data.is_featured}
@@ -864,7 +865,7 @@ export default function PromptGallery({
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="edit_description" className="text-xs font-semibold">
-                                    Description / Notes
+                                    {__('admin.prompts_description_label')}
                                 </Label>
                                 <Input
                                     id="edit_description"
@@ -876,7 +877,7 @@ export default function PromptGallery({
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="edit_prompt_body" className="text-xs font-semibold">
-                                    Prompt Content <span className="text-red-500">*</span>
+                                    {__('admin.prompts_content_label')} <span className="text-red-500">*</span>
                                 </Label>
                                 <Textarea
                                     id="edit_prompt_body"
@@ -893,7 +894,7 @@ export default function PromptGallery({
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="edit_tags" className="text-xs font-semibold">
-                                    Tags (comma-separated)
+                                    {__('admin.prompts_tags_label')}
                                 </Label>
                                 <Input
                                     id="edit_tags"
@@ -910,14 +911,14 @@ export default function PromptGallery({
                                     onClick={() => setEditingPrompt(null)}
                                     className="text-xs"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={form.processing}
                                     className="text-xs bg-slate-900 text-white hover:bg-black dark:bg-white dark:text-slate-900"
                                 >
-                                    {form.processing ? 'Saving...' : 'Update Prompt'}
+                                    {form.processing ? __('general.saving') : __('admin.prompts_update_prompt')}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -936,7 +937,7 @@ export default function PromptGallery({
                             {viewingPrompt?.is_featured && (
                                 <span className="flex items-center gap-1 text-[11px] font-medium text-slate-800 dark:text-slate-200">
                                     <Sparkles className="h-3 w-3" />
-                                    Featured
+                                    {__('admin.featured')}
                                 </span>
                             )}
                         </div>
@@ -973,7 +974,7 @@ export default function PromptGallery({
 
                     <DialogFooter className="flex flex-row justify-between items-center sm:justify-between w-full pt-2 border-t border-slate-100 dark:border-white/5">
                         <div className="text-xs text-slate-400">
-                            Copied {viewingPrompt?.copy_count || 0} times
+                            {__('admin.prompts_copied_times', { count: viewingPrompt?.copy_count || 0 })}
                         </div>
                         <div className="flex items-center gap-2">
                             <Button
@@ -982,7 +983,7 @@ export default function PromptGallery({
                                 onClick={() => setViewingPrompt(null)}
                                 className="text-xs"
                             >
-                                Close
+                                {__('general.close')}
                             </Button>
                             {viewingPrompt && (
                                 <Button
@@ -993,12 +994,12 @@ export default function PromptGallery({
                                     {copiedId === viewingPrompt.id ? (
                                         <>
                                             <Check className="h-3.5 w-3.5" />
-                                            <span>Copied!</span>
+                                            <span>{__('general.copied')}</span>
                                         </>
                                     ) : (
                                         <>
                                             <Copy className="h-3.5 w-3.5" />
-                                            <span>Copy Prompt</span>
+                                            <span>{__('admin.prompts_copy_prompt')}</span>
                                         </>
                                     )}
                                 </Button>
@@ -1013,10 +1014,10 @@ export default function PromptGallery({
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">
-                            Delete Prompt
+                            {__('admin.prompts_delete_prompt')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
-                            Are you sure you want to delete &quot;{deletingPrompt?.title}&quot;? This action can be reversed via soft delete restore.
+                            {__('admin.prompts_delete_description', { title: deletingPrompt?.title ?? '' })}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -1027,14 +1028,14 @@ export default function PromptGallery({
                             onClick={() => setDeletingPrompt(null)}
                             className="text-xs"
                         >
-                            Cancel
+                            {__('general.cancel')}
                         </Button>
                         <Button
                             type="button"
                             onClick={handleDelete}
                             className="text-xs bg-red-600 hover:bg-red-700 text-white"
                         >
-                            Delete Prompt
+                            {__('admin.prompts_delete_prompt')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

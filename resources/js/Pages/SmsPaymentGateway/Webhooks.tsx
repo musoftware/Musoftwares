@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     ArrowLeft, Webhook, Activity, RefreshCw, Trash2, ShieldCheck, CheckCircle2, Play
 } from 'lucide-react';
@@ -23,6 +24,7 @@ interface WebhooksProps {
 }
 
 export default function Webhooks({ webhook }: WebhooksProps) {
+    const { confirm, confirmDialog } = useConfirm();
     const { data, setData, post, processing, errors } = useForm({
         webhook_url: webhook?.webhook_url || '',
         webhook_secret: webhook?.webhook_secret || '',
@@ -35,10 +37,15 @@ export default function Webhooks({ webhook }: WebhooksProps) {
         post(route('sms-payment-gateway.webhook.update'));
     };
 
-    const handleDelete = () => {
-        if (webhook && confirm('Are you sure you want to remove this webhook?')) {
-            router.delete(route('sms-payment-gateway.webhook.delete', webhook.id));
-        }
+    const handleDelete = async () => {
+        if (!webhook) return;
+        const accepted = await confirm({
+            title: __('sms_gateway.webhooks_remove_title'),
+            description: __('sms_gateway.webhooks_remove_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('sms-payment-gateway.webhook.delete', webhook.id));
     };
 
     const handleTest = () => {
@@ -89,7 +96,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                 </div>
                                 
                                 <div className="space-y-2">
-                                    <Label htmlFor="webhook_secret">Secret Token (Optional)</Label>
+                                    <Label htmlFor="webhook_secret">{__('sms_gateway.webhooks_secret_label')}</Label>
                                     <Input
                                         id="webhook_secret"
                                         type="text"
@@ -109,7 +116,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                 )}
                                 <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                                     {processing ? <RefreshCw className="w-4 h-4 me-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 me-2" />}
-                                    {webhook ? 'Update Settings' : 'Register Webhook'}
+                                    {webhook ? __('sms_gateway.webhooks_update_settings') : __('sms_gateway.webhooks_register')}
                                 </Button>
                             </CardFooter>
                         </form>
@@ -140,7 +147,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                     <div className="flex justify-between items-center py-2">
                                         <span className="text-sm font-medium text-slate-500">{__('general.last_triggered')}</span>
                                         <span className="font-bold text-slate-700">
-                                            {webhook.last_triggered_at ? new Date(webhook.last_triggered_at).toLocaleString() : 'Never'}
+                                            {webhook.last_triggered_at ? new Date(webhook.last_triggered_at).toLocaleString() : __('general.never')}
                                         </span>
                                     </div>
                                 </CardContent>
@@ -164,7 +171,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                                         ) : (
                                             <Play className="w-4 h-4 me-2 text-indigo-600" />
                                         )}
-                                        {testing ? 'Dispatching...' : 'Send Ping Event'}
+                                        {testing ? __('sms_gateway.webhooks_dispatching') : __('sms_gateway.webhooks_send_ping')}
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -172,6 +179,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                     )}
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

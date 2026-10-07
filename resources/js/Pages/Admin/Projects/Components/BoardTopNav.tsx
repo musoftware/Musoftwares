@@ -122,8 +122,8 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
         try {
             const { data } = await axios.get(route('admin.projects.shares.index', { project: project.id }));
             setCollaborators(data);
-        } catch (e) {
-            console.error('Failed to load collaborators:', e);
+        } catch {
+            toast.error(__('admin.board_share_load_failed'));
         } finally {
             setLoadingCollaborators(false);
         }
@@ -148,8 +148,8 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                 params: { q: val }
             });
             setSuggestions(data);
-        } catch (e) {
-            console.error('Failed to search clients:', e);
+        } catch {
+            toast.error(__('admin.board_share_search_failed'));
         }
     };
 
@@ -164,14 +164,14 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                 user_id: user.id
             });
             if (data.ok) {
-                toast.success(__('general.project_updated_successfully') || 'Collaborator added successfully!');
+                toast.success(__('general.project_updated_successfully'));
                 setCollaborators(prev => {
                     if (prev.some(c => c.user_id === user.id)) return prev;
                     return [...prev, data.share];
                 });
             }
         } catch (e) {
-            toast.error(__('general.error') || 'Failed to add collaborator.');
+            toast.error(__('general.error'));
         } finally {
             setUpdatingClient(false);
         }
@@ -181,18 +181,18 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
         try {
             const { data } = await axios.delete(route('admin.projects.shares.destroy', { project: project.id, share: shareId }));
             if (data.ok) {
-                toast.success(__('general.project_updated_successfully') || 'Collaborator removed successfully!');
+                toast.success(__('general.project_updated_successfully'));
                 setCollaborators(prev => prev.filter(c => c.id !== shareId));
             }
         } catch (e) {
-            toast.error(__('general.error') || 'Failed to remove collaborator.');
+            toast.error(__('general.error'));
         }
     };
 
     const handleCopyLink = (url: string) => {
         if (!url) return;
         navigator.clipboard.writeText(url);
-        toast.success(__('general.share_link_copied') || 'Link copied to clipboard!');
+        toast.success(__('general.share_link_copied'));
     };
 
     const goToDate = (target: string) => {
@@ -213,15 +213,15 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
         }).then(({ data }) => {
             if (data.ok) {
                 if (data.new_cards.length === 0) {
-                    toast.info(__('general.no_undone_work_found') || 'No incomplete work was found in past days.');
+                    toast.info(__('general.no_undone_work_found'));
                 } else {
-                    toast.success(__('general.undone_cards_brought') || `Brought ${data.new_cards.length} incomplete tasks forward!`);
+                    toast.success(__('general.undone_cards_brought', { count: data.new_cards.length }));
                     const customEvent = new CustomEvent('board-undone-brought', { detail: { cards: data.new_cards } });
                     window.dispatchEvent(customEvent);
                 }
             }
         }).catch(() => {
-            toast.error(__('general.error') || 'Failed to bring undone work.');
+            toast.error(__('general.error'));
         }).finally(() => {
             setBringingUndone(false);
         });
@@ -334,11 +334,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             type="button"
                             onClick={() => setCalendarOpen(true)}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-                            title={__('general.calendar') || 'Calendar'}
-                            aria-label={__('general.calendar') || 'Calendar'}
+                            title={__('general.calendar')}
+                            aria-label={__('general.calendar')}
                         >
                             <LucideCalendar className="h-4 w-4 text-indigo-500 sm:h-3.5 sm:w-3.5" />
-                            <span className="hidden sm:inline">{__('general.calendar') || 'Calendar'}</span>
+                            <span className="hidden sm:inline">{__('general.calendar')}</span>
                         </button>
 
                         {/* Bring Undone Yet Button */}
@@ -347,11 +347,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             onClick={handleBringUndone}
                             disabled={bringingUndone}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50 sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-                            title={__('general.bring_undone') || 'Bring Undone Yet'}
-                            aria-label={__('general.bring_undone') || 'Bring Undone Yet'}
+                            title={__('general.bring_undone')}
+                            aria-label={__('general.bring_undone')}
                         >
                             <Sparkles className={cn("h-4 w-4 text-amber-500 sm:h-3.5 sm:w-3.5", bringingUndone && "animate-spin")} />
-                            <span className="hidden sm:inline">{bringingUndone ? 'Bringing...' : __('general.bring_undone') || 'Bring Undone Yet'}</span>
+                            <span className="hidden sm:inline">{bringingUndone ? __('admin.board_bringing_undone') : __('general.bring_undone')}</span>
                         </button>
 
                         {/* Share Button */}
@@ -360,11 +360,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                 type="button"
                                 onClick={() => setShowShareModal(true)}
                                 className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-                                title={__('general.board_share_btn') || 'Share'}
-                                aria-label={__('general.board_share_btn') || 'Share'}
+                                title={__('general.board_share_btn')}
+                                aria-label={__('general.board_share_btn')}
                             >
                                 <Share2 className="h-4 w-4 text-slate-500 sm:h-3.5 sm:w-3.5" />
-                                <span className="hidden sm:inline">{__('general.board_share_btn') || 'Share'}</span>
+                                <span className="hidden sm:inline">{__('general.board_share_btn')}</span>
                             </button>
                         )}
 
@@ -374,11 +374,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                 type="button"
                                 onClick={onManageCategories}
                                 className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-                                title={__('general.board_manage_categories') || 'Manage categories'}
-                                aria-label={__('general.board_manage_categories') || 'Manage categories'}
+                                title={__('general.board_manage_categories')}
+                                aria-label={__('general.board_manage_categories')}
                             >
                                 <Tag className="h-4 w-4 text-amber-500 sm:h-3.5 sm:w-3.5" />
-                                <span className="hidden sm:inline">{__('general.board_manage_categories') || 'Manage categories'}</span>
+                                <span className="hidden sm:inline">{__('general.board_manage_categories')}</span>
                             </button>
                         )}
 
@@ -388,11 +388,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                 type="button"
                                 onClick={onManageNotices}
                                 className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-colors sm:w-auto sm:gap-1.5 sm:px-3 sm:text-xs sm:font-semibold"
-                                title={__('general.manage_notices') || 'Manage notices'}
-                                aria-label={__('general.manage_notices') || 'Manage notices'}
+                                title={__('general.manage_notices')}
+                                aria-label={__('general.manage_notices')}
                             >
                                 <Bell className="h-4 w-4 text-sky-500 sm:h-3.5 sm:w-3.5" />
-                                <span className="hidden sm:inline">{__('general.manage_notices') || 'Manage notices'}</span>
+                                <span className="hidden sm:inline">{__('general.manage_notices')}</span>
                             </button>
                         )}
 
@@ -407,11 +407,11 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                         ? "border-slate-900 bg-slate-900 text-white hover:bg-slate-800"
                                         : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                                 )}
-                                title={__('general.admin_notes') || 'Admin Notes'}
-                                aria-label={__('general.admin_notes') || 'Admin Notes'}
+                                title={__('general.admin_notes')}
+                                aria-label={__('general.admin_notes')}
                             >
                                 <StickyNote className={cn("h-4 w-4 sm:h-3.5 sm:w-3.5", adminNotesOpen ? "text-white" : "text-amber-500")} />
-                                <span className="hidden sm:inline">{__('general.admin_notes') || 'Admin Notes'}</span>
+                                <span className="hidden sm:inline">{__('general.admin_notes')}</span>
                             </button>
                         )}
 
@@ -490,12 +490,12 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                 <DialogContent className="sm:max-w-[480px]">
                     <DialogHeader>
                         <DialogTitle className="text-base font-semibold">
-                            {__('general.share_project_board') || 'Share Project Board'}
+                            {__('general.share_project_board')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 mt-1">
                             {shareMode === 'view'
-                                ? __('general.share_project_board_desc_view') || 'Anyone with this link can view the read-only project board for this specific date.'
-                                : __('general.share_project_board_desc_edit') || 'Anyone with this link can view, add, edit, and move items on the project board exactly like a client.'
+                                ? __('general.share_project_board_desc_view')
+                                : __('general.share_project_board_desc_edit')
                             }
                         </DialogDescription>
                     </DialogHeader>
@@ -512,7 +512,7 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                     : 'text-slate-600 hover:text-slate-900'
                             )}
                         >
-                            Read-Only
+                            {__('admin.board_share_read_only')}
                         </button>
                         <button
                             type="button"
@@ -524,26 +524,26 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                     : 'text-slate-600 hover:text-slate-900'
                             )}
                         >
-                            Collaborative (Add & Edit)
+                            {__('admin.board_share_collaborative')}
                         </button>
                     </div>
 
                     <div className="mt-3 space-y-3">
                         {project.client_name && (
                             <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 border border-slate-100 flex items-center justify-between">
-                                <span>{__('general.board_client') || 'Client'}</span>
+                                <span>{__('general.board_client')}</span>
                                 <span className="font-semibold text-slate-800">{project.client_name}</span>
                             </div>
                         )}
 
                         <div className="space-y-2 pt-2 border-t border-slate-100">
                             <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                                Collaborators
+                                {__('admin.board_share_collaborators')}
                             </span>
                             {loadingCollaborators ? (
-                                <div className="text-[11px] text-slate-400 py-1">Loading collaborators...</div>
+                                <div className="text-[11px] text-slate-400 py-1">{__('admin.board_share_loading')}</div>
                             ) : collaborators.length === 0 ? (
-                                <div className="text-[11px] text-slate-400 py-1 italic">No collaborators added yet.</div>
+                                <div className="text-[11px] text-slate-400 py-1 italic">{__('admin.board_share_empty')}</div>
                             ) : (
                                 <div className="space-y-1.5 max-h-36 overflow-y-auto">
                                     {collaborators.map((c) => (
@@ -556,6 +556,8 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                                 type="button"
                                                 onClick={() => handleRemoveCollaborator(c.id)}
                                                 className="p-1 hover:bg-slate-100 rounded-md text-red-500 hover:text-red-700 transition-colors"
+                                                aria-label={__('admin.board_share_remove', { name: c.name })}
+                                                title={__('admin.board_share_remove', { name: c.name })}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </button>
@@ -567,30 +569,30 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
 
                         <div className="space-y-1 relative pt-2 border-t border-slate-100">
                             <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                                Add Collaborator
+                                {__('admin.board_share_add')}
                             </span>
                             <div className="relative">
                                 <input
                                     type="text"
-                                    placeholder="Search user to share with..."
+                                    placeholder={__('admin.board_share_search_placeholder')}
                                     value={searchQuery}
                                     onChange={(e) => handleSearchUser(e.target.value)}
                                     onFocus={() => setShowSuggestions(true)}
                                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                     disabled={updatingClient}
-                                    className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-xs text-slate-900 focus:outline-none focus:border-slate-400 placeholder:text-slate-400 disabled:opacity-50"
+                                    className="w-full h-10 rounded-lg border border-slate-200 bg-white ps-3 pe-10 text-xs text-slate-900 focus:outline-none focus:border-slate-400 placeholder:text-slate-400 disabled:opacity-50"
                                 />
-                                <div className="absolute right-3 top-3 flex items-center pointer-events-none">
+                                <div className="absolute end-3 top-3 flex items-center pointer-events-none">
                                     <ChevronDown className="h-4 w-4 text-slate-400" />
                                 </div>
                                 {showSuggestions && suggestions.length > 0 && (
-                                    <div className="absolute left-0 right-0 top-11 z-50 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
+                                    <div className="absolute inset-x-0 top-11 z-50 max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
                                         {suggestions.map((u: any) => (
                                             <button
                                                 key={u.id}
                                                 type="button"
                                                 onClick={() => handleSelectUser(u)}
-                                                className="w-full px-3 py-2 text-left text-xs hover:bg-slate-100 flex flex-col"
+                                                className="w-full px-3 py-2 text-start text-xs hover:bg-slate-100 flex flex-col"
                                             >
                                                 <span className="font-semibold text-slate-800">{u.name}</span>
                                                 <span className="text-[10px] text-slate-500">{u.email}</span>
@@ -604,10 +606,10 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                             <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                                        {__('shortlink.short_link') || 'Short link'}
+                                        {__('shortlink.short_link')}
                                     </span>
                                     <span className="text-[10px] font-medium text-emerald-600">
-                                        {__('shortlink.recommended_for_sharing') || 'Recommended for sharing'}
+                                        {__('shortlink.recommended_for_sharing')}
                                     </span>
                                 </div>
                                 <div className="relative">
@@ -622,14 +624,14 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                         onClick={() => handleCopyLink(shortUrl)}
                                         className="absolute right-1.5 top-1.5 inline-flex h-7 items-center justify-center rounded-md bg-slate-900 px-3 text-[11px] font-semibold text-white hover:bg-slate-800"
                                     >
-                                        {__('general.copy') || 'Copy'}
+                                        {__('general.copy')}
                                     </button>
                                 </div>
                             </div>
                         ) : null}
                         <div className="space-y-1.5">
                             <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                                {__('shortlink.destination_url') || 'Full link'}
+                                {__('shortlink.destination_url')}
                             </span>
                             <div className="relative">
                                 <input
@@ -643,7 +645,7 @@ export default function BoardTopNav({ project, activeFilter, onFilterChange, cou
                                     onClick={() => handleCopyLink(shareUrl)}
                                     className="absolute right-1.5 top-1.5 inline-flex h-7 items-center justify-center rounded-md bg-slate-200 px-3 text-[11px] font-semibold text-slate-700 hover:bg-slate-300"
                                 >
-                                    {__('general.copy') || 'Copy'}
+                                    {__('general.copy')}
                                 </button>
                             </div>
                         </div>

@@ -8,11 +8,14 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use App\Models\CurrenciesExchange;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class UserTabFilterTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected User $admin;
 
@@ -37,7 +40,8 @@ class UserTabFilterTest extends TestCase
             'status' => 'paid',
         ]);
 
-        // User with transaction (Customer)
+        // User with transaction (Customer). Writing a wallet row converts to the business currency.
+        $this->seedUsdEgpRates();
         $customerTransaction = User::factory()->create(['name' => 'Customer With Transaction']);
         Transaction::create([
             'user_id' => $customerTransaction->id,
@@ -58,6 +62,29 @@ class UserTabFilterTest extends TestCase
             ->where('tabCounts.customers', 2)
             ->where('tabCounts.leads', 2) // leadUser + admin
             ->has('clients.data', 2)
+        );
+    }
+
+    public function test_users_list_renders_when_exchange_rates_are_missing(): void
+    {
+        $this->seedUsdEgpRates();
+        $customer = User::factory()->create(['name' => 'Customer With Transaction']);
+        Transaction::create([
+            'user_id' => $customer->id,
+            'amount' => 50,
+            'type' => 'received',
+            'reason' => 'Test Payment',
+        ]);
+
+        CurrenciesExchange::query()->delete();
+        CurrenciesExchange::flushCache();
+
+        $response = $this->actingAs($this->admin)->get('/admin/users');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Users/Index')
+            ->has('clients.data', 1)
         );
     }
 

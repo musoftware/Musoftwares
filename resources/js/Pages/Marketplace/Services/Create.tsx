@@ -4,7 +4,7 @@ import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import {
-    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star, Sparkles
+    ChevronRight, ChevronLeft, Check, Send, ArrowLeft, Star, Sparkles, Camera
 } from 'lucide-react';
 import OverviewStep from './Steps/OverviewStep';
 import PricingStep from './Steps/PricingStep';
@@ -17,11 +17,11 @@ interface Category { id: number; name: string; slug: string; }
 interface Props { categories: Category[]; seller: any; }
 
 const STEPS = [
-    { id: 1, label: 'Overview' },
-    { id: 2, label: 'Pricing' },
-    { id: 3, label: 'Description & FAQ' },
-    { id: 4, label: 'Gallery' },
-    { id: 5, label: 'Publish' },
+    { id: 1, labelKey: 'general.overview' },
+    { id: 2, labelKey: 'general.pricing' },
+    { id: 3, labelKey: 'marketplace.svc_step_description_faq' },
+    { id: 4, labelKey: 'general.gallery' },
+    { id: 5, labelKey: 'marketplace.svc_step_publish' },
 ];
 
 export const emptyPackage = () => ({
@@ -86,7 +86,7 @@ export default function CreateService({ categories, seller }: Props) {
                         <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                             <ArrowLeft className="w-4 h-4" /> {__('general.back')}</Link>
                         <h1 className="text-base font-semibold text-foreground">{__('general.publish_a_service')}</h1>
-                        <div className="text-xs text-slate-400">Step {step} of {STEPS.length}</div>
+                        <div className="text-xs text-slate-400">{__('marketplace.svc_step_of', { step, total: STEPS.length })}</div>
                     </div>
 
                     {/* Step tabs */}
@@ -115,7 +115,7 @@ export default function CreateService({ categories, seller }: Props) {
                                         )}>
                                             {done ? <Check className="w-3 h-3" /> : s.id}
                                         </span>
-                                        <span className="hidden sm:block">{s.label}</span>
+                                        <span className="hidden sm:block">{__(s.labelKey)}</span>
                                     </button>
                                 );
                             })}
@@ -133,11 +133,11 @@ export default function CreateService({ categories, seller }: Props) {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-bold flex items-center gap-2 text-white">
-                                        إنشاء خدمة فورية بالذكاء الاصطناعي (أدمن فقط)
-                                        <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">Admin Only</span>
+                                        {__('marketplace.svc_ai_banner_title')}
+                                        <span className="text-[10px] bg-amber-400/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">{__('marketplace.admin_only')}</span>
                                     </h3>
                                     <p className="text-xs text-slate-300">
-                                        اكتب عنوان الخدمة فقط والذكاء الاصطناعي (ChatGPT / Gemini) سينشئ التفاصيل، الباقات، والصورة تلقائياً!
+                                        {__('marketplace.svc_ai_banner_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -146,7 +146,7 @@ export default function CreateService({ categories, seller }: Props) {
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-bold rounded-lg shadow-md hover:shadow-indigo-500/25 transition-all shrink-0 cursor-pointer"
                             >
                                 <Sparkles className="w-4 h-4 text-amber-300" />
-                                استخدام مولد AI
+                                {__('marketplace.svc_ai_banner_cta')}
                             </Link>
                         </div>
                     </div>
@@ -194,12 +194,12 @@ export default function CreateService({ categories, seller }: Props) {
                                 {/* Thumbnail */}
                                 <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden flex items-center justify-center">
                                     {data.gallery.length > 0 ? (
-                                        <img src={URL.createObjectURL(data.gallery[0])} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={URL.createObjectURL(data.gallery[0])} alt={__('marketplace.svc_thumbnail_alt')} className="w-full h-full object-cover" />
                                     ) : data.kept_gallery?.length > 0 ? (
-                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt="Thumbnail" className="w-full h-full object-cover" />
+                                        <img src={data.kept_gallery[0].startsWith('http') ? data.kept_gallery[0] : (data.kept_gallery[0].startsWith('/') ? data.kept_gallery[0] : `/uploads/${data.kept_gallery[0].replace(/^storage\//, '').replace(/^uploads\//, '')}`)} alt={__('marketplace.svc_thumbnail_alt')} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
-                                            <span className="text-4xl mb-2">📸</span>
+                                            <Camera className="w-9 h-9 mb-2" aria-hidden="true" />
                                             <span className="text-xs font-medium">{__('general.image_preview')}</span>
                                         </div>
                                     )}
@@ -225,7 +225,7 @@ export default function CreateService({ categories, seller }: Props) {
 
                                     {/* Title */}
                                     <h4 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-snug mb-4 min-h-[40px]">
-                                        {data.title || 'I will...'}
+                                        {data.title || __('marketplace.svc_title_preview_placeholder')}
                                     </h4>
 
                                     {/* Footer */}

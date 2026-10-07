@@ -5,36 +5,51 @@ import { Button } from '@/Components/ui/button';
 import { ArrowLeft, Calendar, Clock, DollarSign, List, History, AlertCircle, Edit, Trash2, Play } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function View({ cost, transactions, upcomingSchedule, total_stat }) {
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
     const [generating, setGenerating] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
-    const handleGenerateMissing = () => {
-        if (confirm(__('general.confirm_generate_missing') || 'Are you sure you want to generate all missing past transactions up to today for this schedule?')) {
-            setGenerating(true);
-            router.post(route('admin.recurring_costs.generate_missing', cost.id), {}, {
-                preserveScroll: true,
-                onFinish: () => setGenerating(false),
-            });
-        }
+    const handleGenerateMissing = async () => {
+        const accepted = await confirm({
+            title: __('general.confirm_generate_missing'),
+            confirmLabel: __('general.generate_missing_transactions'),
+        });
+        if (!accepted) return;
+        setGenerating(true);
+        router.post(route('admin.recurring_costs.generate_missing', cost.id), {}, {
+            preserveScroll: true,
+            onFinish: () => setGenerating(false),
+        });
     };
 
-    const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this recurring cost?')) {
-            router.delete(route('admin.recurring_costs.delete', cost.id));
-        }
+    const handleDelete = async () => {
+        const accepted = await confirm({
+            title: __('admin.recurring_cost_delete_title'),
+            description: __('admin.recurring_cost_delete_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.recurring_costs.delete', cost.id));
     };
 
-    const handleDeleteWithTransactions = () => {
-        if (confirm('Are you sure you want to delete this recurring cost AND all its generated transactions? This cannot be undone.')) {
-            router.delete(route('admin.recurring_costs.delete_with_transaction', cost.id));
-        }
+    const handleDeleteWithTransactions = async () => {
+        const accepted = await confirm({
+            title: __('admin.recurring_cost_delete_all_title'),
+            description: __('admin.recurring_cost_delete_all_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete_everything'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.recurring_costs.delete_with_transaction', cost.id));
     };
 
     return (
-        <AdminSidebarLayout title={`${cost.title} - Recurring Details`} header="Business Operations">
-            <Head title={`View Recurring Cost - ${cost.title}`} />
+        <AdminSidebarLayout title={__('admin.recurring_details_title', { title: cost.title })} header={__('admin.business_operations')}>
+            <Head title={__('admin.recurring_cost_view_title', { title: cost.title })} />
 
             <div className="mb-4 flex justify-between items-center">
                 <Link href={route('admin.recurring_costs.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
@@ -42,7 +57,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                 <div className="flex items-center gap-2">
                     <Button variant="default" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm" onClick={handleGenerateMissing} disabled={generating}>
                         <Play className="w-3.5 h-3.5 fill-current" />
-                        {generating ? (__('general.loading') || 'Generating...') : (__('general.generate_missing_transactions') || 'Generate Missing')}
+                        {generating ? (__('general.loading')) : (__('general.generate_missing_transactions'))}
                     </Button>
                     <Link href={route('admin.recurring_costs.edit', cost.id)}>
                         <Button variant="outline" size="sm" className="flex items-center gap-1.5">
@@ -75,7 +90,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                         </div>
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.category_reason')}</span>
-                            <span className="text-sm font-medium text-slate-800 bg-slate-100 border px-2 py-0.5 rounded inline-block mt-0.5">{cost.reason || 'None'}</span>
+                            <span className="text-sm font-medium text-slate-800 bg-slate-100 border px-2 py-0.5 rounded inline-block mt-0.5">{cost.reason || __('general.none')}</span>
                         </div>
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">{__('general.start_date')}</span>
@@ -96,11 +111,11 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                         <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b">{__('general.ledger_stats')}</h3>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500">Total Runs Executed:</span>
-                                <span className="text-sm font-bold text-slate-900">{total_stat.entries_count} times</span>
+                                <span className="text-sm text-gray-500">{__('admin.recurring_total_runs_executed')}</span>
+                                <span className="text-sm font-bold text-slate-900">{__('admin.recurring_runs_count', { count: total_stat.entries_count })}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500">Cumulative Cost:</span>
+                                <span className="text-sm text-gray-500">{__('admin.recurring_cumulative_cost')}</span>
                                 <span className="text-sm font-bold text-red-600 bg-red-50 px-2 py-0.5 border border-red-100 rounded">
                                     {total_stat.total_cost}
                                 </span>
@@ -125,7 +140,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                         }`}
                         onClick={() => setActiveTab('history')}
                     >
-                        <History className="w-4 h-4" /> Generated Transactions ({transactions.length})
+                        <History className="w-4 h-4" /> {__('admin.recurring_generated_transactions_count', { count: transactions.length })}
                     </button>
                     <button
                         className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-all ${
@@ -199,7 +214,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap text-sm">
                                                 {run.recorded ? (
-                                                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
+                                                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded">{__('admin.recurring_recorded_historical')}</span>
                                                 ) : (
                                                     <span className="text-xs bg-green-50 text-slate-900 border border-green-200 px-2 py-0.5 rounded font-medium">{__('general.pending_execution')}</span>
                                                 )}
@@ -220,6 +235,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                     )}
                 </div>
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

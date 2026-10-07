@@ -50,19 +50,8 @@ return [
              *
              */
 
-            'credentials' => [
-                'type' => 'service_account',
-                'project_id' => 'musoftware-c0696',
-                'private_key_id' => '46ff9bf1b96709bd382468d945191f0e6ae971e4',
-                'private_key' => "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC9E8duWioY8Svi\nO8ua8Ofofa3Y5G41rWczN3+DqbiaXG0m8AeGimkbWhckoMWgMw8k9/3VkhLpMeZZ\nv57ZXsx99zXrROtHWZJdRY8Uo8055HDWKwQG43d2HL7Ld0GBlPCbMUIb4bYdgN7F\nU5k99lIsM0JyZ+4578epQ8Jiy6ZQU/LZqICghJJaa1mRdONvsOJxMb0EcMm89mz2\nPRo6jvw3EEnNESKwP6/MWvSOa3jvPm9dtcieFc6djWnKSveZUsQmvknOmwn0li4U\nc5+80DcUiZCmadzH8e2kYWSifqtEjgU4usMySpc7J5zQhBfz/sATeanfEhaw34LH\n7oHLrdHxAgMBAAECggEAPLkW8f5cCcGeldwdUifvWs/OHtuR94Q2ohC/T5IY2t43\nIeuxhwh5pBKlXxqRDZeIVBee+lGc6C6h643qXqYe54+WzfXG2BXQt0rJHlhS5zZR\n9L5A31N7QMAPmHm23H5wXW8O67RsEAKcyOPF0cwDbPWTb/mn3QyAY4CC88aypZYa\n8J032cUjY2C7TZNI6DLMu7a/uk7pudQmm+5qqAg3Y+GHklucEuFn87KwlOUyP5AS\nT1V3r/pASUNVIqVxWEGjCCJ8PcmpYlXFqbHrif2T6hA8hcgZuItmQQrgm4FgdlO4\nNxQ+BgabvfdFEmDCs+WKNcE1sfNCwjD9wSauB1B9pwKBgQDmPCu2Ys4GLaA9+xHR\nVHXnL072Htzo2849Ny/8mKzsogFBZnVJJRComZtHHpPcOq+RBv8UYkyZlBjM8577\nhIoQn6FSoLVWzwcCInFRRn2M0U3VpiCt5FDmwTrh/sV+0Asgfy+4yBD74Dsz9j8T\nP0qrDVN7RkGSQvpHe1jFMVuD6wKBgQDSPIKd0nKxzQhs1qF1+5X/bdlene4UHPIO\nVWjUW3FajCmY6Q3rxR9KkVBmtU0yIucWifJhoSJ2Pg8T1EAciR97A+3leQdxn/cn\nIqKyWHYfDLkhLQadf1Z7h+VsqZkmIkyzaydBJSAonvsv52CSlb7pdXKEdA7+9Bes\nD24pjwi2kwKBgQDiYn3067h7OLfc2hgOBgec19bDiVtcmG11oeNMc+9tCmtDnHRt\nBMYZklitmLJ5FTd22jNNHs8FICs2s8I6vHtplxzwe1dz0UOp5KYZ7b8cDN6E2sI9\nWkf2bj/w4ivd4sFeJdGN1yNkF3r/P/2Ldmt8QDE7AL0PDU69pNqHo13CGwKBgH+G\n6Qxm/d/QqY2r3CE/TUu2DKcSUbqtnD8JnB9EoMv2Pb1dkW41Erge0ZCb5YnGFjtb\nzkVegxMKrgavN3yXyRrL1WDfO563FCsPHXXlpzFKfHodX+fluEYStx5k+lthbvle\nxF8F8C3z0hbK2Y/Reg8PiTnDVN1en4VljsNy2iw1AoGAEoP/YSHpSUOMs7kfTylk\nO13wGqEVFl9iJa+o9Huwsmr2x0kCK+T9rAU0FB7T7HdcLt9rTGG74jy2eSvLbEUl\nRib9Xr50u6GpCjy6RwT+X4IKxQWI8R/Ns8zw6hq9A4z5JbUZwFbmcyW2a+jSgK5y\nXy4/ZVzqy5Vb558FxTYDVm4=\n-----END PRIVATE KEY-----\n",
-                'client_email' => "firebase-adminsdk-1y1cf@musoftware-c0696.iam.gserviceaccount.com",
-                'client_id' => "117518869550883213244",
-                'auth_uri' => "https://accounts.google.com/o/oauth2/auth",
-                'token_uri' => 'https://oauth2.googleapis.com/token',
-                'auth_provider_x509_cert_url' => 'https://www.googleapis.com/oauth2/v1/certs',
-                'client_x509_cert_url' => "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-1y1cf%40musoftware-c0696.iam.gserviceaccount.com",
-                'universe_domain' => 'googleapis.com',
-            ],
+            // Path to the service account JSON file. Never commit the key itself.
+            'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase-credentials.json')),
 
             /*
              * ------------------------------------------------------------------------

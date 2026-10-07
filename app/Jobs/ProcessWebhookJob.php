@@ -3,15 +3,14 @@
 namespace App\Jobs;
 
 use App\Helpers\KashierHelper;
-use App\Models\Currency;
+use App\Helpers\KashierSignedAmount;
 use App\Models\IncomingWebhook;
 use App\Models\Invoice;
+use App\Models\KashierCheckout;
 use App\Models\PaymentLink;
-use App\Models\PointTransaction;
-use App\Models\Transaction;
 use App\Models\User;
-use App\Models\UserSubscription;
-use Carbon\Carbon;
+use App\Services\BalanceService;
+use App\Services\KashierCheckoutFulfillment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -54,20 +53,8 @@ class ProcessWebhookJob implements ShouldQueue
             }
 
             // 3. Process based on source
-            switch ($this->webhook->source) {
-                case 'kashier':
-                    $this->processKashier($this->webhook->payload);
-                    break;
-                case 'whatsapp':
-                    $this->processWhatsApp($this->webhook->payload);
-                    break;
-                case 'stripe':
-                    $this->processStripe($this->webhook->payload);
-                    break;
-                default:
-                    Log::warning("No processor defined for webhook source: {$this->webhook->source}");
-                    break;
-            }
+            // Only Kashier has a verifier, so validateSignature() already rejected every other source.
+            $this->processKashier($this->webhook->payload);
 
             // 4. Mark as processed
             $this->webhook->update([
@@ -91,29 +78,21 @@ class ProcessWebhookJob implements ShouldQueue
     /**
      * Validate the webhook signature.
      */
-    private function validateSignature($source, $payload, $headers)
+    private function validateSignature($source, $payload, $headers): bool
     {
         if ($source === 'kashier') {
-            if (class_exists('\App\Helpers\KashierHelper') && method_exists('\App\Helpers\KashierHelper', 'validatePayload')) {
-                $signature = $headers['x-kashier-signature'][0] ?? ($headers['X-Kashier-Signature'][0] ?? null);
+            $signature = $headers['x-kashier-signature'][0] ?? ($headers['X-Kashier-Signature'][0] ?? null);
 
-                return KashierHelper::validatePayload($payload, $signature);
-            }
-
-            return true;
+            return KashierHelper::validatePayload($payload, $signature);
         }
 
-        if ($source === 'whatsapp') {
-            // WhatsApp signature validation (X-Hub-Signature-256)
-            return true;
-        }
+        // No verifier is implemented for any other source (whatsapp, stripe, ...): never trust them.
+        Log::warning('Webhook rejected: no signature verifier for source.', [
+            'webhook_id' => $this->webhook->id,
+            'source' => $source,
+        ]);
 
-        if ($source === 'stripe') {
-            // Stripe signature validation
-            return true;
-        }
-
-        return true;
+        return false;
     }
 
     private function processKashier($payload)
@@ -161,134 +140,66 @@ class ProcessWebhookJob implements ShouldQueue
 
         $trxId = $data['transactionId'] ?? null;
 
-        $amountPaid = floatval($metaData['original_amount'] ?? $data['amount'] ?? 0);
-        $currencyCode = $metaData['original_currency'] ?? ($data['currency'] ?? 'EGP');
+        // Only the signed charge (data.amount + data.currency) is trusted; metaData.original_amount is payer-editable.
+        $paid = KashierSignedAmount::fromWebhookData($data);
 
-        $currencyId = null;
-        if ($currencyCode) {
-            $currencyModel = Currency::where('currency', strtoupper($currencyCode))->first();
-            if ($currencyModel) {
-                $currencyId = $currencyModel->id;
-            }
-        }
-
-        if (! $source || ! $trxId || $amountPaid <= 0) {
+        if (! $source || ! $trxId || ! $paid) {
             throw new \Exception('Invalid Kashier webhook payload structure.');
         }
 
         // Route to the appropriate service logic based on source
         switch ($source) {
             case 'balance-recharge':
-                $this->handleBalanceRecharge($userId, $trxId, $amountPaid, $currencyId, $metaData);
+                $this->handleBalanceRecharge($userId, (string) $trxId, $paid, $data);
                 break;
-            case 'subscription-purchase':
-                $this->handleSubscriptionPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData);
-                break;
-            case 'points-purchase':
-                $this->handlePointsPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData);
+            case KashierCheckout::PURPOSE_SUBSCRIPTION:
+            case KashierCheckout::PURPOSE_POINTS:
+                $this->handleCheckoutPurchase($data, $source);
                 break;
             case 'booking-purchase':
-                $this->handleBookingPurchase($userId, $trxId, $amountPaid, $metaData);
+                $this->handleBookingPurchase($userId, $trxId, $paid->amount, $metaData);
                 break;
             case 'guest-invoice-payment':
             case 'user-invoice-payment':
-                $this->handleInvoicePayment($trxId, $amountPaid, $metaData);
+                $this->handleInvoicePayment($trxId, $paid, $metaData);
                 break;
             case 'payment-link':
-                $this->handlePaymentLink($trxId, $amountPaid, $metaData);
+                $this->handlePaymentLink($trxId, $paid->amount, $metaData, $paid);
                 break;
             default:
                 Log::warning("Unknown Kashier webhook source: {$source}");
         }
     }
 
-    private function handleBalanceRecharge($userId, $trxId, $amountPaid, $currencyId, $metaData)
+    private function findUserOrFail($userId, string $trxId): User
     {
-        $user = User::find($userId);
+        $user = $userId ? User::find($userId) : null;
         if (! $user) {
-            return;
+            throw new \Exception("Kashier webhook {$trxId} references unknown user ".json_encode($userId));
         }
 
-        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
-        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
-
-        if (! $alreadyProcessed) {
-            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId) {
-                $user->add_balance($amountPaid, $reason, 'received', $currencyId);
-            });
-            Log::info("Kashier balance recharge processed successfully for User {$userId}");
-        }
+        return $user;
     }
 
-    private function handleSubscriptionPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData)
+    /**
+     * Same crediting path as the synchronous FinancialController::webhook route.
+     */
+    private function handleBalanceRecharge($userId, string $trxId, KashierSignedAmount $paid, array $payloadData): void
     {
-        $user = User::find($userId);
-        if (! $user) {
-            return;
-        }
+        $user = $this->findUserOrFail($userId, $trxId);
 
-        $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
-        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
-
-        if (! $alreadyProcessed) {
-            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
-                $days = $metaData['days'] ?? 365;
-                $isNewSystem = $metaData['is_new_system'] ?? true;
-
-                $user->add_balance($amountPaid, $reason, 'received', $currencyId);
-                if (class_exists('\App\Helpers\TimerHelper') && method_exists('\App\Helpers\TimerHelper', 'instance')) {
-                    // Note: TimerHelper addUsed might not support currencyId, so we will skip it for now and fallback
-                    $user->add_balance(-1 * $amountPaid, 'Subscribe to modules', 'used', $currencyId);
-                } else {
-                    $user->add_balance(-1 * $amountPaid, 'Subscribe to modules', 'used', $currencyId);
-                }
-
-                $items = $metaData['items'] ?? [];
-                if (is_array($items) && ! empty($items)) {
-                    foreach ($items as $item) {
-                        $expiry = Carbon::now()->addDays((int) $days);
-
-                        $existing = UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
-                        if ($existing && $existing->status === 'active' && Carbon::parse($existing->expires_at)->isFuture()) {
-                            $expiry = Carbon::parse($existing->expires_at)->addDays((int) $days);
-                        }
-
-                        UserSubscription::updateOrCreate(
-                            ['user_id' => $user->id, 'object' => $item],
-                            ['status' => 'active', 'started_at' => now(), 'expires_at' => $expiry, 'auto_renew' => true]
-                        );
-
-                    }
-                }
-            });
-            Log::info("Kashier subscription processed successfully for User {$userId}");
-        }
+        app(BalanceService::class)->processKashierDepositWebhook($user, $paid, $trxId, $payloadData);
     }
 
-    private function handlePointsPurchase($userId, $trxId, $amountPaid, $currencyId, $metaData)
+    /**
+     * Same fulfilment path as the synchronous points/subscription webhook routes.
+     */
+    private function handleCheckoutPurchase(array $data, string $purpose): void
     {
-        $user = User::find($userId);
-        if (! $user) {
-            return;
-        }
+        $result = app(KashierCheckoutFulfillment::class)->fulfill($data, $purpose);
 
-        $reason = "Points purchase via Kashier (Trx: $trxId)";
-        $alreadyProcessed = Transaction::where('user_id', $user->id)->where('reason', $reason)->exists();
-
-        if (! $alreadyProcessed) {
-            DB::transaction(function () use ($user, $amountPaid, $reason, $currencyId, $metaData) {
-                $points = $metaData['points'] ?? 0;
-                $user->add_balance($amountPaid, $reason, 'received', $currencyId);
-                $user->add_balance(-1 * $amountPaid, "Used for {$points} points", 'used', $currencyId);
-
-                PointTransaction::create([
-                    'user_id' => $user->id,
-                    'amount' => $points,
-                    'type' => 'credit',
-                    'description' => "Purchased {$points} points",
-                ]);
-            });
-            Log::info("Kashier points purchase processed successfully for User {$userId}");
+        if ($result === KashierCheckoutFulfillment::REJECTED) {
+            throw new \Exception("Kashier {$purpose} webhook rejected for transaction ".($data['transactionId'] ?? 'unknown'));
         }
     }
 
@@ -306,26 +217,43 @@ class ProcessWebhookJob implements ShouldQueue
         }
     }
 
-    private function handleInvoicePayment($trxId, $amountPaid, $metaData)
+    private function handleInvoicePayment($trxId, KashierSignedAmount $paid, array $metaData): void
     {
-        $invoiceId = $metaData['invoice_id'] ?? null;
-        if ($invoiceId && class_exists('\App\Models\Invoice')) {
-            $invoice = Invoice::find($invoiceId);
-            if ($invoice && $invoice->status !== 'paid') {
-                $invoice->mark_as_paid();
-                Log::info("Kashier invoice payment processed successfully for Invoice {$invoiceId}");
-            }
-        }
-    }
-
-    private function handlePaymentLink($trxId, $amountPaid, $metaData)
-    {
-        $paymentLinkId = $metaData['payment_link_id'] ?? null;
-        if (! $paymentLinkId || ! class_exists('\App\Models\PaymentLink')) {
+        $invoice = isset($metaData['invoice_id']) ? Invoice::find($metaData['invoice_id']) : null;
+        if (! $invoice || $invoice->status === 'paid') {
             return;
         }
 
-        DB::transaction(function () use ($paymentLinkId, $trxId, $amountPaid) {
+        $amountDue = $invoice->unpaid_total();
+        $invoiceCurrencyId = (int) ($invoice->currency_id ?? $invoice->currency);
+        if (! $invoiceCurrencyId || ! $paid->covers($amountDue, $invoiceCurrencyId)) {
+            Log::warning('Kashier invoice payment rejected: paid amount is less than amount due.', [
+                'invoice_id' => $invoice->id,
+                'trx' => $trxId,
+                'amount_due' => $amountDue,
+                'invoice_currency_id' => $invoiceCurrencyId,
+                'paid' => $paid->amount,
+                'paid_currency' => $paid->currencyCode,
+            ]);
+
+            throw new \Exception("Kashier payment {$trxId} does not cover invoice {$invoice->id}");
+        }
+
+        $invoice->mark_as_paid();
+        Log::info('Kashier invoice payment processed.', ['invoice_id' => $invoice->id, 'trx' => $trxId]);
+    }
+
+    /**
+     * $paid is the signed charge; without it (legacy callers) $amountPaid is compared in the link's own currency.
+     */
+    private function handlePaymentLink($trxId, $amountPaid, $metaData, ?KashierSignedAmount $paid = null)
+    {
+        $paymentLinkId = $metaData['payment_link_id'] ?? null;
+        if (! $paymentLinkId) {
+            return;
+        }
+
+        DB::transaction(function () use ($paymentLinkId, $trxId, $amountPaid, $paid) {
             $paymentLink = PaymentLink::lockForUpdate()->find($paymentLinkId);
             if (! $paymentLink) {
                 Log::warning("Kashier payment link webhook: link {$paymentLinkId} not found.");
@@ -339,7 +267,11 @@ class ProcessWebhookJob implements ShouldQueue
                 return;
             }
 
-            if ((float) $paymentLink->amount !== (float) $amountPaid) {
+            $amountMatches = $paid
+                ? $paid->covers((float) $paymentLink->amount, (int) $paymentLink->currency_id)
+                : (float) $paymentLink->amount === (float) $amountPaid;
+
+            if (! $amountMatches) {
                 Log::warning("Kashier payment link webhook amount mismatch for link {$paymentLinkId}: expected {$paymentLink->amount}, got {$amountPaid}.");
 
                 throw new \Exception("Payment amount mismatch for payment link {$paymentLinkId}");
@@ -348,16 +280,5 @@ class ProcessWebhookJob implements ShouldQueue
             $paymentLink->markPaid(PaymentLink::METHOD_KASHIER, (string) $trxId);
             Log::info("Kashier payment link processed successfully for Link {$paymentLinkId}");
         });
-    }
-
-    private function processWhatsApp($payload)
-    {
-        Log::info('Processing WhatsApp webhook', ['payload' => $payload]);
-        // Map to internal state change here
-    }
-
-    private function processStripe($payload)
-    {
-        Log::info('Processing Stripe webhook', ['payload' => $payload]);
     }
 }

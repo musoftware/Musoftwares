@@ -13,9 +13,11 @@ use Tests\TestCase;
 class GuestInvoiceCurrencyShowTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     public function test_guest_invoice_show_with_loaded_currency_does_not_fail()
     {
+        $this->seedUsdEgpRates(); // the page shows the USD total in the EGP business currency
         $currency = Currency::firstOrCreate(
             ['id' => 1],
             [

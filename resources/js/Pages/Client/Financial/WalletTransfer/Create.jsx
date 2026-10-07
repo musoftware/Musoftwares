@@ -100,7 +100,7 @@ export default function Create({ user, wallet }) {
             .then(async (res) => {
                 const responseData = await res.json();
                 if (!res.ok) {
-                    throw new Error(responseData.message || 'Failed to estimate transaction details.');
+                    throw new Error(responseData.message || __('client.transfer_estimate_failed'));
                 }
                 return responseData;
             })
@@ -129,7 +129,7 @@ export default function Create({ user, wallet }) {
     };
 
     return (
-        <AuthenticatedLayout header="Send Wallet Funds">
+        <AuthenticatedLayout header={__('client.transfer_header')}>
             <Head title={__('general.send_transfer')} />
 
             <div className="w-full max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -163,11 +163,11 @@ export default function Create({ user, wallet }) {
                             
                             {/* Wizard Progress Steps Indicator */}
                             <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                                <span className={step === 1 ? "text-primary" : "text-muted-foreground/60"}>1. Recipient</span>
+                                <span className={step === 1 ? "text-primary" : "text-muted-foreground/60"}>{__('client.transfer_step_recipient')}</span>
                                 <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-                                <span className={step === 2 ? "text-primary" : "text-muted-foreground/60"}>2. Amount</span>
+                                <span className={step === 2 ? "text-primary" : "text-muted-foreground/60"}>{__('client.transfer_step_amount')}</span>
                                 <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-                                <span className={step === 3 ? "text-primary" : "text-muted-foreground/60"}>3. Confirm</span>
+                                <span className={step === 3 ? "text-primary" : "text-muted-foreground/60"}>{__('client.transfer_step_confirm')}</span>
                             </div>
                         </div>
                     </CardHeader>
@@ -272,7 +272,7 @@ export default function Create({ user, wallet }) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="reason">Memo / Reason (Optional)</Label>
+                                            <Label htmlFor="reason">{__('client.transfer_memo_label')}</Label>
                                             <Input
                                                 id="reason"
                                                 type="text"
@@ -306,7 +306,7 @@ export default function Create({ user, wallet }) {
                                             </div>
 
                                             <div className="p-4 flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground flex items-center gap-1.5">{__('general.transfer_fee')}<span className="text-xs text-muted-foreground/60">(1% capped)</span>
+                                                <span className="text-muted-foreground flex items-center gap-1.5">{__('general.transfer_fee')}<span className="text-xs text-muted-foreground/60">{__('client.transfer_fee_capped')}</span>
                                                 </span>
                                                 <span className="font-semibold text-foreground">
                                                     +{Number(previewData.fee).toFixed(2)} {previewData.currency}
@@ -341,7 +341,7 @@ export default function Create({ user, wallet }) {
                                             </div>
 
                                             <div className="p-4 bg-muted/10 flex items-center justify-between text-xs text-muted-foreground">
-                                                <span>Your remaining daily transfer limit:</span>
+                                                <span>{__('client.transfer_remaining_limit')}</span>
                                                 <span className="font-semibold">{Number(previewData.remaining_limit).toFixed(2)} {previewData.currency}</span>
                                             </div>
                                         </div>
@@ -376,27 +376,27 @@ export default function Create({ user, wallet }) {
                                         <h3 className="font-bold text-center text-sm tracking-wide uppercase text-muted-foreground">{__('general.transfer_confirmation')}</h3>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Sender User:</span>
+                                                <span className="text-muted-foreground">{__('client.transfer_sender_user')}</span>
                                                 <span className="font-medium text-foreground">{user.name} ({user.email})</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Recipient User:</span>
+                                                <span className="text-muted-foreground">{__('client.transfer_recipient_user')}</span>
                                                 <span className="font-medium text-primary">{selectedRecipient.name} ({selectedRecipient.email})</span>
                                             </div>
                                             <div className="flex justify-between border-t pt-2">
-                                                <span className="text-muted-foreground">Transfer Principal:</span>
+                                                <span className="text-muted-foreground">{__('client.transfer_principal')}</span>
                                                 <span className="font-bold">{Number(previewData.amount).toFixed(2)} {previewData.currency}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Calculated Fee:</span>
+                                                <span className="text-muted-foreground">{__('client.transfer_calculated_fee')}</span>
                                                 <span className="font-medium">+{Number(previewData.fee).toFixed(2)} {previewData.currency}</span>
                                             </div>
                                             <div className="flex justify-between border-t border-primary/20 pt-2 text-foreground font-bold">
-                                                <span>Total Debit Amount:</span>
+                                                <span>{__('client.transfer_total_debit')}</span>
                                                 <span>{Number(parseFloat(previewData.amount) + parseFloat(previewData.fee)).toFixed(2)} {previewData.currency}</span>
                                             </div>
                                             <div className="flex justify-between text-emerald-600 font-bold">
-                                                <span>Recipient Credit Amount:</span>
+                                                <span>{__('client.transfer_recipient_credit')}</span>
                                                 <span>{Number(previewData.converted_amount).toFixed(2)} {previewData.converted_currency}</span>
                                             </div>
                                         </div>
@@ -431,7 +431,7 @@ export default function Create({ user, wallet }) {
                                             className="shadow-none bg-primary hover:bg-primary/95 text-primary-foreground font-semibold px-6"
                                             disabled={processing || !data.confirm_transfer}
                                         >
-                                            {processing ? 'Processing Transfer...' : (
+                                            {processing ? __('client.transfer_processing') : (
                                                 <>{__('general.execute_transfer')}<Send className="w-4 h-4 ms-2" />
                                                 </>
                                             )}

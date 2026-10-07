@@ -34,15 +34,15 @@ export default function LegacyCoWorkerShow({ worker }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.legacy_co_worker_details')} header="Co-Worker Details">
-            <Head title={`Co-Worker - ${worker.person_name}`} />
+        <AdminSidebarLayout title={__('general.legacy_co_worker_details')} header={__('general.legacy_co_worker_details')}>
+            <Head title={__('admin.co_worker_title', { name: worker.person_name })} />
 
             <div className="mb-6">
                 <Link
                     href="/admin/users/co-work"
                     className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
                 >
-                    <ArrowLeft className="w-4 h-4 me-1" />{__('general.back_to_co_work')}</Link>
+                    <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />{__('general.back_to_co_work')}</Link>
             </div>
 
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-7xl mx-auto w-full">
@@ -56,7 +56,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                             <h1 className="text-2xl font-bold text-slate-900 mb-1">{worker.person_name || '—'}</h1>
                             <p className="text-slate-500 text-sm flex items-center gap-2">
                                 <span className="inline-flex items-center gap-1">
-                                    <Clock className="w-4 h-4 text-slate-400" /> Joined {new Date(worker.created_at).toLocaleDateString()}
+                                    <Clock className="w-4 h-4 text-slate-400" /> {__('admin.joined_on', { date: new Date(worker.created_at).toLocaleDateString() })}
                                 </span>
                             </p>
                         </div>
@@ -71,7 +71,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                         
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="w-9 px-0">
+                                <Button variant="outline" size="sm" className="w-9 px-0" aria-label={__('general.open_menu')} title={__('general.open_menu')}>
                                     <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -123,7 +123,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.mobile_number')}</p>
                                             <p className="text-slate-900 font-medium flex items-center gap-2">
                                                 {worker.flag_path && (
-                                                    <img src={worker.flag_path} alt="flag" className="w-5 h-3.5 object-cover rounded-sm shadow-sm" />
+                                                    <img src={worker.flag_path} alt="" className="w-5 h-3.5 object-cover rounded-sm shadow-sm" />
                                                 )}
                                                 {worker.mobile}
                                             </p>
@@ -189,7 +189,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                         <div>
                                             <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.available_hours')}</p>
                                             <p className="text-slate-900 font-medium">
-                                                {worker.time_from || '?'} to {worker.time_to || '?'}
+                                                {__('admin.time_range', { from: worker.time_from || '?', to: worker.time_to || '?' })}
                                             </p>
                                         </div>
                                     </div>
@@ -220,8 +220,9 @@ export default function LegacyCoWorkerShow({ worker }) {
                 onCancel={() => setIsDeleteDialogOpen(false)}
                 onConfirm={handleDelete}
                 title={__('general.delete_legacy_co_worker')}
-                description={`Are you sure you want to delete ${worker.person_name}? This action cannot be undone.`}
-                confirmLabel="Delete"
+                description={__('admin.co_worker_delete_confirm', { name: worker.person_name })}
+                confirmLabel={__('general.delete')}
+                cancelLabel={__('general.cancel')}
                 variant="danger"
             />
             
@@ -230,8 +231,9 @@ export default function LegacyCoWorkerShow({ worker }) {
                 onCancel={() => setIsCreateUserDialogOpen(false)}
                 onConfirm={handleCreateUser}
                 title={__('general.create_user_account')}
-                description={`Are you sure you want to create an Employee user account for ${worker.person_name}? Credentials will be generated and sent via WhatsApp if available.`}
-                confirmLabel="Create User"
+                description={__('admin.co_worker_create_user_confirm', { name: worker.person_name })}
+                confirmLabel={__('general.create_user_account')}
+                cancelLabel={__('general.cancel')}
             />
 
             <ConfirmModal
@@ -239,8 +241,9 @@ export default function LegacyCoWorkerShow({ worker }) {
                 onCancel={() => setIsResetPasswordDialogOpen(false)}
                 onConfirm={handleResetPassword}
                 title={__('general.reset_password_send_credentials')}
-                description={`Are you sure you want to reset the password for ${worker.person_name}'s account? New credentials will be generated and sent via WhatsApp if available.`}
-                confirmLabel="Reset Password"
+                description={__('admin.co_worker_reset_password_confirm', { name: worker.person_name })}
+                confirmLabel={__('general.reset_password')}
+                cancelLabel={__('general.cancel')}
             />
         </AdminSidebarLayout>
     );

@@ -9,6 +9,7 @@ import { Badge } from '@/Components/ui/badge';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface DocumentType {
     id: number;
@@ -36,13 +37,14 @@ interface Props {
 }
 
 const STEPS = [
-    { id: 'id_front', label: 'Government ID', desc: 'Front of your Passport or National ID', required: true },
-    { id: 'selfie', label: 'Selfie Verification', desc: 'A clear photo of your face holding your ID', required: true },
-    { id: 'proof_of_address', label: 'Proof of Address', desc: 'Utility bill or bank statement (Optional)', required: false }
+    { id: 'id_front', label: 'client.kyc_step_id_label', desc: 'client.kyc_step_id_desc', required: true },
+    { id: 'selfie', label: 'client.kyc_step_selfie_label', desc: 'client.kyc_step_selfie_desc', required: true },
+    { id: 'proof_of_address', label: 'client.kyc_step_address_label', desc: 'client.kyc_step_address_desc', required: false }
 ];
 
 export default function KycIndex({ auth, kycStatus, documents, missingDocs, requiredDocs }: Props) {
     const { toast } = useToast();
+    const { confirm, confirmDialog } = useConfirm();
     const [activeStep, setActiveStep] = useState(0);
     const [uploadingType, setUploadingType] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
         const file = acceptedFiles[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
-                toast({ title: "File too large", description: "Maximum file size is 5MB.", variant: "destructive" });
+                toast({ title: __('client.kyc_file_too_large'), description: __('client.kyc_max_size'), variant: "destructive" });
                 return;
             }
             setData({ document_type: docType, document: file });
@@ -72,7 +74,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
         post(route('kyc.upload'), {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: "Uploaded", description: "Document uploaded successfully." });
+                toast({ title: __('client.kyc_uploaded'), description: __('client.kyc_uploaded_desc') });
                 reset();
                 setUploadingType(null);
                 if (activeStep < STEPS.length - 1) {
@@ -89,18 +91,22 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
         router.post(route('kyc.submit'), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: "Submitted", description: "Your KYC application is now under review." });
+                toast({ title: __('client.kyc_submitted'), description: __('client.kyc_submitted_desc') });
             }
         });
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm("Are you sure you want to delete this document?")) {
-            router.delete(route('kyc.delete', id), {
-                preserveScroll: true,
-                onSuccess: () => toast({ title: "Deleted", description: "Document removed." })
-            });
-        }
+    const handleDelete = async (id: number) => {
+        const accepted = await confirm({
+            title: __('client.kyc_delete_title'),
+            description: __('client.kyc_delete_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('kyc.delete', id), {
+            preserveScroll: true,
+            onSuccess: () => toast({ title: __('client.kyc_deleted'), description: __('client.kyc_deleted_desc') })
+        });
     };
 
     const getStatusColor = (status: string) => {
@@ -166,7 +172,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                     ) : (
                         <div className="text-center">
                             <p className="text-sm font-semibold text-slate-900">{__('general.drag_drop_your_file_here')}</p>
-                            <p className="text-xs text-slate-500 mt-1">or click to browse from your device</p>
+                            <p className="text-xs text-slate-500 mt-1">{__('client.kyc_or_browse')}</p>
                             <p className="text-xs text-slate-400 mt-2">{__('general.jpg_png_pdf_up_to_5mb')}</p>
                         </div>
                     )}
@@ -179,7 +185,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                             disabled={processing}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
                         >
-                            {processing ? 'Uploading...' : 'Confirm Upload'}
+                            {processing ? __('client.kyc_uploading') : __('client.kyc_confirm_upload')}
                         </Button>
                     </div>
                 )}
@@ -216,16 +222,16 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                         </div>
                         <div>
                             <h3 className="text-lg font-bold text-slate-900 mb-1">
-                                {isVerified ? 'Identity Verified' :
-                                 isPendingReview ? 'Application Under Review' :
-                                 isRejected ? 'Application Rejected' :
-                                 'Verification Required'}
+                                {isVerified ? __('client.kyc_identity_verified') :
+                                 isPendingReview ? __('client.kyc_under_review') :
+                                 isRejected ? __('client.kyc_rejected') :
+                                 __('client.kyc_verification_required')}
                             </h3>
                             <p className="text-sm text-slate-600">
-                                {isVerified ? 'Your identity has been fully verified. You have full access to all features.' :
-                                 isPendingReview ? 'We are reviewing your documents. This usually takes 1-2 business days.' :
-                                 isRejected ? `Your application was rejected. Reason: ${kycStatus.notes?.replace('KYC rejected: ', '')}` :
-                                 'To comply with regulations and enable full features, please verify your identity.'}
+                                {isVerified ? __('client.kyc_verified_desc') :
+                                 isPendingReview ? __('client.kyc_review_desc') :
+                                 isRejected ? __('client.kyc_rejected_desc', { reason: kycStatus.notes?.replace('KYC rejected: ', '') ?? '' }) :
+                                 __('client.kyc_required_desc')}
                             </p>
                         </div>
                     </div>
@@ -256,7 +262,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                                     {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : <span className="text-sm font-bold">{idx + 1}</span>}
                                                 </div>
                                                 <div>
-                                                    <p className={`text-sm font-semibold ${isActive ? 'text-indigo-900' : 'text-slate-700'}`}>{step.label}</p>
+                                                    <p className={`text-sm font-semibold ${isActive ? 'text-indigo-900' : 'text-slate-700'}`}>{__(step.label)}</p>
                                                     {step.required && <span className="text-[10px] uppercase font-bold text-rose-500 tracking-wider">{__('general.required')}</span>}
                                                 </div>
                                             </div>
@@ -288,8 +294,8 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                                         <CardHeader>
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <CardTitle>{STEPS[activeStep].label}</CardTitle>
-                                                    <CardDescription className="mt-1">{STEPS[activeStep].desc}</CardDescription>
+                                                    <CardTitle>{__(STEPS[activeStep].label)}</CardTitle>
+                                                    <CardDescription className="mt-1">{__(STEPS[activeStep].desc)}</CardDescription>
                                                 </div>
                                                 <ImageIcon className="w-8 h-8 text-slate-300" />
                                             </div>
@@ -346,6 +352,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                     </div>
                 )}
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

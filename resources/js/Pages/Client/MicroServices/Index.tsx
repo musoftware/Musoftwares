@@ -26,7 +26,7 @@ import {
     ShieldCheck,
     HelpCircle
 } from 'lucide-react';
-import { __ } from '@/lib/i18n';
+import { __, getLoadedLocale } from '@/lib/i18n';
 
 interface MicroServiceItem {
     id: number;
@@ -110,7 +110,7 @@ export default function MicroServicesIndex({
 
     return (
         <AuthenticatedLayout>
-            <Head title="الخدمات المصغرة | Micro Services" />
+            <Head title={__('client.micro_page_title')} />
 
             <div className="border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md">
                 <PageShell maxWidth="7xl" className="py-8">
@@ -121,11 +121,11 @@ export default function MicroServicesIndex({
                                     <Sparkles className="w-5 h-5" />
                                 </span>
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white">
-                                    الخدمات المصغرة (Micro Services)
+                                    {__('client.micro_page_title')}
                                 </h1>
                             </div>
                             <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 max-w-2xl">
-                                حلول سريعة وفورية ينفذها فريق العمل بدقة. اختر الخدمة، واكتب بيانات طلبك، وسيتم الخصم مباشرة من رصيدك المتاح.
+                                {__('client.micro_subtitle')}
                             </p>
                         </div>
 
@@ -136,7 +136,7 @@ export default function MicroServicesIndex({
                             </div>
                             <div>
                                 <div className="text-[11px] font-medium text-[#1d1d1f]/60 dark:text-zinc-400">
-                                    رصيدك المتاح الحالي
+                                    {__('client.micro_current_balance')}
                                 </div>
                                 <div className="text-lg font-bold text-[#1d1d1f] dark:text-zinc-100">
                                     {formatted_balance}
@@ -147,7 +147,7 @@ export default function MicroServicesIndex({
                                 className="ms-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 shadow-xs"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                <span>شحن</span>
+                                <span>{__('client.micro_top_up')}</span>
                             </Link>
                         </div>
                     </div>
@@ -163,7 +163,7 @@ export default function MicroServicesIndex({
                                     : 'border-transparent text-[#1d1d1f]/60 dark:text-zinc-400 hover:text-[#1d1d1f] dark:hover:text-white'
                             }`}
                         >
-                            دليل الخدمات ({services.length})
+                            {__('client.micro_catalog_tab', { count: services.length })}
                         </button>
                         <button
                             type="button"
@@ -174,7 +174,7 @@ export default function MicroServicesIndex({
                                     : 'border-transparent text-[#1d1d1f]/60 dark:text-zinc-400 hover:text-[#1d1d1f] dark:hover:text-white'
                             }`}
                         >
-                            <span>طلباتي السابقة</span>
+                            <span>{__('client.micro_orders_tab')}</span>
                             {orders.length > 0 && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-mono font-bold">
                                     {orders.length}
@@ -195,7 +195,8 @@ export default function MicroServicesIndex({
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="ابحث في الخدمات المتاحة..."
+                                placeholder={__('client.micro_search_placeholder')}
+                                aria-label={__('client.micro_search_placeholder')}
                                 className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/30"
                             />
                         </div>
@@ -204,10 +205,10 @@ export default function MicroServicesIndex({
                             <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-black/5 dark:border-white/10 p-8">
                                 <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-3 opacity-60" />
                                 <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white">
-                                    لا توجد خدمات مطابقة
+                                    {__('client.micro_no_match_title')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 mt-1">
-                                    لم يتم العثور على خدمات مصغرة تطابق بحثك حالياً.
+                                    {__('client.micro_no_match_desc')}
                                 </p>
                             </div>
                         ) : (
@@ -234,7 +235,7 @@ export default function MicroServicesIndex({
                                             <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/50 dark:text-zinc-400 pt-2 border-t border-black/5 dark:border-white/5">
                                                 <Clock className="w-3.5 h-3.5 text-blue-500" />
                                                 <span>
-                                                    مدة التنفيذ المتوقعة: {service.delivery_days} {service.delivery_days === 1 ? 'يوم عمل' : 'أيام عمل'}
+                                                    {__(service.delivery_days === 1 ? 'client.micro_delivery_one' : 'client.micro_delivery_many', { days: service.delivery_days })}
                                                 </span>
                                             </div>
                                         </div>
@@ -242,7 +243,7 @@ export default function MicroServicesIndex({
                                         <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/10 flex items-center justify-between gap-4">
                                             <div>
                                                 <div className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400 font-medium">
-                                                    السعر
+                                                    {__('client.micro_price')}
                                                 </div>
                                                 <div className="text-lg font-extrabold text-[#0071e3] dark:text-blue-400">
                                                     {service.formatted_price}
@@ -254,7 +255,7 @@ export default function MicroServicesIndex({
                                                 onClick={() => openOrderModal(service)}
                                                 className="rounded-xl px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-sm active:scale-98 transition-all"
                                             >
-                                                <span>طلب الخدمة</span>
+                                                <span>{__('client.micro_order_service')}</span>
                                                 <ArrowRight className="w-3.5 h-3.5 ms-1 rtl:rotate-180" />
                                             </Button>
                                         </div>
@@ -270,17 +271,17 @@ export default function MicroServicesIndex({
                             <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-black/5 dark:border-white/10 p-8">
                                 <FileText className="w-12 h-12 text-[#1d1d1f]/30 dark:text-zinc-600 mx-auto mb-3" />
                                 <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white">
-                                    لا توجد لديك طلبات سابقة
+                                    {__('client.micro_no_orders_title')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
-                                    يمكنك تصفح دليل الخدمات المصغرة وطلب أي خدمة لتظهر لك تفاصيل وحالة تنفيذها هنا.
+                                    {__('client.micro_no_orders_desc')}
                                 </p>
                                 <Button
                                     type="button"
                                     onClick={() => setActiveTab('catalog')}
                                     className="mt-4 rounded-xl text-xs"
                                 >
-                                    تصفح الخدمات
+                                    {__('client.micro_browse_services')}
                                 </Button>
                             </div>
                         ) : (
@@ -301,14 +302,14 @@ export default function MicroServicesIndex({
                                                     </h4>
                                                 </div>
                                                 <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400">
-                                                    تاريخ الطلب: {order.created_at ? new Date(order.created_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }) : '-'}
+                                                    {__('client.micro_order_date', { date: order.created_at ? new Date(order.created_at).toLocaleString(getLoadedLocale() === 'ar' ? 'ar-EG' : 'en-US', { timeZone: 'Africa/Cairo' }) : '-' })}
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center gap-3">
                                                 <div className="text-end">
                                                     <div className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400">
-                                                        المبلغ المدفوع
+                                                        {__('client.micro_amount_paid')}
                                                     </div>
                                                     <div className="text-sm font-bold text-[#1d1d1f] dark:text-zinc-100">
                                                         {order.formatted_amount}
@@ -318,12 +319,12 @@ export default function MicroServicesIndex({
                                                 {order.status === 'completed' ? (
                                                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                                        <span>مكتملة</span>
+                                                        <span>{__('client.micro_status_completed')}</span>
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                                         <Clock className="w-3.5 h-3.5 animate-spin" />
-                                                        <span>قيد التنفيذ</span>
+                                                        <span>{__('client.micro_status_in_progress')}</span>
                                                     </span>
                                                 )}
                                             </div>
@@ -332,7 +333,7 @@ export default function MicroServicesIndex({
                                         {/* Requirements */}
                                         <div className="bg-[#f9f9fb] dark:bg-zinc-950/50 p-3.5 rounded-xl border border-black/5 dark:border-white/5 space-y-1">
                                             <span className="text-[11px] font-bold text-[#1d1d1f]/60 dark:text-zinc-400">
-                                                بيانات وتفاصيل الطلب المرسلة:
+                                                {__('client.micro_submitted_details')}
                                             </span>
                                             <p className="text-xs text-[#1d1d1f]/80 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
                                                 {order.requirements}
@@ -344,7 +345,7 @@ export default function MicroServicesIndex({
                                             <div className="bg-emerald-500/5 dark:bg-emerald-500/10 p-3.5 rounded-xl border border-emerald-500/20 space-y-1">
                                                 <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                                                     <ShieldCheck className="w-3.5 h-3.5" />
-                                                    رد وملاحظات الإدارة:
+                                                    {__('client.micro_admin_notes')}
                                                 </span>
                                                 <p className="text-xs text-emerald-950 dark:text-emerald-200 whitespace-pre-wrap leading-relaxed">
                                                     {order.admin_notes}
@@ -365,7 +366,7 @@ export default function MicroServicesIndex({
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                            <span>طلب خدمة: {selectedService?.title}</span>
+                            <span>{__('client.micro_order_title', { title: selectedService?.title ?? '' })}</span>
                         </DialogTitle>
                         <DialogDescription className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 pt-1">
                             {selectedService?.description}
@@ -376,13 +377,13 @@ export default function MicroServicesIndex({
                         {/* Financial breakdown */}
                         <div className="bg-[#f5f5f7] dark:bg-zinc-950/60 p-4 rounded-2xl border border-black/5 dark:border-white/10 space-y-2">
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">سعر الخدمة المطلوب:</span>
+                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_service_price')}</span>
                                 <span className="font-bold text-base text-[#0071e3] dark:text-blue-400">
                                     {selectedService?.formatted_price}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">رصيدك المتاح الحالي:</span>
+                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_balance_label')}</span>
                                 <span className={`font-bold text-sm ${hasEnoughBalance ? 'text-emerald-600' : 'text-red-500'}`}>
                                     {formatted_balance}
                                 </span>
@@ -392,9 +393,9 @@ export default function MicroServicesIndex({
                                 <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
                                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                                     <div className="space-y-1">
-                                        <p className="font-semibold">رصيدك المتاح غير كافٍ لشراء هذه الخدمة.</p>
+                                        <p className="font-semibold">{__('client.micro_insufficient')}</p>
                                         <p className="text-[11px] opacity-80">
-                                            يرجى شحن رصيدك أولاً لإتمام طلب الخدمة.
+                                            {__('client.micro_insufficient_hint')}
                                         </p>
                                     </div>
                                 </div>
@@ -403,14 +404,15 @@ export default function MicroServicesIndex({
 
                         {/* Requirements Textarea */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#1d1d1f] dark:text-zinc-200">
-                                بيانات وتفاصيل الطلب <span className="text-red-500">*</span>
+                            <label htmlFor="micro_requirements" className="text-xs font-bold text-[#1d1d1f] dark:text-zinc-200">
+                                {__('client.micro_requirements_label')} <span className="text-red-500">*</span>
                             </label>
                             <Textarea
+                                id="micro_requirements"
                                 rows={4}
                                 value={data.requirements}
                                 onChange={(e) => setData('requirements', e.target.value)}
-                                placeholder="اكتب هنا كافة البيانات والتفاصيل والروابط المطلوبة لتنفيذ هذه الخدمة بدقة..."
+                                placeholder={__('client.micro_requirements_placeholder')}
                                 className="w-full text-xs rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-950 p-3 focus:ring-2 focus:ring-[#0071e3]/30"
                                 required
                             />
@@ -426,7 +428,7 @@ export default function MicroServicesIndex({
                                 onClick={closeOrderModal}
                                 className="rounded-xl text-xs"
                             >
-                                إلغاء
+                                {__('general.cancel')}
                             </Button>
 
                             {!hasEnoughBalance ? (
@@ -435,7 +437,7 @@ export default function MicroServicesIndex({
                                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
                                 >
                                     <Plus className="w-4 h-4" />
-                                    <span>شحن الرصيد الآن</span>
+                                    <span>{__('client.micro_top_up_now')}</span>
                                 </Link>
                             ) : (
                                 <Button
@@ -443,7 +445,7 @@ export default function MicroServicesIndex({
                                     disabled={processing || !data.requirements.trim()}
                                     className="rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-sm"
                                 >
-                                    {processing ? 'جاري الخصم والطلب...' : 'تأكيد الطلب والخصم من الرصيد'}
+                                    {processing ? __('client.micro_processing') : __('client.micro_confirm_order')}
                                 </Button>
                             )}
                         </DialogFooter>

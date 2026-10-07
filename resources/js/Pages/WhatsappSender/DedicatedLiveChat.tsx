@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
@@ -31,7 +32,9 @@ import {
     Edit2,
     Save,
     Smile,
-    Radio
+    Radio,
+    Flame,
+    Zap
 } from 'lucide-react';
 import {
     Tooltip,
@@ -113,11 +116,11 @@ interface Props {
 }
 
 const AVAILABLE_TAGS = [
-    { label: 'VIP', color: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950 dark:text-purple-300' },
-    { label: 'Lead', color: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950 dark:text-blue-300' },
-    { label: 'Urgent', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300' },
-    { label: 'Pending', color: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300' },
-    { label: 'Resolved', color: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300' },
+    { label: 'VIP', labelKey: 'whatsapp.livechat_tag_vip', color: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950 dark:text-purple-300' },
+    { label: 'Lead', labelKey: 'whatsapp.livechat_tag_lead', color: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-950 dark:text-blue-300' },
+    { label: 'Urgent', labelKey: 'whatsapp.livechat_tag_urgent', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300' },
+    { label: 'Pending', labelKey: 'whatsapp.livechat_tag_pending', color: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300' },
+    { label: 'Resolved', labelKey: 'whatsapp.livechat_tag_resolved', color: 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300' },
 ];
 
 export default function DedicatedLiveChat({ business, accounts, templates }: Props) {
@@ -164,8 +167,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
     // Interactive buttons state
     const [showInteractiveModal, setShowInteractiveModal] = useState(false);
-    const [interactiveBody, setInteractiveBody] = useState('How would you like to proceed?');
-    const [interactiveButtons, setInteractiveButtons] = useState<string[]>(['Yes, please', 'Talk to human', 'Not now']);
+    const [interactiveBody, setInteractiveBody] = useState(__('whatsapp.livechat_default_interactive_body'));
+    const [interactiveButtons, setInteractiveButtons] = useState<string[]>([__('whatsapp.livechat_default_btn_yes'), __('whatsapp.livechat_default_btn_human'), __('whatsapp.livechat_default_btn_later')]);
 
     // Right CRM Sidebar
     const [showCrmSidebar, setShowCrmSidebar] = useState(true);
@@ -228,10 +231,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                     setContactNotesInput(res.data.contact.custom_fields?.internal_notes || '');
                 } else {
                     setActiveContact({
-                        name: `Customer ${phone}`,
+                        name: __('whatsapp.livechat_customer_name', { phone }),
                         phone: phone,
                     });
-                    setContactNameInput(`Customer ${phone}`);
+                    setContactNameInput(__('whatsapp.livechat_customer_name', { phone }));
                     setContactNotesInput('');
                 }
             }
@@ -298,12 +301,12 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
         const currentAccount = accounts.find(a => a.id === selectedAccountId);
         if (!currentAccount) {
-            setErrorMsg('Please connect or select a valid WhatsApp Account first.');
+            setErrorMsg(__('whatsapp.livechat_err_no_account'));
             return;
         }
 
         if (currentAccount.status !== 'active') {
-            setErrorMsg(`Selected account "${currentAccount.name}" is not registered (${currentAccount.status}). Please select an active account.`);
+            setErrorMsg(__('whatsapp.livechat_err_account_inactive', { name: currentAccount.name, status: currentAccount.status }));
             return;
         }
 
@@ -345,11 +348,11 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                 }
                 fetchConversations();
             } else {
-                setErrorMsg(res.data.error || 'Failed to send message.');
+                setErrorMsg(res.data.error || __('whatsapp.livechat_err_send_failed'));
             }
         } catch (err: any) {
             console.error('Send message error:', err);
-            setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'Error occurred while sending message.');
+            setErrorMsg(err.response?.data?.error || err.response?.data?.message || __('whatsapp.livechat_err_send_error'));
         } finally {
             setSending(false);
         }
@@ -387,10 +390,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                 }
                 fetchConversations();
             } else {
-                setErrorMsg(res.data.error || 'Failed to send media file.');
+                setErrorMsg(res.data.error || __('whatsapp.livechat_err_media_failed'));
             }
         } catch (err: any) {
-            setErrorMsg(err.response?.data?.error || 'Failed to upload and send media.');
+            setErrorMsg(err.response?.data?.error || __('whatsapp.livechat_err_media_upload'));
         } finally {
             setSending(false);
         }
@@ -422,10 +425,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                 }
                 fetchConversations();
             } else {
-                setErrorMsg(res.data.error || 'Failed to send interactive buttons.');
+                setErrorMsg(res.data.error || __('whatsapp.livechat_err_interactive'));
             }
         } catch (err: any) {
-            setErrorMsg(err.response?.data?.error || 'Failed to send interactive buttons.');
+            setErrorMsg(err.response?.data?.error || __('whatsapp.livechat_err_interactive'));
         } finally {
             setSending(false);
         }
@@ -520,10 +523,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
         const now = new Date().getTime();
         const expires = new Date(expiresAtStr).getTime();
         const diffMs = expires - now;
-        if (diffMs <= 0) return 'Expired';
+        if (diffMs <= 0) return __('whatsapp.livechat_expired');
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        return `${hours}h ${mins}m left`;
+        return __('whatsapp.livechat_time_left', { hours, mins });
     };
 
     const activeReferral = messages.find(m => m.referral)?.referral;
@@ -534,7 +537,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
     return (
         <div className="h-screen max-h-screen w-screen overflow-hidden flex bg-[#f0f2f5] dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 font-sans antialiased select-none">
-            <Head title={`WhatsApp Web Live Chat - ${business.name}`} />
+            <Head title={__('whatsapp.livechat_page_title', { name: business.name })} />
 
             {/* 1. Leftmost Slim Multi-Account Switcher Drawer */}
             <div className="w-16 md:w-20 bg-[#f0f2f5] dark:bg-zinc-900 border-r border-[#e9edef] dark:border-zinc-800 flex flex-col items-center py-3 space-y-4 shrink-0 z-10 overflow-hidden">
@@ -544,13 +547,14 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         <TooltipTrigger asChild>
                             <Link
                                 href={route('whatsapp.businesses.workspace', business.id)}
+                                aria-label={__('whatsapp.livechat_return_workspace')}
                                 className="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition shadow-xs cursor-pointer"
                             >
                                 <ArrowLeft className="w-5 h-5 text-zinc-700 dark:text-zinc-200" />
                             </Link>
                         </TooltipTrigger>
                         <TooltipContent side="right" className="bg-zinc-900 text-white font-bold border-zinc-800 text-xs px-3 py-1.5 shadow-xl">
-                            Return to Business Workspace
+                            {__('whatsapp.livechat_return_workspace')}
                         </TooltipContent>
                     </Tooltip>
 
@@ -558,9 +562,9 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
                     {/* Multi-Account Drawer List */}
                     <div className="flex-1 w-full overflow-y-auto space-y-3 px-2 flex flex-col items-center">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 text-center">Numbers</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 text-center">{__('whatsapp.livechat_numbers')}</span>
                         {accounts.length === 0 ? (
-                            <div className="text-[10px] text-zinc-400 text-center">No Numbers</div>
+                            <div className="text-[10px] text-zinc-400 text-center">{__('whatsapp.livechat_no_numbers')}</div>
                         ) : (
                             accounts.map((acc) => {
                                 const isAccSelected = selectedAccountId === acc.id;
@@ -570,6 +574,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         <TooltipTrigger asChild>
                                             <button
                                                 onClick={() => setSelectedAccountId(acc.id)}
+                                                aria-label={`${acc.name} (${acc.display_phone_number || acc.phone_number_id})`}
                                                 className={`relative w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer ${
                                                     isAccSelected
                                                         ? 'bg-[#00a884] text-white shadow-sm border-2 border-[#00a884]'
@@ -605,7 +610,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             </h2>
                             <p className="text-[11px] text-[#00a884] font-mono font-bold flex items-center gap-1">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-                                {selectedAccount ? `${selectedAccount.name}${selectedAccount.display_phone_number ? ` • ${selectedAccount.display_phone_number}` : ''}` : 'No Line'}
+                                {selectedAccount ? `${selectedAccount.name}${selectedAccount.display_phone_number ? ` • ${selectedAccount.display_phone_number}` : ''}` : __('whatsapp.livechat_no_line')}
                             </p>
                         </div>
                     </div>
@@ -613,7 +618,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                     <button
                         onClick={() => { fetchConversations(); if (selectedPhone) fetchChatMessages(selectedPhone); }}
                         className="p-2 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition border border-zinc-200 dark:border-zinc-700 cursor-pointer"
-                        title="Refresh Conversations"
+                        title={__('whatsapp.livechat_refresh')}
+                        aria-label={__('whatsapp.livechat_refresh')}
                     >
                         <RefreshCw className={`w-4 h-4 ${loadingConversations || loadingMessages ? 'animate-spin text-[#00a884]' : ''}`} />
                     </button>
@@ -627,7 +633,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search chats or phone..."
+                            placeholder={__('whatsapp.livechat_search_placeholder')}
+                            aria-label={__('whatsapp.livechat_search_placeholder')}
                             className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-zinc-800 border border-transparent rounded-lg text-xs text-zinc-800 dark:text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] transition-all shadow-xs"
                         />
                     </div>
@@ -638,13 +645,13 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             onClick={() => setTagFilter('all')}
                             className={`px-2.5 py-1 font-semibold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === 'all' ? 'bg-[#00a884] text-white shadow-xs' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'}`}
                         >
-                            All
+                            {__('general.all')}
                         </button>
                         <button
                             onClick={() => setTagFilter('ctwa')}
                             className={`px-2.5 py-1 font-bold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === 'ctwa' ? 'bg-amber-500 text-black shadow-xs' : 'bg-white dark:bg-zinc-800 text-amber-600 border border-amber-200 dark:border-amber-900'}`}
                         >
-                            🔥 CTWA Ads
+                            <Flame className="inline w-3 h-3 me-0.5" aria-hidden="true" />{__('whatsapp.livechat_ctwa_ads')}
                         </button>
                         {AVAILABLE_TAGS.map(t => (
                             <button
@@ -652,7 +659,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                 onClick={() => setTagFilter(tagFilter === t.label ? 'all' : t.label)}
                                 className={`px-2.5 py-1 font-semibold rounded-lg shrink-0 transition-all cursor-pointer ${tagFilter === t.label ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'}`}
                             >
-                                {t.label}
+                                {__(t.labelKey)}
                             </button>
                         ))}
                     </div>
@@ -663,11 +670,11 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                     {loadingConversations && conversations.length === 0 ? (
                         <div className="p-8 text-center text-zinc-400 text-xs flex flex-col items-center gap-2">
                             <RefreshCw className="w-5 h-5 animate-spin text-[#00a884]" />
-                            Loading chats...
+                            {__('whatsapp.livechat_loading_chats')}
                         </div>
                     ) : filteredConversations.length === 0 ? (
                         <div className="p-8 text-center text-zinc-400 text-xs">
-                            No conversations match your filter.
+                            {__('whatsapp.livechat_no_match')}
                         </div>
                     ) : (
                         filteredConversations.map((conv) => {
@@ -693,7 +700,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                 {conv.contact_name || `+${conv.recipient_phone}`}
                                                 {isAd && (
                                                     <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 font-bold text-[9px]">
-                                                        🔥 CTWA
+                                                        <Flame className="inline w-2.5 h-2.5 me-0.5" aria-hidden="true" />CTWA
                                                     </span>
                                                 )}
                                             </h4>
@@ -704,9 +711,9 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
                                         <p className="text-[11px] text-zinc-500 truncate flex items-center gap-1">
                                             {conv.last_message_direction === 'outbound' && (
-                                                <span className="text-[#00a884] font-bold text-[10px]">You:</span>
+                                                <span className="text-[#00a884] font-bold text-[10px]">{__('whatsapp.livechat_you')}</span>
                                             )}
-                                            <span>{conv.last_message || `[${conv.last_message_type} message]`}</span>
+                                            <span>{conv.last_message || __('whatsapp.livechat_type_message', { type: conv.last_message_type })}</span>
                                         </p>
 
                                         {/* Render conversation tags */}
@@ -721,7 +728,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                                 tagMeta ? tagMeta.color : 'bg-purple-100 text-purple-800 border-purple-300'
                                                             }`}
                                                         >
-                                                            {t}
+                                                            {tagMeta ? __(tagMeta.labelKey) : t}
                                                         </span>
                                                     );
                                                 })}
@@ -753,7 +760,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             target="_blank"
                                             rel="noreferrer"
                                             className="text-[#00a884] hover:underline text-[10px] flex items-center gap-0.5"
-                                            title="Open in WhatsApp Web"
+                                            title={__('whatsapp.livechat_open_wa_web')}
+                                            aria-label={__('whatsapp.livechat_open_wa_web')}
                                         >
                                             <ExternalLink className="w-3.5 h-3.5" />
                                         </a>
@@ -769,7 +777,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                 {activeReferral ? (
                                     <div className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 text-amber-900 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-xs">
                                         <Clock className="w-4 h-4 text-amber-600" />
-                                        <span>⚡ 72h Free Ad Window</span>
+                                        <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" aria-hidden="true" />{__('whatsapp.livechat_free_ad_window')}</span>
                                     </div>
                                 ) : (
                                     <div className={`px-3 py-1 rounded-full border text-[11px] font-semibold flex items-center gap-1.5 shadow-xs ${
@@ -778,7 +786,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             : 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
                                     }`}>
                                         <Clock className={`w-3.5 h-3.5 ${isWindowActive ? 'text-[#00a884]' : 'text-rose-500'}`} />
-                                        <span>{isWindowActive ? '24h Session Active' : '24h Window Expired (Use Template)'}</span>
+                                        <span>{isWindowActive ? __('whatsapp.livechat_session_active') : __('whatsapp.livechat_session_expired')}</span>
                                     </div>
                                 )}
 
@@ -789,7 +797,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             ? 'bg-[#00a884] text-white border-[#00a884]'
                                             : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
                                     }`}
-                                    title="Toggle Contact CRM & Notes"
+                                    title={__('whatsapp.livechat_toggle_crm')}
+                                    aria-label={__('whatsapp.livechat_toggle_crm')}
                                 >
                                     <SlidersHorizontal className="w-4 h-4" />
                                 </button>
@@ -801,13 +810,13 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             <div className="px-4 py-2 bg-amber-500 text-zinc-950 text-xs font-bold flex items-center justify-between shadow-xs">
                                 <span className="flex items-center gap-2">
                                     <AlertCircle className="w-4 h-4 shrink-0" />
-                                    The 24-hour free customer session has expired. To resume conversation, Meta requires sending an approved Message Template.
+                                    {__('whatsapp.livechat_session_expired_notice')}
                                 </span>
                                 <button
                                     onClick={() => setMessageType('template')}
                                     className="px-3 py-1 bg-zinc-900 text-white rounded-lg text-[11px] hover:bg-black transition-all cursor-pointer"
                                 >
-                                    Select Template
+                                    {__('whatsapp.livechat_select_template')}
                                 </button>
                             </div>
                         )}
@@ -820,7 +829,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     <Sparkles className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                     <div className="flex-1 space-y-1">
                                         <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center justify-between">
-                                            <span>🔥 Came from Meta Ad: {activeReferral.headline || 'Click to WhatsApp Campaign'}</span>
+                                            <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5" aria-hidden="true" />{__('whatsapp.livechat_came_from_ad', { headline: activeReferral.headline || __('whatsapp.livechat_ctwa_campaign') })}</span>
                                             {activeReferral.ctwa_clid && (
                                                 <span className="font-mono text-[10px] bg-amber-200 dark:bg-amber-900 px-2 py-0.5 rounded text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
                                                     CLID: {activeReferral.ctwa_clid}
@@ -829,7 +838,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         </div>
                                         {activeReferral.body && <p className="text-[11px] text-amber-800 dark:text-amber-300">{activeReferral.body}</p>}
                                         <div className="text-[10px] text-amber-700 dark:text-amber-400 font-mono">
-                                            Ad ID: {activeReferral.source_id || 'N/A'} {activeReferral.source_url && `| ${activeReferral.source_url}`}
+                                            {__('whatsapp.livechat_ad_id')} {activeReferral.source_id || __('general.n_a')} {activeReferral.source_url && `| ${activeReferral.source_url}`}
                                         </div>
                                     </div>
                                 </div>
@@ -838,12 +847,12 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             {loadingMessages && messages.length === 0 ? (
                                 <div className="h-full flex items-center justify-center text-zinc-500 text-xs gap-2">
                                     <RefreshCw className="w-4 h-4 animate-spin text-[#00a884]" />
-                                    Loading messages...
+                                    {__('whatsapp.livechat_loading_messages')}
                                 </div>
                             ) : messages.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center text-zinc-500 text-xs gap-2">
                                     <MessageSquare className="w-10 h-10 text-zinc-400" />
-                                    No messages in this chat thread yet. Send a message below to start conversation!
+                                    {__('whatsapp.livechat_no_messages')}
                                 </div>
                             ) : (
                                 messages.map((msg) => {
@@ -867,7 +876,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                 {/* Image Message */}
                                                 {isImage && msg.payload?.image?.link && (
                                                     <div className="mb-2 rounded-lg overflow-hidden max-w-xs border border-black/10">
-                                                        <img src={msg.payload.image.link} alt="Attachment" className="w-full h-auto object-cover max-h-64" />
+                                                        <img src={msg.payload.image.link} alt={__('whatsapp.livechat_attachment')} className="w-full h-auto object-cover max-h-64" />
                                                     </div>
                                                 )}
 
@@ -877,11 +886,11 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                         <FileCode className="w-6 h-6 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                                         <div className="min-w-0 flex-1">
                                                             <div className="font-semibold text-xs truncate">
-                                                                {msg.payload?.document?.filename || 'Document File'}
+                                                                {msg.payload?.document?.filename || __('whatsapp.livechat_document_file')}
                                                             </div>
                                                             {msg.payload?.document?.link && (
                                                                 <a href={msg.payload.document.link} target="_blank" rel="noreferrer" className="text-[10px] text-emerald-600 underline">
-                                                                    Download Document
+                                                                    {__('whatsapp.livechat_download_document')}
                                                                 </a>
                                                             )}
                                                         </div>
@@ -897,7 +906,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                     <div className="mt-2 pt-2 border-t border-black/10 space-y-1">
                                                         {msg.payload.interactive.action.buttons.map((btn: any, idx: number) => (
                                                             <div key={idx} className="p-1.5 text-center bg-white/80 dark:bg-zinc-800 rounded text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-200 dark:border-emerald-800">
-                                                                {btn.reply?.title || 'Option'}
+                                                                {btn.reply?.title || __('whatsapp.livechat_option')}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -928,7 +937,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                                     {errorMsg}
                                 </span>
-                                <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-800 cursor-pointer">
+                                <button onClick={() => setErrorMsg(null)} className="text-rose-600 hover:text-rose-800 cursor-pointer" aria-label={__('general.close')}>
                                     <X className="w-4 h-4" />
                                 </button>
                             </div>
@@ -938,11 +947,11 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         {showQuickRepliesPopup && (
                             <div className="mx-4 mb-2 p-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-2xl space-y-1 max-h-56 overflow-y-auto z-20 animate-in fade-in slide-in-from-bottom-2">
                                 <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-3 py-1 flex items-center justify-between">
-                                    <span>⚡ Quick Replies (Type to filter)</span>
-                                    <span>Press click or Enter</span>
+                                    <span className="flex items-center gap-1"><Zap className="w-3 h-3" aria-hidden="true" />{__('whatsapp.livechat_quick_replies_filter')}</span>
+                                    <span>{__('whatsapp.livechat_press_enter')}</span>
                                 </div>
                                 {filteredQuickReplies.length === 0 ? (
-                                    <div className="px-3 py-2 text-xs text-zinc-400">No matching quick replies found.</div>
+                                    <div className="px-3 py-2 text-xs text-zinc-400">{__('whatsapp.livechat_no_quick_replies')}</div>
                                 ) : (
                                     filteredQuickReplies.map((qr, idx) => (
                                         <button
@@ -974,7 +983,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         className="text-[#00a884] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                                     >
                                         <FileText className="w-3.5 h-3.5" />
-                                        {messageType === 'text' ? 'Switch to Approved WABA Template' : 'Switch to Direct Text Reply'}
+                                        {messageType === 'text' ? __('whatsapp.livechat_switch_template') : __('whatsapp.livechat_switch_text')}
                                     </button>
 
                                     <button
@@ -983,10 +992,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         className="text-zinc-600 dark:text-zinc-400 hover:text-[#00a884] flex items-center gap-1 font-semibold cursor-pointer"
                                     >
                                         <Radio className="w-3.5 h-3.5 text-emerald-500" />
-                                        Interactive Buttons
+                                        {__('whatsapp.livechat_interactive_buttons')}
                                     </button>
                                 </div>
-                                <span className="text-[10px] text-zinc-400">Type <strong className="text-[#00a884]">/</strong> for saved canned responses</span>
+                                <span className="text-[10px] text-zinc-400">{__('whatsapp.livechat_slash_hint')}</span>
                             </div>
 
                             {messageType === 'template' ? (
@@ -994,9 +1003,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     <select
                                         value={selectedTemplate}
                                         onChange={(e) => setSelectedTemplate(e.target.value)}
+                                        aria-label={__('whatsapp.livechat_select_template_placeholder')}
                                         className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-[#00a884]"
                                     >
-                                        <option value="">Select Approved WABA Template...</option>
+                                        <option value="">{__('whatsapp.livechat_select_template_placeholder')}</option>
                                         {templates.map(t => (
                                             <option key={t.id} value={String(t.id)}>
                                                 {t.name} ({t.language}) - [{t.status}]
@@ -1009,7 +1019,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         className="px-6 py-2.5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs cursor-pointer"
                                     >
                                         {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                        Send Template
+                                        {__('whatsapp.livechat_send_template')}
                                     </button>
                                 </form>
                             ) : (
@@ -1019,7 +1029,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         type="button"
                                         onClick={() => setShowMediaModal(true)}
                                         className="p-2 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 transition cursor-pointer"
-                                        title="Attach Image or Document"
+                                        title={__('whatsapp.livechat_attach')}
+                                        aria-label={__('whatsapp.livechat_attach')}
                                     >
                                         <Paperclip className="w-4 h-4" />
                                     </button>
@@ -1032,9 +1043,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             setShowQuickRepliesPopup(!showQuickRepliesPopup);
                                         }}
                                         className="p-2 rounded-xl bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-emerald-600 dark:text-emerald-400 border border-zinc-200 dark:border-zinc-700 transition cursor-pointer font-bold text-xs"
-                                        title="Quick Canned Replies (/)"
+                                        title={__('whatsapp.livechat_quick_canned')}
+                                        aria-label={__('whatsapp.livechat_quick_canned')}
                                     >
-                                        ⚡
+                                        <Zap className="w-4 h-4" aria-hidden="true" />
                                     </button>
 
                                     <textarea
@@ -1046,7 +1058,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                 handleSendMessage();
                                             }
                                         }}
-                                        placeholder="Type a message (or type / for quick reply)..."
+                                        placeholder={__('whatsapp.livechat_message_placeholder')}
+                                        aria-label={__('whatsapp.livechat_message_placeholder')}
                                         rows={1}
                                         className="flex-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-4 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-[#00a884] resize-none shadow-xs"
                                     />
@@ -1054,6 +1067,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                     <button
                                         type="submit"
                                         disabled={sending || !messageText.trim()}
+                                        aria-label={__('general.send')}
                                         className="h-9 px-5 bg-[#00a884] hover:bg-[#008f70] text-white rounded-lg font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-xs shrink-0 cursor-pointer"
                                     >
                                         {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -1065,7 +1079,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-zinc-400 text-sm gap-2">
                         <Smartphone className="w-12 h-12 text-zinc-300 dark:text-zinc-700" />
-                        Select a conversation from the left to start live chat
+                        {__('whatsapp.livechat_select_conversation')}
                     </div>
                 )}
             </div>
@@ -1074,8 +1088,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
             {selectedPhone && showCrmSidebar && (
                 <div className="w-80 bg-white dark:bg-zinc-900 border-l border-[#e9edef] dark:border-zinc-800 h-full flex flex-col shrink-0 overflow-y-auto p-5 space-y-6 z-10 animate-in slide-in-from-right-4">
                     <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500">Contact CRM</h3>
-                        <button onClick={() => setShowCrmSidebar(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500">{__('whatsapp.livechat_contact_crm')}</h3>
+                        <button onClick={() => setShowCrmSidebar(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer" aria-label={__('general.close')}>
                             <X className="w-4 h-4" />
                         </button>
                     </div>
@@ -1093,12 +1107,14 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                         type="text"
                                         value={contactNameInput}
                                         onChange={(e) => setContactNameInput(e.target.value)}
+                                        aria-label={__('whatsapp.livechat_contact_name')}
                                         className="flex-1 px-2.5 py-1 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-center font-bold"
                                     />
                                     <button
                                         onClick={handleSaveCrmDetails}
                                         disabled={isSavingCrm}
                                         className="p-1.5 bg-[#00a884] text-white rounded-lg cursor-pointer"
+                                        aria-label={__('general.save')}
                                     >
                                         <Save className="w-3.5 h-3.5" />
                                     </button>
@@ -1106,7 +1122,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             ) : (
                                 <div className="flex items-center justify-center gap-1.5">
                                     <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{activeContact?.name || selectedPhone}</h4>
-                                    <button onClick={() => setIsEditingContactName(true)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                                    <button onClick={() => setIsEditingContactName(true)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer" aria-label={__('whatsapp.livechat_edit_name')}>
                                         <Edit2 className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
@@ -1119,7 +1135,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                     <div className="space-y-2.5">
                         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500">
                             <Tag className="w-3.5 h-3.5 text-purple-500" />
-                            <span>Tags & Labels</span>
+                            <span>{__('whatsapp.livechat_tags_labels')}</span>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                             {AVAILABLE_TAGS.map(tag => {
@@ -1134,7 +1150,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700 opacity-60 hover:opacity-100'
                                         }`}
                                     >
-                                        {isSelected ? `✓ ${tag.label}` : `+ ${tag.label}`}
+                                        {isSelected ? <Check className="inline w-3 h-3 me-0.5" aria-hidden="true" /> : '+ '}{__(tag.labelKey)}
                                     </button>
                                 );
                             })}
@@ -1146,15 +1162,16 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-500">
                                 <StickyNote className="w-3.5 h-3.5 text-amber-500" />
-                                <span>Internal Team Notes</span>
+                                <span>{__('whatsapp.livechat_internal_notes')}</span>
                             </div>
-                            <span className="text-[10px] text-amber-600 font-bold bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded">Staff only</span>
+                            <span className="text-[10px] text-amber-600 font-bold bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded">{__('whatsapp.livechat_staff_only')}</span>
                         </div>
                         <textarea
                             rows={3}
                             value={contactNotesInput}
                             onChange={(e) => setContactNotesInput(e.target.value)}
-                            placeholder="Add private staff notes about this client (e.g. VIP lead, requested quotation for ERP)..."
+                            placeholder={__('whatsapp.livechat_notes_placeholder')}
+                            aria-label={__('whatsapp.livechat_internal_notes')}
                             className="w-full p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-xl text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none leading-relaxed"
                         />
                         <button
@@ -1162,7 +1179,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             disabled={isSavingCrm}
                             className="w-full py-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold rounded-xl transition cursor-pointer"
                         >
-                            {isSavingCrm ? 'Saving Notes...' : 'Save Notes'}
+                            {isSavingCrm ? __('general.saving') : __('whatsapp.livechat_save_notes')}
                         </button>
                     </div>
 
@@ -1171,11 +1188,11 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-2xl space-y-2 text-xs">
                             <div className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
                                 <Sparkles className="w-4 h-4 text-amber-600" />
-                                Meta Ad Attribution
+                                {__('whatsapp.livechat_ad_attribution')}
                             </div>
                             <div className="text-[11px] text-amber-800 dark:text-amber-300 space-y-1">
-                                <div><strong>Campaign:</strong> {activeReferral.headline || 'Direct CTWA'}</div>
-                                {activeReferral.source_id && <div><strong>Ad ID:</strong> {activeReferral.source_id}</div>}
+                                <div><strong>{__('whatsapp.livechat_campaign')}</strong> {activeReferral.headline || __('whatsapp.livechat_direct_ctwa')}</div>
+                                {activeReferral.source_id && <div><strong>{__('whatsapp.livechat_ad_id')}</strong> {activeReferral.source_id}</div>}
                                 {activeReferral.ctwa_clid && <div className="truncate font-mono"><strong>CLID:</strong> {activeReferral.ctwa_clid}</div>}
                             </div>
                         </div>
@@ -1188,8 +1205,8 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5">
                         <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-base">Send Media Attachment</h3>
-                            <button onClick={() => setShowMediaModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                            <h3 className="font-bold text-base">{__('whatsapp.livechat_send_media')}</h3>
+                            <button onClick={() => setShowMediaModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer" aria-label={__('general.close')}>
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -1200,13 +1217,13 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                 onClick={() => { setMediaType('image'); setSelectedMediaFile(null); }}
                                 className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer ${mediaType === 'image' ? 'bg-white dark:bg-zinc-700 text-[#00a884] shadow-xs' : 'text-zinc-500'}`}
                             >
-                                <ImageIcon className="w-4 h-4" /> Image
+                                <ImageIcon className="w-4 h-4" /> {__('whatsapp.livechat_image')}
                             </button>
                             <button
                                 onClick={() => { setMediaType('document'); setSelectedMediaFile(null); }}
                                 className={`flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer ${mediaType === 'document' ? 'bg-white dark:bg-zinc-700 text-[#00a884] shadow-xs' : 'text-zinc-500'}`}
                             >
-                                <FileCode className="w-4 h-4" /> Document / PDF
+                                <FileCode className="w-4 h-4" /> {__('whatsapp.livechat_document_pdf')}
                             </button>
                         </div>
 
@@ -1218,6 +1235,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             <input
                                 ref={mediaInputRef}
                                 type="file"
+                                aria-label={__('whatsapp.livechat_attach')}
                                 accept={mediaType === 'image' ? 'image/jpeg,image/png,image/webp' : 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip,text/plain'}
                                 className="hidden"
                                 onChange={(e) => {
@@ -1233,7 +1251,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             {selectedMediaFile ? (
                                 <div className="space-y-2">
                                     {mediaPreviewUrl && (
-                                        <img src={mediaPreviewUrl} alt="Preview" className="w-24 h-24 object-cover rounded-xl mx-auto border" />
+                                        <img src={mediaPreviewUrl} alt={__('general.preview')} className="w-24 h-24 object-cover rounded-xl mx-auto border" />
                                     )}
                                     <div className="font-bold text-xs text-zinc-900 dark:text-zinc-100">{selectedMediaFile.name}</div>
                                     <div className="text-[10px] text-zinc-400 font-mono">{(selectedMediaFile.size / 1024).toFixed(1)} KB</div>
@@ -1241,20 +1259,21 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             ) : (
                                 <>
                                     <Paperclip className="w-8 h-8 mx-auto text-zinc-400" />
-                                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Click to select {mediaType === 'image' ? 'photo' : 'file'}</p>
-                                    <p className="text-[10px] text-zinc-400">Max size 16MB</p>
+                                    <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">{mediaType === 'image' ? __('whatsapp.livechat_select_photo') : __('whatsapp.livechat_select_file')}</p>
+                                    <p className="text-[10px] text-zinc-400">{__('whatsapp.livechat_max_size')}</p>
                                 </>
                             )}
                         </div>
 
                         {/* Caption input */}
                         <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-zinc-500">Caption (Optional)</label>
+                            <label className="text-xs font-semibold text-zinc-500">{__('whatsapp.livechat_caption')}</label>
                             <input
                                 type="text"
                                 value={mediaCaption}
                                 onChange={(e) => setMediaCaption(e.target.value)}
-                                placeholder="Add a caption..."
+                                placeholder={__('whatsapp.livechat_caption_placeholder')}
+                                aria-label={__('whatsapp.livechat_caption')}
                                 className="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-[#00a884] focus:outline-none"
                             />
                         </div>
@@ -1265,7 +1284,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             className="w-full py-3 bg-[#00a884] hover:bg-[#008f70] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
                         >
                             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                            Send {mediaType === 'image' ? 'Image' : 'Document'} to WhatsApp
+                            {mediaType === 'image' ? __('whatsapp.livechat_send_image') : __('whatsapp.livechat_send_document')}
                         </button>
                     </div>
                 </div>
@@ -1278,30 +1297,31 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Radio className="w-5 h-5 text-emerald-500" />
-                                <h3 className="font-bold text-base">Send Interactive Buttons</h3>
+                                <h3 className="font-bold text-base">{__('whatsapp.livechat_send_interactive_title')}</h3>
                             </div>
-                            <button onClick={() => setShowInteractiveModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                            <button onClick={() => setShowInteractiveModal(false)} className="text-zinc-400 hover:text-zinc-600 cursor-pointer" aria-label={__('general.close')}>
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         <p className="text-xs text-zinc-500">
-                            Send quick-reply buttons (up to 3). Customers can tap any button to reply instantly.
+                            {__('whatsapp.livechat_interactive_desc')}
                         </p>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-zinc-500">Message Body</label>
+                            <label className="text-xs font-semibold text-zinc-500">{__('whatsapp.livechat_message_body')}</label>
                             <textarea
                                 rows={2}
                                 value={interactiveBody}
                                 onChange={(e) => setInteractiveBody(e.target.value)}
-                                placeholder="e.g. Would you like to speak to a specialist?"
+                                placeholder={__('whatsapp.livechat_interactive_placeholder')}
+                                aria-label={__('whatsapp.livechat_message_body')}
                                 className="w-full p-3 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl focus:ring-1 focus:ring-[#00a884] focus:outline-none resize-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-semibold text-zinc-500">Button Labels (1 to 3 buttons)</label>
+                            <label className="text-xs font-semibold text-zinc-500">{__('whatsapp.livechat_button_labels')}</label>
                             {interactiveButtons.map((btn, idx) => (
                                 <div key={idx} className="flex items-center gap-2">
                                     <span className="text-xs font-mono text-zinc-400 w-5">#{idx + 1}</span>
@@ -1314,13 +1334,15 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                                             newBtns[idx] = e.target.value;
                                             setInteractiveButtons(newBtns);
                                         }}
-                                        placeholder={`Button ${idx + 1} title (max 20 chars)`}
+                                        placeholder={__('whatsapp.livechat_button_placeholder', { number: idx + 1 })}
+                                        aria-label={__('whatsapp.livechat_button_placeholder', { number: idx + 1 })}
                                         className="flex-1 px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl"
                                     />
                                     {interactiveButtons.length > 1 && (
                                         <button
                                             onClick={() => setInteractiveButtons(interactiveButtons.filter((_, i) => i !== idx))}
                                             className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer"
+                                            aria-label={__('general.delete')}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -1330,10 +1352,10 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
 
                             {interactiveButtons.length < 3 && (
                                 <button
-                                    onClick={() => setInteractiveButtons([...interactiveButtons, `Option ${interactiveButtons.length + 1}`])}
+                                    onClick={() => setInteractiveButtons([...interactiveButtons, __('whatsapp.livechat_option_n', { number: interactiveButtons.length + 1 })])}
                                     className="text-xs text-[#00a884] hover:underline font-semibold flex items-center gap-1 cursor-pointer pt-1"
                                 >
-                                    <Plus className="w-3.5 h-3.5" /> Add Button
+                                    <Plus className="w-3.5 h-3.5" /> {__('whatsapp.livechat_add_button')}
                                 </button>
                             )}
                         </div>
@@ -1344,7 +1366,7 @@ export default function DedicatedLiveChat({ business, accounts, templates }: Pro
                             className="w-full py-3 bg-[#00a884] hover:bg-[#008f70] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition cursor-pointer"
                         >
                             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                            Send Interactive Message
+                            {__('whatsapp.livechat_send_interactive')}
                         </button>
                     </div>
                 </div>

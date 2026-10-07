@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Artisan;
+use App\Exceptions\MissingExchangeRateException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CurrenciesExchange extends Model
 {
@@ -112,8 +113,9 @@ class CurrenciesExchange extends Model
     {
         $cur1 = static::normalizeCurrencyId($cur1);
         $cur2 = static::normalizeCurrencyId($cur2);
-        if (trim($cur1) == trim($cur2)) {
-            return round($amount, 2);
+        // Zero is zero in every currency, so it never needs (or fails on) a rate lookup.
+        if (trim($cur1) == trim($cur2) || (float) $amount == 0.0) {
+            return round((float) $amount, 2);
         }
 
         $cacheKey = 'today_'.trim($cur1).'_'.trim($cur2);
@@ -189,7 +191,7 @@ class CurrenciesExchange extends Model
     {
         $cur1 = static::normalizeCurrencyId($cur1);
         $cur2 = static::normalizeCurrencyId($cur2);
-        if ($cur1 == $cur2) {
+        if ($cur1 == $cur2 || (float) $amount == 0.0) {
             return 1 * $amount;
         }
         $date_str = date('Y-m-d', strtotime($date));
@@ -219,25 +221,10 @@ class CurrenciesExchange extends Model
                         ->orderByDesc('date_string')->first();
                 }
 
-                if ($reverse != null && $reverse->rate > 0) {
-                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
-                } else {
-                    try {
-                        Artisan::call('currency:fetch-rates');
-                        $ex = CurrenciesExchange::where('currency1', trim($cur1))
-                            ->where('currency2', trim($cur2))
-                            ->where('date_string', trim($date_str))
-                            ->first();
-                        if ($ex == null) {
-                            $ex = CurrenciesExchange::where('currency1', trim($cur1))
-                                ->where('currency2', trim($cur2))
-                                ->orderByDesc('date_string')->first();
-                        }
-                    } catch (\Exception $e) {
-                        // Ignore command failure
-                    }
-                    static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
+                if ($reverse == null || $reverse->rate <= 0) {
+                    static::throwMissingRate($cur1, $cur2, $date_str);
                 }
+                static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
             } else {
                 static::$memoryCache[$cacheKey] = $ex->rate;
             }
@@ -290,7 +277,10 @@ class CurrenciesExchange extends Model
                             ->where('currency2', trim($cur2))
                             ->orderBy('id')->first();
                     }
-                    static::$memoryCache[$cacheKey] = $ex ? $ex->rate : 1.0;
+                    if ($ex == null) {
+                        static::throwMissingRate($cur1, $cur2, $date_str);
+                    }
+                    static::$memoryCache[$cacheKey] = $ex->rate;
                 }
             } else {
                 static::$memoryCache[$cacheKey] = $ex->rate;
@@ -340,17 +330,34 @@ class CurrenciesExchange extends Model
                         ->first();
                 }
 
-                if ($reverse != null && $reverse->rate > 0) {
-                    static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
-                } else {
-                    static::$memoryCache[$cacheKey] = 1;
+                if ($reverse == null || $reverse->rate <= 0) {
+                    static::throwMissingRate($cur1, $cur2, (string) $date);
                 }
+                static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
             } else {
                 static::$memoryCache[$cacheKey] = $ex->rate;
             }
         }
 
         return static::$memoryCache[$cacheKey];
+    }
+
+    /**
+     * No rate exists for the pair. Never guess (a silent 1.0 turns 100 USD into 100 EGP) and never
+     * fetch rates inside a web request; the scheduled currency:fetch-rates command owns that.
+     *
+     * @throws MissingExchangeRateException
+     */
+    private static function throwMissingRate(string $cur1, string $cur2, ?string $date): never
+    {
+        Log::error('Missing exchange rate.', [
+            'from_currency_id' => $cur1,
+            'to_currency_id' => $cur2,
+            'date' => $date,
+            'hint' => 'Run php artisan currency:fetch-rates or add the rate in admin settings.',
+        ]);
+
+        throw new MissingExchangeRateException($cur1, $cur2, $date);
     }
 
     public static function UsdToCost($ex_cost, $source)

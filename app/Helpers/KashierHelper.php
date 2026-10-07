@@ -2,10 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Models\CurrenciesExchange;
-use App\Models\Currency;
-use App\Models\User;
-
 class KashierHelper
 {
     public static function generateHash($merchantId, $orderId, $amount, $currency, $customerReference)
@@ -18,24 +14,6 @@ class KashierHelper
         }
 
         return hash_hmac('sha256', $path, $secretKey, false);
-    }
-
-    /**
-     * Parses the webhook amount safely into the user's currency.
-     * Uses the original_amount if available, otherwise converts from EGP.
-     */
-    public static function getWebhookAmountInUserCurrency(float $webhookAmount, array $metadata, User $user): float
-    {
-        if (isset($metadata['original_amount'])) {
-            return floatval($metadata['original_amount']);
-        }
-
-        $egpCurrency = Currency::where('currency', 'EGP')->first();
-        if ($egpCurrency && $user->currency != $egpCurrency->id) {
-            return CurrenciesExchange::RateToday($webhookAmount, $egpCurrency->id, $user->currency);
-        }
-
-        return $webhookAmount;
     }
 
     public static function validatePayload($rawPayload = null, $kashierSignature = null): bool

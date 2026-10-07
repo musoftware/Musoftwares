@@ -9,6 +9,13 @@
 #   .\deploy\fast.ps1 -AssetsOnly     # Only uploads public/build folder
 #   .\deploy\fast.ps1 -Commit HEAD    # Uploads files modified in latest git commit
 #   .\deploy\fast.ps1 -DryRun         # Lists files that would be uploaded without uploading
+#   .\deploy\fast.ps1 -AllowDirty     # Also deploys uncommitted working-tree changes
+#   .\deploy\fast.ps1 -SkipTests      # Skips the local Pest run (asks you to type a confirmation)
+#
+# Safety gates, in order:
+#   1. Refuses uncommitted changes unless -AllowDirty is passed.
+#   2. Runs the Pest suite locally. A failure aborts the deploy.
+#   3. After upload, shows pending migrations on the server and asks before migrate --force.
 
 param(
     [switch]$Build,
@@ -16,7 +23,9 @@ param(
     [switch]$AssetsOnly,
     [string]$Commit = "",
     [switch]$DryRun,
-    [switch]$NoPassword
+    [switch]$NoPassword,
+    [switch]$AllowDirty,
+    [switch]$SkipTests
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,6 +33,7 @@ $startTime = Get-Date
 
 $PROJECT_ROOT = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location $PROJECT_ROOT
+. "$PSScriptRoot\common.ps1"
 
 function Banner($msg, $color = "Cyan") {
     Write-Host ""
@@ -51,31 +61,24 @@ function Info($msg) {
 Banner "Musoftware Fast Deploy"
 
 # 1. Read SSH Config
-$configFile = Join-Path $PSScriptRoot ".ssh-config"
-if (-not (Test-Path $configFile)) {
-    Fail ".ssh-config file not found in deploy/ directory"
-    exit 1
-}
+$cfg = Read-SshConfig
+$REMOTE_PATH = $cfg.RemotePath
 
-$config = @{}
-Get-Content $configFile | Where-Object { $_ -notmatch "^#" -and $_ -notmatch "^\s*$" } | ForEach-Object {
-    $parts = $_ -split "=", 2
-    if ($parts.Count -eq 2) {
-        $config[$parts[0].Trim()] = $parts[1].Trim().Trim('"')
-    }
-}
-
-$SSH_USER = $config["SSH_USER"]
-$SSH_HOST = $config["SSH_HOST"]
-$SSH_PORT = $config["SSH_PORT"]
-if ([string]::IsNullOrEmpty($SSH_PORT)) { $SSH_PORT = 22 }
-$REMOTE_PATH = $config["REMOTE_PATH"].TrimEnd('/')
-$SSH_PASSWORD = $config["SSH_PASSWORD"]
-
-Info "Target : $SSH_USER@${SSH_HOST}:$SSH_PORT"
+Info "Target : $($cfg.User)@$($cfg.Host):$($cfg.Port)"
 Info "Remote : $REMOTE_PATH"
 
-# 2. Optional Frontend Build
+# 2. Refuse uncommitted changes unless -AllowDirty
+$dirtyLines = @(& git status --porcelain 2>$null)
+if ($dirtyLines.Count -gt 0 -and -not $AllowDirty) {
+    Fail "Working tree has $($dirtyLines.Count) uncommitted change(s). Commit them first, or pass -AllowDirty."
+    $dirtyLines | Select-Object -First 20 | ForEach-Object { Info $_ }
+    exit 1
+}
+if ($dirtyLines.Count -gt 0 -and $AllowDirty) {
+    Write-Host " [WARN] -AllowDirty: uncommitted files will be deployed." -ForegroundColor Yellow
+}
+
+# 3. Optional Frontend Build
 if ($Build) {
     Step "Compiling frontend assets (npm run build)..."
     & npm run build
@@ -86,7 +89,7 @@ if ($Build) {
     Pass "Frontend build finished."
 }
 
-# 3. Detect Changed Files
+# 4. Detect Changed Files
 $filesToUpload = [System.Collections.Generic.List[string]]::new()
 $includeBuildFolder = -not $PHPOnly
 
@@ -99,9 +102,8 @@ if ($AssetsOnly) {
     if ($Commit) {
         $rawGitFiles = & git diff --name-only "$Commit^" "$Commit" 2>$null
     } else {
-        # Unstaged + Staged changed files
-        $statusOutput = & git status --porcelain 2>$null
-        foreach ($line in $statusOutput) {
+        # Unstaged + staged changes (empty unless -AllowDirty was passed)
+        foreach ($line in $dirtyLines) {
             if ($line.Length -ge 4) {
                 $status = $line.Substring(0, 2).Trim()
                 $relPath = $line.Substring(3).Trim().Trim('"')
@@ -185,12 +187,24 @@ if ($includeBuildFolder) {
     Write-Host "  [+] public/build (compiled frontend assets)" -ForegroundColor Cyan
 }
 
+$migrationFiles = @($filesToUpload | Where-Object { ($_ -replace '\\', '/') -match '(^|/)database/migrations/[^/]+\.php$' })
+if ($migrationFiles.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Migration files in this upload:" -ForegroundColor Yellow
+    foreach ($m in $migrationFiles) {
+        Write-Host "  [M] $m" -ForegroundColor Yellow
+    }
+}
+
 if ($DryRun) {
     Banner "DRY RUN COMPLETE - No files were uploaded." "Magenta"
     exit 0
 }
 
-# 4. Stage Archive
+# 5. Run the test suite locally (or confirm skipping it)
+Assert-TestsOrConfirmedSkip $PROJECT_ROOT -SkipTests:$SkipTests
+
+# 6. Stage Archive
 Step "Creating fast deployment package..."
 $stageDir = Join-Path $env:TEMP "musoftwares-fast-deploy"
 $stageContents = Join-Path $stageDir "contents"
@@ -238,42 +252,60 @@ if ($null -ne (Get-Command tar.exe -ErrorAction SilentlyContinue)) {
 $zipSizeMB = '{0:N2}' -f ((Get-Item $zipFile).Length / 1MB)
 Pass "Archive created: $zipFile ($zipSizeMB MB)"
 
-# 5. Single Transfer & Server Extraction
+# 7. Single Transfer & Server Extraction
 Step "Uploading and extracting on remote server..."
 
-$hasPutty = $null -ne (Get-Command plink -ErrorAction SilentlyContinue) -and $null -ne (Get-Command pscp -ErrorAction SilentlyContinue)
+$sshMode = Resolve-SshMode $cfg -NoPassword:$NoPassword
+Info "SSH mode: $sshMode"
 $remoteZip = "/tmp/fast_deploy.zip"
 
-$remoteExtractCmd = "cd $REMOTE_PATH && unzip -oq $remoteZip && rm -f $remoteZip && php artisan migrate --force && php artisan optimize:clear"
-
-if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
-    # Accept host key if not cached
-    & plink.exe -batch -T -P $SSH_PORT -pw $SSH_PASSWORD "${SSH_USER}@${SSH_HOST}" exit 2>$null
-
-    # Upload zip in one go
-    & pscp.exe -sftp -batch -P $SSH_PORT -pw $SSH_PASSWORD $zipFile "${SSH_USER}@${SSH_HOST}:$remoteZip"
-    if ($LASTEXITCODE -ne 0) {
-        Fail "Archive upload failed via pscp."
-        exit 1
-    }
-
-    # Extract and clear cache directly via plink
-    & plink.exe -batch -T -P $SSH_PORT -pw $SSH_PASSWORD "${SSH_USER}@${SSH_HOST}" $remoteExtractCmd
-    if ($LASTEXITCODE -ne 0) {
-        Fail "Remote extraction or cache clear failed."
-        exit 1
-    }
-} else {
-    & scp -P $SSH_PORT -o StrictHostKeyChecking=no $zipFile "${SSH_USER}@${SSH_HOST}:$remoteZip"
-    if ($LASTEXITCODE -ne 0) {
-        Fail "Archive upload failed via scp."
-        exit 1
-    }
-
-    & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $remoteExtractCmd
+Send-RemoteFile $cfg $sshMode $zipFile $remoteZip
+if ($LASTEXITCODE -ne 0) {
+    Fail "Archive upload failed."
+    exit 1
 }
 
-# 6. Cleanup Staging
+Invoke-Remote $cfg $sshMode "cd $REMOTE_PATH && unzip -oq $remoteZip && rm -f $remoteZip" | ForEach-Object { Info $_ }
+if ($LASTEXITCODE -ne 0) {
+    Fail "Remote extraction failed."
+    exit 1
+}
+Pass "Files extracted on server."
+
+# 8. Show pending migrations and ask before migrate --force
+Step "Checking pending migrations on the server..."
+$statusOutput = @(Invoke-Remote $cfg $sshMode "cd $REMOTE_PATH && php artisan migrate:status --pending --no-ansi")
+if ($LASTEXITCODE -ne 0) {
+    $statusOutput | ForEach-Object { Info $_ }
+    Fail "Could not read migration status on the server. Migrations were NOT run."
+    exit 1
+}
+$pendingRows = @($statusOutput | Where-Object { $_ -match "Pending" -and $_ -notmatch "No pending" })
+
+if ($pendingRows.Count -eq 0) {
+    Pass "No pending migrations."
+} else {
+    Write-Host "Pending migrations on PRODUCTION:" -ForegroundColor Yellow
+    $pendingRows | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+    if (Confirm-Typed "These migrations will run on the PRODUCTION database with --force." "MIGRATE") {
+        Invoke-Remote $cfg $sshMode "cd $REMOTE_PATH && php artisan migrate --force --no-ansi" | ForEach-Object { Info $_ }
+        if ($LASTEXITCODE -ne 0) {
+            Fail "Remote migration failed. Check the server now."
+            exit 1
+        }
+        Pass "Migrations finished."
+    } else {
+        Write-Host " [WARN] Migrations skipped. New code is live but the database is NOT migrated." -ForegroundColor Yellow
+    }
+}
+
+Invoke-Remote $cfg $sshMode "cd $REMOTE_PATH && php artisan optimize:clear --no-ansi" | ForEach-Object { Info $_ }
+if ($LASTEXITCODE -ne 0) {
+    Fail "Remote cache clear failed."
+    exit 1
+}
+
+# 9. Cleanup Staging
 Remove-Item -LiteralPath $stageDir -Recurse -Force
 
 $elapsed = [math]::Round(((Get-Date) - $startTime).TotalSeconds, 1)

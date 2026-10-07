@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface Service {
     id: number;
@@ -52,6 +53,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
     const [selectedService, setSelectedService] = useState<Service | null>(null);
     const [genLang, setGenLang] = useState<string>('all');
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,6 +73,17 @@ export default function Index({ articles, services, filters }: IndexProps) {
         });
     };
 
+    const handleDelete = async (id: number, title: string) => {
+        const accepted = await confirm({
+            title: __('general.are_you_sure'),
+            description: __('admin.blog_articles_delete_confirm', { title }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.blog-articles.destroy', id));
+    };
+
     // Calculate metrics
     const totalServices = services?.length || 0;
     const servicesWithoutPosts = services?.filter(s => s.articles_en_count === 0 && s.articles_ar_count === 0) || [];
@@ -82,7 +95,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
             return (
                 <Badge className="bg-green-50 text-green-700 border-green-200 hover:bg-green-50 border shadow-none">
                     <CheckCircle2 className="h-3 w-3 me-1 text-green-600 inline" />
-                    {__('general.completed') || 'Completed'}
+                    {__('general.completed')}
                 </Badge>
             );
         }
@@ -90,26 +103,27 @@ export default function Index({ articles, services, filters }: IndexProps) {
             return (
                 <Badge className="bg-yellow-50 text-yellow-700 border-yellow-250 hover:bg-yellow-50 border shadow-none">
                     <AlertCircle className="h-3 w-3 me-1 text-yellow-600 inline" />
-                    {__('general.partial') || 'Partial'}
+                    {__('general.partial')}
                 </Badge>
             );
         }
         return (
             <Badge variant="destructive" className="bg-red-50 text-red-700 border-red-200 hover:bg-red-50 border shadow-none">
                 <AlertCircle className="h-3 w-3 me-1 text-red-600 inline" />
-                {__('general.missing_posts') || 'No Posts Yet'}
+                {__('general.missing_posts')}
             </Badge>
         );
     };
 
     return (
-        <AdminSidebarLayout title={__('general.blog_articles')} header="Blog Articles Manager">
+        <AdminSidebarLayout title={__('general.blog_articles')} header={__('admin.blog_articles_manager_heading')}>
+            {confirmDialog}
             
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.total_services') || 'Active Services'}</p>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.total_services')}</p>
                         <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{totalServices}</h3>
                     </div>
                     <div className="h-12 w-12 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600">
@@ -119,12 +133,12 @@ export default function Index({ articles, services, filters }: IndexProps) {
 
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.services_without_posts') || 'Services Without Posts'}</p>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.services_without_posts')}</p>
                         <h3 className="text-3xl font-extrabold mt-2 text-gray-900 flex items-center gap-2">
                             {servicesWithoutPostsCount}
                             {servicesWithoutPostsCount > 0 && (
                                 <Badge variant="destructive" className="bg-red-50 text-red-700 hover:bg-red-50 border-red-250 border shadow-none font-bold text-xs">
-                                    {__('general.needs_attention') || 'Needs Attention'}
+                                    {__('general.needs_attention')}
                                 </Badge>
                             )}
                         </h3>
@@ -140,7 +154,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
 
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.total_blog_articles') || 'Total Generated Articles'}</p>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{__('general.total_blog_articles')}</p>
                         <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{totalArticles}</h3>
                     </div>
                     <div className="h-12 w-12 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600">
@@ -159,7 +173,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
                             : 'border-transparent text-gray-400 hover:text-black'
                     }`}
                 >
-                    {__('general.blog_articles') || 'Blog Articles'}
+                    {__('general.blog_articles')}
                 </button>
                 <button
                     onClick={() => setActiveTab('services')}
@@ -169,7 +183,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
                             : 'border-transparent text-gray-400 hover:text-black'
                     }`}
                 >
-                    {__('general.services_auto_blog') || 'Services & Auto-Blog'}
+                    {__('general.services_auto_blog')}
                 </button>
             </div>
 
@@ -198,7 +212,7 @@ export default function Index({ articles, services, filters }: IndexProps) {
                             <table className="w-full text-start text-sm whitespace-nowrap">
                                 <thead className="border-b bg-gray-50">
                                     <tr>
-                                        <th className="p-4 font-medium text-gray-600 w-16">ID</th>
+                                        <th className="p-4 font-medium text-gray-600 w-16">{__('general.id')}</th>
                                         <th className="p-4 font-medium text-gray-600">{__('general.title')}</th>
                                         <th className="p-4 font-medium text-gray-600 text-center">{__('general.language')}</th>
                                         <th className="p-4 font-medium text-gray-600 text-center">{__('general.status')}</th>
@@ -263,11 +277,10 @@ export default function Index({ articles, services, filters }: IndexProps) {
                                                                     <Pencil className="h-4 w-4" />
                                                                     {__('general.edit')}</Button>
                                                             </Link>
-                                                            <Link href={route('admin.blog-articles.destroy', article.id)} method="delete" as="button" className="w-full">
-                                                                <Button variant="destructive" className="w-full justify-start gap-2">
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                    {__('general.delete')}</Button>
-                                                            </Link>
+                                                            <Button variant="destructive" className="w-full justify-start gap-2" onClick={() => handleDelete(article.id, article.title)}>
+                                                                <Trash2 className="h-4 w-4" />
+                                                                {__('general.delete')}
+                                                            </Button>
                                                         </div>
                                                     </DialogContent>
                                                 </Dialog>
@@ -300,12 +313,12 @@ export default function Index({ articles, services, filters }: IndexProps) {
                         <table className="w-full text-start text-sm whitespace-nowrap">
                             <thead className="border-b bg-gray-50">
                                 <tr>
-                                    <th className="p-4 font-medium text-gray-600 w-16">ID</th>
-                                    <th className="p-4 font-medium text-gray-600">{__('general.service_title') || 'Service Title'}</th>
-                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.english_posts') || 'English Posts'}</th>
-                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.arabic_posts') || 'Arabic Posts'}</th>
-                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.status') || 'Status'}</th>
-                                    <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions') || 'Actions'}</th>
+                                    <th className="p-4 font-medium text-gray-600 w-16">{__('general.id')}</th>
+                                    <th className="p-4 font-medium text-gray-600">{__('general.service_title')}</th>
+                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.english_posts')}</th>
+                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.arabic_posts')}</th>
+                                    <th className="p-4 font-medium text-gray-600 text-center">{__('general.status')}</th>
+                                    <th className="p-4 font-medium text-gray-600 text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -320,22 +333,22 @@ export default function Index({ articles, services, filters }: IndexProps) {
                                         <td className="p-4 text-center">
                                             {service.articles_en_count > 0 ? (
                                                 <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 border shadow-none font-bold">
-                                                    {service.articles_en_count} {__('general.posts') || 'posts'}
+                                                    {service.articles_en_count} {__('general.posts')}
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="outline" className="text-gray-400 border-gray-200 border shadow-none">
-                                                    0 {__('general.posts') || 'posts'}
+                                                    0 {__('general.posts')}
                                                 </Badge>
                                             )}
                                         </td>
                                         <td className="p-4 text-center">
                                             {service.articles_ar_count > 0 ? (
                                                 <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 border-indigo-100 border shadow-none font-bold">
-                                                    {service.articles_ar_count} {__('general.posts') || 'posts'}
+                                                    {service.articles_ar_count} {__('general.posts')}
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="outline" className="text-gray-400 border-gray-200 border shadow-none">
-                                                    0 {__('general.posts') || 'posts'}
+                                                    0 {__('general.posts')}
                                                 </Badge>
                                             )}
                                         </td>
@@ -356,12 +369,12 @@ export default function Index({ articles, services, filters }: IndexProps) {
                                                 {generatingId === service.id ? (
                                                     <>
                                                         <RefreshCw className="h-3.5 w-3.5 animate-spin text-gray-500" />
-                                                        {__('general.generating') || 'Generating...'}
+                                                        {__('general.generating')}
                                                     </>
                                                 ) : (
                                                     <>
                                                         <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
-                                                        {__('general.generate_ai_post') || 'Generate AI Post'}
+                                                        {__('general.generate_ai_post')}
                                                     </>
                                                 )}
                                             </Button>
@@ -373,8 +386,8 @@ export default function Index({ articles, services, filters }: IndexProps) {
                                         <td colSpan={6} className="p-12 text-center text-gray-500">
                                             <div className="flex flex-col items-center justify-center">
                                                 <FileText className="h-10 w-10 text-gray-300 mb-3" />
-                                                <p className="text-lg font-medium text-gray-600">{__('general.no_services_found') || 'No Active Services Found'}</p>
-                                                <p className="text-sm text-gray-400 mt-1">{__('general.create_active_services_to_enable') || 'Ensure you have active services in the marketplace first.'}</p>
+                                                <p className="text-lg font-medium text-gray-600">{__('general.no_services_found')}</p>
+                                                <p className="text-sm text-gray-400 mt-1">{__('general.create_active_services_to_enable')}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -391,32 +404,32 @@ export default function Index({ articles, services, filters }: IndexProps) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Sparkles className="h-5 w-5 text-indigo-600" />
-                            <span>{__('general.generate_ai_blog_post') || 'Generate AI Blog Post'}</span>
+                            <span>{__('general.generate_ai_blog_post')}</span>
                         </DialogTitle>
                     </DialogHeader>
                     {selectedService && (
                         <div className="py-4 space-y-4">
                             <p className="text-sm text-gray-500 leading-relaxed">
-                                {__('general.generate_for_service') || 'Select the language(s) to generate a new blog article for service:'}{' '}
+                                {__('general.generate_for_service')}{' '}
                                 <strong className="text-gray-950 font-bold">{selectedService.title}</strong>.
                             </p>
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.generation_language') || 'Language'}</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.generation_language')}</label>
                                 <select 
                                     value={genLang} 
                                     onChange={(e) => setGenLang(e.target.value)}
                                     className="w-full p-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 font-medium"
                                 >
-                                    <option value="all">{__('general.both_ar_en') || 'Both English & Arabic'}</option>
-                                    <option value="en">{__('general.english') || 'English'}</option>
-                                    <option value="ar">{__('general.arabic') || 'Arabic'}</option>
+                                    <option value="all">{__('general.both_ar_en')}</option>
+                                    <option value="en">{__('general.english')}</option>
+                                    <option value="ar">{__('general.arabic')}</option>
                                 </select>
                             </div>
                             <div className="flex justify-end gap-3 pt-4 border-t border-gray-150">
                                 <Button variant="ghost" onClick={() => setIsDialogOpen(false)}>{__('general.cancel')}</Button>
                                 <Button onClick={() => handleGenerate(selectedService.id, genLang)} className="gap-2">
                                     <Sparkles className="h-4 w-4" />
-                                    {__('general.generate') || 'Generate'}
+                                    {__('general.generate')}
                                 </Button>
                             </div>
                         </div>

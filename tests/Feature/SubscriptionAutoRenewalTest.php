@@ -14,18 +14,20 @@ use Tests\TestCase;
 class SubscriptionAutoRenewalTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         // Seed roles & permissions
         $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create standard client user
-        $this->user = User::factory()->create(['onboarding_completed' => true, 'currency_id' => 1]);
+        $this->user = User::factory()->create(['onboarding_completed' => true, 'currency_id' => self::EGP]); // base prices are EGP, so the wallet debit equals the list price
         $this->user->assignRole('client');
     }
 

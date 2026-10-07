@@ -130,7 +130,7 @@ export default function Show({ host, eventType }: any) {
                                             <h4 className="font-semibold text-foreground text-sm truncate">{prov.name}</h4>
                                             <p className="text-xs text-muted-foreground truncate flex items-center">
                                                 <Stethoscope className="w-3 h-3 me-0.5" />
-                                                {prov.specialty || 'Specialist'}
+                                                {prov.specialty || __('booking.specialist')}
                                             </p>
                                         </div>
                                     </div>
@@ -149,14 +149,14 @@ export default function Show({ host, eventType }: any) {
                         <div className="flex items-center justify-end gap-4 mb-4">
                             <span className="font-semibold text-foreground">{format(today, 'MMMM yyyy')}</span>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-border" disabled><ChevronLeft className="h-4 w-4" /></Button>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-border" disabled><ChevronRight className="h-4 w-4" /></Button>
+                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-border" disabled aria-label={__('general.previous')}><ChevronLeft className="h-4 w-4" /></Button>
+                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-border" disabled aria-label={__('general.next_page')}><ChevronRight className="h-4 w-4" /></Button>
                             </div>
                         </div>
                         
                         <div className="grid grid-cols-7 gap-1.5 text-center text-xs mb-2">
-                            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                                <div key={day} className="text-muted-foreground font-semibold py-1">{day}</div>
+                            {['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'].map(day => (
+                                <div key={day} className="text-muted-foreground font-semibold py-1">{__(`booking.day_short_${day}`)}</div>
                             ))}
                         </div>
                         
@@ -203,7 +203,7 @@ export default function Show({ host, eventType }: any) {
                             {loadingSlots ? (
                                 <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
                                     <Clock className="w-5 h-5 animate-spin me-2" />
-                                    {__('general.loading_slots')}...
+                                    {__('general.loading_slots')}
                                 </div>
                             ) : availableSlots.length === 0 ? (
                                 <div className="h-48 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border rounded-2xl p-4 text-center">
@@ -274,7 +274,7 @@ export default function Show({ host, eventType }: any) {
                     </span>
                     <span className="text-xs font-medium text-muted-foreground mt-0.5 flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                        {selectedTime} ({eventType.duration_minutes} minutes)
+                        {selectedTime} ({__('booking.minutes_long', { count: eventType.duration_minutes })})
                     </span>
                 </div>
 
@@ -282,7 +282,7 @@ export default function Show({ host, eventType }: any) {
                     <div className="border-t sm:border-t-0 sm:border-s border-border sm:ps-4 pt-3 sm:pt-0">
                         <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{__('general.provider')}</h4>
                         <span className="text-sm font-semibold text-foreground block">
-                            {selectedProvider?.name || availableSlots.find(s => s.time === selectedTime)?.provider?.name || 'Assigned Specialist'}
+                            {selectedProvider?.name || availableSlots.find(s => s.time === selectedTime)?.provider?.name || __('booking.assigned_specialist')}
                         </span>
                         {selectedProvider?.specialty && (
                             <span className="text-xs font-medium text-foreground block mt-0.5">
@@ -298,7 +298,7 @@ export default function Show({ host, eventType }: any) {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="guest_name" className="text-sm font-semibold text-foreground">Your Full Name *</Label>
+                        <Label htmlFor="guest_name" className="text-sm font-semibold text-foreground">{__('booking.your_full_name_required')}</Label>
                         <Input 
                             id="guest_name" 
                             value={data.guest_name}
@@ -311,7 +311,7 @@ export default function Show({ host, eventType }: any) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="guest_phone" className="text-sm font-semibold text-foreground">Phone Number (Optional)</Label>
+                        <Label htmlFor="guest_phone" className="text-sm font-semibold text-foreground">{__('booking.phone_optional')}</Label>
                         <Input 
                             id="guest_phone" 
                             value={data.guest_phone || ''}
@@ -323,7 +323,7 @@ export default function Show({ host, eventType }: any) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="guest_email" className="text-sm font-semibold text-foreground">Email Address *</Label>
+                    <Label htmlFor="guest_email" className="text-sm font-semibold text-foreground">{__('booking.email_required')}</Label>
                     <Input 
                         id="guest_email" 
                         type="email"
@@ -337,7 +337,7 @@ export default function Show({ host, eventType }: any) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="notes" className="text-sm font-semibold text-foreground">Additional Notes (Optional)</Label>
+                    <Label htmlFor="notes" className="text-sm font-semibold text-foreground">{__('booking.notes_optional')}</Label>
                     <Textarea 
                         id="notes" 
                         value={data.notes}
@@ -355,11 +355,11 @@ export default function Show({ host, eventType }: any) {
                         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl py-6 text-base font-semibold shadow-sm flex items-center justify-center gap-2"
                     >
                         {processing ? (
-                            'Processing booking...'
+                            __('booking.processing_booking')
                         ) : eventType.requires_payment ? (
                             <>
                                 <CreditCard className="w-5 h-5" />
-                                Proceed to Payment ({eventType.price} {eventType.currency})
+                                {__('booking.proceed_to_payment', { amount: `${eventType.price} ${eventType.currency}` })}
                             </>
                         ) : (
                             <>
@@ -375,7 +375,7 @@ export default function Show({ host, eventType }: any) {
 
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12 selection:bg-muted">
-            <Head title={`Book ${eventType.title} | Musoftwares`} />
+            <Head title={__('booking.public_page_title', { title: eventType.title })} />
             
             <div className="max-w-5xl w-full bg-card text-card-foreground rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.03)] overflow-hidden border border-border flex flex-col md:flex-row">
                 
@@ -396,13 +396,13 @@ export default function Show({ host, eventType }: any) {
                         <div className="space-y-3.5">
                             <div className="flex items-center text-xs font-semibold text-foreground bg-card p-3 rounded-xl shadow-xs border border-border">
                                 <Clock className="w-4 h-4 me-2.5 text-muted-foreground shrink-0" />
-                                Duration: {eventType.duration_minutes} min
+                                {__('booking.duration_label', { count: eventType.duration_minutes })}
                             </div>
                             
                             {eventType.requires_payment && eventType.price > 0 && (
                                 <div className="flex items-center text-xs font-semibold text-foreground bg-muted p-3 rounded-xl shadow-xs border border-border">
                                     <CreditCard className="w-4 h-4 me-2.5 text-muted-foreground shrink-0" />
-                                    Fee: {eventType.price} {eventType.currency}
+                                    {__('booking.fee_label', { amount: `${eventType.price} ${eventType.currency}` })}
                                 </div>
                             )}
                         </div>

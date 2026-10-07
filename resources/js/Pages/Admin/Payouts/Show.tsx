@@ -45,8 +45,8 @@ export default function Show({ payout }: any) {
             tax,
             items,
         }, {
-            onSuccess: () => toastSuccess(__('general.saved') || 'Payout saved'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.saved')),
+            onError: () => toastError(__('general.error_occurred')),
             onFinish: () => setSaving(false),
         });
     };
@@ -55,8 +55,8 @@ export default function Show({ payout }: any) {
         setPendingMarkPaid(false);
         router.post(route('admin.payouts.mark-paid', payout.id), {}, {
             preserveScroll: true,
-            onSuccess: () => toastSuccess(__('general.payout_marked_paid') || 'Payout marked as paid'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.payout_marked_paid')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -69,20 +69,20 @@ export default function Show({ payout }: any) {
     };
 
     return (
-        <AdminSidebarLayout title={`Payout #${payout.id}`} header={`Payout #${payout.id}`}>
+        <AdminSidebarLayout title={__('admin.payouts_show_title', { id: payout.id })} header={__('admin.payouts_show_title', { id: payout.id })}>
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Link href={route('admin.payouts.index')} className="text-muted-foreground hover:text-foreground">
-                        <ArrowLeft className="h-5 w-5" />
+                    <Link href={route('admin.payouts.index')} className="text-muted-foreground hover:text-foreground" aria-label={__('admin.payouts_back_to_list')} title={__('admin.payouts_back_to_list')}>
+                        <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
                     </Link>
-                    <h1 className="text-2xl font-bold">Payout #{payout.id}</h1>
+                    <h1 className="text-2xl font-bold">{__('admin.payouts_show_title', { id: payout.id })}</h1>
                     <StatusBadge status={payout.status} />
                 </div>
                 {!isPaid && (
                     <div className="flex gap-2">
                         <Button variant="outline" onClick={handleSave} disabled={saving}>{saving ? __('general.saving') : __('general.save_changes')}</Button>
                         <Button onClick={() => setPendingMarkPaid(true)} className="bg-green-600 hover:bg-green-700">
-                            <CheckCircle className="mr-2 h-4 w-4" /> {__('general.mark_as_paid')}
+                            <CheckCircle className="me-2 h-4 w-4" /> {__('general.mark_as_paid')}
                         </Button>
                     </div>
                 )}
@@ -92,23 +92,23 @@ export default function Show({ payout }: any) {
                 <div className="md:col-span-2 space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Payout Items</CardTitle>
+                            <CardTitle>{__('admin.payouts_items_title')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 {items.map((item: any, index: number) => (
                                     <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
                                         <div className="flex-1 space-y-2">
-                                            <Label>Description</Label>
+                                            <Label>{__('general.description')}</Label>
                                             <Input 
                                                 value={item.description} 
                                                 onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                                                 disabled={isPaid}
-                                                placeholder="e.g. Website Development Milestone"
+                                                placeholder={__('admin.payouts_item_placeholder')}
                                             />
                                         </div>
                                         <div className="w-24 space-y-2">
-                                            <Label>Qty</Label>
+                                            <Label>{__('general.qty')}</Label>
                                             <Input 
                                                 type="number" 
                                                 min="1" 
@@ -118,7 +118,7 @@ export default function Show({ payout }: any) {
                                             />
                                         </div>
                                         <div className="w-32 space-y-2">
-                                            <Label>Amount</Label>
+                                            <Label>{__('general.amount')}</Label>
                                             <Input 
                                                 type="number" 
                                                 min="0" 
@@ -130,7 +130,7 @@ export default function Show({ payout }: any) {
                                         </div>
                                         {!isPaid && (
                                             <div className="pt-8">
-                                                <Button variant="ghost" size="icon" className="text-red-600" onClick={() => handleRemoveItem(index)}>
+                                                <Button variant="ghost" size="icon" className="text-red-600" onClick={() => handleRemoveItem(index)} aria-label={__('admin.payouts_remove_item')} title={__('admin.payouts_remove_item')}>
                                                     <Trash className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -141,18 +141,18 @@ export default function Show({ payout }: any) {
                             
                             {!isPaid && (
                                 <Button variant="outline" className="mt-4 w-full" onClick={handleAddItem}>
-                                    <Plus className="mr-2 h-4 w-4" /> Add Item
+                                    <Plus className="me-2 h-4 w-4" /> {__('general.add_item')}
                                 </Button>
                             )}
 
                             <div className="mt-8 flex justify-end">
                                 <div className="w-64 space-y-3">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Subtotal</span>
+                                        <span className="text-muted-foreground">{__('general.subtotal')}</span>
                                         <span>{formatMoney(calculateSubtotal(), payout.currency_id)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm items-center">
-                                        <span className="text-muted-foreground">Tax</span>
+                                        <span className="text-muted-foreground">{__('general.tax')}</span>
                                         {isPaid ? (
                                             <span>{formatMoney(payout.tax, payout.currency_id)}</span>
                                         ) : (
@@ -160,12 +160,12 @@ export default function Show({ payout }: any) {
                                                 type="number" 
                                                 value={tax} 
                                                 onChange={(e) => setTax(Number(e.target.value))} 
-                                                className="w-24 h-8 text-right"
+                                                className="w-24 h-8 text-end"
                                             />
                                         )}
                                     </div>
                                     <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                                        <span>Total</span>
+                                        <span>{__('general.total')}</span>
                                         <span>{formatMoney(calculateTotal(), payout.currency_id)}</span>
                                     </div>
                                 </div>
@@ -177,22 +177,22 @@ export default function Show({ payout }: any) {
                 <div className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Details</CardTitle>
+                            <CardTitle>{__('general.details')}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <Label className="text-muted-foreground text-xs uppercase">Customer</Label>
+                                <Label className="text-muted-foreground text-xs uppercase">{__('general.customer')}</Label>
                                 <div className="font-medium mt-1">{payout.user?.name}</div>
                                 <div className="text-sm text-muted-foreground">{payout.user?.email}</div>
                             </div>
                             {payout.project && (
                                 <div>
-                                    <Label className="text-muted-foreground text-xs uppercase">Project</Label>
+                                    <Label className="text-muted-foreground text-xs uppercase">{__('general.project')}</Label>
                                     <div className="font-medium mt-1">{payout.project.project_name}</div>
                                 </div>
                             )}
                             <div>
-                                <Label className="text-muted-foreground text-xs uppercase">Date</Label>
+                                <Label className="text-muted-foreground text-xs uppercase">{__('general.date')}</Label>
                                 <div className="font-medium mt-1">{new Date(payout.created_at).toLocaleDateString()}</div>
                             </div>
                         </CardContent>
@@ -200,14 +200,14 @@ export default function Show({ payout }: any) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Notes</CardTitle>
+                            <CardTitle>{__('general.notes')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Textarea
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 disabled={isPaid}
-                                placeholder="Add any private notes here..."
+                                placeholder={__('admin.payouts_notes_placeholder')}
                                 rows={4}
                             />
                         </CardContent>
@@ -217,8 +217,8 @@ export default function Show({ payout }: any) {
 
             <ConfirmModal
                 isOpen={pendingMarkPaid}
-                title={__('general.mark_as_paid') || 'Mark as paid?'}
-                description={__('general.confirm_mark_payout_paid_desc') || 'This will credit the user\'s wallet and add an offsetting transaction to balance it.'}
+                title={__('general.mark_as_paid')}
+                description={__('general.confirm_mark_payout_paid_desc')}
                 confirmLabel={__('general.mark_as_paid')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={confirmMarkPaid}

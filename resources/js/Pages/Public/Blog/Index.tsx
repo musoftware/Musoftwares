@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, BookOpen, Globe, Search, X } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface BlogArticle {
     id: number;
@@ -88,7 +89,7 @@ export default function Index({ articles, filters }: IndexProps) {
                             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100/50 text-indigo-700 text-sm font-medium mb-6"
                         >
                             <BookOpen className="h-4 w-4" />
-                            <span>{__('general.our_blog') || 'Our Blog'}</span>
+                            <span>{__('general.our_blog')}</span>
                         </motion.div>
 
                         <motion.h1 
@@ -120,7 +121,7 @@ export default function Index({ articles, filters }: IndexProps) {
                                 type="text"
                                 value={search}
                                 onChange={(e) => handleSearch(e.target.value)}
-                                placeholder={__('general.search_articles') || "Search articles..."}
+                                placeholder={__('general.search_articles')}
                                 className="w-full px-5 py-3.5 ps-12 rounded-2xl bg-white border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all duration-300 text-slate-800 shadow-sm text-sm placeholder:text-slate-400 outline-none"
                             />
                             <div className="absolute start-4 text-slate-400">
@@ -227,23 +228,7 @@ export default function Index({ articles, filters }: IndexProps) {
                     {/* Pagination */}
                     {articles.links.length > 3 && (
                         <div className="mt-16 flex justify-center">
-                            <div className="flex flex-wrap justify-center gap-2">
-                                {articles.links.map((link, i) => (
-                                    <Link
-                                        key={i}
-                                        href={link.url || '#'}
-                                        preserveScroll
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                            link.active 
-                                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
-                                                : !link.url 
-                                                    ? 'bg-slate-50 text-slate-400 cursor-not-allowed border border-slate-200' 
-                                                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
-                                        }`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
+                            <Pagination links={articles.links} />
                         </div>
                     )}
 

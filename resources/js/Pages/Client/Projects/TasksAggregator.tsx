@@ -87,6 +87,10 @@ const PRIORITY_STYLES: Record<string, string> = {
     low: 'bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f]/70 dark:text-white/70 border-black/5 dark:border-white/10',
 };
 
+function priorityLabel(priority: string): string {
+    return PRIORITY_STYLES[priority] ? __(`client.board_priority_${priority}`) : priority;
+}
+
 const TONE_LABEL: Record<Bucket['tone'], string> = {
     danger: 'text-rose-600 dark:text-rose-400',
     today: 'text-[#0071e3] dark:text-[#2997ff]',
@@ -267,7 +271,7 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                         <div className="flex items-center gap-2">
                             <Filter className="h-4 w-4 text-[#0071e3] dark:text-[#2997ff]" />
                             <span className="text-xs font-bold text-[#1d1d1f] dark:text-white uppercase tracking-wider font-mono">
-                                Filter Workspaces
+                                {__('client.projects_filter_workspaces')}
                             </span>
                         </div>
 
@@ -280,7 +284,7 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                     applyFilters({ project_id: next });
                                 }}
                             >
-                                <SelectTrigger className="w-full sm:w-[220px] h-10 rounded-xl bg-white dark:bg-white/5 border-black/10 dark:border-white/10 text-xs font-semibold text-[#1d1d1f] dark:text-white">
+                                <SelectTrigger aria-label={__('general.all_projects')} className="w-full sm:w-[220px] h-10 rounded-xl bg-white dark:bg-white/5 border-black/10 dark:border-white/10 text-xs font-semibold text-[#1d1d1f] dark:text-white">
                                     <SelectValue placeholder={__('general.all_projects') ?? ''} />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl border-black/10 dark:border-white/10 bg-white dark:bg-[#1e293b] text-[#1d1d1f] dark:text-white shadow-lg">
@@ -375,7 +379,7 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                     {openItem.title}
                                 </SheetTitle>
                                 <SheetDescription className="mt-1 text-xs text-[#1d1d1f]/60 dark:text-white/60">
-                                    {openItem.kind === 'task' ? __('general.task') : __('general.todo')} ·{' '}
+                                    {openItem.kind === 'task' ? __('general.task') : __('client.board_type_todo')} ·{' '}
                                     {openItem.project_name}
                                 </SheetDescription>
                             </SheetHeader>
@@ -388,7 +392,7 @@ export default function TasksAggregator({ projects, items, filters, stats }: Pro
                                                 PRIORITY_STYLES[openItem.priority] ?? PRIORITY_STYLES.normal
                                             }`}
                                         >
-                                            {openItem.priority}
+                                            {priorityLabel(openItem.priority)}
                                         </span>
                                     </div>
                                 )}
@@ -448,7 +452,7 @@ function TaskRow({ item, onOpen }: { item: Item; onOpen: (item: Item) => void })
                         <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border capitalize font-mono ${
                             PRIORITY_STYLES[item.priority] ?? PRIORITY_STYLES.normal
                         }`}>
-                            {item.priority}
+                            {priorityLabel(item.priority)}
                         </span>
                     )}
                 </div>

@@ -11,10 +11,10 @@
         "geoip2/geoip2": "^3.3",
         "http-interop/http-factory-guzzle": "^1.2",
         "inertiajs/inertia-laravel": "^2.0",
-        "laravel-notification-channels/fcm": "*",
+        "laravel-notification-channels/fcm": "^6.1",
         "laravel/breeze": "^2.4",
         "laravel/framework": "^12.0",
-        "laravel/reverb": "*",
+        "laravel/reverb": "^1.10",
         "laravel/sanctum": "^4.3",
         "laravel/scout": "^11.2",
         "laravel/socialite": "^5.27",
@@ -90,7 +90,7 @@
             "wikimedia/composer-merge-plugin": true
         },
         "platform": {
-            "php": "8.4.0"
+            "php": "8.4.1"
         },
         "platform-check": false
     },

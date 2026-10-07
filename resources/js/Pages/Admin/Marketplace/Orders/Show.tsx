@@ -97,11 +97,11 @@ export default function Show({ order }: { order: OrderDetail }) {
                     setProcessing(false);
                     setPendingAction(null);
                     setResolutionReason('');
-                    toast.success(__('general.action_completed') || 'Action completed successfully');
+                    toast.success(__('general.action_completed'));
                 },
                 onError: (errors) => {
                     setProcessing(false);
-                    const errMsg = errors?.error || __('general.error_occurred') || 'Something went wrong';
+                    const errMsg = errors?.error || __('general.error_occurred');
                     toast.error(errMsg);
                 },
             }
@@ -110,15 +110,15 @@ export default function Show({ order }: { order: OrderDetail }) {
 
     const actionLabels: Record<string, { title: string; description: string; confirmLabel: string; cls: string }> = {
         release_to_seller: {
-            title: __('general.release_funds_to_seller') || 'Release Funds to Seller',
-            description: __('general.confirm_release_funds_desc') || 'The escrowed funds will be credited to the seller wallet minus platform commission.',
-            confirmLabel: __('general.release_funds') || 'Release Funds',
+            title: __('general.release_funds_to_seller'),
+            description: __('general.confirm_release_funds_desc'),
+            confirmLabel: __('general.release_funds'),
             cls: 'bg-emerald-600 hover:bg-emerald-700 text-white',
         },
         refund_buyer: {
-            title: __('general.refund_buyer') || 'Refund Buyer & Cancel Order',
-            description: __('general.confirm_refund_buyer_desc') || 'The escrowed funds will be fully refunded to the buyer wallet and order will be marked cancelled.',
-            confirmLabel: __('general.refund_buyer') || 'Refund Buyer',
+            title: __('general.refund_buyer'),
+            description: __('general.confirm_refund_buyer_desc'),
+            confirmLabel: __('general.refund_buyer'),
             cls: 'bg-rose-600 hover:bg-rose-700 text-white',
         },
     };
@@ -132,7 +132,7 @@ export default function Show({ order }: { order: OrderDetail }) {
 
             <div className="mb-4">
                 <Link href="/admin/marketplace/orders" className="text-sm text-slate-500 hover:text-black inline-flex items-center gap-1 font-medium">
-                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_orders')}
+                    <ArrowLeft className="w-4 h-4 rtl:rotate-180" />{__('general.back_to_orders')}
                 </Link>
             </div>
 
@@ -190,7 +190,7 @@ export default function Show({ order }: { order: OrderDetail }) {
                                 </h3>
                                 {order.escrow && (
                                     <Badge className="uppercase font-mono text-xs bg-indigo-50 text-indigo-700 border-indigo-200">
-                                        Escrow {order.escrow.status}
+                                        {__('admin.marketplace_escrow_status', { status: order.escrow.status })}
                                     </Badge>
                                 )}
                             </div>
@@ -261,7 +261,7 @@ export default function Show({ order }: { order: OrderDetail }) {
                                             <Button asChild variant="outline" size="sm">
                                                 <a href={`/storage/${file.file_path}`} download target="_blank" rel="noopener noreferrer">
                                                     <Download className="w-3.5 h-3.5 me-1" />
-                                                    {__('general.download_file') || 'Download'}
+                                                    {__('general.download_file')}
                                                 </a>
                                             </Button>
                                         </div>

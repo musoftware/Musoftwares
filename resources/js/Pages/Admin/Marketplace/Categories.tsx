@@ -32,9 +32,9 @@ export default function Categories({ categories }: any) {
         post(route('admin.marketplace.categories.store'), {
             onSuccess: () => {
                 reset();
-                toast.success(__('general.created') || 'Created');
+                toast.success(__('general.created'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -43,11 +43,11 @@ export default function Categories({ categories }: any) {
         router.delete(route('admin.marketplace.categories.destroy', pendingDelete), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -98,7 +98,7 @@ export default function Categories({ categories }: any) {
                                 <EmptyState
                                     icon={FolderTree}
                                     title={__('general.no_categories_found')}
-                                    description={__('general.create_your_first_category') || 'Create your first marketplace category.'}
+                                    description={__('general.create_your_first_category')}
                                 />
                             ) : (
                                 <Table>
@@ -136,8 +136,8 @@ export default function Categories({ categories }: any) {
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete') || 'Delete?'}
-                description={__('general.confirm_delete_category') || 'This category will be permanently deleted.'}
+                title={__('general.delete')}
+                description={__('general.confirm_delete_category')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

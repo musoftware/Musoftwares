@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\UserActivity;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ActivityService extends BaseService
 {
@@ -35,6 +36,7 @@ class ActivityService extends BaseService
                         $location = geoip()->getLocation($ip);
                         $isoCode = $location->iso_code ?? 'US';
                     } catch (\Exception $e) {
+                        Log::debug('GeoIP lookup failed, using default country', ['ip' => $ip, 'error' => $e->getMessage()]);
                     }
                 }
 
@@ -65,6 +67,7 @@ class ActivityService extends BaseService
                     $location = geoip()->getLocation($ip);
                     $isoCode = $location->iso_code ?? 'US';
                 } catch (\Exception $e) {
+                    Log::debug('GeoIP lookup failed, using default country', ['ip' => $ip, 'error' => $e->getMessage()]);
                 }
             }
 

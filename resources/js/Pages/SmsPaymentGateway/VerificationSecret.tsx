@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { ShieldAlert, ArrowLeft, RefreshCw, KeyRound, Copy, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface VerificationSecretProps {
     secret: string;
@@ -13,6 +14,7 @@ interface VerificationSecretProps {
 
 export default function VerificationSecret({ secret }: VerificationSecretProps) {
     const [copied, setCopied] = React.useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleCopy = () => {
         navigator.clipboard.writeText(secret);
@@ -20,10 +22,14 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const handleRegenerate = () => {
-        if (confirm('Are you sure you want to regenerate this secret? This will break existing webhook verifications until you update them.')) {
-            router.post(route('sms-payment-gateway.verification-secret.regenerate'));
-        }
+    const handleRegenerate = async () => {
+        const accepted = await confirm({
+            title: __('sms_gateway.secret_regenerate_title'),
+            description: __('sms_gateway.secret_regenerate_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.post(route('sms-payment-gateway.verification-secret.regenerate'));
     };
 
     return (
@@ -45,8 +51,8 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
                     <Card className="border-indigo-100 shadow-lg shadow-indigo-100/50">
                         <CardHeader className="bg-indigo-50/50 border-b border-indigo-100 pb-8">
                             <CardTitle className="text-indigo-900">{__('general.your_signature_key')}</CardTitle>
-                            <CardDescription className="text-indigo-700/80">{__('general.when_we_send_an_http_post_to_your_webhook_endpoint_we_include_an')}<code>{__('general.x_text_payment_gateway_signature')}</code> header. 
-                                Compute an HMAC SHA256 signature of the raw JSON payload using this secret to verify authenticity.
+                            <CardDescription className="text-indigo-700/80">
+                                {__('sms_gateway.secret_signature_intro')} <code dir="ltr">X-Musoftware-Signature</code>. {__('sms_gateway.secret_signature_compute')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="p-8">
@@ -55,16 +61,17 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
                                     <input 
                                         type="text" 
                                         readOnly 
-                                        value={secret} 
+                                        value={secret}
+                                        aria-label={__('sms_gateway.secret_value_label')}
                                         className="w-full font-mono text-center text-lg md:text-xl py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none text-slate-800 tracking-wider"
                                     />
                                 </div>
                                 <div className="flex gap-2 w-full md:w-auto">
                                     <Button onClick={handleCopy} size="lg" className="flex-1 md:flex-none h-14 bg-slate-900 hover:bg-slate-800">
                                         {copied ? <Check className="w-5 h-5 me-2 text-emerald-400" /> : <Copy className="w-5 h-5 me-2" />}
-                                        {copied ? 'Copied' : 'Copy'}
+                                        {copied ? __('sms_gateway.secret_copied') : __('general.copy')}
                                     </Button>
-                                    <Button onClick={handleRegenerate} size="lg" variant="outline" className="flex-1 md:flex-none h-14 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700">
+                                    <Button onClick={handleRegenerate} size="lg" variant="outline" aria-label={__('sms_gateway.secret_regenerate_title')} className="flex-1 md:flex-none h-14 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700">
                                         <RefreshCw className="w-5 h-5" />
                                     </Button>
                                 </div>
@@ -79,6 +86,7 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
                     </Card>
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

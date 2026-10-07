@@ -187,7 +187,8 @@ export default function Invoices({
                         <Link
                             href={route('billing.invoices.pay', row.uuid)}
                             className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 hover:bg-black/5 dark:hover:bg-zinc-700 text-[#1d1d1f]/60 dark:text-zinc-300 hover:text-[#1d1d1f] dark:hover:text-white inline-flex items-center justify-center transition-colors"
-                            title="View"
+                            title={__('client.invoices_view')}
+                            aria-label={__('client.invoices_view')}
                         >
                             <Eye className="w-3.5 h-3.5" />
                         </Link>
@@ -197,7 +198,8 @@ export default function Invoices({
                         className="w-8 h-8 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 hover:bg-black/5 dark:hover:bg-zinc-700 text-[#1d1d1f]/60 dark:text-zinc-300 hover:text-[#1d1d1f] dark:hover:text-white inline-flex items-center justify-center transition-colors"
                         target="_blank"
                         rel="noreferrer"
-                        title={__('general.download')}
+                        title={__('client.invoices_download')}
+                        aria-label={__('client.invoices_download')}
                     >
                         <Download className="w-3.5 h-3.5" />
                     </a>
@@ -256,7 +258,7 @@ export default function Invoices({
                     {/* Invoices List Table Card */}
                     <ContentCard
                         title={__('billing.billing_history')}
-                        subtitle="Track all issued and settled invoices with official tax statements."
+                        subtitle={__('client.invoices_history_subtitle')}
                     >
                         <DataTable
                             columns={columns}

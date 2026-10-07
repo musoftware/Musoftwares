@@ -30,12 +30,12 @@ export default function RuleBuilder({ rule }) {
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">{__('general.rule_name')}</label>
-                            <Input placeholder={__('general.e_g_block_vip_double_bookings')} defaultValue={rule?.name} />
+                            <label htmlFor="rule-name" className="text-sm font-medium">{__('general.rule_name')}</label>
+                            <Input id="rule-name" placeholder={__('general.e_g_block_vip_double_bookings')} defaultValue={rule?.name} />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">{__('general.trigger_event')}</label>
-                            <Input placeholder={__('general.e_g_booking_created')} defaultValue={rule?.event_trigger} />
+                            <label htmlFor="rule-trigger" className="text-sm font-medium">{__('general.trigger_event')}</label>
+                            <Input id="rule-trigger" placeholder={__('general.e_g_booking_created')} defaultValue={rule?.event_trigger} />
                         </div>
                     </div>
                 </CardContent>
@@ -47,7 +47,7 @@ export default function RuleBuilder({ rule }) {
                     <CardHeader className="bg-blue-50/50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center text-blue-700">
-                                <Settings2 className="me-2 h-5 w-5" /> IF (Conditions)
+                                <Settings2 className="me-2 h-5 w-5" /> {__('booking.rule_if_conditions')}
                             </CardTitle>
                             <Button size="sm" variant="outline" className="text-blue-600">
                                 <Plus className="h-4 w-4 me-1" />{__('general.add_group')}</Button>
@@ -58,7 +58,7 @@ export default function RuleBuilder({ rule }) {
                             <div className="text-center p-6 text-muted-foreground border-2 border-dashed rounded-lg">{__('general.no_conditions_defined_rule_will_always_execute')}</div>
                         ) : (
                             // Render draggable condition groups here
-                            <div>[Visual Condition Nodes]</div>
+                            <div>{__('booking.rule_condition_nodes')}</div>
                         )}
                     </CardContent>
                 </Card>
@@ -68,7 +68,7 @@ export default function RuleBuilder({ rule }) {
                     <CardHeader className="bg-emerald-50/50">
                         <div className="flex items-center justify-between">
                             <CardTitle className="flex items-center text-emerald-700">
-                                <GitMerge className="me-2 h-5 w-5" /> THEN (Actions)
+                                <GitMerge className="me-2 h-5 w-5" /> {__('booking.rule_then_actions')}
                             </CardTitle>
                             <Button size="sm" variant="outline" className="text-emerald-600">
                                 <Plus className="h-4 w-4 me-1" />{__('general.add_action')}</Button>
@@ -79,7 +79,7 @@ export default function RuleBuilder({ rule }) {
                             <div className="text-center p-6 text-muted-foreground border-2 border-dashed rounded-lg">{__('general.add_an_action_to_execute_when_conditions_are_met')}</div>
                         ) : (
                             // Render action stack here
-                            <div>[Visual Action Nodes]</div>
+                            <div>{__('booking.rule_action_nodes')}</div>
                         )}
                     </CardContent>
                 </Card>

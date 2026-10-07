@@ -20,6 +20,7 @@ import {
 } from '@/Components/ui/select';
 import { MoreHorizontal, Search, Plus, Trash2, Edit } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface CurrencyMini {
     id: number;
@@ -37,7 +38,7 @@ interface Exchange {
     currency_to?: CurrencyMini | null;
 }
 
-interface Pagination<T> {
+interface Paginated<T> {
     data: T[];
     links: { url: string | null; label: string; active: boolean }[];
     from: number;
@@ -46,7 +47,7 @@ interface Pagination<T> {
 }
 
 interface Props {
-    exchanges: Pagination<Exchange>;
+    exchanges: Paginated<Exchange>;
     currencies: CurrencyMini[];
     filters: { search: string; currency_id: string | null };
 }
@@ -164,7 +165,7 @@ export default function Index({ exchanges, currencies, filters }: Props) {
                                             <td className="px-4 py-3 text-end">
                                                 <Dialog>
                                                     <DialogTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <Button variant="ghost" className="h-8 w-8 p-0" aria-label={__('general.actions')} title={__('general.actions')}>
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DialogTrigger>
@@ -213,30 +214,9 @@ export default function Index({ exchanges, currencies, filters }: Props) {
                         </table>
                     </div>
 
-                    {exchanges.total > 0 && exchanges.links.length > 3 && (
-                        <div className="flex items-center justify-end gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                            <div className="me-auto flex items-center gap-1">
-                                {exchanges.links.map((link, idx) =>
-                                    link.url ? (
-                                        <button
-                                            key={idx}
-                                            onClick={() => router.visit(link.url!)}
-                                            className={`rounded-md px-3 py-1 text-sm transition-colors ${
-                                                link.active
-                                                    ? 'bg-slate-900 font-medium text-white shadow-sm'
-                                                    : 'text-slate-500 hover:bg-slate-100'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ) : (
-                                        <span
-                                            key={idx}
-                                            className="rounded-md px-3 py-1 text-sm text-slate-300 cursor-not-allowed"
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ),
-                                )}
-                            </div>
+                    {exchanges.total > 0 && (
+                        <div className="border-t border-slate-200 bg-slate-50 px-4 pb-3">
+                            <Pagination links={exchanges.links} />
                         </div>
                     )}
                 </div>

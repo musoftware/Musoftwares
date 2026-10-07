@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Award, Check, AlertCircle, Sparkles, Shield, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 interface RewardItem {
     id: number;
@@ -81,8 +82,8 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
             setRewards([
                 {
                     id: 1,
-                    name: '15% Deducted on Next Invoice',
-                    description: 'Applied automatically to your next engineering milestone or recurring sprint settlement.',
+                    name: __('client.loyalty_rewards_fallback_discount_name'),
+                    description: __('client.loyalty_rewards_fallback_discount_desc'),
                     reward_type: 'invoice_discount',
                     points_cost: 300,
                     discount_value: 15,
@@ -90,8 +91,8 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                 },
                 {
                     id: 2,
-                    name: '5 Hours Priority Incident Response',
-                    description: 'Dedicated core engineer availability for zero-hour patches, audits, or load balancing.',
+                    name: __('client.loyalty_rewards_fallback_support_name'),
+                    description: __('client.loyalty_rewards_fallback_support_desc'),
                     reward_type: 'free_maintenance_hours',
                     points_cost: 600,
                     discount_value: 5,
@@ -99,8 +100,8 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                 },
                 {
                     id: 3,
-                    name: '30-Day Desktop Runtime License Lease',
-                    description: 'Complimentary activation lease for background automation and headless scraper workers.',
+                    name: __('client.loyalty_rewards_fallback_license_name'),
+                    description: __('client.loyalty_rewards_fallback_license_desc'),
                     reward_type: 'license_extension',
                     points_cost: 450,
                     discount_value: 30,
@@ -116,7 +117,7 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
         if (userPoints < reward.points_cost) {
             setStatusMsg({
                 type: 'error',
-                text: 'Insufficient loyalty capital to acquire this privilege.',
+                text: __('client.loyalty_rewards_insufficient'),
             });
             return;
         }
@@ -130,7 +131,7 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
 
             setStatusMsg({
                 type: 'success',
-                text: `Successfully unlocked "${reward.name}". Your benefit is active immediately.`,
+                text: __('client.loyalty_rewards_success', { name: reward.name }),
             });
 
             if (newBal !== undefined) {
@@ -139,7 +140,7 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
         } catch (err: any) {
             setStatusMsg({
                 type: 'error',
-                text: err.response?.data?.message || 'Transaction could not be completed. Please try again.',
+                text: err.response?.data?.message || __('client.loyalty_rewards_failed'),
             });
         } finally {
             setRedeemingId(null);
@@ -164,12 +165,13 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                             <Award className="w-4 h-4" />
                         </div>
                         <h3 className="text-lg font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
-                            Loyalty Rewards & Benefits
+                            {__('client.loyalty_rewards_title')}
                         </h3>
                     </div>
                     <button
                         type="button"
                         onClick={onClose}
+                        aria-label={__('general.close')}
                         className="p-2 rounded-full text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                     >
                         <X className="w-4 h-4" />
@@ -179,10 +181,10 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                 {/* Balance Status Banner */}
                 <div className="mt-4 p-3.5 rounded-2xl bg-[#f5f5f7] dark:bg-zinc-900/90 border border-black/5 dark:border-white/5 flex items-center justify-between text-xs font-mono">
                     <span className="text-zinc-600 dark:text-zinc-400">
-                        Available Balance: <strong className="text-[#1d1d1f] dark:text-white text-sm font-semibold tabular-nums ml-1">{userPoints.toLocaleString()} PTS</strong>
+                        {__('client.loyalty_rewards_available_balance')} <strong className="text-[#1d1d1f] dark:text-white text-sm font-semibold tabular-nums ms-1">{__('client.loyalty_page_points_value', { points: userPoints.toLocaleString() })}</strong>
                     </span>
                     <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
-                        Points are non-expiring
+                        {__('client.loyalty_rewards_non_expiring')}
                     </span>
                 </div>
 
@@ -196,9 +198,9 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                 {/* Privilege Cards */}
                 <div className="mt-4 space-y-3 overflow-y-auto pr-1 flex-1 min-h-0">
                     {loading ? (
-                        <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500 font-mono">Retrieving privilege catalog...</div>
+                        <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500 font-mono">{__('client.loyalty_rewards_loading')}</div>
                     ) : rewards.length === 0 ? (
-                        <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500 font-mono">No rewards available at this time.</div>
+                        <div className="py-12 text-center text-xs text-zinc-400 dark:text-zinc-500 font-mono">{__('client.loyalty_rewards_empty')}</div>
                     ) : (
                         rewards.map((reward) => {
                             const canAfford = userPoints >= reward.points_cost;
@@ -212,7 +214,7 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                                         <div className="text-sm font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-2">
                                             <span>{reward.name}</span>
                                             <span className="font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-black/10 dark:border-white/10 text-zinc-700 dark:text-zinc-300 tabular-nums">
-                                                {reward.points_cost} PTS
+                                                {__('client.loyalty_page_points_value', { points: reward.points_cost })}
                                             </span>
                                         </div>
                                         <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-sm leading-relaxed">
@@ -231,10 +233,10 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                                         }`}
                                     >
                                         {redeemingId === reward.id
-                                            ? 'Settling...'
+                                            ? __('client.loyalty_rewards_settling')
                                             : canAfford
-                                            ? 'Unlock Privilege'
-                                            : 'Requires Capital'}
+                                            ? __('client.loyalty_rewards_unlock')
+                                            : __('client.loyalty_rewards_requires_capital')}
                                     </button>
                                 </div>
                             );
@@ -248,7 +250,7 @@ export const RewardsCatalogModal: React.FC<RewardsCatalogModalProps> = ({
                         onClick={onClose}
                         className="px-5 py-2 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:text-white border border-black/10 dark:border-white/5 transition-colors cursor-pointer"
                     >
-                        Close
+                        {__('general.close')}
                     </button>
                 </div>
             </div>

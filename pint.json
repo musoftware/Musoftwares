@@ -1,0 +1,10 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "Modules/SmsPaymentGateway/sdk",
+        "wordpress-plugins",
+        "storage",
+        "bootstrap/cache",
+        "node_modules"
+    ]
+}

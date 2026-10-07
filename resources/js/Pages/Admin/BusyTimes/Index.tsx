@@ -44,6 +44,11 @@ interface Props {
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+function dayLabel(day: string | null): string {
+    if (!day) return '—';
+    return DAYS_OF_WEEK.includes(day) ? __(`admin.day_${day.toLowerCase()}`) : day;
+}
+
 export default function Index({ busyTimes, filters, stats }: Props) {
     const [pendingDelete, setPendingDelete] = useState<BusyTime | null>(null);
     const handleFilter = (key: string, value: string) => {
@@ -77,8 +82,8 @@ export default function Index({ busyTimes, filters, stats }: Props) {
             {},
             {
                 preserveState: true,
-                onSuccess: () => toastSuccess(__('general.status_updated') || `Busy time ${row.is_active ? 'deactivated' : 'activated'}.`),
-                onError: () => toastError(__('general.failed_update_status') || 'Failed to update status.'),
+                onSuccess: () => toastSuccess(__('general.status_updated')),
+                onError: () => toastError(__('general.failed_update_status')),
             }
         );
     };
@@ -88,8 +93,8 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         const id = pendingDelete.id;
         setPendingDelete(null);
         router.delete(`/admin/busy-times/${id}`, {
-            onSuccess: () => toastSuccess(__('general.deleted') || 'Busy time deleted.'),
-            onError: () => toastError(__('general.failed_delete') || 'Failed to delete.'),
+            onSuccess: () => toastSuccess(__('general.deleted')),
+            onError: () => toastError(__('general.failed_delete')),
         });
     };
 
@@ -102,7 +107,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
     const columns = [
         {
             key: 'id',
-            label: 'ID',
+            label: __('general.id'),
             sortable: true,
             className: 'w-[60px]',
             render: (row: BusyTime) => (
@@ -111,7 +116,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         },
         {
             key: 'user',
-            label: 'User',
+            label: __('general.user'),
             render: (row: BusyTime) => (
                 <div className="flex flex-col">
                     {row.user ? (
@@ -132,7 +137,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         },
         {
             key: 'type',
-            label: 'Type',
+            label: __('general.type'),
             render: (row: BusyTime) => (
                 <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
@@ -151,11 +156,11 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         },
         {
             key: 'schedule',
-            label: 'Schedule',
+            label: __('general.schedule'),
             render: (row: BusyTime) => (
                 <div className="flex flex-col gap-0.5">
                     {row.is_recurring ? (
-                        <span className="font-medium text-slate-700">{row.day_of_week ?? '—'}</span>
+                        <span className="font-medium text-slate-700">{dayLabel(row.day_of_week)}</span>
                     ) : (
                         <span className="font-medium text-slate-700">
                             {row.specific_date
@@ -179,7 +184,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         },
         {
             key: 'reason',
-            label: 'Reason',
+            label: __('general.reason'),
             render: (row: BusyTime) => (
                 <span className="text-slate-600 text-sm line-clamp-1 max-w-[180px]" title={row.reason ?? ''}>
                     {row.reason || <span className="text-slate-400 italic">{__('general.no_reason')}</span>}
@@ -188,20 +193,20 @@ export default function Index({ busyTimes, filters, stats }: Props) {
         },
         {
             key: 'is_active',
-            label: 'Status',
+            label: __('general.status'),
             render: (row: BusyTime) => (
                 <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
                         row.is_active ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-500'
                     }`}
                 >
-                    {row.is_active ? 'Active' : 'Inactive'}
+                    {row.is_active ? __('general.active') : __('general.inactive')}
                 </span>
             ),
         },
         {
             key: 'created_at',
-            label: 'Created',
+            label: __('general.created'),
             sortable: true,
             render: (row: BusyTime) => (
                 <span className="text-slate-500 text-sm whitespace-nowrap">
@@ -268,14 +273,14 @@ export default function Index({ busyTimes, filters, stats }: Props) {
             >
                 <option value="">{__('general.all_days')}</option>
                 {DAYS_OF_WEEK.map((d) => (
-                    <option key={d} value={d}>{d}</option>
+                    <option key={d} value={d}>{dayLabel(d)}</option>
                 ))}
             </select>
         </div>
     );
 
     return (
-        <AdminSidebarLayout title={__('general.busy_times')} header="User Busy Times">
+        <AdminSidebarLayout title={__('general.busy_times')} header={__('general.busy_times')}>
             <Head title={__('general.busy_times')} />
 
             {/* Stats */}
@@ -305,14 +310,14 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 filters={{ ...filters, extra: advancedFilters }}
                 onSearch={handleSearch}
                 onSort={handleSort}
-                emptyTitle="No busy times found"
-                emptyDescription="Users haven't configured any busy time slots yet."
+                emptyTitle={__('admin.busy_times_empty_title')}
+                emptyDescription={__('admin.busy_times_empty_description')}
             />
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete') || 'Delete busy time?'}
-                description={__('general.confirm_delete_busy_time') || `This will permanently delete the busy time entry for ${pendingDelete?.user?.name ?? 'unknown user'}.`}
+                title={__('general.delete')}
+                description={__('general.confirm_delete_busy_time')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

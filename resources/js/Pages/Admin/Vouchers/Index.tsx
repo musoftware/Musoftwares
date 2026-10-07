@@ -19,7 +19,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Ticket, Plus, Pencil, Trash2, CheckCircle, XCircle, MoreHorizontal } from 'lucide-react';
+import { Ticket, Plus, Pencil, Trash2, CheckCircle, XCircle, MoreHorizontal, ArrowRight } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
@@ -34,6 +34,7 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 const emptyForm = {
     name: '',
@@ -90,9 +91,9 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
             onSuccess: () => {
                 setIsCreateOpen(false);
                 resetForm();
-                toastSuccess(__('general.created') || 'Voucher created');
+                toastSuccess(__('general.created'));
             },
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -103,9 +104,9 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
                 setIsEditOpen(false);
                 setEditingVoucher(null);
                 resetForm();
-                toastSuccess(__('general.updated') || 'Voucher updated');
+                toastSuccess(__('general.updated'));
             },
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -135,8 +136,8 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
         const id = pendingDelete.id;
         setPendingDelete(null);
         router.delete(route('admin.vouchers.destroy', id), {
-            onSuccess: () => toastSuccess(__('general.deleted') || 'Voucher deleted'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.deleted')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -229,7 +230,7 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
 
             {formData.type === 'percentage' && (
                 <div>
-                    <Label htmlFor="reward_percentage">Reward Percentage (%)</Label>
+                    <Label htmlFor="reward_percentage">{__('admin.vouchers_reward_percentage')}</Label>
                     <Input
                         id="reward_percentage"
                         type="number"
@@ -318,13 +319,13 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
     const paginationLinks = vouchers?.links;
 
     return (
-        <AdminSidebarLayout title={__('general.vouchers')} header="Vouchers Manager">
+        <AdminSidebarLayout title={__('general.vouchers')} header={__('admin.vouchers_header')}>
             <Head title={__('general.admin_vouchers')} />
 
             <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Ticket className="h-4 w-4" />
-                    <span>{items.length} voucher{items.length !== 1 ? 's' : ''}</span>
+                    <span>{__('admin.vouchers_count', { count: items.length })}</span>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -348,8 +349,8 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
             {items.length === 0 ? (
                 <EmptyState
                     icon={Ticket}
-                    title={__('general.no_vouchers_found') || 'No vouchers found'}
-                    description={__('general.create_first_voucher') || 'Create your first voucher to reward customers.'}
+                    title={__('general.no_vouchers_found')}
+                    description={__('general.create_first_voucher')}
                 />
             ) : (
                 <Card className="overflow-hidden">
@@ -381,7 +382,7 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                                     : 'bg-blue-50 text-blue-700 border border-blue-200'
                                             }`}>
-                                                {v.type}
+                                                {v.type === 'fixed' ? __('general.fixed') : __('general.percentage')}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-700">
@@ -389,7 +390,7 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
                                             {v.spend_currency && v.spend_currency.currency && (
                                                 <span className="text-gray-400 ms-1">{v.spend_currency.currency}</span>
                                             )}
-                                            <span className="mx-2 text-gray-400">→</span>
+                                            <ArrowRight className="mx-2 inline h-3.5 w-3.5 text-gray-400 rtl:rotate-180" aria-hidden="true" />
                                             <span className="font-medium">
                                                 {v.type === 'percentage'
                                                     ? `${parseFloat(String(v.reward_percentage ?? 0)).toFixed(2)}%`
@@ -437,21 +438,7 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
                 </Card>
             )}
 
-            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-center gap-1">
-                    {paginationLinks.map((link: any, i: number) => (
-                        <Button
-                            key={i}
-                            variant={link.active ? 'default' : 'outline'}
-                            size="sm"
-                            disabled={!link.url}
-                            onClick={() => link.url && router.visit(link.url)}
-                        >
-                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                        </Button>
-                    ))}
-                </div>
-            )}
+            <Pagination links={Array.isArray(paginationLinks) ? paginationLinks : []} />
 
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-lg">
@@ -471,8 +458,8 @@ export default function Index({ vouchers, currencies = [] }: { vouchers: any; cu
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete_voucher') || 'Delete voucher?'}
-                description={__('general.confirm_delete_voucher_desc') || `This will permanently delete voucher "${pendingDelete?.name}".`}
+                title={__('general.delete_voucher')}
+                description={__('general.confirm_delete_voucher_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

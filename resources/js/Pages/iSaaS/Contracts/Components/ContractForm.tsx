@@ -167,7 +167,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
     // AI Logic
     const handleAiGenerate = async () => {
         if (!data.project_name) {
-            toast.error('Project Name is required to generate content.');
+            toast.error(__('general.isaas_contract_ai_name_required'));
             return;
         }
 
@@ -208,10 +208,10 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                 
                 setData(newData);
                 if (newData.items.length > 0) recalculateTotal(newData.items);
-                toast.success('Empty fields populated by AI.');
+                toast.success(__('general.isaas_contract_ai_populated'));
             }
         } catch (error: any) {
-            toast.error((error as any).response?.data?.error || 'Failed to generate content with AI');
+            toast.error((error as any).response?.data?.error || __('general.isaas_contract_ai_generate_failed'));
         } finally {
             setIsGenerating(false);
         }
@@ -219,7 +219,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
 
     const handleAiReview = async () => {
         if (!data.description || data.description.length < 50) {
-            toast.error('Description is too short for AI review.');
+            toast.error(__('general.isaas_contract_ai_description_short'));
             return;
         }
 
@@ -232,12 +232,12 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
             const aiData = response.data.data;
             if (aiData && aiData.refined_content) {
                 setData('description', aiData.refined_content);
-                toast.success('Contract reviewed by AI.', {
-                    description: `Issues: ${aiData.critical_issues?.length || 0}, Suggestions: ${aiData.suggestions?.length || 0}`
+                toast.success(__('general.isaas_contract_ai_reviewed'), {
+                    description: __('general.isaas_contract_ai_review_summary', { issues: aiData.critical_issues?.length || 0, suggestions: aiData.suggestions?.length || 0 })
                 });
             }
         } catch (error: any) {
-            toast.error((error as any).response?.data?.error || 'Failed to review content with AI');
+            toast.error((error as any).response?.data?.error || __('general.isaas_contract_ai_review_failed'));
         } finally {
             setIsReviewing(false);
         }
@@ -311,20 +311,20 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             </div>
 
                             <div className="pt-4 border-t">
-                                <h3 className="text-sm font-medium mb-3">Pricing Breakdown (Items)</h3>
+                                <h3 className="text-sm font-medium mb-3">{__('general.isaas_contract_pricing_breakdown')}</h3>
                                 
                                 <div className="space-y-3">
                                     {data.items.map((item, index) => (
                                         <div key={index} className="flex flex-col md:flex-row gap-2 items-start border p-3 rounded-md bg-gray-50">
                                             <div className="flex-1 space-y-2">
-                                                <Input placeholder={__('general.item_name_e_g_ui_design')} value={item.item} onChange={e => updateItem(index, 'item', e.target.value)} />
-                                                <Input placeholder={__('general.short_description')} value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
+                                                <Input aria-label={__('general.item_name_e_g_ui_design')} placeholder={__('general.item_name_e_g_ui_design')} value={item.item} onChange={e => updateItem(index, 'item', e.target.value)} />
+                                                <Input aria-label={__('general.short_description')} placeholder={__('general.short_description')} value={item.description} onChange={e => updateItem(index, 'description', e.target.value)} />
                                             </div>
                                             <div className="w-24">
-                                                <Input type="number" placeholder={__('general.hours')} value={item.hours} onChange={e => updateItem(index, 'hours', parseFloat(e.target.value))} />
+                                                <Input aria-label={__('general.hours')} type="number" placeholder={__('general.hours')} value={item.hours} onChange={e => updateItem(index, 'hours', parseFloat(e.target.value))} />
                                             </div>
                                             <div className="w-32 space-y-2">
-                                                <Input type="number" placeholder={__('general.rate_fixed')} value={item.hourly_rate_egp} onChange={e => updateItem(index, 'hourly_rate_egp', parseFloat(e.target.value))} />
+                                                <Input aria-label={__('general.rate_fixed')} type="number" placeholder={__('general.rate_fixed')} value={item.hourly_rate_egp} onChange={e => updateItem(index, 'hourly_rate_egp', parseFloat(e.target.value))} />
                                                 <Select value={item.frequency} onValueChange={v => updateItem(index, 'frequency', v)}>
                                                     <SelectTrigger><SelectValue/></SelectTrigger>
                                                     <SelectContent>
@@ -335,9 +335,9 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                                 </Select>
                                             </div>
                                             <div className="w-32">
-                                                <Input type="number" placeholder={__('general.subtotal')} value={item.subtotal_egp} onChange={e => updateItem(index, 'subtotal_egp', parseFloat(e.target.value))} />
+                                                <Input aria-label={__('general.subtotal')} type="number" placeholder={__('general.subtotal')} value={item.subtotal_egp} onChange={e => updateItem(index, 'subtotal_egp', parseFloat(e.target.value))} />
                                             </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeItem(index)}>
+                                            <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeItem(index)} aria-label={__('general.isaas_contract_remove_item')}>
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
@@ -348,12 +348,12 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             </div>
 
                             <div className="pt-4 border-t">
-                                <h3 className="text-sm font-medium mb-3">{__('general.key_features')}<span className="text-gray-400 font-normal">(Quotation Bullet Points)</span></h3>
+                                <h3 className="text-sm font-medium mb-3">{__('general.key_features')}<span className="text-gray-400 font-normal">{__('general.isaas_contract_bullet_points')}</span></h3>
                                 <div className="space-y-2">
                                     {data.features.map((feature, index) => (
                                         <div key={index} className="flex gap-2">
-                                            <Input value={feature} onChange={e => updateFeature(index, e.target.value)} />
-                                            <Button type="button" variant="outline" size="icon" className="text-red-500 shrink-0" onClick={() => removeFeature(index)}>
+                                            <Input value={feature} onChange={e => updateFeature(index, e.target.value)} aria-label={__('general.key_features')} />
+                                            <Button type="button" variant="outline" size="icon" className="text-red-500 shrink-0" onClick={() => removeFeature(index)} aria-label={__('general.isaas_contract_remove_feature')}>
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
@@ -405,7 +405,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             <div>
                                 <Label>{__('general.status')}</Label>
                                 <Select value={data.status} onValueChange={v => setData('status', v)}>
-                                    <SelectTrigger className="mt-1"><SelectValue/></SelectTrigger>
+                                    <SelectTrigger aria-label={__('general.status')} className="mt-1"><SelectValue/></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="draft">{__('general.draft')}</SelectItem>
                                         <SelectItem value="sent">{__('general.sent_to_client')}</SelectItem>
@@ -419,17 +419,17 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                             <div>
                                 <Label>{__('general.contract_language')}</Label>
                                 <Select value={data.lang} onValueChange={v => setData('lang', v)}>
-                                    <SelectTrigger className="mt-1"><SelectValue/></SelectTrigger>
+                                    <SelectTrigger aria-label={__('general.contract_language')} className="mt-1"><SelectValue/></SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="ar">Arabic (RTL)</SelectItem>
-                                        <SelectItem value="en">English (LTR)</SelectItem>
+                                        <SelectItem value="ar">{__('general.isaas_contract_lang_ar')}</SelectItem>
+                                        <SelectItem value="en">{__('general.isaas_contract_lang_en')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div>
-                                <Label>Link to Project ID (Optional)</Label>
-                                <Input type="number" value={data.project_id} onChange={e => setData('project_id', e.target.value)} className="mt-1" />
+                                <Label htmlFor="project_id">{__('general.isaas_contract_project_id')}</Label>
+                                <Input id="project_id" type="number" value={data.project_id} onChange={e => setData('project_id', e.target.value)} className="mt-1" />
                             </div>
 
                             <div className="pt-4 border-t">
@@ -438,7 +438,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                 {data.user_id ? (
                                     <div className="flex items-center justify-end gap-4 p-3 border rounded-md bg-gray-50">
                                         <span className="text-sm font-medium">{selectedClientName}</span>
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => { setData('user_id', null); setSelectedClientName(''); }}>
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => { setData('user_id', null); setSelectedClientName(''); }} aria-label={__('general.isaas_contract_clear_client')}>
                                             <X className="w-4 h-4 text-red-500" />
                                         </Button>
                                     </div>
@@ -446,13 +446,14 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     <div className="space-y-3">
                                         <div>
                                             <Label className="text-xs text-gray-500">{__('general.manual_client_name')}</Label>
-                                            <Input value={data.client_name} onChange={e => setData('client_name', e.target.value)} placeholder={__('general.enter_guest_name')} className="mt-1" />
+                                            <Input aria-label={__('general.manual_client_name')} value={data.client_name} onChange={e => setData('client_name', e.target.value)} placeholder={__('general.enter_guest_name')} className="mt-1" />
                                         </div>
                                         
                                         <div className="relative">
                                             <Search className="w-4 h-4 absolute start-3 top-3 text-gray-400" />
                                             <Input 
                                                 className="ps-9" 
+                                                aria-label={__('general.search_system_users')}
                                                 placeholder={__('general.search_system_users')} 
                                                 value={clientSearch}
                                                 onChange={e => setClientSearch(e.target.value)}
@@ -486,26 +487,26 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                         <CardContent className="space-y-4">
                             <div>
                                 <Label>{__('general.quotation_reference')}</Label>
-                                <Input value={data.reference} onChange={e => setData('reference', e.target.value)} className="mt-1" />
+                                <Input aria-label={__('general.quotation_reference')} value={data.reference} onChange={e => setData('reference', e.target.value)} className="mt-1" />
                             </div>
                             <div>
                                 <Label>{__('general.prepared_by')}</Label>
-                                <Input value={data.prepared_by} onChange={e => setData('prepared_by', e.target.value)} className="mt-1" />
+                                <Input aria-label={__('general.prepared_by')} value={data.prepared_by} onChange={e => setData('prepared_by', e.target.value)} className="mt-1" />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <Label>{__('general.valid_until')}</Label>
-                                    <Input type="date" value={data.valid_until} onChange={e => setData('valid_until', e.target.value)} className="mt-1" />
+                                    <Input aria-label={__('general.valid_until')} type="date" value={data.valid_until} onChange={e => setData('valid_until', e.target.value)} className="mt-1" />
                                 </div>
                                 <div>
                                     <Label>{__('general.duration')}</Label>
-                                    <Input placeholder={__('general.e_g_15_days')} value={data.duration} onChange={e => setData('duration', e.target.value)} className="mt-1" />
+                                    <Input aria-label={__('general.duration')} placeholder={__('general.e_g_15_days')} value={data.duration} onChange={e => setData('duration', e.target.value)} className="mt-1" />
                                 </div>
                             </div>
                             
                             <div>
-                                <Label>Project Description (Brief)</Label>
-                                <Textarea rows={2} value={data.project_description} onChange={e => setData('project_description', e.target.value)} className="mt-1" />
+                                <Label>{__('general.isaas_contract_project_description_brief')}</Label>
+                                <Textarea aria-label={__('general.isaas_contract_project_description_brief')} rows={2} value={data.project_description} onChange={e => setData('project_description', e.target.value)} className="mt-1" />
                             </div>
 
                             <div className="space-y-3 pt-3 border-t">
@@ -514,7 +515,7 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     <Label htmlFor="includes_hosting">{__('general.includes_hosting')}</Label>
                                 </div>
                                 {data.includes_hosting && (
-                                    <Input placeholder={__('general.hosting_duration_e_g_1_year')} value={data.hosting_duration} onChange={e => setData('hosting_duration', e.target.value)} />
+                                    <Input aria-label={__('general.hosting_duration_e_g_1_year')} placeholder={__('general.hosting_duration_e_g_1_year')} value={data.hosting_duration} onChange={e => setData('hosting_duration', e.target.value)} />
                                 )}
 
                                 <div className="flex items-center space-x-2">
@@ -522,18 +523,18 @@ export default function ContractForm({ contract, currencies }: ContractFormProps
                                     <Label htmlFor="includes_support">{__('general.includes_support')}</Label>
                                 </div>
                                 {data.includes_support && (
-                                    <Input placeholder={__('general.support_duration_e_g_3_months')} value={data.support_duration} onChange={e => setData('support_duration', e.target.value)} />
+                                    <Input aria-label={__('general.support_duration_e_g_3_months')} placeholder={__('general.support_duration_e_g_3_months')} value={data.support_duration} onChange={e => setData('support_duration', e.target.value)} />
                                 )}
                             </div>
 
                             <div className="space-y-3 pt-3 border-t">
                                 <div>
                                     <Label>{__('general.extra_notes')}</Label>
-                                    <Textarea rows={2} value={data.notes} onChange={e => setData('notes', e.target.value)} className="mt-1" />
+                                    <Textarea aria-label={__('general.extra_notes')} rows={2} value={data.notes} onChange={e => setData('notes', e.target.value)} className="mt-1" />
                                 </div>
                                 <div>
                                     <Label>{__('general.special_terms')}</Label>
-                                    <Textarea rows={2} value={data.terms} onChange={e => setData('terms', e.target.value)} className="mt-1" />
+                                    <Textarea aria-label={__('general.special_terms')} rows={2} value={data.terms} onChange={e => setData('terms', e.target.value)} className="mt-1" />
                                 </div>
                             </div>
                         </CardContent>

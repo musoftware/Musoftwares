@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ReferralService extends BaseService
 {
@@ -133,7 +134,7 @@ class ReferralService extends BaseService
                 ]
             );
         } catch (\Throwable $e) {
-            // Gracefully ignore if loyalty rule isn't active
+            Log::error('Referral: loyalty award for registration failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
 
         event(new Registered($user));

@@ -210,8 +210,16 @@ Route::get('currencies', function () {
         $code = strtoupper($currency->currency);
         if (isset($rates[$code])) {
             $usdRates[$currency->id] = $rates[$code];
-        } else {
+
+            continue;
+        }
+
+        try {
             $usdRates[$currency->id] = \App\Models\CurrenciesExchange::RateToday(1, $usdId, $currency->id);
+        } catch (\App\Exceptions\MissingExchangeRateException $e) {
+            // Rate list is informational; one missing pair must not break the whole endpoint.
+            \Illuminate\Support\Facades\Log::warning('Currencies API: missing exchange rate.', ['currency_id' => $currency->id, 'error' => $e->getMessage()]);
+            $usdRates[$currency->id] = null;
         }
     }
 

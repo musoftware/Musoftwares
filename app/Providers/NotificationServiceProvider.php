@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Helpers\MuFcmChannel;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Log;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -36,7 +37,7 @@ class NotificationServiceProvider extends ServiceProvider
                 return;
             }
         } catch (\Throwable $e) {
-            // channel() throws when the driver is not registered yet — proceed.
+            Log::debug('FCM channel not registered yet, extending it now', ['error' => $e->getMessage()]);
         }
 
         $manager->extend('fcm', function () {

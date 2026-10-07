@@ -454,11 +454,11 @@ class UserEditAuditTest extends TestCase
     public function test_kyc_can_be_unverified_too(): void
     {
         // First mark as verified
-        $this->target->update([
+        $this->target->forceFill([
             'kyc_verified' => true,
             'kyc_verified_at' => now(),
             'kyc_verified_by' => $this->admin->id,
-        ]);
+        ])->save();
 
         $response = $this->actingAs($this->admin)->put(
             "/admin/users/{$this->targetId}",

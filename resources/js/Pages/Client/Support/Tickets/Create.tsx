@@ -35,48 +35,20 @@ interface Props {
 }
 
 interface PresetOption {
-    id: string;
-    title: string;
+    id: 'quote' | 'project_inquiry' | 'urgent' | 'modification';
     icon: React.ComponentType<{ className?: string }>;
     priority: 'Low' | 'Medium' | 'High';
-    defaultSubject: string;
-    defaultDescription: string;
 }
 
 const PRESETS: PresetOption[] = [
-    {
-        id: 'quote',
-        title: 'طلب تسعير ميزة',
-        icon: DollarSign,
-        priority: 'Medium',
-        defaultSubject: 'طلب تسعير ميزة جديدة: ',
-        defaultDescription: 'أرغب في الاستفسار عن إمكانية وتكلفة تنفيذ الميزة التالية:\n\n1. تفاصيل الميزة المطلوبة:\n\n2. المخرجات المتوقعة:\n\n3. الموعد المفضل للتسليم (إن وجد):\n',
-    },
-    {
-        id: 'project_inquiry',
-        title: 'استفسار مشروع',
-        icon: HelpCircle,
-        priority: 'Medium',
-        defaultSubject: 'استفسار بخصوص المشروع: ',
-        defaultDescription: 'السلام عليكم، لدي استفسار بخصوص سير العمل في المشروع:\n\n- البند المطلوب توضيحه:\n\n- الاستفسار:\n',
-    },
-    {
-        id: 'urgent',
-        title: 'مشكلة فنية عاجلة',
-        icon: ShieldAlert,
-        priority: 'High',
-        defaultSubject: 'مشكلة عاجلة: ',
-        defaultDescription: 'نواجه مشكلة تتطلب فحصاً فورياً:\n\n1. وصف المشكلة:\n\n2. الخطوات المؤدية لحدوثها:\n\n3. الأثر الحالي:\n',
-    },
-    {
-        id: 'modification',
-        title: 'طلب تعديل أو تحسين',
-        icon: FileEdit,
-        priority: 'Low',
-        defaultSubject: 'طلب تعديل على: ',
-        defaultDescription: 'أود طلب تعديل على الجزء التالي:\n\n- الجزء المطلوب تعديله:\n\n- التعديل المقترح:\n\n- الهدف من التعديل:\n',
-    },
+    { id: 'quote', icon: DollarSign, priority: 'Medium' },
+    { id: 'project_inquiry', icon: HelpCircle, priority: 'Medium' },
+    { id: 'urgent', icon: ShieldAlert, priority: 'High' },
+    { id: 'modification', icon: FileEdit, priority: 'Low' },
 ];
+
+const presetText = (preset: PresetOption, field: 'title' | 'subject' | 'description') =>
+    __(`client.ticket_create_preset_${preset.id}_${field}`);
 
 // Max video size allowed in bytes (3MB)
 const MAX_VIDEO_SIZE = 3 * 1024 * 1024;
@@ -143,9 +115,9 @@ export default function Create({ projects = [], initialProjectId = null }: Props
         setActivePreset(preset.id);
         setData((prev) => ({
             ...prev,
-            subject: prev.subject && prev.subject.trim() !== '' ? prev.subject : preset.defaultSubject,
+            subject: prev.subject && prev.subject.trim() !== '' ? prev.subject : presetText(preset, 'subject'),
             priority: preset.priority,
-            description: prev.description && prev.description.trim() !== '' ? prev.description : preset.defaultDescription,
+            description: prev.description && prev.description.trim() !== '' ? prev.description : presetText(preset, 'description'),
         }));
     };
 
@@ -195,7 +167,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
 
         if (file.size > MAX_VIDEO_SIZE) {
             setAttachmentError(
-                `حجم الفيديو (${(file.size / 1024 / 1024).toFixed(1)}MB) يتجاوز الحد الأقصى المسموح وهو 3 ميجابايت (3MB). يرجى اختيار مقطع أقصر أو ضغطه.`
+                __('client.ticket_create_video_too_large', { size: (file.size / 1024 / 1024).toFixed(1) })
             );
             if (videoInputRef.current) videoInputRef.current.value = '';
             return;
@@ -212,7 +184,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
     const startVoiceRecording = async () => {
         try {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                setAttachmentError('المتصفح الحالي لا يدعم تسجيل الصوت المباشر.');
+                setAttachmentError(__('client.ticket_create_recording_unsupported'));
                 return;
             }
 
@@ -280,7 +252,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
 
         } catch (err: any) {
             console.error('Microphone access denied:', err);
-            setAttachmentError('تعذر الوصول إلى الميكروفون. يرجى التأكد من منح الإذن للمتصفح.');
+            setAttachmentError(__('client.ticket_create_microphone_denied'));
         }
     };
 
@@ -335,7 +307,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${__('general.open_new_ticket') || 'فتح تذكرة دعم واستفسار'} — Musoftwares`} />
+            <Head title={`${__('client.ticket_create_title')} — Musoftwares`} />
 
             {/* Hidden Native File Inputs */}
             <input
@@ -370,15 +342,15 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                             className="inline-flex items-center gap-2 text-xs font-semibold text-[#1d1d1f]/70 dark:text-white/70 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                            <span>{__('general.back_to_tickets') || 'العودة لتذاكر الدعم'}</span>
+                            <span>{__('general.back_to_tickets')}</span>
                         </Link>
 
                         {/* Discreet Loyalty Incentive Badge */}
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/[0.03] dark:bg-white/[0.06] border border-black/5 dark:border-white/10 text-xs font-medium">
                             <Sparkles className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#2997ff]" />
-                            <span className="text-[#1d1d1f] dark:text-white font-semibold">+15 نقطة ولاء</span>
+                            <span className="text-[#1d1d1f] dark:text-white font-semibold">{__('client.ticket_create_loyalty_points')}</span>
                             <span className="text-black/30 dark:text-white/30">|</span>
-                            <span className="text-black/60 dark:text-white/60">+25 عند الإغلاق</span>
+                            <span className="text-black/60 dark:text-white/60">{__('client.ticket_create_loyalty_on_close')}</span>
                         </div>
                     </div>
                 </header>
@@ -389,17 +361,17 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                     {/* Header Section */}
                     <div className="text-start mb-10">
                         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-white">
-                            {__('general.open_new_ticket') || 'فتح تذكرة دعم واستفسار'}
+                            {__('client.ticket_create_title')}
                         </h1>
                         <p className="mt-3 text-base text-[#1d1d1f]/60 dark:text-white/60 leading-relaxed max-w-xl">
-                            صف استفسارك أو طلبك بدقة أدناه، ويمكنك إرفاق صور، تسجيل صوتك لشرح التفاصيل، أو إرفاق فيديو توضيحي قصير (3MB).
+                            {__('client.ticket_create_intro')}
                         </p>
                     </div>
 
                     {/* Presets - Apple Segmented Chips */}
                     <div className="mb-10">
                         <div className="text-[11px] font-semibold uppercase tracking-wider text-[#1d1d1f]/40 dark:text-white/40 mb-3 px-1">
-                            قوالب جاهزة لتسريع طلبك
+                            {__('client.ticket_create_presets_heading')}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             {PRESETS.map((preset) => {
@@ -429,7 +401,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             )}
                                         </div>
                                         <div className="mt-3 text-xs font-bold leading-snug">
-                                            {preset.title}
+                                            {presetText(preset, 'title')}
                                         </div>
                                     </button>
                                 );
@@ -447,7 +419,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                     <div className="flex items-center justify-between">
                                         <label htmlFor="project_id" className="text-xs font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-1.5">
                                             <FolderKanban className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#2997ff]" />
-                                            <span>ربط التذكرة بمشروع (اختياري)</span>
+                                            <span>{__('client.ticket_create_link_project_label')}</span>
                                         </label>
                                         {data.project_id && (
                                             <button
@@ -455,7 +427,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 onClick={() => setData('project_id', '')}
                                                 className="text-[11px] text-[#0071e3] dark:text-[#2997ff] hover:underline cursor-pointer"
                                             >
-                                                إلغاء الربط (تذكرة عامة)
+                                                {__('client.ticket_create_unlink_project')}
                                             </button>
                                         )}
                                     </div>
@@ -465,10 +437,10 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                         onChange={(e) => setData('project_id', e.target.value)}
                                         className="h-12 w-full rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] border border-transparent dark:border-white/5 px-4 text-xs sm:text-sm text-[#1d1d1f] dark:text-white font-medium focus:bg-white dark:focus:bg-black focus:border-[#0071e3] focus:ring-4 focus:ring-[#0071e3]/10 focus:outline-none transition-all"
                                     >
-                                        <option value="">دعم فني واستفسار عام (بدون مشروع محدد)</option>
+                                        <option value="">{__('client.ticket_create_no_project_option')}</option>
                                         {projects.map((p) => (
                                             <option key={p.id} value={p.id}>
-                                                مشروع: {p.project_name}
+                                                {__('client.ticket_create_project_option', { name: p.project_name })}
                                             </option>
                                         ))}
                                     </select>
@@ -479,7 +451,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                             {/* Subject Field */}
                             <div className="space-y-2">
                                 <label htmlFor="subject" className="text-xs font-semibold text-[#1d1d1f] dark:text-white block">
-                                    {__('general.subject') || 'عنوان التذكرة'} <span className="text-[#0071e3]">*</span>
+                                    {__('client.ticket_create_subject')} <span className="text-[#0071e3]">*</span>
                                 </label>
                                 <input
                                     id="subject"
@@ -487,7 +459,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                     value={data.subject}
                                     onChange={(e) => setData('subject', e.target.value)}
                                     required
-                                    placeholder="مثال: استفسار عن خطة التسليم أو طلب تسعير ميزة"
+                                    placeholder={__('client.ticket_create_subject_placeholder')}
                                     className="h-12 w-full rounded-xl bg-[#f5f5f7] dark:bg-[#1c1c1e] border border-transparent dark:border-white/5 px-4 text-xs sm:text-sm text-[#1d1d1f] dark:text-white font-semibold focus:bg-white dark:focus:bg-black focus:border-[#0071e3] focus:ring-4 focus:ring-[#0071e3]/10 focus:outline-none transition-all placeholder:text-[#1d1d1f]/30 dark:placeholder:text-white/30"
                                 />
                                 <InputError message={errors.subject} />
@@ -496,7 +468,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                             {/* Priority - Apple Native Segmented Control */}
                             <div className="space-y-2">
                                 <label className="text-xs font-semibold text-[#1d1d1f] dark:text-white block">
-                                    {__('general.priority') || 'درجة الأهمية'}
+                                    {__('general.priority')}
                                 </label>
                                 <div className="grid grid-cols-3 gap-1.5 bg-[#f5f5f7] dark:bg-[#1c1c1e] p-1.5 rounded-2xl">
                                     <button
@@ -508,7 +480,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 : 'text-[#1d1d1f]/60 dark:text-white/60 hover:text-[#1d1d1f] dark:hover:text-white'
                                         }`}
                                     >
-                                        عادية (Normal)
+                                        {__('client.ticket_create_priority_low')}
                                     </button>
 
                                     <button
@@ -520,7 +492,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 : 'text-[#1d1d1f]/60 dark:text-white/60 hover:text-[#1d1d1f] dark:hover:text-white'
                                         }`}
                                     >
-                                        أولوية (High)
+                                        {__('client.ticket_create_priority_medium')}
                                     </button>
 
                                     <button
@@ -532,7 +504,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 : 'text-[#1d1d1f]/60 dark:text-white/60 hover:text-[#1d1d1f] dark:hover:text-white'
                                         }`}
                                     >
-                                        عاجلة جداً (Critical)
+                                        {__('client.ticket_create_priority_high')}
                                     </button>
                                 </div>
                                 <InputError message={errors.priority} />
@@ -541,7 +513,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                             {/* Description Field */}
                             <div className="space-y-2">
                                 <label htmlFor="description" className="text-xs font-semibold text-[#1d1d1f] dark:text-white block">
-                                    {__('general.description') || 'تفاصيل الطلب أو الاستفسار'} <span className="text-[#0071e3]">*</span>
+                                    {__('general.description')} <span className="text-[#0071e3]">*</span>
                                 </label>
                                 <textarea
                                     id="description"
@@ -549,7 +521,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                     value={data.description}
                                     onChange={(e) => setData('description', e.target.value)}
                                     required
-                                    placeholder="اكتب هنا التفاصيل بوضوح لمساعدتنا في تقديم الحل أو الرد الدقيق..."
+                                    placeholder={__('client.ticket_create_description_placeholder')}
                                     className="w-full rounded-2xl bg-[#f5f5f7] dark:bg-[#1c1c1e] border border-transparent dark:border-white/5 p-4 text-xs sm:text-sm text-[#1d1d1f] dark:text-white leading-relaxed resize-none focus:bg-white dark:focus:bg-black focus:border-[#0071e3] focus:ring-4 focus:ring-[#0071e3]/10 focus:outline-none transition-all placeholder:text-[#1d1d1f]/30 dark:placeholder:text-white/30 font-normal"
                                 />
                                 <InputError message={errors.description} />
@@ -559,10 +531,10 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                             <div className="space-y-3 pt-2">
                                 <div className="flex items-center justify-between">
                                     <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white">
-                                        إرفاق وسائط وتوضيحات (اختياري)
+                                        {__('client.ticket_create_attachments_label')}
                                     </span>
                                     <span className="text-[11px] text-[#1d1d1f]/50 dark:text-white/50">
-                                        صورة · تسجيل صوتي · ملف MP3 · فيديو قصير (3MB)
+                                        {__('client.ticket_create_attachments_hint')}
                                     </span>
                                 </div>
 
@@ -577,7 +549,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             className="flex items-center justify-center gap-2 p-3 rounded-xl border border-black/5 dark:border-white/10 bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] text-[#1d1d1f] dark:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                                         >
                                             <ImageIcon className="w-4 h-4 text-[#0071e3]" />
-                                            <span>رفع صورة</span>
+                                            <span>{__('client.ticket_create_upload_image')}</span>
                                         </button>
 
                                         {/* 2. Record Live Voice Note */}
@@ -587,7 +559,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             className="flex items-center justify-center gap-2 p-3 rounded-xl border border-rose-500/20 bg-rose-50/50 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                                         >
                                             <Mic className="w-4 h-4" />
-                                            <span>تسجيل صوتي</span>
+                                            <span>{__('client.ticket_create_record_voice')}</span>
                                         </button>
 
                                         {/* 3. Upload Audio File (MP3) */}
@@ -597,7 +569,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             className="flex items-center justify-center gap-2 p-3 rounded-xl border border-black/5 dark:border-white/10 bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] text-[#1d1d1f] dark:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                                         >
                                             <Music className="w-4 h-4 text-purple-600" />
-                                            <span>ملف صوتي MP3</span>
+                                            <span>{__('client.ticket_create_upload_audio')}</span>
                                         </button>
 
                                         {/* 4. Upload Short Video (3M) */}
@@ -607,7 +579,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             className="flex items-center justify-center gap-2 p-3 rounded-xl border border-black/5 dark:border-white/10 bg-[#f5f5f7] dark:bg-[#1c1c1e] hover:bg-black/[0.06] dark:hover:bg-white/[0.08] text-[#1d1d1f] dark:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
                                         >
                                             <Video className="w-4 h-4 text-emerald-600" />
-                                            <span>فيديو قصير (≤ 3MB)</span>
+                                            <span>{__('client.ticket_create_upload_video')}</span>
                                         </button>
 
                                     </div>
@@ -623,13 +595,13 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             </div>
                                             <div>
                                                 <div className="text-xs font-bold text-rose-900 dark:text-rose-200 flex items-center gap-2">
-                                                    <span>جاري تسجيل الصوت المباشر...</span>
+                                                    <span>{__('client.ticket_create_recording_live')}</span>
                                                     <span className="font-mono text-sm px-2 py-0.5 rounded-md bg-white/80 dark:bg-black/40 text-rose-600 dark:text-rose-400">
                                                         {formatTime(recordingDuration)} / {formatTime(MAX_RECORDING_SECONDS)}
                                                     </span>
                                                 </div>
                                                 <span className="text-[11px] text-rose-700/70 dark:text-rose-300/70">
-                                                    تحدث بوضوح، اضغط على إنهاء وحفظ عند الانتهاء
+                                                    {__('client.ticket_create_recording_hint')}
                                                 </span>
                                             </div>
                                         </div>
@@ -640,7 +612,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 onClick={cancelVoiceRecording}
                                                 className="px-3.5 py-2 rounded-xl bg-white dark:bg-black/30 hover:bg-rose-100 text-xs font-semibold text-rose-700 dark:text-rose-300 transition cursor-pointer"
                                             >
-                                                إلغاء
+                                                {__('general.cancel')}
                                             </button>
                                             <button
                                                 type="button"
@@ -648,7 +620,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm cursor-pointer"
                                             >
                                                 <Square className="w-3.5 h-3.5 fill-white" />
-                                                <span>إنهاء وحفظ</span>
+                                                <span>{__('client.ticket_create_stop_and_save')}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -664,6 +636,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                         <button
                                             type="button"
                                             onClick={() => setAttachmentError(null)}
+                                            aria-label={__('client.ticket_create_dismiss_error')}
                                             className="text-rose-500 hover:text-rose-700 cursor-pointer"
                                         >
                                             <X className="w-4 h-4" />
@@ -686,7 +659,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                     {data.attachment.name}
                                                 </span>
                                                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60">
-                                                    {(data.attachment.size / 1024 / 1024).toFixed(2)} MB
+                                                    {__('client.ticket_create_file_size_mb', { size: (data.attachment.size / 1024 / 1024).toFixed(2) })}
                                                 </span>
                                             </div>
 
@@ -696,7 +669,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                                 className="text-xs text-rose-600 hover:text-rose-700 dark:text-rose-400 flex items-center gap-1 font-semibold cursor-pointer"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                <span>إزالة المرفق</span>
+                                                <span>{__('client.ticket_create_remove_attachment')}</span>
                                             </button>
                                         </div>
 
@@ -705,7 +678,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                             <div className="rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-black/5 dark:bg-black">
                                                 <img
                                                     src={previewUrl}
-                                                    alt="Attached preview"
+                                                    alt={__('client.ticket_create_attachment_preview_alt')}
                                                     className="max-h-60 w-auto object-contain mx-auto rounded-lg"
                                                 />
                                             </div>
@@ -743,7 +716,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                     href={route('tickets.index')}
                                     className="text-xs font-semibold text-[#1d1d1f]/60 dark:text-white/60 hover:text-[#1d1d1f] dark:hover:text-white transition-colors order-2 sm:order-1"
                                 >
-                                    إلغاء والعودة
+                                    {__('client.ticket_create_cancel_and_back')}
                                 </Link>
 
                                 <button
@@ -752,7 +725,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                                     className="w-full sm:w-auto px-8 py-3.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold rounded-full transition-all flex items-center justify-center gap-2 shadow-sm shadow-blue-500/25 disabled:opacity-50 cursor-pointer order-1 sm:order-2"
                                 >
                                     <Send className="w-3.5 h-3.5 rtl:rotate-180" />
-                                    <span>{processing ? 'جاري الإرسال...' : 'إرسال التذكرة (+15 PTS)'}</span>
+                                    <span>{processing ? __('client.ticket_create_sending') : __('client.ticket_create_submit')}</span>
                                 </button>
                             </div>
 

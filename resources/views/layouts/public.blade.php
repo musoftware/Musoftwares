@@ -13,15 +13,15 @@
     </script>
 
 
-    <title>{{ $title ?? ($locale === 'ar' ? 'موسوفت ويرز | تطوير البرمجيات والأنظمة السحابية والـ ERP' : 'Musoftwares | Enterprise Software, Cloud ERP & Custom Development') }}</title>
-    <meta name="description" content="{{ $description ?? 'Custom web applications, mobile apps, and enterprise automation platforms engineered by Mahmoud Amin in Suez, Egypt.' }}">
-
     @php
         $currentUrl = url()->current();
         $canonicalUrl = $canonical ?? $currentUrl;
         $ogImage = $image ?? asset('images/apple/web-mobile-suite.jpg');
         $locale = app()->getLocale();
     @endphp
+
+    <title>{{ $title ?? ($locale === 'ar' ? 'موسوفت ويرز | تطوير البرمجيات والأنظمة السحابية والـ ERP' : 'Musoftwares | Enterprise Software, Cloud ERP & Custom Development') }}</title>
+    <meta name="description" content="{{ $description ?? 'Custom web applications, mobile apps, and enterprise automation platforms engineered by Mahmoud Amin in Suez, Egypt.' }}">
 
     <link rel="canonical" href="{{ $canonicalUrl }}">
     

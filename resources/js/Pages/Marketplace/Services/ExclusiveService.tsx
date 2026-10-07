@@ -15,7 +15,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
         name: '',
         email: '',
         phone: '',
-        description: `أرغب في الاستفسار عن الخدمة الحصرية: ${serviceSlug}`,
+        description: __('marketplace.exclusive_default_message', { service: serviceSlug }),
         'g-recaptcha-response': '',
     });
     
@@ -36,7 +36,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
         e.preventDefault();
         
         if (import.meta.env.VITE_RECAPTCHA_SITE_KEY && !form['g-recaptcha-response']) {
-            setErrors({ ...errors, 'g-recaptcha-response': __('general.recaptcha_required') || 'يرجى إكمال اختبار الكابتشا.' });
+            setErrors({ ...errors, 'g-recaptcha-response': __('general.recaptcha_required') });
             return;
         }
 
@@ -61,7 +61,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
 
     return (
         <MarketplaceLayout>
-            <Head title={__('general.exclusive_service') || 'Exclusive Service'} />
+            <Head title={__('general.exclusive_service')} />
             
             <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-xl w-full space-y-8">
@@ -72,13 +72,13 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                 <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
                                     <Send className="w-8 h-8 text-emerald-600" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900">تم استلام طلبك بنجاح</h2>
+                                <h2 className="text-2xl font-bold text-gray-900">{__('marketplace.exclusive_success_title')}</h2>
                                 <p className="text-gray-500 max-w-7xl mx-auto">
-                                    شكراً لتواصلك معنا. سنقوم بمراجعة طلبك للخدمة الحصرية والتواصل معك قريباً عبر البريد الإلكتروني أو الهاتف الذي قدمته.
+                                    {__('marketplace.exclusive_success_desc')}
                                 </p>
                                 <div className="pt-4">
                                     <Button onClick={() => window.location.href = route('marketplace.services.index')} variant="outline">
-                                        العودة للسوق
+                                        {__('marketplace.exclusive_back_to_marketplace')}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -91,16 +91,16 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                     <ShieldAlert className="w-6 h-6 text-indigo-600" />
                                 </div>
                                 <CardTitle className="text-2xl font-bold text-gray-900">
-                                    خدمة حصرية
+                                    {__('general.exclusive_service')}
                                 </CardTitle>
                                 <CardDescription className="text-base text-gray-600 mt-2">
-                                    هذه الخدمة حصرية وغير متاحة للجميع. يرجى ترك بياناتك وسنقوم بالتواصل معك لتحديد إمكانية تقديمها لك.
+                                    {__('marketplace.exclusive_intro')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={submitRequest} className="space-y-5">
                                     <div className="space-y-1">
-                                        <InputLabel htmlFor="name" value="الاسم الكامل" className="font-medium" />
+                                        <InputLabel htmlFor="name" value={__('general.full_name')} className="font-medium" />
                                         <TextInput
                                             id="name"
                                             type="text"
@@ -108,14 +108,14 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                                             required
-                                            placeholder="أدخل اسمك الكريم"
+                                            placeholder={__('marketplace.exclusive_name_placeholder')}
                                         />
                                         <InputError message={errors.name} />
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div className="space-y-1">
-                                            <InputLabel htmlFor="email" value="البريد الإلكتروني" className="font-medium" />
+                                            <InputLabel htmlFor="email" value={__('general.email_address')} className="font-medium" />
                                             <TextInput
                                                 id="email"
                                                 type="email"
@@ -130,7 +130,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                         </div>
                                         
                                         <div className="space-y-1">
-                                            <InputLabel htmlFor="phone" value="رقم الهاتف" className="font-medium" />
+                                            <InputLabel htmlFor="phone" value={__('crm.lead_phone')} className="font-medium" />
                                             <TextInput
                                                 id="phone"
                                                 type="tel"
@@ -146,7 +146,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                     </div>
 
                                     <div className="space-y-1">
-                                        <InputLabel htmlFor="description" value="تفاصيل الطلب (اختياري)" className="font-medium" />
+                                        <InputLabel htmlFor="description" value={__('marketplace.exclusive_details_label')} className="font-medium" />
                                         <textarea
                                             id="description"
                                             rows={4}
@@ -176,7 +176,7 @@ export default function ExclusiveService({ serviceSlug }: { serviceSlug: string 
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md text-base h-11"
                                             disabled={isSubmitting}
                                         >
-                                            {isSubmitting ? 'جاري إرسال الطلب...' : 'إرسال طلب الخدمة الحصرية'}
+                                            {isSubmitting ? __('marketplace.exclusive_submitting') : __('marketplace.exclusive_submit')}
                                         </Button>
                                     </div>
                                 </form>

@@ -36,8 +36,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         e.preventDefault();
         if (!newsletterEmail || !newsletterEmail.includes('@')) {
             toast({
-                title: 'Invalid Email',
-                description: 'Please enter a valid email address.',
+                title: __('frontend.public_layout_invalid_email'),
+                description: __('frontend.public_layout_invalid_email_desc'),
                 variant: 'destructive',
             });
             return;
@@ -61,20 +61,20 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             if (res.ok && json.success) {
                 setNewsletterEmail('');
                 toast({
-                    title: 'Subscribed Successfully!',
-                    description: json.message || 'Thank you for subscribing to our studio insights.',
+                    title: __('frontend.public_layout_subscribed'),
+                    description: json.message || __('frontend.public_layout_subscribed_desc'),
                 });
             } else {
                 toast({
-                    title: 'Subscription Failed',
-                    description: json.message || 'Could not subscribe. Please try again.',
+                    title: __('frontend.public_layout_subscribe_failed'),
+                    description: json.message || __('frontend.public_layout_subscribe_failed_desc'),
                     variant: 'destructive',
                 });
             }
         } catch (error) {
             toast({
-                title: 'Error',
-                description: 'An unexpected error occurred. Please try again later.',
+                title: __('general.error'),
+                description: __('frontend.public_layout_unexpected_error'),
                 variant: 'destructive',
             });
         } finally {
@@ -96,8 +96,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 reset();
                 setIsGuestTicketOpen(false);
                 toast({
-                    title: __('general.success') || 'Success',
-                    description: __('general.ticket_submitted_success') || 'Your brief has been submitted successfully. An architect will reach out within 24 hours.',
+                    title: __('general.success'),
+                    description: __('general.ticket_submitted_success'),
                 });
             }
         });
@@ -163,55 +163,55 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const guestNavItems: NavItem[] = [
         {
             id: 'web',
-            label: __('general.web_apps') || 'Web Apps',
+            label: __('general.web_apps'),
             href: '/#web',
             items: []
         },
         {
             id: 'mobile',
-            label: __('general.mobile_apps') || 'Mobile Apps',
+            label: __('general.mobile_apps'),
             href: '/#mobile',
             items: []
         },
         {
             id: 'desktop',
-            label: __('general.desktop_apps') || 'Desktop Apps',
+            label: __('general.desktop_apps'),
             href: '/#desktop',
             items: []
         },
         {
             id: 'platforms',
-            label: __('general.platforms') || 'Platforms',
+            label: __('frontend.public_layout_platforms'),
             href: '/platforms',
             items: []
         },
         {
             id: 'solutions',
-            label: __('general.solutions') || 'Solutions',
+            label: __('general.solutions'),
             href: '/solutions',
             items: []
         },
         {
             id: 'portfolio',
-            label: __('general.portfolio') || 'Portfolio',
+            label: __('general.portfolio'),
             href: '/portfolio',
             items: []
         },
         {
             id: 'estimator',
-            label: __('general.estimator') || 'Estimator',
+            label: __('general.estimator'),
             href: '/estimator',
             items: []
         },
         {
             id: 'founder',
-            label: __('general.founder') || 'Founder',
+            label: __('general.founder'),
             href: '/about/mahmoud-amin',
             items: []
         },
         {
             id: 'contact',
-            label: __('general.contact') || 'Contact',
+            label: __('general.contact'),
             href: '/company/contact',
             items: []
         },
@@ -220,45 +220,45 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     const authNavItems: NavItem[] = [
         {
             id: 'platforms',
-            label: __('general.platforms') || 'Platforms',
+            label: __('frontend.public_layout_platforms'),
             href: '/platforms',
             items: [
-                { title: 'Enterprise ERP Systems', desc: 'Modular double-entry ledger & operations', href: '/platforms/erp' },
-                { title: 'WhatsApp Cloud API', desc: 'Verified Meta Graph automated pipeline', href: '/platforms/crm' },
-                { title: 'Meta API Interceptors', desc: 'Omnichannel CRM synchronization', href: '/platforms/cloud' },
+                { title: __('frontend.public_layout_nav_erp_title'), desc: __('frontend.public_layout_nav_erp_desc'), href: '/platforms/erp' },
+                { title: 'WhatsApp Cloud API', desc: __('frontend.public_layout_nav_whatsapp_desc'), href: '/platforms/crm' },
+                { title: __('frontend.public_layout_nav_meta_title'), desc: __('frontend.public_layout_nav_meta_desc'), href: '/platforms/cloud' },
             ]
         },
         {
             id: 'solutions',
-            label: __('general.solutions') || 'Solutions',
+            label: __('general.solutions'),
             href: '/solutions',
             items: [
-                { title: 'E-Commerce Platforms', desc: 'Realtime store & omnichannel POS', href: '/solutions/ecommerce' },
-                { title: 'Fintech & Wallets', desc: 'Automated ledgers & payment gateways', href: '/solutions/finance' },
-                { title: 'Education & LMS', desc: 'Interactive portals & course telemetry', href: '/solutions/education' },
+                { title: __('frontend.public_layout_nav_ecommerce_title'), desc: __('frontend.public_layout_nav_ecommerce_desc'), href: '/solutions/ecommerce' },
+                { title: __('frontend.public_layout_nav_fintech_title'), desc: __('frontend.public_layout_nav_fintech_desc'), href: '/solutions/finance' },
+                { title: __('frontend.public_layout_nav_education_title'), desc: __('frontend.public_layout_nav_education_desc'), href: '/solutions/education' },
             ]
         },
         {
             id: 'portfolio',
-            label: __('general.portfolio') || 'Portfolio',
+            label: __('general.portfolio'),
             href: '/portfolio',
             items: []
         },
         {
             id: 'estimator',
-            label: __('general.estimator') || 'Estimator',
+            label: __('general.estimator'),
             href: '/estimator',
             items: []
         },
         {
             id: 'pricing',
-            label: __('general.pricing') || 'Pricing',
+            label: __('general.pricing'),
             href: '/pricing',
             items: []
         },
         {
             id: 'insights',
-            label: __('general.documentation') || 'Insights',
+            label: __('frontend.public_layout_documentation'),
             href: '/compare/laravel-vs-nodejs',
             items: []
         }
@@ -339,7 +339,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hidden sm:inline-flex p-2 text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 hover:text-[#25D366] transition-colors"
-                            title={__('general.whatsapp_direct') || 'Direct Consultation'}
+                            title={__('general.whatsapp_direct')}
                         >
                             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                         </a>
@@ -348,7 +348,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             <div className="hidden lg:flex items-center">
                                 <SafeLink href={route('dashboard')}>
                                     <button className="px-3.5 py-1.5 rounded-[980px] border border-black/10 dark:border-white/10 bg-white dark:bg-[#1d1d1f] text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-[#2d2d2f] text-[12px] font-medium transition-all shadow-sm cursor-pointer">
-                                        {__('general.console') || 'Dashboard'} ➔
+                                        {__('general.console')} ➔
                                     </button>
                                 </SafeLink>
                             </div>
@@ -358,11 +358,11 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     href={route('login')}
                                     className="text-[12px] font-medium text-[#1d1d1f]/75 dark:text-[#f5f5f7]/75 hover:text-[#1d1d1f] dark:hover:text-white transition-colors px-2"
                                 >
-                                    {__('general.sign_in') || 'Sign in'}
+                                    {__('frontend.sign_in')}
                                 </SafeLink>
                                 <SafeLink href="/start-project">
                                     <button className="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm cursor-pointer">
-                                        {__('general.start_a_project') || 'Start a Project'}
+                                        {__('general.start_a_project')}
                                     </button>
                                 </SafeLink>
                             </div>
@@ -372,7 +372,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             className="lg:hidden p-2 text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 hover:text-[#1d1d1f] dark:hover:text-white transition-colors rounded-lg focus:outline-none"
-                            aria-label="Toggle navigation"
+                            aria-label={__('frontend.public_layout_toggle_nav')}
                         >
                             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                         </button>
@@ -402,7 +402,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 className="flex items-center gap-2.5 py-2.5 px-2 text-[#25D366] hover:opacity-80 font-medium border-b border-black/5 dark:border-white/10 transition-opacity"
                             >
                                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                                <span>{__('general.whatsapp_direct') || 'Direct Consultation'}</span>
+                                <span>{__('general.whatsapp_direct')}</span>
                             </a>
 
                             {!auth?.user ? (
@@ -412,14 +412,14 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="text-center py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                                     >
-                                        {__('general.sign_in') || 'Sign in'}
+                                        {__('frontend.sign_in')}
                                     </SafeLink>
                                     <SafeLink
                                         href="/start-project"
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="text-center py-2.5 px-4 rounded-xl bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed] transition-colors shadow-sm"
                                     >
-                                        {__('general.start_a_project') || 'Start a Project'}
+                                        {__('general.start_a_project')}
                                     </SafeLink>
                                 </div>
                             ) : (
@@ -429,7 +429,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="flex items-center justify-center py-2.5 px-4 rounded-xl bg-[#0071e3] text-white text-sm font-medium hover:bg-[#0077ed] transition-colors shadow-sm"
                                     >
-                                        {__('general.console') || 'Dashboard'} ➔
+                                        {__('general.console')} ➔
                                     </SafeLink>
                                 </div>
                             )}
@@ -450,41 +450,41 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     {/* 4 Columns */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12 flex-1">
                         <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.contact_us') || 'Contact Us'}</div>
+                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.contact_us')}</div>
                             <ul className="space-y-2 text-[12px]">
-                                <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.whatsapp_direct') || 'WhatsApp Direct'}</a></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.email_studio') || 'Email Studio'}</a></li>
-                                <li><SafeLink href="/start-project" className="hover:text-[#0071e3] transition-colors text-[#0071e3] font-medium">{__('general.start_project_wizard') || 'System Scoping Wizard ➔'}</SafeLink></li>
+                                <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.whatsapp_direct')}</a></li>
+                                <li><a href="mailto:admin@musoftwares.com" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.email_studio')}</a></li>
+                                <li><SafeLink href="/start-project" className="hover:text-[#0071e3] transition-colors text-[#0071e3] font-medium">{__('general.start_project_wizard')}</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.solutions') || 'Solutions'}</div>
+                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.solutions')}</div>
                             <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/platforms/erp" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">Enterprise ERP</SafeLink></li>
+                                <li><SafeLink href="/platforms/erp" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_erp')}</SafeLink></li>
                                 <li><SafeLink href="/platforms/crm" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">WhatsApp Cloud API</SafeLink></li>
-                                <li><SafeLink href="/platforms/cloud" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">Meta Graph Suite</SafeLink></li>
-                                <li><SafeLink href="/start-project" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">System Architecture Wizard</SafeLink></li>
+                                <li><SafeLink href="/platforms/cloud" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_meta_suite')}</SafeLink></li>
+                                <li><SafeLink href="/start-project" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_wizard')}</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.press_center') || 'Press Center'}</div>
+                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.press_center')}</div>
                             <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/estimator" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.estimator') || 'Architecture Estimator'}</SafeLink></li>
-                                <li><SafeLink href="/portfolio" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.portfolio') || 'Case Studies Archive'}</SafeLink></li>
-                                <li><SafeLink href="/about/mahmoud-amin" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.leadership_bio') || 'Leadership Bio (Mahmoud Amin)'}</SafeLink></li>
-                                <li><SafeLink href="/compare/laravel-vs-nodejs" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">Tech Benchmarks (Laravel vs Node.js)</SafeLink></li>
+                                <li><SafeLink href="/estimator" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.estimator')}</SafeLink></li>
+                                <li><SafeLink href="/portfolio" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.portfolio')}</SafeLink></li>
+                                <li><SafeLink href="/about/mahmoud-amin" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.leadership_bio')}</SafeLink></li>
+                                <li><SafeLink href="/compare/laravel-vs-nodejs" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_benchmarks')}</SafeLink></li>
                             </ul>
                         </div>
 
                         <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.legal') || 'Legal & Privacy'}</div>
+                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.legal')}</div>
                             <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/privacy-policy" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.privacy_policy') || 'Privacy Policy'}</SafeLink></li>
-                                <li><SafeLink href="/terms-of-service" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.terms_of_service') || 'Terms & SLA'}</SafeLink></li>
-                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">Security Architecture</span></li>
-                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">GDPR Compliance</span></li>
+                                <li><SafeLink href="/privacy-policy" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('landing_legal.privacy_title')}</SafeLink></li>
+                                <li><SafeLink href="/terms-of-service" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.terms_of_service')}</SafeLink></li>
+                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">{__('frontend.public_layout_footer_security')}</span></li>
+                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">{__('frontend.public_layout_footer_gdpr')}</span></li>
                             </ul>
                         </div>
                     </div>
@@ -506,8 +506,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 </div>
 
                 <div className="max-w-[1280px] mx-auto mt-12 pt-6 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 text-[11px]">
-                    <div>&copy; {new Date().getFullYear()} Musoftwares Inc. {__('general.all_rights_reserved') || 'All rights reserved.'}</div>
-                    <div className="mt-1 sm:mt-0">Suez, Egypt • {__('general.worldwide_delivery') || 'Worldwide Delivery'}</div>
+                    <div>&copy; {new Date().getFullYear()} Musoftwares Inc. {__('general.all_rights_reserved')}</div>
+                    <div className="mt-1 sm:mt-0">{__('frontend.public_layout_location')} • {__('general.worldwide_delivery')}</div>
                 </div>
             </footer>
 
@@ -515,36 +515,36 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
             <Dialog open={isGuestTicketOpen} onOpenChange={setIsGuestTicketOpen}>
                 <DialogContent className="sm:max-w-md bg-white dark:bg-[#1d1d1f] border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-[24px] shadow-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold text-lg">{__('general.submit_guest_ticket') || 'Connect with Engineering Studio'}</DialogTitle>
+                        <DialogTitle className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold text-lg">{__('general.submit_guest_ticket')}</DialogTitle>
                         <DialogDescription className="text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 text-xs">
-                            {__('general.please_fill_out_the_form_below_and_we_wi') || 'Describe your system requirements and our architects will reply within 24 hours.'}
+                            {__('general.please_fill_out_the_form_below_and_we_wi')}
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={submitGuestTicket} className="space-y-4 text-xs">
                         <div className="space-y-1.5">
-                            <Label htmlFor="name" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.name') || 'Name'}</Label>
+                            <Label htmlFor="name" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.name')}</Label>
                             <Input id="name" required value={data.name} onChange={e => setData('name', e.target.value)} className="bg-[#f5f5f7] dark:bg-black/40 border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-xl focus:bg-white dark:focus:bg-black/60" />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="email" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.email') || 'Email'}</Label>
+                            <Label htmlFor="email" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.email')}</Label>
                             <Input id="email" type="email" required value={data.email} onChange={e => setData('email', e.target.value)} className="bg-[#f5f5f7] dark:bg-black/40 border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-xl focus:bg-white dark:focus:bg-black/60" />
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="mobile" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium flex items-center gap-2">
-                                {__('general.mobile') || 'Mobile / WhatsApp'} <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" />
+                                {__('general.mobile')} <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" />
                             </Label>
                             <Input id="mobile" required value={data.mobile} onChange={e => setData('mobile', e.target.value)} className="bg-[#f5f5f7] dark:bg-black/40 border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-xl focus:bg-white dark:focus:bg-black/60" />
                         </div>
                         <div className="space-y-1.5">
-                            <Label htmlFor="body" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.message') || 'Scope Brief'}</Label>
+                            <Label htmlFor="body" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.message')}</Label>
                             <Textarea id="body" required value={data.body} onChange={e => setData('body', e.target.value)} rows={4} className="bg-[#f5f5f7] dark:bg-black/40 border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-xl focus:bg-white dark:focus:bg-black/60" />
                         </div>
                         <DialogFooter className="pt-2">
                             <button type="button" onClick={() => setIsGuestTicketOpen(false)} className="px-4 py-2 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-black/30 text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-[#f5f5f7] dark:hover:bg-white/10 text-xs font-medium">
-                                {__('general.cancel') || 'Cancel'}
+                                {__('general.cancel')}
                             </button>
                             <button type="submit" disabled={processing} className="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-medium">
-                                {__('general.submit') || 'Send Brief'}
+                                {__('general.submit')}
                             </button>
                         </DialogFooter>
                     </form>

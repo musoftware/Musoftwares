@@ -58,7 +58,7 @@ export default function Create() {
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <Label htmlFor="client_name" className="text-sm font-semibold text-gray-700">Client Name (Optional)</Label>
+                                        <Label htmlFor="client_name" className="text-sm font-semibold text-gray-700">{__('general.isaas_client_name_optional')}</Label>
                                         <Input
                                             id="client_name"
                                             value={data.client_name}
@@ -69,7 +69,7 @@ export default function Create() {
                                         {errors.client_name && <p className="text-sm text-red-600 mt-1">{errors.client_name}</p>}
                                     </div>
                                     <div>
-                                        <Label htmlFor="client_email" className="text-sm font-semibold text-gray-700">Client Email (Optional)</Label>
+                                        <Label htmlFor="client_email" className="text-sm font-semibold text-gray-700">{__('general.isaas_client_email_optional')}</Label>
                                         <Input
                                             id="client_email"
                                             type="email"

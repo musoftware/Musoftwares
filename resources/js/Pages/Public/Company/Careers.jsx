@@ -9,16 +9,16 @@ import { openWhatsAppChat } from '@/lib/whatsapp';
 export default function Careers({ canLogin, canRegister }) {
     const jobs = [
         {
-            title: __('landing_company.careers_job_1_title') || 'Senior Backend Engineer (Laravel / PHP 8.3)',
-            type: __('landing_company.careers_job_1_type') || 'Full-time / Remote',
-            desc: __('landing_company.careers_job_1_desc') || 'Architect and scale high-concurrency SaaS backends, queue pipelines, and multi-tenant financial ledgers.',
+            title: __('landing_company.careers_job_1_title'),
+            type: __('landing_company.careers_job_1_type'),
+            desc: __('landing_company.careers_job_1_desc'),
             techs: ['Laravel', 'PostgreSQL', 'Redis', 'Docker'],
             subject: 'Senior Backend Engineer Application',
         },
         {
-            title: __('landing_company.careers_job_2_title') || 'Frontend Architect (React 19 / TypeScript)',
-            type: __('landing_company.careers_job_2_type') || 'Full-time / Remote',
-            desc: __('landing_company.careers_job_2_desc') || 'Engineer delight-driven, high-performance web user interfaces with Apple-grade aesthetic precision.',
+            title: __('landing_company.careers_job_2_title'),
+            type: __('landing_company.careers_job_2_type'),
+            desc: __('landing_company.careers_job_2_desc'),
             techs: ['React', 'TypeScript', 'Tailwind', 'GSAP'],
             subject: 'Frontend Architect Application',
         },
@@ -26,7 +26,7 @@ export default function Careers({ canLogin, canRegister }) {
 
     return (
         <PublicLayout>
-            <Head title={`${__('landing_company.careers_meta_title') || 'Careers'} | Musoftwares`} />
+            <Head title={`${__('landing_company.careers_meta_title')} | Musoftwares`} />
 
             <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
@@ -39,7 +39,7 @@ export default function Careers({ canLogin, canRegister }) {
                             <span className="text-[#0071e3]">Runs Global Businesses.</span>
                         </>
                     }
-                    subtitle={__('landing_company.careers_subtitle') || 'Join an elite engineering studio dedicated to craftsmanship, clean architecture, and ultra-high reliability.'}
+                    subtitle={__('landing_company.careers_subtitle')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20">

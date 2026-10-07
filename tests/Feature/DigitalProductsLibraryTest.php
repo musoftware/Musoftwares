@@ -15,6 +15,7 @@ use Tests\TestCase;
 class DigitalProductsLibraryTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $admin;
     protected User $clientUser;
@@ -22,6 +23,7 @@ class DigitalProductsLibraryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->seed(RolesAndPermissionsSeeder::class);
         app()->setLocale('ar');

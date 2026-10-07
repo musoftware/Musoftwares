@@ -588,12 +588,10 @@ class RecurringBusinessController extends Controller
             return $salary;
         });
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->get();
 
         return Inertia::render('Admin/Business/RecurringSalaries/Index', [
             'salaries' => $salaries,
             'currencies' => $currencies,
-            'users' => $users,
         ]);
     }
 
@@ -643,7 +641,6 @@ class RecurringBusinessController extends Controller
     {
         $salary = RecurringSalary::findOrFail($id);
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->get();
 
         return Inertia::render('Admin/Business/RecurringSalaries/Edit', [
             'salary' => [
@@ -661,7 +658,6 @@ class RecurringBusinessController extends Controller
                 'recurring_times_year' => $salary->recurring_times_year ? explode(',', $salary->recurring_times_year) : [],
             ],
             'currencies' => $currencies,
-            'users' => $users,
         ]);
     }
 

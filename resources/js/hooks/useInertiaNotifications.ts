@@ -70,14 +70,14 @@ export function useInertiaNotifications() {
             if (lastToastRef.current.errorsSerialized !== errorsSerialized) {
                 if (safeErrors.error) {
                     toast({
-                        title: __('general.system_error') || 'System Error',
+                        title: __('general.system_error'),
                         description: safeErrors.error,
                         variant: 'destructive',
                     });
                 } else {
                     const firstVal = Object.values(safeErrors)[0];
                     toast({
-                        title: __('general.please_fix_the_following') || 'Notice',
+                        title: __('general.please_fix_the_following'),
                         description: String(firstVal),
                         variant: 'destructive',
                     });

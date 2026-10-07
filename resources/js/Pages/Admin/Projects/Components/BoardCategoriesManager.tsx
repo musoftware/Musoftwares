@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useConfirm } from '@/hooks/useConfirm';
 import { BoardCategoryChip, categoryPalette, CATEGORY_COLOR_CLASSES } from '@/Pages/Client/Projects/Components/BoardCategoryChip';
 
 export interface BoardCategory {
@@ -46,6 +47,7 @@ export default function BoardCategoriesManager({
     const [creating, setCreating] = useState(false);
     const [draft, setDraft] = useState({ name: '', name_ar: '', color: 'rose' });
     const [busy, setBusy] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     // Sync when the parent provides a fresh list (e.g. after a sibling reload).
@@ -78,10 +80,10 @@ export default function BoardCategoriesManager({
             if (created) setList((prev) => [...prev, created]);
             setDraft({ name: '', name_ar: '', color: 'rose' });
             setCreating(false);
-            toast.success(__('general.board_category_added') || 'Category added.');
+            toast.success(__('general.board_category_added'));
             refreshParent();
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed') || 'Could not add category.');
+            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed'));
         } finally {
             setBusy(false);
         }
@@ -101,10 +103,10 @@ export default function BoardCategoriesManager({
                 setList((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
             }
             setEditing(null);
-            toast.success(__('general.board_category_updated') || 'Category updated.');
+            toast.success(__('general.board_category_updated'));
             refreshParent();
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed') || 'Could not update category.');
+            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed'));
         } finally {
             setBusy(false);
         }
@@ -112,20 +114,25 @@ export default function BoardCategoriesManager({
 
     const submitDelete = async (cat: BoardCategory) => {
         if (cat.is_system) {
-            toast.error(__('general.board_system_category_locked') || 'System categories cannot be deleted.');
+            toast.error(__('general.board_system_category_locked'));
             return;
         }
-        if (!confirm(__('general.confirm_delete_category') || 'Delete this category? Items inside will not be deleted.')) return;
+        const accepted = await confirm({
+            title: __('general.confirm_delete_category'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         setBusy(true);
         try {
             await axios.delete(
                 route('admin.projects.board.categories.destroy', { project: projectId, category: cat.id }),
             );
             setList((prev) => prev.filter((c) => c.id !== cat.id));
-            toast.success(__('general.board_category_deleted') || 'Category removed.');
+            toast.success(__('general.board_category_deleted'));
             refreshParent();
         } catch (err: any) {
-            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed') || 'Could not delete category.');
+            toast.error(err?.response?.data?.message || __('general.board_category_assign_failed'));
         } finally {
             setBusy(false);
         }
@@ -138,10 +145,10 @@ export default function BoardCategoriesManager({
                     <DialogHeader>
                         <DialogTitle className="text-base font-extrabold inline-flex items-center gap-2">
                             <Tag className="h-4 w-4 text-amber-500" />
-                            {__('general.board_manage_categories') || 'Manage categories'}
+                            {__('general.board_manage_categories')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 mt-1">
-                            {__('general.board_drag_to_reorder') || 'Drag to reorder cards within this lane.'}
+                            {__('general.board_drag_to_reorder')}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
@@ -172,13 +179,14 @@ export default function BoardCategoriesManager({
                                                     value={editing.name}
                                                     onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                                                     className="h-9 rounded-lg text-xs flex-1"
-                                                    placeholder="Name"
+                                                    placeholder={__('general.name')}
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => setEditing(null)}
                                                     className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-500"
-                                                    title="Cancel"
+                                                    title={__('general.cancel')}
+                                                    aria-label={__('general.cancel')}
                                                 >
                                                     <X className="h-4 w-4" />
                                                 </button>
@@ -189,7 +197,7 @@ export default function BoardCategoriesManager({
                                                     className="inline-flex h-9 items-center gap-1 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                                                 >
                                                     <Save className="h-3.5 w-3.5" />
-                                                    {__('general.save') || 'Save'}
+                                                    {__('general.save')}
                                                 </button>
                                             </div>
                                             <div className="flex flex-wrap gap-1.5">
@@ -215,7 +223,7 @@ export default function BoardCategoriesManager({
                                             <BoardCategoryChip category={c} className="flex-1" />
                                             {c.is_system && (
                                                 <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 ring-1 ring-inset ring-slate-200">
-                                                    {__('general.system') || 'System'}
+                                                    {__('general.system')}
                                                 </span>
                                             )}
                                             <div className="flex items-center gap-0.5">
@@ -223,7 +231,8 @@ export default function BoardCategoriesManager({
                                                     type="button"
                                                     onClick={() => setEditing({ id: c.id, name: c.name, color: c.color })}
                                                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                                                    title={__('general.board_edit_category') || 'Edit'}
+                                                    title={__('general.board_edit_category')}
+                                                    aria-label={__('general.board_edit_category')}
                                                 >
                                                     <Pencil className="h-3.5 w-3.5" />
                                                 </button>
@@ -231,7 +240,8 @@ export default function BoardCategoriesManager({
                                                     type="button"
                                                     onClick={() => void submitDelete(c)}
                                                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                                                    title={__('general.board_delete_category') || 'Delete'}
+                                                    title={__('general.board_delete_category')}
+                                                    aria-label={__('general.board_delete_category')}
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </button>
@@ -250,7 +260,7 @@ export default function BoardCategoriesManager({
                                     ref={inputRef}
                                     value={draft.name}
                                     onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                                    placeholder="Name (e.g., Blockers)"
+                                    placeholder={__('admin.board_category_name_placeholder')}
                                     className="h-9 rounded-lg text-xs"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') { e.preventDefault(); void submitCreate(); }
@@ -260,13 +270,13 @@ export default function BoardCategoriesManager({
                                 <Input
                                     value={draft.name_ar}
                                     onChange={(e) => setDraft({ ...draft, name_ar: e.target.value })}
-                                    placeholder="(الاسم بالعربية)"
+                                    placeholder={__('admin.board_category_name_ar_placeholder')}
                                     dir="rtl"
                                     className="h-9 rounded-lg text-xs"
                                 />
                             </div>
                             <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="text-[11px] font-bold text-slate-500 mr-1">Color</span>
+                                <span className="text-[11px] font-bold text-slate-500 me-1">{__('admin.board_category_color')}</span>
                                 {COLOR_KEYS.map((ck) => (
                                     <button
                                         key={ck}
@@ -288,7 +298,7 @@ export default function BoardCategoriesManager({
                                     onClick={() => setCreating(false)}
                                     className="flex-1 h-9 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-white"
                                 >
-                                    {__('general.cancel') || 'Cancel'}
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="button"
@@ -296,7 +306,7 @@ export default function BoardCategoriesManager({
                                     onClick={() => void submitCreate()}
                                     className="flex-1 h-9 rounded-lg bg-slate-900 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                                 >
-                                    {__('general.save') || 'Save'}
+                                    {__('general.save')}
                                 </button>
                             </div>
                         </div>
@@ -307,10 +317,11 @@ export default function BoardCategoriesManager({
                             className="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         >
                             <Plus className="h-3.5 w-3.5" />
-                            {__('general.board_add_category') || 'Add category'}
+                            {__('general.board_add_category')}
                         </button>
                     )}
                 </div>
+                {confirmDialog}
             </DialogContent>
         </Dialog>
     );

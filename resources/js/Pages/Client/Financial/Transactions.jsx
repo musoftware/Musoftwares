@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { formatMoney } from '@/lib/utils';
+import Pagination from '@/Components/Pagination';
 
 export default function Transactions({ transactions, wallet }) {
     const currency = wallet?.currency;
@@ -177,12 +178,12 @@ export default function Transactions({ transactions, wallet }) {
                                                             ) : (
                                                                 <ArrowUpRight className="w-3 h-3" />
                                                             )}
-                                                            {isCredit ? 'Credit' : 'Debit'}
+                                                            {isCredit ? __('client.tx_credit') : __('client.tx_debit')}
                                                         </span>
                                                     </td>
                                                     <td className="py-4 px-4">
                                                         <p className="text-xs sm:text-sm font-semibold text-[#1d1d1f]">
-                                                            {tx.description || 'System transaction'}
+                                                            {tx.description || __('client.tx_system_transaction')}
                                                         </p>
                                                         {tx.reference_type && (
                                                             <span className="text-[10px] text-[#1d1d1f]/50 font-mono">
@@ -216,25 +217,9 @@ export default function Transactions({ transactions, wallet }) {
                         </div>
 
                         {/* Pagination Footer */}
-                        {transactions?.links && transactions.links.length > 3 && (
-                            <div className="p-4 border-t border-black/5 flex items-center justify-end gap-1">
-                                {transactions.links.map((link, idx) => {
-                                    const isCurrent = link.active;
-                                    return (
-                                        <Link
-                                            key={idx}
-                                            href={link.url || '#'}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                                isCurrent
-                                                    ? 'bg-[#1d1d1f] text-white shadow-xs'
-                                                    : link.url
-                                                        ? 'bg-white border border-black/10 text-[#1d1d1f] hover:bg-[#f5f5f7]'
-                                                        : 'opacity-40 pointer-events-none bg-white text-[#1d1d1f]/40'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    );
-                                })}
+                        {transactions?.links?.length > 3 && (
+                            <div className="px-4 pb-4 border-t border-black/5">
+                                <Pagination links={transactions.links} />
                             </div>
                         )}
                     </div>

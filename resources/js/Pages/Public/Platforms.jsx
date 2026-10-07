@@ -42,39 +42,39 @@ export default function Platforms() {
     return (
         <PublicLayout>
             <Head>
-                <title>{__('general.platforms') || 'Platforms'} | Musoftwares</title>
-                <meta name="description" content="Explore the platforms we build, from internal dashboards to high-performance enterprise systems." />
+                <title>{__('general.platforms')} | Musoftwares</title>
+                <meta name="description" content={__('frontend.platforms_meta_desc')} />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss building a platform." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage={__('frontend.platforms_whatsapp_message')} />
 
             <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] overflow-x-hidden pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <div className="reveal-section">
                     <StudioHeader
-                        badge={__('general.platforms') || 'Digital Architecture'}
+                        badge={__('general.platforms')}
                         title={
                             <>
-                                Scalable Digital Platforms. <br className="hidden sm:inline" />
-                                <span className="text-[#0071e3]">Engineered For Longevity.</span>
+                                {__('frontend.platforms_hero_title')} <br className="hidden sm:inline" />
+                                <span className="text-[#0071e3]">{__('frontend.platforms_hero_highlight')}</span>
                             </>
                         }
-                        subtitle={__('general.we_dont_just_write_code') || "We don't just write code; we build robust platforms that serve as the operational backbone of your business."}
+                        subtitle={__('general.we_dont_just_write_code')}
                     />
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                         <button
-                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom platform architecture.")}
+                            onClick={() => openWhatsAppChat(__('frontend.platforms_cta_message'))}
                             className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            DISCUSS PLATFORM ➔
+                            {__('frontend.platforms_cta')} ➔
                         </button>
                         <Link
                             href="/estimator"
                             className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                         >
-                            {__('general.calculate_estimate') || 'ESTIMATE SCOPE'}
+                            {__('general.calculate_estimate')}
                         </Link>
                     </div>
                 </div>
@@ -90,22 +90,22 @@ export default function Platforms() {
                                     <LayoutDashboard className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
-                                    {__('general.internal_admin_dashboards') || 'Internal Admin Dashboards'}
+                                    {__('general.internal_admin_dashboards')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
-                                    {__('general.give_your_team_a_central_hub_to_manage_d') || 'Give your team a central hub to manage daily workflows, financial ledgers, and analytics.'}
+                                    {__('general.give_your_team_a_central_hub_to_manage_d')}
                                 </p>
                                 <ul className="space-y-2.5 pt-2 text-xs font-sans text-[#1d1d1f]/80">
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.data_visualizations_charts') || 'Realtime Data Visualizations & Metrics'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.rolebased_permissions') || 'Granular Role-Based Permissions'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.realtime_data_updates') || 'Zero-Lag Operational Feeds'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.data_visualizations_charts')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.rolebased_permissions')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.realtime_data_updates')}</li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsAppChat("I'm interested in an Internal Dashboard.")}
+                                onClick={() => openWhatsAppChat(__('frontend.platforms_dashboard_message'))}
                                 className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                             >
-                                <span>DISCUSS THIS PLATFORM</span>
+                                <span>{__('frontend.platforms_discuss_this_platform')}</span>
                                 <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                             </button>
                         </div>
@@ -117,22 +117,22 @@ export default function Platforms() {
                                     <Workflow className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
-                                    {__('general.workflow_automation') || 'Workflow Automation'}
+                                    {__('general.workflow_automation')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
-                                    {__('general.replace_manual_data_entry_with_automated') || 'Replace manual repetitive data entry with automated background pipelines.'}
+                                    {__('general.replace_manual_data_entry_with_automated')}
                                 </p>
                                 <ul className="space-y-2.5 pt-2 text-xs font-sans text-[#1d1d1f]/80">
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.thirdparty_api_integrations') || 'Third-party API & Graph Integrations'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.scheduled_background_tasks') || 'Scheduled Daemon Queue Workers'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.automated_sms_email_triggers') || 'Automated Webhook & WhatsApp Triggers'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.thirdparty_api_integrations')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.scheduled_background_tasks')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.automated_sms_email_triggers')}</li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsAppChat("I'm interested in Workflow Automation.")}
+                                onClick={() => openWhatsAppChat(__('frontend.platforms_workflow_message'))}
                                 className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                             >
-                                <span>DISCUSS THIS PLATFORM</span>
+                                <span>{__('frontend.platforms_discuss_this_platform')}</span>
                                 <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                             </button>
                         </div>
@@ -144,22 +144,22 @@ export default function Platforms() {
                                     <Globe className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
-                                    {__('general.saas_applications') || 'SaaS Applications'}
+                                    {__('general.saas_applications')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
-                                    {__('general.launch_your_own_subscriptionbased_softwa') || 'Launch your own subscription-based software with automated multi-tenant isolation.'}
+                                    {__('general.launch_your_own_subscriptionbased_softwa')}
                                 </p>
                                 <ul className="space-y-2.5 pt-2 text-xs font-sans text-[#1d1d1f]/80">
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.subscription_billing_logic') || 'Billing & Automated Wallet Deductions'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.tenant_data_isolation') || 'Zero-Leak Schema Tenant Isolation'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.custom_user_portals') || 'White-Label Customer Workspaces'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.subscription_billing_logic')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.tenant_data_isolation')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.custom_user_portals')}</li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsAppChat("I'm interested in building a SaaS Application.")}
+                                onClick={() => openWhatsAppChat(__('frontend.platforms_saas_message'))}
                                 className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                             >
-                                <span>DISCUSS THIS PLATFORM</span>
+                                <span>{__('frontend.platforms_discuss_this_platform')}</span>
                                 <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                             </button>
                         </div>
@@ -171,22 +171,22 @@ export default function Platforms() {
                                     <Monitor className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1d1d1f] font-sans tracking-tight">
-                                    {__('general.customer_portals') || 'Client Workspaces & Portals'}
+                                    {__('general.customer_portals')}
                                 </h3>
                                 <p className="text-sm text-[#1d1d1f]/60 leading-relaxed font-sans">
-                                    {__('general.give_your_clients_a_professional_interfa') || 'Give your clients a high-fidelity interface to track invoices, deliverables, and projects.'}
+                                    {__('general.give_your_clients_a_professional_interfa')}
                                 </p>
                                 <ul className="space-y-2.5 pt-2 text-xs font-sans text-[#1d1d1f]/80">
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.secure_client_authentication') || 'Secure Single-Sign-On Auth'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.invoice_document_sharing') || 'PDF Quotations & Instant Invoicing'}</li>
-                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.support_ticket_systems') || 'Direct Real-Time Chat & Tickets'}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.secure_client_authentication')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.invoice_document_sharing')}</li>
+                                    <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] shrink-0"></span>{__('general.support_ticket_systems')}</li>
                                 </ul>
                             </div>
                             <button
-                                onClick={() => openWhatsAppChat("I'm interested in building a Customer Portal.")}
+                                onClick={() => openWhatsAppChat(__('frontend.platforms_portal_message'))}
                                 className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                             >
-                                <span>DISCUSS THIS PLATFORM</span>
+                                <span>{__('frontend.platforms_discuss_this_platform')}</span>
                                 <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                             </button>
                         </div>

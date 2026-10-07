@@ -34,11 +34,11 @@ export default function Create({ services }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.create_article')} header="Add New Blog Article">
+        <AdminSidebarLayout title={__('general.create_article')} header={__('admin.blog_articles_create_heading')}>
             <div className="mb-6 flex items-center">
                 <Link href={route('admin.blog-articles.index')}>
                     <Button variant="ghost" className="gap-2">
-                        <ArrowLeft className="h-4 w-4" />{__('general.back_to_articles')}</Button>
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />{__('general.back_to_articles')}</Button>
                 </Link>
             </div>
 
@@ -46,7 +46,7 @@ export default function Create({ services }) {
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="title">Title *</Label>
+                            <Label htmlFor="title">{__('general.title')} *</Label>
                             <Input
                                 id="title"
                                 value={data.title}
@@ -70,7 +70,7 @@ export default function Create({ services }) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="content">Content *</Label>
+                        <Label htmlFor="content">{__('general.content')} *</Label>
                         <Textarea
                             id="content"
                             value={data.content}
@@ -96,7 +96,7 @@ export default function Create({ services }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <Label htmlFor="language">Language *</Label>
+                            <Label htmlFor="language">{__('general.language')} *</Label>
                             <Select value={data.language} onValueChange={(val) => setData('language', (val as string) || '')}>
                                 <SelectTrigger>
                                     <SelectValue placeholder={__('general.select_language')} />
@@ -116,7 +116,7 @@ export default function Create({ services }) {
                                     <SelectValue placeholder={__('general.select_a_service_optional')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">-- No Service --</SelectItem>
+                                    <SelectItem value="none">{__('admin.blog_articles_no_service')}</SelectItem>
                                     {services?.map(service => (
                                         <SelectItem key={service.id} value={service.id.toString()}>
                                             {service.title}
@@ -148,7 +148,7 @@ export default function Create({ services }) {
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 pt-4">
+                    <div className="flex items-center gap-2 pt-4">
                         <Switch
                             id="is_published"
                             checked={data.is_published}
@@ -160,7 +160,7 @@ export default function Create({ services }) {
                     <div className="flex justify-end pt-4 border-t">
                         <Button type="submit" disabled={processing} className="gap-2">
                             <Save className="h-4 w-4" />
-                            {processing ? 'Saving...' : 'Save Article'}
+                            {processing ? __('common.saving') : __('admin.blog_articles_save_article')}
                         </Button>
                     </div>
                 </form>

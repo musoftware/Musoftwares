@@ -114,21 +114,21 @@ export default function Dashboard({
 
     return (
         <AuthenticatedLayout>
-            <Head title="Client Console — Musoftwares Studio" />
+            <Head title={__('client.dash_page_title')} />
 
             <div className="w-full max-w-full min-w-0 overflow-x-clip">
                 {/* 1. TOP ACTIVE PROJECT SHOWCASE (Apple Bento Hero Banner) */}
                 <PageHeroHeader
-                    badge={hasActiveProject ? "Active Studio Delivery" : "Studio Workspace"}
+                    badge={hasActiveProject ? __('client.dash_badge_active') : __('client.dash_badge_workspace')}
                     title={
                         hasActiveProject
-                            ? (currentProject?.name || currentProject?.project_name || 'Enterprise Architecture Workspace')
-                            : "Start Your Next Project Workspace"
+                            ? (currentProject?.name || currentProject?.project_name || __('client.dash_default_project_name'))
+                            : __('client.dash_start_next_project')
                     }
                     description={
                         hasActiveProject
-                            ? (currentProject?.phase || 'Real-time sprint progress tracked with zero-loss audit logging.')
-                            : "All previous sprint deliverables have been finalized and signed off. Launch a new project or scope your next milestone."
+                            ? (currentProject?.phase || __('client.dash_default_phase'))
+                            : __('client.dash_all_delivered_desc')
                     }
                     actions={
                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
@@ -138,7 +138,7 @@ export default function Dashboard({
                                         href={currentProject?.id ? `/projects/${currentProject.id}` : '/projects'}
                                         className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 active:scale-98 select-none cursor-pointer"
                                     >
-                                        <span>LAUNCH WORKSPACE</span>
+                                        <span className="uppercase">{__('client.dash_launch_workspace')}</span>
                                         <ArrowRight className="w-4 h-4" />
                                     </Link>
                                     <Link
@@ -146,21 +146,21 @@ export default function Dashboard({
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-blue-500/25 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
                                     >
                                         <LifeBuoy className="w-3.5 h-3.5 shrink-0" />
-                                        <span>OPEN TICKET</span>
-                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
+                                        <span className="uppercase">{__('client.dash_open_ticket')}</span>
+                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5 uppercase">{__('client.dash_ticket_points')}</span>
                                     </Link>
                                     <Link
                                         href="/micro-services"
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-purple-500/25 bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
                                     >
                                         <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                                        <span>MICRO SERVICES</span>
+                                        <span className="uppercase">{__('client.dash_micro_services')}</span>
                                     </Link>
                                     <Link
                                         href="/estimator"
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm active:scale-98 select-none cursor-pointer text-center flex items-center justify-center"
                                     >
-                                        NEW SCOPE +
+                                        <span className="uppercase">{__('client.dash_new_scope')}</span>
                                     </Link>
                                 </>
                             ) : (
@@ -169,7 +169,7 @@ export default function Dashboard({
                                         href="/projects/create-new"
                                         className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 active:scale-98 select-none cursor-pointer"
                                     >
-                                        <span>START NEW PROJECT +</span>
+                                        <span className="uppercase">{__('client.dash_start_new_project')}</span>
                                         <ArrowRight className="w-4 h-4" />
                                     </Link>
                                     <Link
@@ -177,21 +177,21 @@ export default function Dashboard({
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-blue-500/25 bg-blue-500/10 text-[#0071e3] hover:bg-blue-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
                                     >
                                         <LifeBuoy className="w-3.5 h-3.5 shrink-0" />
-                                        <span>OPEN TICKET</span>
-                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5">+15 PTS</span>
+                                        <span className="uppercase">{__('client.dash_open_ticket')}</span>
+                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-blue-500/15 text-[#0071e3] dark:text-blue-400 ms-0.5 uppercase">{__('client.dash_ticket_points')}</span>
                                     </Link>
                                     <Link
                                         href="/micro-services"
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-purple-500/25 bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-semibold rounded-[980px] transition-all flex items-center justify-center gap-1.5 shadow-2xs active:scale-98 select-none cursor-pointer text-center"
                                     >
                                         <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                                        <span>MICRO SERVICES</span>
+                                        <span className="uppercase">{__('client.dash_micro_services')}</span>
                                     </Link>
                                     <Link
                                         href="/projects"
                                         className="flex-1 sm:flex-initial px-4 py-2.5 border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-[#1d1d1f] dark:text-[#f8fafc] hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 text-xs font-semibold rounded-[980px] transition-all shadow-sm active:scale-98 select-none cursor-pointer text-center flex items-center justify-center"
                                     >
-                                        VIEW ARCHIVE
+                                        <span className="uppercase">{__('client.dash_view_archive')}</span>
                                     </Link>
                                 </>
                             )}
@@ -229,13 +229,13 @@ export default function Dashboard({
                         <div className="space-y-2 max-w-2xl">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 dark:bg-blue-950/60 text-[#0071e3] dark:text-blue-400 text-[11px] font-bold tracking-wide">
                                 <LifeBuoy className="w-3.5 h-3.5" />
-                                <span>PORTAL SUPPORT DESK &bull; VIP TIER DISPATCH</span>
+                                <span className="uppercase">{__('client.dash_support_badge')}</span>
                             </div>
                             <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
-                                Need Immediate Engineering Support or Scope Guidance?
+                                {__('client.dash_support_title')}
                             </h3>
                             <p className="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
-                                Submit support requests through our portal to ensure strict SLA dispatch based on your loyalty tier. Every ticket opened awards you <strong className="text-slate-900 dark:text-white">+15 Loyalty Points</strong>, and <strong className="text-slate-900 dark:text-white">+25 Bonus Points</strong> on satisfactory resolution.
+                                {__('client.dash_support_desc')}
                             </p>
                         </div>
                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto shrink-0">
@@ -244,13 +244,13 @@ export default function Dashboard({
                                 className="w-full sm:w-auto px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-98 select-none"
                             >
                                 <MessageSquare className="w-4 h-4" />
-                                <span>Open Support Ticket</span>
+                                <span>{__('client.dash_open_support_ticket')}</span>
                             </Link>
                             <Link
                                 href="/tickets"
                                 className="w-full sm:w-auto px-4 py-2.5 border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 text-xs font-semibold rounded-xl transition-all cursor-pointer active:scale-98 select-none text-center flex items-center justify-center"
                             >
-                                View Tickets
+                                {__('client.dash_view_tickets')}
                             </Link>
                         </div>
                     </div>
@@ -259,27 +259,27 @@ export default function Dashboard({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Pillar 1: Projects & Sprints */}
                         <BentoStatCard
-                            label="Projects & Tasks"
+                            label={__('client.dash_projects_tasks')}
                             value={
                                 <span>
-                                    {activeProjects.length} <span className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-normal">Active</span>
+                                    {activeProjects.length} <span className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-normal">{__('general.active')}</span>
                                     {completedProjects.length > 0 && (
                                         <span className="text-xs text-zinc-400 font-normal ms-2">
-                                            ({completedProjects.length} Delivered)
+                                            {__('client.dash_delivered_count', { count: completedProjects.length })}
                                         </span>
                                     )}
                                 </span>
                             }
                             description={
                                 hasActiveProject
-                                    ? "Sprint deliveries, kanban boards & files"
-                                    : "All current projects delivered. Ready for new briefs."
+                                    ? __('client.dash_projects_desc_active')
+                                    : __('client.dash_projects_desc_done')
                             }
                             icon={Folder}
                             accentColor="blue"
                             action={
                                 <Link href="/projects" className="text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:underline flex items-center gap-1">
-                                    <span>VIEW ALL PROJECTS</span>
+                                    <span className="uppercase">{__('client.dash_view_all_projects')}</span>
                                     <ArrowUpRight className="h-3.5 w-3.5" />
                                 </Link>
                             }
@@ -287,7 +287,7 @@ export default function Dashboard({
 
                         {/* Pillar 2: Financial Ledger & Wallet */}
                         <BentoStatCard
-                            label="Financial Ledger"
+                            label={__('client.dash_financial_ledger')}
                             value={
                                 <span>
                                     {formatCurrencyAmount(walletBalance)} <span className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-normal">{currency}</span>
@@ -295,9 +295,9 @@ export default function Dashboard({
                             }
                             description={
                                 unpaidCount > 0 ? (
-                                    <span className="text-amber-600 dark:text-amber-400 font-semibold">{unpaidCount} Pending Invoices ({totalDueFormatted})</span>
+                                    <span className="text-amber-600 dark:text-amber-400 font-semibold">{__('client.dash_pending_invoices', { count: unpaidCount, total: totalDueFormatted })}</span>
                                 ) : (
-                                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">All accounts settled</span>
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">{__('client.dash_all_settled')}</span>
                                 )
                             }
                             icon={Wallet}
@@ -305,11 +305,11 @@ export default function Dashboard({
                             action={
                                 <div className="flex items-center space-x-4 rtl:space-x-reverse text-xs font-semibold">
                                     <Link href="/billing/invoices" className="text-[#1d1d1f] dark:text-[#f8fafc] hover:text-[#0071e3] dark:hover:text-[#2997ff] flex items-center gap-1 transition-colors">
-                                        <span>INVOICES</span>
+                                        <span className="uppercase">{__('client.dash_invoices')}</span>
                                         <ArrowUpRight className="h-3.5 w-3.5" />
                                     </Link>
                                     <Link href="/financial/add-balance" className="text-[#0071e3] dark:text-[#2997ff] hover:underline flex items-center gap-1">
-                                        <span>+ ADD FUNDS</span>
+                                        <span className="uppercase">{__('client.dash_add_funds')}</span>
                                     </Link>
                                 </div>
                             }
@@ -317,18 +317,18 @@ export default function Dashboard({
 
                         {/* Pillar 3: Deployed Systems & Tools */}
                         <BentoStatCard
-                            label="Deployed Systems"
+                            label={__('client.dash_deployed_systems')}
                             value={
                                 <span>
-                                    {activeToolLicenses.length > 0 ? activeToolLicenses.length : 3} <span className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-normal">Active Instances</span>
+                                    {activeToolLicenses.length > 0 ? activeToolLicenses.length : 3} <span className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-normal">{__('client.dash_active_instances')}</span>
                                 </span>
                             }
-                            description="ERP, Meta Cloud API, and Background Runtime"
+                            description={__('client.dash_deployed_desc')}
                             icon={Server}
                             accentColor="cyan"
                             action={
                                 <Link href="/marketplace" className="text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:underline flex items-center gap-1">
-                                    <span>MARKETPLACE APPS</span>
+                                    <span className="uppercase">{__('client.dash_marketplace_apps')}</span>
                                     <ArrowUpRight className="h-3.5 w-3.5" />
                                 </Link>
                             }
@@ -339,10 +339,10 @@ export default function Dashboard({
                     <div className="space-y-6">
                         <div>
                             <h2 className="text-xl sm:text-2xl font-bold text-[#1d1d1f] dark:text-[#f8fafc] tracking-tight font-sans">
-                                Integrated Enterprise Systems
+                                {__('client.dash_integrated_systems')}
                             </h2>
                             <p className="text-xs sm:text-sm text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1 font-sans">
-                                Direct Single Sign-On (SSO) links to your provisioned infrastructure
+                                {__('client.dash_integrated_systems_desc')}
                             </p>
                         </div>
 
@@ -354,14 +354,14 @@ export default function Dashboard({
                                         <Coins className="w-6 h-6" />
                                     </div>
                                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/60 rounded-full">
-                                        Live
+                                        {__('client.dash_live')}
                                     </span>
                                 </div>
                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-amber-600 dark:group-hover:text-amber-400 tracking-tight transition-colors">
-                                    Gold Saver & Assets
+                                    {__('client.dash_gold_saver_title')}
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Real-time gold vault, hedging, gram rates & personal asset tracking.
+                                    {__('client.dash_gold_saver_desc')}
                                 </p>
                             </a>
 
@@ -372,14 +372,14 @@ export default function Dashboard({
                                         <CreditCard className="w-6 h-6" />
                                     </div>
                                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60 rounded-full">
-                                        Active
+                                        {__('general.active')}
                                     </span>
                                 </div>
                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-rose-600 dark:group-hover:text-rose-400 tracking-tight transition-colors">
-                                    Automated Payment Gateway
+                                    {__('client.dash_payment_gateway_title')}
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Automated SMS verification, webhook notifications & mobile wallet settlements.
+                                    {__('client.dash_payment_gateway_desc')}
                                 </p>
                             </a>
 
@@ -390,14 +390,14 @@ export default function Dashboard({
                                         <Wrench className="w-6 h-6" />
                                     </div>
                                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 rounded-full">
-                                        Store
+                                        {__('client.dash_store')}
                                     </span>
                                 </div>
                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] tracking-tight transition-colors">
-                                    Software & Tools Store
+                                    {__('client.dash_tools_store_title')}
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Desktop utilities with instant automated activation linked to your email.
+                                    {__('client.dash_tools_store_desc')}
                                 </p>
                             </Link>
 
@@ -408,14 +408,14 @@ export default function Dashboard({
                                         <Key className="w-6 h-6" />
                                     </div>
                                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 rounded-full">
-                                        Licenses
+                                        {__('client.dash_licenses')}
                                     </span>
                                 </div>
                                 <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 tracking-tight transition-colors">
-                                    My Licenses & Devices
+                                    {__('client.dash_licenses_title')}
                                 </h3>
                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                    Manage your purchased software tools, linked computers, and hardware keys.
+                                    {__('client.dash_licenses_desc')}
                                 </p>
                             </Link>
 
@@ -427,14 +427,14 @@ export default function Dashboard({
                                             <Laptop className="w-6 h-6" />
                                         </div>
                                         <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-[#0071e3] dark:text-[#3898ec] border border-[#0071e3]/20 rounded-full">
-                                            Reseller
+                                            {__('client.dash_reseller')}
                                         </span>
                                     </div>
                                     <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] group-hover:text-[#0071e3] dark:group-hover:text-[#3898ec] tracking-tight transition-colors">
-                                        Software Reseller Portal
+                                        {__('client.dash_reseller_title')}
                                     </h3>
                                     <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-1.5 leading-relaxed">
-                                        Manage client device activations, quotas, and software licenses.
+                                        {__('client.dash_reseller_desc')}
                                     </p>
                                 </Link>
                             )}
@@ -444,10 +444,11 @@ export default function Dashboard({
                     {/* Recent Transactions / Invoices Table */}
                     {recentTransactions.length > 0 && (
                         <ContentCard
-                            title="Recent Financial Operations"
+                            title={__('client.dash_recent_operations')}
                             action={
-                                <Link href="/billing/invoices" className="text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:underline">
-                                    View Full Archive ➔
+                                <Link href="/billing/invoices" className="text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:underline inline-flex items-center gap-1">
+                                    {__('client.dash_view_full_archive')}
+                                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                                 </Link>
                             }
                         >
@@ -455,10 +456,10 @@ export default function Dashboard({
                                 <table className="w-full text-xs font-sans text-left rtl:text-right">
                                     <thead>
                                         <tr className="border-b border-black/5 dark:border-white/10 text-[#1d1d1f]/50 dark:text-zinc-400 font-semibold uppercase tracking-wider">
-                                            <th className="py-3 px-2">Operation ID</th>
-                                            <th className="py-3 px-2">Date</th>
-                                            <th className="py-3 px-2">Description</th>
-                                            <th className="py-3 px-2 text-right rtl:text-left">Amount</th>
+                                            <th className="py-3 px-2">{__('client.dash_operation_id')}</th>
+                                            <th className="py-3 px-2">{__('general.date')}</th>
+                                            <th className="py-3 px-2">{__('general.description')}</th>
+                                            <th className="py-3 px-2 text-right rtl:text-left">{__('general.amount')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-black/5 dark:divide-white/10">

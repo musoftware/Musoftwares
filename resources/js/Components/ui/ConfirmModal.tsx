@@ -12,6 +12,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 // ── Simple confirm modal (yes/no) ────────────────────────────────────────────
 
@@ -31,8 +32,8 @@ export function ConfirmModal({
     isOpen,
     title,
     description,
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    confirmLabel,
+    cancelLabel,
     variant = 'default',
     onConfirm,
     onCancel,
@@ -70,7 +71,7 @@ export function ConfirmModal({
                         disabled={loading}
                         className="shadow-none border-slate-200"
                     >
-                        {cancelLabel}
+                        {cancelLabel ?? __('general.cancel')}
                     </Button>
                     <Button
                         size="sm"
@@ -83,7 +84,7 @@ export function ConfirmModal({
                                 : ''
                         )}
                     >
-                        {loading ? 'Processing...' : confirmLabel}
+                        {loading ? __('general.processing') : (confirmLabel ?? __('general.confirm'))}
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -111,10 +112,10 @@ export function PromptModal({
     isOpen,
     title,
     description,
-    label = 'Value',
+    label,
     placeholder = '',
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    confirmLabel,
+    cancelLabel,
     inputType = 'text',
     onConfirm,
     onCancel,
@@ -146,7 +147,7 @@ export function PromptModal({
                 </DialogHeader>
                 <div className="mt-2 space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                        {label}
+                        {label ?? __('general.value')}
                     </Label>
                     <Input
                         type={inputType}
@@ -166,7 +167,7 @@ export function PromptModal({
                         disabled={loading}
                         className="shadow-none border-slate-200"
                     >
-                        {cancelLabel}
+                        {cancelLabel ?? __('general.cancel')}
                     </Button>
                     <Button
                         size="sm"
@@ -174,7 +175,7 @@ export function PromptModal({
                         disabled={loading || !value.trim()}
                         className="shadow-none"
                     >
-                        {loading ? 'Processing...' : confirmLabel}
+                        {loading ? __('general.processing') : (confirmLabel ?? __('general.confirm'))}
                     </Button>
                 </DialogFooter>
             </DialogContent>

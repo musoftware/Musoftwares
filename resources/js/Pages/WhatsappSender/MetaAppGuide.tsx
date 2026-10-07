@@ -1,6 +1,8 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Link2, Wrench } from 'lucide-react';
 
 export default function MetaAppGuide() {
     const appCallback = `${window.location.origin}/whatsapp-sender/auth/facebook/callback`;
@@ -8,7 +10,7 @@ export default function MetaAppGuide() {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Meta App Setup Guide" />
+            <Head title={__('whatsapp.meta_guide_page_title')} />
 
             <div className="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-12">
                 {/* Header Section */}
@@ -21,25 +23,26 @@ export default function MetaAppGuide() {
                         WhatsApp WABA Cloud API
                     </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 font-sans">
-                        دليل إعداد تطبيق Meta Developer
+                        {__('whatsapp.meta_guide_title')}
                     </h1>
                     <p className="text-base text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
-                        خطوة بخطوة لإنشاء تطبيق فيسبوك مطورين خاص بك والحصول على معرف التطبيق (App ID) والمفتاح السري لتفعيل تسجيل الدخول التلقائي.
+                        {__('whatsapp.meta_guide_subtitle')}
                     </p>
                 </div>
 
                 {/* Redirect URLs Box */}
                 <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 md:p-8 space-y-6">
                     <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                        🔗 روابط إعادة التوجيه الصالحة (OAuth Redirect URIs)
+                        <Link2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                        {__('whatsapp.meta_guide_redirects_title')}
                     </h3>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        ستحتاج لنسخ هذه الروابط ولصقها داخل إعدادات <strong>Facebook Login for Business</strong> في لوحة تحكم تطبيق فيسبوك:
+                        {__('whatsapp.meta_guide_redirects_desc')}
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-4 rounded-2xl space-y-2">
                             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">
-                                رابط لوحة تحكم الإدارة (Workspace Callback)
+                                {__('whatsapp.meta_guide_workspace_callback')}
                             </span>
                             <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs font-mono select-all overflow-x-auto text-zinc-700 dark:text-zinc-300">
                                 {appCallback}
@@ -48,7 +51,7 @@ export default function MetaAppGuide() {
 
                         <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 p-4 rounded-2xl space-y-2">
                             <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
-                                رابط ربط العملاء الخارجيين (Guest Invite Callback)
+                                {__('whatsapp.meta_guide_guest_callback')}
                             </span>
                             <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs font-mono select-all overflow-x-auto text-zinc-700 dark:text-zinc-300">
                                 {guestCallback}
@@ -59,7 +62,7 @@ export default function MetaAppGuide() {
 
                 {/* Step-by-Step Guide */}
                 <div className="space-y-8">
-                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">🛠️ خطوات إنشاء التطبيق في فيسبوك</h2>
+                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2"><Wrench className="w-6 h-6 text-zinc-500" aria-hidden="true" />{__('whatsapp.meta_guide_steps_title')}</h2>
 
                     <div className="space-y-6">
                         {/* Step 1 */}
@@ -68,9 +71,10 @@ export default function MetaAppGuide() {
                                 01
                             </div>
                             <div className="space-y-2 pt-1.5">
-                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">التسجيل كمطور في فيسبوك</h4>
+                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.meta_guide_step1_title')}</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    توجه إلى موقع <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline font-semibold">Meta for Developers</a> وقم بتسجيل الدخول بحسابك الشخصي، ثم أكمل خطوات تفعيل حساب المطور.
+                                    {__('whatsapp.meta_guide_step1_desc')}{' '}
+                                    <a href="https://developers.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline font-semibold">Meta for Developers</a>
                                 </p>
                             </div>
                         </div>
@@ -81,9 +85,9 @@ export default function MetaAppGuide() {
                                 02
                             </div>
                             <div className="space-y-2 pt-1.5">
-                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">إنشاء تطبيق جديد (Create App)</h4>
+                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.meta_guide_step2_title')}</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    اضغط على زر <strong>Create App</strong> ثم اختر <strong>Other</strong> ثم حدد نوع التطبيق <strong>Business</strong> (أعمال). أدخل اسماً مناسباً للتطبيق (مثلاً: <em>Musoftwares WhatsApp API</em>) واربطه بحساب مدير الأعمال (Business Manager) الخاص بك إن وجد.
+                                    {__('whatsapp.meta_guide_step2_desc')}
                                 </p>
                             </div>
                         </div>
@@ -94,9 +98,9 @@ export default function MetaAppGuide() {
                                 03
                             </div>
                             <div className="space-y-2 pt-1.5">
-                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">إعداد منتج WhatsApp</h4>
+                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.meta_guide_step3_title')}</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    من القائمة الجانبية للتطبيق أو المنتجات المتاحة، ابحث عن <strong>WhatsApp</strong> واضغط على <strong>Set Up</strong> لتثبيته وتفعيله داخل التطبيق.
+                                    {__('whatsapp.meta_guide_step3_desc')}
                                 </p>
                             </div>
                         </div>
@@ -107,9 +111,9 @@ export default function MetaAppGuide() {
                                 04
                             </div>
                             <div className="space-y-2 pt-1.5">
-                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">تكوين منتج تسجيل الدخول (Facebook Login)</h4>
+                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.meta_guide_step4_title')}</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    أضف منتج <strong>Facebook Login for Business</strong> من قسم المنتجات. اذهب إلى إعدادات تسجيل الدخول وفي حقل <strong>Valid OAuth Redirect URIs</strong> قم بلصق الروابط الموضحة في المربع العلوي، ثم احفظ التغييرات.
+                                    {__('whatsapp.meta_guide_step4_desc')}
                                 </p>
                             </div>
                         </div>
@@ -120,9 +124,9 @@ export default function MetaAppGuide() {
                                 05
                             </div>
                             <div className="space-y-2 pt-1.5">
-                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">نسخ بيانات التطبيق الأساسية</h4>
+                                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.meta_guide_step5_title')}</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                    اذهب إلى <strong>App Settings</strong> ثم <strong>Basic</strong>. ستجد هناك **App ID** (معرف التطبيق) و **App Secret** (المفتاح السري للتطبيق). انسخهما ثم قم بإدخالهما في لوحة تحكم الأعمال الخاصة بك هنا في خيارات تعديل البيزنس.
+                                    {__('whatsapp.meta_guide_step5_desc')}
                                 </p>
                             </div>
                         </div>
@@ -135,7 +139,7 @@ export default function MetaAppGuide() {
                         href="/whatsapp-sender"
                         className="bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-sm font-bold px-6 py-3 rounded-2xl transition shadow-md"
                     >
-                        العودة للأعمال
+                        {__('whatsapp.meta_guide_back')}
                     </Link>
                 </div>
             </div>

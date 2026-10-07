@@ -8,6 +8,8 @@ import { Trash2, Edit, Plus, Clock, Bell, ArrowLeft, Loader2 } from 'lucide-reac
 import axios from 'axios';
 import { router } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import { toast } from 'sonner';
 
 type NoticeType = 'info' | 'success' | 'warning' | 'danger';
 
@@ -48,16 +50,30 @@ const TYPE_BADGE: Record<NoticeType, string> = {
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const monthDays = Array.from({ length: 31 }, (_, i) => i + 1);
 const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'january', 'february', 'march', 'april', 'may', 'june',
+    'july', 'august', 'september', 'october', 'november', 'december',
 ];
 
+const NOTICE_TYPE_KEYS: Record<NoticeType, string> = {
+    info: 'general.info',
+    success: 'general.success',
+    warning: 'admin.notice_type_warning',
+    danger: 'admin.notice_type_danger',
+};
+
+const RECURRING_UNIT_KEYS: Record<string, string> = {
+    day: 'admin.notices_unit_day',
+    week: 'admin.notices_unit_week',
+    month: 'admin.notices_unit_month',
+    year: 'admin.notices_unit_year',
+};
+
 const getYearDaysList = () => {
-    const list: { val: string; label: string }[] = [];
+    const list: { val: string; day: string; month: string }[] = [];
     monthNames.forEach((month, mIdx) => {
         const daysInMonth = new Date(2024, mIdx + 1, 0).getDate();
         for (let d = 1; d <= daysInMonth; d++) {
-            list.push({ val: `${d}-${mIdx + 1}`, label: `${d.toString().padStart(2, '0')} - ${month}` });
+            list.push({ val: `${d}-${mIdx + 1}`, day: d.toString().padStart(2, '0'), month });
         }
     });
     return list;
@@ -79,19 +95,24 @@ const emptyForm: FormState = {
 
 export const NOTICES_MANAGER_OPEN_EVENT = 'notices-manager:open';
 
+const SCHEDULE_VALUE_FIELDS: Record<string, keyof NoticeRow> = {
+    week: 'recurring_times_week',
+    month: 'recurring_times_month',
+    year: 'recurring_times_year',
+};
+
 function scheduleLabel(n: NoticeRow): string {
-    let label = `Every ${n.recurring_times} ${n.recurring}`;
-    if (n.recurring === 'week' && n.recurring_times_week) {
-        label += ` on [${n.recurring_times_week}]`;
-    } else if (n.recurring === 'month' && n.recurring_times_month) {
-        label += ` on [${n.recurring_times_month}]`;
-    } else if (n.recurring === 'year' && n.recurring_times_year) {
-        label += ` on [${n.recurring_times_year}]`;
-    }
-    return label;
+    const unitKey = RECURRING_UNIT_KEYS[n.recurring];
+    const unit = unitKey ? __(unitKey) : n.recurring;
+    const label = __('admin.notices_schedule_every', { count: n.recurring_times, unit });
+    const field = SCHEDULE_VALUE_FIELDS[n.recurring];
+    const values = field ? n[field] : null;
+    if (!values) return label;
+    return __('admin.notices_schedule_on', { schedule: label, values: String(values) });
 }
 
 export default function NoticesManager() {
+    const { confirm, confirmDialog } = useConfirm();
     const [open, setOpen] = useState(false);
     const [view, setView] = useState<'list' | 'form'>('list');
     const [rows, setRows] = useState<NoticeRow[]>([]);
@@ -107,7 +128,7 @@ export default function NoticesManager() {
             setRows(res.data.notices ?? []);
             setStats(res.data.stats ?? { total_active: 0, due_today: 0 });
         } catch {
-            toast('error');
+            toast.error(__('general.error_occurred'));
         } finally {
             setLoading(false);
         }
@@ -155,7 +176,7 @@ export default function NoticesManager() {
             });
             setView('form');
         } catch {
-            toast('error');
+            toast.error(__('general.error_occurred'));
         }
     };
 
@@ -180,20 +201,26 @@ export default function NoticesManager() {
             await fetchAll();
             reloadBoardNotices();
         } catch {
-            toast('error');
+            toast.error(__('general.error_occurred'));
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm('Delete this notice?')) return;
+        const accepted = await confirm({
+            title: __('admin.notices_delete_title'),
+            description: __('admin.notices_delete_description'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         try {
             await axios.delete(route('admin.recurring_notices.delete', id));
             await fetchAll();
             reloadBoardNotices();
         } catch {
-            toast('error');
+            toast.error(__('general.error_occurred'));
         }
     };
 
@@ -203,11 +230,12 @@ export default function NoticesManager() {
             await fetchAll();
             reloadBoardNotices();
         } catch {
-            toast('error');
+            toast.error(__('general.error_occurred'));
         }
     };
 
     return (
+        <>
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-[720px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -216,7 +244,7 @@ export default function NoticesManager() {
                         {__('general.recurring_notices')}
                     </DialogTitle>
                     <DialogDescription className="text-xs text-slate-500">
-                        {__('general.manage_recurring_notices_hint', {}, 'Schedule notices that surface on the board when due.')}
+                        {__('general.manage_recurring_notices_hint')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -242,7 +270,7 @@ export default function NoticesManager() {
                         {loading ? (
                             <div className="flex items-center justify-center py-10 text-slate-400">
                                 <Loader2 className="h-4 w-4 animate-spin me-2" />
-                                Loading…
+                                {__('general.loading')}
                             </div>
                         ) : rows.length === 0 ? (
                             <div className="rounded-lg border border-dashed bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
@@ -255,7 +283,7 @@ export default function NoticesManager() {
                                         <div className="min-w-0 flex-1">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 <h4 className="truncate text-sm font-semibold text-slate-900">{n.title}</h4>
-                                                <span className={`inline-flex rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ring-1 ${TYPE_BADGE[n.type]}`}>{n.type}</span>
+                                                <span className={`inline-flex rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ring-1 ${TYPE_BADGE[n.type]}`}>{__(NOTICE_TYPE_KEYS[n.type] ?? 'general.info')}</span>
                                             </div>
                                             {n.message && <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{n.message}</p>}
                                             <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
@@ -270,11 +298,11 @@ export default function NoticesManager() {
                                             </div>
                                         </div>
                                         <div className="flex shrink-0 items-center gap-1">
-                                            <Switch checked={n.is_active} onCheckedChange={() => handleToggle(n.id)} />
-                                            <Button variant="ghost" size="sm" onClick={() => startEdit(n.id)} className="text-slate-700 hover:text-black">
+                                            <Switch checked={n.is_active} onCheckedChange={() => handleToggle(n.id)} aria-label={n.is_active ? __('general.deactivate') : __('general.activate')} />
+                                            <Button variant="ghost" size="sm" onClick={() => startEdit(n.id)} className="text-slate-700 hover:text-black" aria-label={__('general.edit')} title={__('general.edit')}>
                                                 <Edit className="h-4 w-4" />
                                             </Button>
-                                            <Button variant="ghost" size="sm" onClick={() => handleDelete(n.id)} className="text-red-600 hover:text-red-900">
+                                            <Button variant="ghost" size="sm" onClick={() => handleDelete(n.id)} className="text-red-600 hover:text-red-900" aria-label={__('general.delete')} title={__('general.delete')}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -290,7 +318,7 @@ export default function NoticesManager() {
                             onClick={() => setView('list')}
                             className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-black"
                         >
-                            <ArrowLeft className="h-3.5 w-3.5" />{__('general.back_to_recurring_notices')}
+                            <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />{__('general.back_to_recurring_notices')}
                         </button>
 
                         <div className="space-y-2">
@@ -313,10 +341,9 @@ export default function NoticesManager() {
                             <div className="space-y-2">
                                 <Label htmlFor="nm-type">{__('general.notice_type')}</Label>
                                 <select id="nm-type" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as NoticeType })}>
-                                    <option value="info">Info</option>
-                                    <option value="success">Success</option>
-                                    <option value="warning">Warning</option>
-                                    <option value="danger">Danger</option>
+                                    {(Object.keys(NOTICE_TYPE_KEYS) as NoticeType[]).map((type) => (
+                                        <option key={type} value={type}>{__(NOTICE_TYPE_KEYS[type])}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="space-y-2">
@@ -336,7 +363,7 @@ export default function NoticesManager() {
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="nm-int">Interval (Every N)</Label>
+                                <Label htmlFor="nm-int">{__('admin.notices_interval')}</Label>
                                 <select id="nm-int" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={form.recurring_times} onChange={(e) => setForm({ ...form, recurring_times: parseInt(e.target.value) || 1 })}>
                                     {Array.from({ length: 30 }, (_, i) => i + 1).map((num) => (
                                         <option key={num} value={num}>{num}</option>
@@ -355,7 +382,7 @@ export default function NoticesManager() {
                                     value={form.recurring_times_week}
                                     onChange={(e) => setForm({ ...form, recurring_times_week: Array.from(e.target.selectedOptions, (o) => o.value) })}
                                 >
-                                    {weekDays.map((wd) => <option key={wd} value={wd}>{wd}</option>)}
+                                    {weekDays.map((wd) => <option key={wd} value={wd}>{__(`admin.day_${wd.toLowerCase()}`)}</option>)}
                                 </select>
                                 <span className="text-xs text-slate-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                             </div>
@@ -387,7 +414,7 @@ export default function NoticesManager() {
                                     value={form.recurring_times_year}
                                     onChange={(e) => setForm({ ...form, recurring_times_year: Array.from(e.target.selectedOptions, (o) => o.value) })}
                                 >
-                                    {yearDaysList.map((yd) => <option key={yd.val} value={yd.val}>{yd.label}</option>)}
+                                    {yearDaysList.map((yd) => <option key={yd.val} value={yd.val}>{`${yd.day} - ${__(`admin.month_${yd.month}`)}`}</option>)}
                                 </select>
                                 <span className="text-xs text-slate-400">{__('general.hold_ctrl_cmd_to_select_multiple_dates')}</span>
                             </div>
@@ -395,7 +422,7 @@ export default function NoticesManager() {
 
                         <div className="flex justify-end gap-2 border-t pt-4">
                             <Button type="button" variant="outline" onClick={() => setView('list')} className="h-9 text-xs">
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button type="submit" disabled={submitting} className="bg-black hover:bg-slate-800 text-white h-9 text-xs">
                                 {submitting && <Loader2 className="h-3.5 w-3.5 me-1 animate-spin" />}
@@ -406,17 +433,7 @@ export default function NoticesManager() {
                 )}
             </DialogContent>
         </Dialog>
+        {confirmDialog}
+        </>
     );
-}
-
-function toast(type: 'success' | 'error') {
-    if (typeof window === 'undefined') return;
-    // Lightweight CSS-only notification fallback so we don't pull in a new dependency.
-    const id = `notices-toast-${Date.now()}`;
-    const el = document.createElement('div');
-    el.id = id;
-    el.textContent = type === 'success' ? 'Saved.' : 'Something went wrong.';
-    el.className = `fixed bottom-4 right-4 z-[9999] rounded-md px-3 py-2 text-xs font-medium shadow-lg ${type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`;
-    document.body.appendChild(el);
-    window.setTimeout(() => el.remove(), 2200);
 }

@@ -4,6 +4,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import { Stethoscope, FileHeart, Activity, ArrowRight, CheckCircle2 } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -43,33 +44,33 @@ export default function Healthcare({ auth }) {
 
     const features = [
         {
-            title: "Patient Records",
+            title: __('frontend.solution_healthcare_f1_title'),
             icon: FileHeart,
-            desc: "Secure, compliant Electronic Health Records (EHR) management. Access patient history instantly and securely.",
-            bullets: ["HIPAA compliant storage", "Role-based access", "Audit logging"]
+            desc: __('frontend.solution_healthcare_f1_desc'),
+            bullets: [__('frontend.solution_healthcare_f1_b1'), __('frontend.solution_healthcare_f1_b2'), __('frontend.solution_healthcare_f1_b3')]
         },
         {
-            title: "Telemedicine",
+            title: __('frontend.solution_healthcare_f2_title'),
             icon: Activity,
-            desc: "Integrated video consultation platforms with digital prescriptions and real-time vital tracking.",
-            bullets: ["Secure video calls", "Digital prescriptions", "Session recording"]
+            desc: __('frontend.solution_healthcare_f2_desc'),
+            bullets: [__('frontend.solution_healthcare_f2_b1'), __('frontend.solution_healthcare_f2_b2'), __('frontend.solution_healthcare_f2_b3')]
         },
         {
-            title: "Clinic Operations",
+            title: __('frontend.solution_healthcare_f3_title'),
             icon: Stethoscope,
-            desc: "Streamline the day-to-day operations of your clinic with automated scheduling and billing systems.",
-            bullets: ["Smart scheduling", "Insurance billing", "Staff management"]
+            desc: __('frontend.solution_healthcare_f3_desc'),
+            bullets: [__('frontend.solution_healthcare_f3_b1'), __('frontend.solution_healthcare_f3_b2'), __('frontend.solution_healthcare_f3_b3')]
         }
     ];
 
     return (
         <PublicLayout auth={auth}>
             <Head>
-                <title>Healthcare Systems | Musoftware</title>
-                <meta name="description" content="Modernize healthcare operations with secure, compliant systems for managing patient data." />
+                <title>{`${__('frontend.solution_healthcare_meta_title')} | Musoftware`}</title>
+                <meta name="description" content={__('frontend.solution_healthcare_meta_desc')} />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss a Healthcare System." />
+            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage={__('frontend.solution_healthcare_whatsapp_message')} />
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
                 
@@ -78,19 +79,19 @@ export default function Healthcare({ auth }) {
                     <div className="max-w-4xl">
                         <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
                             <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            Solution
+                            {__('frontend.solution_badge')}
                         </div>
                         <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Healthcare Systems.
+                            {__('frontend.solution_healthcare_hero_title')}
                         </h1>
                         <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            Modernize healthcare operations. We build secure, compliant systems for managing patient data, telehealth appointments, and clinical workflows.
+                            {__('frontend.solution_healthcare_hero_desc')}
                         </p>
                         <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss a Healthcare System.")}
+                            onClick={() => openWhatsApp(__('frontend.solution_healthcare_whatsapp_message'))}
                             className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-8 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            Discuss Your Needs
+                            {__('frontend.solution_discuss_needs')}
                         </Button>
                     </div>
                 </section>
@@ -98,8 +99,8 @@ export default function Healthcare({ auth }) {
                 {/* Features Grid */}
                 <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Medical Software</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">Engineered for patient care and data security.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('frontend.solution_healthcare_section_title')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('frontend.solution_healthcare_section_desc')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -129,16 +130,16 @@ export default function Healthcare({ auth }) {
                 <section className="py-24 bg-[#f5f5f7] text-[#1d1d1f] border-t border-black/5 text-center reveal-section px-6">
                     <div className="max-w-3xl mx-auto">
                         <h2 className="gsap-fade-up text-3xl md:text-5xl font-bold tracking-tight mb-6">
-                            Ready to modernize your clinic?
+                            {__('frontend.solution_healthcare_cta_title')}
                         </h2>
                         <p className="gsap-fade-up text-lg text-[#1d1d1f]/70 mb-10 leading-relaxed">
-                            Replace outdated systems with modern, fast, and highly secure healthcare software.
+                            {__('frontend.solution_healthcare_cta_desc')}
                         </p>
                         <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I need to modernize my healthcare software.")}
+                            onClick={() => openWhatsApp(__('frontend.solution_healthcare_cta_message'))}
                             className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-10 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-3 mx-auto cursor-pointer"
                         >
-                            Book a Consultation <ArrowRight className="w-4 h-4" />
+                            {__('frontend.solution_book_consultation')} <ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>
                 </section>

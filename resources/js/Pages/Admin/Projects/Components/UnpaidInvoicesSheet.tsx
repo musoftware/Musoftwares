@@ -61,7 +61,7 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
         })
         .catch((err) => {
             console.error('Error fetching unpaid invoices:', err);
-            setError(__('general.error_loading_invoices') || 'Error loading invoices');
+            setError(__('general.error_loading_invoices'));
         })
         .finally(() => {
             setLoading(false);
@@ -76,7 +76,7 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                 <SheetHeader className="p-6 border-b border-slate-200 bg-white">
                     <SheetTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-red-600" />
-                        {__('general.unpaid_dues') || 'Unpaid Dues'}
+                        {__('general.unpaid_dues')}
                     </SheetTitle>
                     <SheetDescription className="text-slate-500 text-sm mt-1">
                         <span className="font-semibold text-slate-800">{project.project_name}</span>
@@ -92,7 +92,7 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 gap-2 text-slate-500">
                             <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                            <span className="text-sm font-medium">{__('general.loading') || 'Loading...'}</span>
+                            <span className="text-sm font-medium">{__('general.loading')}</span>
                         </div>
                     ) : error ? (
                         <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2">
@@ -102,8 +102,8 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                     ) : invoices.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-slate-500 bg-white rounded-xl border border-slate-100 p-6 text-center">
                             <AlertCircle className="h-10 w-10 text-slate-300 mb-2" />
-                            <p className="font-semibold text-slate-800 text-sm">{__('general.no_unpaid_invoices') || 'No Unpaid Invoices'}</p>
-                            <p className="text-xs text-slate-400 mt-1">{__('general.project_all_invoices_paid') || 'All invoices for this project are fully paid.'}</p>
+                            <p className="font-semibold text-slate-800 text-sm">{__('general.no_unpaid_invoices')}</p>
+                            <p className="text-xs text-slate-400 mt-1">{__('general.project_all_invoices_paid')}</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -122,13 +122,13 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                                                     ? 'bg-amber-50 text-amber-700 border-amber-200' 
                                                     : 'bg-rose-50 text-rose-700 border-rose-200'
                                             }`}>
-                                                {isPartial ? (__('general.partially_paid') || 'Partially Paid') : (__('general.unpaid') || 'Unpaid')}
+                                                {isPartial ? __('admin.project_finance_invoice_partially_paid') : __('admin.project_finance_invoice_unpaid')}
                                             </span>
                                         </div>
 
                                         <div className="space-y-1">
                                             <div className="flex justify-between items-baseline">
-                                                <span className="text-xs text-slate-400">{__('general.amount') || 'Amount'}</span>
+                                                <span className="text-xs text-slate-400">{__('general.amount')}</span>
                                                 <span className="font-mono font-bold text-slate-800">
                                                     {formatMoney(invoice.amount, invoice.currency)}
                                                 </span>
@@ -136,13 +136,13 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                                             {isPartial && (
                                                 <>
                                                     <div className="flex justify-between items-baseline text-xs">
-                                                        <span className="text-slate-400">{__('general.paid') || 'Paid'}</span>
+                                                        <span className="text-slate-400">{__('general.paid')}</span>
                                                         <span className="font-mono text-emerald-600 font-medium">
                                                             {formatMoney(invoice.paid_amount, invoice.currency)}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between items-baseline text-xs border-t border-slate-100 pt-1 mt-1">
-                                                        <span className="font-medium text-slate-500">{__('general.remaining') || 'Remaining'}</span>
+                                                        <span className="font-medium text-slate-500">{__('general.remaining')}</span>
                                                         <span className="font-mono text-rose-600 font-bold">
                                                             {formatMoney(remainingAmount, invoice.currency)}
                                                         </span>
@@ -155,14 +155,14 @@ export function UnpaidInvoicesSheet({ project, isOpen, onClose }: UnpaidInvoices
                                             <div className="flex items-center gap-1">
                                                 <Calendar className="h-3 w-3" />
                                                 <span>
-                                                    {invoice.due_date ? `${__('general.due')} ${invoice.due_date}` : (__('general.no_due_date') || 'No due date')}
+                                                    {invoice.due_date ? `${__('general.due')} ${invoice.due_date}` : (__('general.no_due_date'))}
                                                 </span>
                                             </div>
                                             <Link
                                                 href={`/admin/invoices/${invoice.id}`}
                                                 className="inline-flex items-center gap-1 text-slate-900 font-semibold hover:underline"
                                             >
-                                                <span>{__('general.view_invoice') || 'View'}</span>
+                                                <span>{__('general.view_invoice')}</span>
                                                 <ExternalLink className="h-3 w-3" />
                                             </Link>
                                         </div>

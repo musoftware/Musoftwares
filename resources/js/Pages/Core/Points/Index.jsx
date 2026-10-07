@@ -13,12 +13,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function PointsIndex({ auth, tiers = [], quickPackages = [], transactions, egpToPreferredRate = 0.10, currency }) {
     const { wallet, flash } = usePage().props;
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
     const Layout = AuthenticatedLayout;
     const [customPoints, setCustomPoints] = useState('');
+    const { confirm, confirmDialog } = useConfirm();
     const globalCurrency = currency || wallet?.currency || auth?.user?.currency || auth?.user?.preferred_currency;
 
     // Calculate dynamic price for custom amount using tiers
@@ -39,33 +41,30 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
         return { pricePerPoint, totalCost, fullPrice, savings, discountPercent };
     }, [customPoints, tiers]);
 
-    const handleQuickBuy = (pkg) => {
-        const canUseWallet = wallet_balance >= pkg.total_cost;
-        const msg = canUseWallet
-            ? `Pay ${formatMoney(pkg.total_cost, globalCurrency)} from your wallet to buy ${formatNumber(pkg.points)} points?`
-            : `You'll be redirected to Kashier to securely pay ${formatMoney(pkg.total_cost, globalCurrency)}. Continue?`;
+    const confirmPurchase = (totalCost, points) => {
+        const amount = formatMoney(totalCost, globalCurrency);
+        const description = wallet_balance >= totalCost
+            ? __('general.points_confirm_wallet', { amount, points: formatNumber(points) })
+            : __('general.points_confirm_kashier', { amount });
 
-        if (confirm(msg)) {
-            router.post(route('point-purchases.store'), { package_id: pkg.id });
-        }
+        return confirm({ title: __('general.points_confirm_title'), description });
     };
 
-    const handleCustomPurchase = () => {
+    const handleQuickBuy = async (pkg) => {
+        if (!(await confirmPurchase(pkg.total_cost, pkg.points))) return;
+        router.post(route('point-purchases.store'), { package_id: pkg.id });
+    };
+
+    const handleCustomPurchase = async () => {
         const pts = parseInt(customPoints, 10);
         if (!pts || pts <= 0 || !customPricing) return;
 
-        const canUseWallet = wallet_balance >= customPricing.totalCost;
-        const msg = canUseWallet
-            ? `Pay ${formatMoney(customPricing.totalCost, globalCurrency)} from your wallet to buy ${formatNumber(pts)} points?`
-            : `You'll be redirected to Kashier to securely pay ${formatMoney(customPricing.totalCost, globalCurrency)}. Continue?`;
-
-        if (confirm(msg)) {
-            router.post(route('point-purchases.store-wallet'), { points: pts });
-        }
+        if (!(await confirmPurchase(customPricing.totalCost, pts))) return;
+        router.post(route('point-purchases.store-wallet'), { points: pts });
     };
 
     return (
-        <Layout header="Buy Points">
+        <Layout header={__('general.buy_points')}>
             <AppPage>
                 <PageHeader 
                     title={__('general.buy_points')} 
@@ -84,7 +83,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                         </CardHeader>
                         <CardContent>
                             <div className="text-5xl lg:text-6xl font-bold tracking-tight mb-2">
-                                {formatNumber(auth.user.points_balance || 0)} <span className="text-2xl text-primary-foreground/70 font-medium">pts</span>
+                                {formatNumber(auth.user.points_balance || 0)} <span className="text-2xl text-primary-foreground/70 font-medium">{__('general.points_pts')}</span>
                             </div>
                         </CardContent>
                         <CardFooter className="bg-black/10 border-t-0 mt-4">
@@ -122,12 +121,12 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                         <div className="flex items-center gap-2">
                                             {isActive && <Sparkles className="w-3 h-3 text-primary animate-pulse" />}
                                             <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                                                {formatNumber(tier.min)}{tier.max ? `–${formatNumber(tier.max)}` : '+'} pts
+                                                {__('general.points_count', { count: `${formatNumber(tier.min)}${tier.max ? `–${formatNumber(tier.max)}` : '+'}` })}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                                                <FinancialAmount amount={tier.price_per_point} currency={globalCurrency} />/pt
+                                                <FinancialAmount amount={tier.price_per_point} currency={globalCurrency} />{__('general.points_per_pt')}
                                             </span>
                                             {tier.discount_percent > 0 && (
                                                 <Badge variant={isActive ? "default" : "secondary"} className="h-5 px-1.5 text-[10px]">
@@ -173,7 +172,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                             <CardDescription className="uppercase tracking-widest text-xs font-semibold">{pkg.label}</CardDescription>
                                             <CardTitle className="text-3xl font-bold flex items-baseline justify-center gap-1 mt-2">
                                                 {formatNumber(pkg.points)}
-                                                <span className="text-sm text-muted-foreground font-normal">pts</span>
+                                                <span className="text-sm text-muted-foreground font-normal">{__('general.points_pts')}</span>
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="text-center pb-6">
@@ -225,9 +224,10 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">{__('general.number_of_points')}</label>
+                                    <label htmlFor="custom-points" className="block text-sm font-medium mb-2">{__('general.number_of_points')}</label>
                                     <div className="relative">
                                         <Input
+                                            id="custom-points"
                                             type="number"
                                             value={customPoints}
                                             onChange={(e) => setCustomPoints(e.target.value)}
@@ -236,7 +236,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                             min="1"
                                         />
                                         <div className="absolute end-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
-                                            pts
+                                            {__('general.points_pts')}
                                         </div>
                                     </div>
                                 </div>
@@ -276,7 +276,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                                         {customPricing.savings > 0 && (
                                             <div className="flex items-center justify-center gap-2 py-1.5 px-3 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-md mt-2">
-                                                <Sparkles className="w-3 h-3" />{__('general.you_save')}<FinancialAmount amount={customPricing.savings} currency={globalCurrency} /> ({customPricing.discountPercent}% off)
+                                                <Sparkles className="w-3 h-3" />{__('general.you_save')}<FinancialAmount amount={customPricing.savings} currency={globalCurrency} /> {__('general.points_percent_off', { percent: customPricing.discountPercent })}
                                             </div>
                                         )}
                                     </div>
@@ -359,6 +359,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                     </Card>
                 </div>
             </AppPage>
+            {confirmDialog}
         </Layout>
     );
 }

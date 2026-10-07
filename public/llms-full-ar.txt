@@ -13,6 +13,7 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
+- **Web Dev**: http://localhost/marketplace/categories/web-dev
 
 ## دليل الخدمات الشامل
 

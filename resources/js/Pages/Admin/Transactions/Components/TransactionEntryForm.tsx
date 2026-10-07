@@ -67,11 +67,11 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
     }, [type]);
 
     const feeSources = [
-        { id: 'upwork', label: 'Upwork', icon: 'fas fa-briefcase', color: '#14a800', hint: '20% Platform Fee', fee_rate: 0.20, fee_text: '20%' },
-        { id: 'paypal', label: 'Paypal', icon: 'fab fa-paypal', color: '#003087', hint: 'Transaction Fee', fee_rate: 0.05, fee_text: '5%' },
-        { id: 'gumroad', label: 'Gumroad', icon: 'fas fa-store', color: '#ff90e8', hint: 'Platform + Trans.', fee_rate: 0.135, fee_text: '13.5%' },
-        { id: 'wallet', label: 'Wallet', icon: 'fas fa-wallet', color: '#dc3545', hint: 'Internal Transfer', fee_rate: 0.01, fee_text: '1%' },
-        { id: 'custom', label: 'Custom', icon: 'fas fa-edit', color: '#6c757d', hint: 'Manual Entry', fee_rate: 0, fee_text: 'Manual' }
+        { id: 'upwork', label: 'Upwork', icon: 'fas fa-briefcase', color: '#14a800', hint: __('admin.fee_hint_platform', { rate: '20%' }), fee_rate: 0.20, fee_text: '20%' },
+        { id: 'paypal', label: 'Paypal', icon: 'fab fa-paypal', color: '#003087', hint: __('admin.fee_hint_transaction'), fee_rate: 0.05, fee_text: '5%' },
+        { id: 'gumroad', label: 'Gumroad', icon: 'fas fa-store', color: '#ff90e8', hint: __('admin.fee_hint_platform_and_transaction'), fee_rate: 0.135, fee_text: '13.5%' },
+        { id: 'wallet', label: __('general.wallet'), icon: 'fas fa-wallet', color: '#dc3545', hint: __('admin.fee_hint_internal_transfer'), fee_rate: 0.01, fee_text: '1%' },
+        { id: 'custom', label: __('admin.fee_source_custom'), icon: 'fas fa-edit', color: '#6c757d', hint: __('admin.fee_hint_manual_entry'), fee_rate: 0, fee_text: __('admin.fee_manual') }
     ];
 
     const [selectedFeeSource, setSelectedFeeSource] = useState<string>('custom');
@@ -200,7 +200,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                             </div>
                             <div className="md:col-span-5 space-y-1">
                                 <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">
-                                    Amount {exchangeFromCurrency && `(${currencies.find(c => c.id.toString() === exchangeFromCurrency)?.symbol})`}
+                                    {__('general.amount')} {exchangeFromCurrency && `(${currencies.find(c => c.id.toString() === exchangeFromCurrency)?.symbol})`}
                                 </Label>
                                 <Input type="number" className="bg-white" value={exchangeAmount} onChange={e => setExchangeAmount(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyExchange()} placeholder="0.00" />
                             </div>
@@ -266,6 +266,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         className="rounded-s-none h-12 px-3 border-s-0"
                                         onClick={() => setShowExchange(!showExchange)}
                                         title={__('general.currency_exchange')}
+                                        aria-label={__('general.currency_exchange')}
                                     >
                                         <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
                                     </Button>
@@ -279,7 +280,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                             <div className="md:col-span-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">Fee</Label>
+                                        <Label className="text-xs uppercase tracking-wider text-muted-foreground font-bold">{__('admin.transaction_fee')}</Label>
                                         <Input 
                                             type="number" 
                                             value={fee} 
@@ -378,7 +379,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                 />
                                                 <Percent className="h-3 w-3 absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                             </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-destructive h-10 w-10 shrink-0" onClick={() => setProjectSplits(projectSplits.filter((_, i) => i !== idx))}>
+                                            <Button type="button" variant="ghost" size="icon" className="text-destructive h-10 w-10 shrink-0" aria-label={__('general.delete')} onClick={() => setProjectSplits(projectSplits.filter((_, i) => i !== idx))}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -398,7 +399,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                     {type === 'timer-received' || type === 'receive' ? (
                         <div className="flex items-center gap-2">
                             <Switch id="isUsed" checked={isUsed} onCheckedChange={(c: boolean) => setIsUsed(c)} />
-                            <label htmlFor="isUsed" className="text-sm text-muted-foreground cursor-pointer user-select-none">{__('general.mark_as_used_money')}<span className="text-xs opacity-70">(Funds already spent/utilized)</span>
+                            <label htmlFor="isUsed" className="text-sm text-muted-foreground cursor-pointer user-select-none">{__('general.mark_as_used_money')}<span className="text-xs opacity-70">{__('admin.transaction_funds_already_used_hint')}</span>
                             </label>
                         </div>
                     ) : null}
@@ -419,8 +420,8 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                         <th className="px-4 py-3 font-semibold">{__('general.reason')}</th>
                                         {projectSplits.length > 0 && <th className="px-4 py-3 font-semibold">{__('general.project')}</th>}
                                         <th className="px-4 py-3 font-semibold text-end">{__('general.gross')}</th>
-                                        <th className="px-4 py-3 font-semibold text-end">Fee</th>
-                                        <th className="px-4 py-3 font-semibold text-end">Net</th>
+                                        <th className="px-4 py-3 font-semibold text-end">{__('admin.transaction_fee')}</th>
+                                        <th className="px-4 py-3 font-semibold text-end">{__('general.net')}</th>
                                         <th className="px-4 py-3 font-semibold text-end w-16"></th>
                                     </tr>
                                 </thead>
@@ -451,7 +452,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                                 <CurrencyDisplay amount={item.amount - item.fee} currency={user.currency_obj || businessCurrency} />
                                             </td>
                                             <td className="px-4 py-3 text-end">
-                                                <Button type="button" variant="ghost" size="icon" className="text-destructive h-8 w-8 hover:bg-destructive/10" onClick={() => removeItem(idx)}>
+                                                <Button type="button" variant="ghost" size="icon" className="text-destructive h-8 w-8 hover:bg-destructive/10" aria-label={__('general.delete')} onClick={() => removeItem(idx)}>
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
                                             </td>
@@ -476,7 +477,7 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                         )}
                     </div>
                     <Button onClick={submitTransactions} disabled={processing} size="lg" className="w-full md:w-auto min-w-[200px]">
-                        {processing ? 'Processing...' : `Save ${stagedItems.length} Transaction(s)`}
+                        {processing ? __('general.processing') : __('admin.transaction_save_staged', { count: stagedItems.length })}
                     </Button>
                 </div>
             )}

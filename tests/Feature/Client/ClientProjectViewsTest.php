@@ -11,11 +11,13 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class ClientProjectViewsTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
@@ -244,6 +246,8 @@ class ClientProjectViewsTest extends TestCase
 
     public function test_client_can_activate_ai_with_egp_balance()
     {
+        // Activation charges 10 EGP converted to the client currency, so it needs a real rate.
+        $this->seedUsdEgpRates();
         $client = $this->makeClient([
             'user_balance' => 20.0,
         ]);
@@ -268,6 +272,7 @@ class ClientProjectViewsTest extends TestCase
 
     public function test_client_cannot_activate_ai_with_insufficient_balance()
     {
+        $this->seedUsdEgpRates();
         $client = $this->makeClient([
             'user_balance' => 0.0,
         ]);

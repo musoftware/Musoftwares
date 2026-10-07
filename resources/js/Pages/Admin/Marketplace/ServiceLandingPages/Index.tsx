@@ -32,8 +32,8 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
     const toggleStatus = (id: number) => {
         router.post(route('admin.marketplace.service-landing-pages.toggle-status', id), {}, {
             preserveScroll: true,
-            onSuccess: () => toast.success(__('general.updated') || 'Updated'),
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toast.success(__('general.updated')),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -42,11 +42,11 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
         router.delete(route('admin.marketplace.service-landing-pages.destroy', pendingDelete), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -80,7 +80,7 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
                             <div className="relative flex-1 max-w-md">
                                 <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
                                 <Input
-                                    placeholder={__('general.search_landing_pages') || 'Search landing pages...'}
+                                    placeholder={__('general.search_landing_pages')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="ps-8 h-9"
@@ -93,7 +93,7 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
                             <EmptyState
                                 icon={Layers}
                                 title={__('general.no_landing_pages_found')}
-                                description={__('general.no_landing_pages_found_desc') || 'Landing pages will appear here as sellers create them.'}
+                                description={__('general.no_landing_pages_found_desc')}
                             />
                         ) : (
                             <div className="border rounded-md overflow-x-auto">
@@ -133,7 +133,7 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
                                                 </TableCell>
                                                 <TableCell>
                                                     {service.landing_page.variants?.length > 0 ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                                        <span className="text-sm text-slate-700">
                                                             {service.landing_page.variants.length} {__('general.variants')}
                                                         </span>
                                                     ) : (
@@ -147,6 +147,7 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
                                                     <Switch
                                                         checked={service.landing_page.is_active}
                                                         onCheckedChange={() => toggleStatus(service.landing_page.id)}
+                                                        aria-label={__('general.status')}
                                                     />
                                                 </TableCell>
                                                 <TableCell className="text-end">
@@ -183,8 +184,8 @@ export default function Index({ servicesWithLandingPages, filters, auth }: any) 
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete') || 'Delete?'}
-                description={__('general.confirm_delete_landing_page') || 'This landing page will be permanently deleted.'}
+                title={__('general.delete')}
+                description={__('general.confirm_delete_landing_page')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

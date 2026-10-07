@@ -6,13 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Badge } from '@/Components/ui/badge';
 import MDEditor from '@uiw/react-md-editor';
 import { 
-    ArrowRight, Edit3, Trash2, Copy, Check, 
-    Share2, ExternalLink, MessageCircle, DollarSign,
-    Layers, CheckCircle2, Clock, Globe, Code, Server,
-    FileText, User, Receipt
+    ArrowLeft, Edit3, Trash2, Copy, Check,
+    Share2, ExternalLink, MessageCircle,
+    CheckCircle2, Clock, Globe, Code, Server,
+    FileText, Receipt
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface QuotationItem {
     id: number;
@@ -90,6 +91,7 @@ interface ShowProps {
 export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl, whatsappMessage }: ShowProps) {
     const [copiedLink, setCopiedLink] = useState(false);
     const [copiedWa, setCopiedWa] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleCopyShortLink = () => {
         navigator.clipboard.writeText(shortUrl);
@@ -111,12 +113,17 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
         });
     };
 
-    const handleDelete = () => {
-        if (confirm(__('quotations.delete_confirm', { title: quotation.title }))) {
-            router.delete(`/admin/marketplace/quotations/${quotation.id}`, {
-                onSuccess: () => toast.success(__('quotations.deleted_success')),
-            });
-        }
+    const handleDelete = async () => {
+        const accepted = await confirm({
+            title: __('quotations.delete'),
+            description: __('quotations.delete_confirm', { title: quotation.title }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/marketplace/quotations/${quotation.id}`, {
+            onSuccess: () => toast.success(__('quotations.deleted_success')),
+        });
     };
 
     const ourWorkItems = quotation.items?.filter(i => i.type === 'our_work') || [];
@@ -126,6 +133,7 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
     return (
         <AdminSidebarLayout header={`${__('quotations.title')}: ${quotation.quotation_number}`}>
             <Head title={`${__('quotations.title')}: ${quotation.title} - ${__('quotations.admin_title')}`} />
+            {confirmDialog}
 
             <div className="max-w-7xl mx-auto space-y-8 pb-16">
                 {/* Top Action Bar */}
@@ -134,8 +142,10 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
                         <Link
                             href="/admin/marketplace/quotations"
                             className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                            aria-label={__('general.back')}
+                            title={__('general.back')}
                         >
-                            <ArrowRight className="w-5 h-5" />
+                            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                         </Link>
                         <div>
                             <div className="flex items-center gap-2">
@@ -184,7 +194,7 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
                         <Link href={`/admin/marketplace/quotations/${quotation.id}/edit`}>
                             <Button variant="outline" className="border-slate-300 gap-1.5 text-slate-700">
                                 <Edit3 className="w-4 h-4" />
-                                {__('quotations.save_changes')}
+                                {__('general.edit')}
                             </Button>
                         </Link>
 
@@ -194,6 +204,7 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
                             onClick={handleDuplicate}
                             className="border-slate-300 gap-1.5 text-slate-700"
                             title={__('quotations.duplicate')}
+                            aria-label={__('quotations.duplicate')}
                         >
                             <Copy className="w-4 h-4" />
                         </Button>
@@ -204,6 +215,7 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
                             onClick={handleDelete}
                             className="border-red-200 text-red-600 hover:bg-red-50 gap-1.5"
                             title={__('quotations.delete')}
+                            aria-label={__('quotations.delete')}
                         >
                             <Trash2 className="w-4 h-4" />
                         </Button>
@@ -446,7 +458,7 @@ export default function Show({ quotation, publicUrl, shortUrl, whatsappShareUrl,
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     {order.status === 'paid' ? (
-                                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">Paid (50%)</Badge>
+                                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">{__('admin.quotations_order_paid_deposit', { pct: quotation.deposit_percentage })}</Badge>
                                                     ) : (
                                                         <Badge variant="outline">{order.status}</Badge>
                                                     )}

@@ -199,7 +199,7 @@ class QuotationSystemTest extends TestCase
         $this->assertEquals('unpaid', $invoice->status);
     }
 
-    public function test_payment_success_marks_order_and_invoice_as_paid()
+    private function createPendingOrder(): QuotationOrder
     {
         $quotation = Quotation::create([
             'title' => 'عرض تجريبي',
@@ -223,7 +223,7 @@ class QuotationSystemTest extends TestCase
             'currency' => $this->currencyUsd->id,
         ]);
 
-        $order = QuotationOrder::create([
+        return QuotationOrder::create([
             'quotation_id' => $quotation->id,
             'user_id' => $user->id,
             'client_name' => 'العميل المسدد',
@@ -233,6 +233,30 @@ class QuotationSystemTest extends TestCase
             'status' => 'pending_payment',
             'invoice_id' => $invoice->id,
         ]);
+    }
+
+    private function postSignedWebhook(QuotationOrder $order, float $amount, string $status = 'SUCCESS', ?string $signature = null)
+    {
+        config(['services.kashier.secret_key' => 'test_secret_key']);
+
+        $signed = [
+            'amount' => $amount,
+            'currency' => 'USD',
+            'merchantOrderId' => "qto_{$order->invoice_id}_6a809d141e9c9-{$order->user_id}",
+            'status' => $status,
+            'transactionId' => 'TX-QTO-1',
+        ];
+        $payload = ['data' => $signed + ['signatureKeys' => array_keys($signed)]];
+        $validSignature = hash_hmac('sha256', http_build_query($signed, '', '&', PHP_QUERY_RFC3986), 'test_secret_key');
+
+        return $this->postJson(route('guest.quotations.payment.webhook'), $payload, [
+            'x-kashier-signature' => $signature ?? $validSignature,
+        ]);
+    }
+
+    public function test_payment_success_redirect_does_not_mark_order_as_paid()
+    {
+        $order = $this->createPendingOrder();
 
         $response = $this->get(route('guest.quotations.payment.success', [
             'orderUuid' => $order->uuid,
@@ -241,12 +265,52 @@ class QuotationSystemTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page->component('Guest/QuotationPaymentResult'));
+        $this->assertEquals('pending_payment', $order->refresh()->status);
+        $this->assertEquals('unpaid', $order->invoice->status);
+    }
+
+    public function test_signed_webhook_marks_order_and_invoice_as_paid()
+    {
+        $order = $this->createPendingOrder();
+
+        $this->postSignedWebhook($order, 500)->assertStatus(200);
 
         $order->refresh();
-        $invoice->refresh();
-
         $this->assertEquals('paid', $order->status);
         $this->assertEquals('kashier', $order->payment_gateway);
-        $this->assertEquals('paid', $invoice->status);
+        $this->assertEquals('TX-QTO-1', $order->payment_reference);
+        $this->assertEquals('paid', $order->invoice->status);
+    }
+
+    public function test_webhook_with_invalid_signature_is_rejected()
+    {
+        $order = $this->createPendingOrder();
+
+        $this->postSignedWebhook($order, 500, signature: 'forged')->assertStatus(400);
+
+        $this->assertEquals('pending_payment', $order->refresh()->status);
+    }
+
+    public function test_webhook_with_underpaid_amount_is_rejected()
+    {
+        $order = $this->createPendingOrder();
+
+        $this->postSignedWebhook($order, 10)->assertStatus(400);
+
+        $this->assertEquals('pending_payment', $order->refresh()->status);
+    }
+
+    public function test_webhook_with_failed_status_does_not_mark_paid()
+    {
+        $order = $this->createPendingOrder();
+
+        $this->postSignedWebhook($order, 500, 'FAILED')->assertStatus(200);
+
+        $this->assertEquals('pending_payment', $order->refresh()->status);
+    }
+
+    public function test_webhook_rejects_get_requests()
+    {
+        $this->get('/guest/quotations/payment/webhook?order_id=qto_1')->assertStatus(405);
     }
 }

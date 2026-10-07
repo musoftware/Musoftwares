@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\FcmHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
@@ -27,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceController extends Controller
 {
@@ -100,7 +102,7 @@ class InvoiceController extends Controller
                     try {
                         $decodedSearch = TextHelper::instance()->crockford_decode2($search);
                     } catch (\Exception $e) {
-                        // Ignore
+                        Log::debug('Invoice search term is not an encoded invoice id', ['search' => $search, 'error' => $e->getMessage()]);
                     }
                 }
 
@@ -216,9 +218,34 @@ class InvoiceController extends Controller
         ];
     }
 
-    private function getClients()
+    private const ALLOWED_PER_PAGE = [12, 20, 50, 100];
+
+    private const LIST_RELATIONS = ['user', 'project', 'items.timers', 'comments', 'costLines'];
+
+    private function resolvePerPage(Request $request): int
     {
-        return User::select(['id', 'name', 'email'])->orderBy('name')->get();
+        $perPage = (int) $request->input('per_page', 20);
+
+        return in_array($perPage, self::ALLOWED_PER_PAGE, true) ? $perPage : 20;
+    }
+
+    private function paginateInvoices($query, Request $request)
+    {
+        return $this->applyFilters($query, $request)
+            ->paginate($this->resolvePerPage($request))
+            ->withQueryString()
+            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
+    }
+
+    private function renderInvoiceList(Request $request, $invoices, string $currentTab)
+    {
+        return Inertia::render('Admin/Invoices/Index', [
+            'invoices' => $invoices,
+            'currentTab' => $currentTab,
+            'filters' => $this->extractFilterParams($request),
+            'stats' => $this->getStats($request),
+            'projects' => $this->getFilteredProjects($request),
+        ]);
     }
 
     private function getFilteredProjects(Request $request)
@@ -256,21 +283,9 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines']);
-        $query = $this->applyFilters($query, $request);
+        $invoices = $this->paginateInvoices(Invoice::with(self::LIST_RELATIONS), $request);
 
-        $invoices = $query->paginate($request->input('per_page', 20))
-            ->withQueryString()
-            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
-
-        return Inertia::render('Admin/Invoices/Index', [
-            'invoices' => $invoices,
-            'currentTab' => 'all',
-            'filters' => $this->extractFilterParams($request),
-            'stats' => $this->getStats($request),
-            'projects' => $this->getFilteredProjects($request),
-            'clients' => $this->getClients(),
-        ]);
+        return $this->renderInvoiceList($request, $invoices, 'all');
     }
 
     /**
@@ -278,14 +293,10 @@ class InvoiceController extends Controller
      */
     public function unpaid(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+        $query = Invoice::with(self::LIST_RELATIONS)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false);
-        $query = $this->applyFilters($query, $request);
-
-        $invoices = $query->paginate($request->input('per_page', 20))
-            ->withQueryString()
-            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
+        $invoices = $this->paginateInvoices($query, $request);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -293,14 +304,7 @@ class InvoiceController extends Controller
             ]);
         }
 
-        return Inertia::render('Admin/Invoices/Index', [
-            'invoices' => $invoices,
-            'currentTab' => 'unpaid',
-            'filters' => $this->extractFilterParams($request),
-            'stats' => $this->getStats($request),
-            'projects' => $this->getFilteredProjects($request),
-            'clients' => $this->getClients(),
-        ]);
+        return $this->renderInvoiceList($request, $invoices, 'unpaid');
     }
 
     /**
@@ -308,23 +312,11 @@ class InvoiceController extends Controller
      */
     public function archive(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+        $query = Invoice::with(self::LIST_RELATIONS)
             ->where('status', 'cancelled')
             ->where('is_suspended', false);
-        $query = $this->applyFilters($query, $request);
 
-        $invoices = $query->paginate($request->input('per_page', 20))
-            ->withQueryString()
-            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
-
-        return Inertia::render('Admin/Invoices/Index', [
-            'invoices' => $invoices,
-            'currentTab' => 'archive',
-            'filters' => $this->extractFilterParams($request),
-            'stats' => $this->getStats($request),
-            'projects' => $this->getFilteredProjects($request),
-            'clients' => $this->getClients(),
-        ]);
+        return $this->renderInvoiceList($request, $this->paginateInvoices($query, $request), 'archive');
     }
 
     /**
@@ -332,22 +324,10 @@ class InvoiceController extends Controller
      */
     public function suspended(Request $request)
     {
-        $query = Invoice::with(['user.projects', 'project', 'items.timers', 'comments', 'costLines'])
+        $query = Invoice::with(self::LIST_RELATIONS)
             ->where('is_suspended', true);
-        $query = $this->applyFilters($query, $request);
 
-        $invoices = $query->paginate($request->input('per_page', 20))
-            ->withQueryString()
-            ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
-
-        return Inertia::render('Admin/Invoices/Index', [
-            'invoices' => $invoices,
-            'currentTab' => 'suspended',
-            'filters' => $this->extractFilterParams($request),
-            'stats' => $this->getStats($request),
-            'projects' => $this->getFilteredProjects($request),
-            'clients' => $this->getClients(),
-        ]);
+        return $this->renderInvoiceList($request, $this->paginateInvoices($query, $request), 'suspended');
     }
 
     /**
@@ -948,6 +928,9 @@ class InvoiceController extends Controller
             try {
                 $notif = new InvoiceCreatedNotification($invoice);
                 $notif->forceChannels = ['mail', 'database'];
+                if ($invoice->hasSimpleItem()) {
+                    $notif->delay(now()->addHour());
+                }
                 $client->notify($notif);
             } catch (\Throwable $e) {
                 \Log::error('Invoice email notification failed for invoice #'.$invoice->id.': '.$e->getMessage());
@@ -1143,10 +1126,11 @@ class InvoiceController extends Controller
         }
 
         $baseRate = FinanceHelper::calculateOverheadHourlyRate();
-        $system_base_rate = CurrenciesExchange::RateToday(
+        $system_base_rate = $this->convertRateForDisplay(
             $baseRate,
             AdminSettings::GetValue('business_currency', 2),
-            $item->invoice->currency_id
+            $item->invoice->currency_id,
+            $item->id
         );
 
         $client_rate = 0;
@@ -1155,11 +1139,12 @@ class InvoiceController extends Controller
         if ($user) {
             $is_custom_rate_enabled = (bool) ($user->enable_custom_hour_rate ?? false);
             if ((float) ($user->hour_rate ?? 0) > 0) {
-                $client_rate = CurrenciesExchange::RateToday(
+                $client_rate = $this->convertRateForDisplay(
                     $user->hour_rate,
                     $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
-                    $item->invoice->currency_id
-                );
+                    $item->invoice->currency_id,
+                    $item->id
+                ) ?? 0;
             }
         }
 
@@ -1187,12 +1172,27 @@ class InvoiceController extends Controller
             'total_seconds' => $totalSeconds,
             'total_billable' => $totalBillable,
             'span_seconds' => $spanSeconds,
-            'system_base_rate' => round($system_base_rate, 2),
+            'system_base_rate' => $system_base_rate === null ? null : round($system_base_rate, 2),
             'client_rate' => round($client_rate, 2),
             'is_custom_rate_enabled' => $is_custom_rate_enabled,
-            'hour_rate' => round($effectiveRate, 2),
+            'hour_rate' => $effectiveRate === null ? null : round($effectiveRate, 2),
             'is_editable' => $item->invoice ? $item->invoice->canBeEdited() : false,
         ]);
+    }
+
+    /**
+     * Converts an hourly rate for the timer details page. Display only: a missing exchange
+     * rate returns null (the page shows a dash) instead of failing the whole page.
+     */
+    private function convertRateForDisplay(float|string $amount, mixed $fromCurrencyId, mixed $toCurrencyId, int $itemId): ?float
+    {
+        try {
+            return (float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $toCurrencyId);
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Timer details rate unavailable: missing exchange rate.', ['invoice_item_id' => $itemId, 'error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     public function storeTimerDetails(Request $request, $item_id)

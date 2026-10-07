@@ -19,7 +19,7 @@ export default function FloatingWhatsAppButton({
 
     const phone = phoneNumber || settings?.business_whatsapp || settings?.business_phone || "201015218548";
     const cleanPhone = phone.replace(/[^0-9]/g, '');
-    const message = defaultMessage || __('general.whatsapp_float_default_msg') || "Mahmoud here 👋 Send me your project details";
+    const message = defaultMessage || __('general.whatsapp_float_default_msg');
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -40,7 +40,7 @@ export default function FloatingWhatsAppButton({
             onClick={handleClick}
             type="button"
             className={`fixed bottom-6 end-6 z-50 flex items-center gap-3 bg-[#25D366] hover:bg-[#1DA851] text-white py-3 px-5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl group border border-emerald-400/30 cursor-pointer ${className}`}
-            aria-label={__('general.contact_on_whatsapp') || "Contact on WhatsApp"}
+            aria-label={__('general.contact_on_whatsapp')}
         >
             <div className="relative flex items-center justify-center">
                 <MessageCircle className="w-6 h-6 animate-pulse" />

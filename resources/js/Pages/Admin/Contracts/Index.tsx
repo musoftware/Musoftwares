@@ -49,7 +49,7 @@ export default function Index({ contracts }) {
     const handleCopyLink = (uuid: string) => {
         const link = `${window.location.origin}/c/${uuid}`;
         navigator.clipboard.writeText(link);
-        toast.success(__('general.link_copied') || 'Link copied to clipboard');
+        toast.success(__('general.link_copied'));
     };
 
     const handleDelete = () => {
@@ -57,11 +57,11 @@ export default function Index({ contracts }) {
         router.delete(`/admin/contracts/${pendingDelete.id}`, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -75,7 +75,7 @@ export default function Index({ contracts }) {
                 <Link href="/admin/contracts/quick-create">
                     <Button variant="outline" className="gap-2 border-amber-500 text-amber-900 bg-amber-50 hover:bg-amber-100 font-extrabold shadow-sm">
                         <Sparkles className="h-4 w-4 text-amber-600" />
-                        التسعير والعقد السريع
+                        {__('admin.contract_quick_pricing')}
                     </Button>
                 </Link>
                 <Link href="/admin/contracts/create">
@@ -115,26 +115,26 @@ export default function Index({ contracts }) {
                                         </span>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <Button variant="ghost" className="h-8 w-8 p-0" aria-label={__('general.open_menu')} title={__('general.open_menu')}>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem asChild>
                                                     <Link href={`/admin/contracts/${contract.id}/edit`} className="flex w-full cursor-pointer items-center">
-                                                        <Edit className="mr-2 h-4 w-4" />
+                                                        <Edit className="me-2 h-4 w-4" />
                                                         {__('general.edit')}
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleCopyLink(contract.uuid)} className="cursor-pointer">
-                                                    <Copy className="mr-2 h-4 w-4" />
+                                                    <Copy className="me-2 h-4 w-4" />
                                                     {__('general.copy_public_link')}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => setPendingDelete(contract)}
                                                     className="cursor-pointer text-red-600 focus:text-red-600"
                                                 >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    <Trash2 className="me-2 h-4 w-4" />
                                                     {__('general.delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -177,8 +177,8 @@ export default function Index({ contracts }) {
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.confirm_delete_contract') || 'Delete contract?'}
-                description={__('general.confirm_delete_contract_desc') || 'This action cannot be undone. The contract will be permanently deleted.'}
+                title={__('general.confirm_delete_contract')}
+                description={__('general.confirm_delete_contract_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

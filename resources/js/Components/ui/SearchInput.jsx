@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { Loader2, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -5,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export function SearchInput({
     value,
     onChange,
-    placeholder = 'Search...',
+    placeholder = __('general.search_placeholder'),
     loading = false,
     className,
 }) {
@@ -59,12 +60,14 @@ export function SearchInput({
                 value={localValue}
                 onChange={handleChange}
                 placeholder={placeholder}
+                aria-label={placeholder}
                 className="bg-surface border-border focus:border-primary focus:ring-primary placeholder:text-text-muted h-9 w-full rounded-md border pe-8 ps-9 text-[13px] shadow-sm transition-colors focus:ring-1"
             />
             {localValue && (
                 <button
                     type="button"
                     onClick={handleClear}
+                    aria-label={__('general.clear_search')}
                     className="text-text-muted hover:text-text-primary absolute end-3 flex items-center justify-center transition-colors"
                 >
                     <X className="h-3.5 w-3.5" />

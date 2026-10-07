@@ -99,4 +99,14 @@ class AdminSettingControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonStructure(['rate']);
     }
+
+    public function test_calculate_hourly_rate_returns_null_rate_when_exchange_rate_is_missing(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('admin.settings.calculate-hourly-rate'), [
+            'currency_id' => 1,
+        ]);
+
+        $response->assertOk();
+        $response->assertExactJson(['rate' => null]);
+    }
 }

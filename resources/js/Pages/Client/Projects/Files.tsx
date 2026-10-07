@@ -41,7 +41,7 @@ export default function ProjectFiles({ project, files = [] }: Props) {
                             {__('general.files')}
                         </h1>
                         <p className="text-xs sm:text-sm text-[#1d1d1f]/60 dark:text-white/60 font-sans">
-                            Attached specifications, documents, and media for this project workspace.
+                            {__('client.projects_files_intro')}
                         </p>
                     </div>
                 </div>

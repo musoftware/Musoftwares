@@ -194,6 +194,11 @@ class FcmNotificationsTest extends TestCase
             {
                 $this->client = $client;
             }
+
+            public function hasSimpleItem(): bool
+            {
+                return false;
+            }
         };
     }
 

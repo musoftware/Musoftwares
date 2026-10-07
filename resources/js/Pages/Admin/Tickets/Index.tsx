@@ -115,7 +115,7 @@ function SlaCountdownBadge({
         return (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400">
                 <CheckCheck className="h-3 w-3" />
-                <span>مكتمل</span>
+                <span>{__('admin.tickets_sla_completed')}</span>
             </span>
         );
     }
@@ -133,20 +133,18 @@ function SlaCountdownBadge({
     const minutes = Math.floor((absDiff % 3600) / 60);
     const seconds = absDiff % 60;
 
-    let timeString = '';
+    let timeString = __('admin.tickets_time_s', { seconds });
     if (hours > 0) {
-        timeString = `${hours}h ${minutes}m`;
+        timeString = __('admin.tickets_time_hm', { hours, minutes });
     } else if (minutes > 0) {
-        timeString = `${minutes}m ${seconds}s`;
-    } else {
-        timeString = `${seconds}s`;
+        timeString = __('admin.tickets_time_ms', { minutes, seconds });
     }
 
     if (isOverdue) {
         return (
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900 animate-pulse">
                 <ShieldAlert className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
-                <span>متأخر {timeString}</span>
+                <span>{__('admin.tickets_sla_overdue', { time: timeString })}</span>
             </div>
         );
     }
@@ -156,7 +154,7 @@ function SlaCountdownBadge({
         return (
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900">
                 <Zap className="h-3 w-3 text-amber-600 dark:text-amber-400 animate-pulse" />
-                <span>متبقي {timeString}</span>
+                <span>{__('admin.tickets_sla_remaining', { time: timeString })}</span>
             </div>
         );
     }
@@ -165,7 +163,7 @@ function SlaCountdownBadge({
     return (
         <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900">
             <Clock className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-            <span>متبقي {timeString}</span>
+            <span>{__('admin.tickets_sla_remaining', { time: timeString })}</span>
         </div>
     );
 }
@@ -176,17 +174,17 @@ function PriorityBadge({ priority, score }: { priority: string; score?: number }
         high: {
             bg: 'bg-red-50 text-red-700 ring-1 ring-red-200 dark:bg-red-950/40 dark:text-red-400 dark:ring-red-900',
             icon: Zap,
-            label: 'عالية',
+            label: __('general.priority_high'),
         },
         medium: {
             bg: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:ring-amber-900',
             icon: Clock,
-            label: 'متوسطة',
+            label: __('general.priority_medium'),
         },
         low: {
             bg: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700',
             icon: CheckCircle,
-            label: 'منخفضة',
+            label: __('general.priority_low'),
         },
     }[priority] || {
         bg: 'bg-slate-100 text-slate-700 ring-1 ring-slate-200',
@@ -210,7 +208,7 @@ function PriorityBadge({ priority, score }: { priority: string; score?: number }
                             ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
                             : 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'
                     )}
-                    title={`Algorithmic Importance Score: ${score}`}
+                    title={__('admin.tickets_importance_score', { score })}
                 >
                     {score}
                 </span>
@@ -304,11 +302,11 @@ export default function Index({ tickets, filters, stats }: Props) {
                 onSuccess: () => {
                     setSelectedIds([]);
                     setIsBulkProcessing(false);
-                    toastSuccess('تم تنفيذ الإجراء الجماعي بنجاح');
+                    toastSuccess(__('admin.tickets_bulk_success'));
                 },
                 onError: () => {
                     setIsBulkProcessing(false);
-                    toastError('فشل تنفيذ الإجراء الجماعي');
+                    toastError(__('admin.tickets_bulk_failed'));
                 },
             }
         );
@@ -320,26 +318,26 @@ export default function Index({ tickets, filters, stats }: Props) {
         setPendingCloseId(null);
         router.put(`/admin/tickets/${id}`, { action: 'close' }, {
             preserveState: true,
-            onSuccess: () => toastSuccess(__('general.ticket_closed') || 'تم إغلاق التذكرة بنجاح'),
-            onError:   () => toastError(__('general.failed_close_ticket') || 'فشل إغلاق التذكرة'),
+            onSuccess: () => toastSuccess(__('general.ticket_closed')),
+            onError:   () => toastError(__('general.failed_close_ticket')),
         });
     };
 
     const handleReopen = (id: number) => {
         router.put(`/admin/tickets/${id}`, { action: 'reopen' }, {
             preserveState: true,
-            onSuccess: () => toastSuccess(__('general.ticket_reopened') || 'تمت إعادة فتح التذكرة'),
-            onError:   () => toastError(__('general.failed_reopen_ticket') || 'فشل إعادة فتح التذكرة'),
+            onSuccess: () => toastSuccess(__('general.ticket_reopened')),
+            onError:   () => toastError(__('general.failed_reopen_ticket')),
         });
     };
 
     /* ── Quick Views ── */
     const VIEW_TABS = [
-        { id: '', label: 'الكل', icon: Inbox },
-        { id: 'vip', label: 'VIP والمهمة', icon: Crown, highlight: true },
-        { id: 'sla_urgent', label: 'طوارئ SLA', icon: Zap },
-        { id: 'needs_reply', label: 'بانتظار الرد', icon: Clock },
-        { id: 'closed', label: 'المغلقة', icon: CheckCheck },
+        { id: '', label: __('admin.tickets_view_all'), icon: Inbox },
+        { id: 'vip', label: __('admin.tickets_view_vip'), icon: Crown, highlight: true },
+        { id: 'sla_urgent', label: __('admin.tickets_view_sla_urgent'), icon: Zap },
+        { id: 'needs_reply', label: __('admin.tickets_view_needs_reply'), icon: Clock },
+        { id: 'closed', label: __('admin.tickets_view_closed'), icon: CheckCheck },
     ];
 
     /* ── Table Columns ── */
@@ -351,7 +349,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <Checkbox
                         checked={isAllSelected ? true : isSomeSelected ? 'indeterminate' : false}
                         onCheckedChange={toggleSelectAll}
-                        aria-label="تحديد كل التذاكر في الصفحة"
+                        aria-label={__('admin.tickets_select_all_on_page')}
                         className="rounded border-slate-300 dark:border-zinc-700"
                     />
                 </div>
@@ -362,7 +360,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     <Checkbox
                         checked={selectedIds.includes(t.id)}
                         onCheckedChange={() => toggleSelectOne(t.id)}
-                        aria-label={`تحديد تذكرة #${t.id}`}
+                        aria-label={__('admin.tickets_select_ticket', { id: t.id })}
                         className="rounded border-slate-300 dark:border-zinc-700"
                     />
                 </div>
@@ -379,18 +377,18 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'ticket_subject',
-            label: 'الموضوع',
+            label: __('admin.tickets_col_subject'),
             sortable: true,
             render: (t: Ticket) => (
                 <div className="flex flex-col gap-1 min-w-0 max-w-xs sm:max-w-sm">
                     <div className="flex items-center gap-1.5">
                         {t.is_vip && (
-                            <span className="shrink-0 p-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300" title="عميل مميز / VIP">
+                            <span className="shrink-0 p-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300" title={__('admin.tickets_vip_client')}>
                                 <Crown className="h-3.5 w-3.5" />
                             </span>
                         )}
                         {t.needs_attention && (
-                            <span className="shrink-0 h-2 w-2 rounded-full bg-red-500 animate-ping" title="تحتاج اهتمام عاجل" />
+                            <span className="shrink-0 h-2 w-2 rounded-full bg-red-500 animate-ping" title={__('admin.tickets_needs_urgent_attention')} />
                         )}
                         <Link
                             href={`/admin/tickets/${t.id}`}
@@ -401,7 +399,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                     </div>
                     {t.project && (
                         <span className="text-[11px] text-slate-500 dark:text-zinc-400 truncate">
-                            المشروع: {t.project.name}
+                            {__('admin.tickets_project_label', { name: t.project.name })}
                         </span>
                     )}
                 </div>
@@ -409,7 +407,7 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'display_name',
-            label: 'العميل & الرتبة',
+            label: __('admin.tickets_col_client_tier'),
             render: (t: Ticket) => {
                 const tierSlug = t.client_tier?.slug || 'standard';
                 const tierStyle = TIER_STYLES[tierSlug] || TIER_STYLES.standard;
@@ -427,7 +425,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                         tierStyle.text,
                                         tierStyle.ring
                                     )}
-                                    title={`رتبة الولاء: ${t.client_tier.name} (معدل استجابة: ${t.sla_target_minutes} دقيقة)`}
+                                    title={__('admin.tickets_tier_tooltip', { tier: t.client_tier.name, minutes: t.sla_target_minutes })}
                                 >
                                     <TierIcon className="h-2.5 w-2.5" />
                                     {t.client_tier.name}
@@ -441,7 +439,7 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'sla_due_at',
-            label: 'مؤقت الاستجابة (SLA)',
+            label: __('admin.tickets_col_sla'),
             render: (t: Ticket) => (
                 <SlaCountdownBadge
                     dueAt={t.sla_due_at}
@@ -452,7 +450,7 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'priority',
-            label: 'الأولوية والأهمية',
+            label: __('admin.tickets_col_priority'),
             sortable: true,
             render: (t: Ticket) => (
                 <PriorityBadge priority={t.priority} score={t.priority_score} />
@@ -460,7 +458,7 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'ticket_status',
-            label: 'الحالة',
+            label: __('general.status'),
             sortable: true,
             render: (t: Ticket) => (
                 <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', STATUS_BADGE[t.ticket_status] ?? 'bg-slate-100 text-slate-600')}>
@@ -470,11 +468,11 @@ export default function Index({ tickets, filters, stats }: Props) {
         },
         {
             key: 'created_at',
-            label: 'تاريخ الإنشاء',
+            label: __('admin.tickets_col_created'),
             sortable: true,
             render: (t: Ticket) => (
                 <span className="text-xs text-slate-500 dark:text-zinc-400 whitespace-nowrap">
-                    {new Date(t.created_at).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {new Date(t.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
             ),
         },
@@ -531,9 +529,9 @@ export default function Index({ tickets, filters, stats }: Props) {
                 onChange={(e) => applyFilter({ priority: e.target.value })}
             >
                 <option value="">{__('general.all_priorities')}</option>
-                <option value="high">عالية</option>
-                <option value="medium">متوسطة</option>
-                <option value="low">منخفضة</option>
+                <option value="high">{__('general.priority_high')}</option>
+                <option value="medium">{__('general.priority_medium')}</option>
+                <option value="low">{__('general.priority_low')}</option>
             </select>
         </div>
     );
@@ -541,13 +539,13 @@ export default function Index({ tickets, filters, stats }: Props) {
     const hasUrgent = tickets.data.some((t: Ticket) => t.is_urgent || t.is_overdue);
 
     return (
-        <AdminSidebarLayout title={__('general.support_tickets')} header="مكتب الدعم الفني">
+        <AdminSidebarLayout title={__('general.support_tickets')} header={__('admin.tickets_header')}>
             {/* ── Urgent Alert ── */}
             {hasUrgent && (
                 <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-900/50 px-4 py-3 text-sm text-red-700 dark:text-red-300">
                     <Zap className="h-4 w-4 text-red-500 flex-shrink-0 animate-pulse" />
                     <span>
-                        <strong>تنبيه الاستجابة السريعة:</strong> توجد تذاكر تجاوزت الحد الزمني أو تتطلب رداً عاجلاً لعملاء مميزين.
+                        <strong>{__('admin.tickets_urgent_alert_title')}</strong> {__('admin.tickets_urgent_alert_body')}
                     </span>
                 </div>
             )}
@@ -630,8 +628,8 @@ export default function Index({ tickets, filters, stats }: Props) {
                     filters={{ ...filters, extra: advancedFilters }}
                     onSearch={handleSearch}
                     onSort={handleSort}
-                    emptyTitle="لم يتم العثور على أي تذاكر"
-                    emptyDescription="يمكنك تعديل عوامل التصفية أو البحث عن موضوع آخر."
+                    emptyTitle={__('admin.tickets_empty_title')}
+                    emptyDescription={__('admin.tickets_empty_description')}
                 />
             </div>
 
@@ -643,7 +641,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 dark:bg-zinc-800 text-xs font-bold text-indigo-400">
                                 {selectedIds.length}
                             </span>
-                            <span className="text-xs font-semibold">تذاكر محددة</span>
+                            <span className="text-xs font-semibold">{__('admin.tickets_selected_count')}</span>
                         </div>
 
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -655,7 +653,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 disabled={isBulkProcessing}
                             >
                                 <CheckCircle className="me-1.5 h-3.5 w-3.5 text-emerald-400" />
-                                إغلاق
+                                {__('admin.tickets_bulk_close')}
                             </Button>
 
                             <Button
@@ -666,7 +664,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 disabled={isBulkProcessing}
                             >
                                 <RotateCcw className="me-1.5 h-3.5 w-3.5 text-amber-400" />
-                                إعادة فتح
+                                {__('admin.tickets_bulk_reopen')}
                             </Button>
 
                             {/* Priority Dropdown */}
@@ -679,19 +677,19 @@ export default function Index({ tickets, filters, stats }: Props) {
                                         disabled={isBulkProcessing}
                                     >
                                         <Zap className="me-1.5 h-3.5 w-3.5 text-purple-400" />
-                                        الأولوية
+                                        {__('admin.tickets_bulk_priority')}
                                         <ChevronDown className="ms-1 h-3 w-3" />
                                     </Button>
                                 } />
                                 <DropdownMenuContent align="end" className="w-36">
                                     <DropdownMenuItem onClick={() => executeBulk('priority', { priority: 'high' })}>
-                                        عالية (High)
+                                        {__('general.priority_high')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => executeBulk('priority', { priority: 'medium' })}>
-                                        متوسطة (Medium)
+                                        {__('general.priority_medium')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => executeBulk('priority', { priority: 'low' })}>
-                                        منخفضة (Low)
+                                        {__('general.priority_low')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -705,14 +703,15 @@ export default function Index({ tickets, filters, stats }: Props) {
                                 disabled={isBulkProcessing}
                             >
                                 <Trash2 className="me-1.5 h-3.5 w-3.5" />
-                                حذف
+                                {__('admin.tickets_bulk_delete')}
                             </Button>
 
                             {/* Deselect */}
                             <button
                                 onClick={() => setSelectedIds([])}
                                 className="p-1 text-slate-400 hover:text-white transition-colors"
-                                title="إلغاء التحديد"
+                                title={__('admin.tickets_clear_selection')}
+                                aria-label={__('admin.tickets_clear_selection')}
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -724,10 +723,10 @@ export default function Index({ tickets, filters, stats }: Props) {
             {/* ── Single Close Confirm Modal ── */}
             <ConfirmModal
                 isOpen={pendingCloseId !== null}
-                title={__('general.close_ticket') || 'إغلاق التذكرة؟'}
-                description="سيتم تصنيف هذه التذكرة كمغلقة، ويمكنك إعادة فتحها في أي وقت لاحقاً."
-                confirmLabel={__('general.close_ticket') || 'إغلاق التذكرة'}
-                cancelLabel={__('general.cancel') || 'إلغاء'}
+                title={__('general.close_ticket')}
+                description={__('admin.tickets_close_confirm_body')}
+                confirmLabel={__('general.close_ticket')}
+                cancelLabel={__('general.cancel')}
                 onConfirm={confirmClose}
                 onCancel={() => setPendingCloseId(null)}
             />
@@ -735,10 +734,10 @@ export default function Index({ tickets, filters, stats }: Props) {
             {/* ── Bulk Delete Confirm Modal ── */}
             <ConfirmModal
                 isOpen={bulkDeleteModalOpen}
-                title="حذف التذاكر المحددة؟"
-                description={`أنت على وشك حذف ${selectedIds.length} تذكرة محددة. سيتم نقلها إلى المحذوفات (Soft Delete) ويمكن استرجاعها من قاعدة البيانات.`}
-                confirmLabel="تأكيد الحذف"
-                cancelLabel="إلغاء"
+                title={__('admin.tickets_bulk_delete_title')}
+                description={__('admin.tickets_bulk_delete_body', { count: selectedIds.length })}
+                confirmLabel={__('admin.tickets_confirm_delete')}
+                cancelLabel={__('general.cancel')}
                 variant="danger"
                 onConfirm={() => {
                     setBulkDeleteModalOpen(false);

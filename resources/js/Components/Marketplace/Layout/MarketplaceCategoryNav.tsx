@@ -45,7 +45,7 @@ export default function MarketplaceCategoryNav() {
     return (
         <div className="hidden md:block w-full border-b border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-900/50 backdrop-blur-sm transition-colors">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <nav className="flex items-center h-11 overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1">
+                <nav aria-label={__('marketplace.category_nav_label')} className="flex items-center h-11 overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1">
                     <Link
                         href="/marketplace/services"
                         className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold px-3 py-1.5 rounded-full transition-all shrink-0 ${
@@ -55,7 +55,7 @@ export default function MarketplaceCategoryNav() {
                         }`}
                     >
                         <Sparkles className="w-3 h-3" />
-                        <span>{__('general.all_services') || 'All Services'}</span>
+                        <span>{__('general.all_services')}</span>
                     </Link>
 
                     <div className="h-4 w-px bg-slate-200 dark:bg-zinc-800 shrink-0 mx-1"></div>

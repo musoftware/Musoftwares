@@ -54,7 +54,7 @@ export default function Error({ status, message }: { status: number; message?: s
                 >
                     <Link href="/">
                         <Button className="h-11 px-8 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all font-medium">
-                            {__('general.go_back_home') || 'Go Back Home'}
+                            {__('general.go_back_home')}
                         </Button>
                     </Link>
                 </motion.div>

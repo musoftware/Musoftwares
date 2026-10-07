@@ -125,7 +125,7 @@ export default function HtmlStripper() {
             }
             setCleanText(resultText);
         } catch (e) {
-            setCleanText('Error parsing HTML code.');
+            setCleanText(__('tools.html_parse_error'));
         }
     }, [htmlInput, stripMode, compressWhitespace]);
 
@@ -174,7 +174,7 @@ Context:
 
             <FloatingWhatsAppButton 
                 phoneNumber={phoneNumber} 
-                defaultMessage="Hello Mahmoud, I have a question about custom web scraping or API integrations." 
+                defaultMessage={__('tools.html_whatsapp_message')} 
             />
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white pt-24 pb-16 lg:pt-36">
@@ -183,7 +183,7 @@ Context:
                 <section className="reveal-section max-w-7xl mx-auto px-6 lg:px-8 mb-16 text-center">
                     <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-6 bg-white mx-auto">
                         <Terminal className="h-3 w-3 text-slate-800" />
-                        {__('tools.tools_directory') || 'Free Tools'}
+                        {__('tools.tools_directory')}
                     </div>
                     <h1 className="gsap-fade-up text-4xl lg:text-6xl font-extrabold text-[#111111] tracking-tight mb-4">
                         {__('tools.html_title')}
@@ -204,7 +204,7 @@ Context:
                                     <FileCode2 className="h-5 w-5 text-slate-500" />
                                     {__('tools.html_input_label')}
                                 </CardTitle>
-                                <CardDescription>Paste your raw HTML here to filter code structures.</CardDescription>
+                                <CardDescription>{__('tools.html_input_desc')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6 flex-1">
                                 
@@ -242,17 +242,17 @@ Context:
                                         className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 accent-slate-900 cursor-pointer"
                                     />
                                     <Label htmlFor="compressWs" className="text-xs font-semibold text-slate-600 cursor-pointer">
-                                        Compress Whitespace (Remove extra blank lines)
+                                        {__('tools.html_compress_whitespace')}
                                     </Label>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="htmlInput" className="sr-only">HTML Source</Label>
+                                    <Label htmlFor="htmlInput" className="sr-only">{__('tools.html_source_label')}</Label>
                                     <Textarea
                                         id="htmlInput"
                                         value={htmlInput}
                                         onChange={(e) => setHtmlInput(e.target.value)}
-                                        placeholder={__('tools.html_placeholder') || 'Paste HTML code here...'}
+                                        placeholder={__('tools.html_placeholder')}
                                         rows={12}
                                         className="font-mono text-xs border-slate-200 focus-visible:ring-slate-900 bg-slate-50/50 resize-none h-[300px]"
                                     />
@@ -296,7 +296,8 @@ Context:
                                 <Textarea
                                     value={cleanText}
                                     readOnly
-                                    placeholder="Resulting clean text will automatically appear here..."
+                                    placeholder={__('tools.html_output_placeholder')}
+                                    aria-label={__('tools.html_output_label')}
                                     rows={15}
                                     className="font-mono text-xs border-slate-150 focus-visible:ring-slate-900 bg-slate-50/30 resize-none h-[340px]"
                                 />
@@ -326,14 +327,14 @@ Context:
                                 <div className="space-y-2">
                                     <Label htmlFor="scopingPrompt" className="text-slate-300 font-semibold text-xs uppercase tracking-wider flex items-center gap-1">
                                         <MessageSquare className="h-3 w-3 text-slate-400" />
-                                        Describe your custom scraping or API integration requirements:
+                                        {__('tools.html_scoping_label')}
                                     </Label>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                         <Input
                                             id="scopingPrompt"
                                             value={scopingPrompt}
                                             onChange={(e) => setScopingPrompt(e.target.value)}
-                                            placeholder="e.g. Scrape products from an e-commerce catalog and export them to Shopify..."
+                                            placeholder={__('tools.html_scoping_placeholder')}
                                             className="bg-slate-800/80 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-white h-11 flex-1"
                                         />
                                         <Button

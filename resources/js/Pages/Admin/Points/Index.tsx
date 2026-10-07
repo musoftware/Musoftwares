@@ -13,6 +13,7 @@ import {
 '@/Components/ui/dialog';
 import { Coins, History, Search, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -30,7 +31,7 @@ interface PaginationLink {
   active: boolean;
 }
 
-interface Pagination {
+interface PaginatedUsers {
   data: UserRow[];
   links: PaginationLink[];
   meta: any;
@@ -43,7 +44,7 @@ interface Pagination {
 }
 
 interface Props {
-  users: Pagination;
+  users: PaginatedUsers;
   search: string;
 }
 
@@ -83,7 +84,7 @@ function AdjustDialog({ user, onClose }: {user: UserRow;onClose: () => void;}) {
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Coins className="h-4 w-4 text-yellow-600" />
-                        Adjust Points — {user.name}
+                        {__('admin.points_adjust_title', { name: user.name })}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -93,17 +94,19 @@ function AdjustDialog({ user, onClose }: {user: UserRow;onClose: () => void;}) {
                         <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{__('general.current_balance')}</p>
                         <p className="text-2xl font-bold text-slate-900">
                             {user.coins_balance.toLocaleString()}
-                            <span className="ms-1 text-sm font-normal text-slate-400">pts</span>
+                            <span className="ms-1 text-sm font-normal text-slate-400">{__('loyalty.points_abbreviation')}</span>
                         </p>
                     </div>
 
                     {/* Amount */}
                     <div className="space-y-1">
                         <Label htmlFor="adj-amount">
-                            Amount
+                            {__('general.amount')}
                             {amount !== 0 &&
               <span className={`ms-2 text-xs font-semibold ${isAdd ? 'text-green-600' : 'text-red-600'}`}>
-                                    {isAdd ? '+ Adding' : '− Deducting'} {Math.abs(amount).toLocaleString()} pts
+                                    {isAdd
+                                        ? __('admin.points_adding', { count: Math.abs(amount).toLocaleString() })
+                                        : __('admin.points_deducting', { count: Math.abs(amount).toLocaleString() })}
                                 </span>
               }
                         </Label>
@@ -141,7 +144,7 @@ function AdjustDialog({ user, onClose }: {user: UserRow;onClose: () => void;}) {
               disabled={processing || !data.amount || !data.reason}
               variant={isDeduct ? 'destructive' : 'default'}>
               
-                            {processing ? 'Saving…' : isDeduct ? '− Deduct Points' : '+ Add Points'}
+                            {processing ? __('general.saving') : isDeduct ? __('admin.points_deduct_points') : __('admin.points_add_points')}
                         </Button>
                     </DialogFooter>
                 </form>
@@ -178,14 +181,14 @@ function HistoryDialog({ user, onClose }: {user: UserRow;onClose: () => void;}) 
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <History className="h-4 w-4 text-slate-500" />
-                        Points History — {user.name}
+                        {__('admin.points_history_title', { name: user.name })}
                     </DialogTitle>
                 </DialogHeader>
 
                 <div className="max-h-[55vh] overflow-y-auto -mx-4 px-4">
                     {loading ?
           <div className="flex items-center justify-center py-12 text-slate-400 text-sm">
-                            Loading history…
+                            {__('admin.points_loading_history')}
                         </div> :
           error ?
           <div className="flex items-center justify-center py-12 text-red-500 text-sm">{__('general.failed_to_load_history')}</div> :
@@ -266,7 +269,7 @@ export default function Index({ users, search }: Props) {
   const rows = users?.data ?? [];
 
   return (
-    <AdminSidebarLayout title={__('general.points_control')} header="Points Control">
+    <AdminSidebarLayout title={__('general.points_control')} header={__('admin.points_header')}>
             <Head title={__('general.points_control')} />
 
             <div className="space-y-6">
@@ -279,7 +282,7 @@ export default function Index({ users, search }: Props) {
                     <div className="flex items-center gap-1.5 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-1.5">
                         <Coins className="h-4 w-4 text-yellow-600" />
                         <span className="text-sm font-medium text-yellow-700">
-                            {users?.total ?? 0} users
+                            {__('admin.points_users_count', { count: users?.total ?? 0 })}
                         </span>
                     </div>
                 </div>
@@ -299,6 +302,8 @@ export default function Index({ users, search }: Props) {
             <button
               type="button"
               onClick={clearSearch}
+              aria-label={__('general.clear_search')}
+              title={__('general.clear_search')}
               className="absolute end-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
               
                                 <X className="h-3.5 w-3.5" />
@@ -353,7 +358,7 @@ export default function Index({ users, search }: Props) {
                     }>
                     
                                                 <Coins className="h-3 w-3" />
-                                                {user.coins_balance.toLocaleString()} pts
+                                                {__('admin.points_pts_value', { count: user.coins_balance.toLocaleString() })}
                                             </span>
                                         </td>
 
@@ -382,7 +387,7 @@ export default function Index({ users, search }: Props) {
               <tr>
                                     <td colSpan={3} className="px-4 py-12 text-center text-slate-400">
                                         <Coins className="mx-auto mb-2 h-8 w-8 opacity-20" />
-                                        <p>No users found{search ? ` for "${search}"` : ''}.</p>
+                                        <p>{search ? __('admin.points_no_users_for', { search }) : __('admin.points_no_users')}</p>
                                     </td>
                                 </tr>
               }
@@ -393,31 +398,9 @@ export default function Index({ users, search }: Props) {
                     {users?.links && users.total > 0 &&
           <div className="flex items-center justify-end gap-4 border-t border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-600">
                             <span className="me-auto text-xs text-slate-400">
-                                {users.from}–{users.to} of{' '}
-                                <span className="font-medium text-slate-700">{users.total}</span>
+                                {__('admin.points_range', { from: users.from, to: users.to, total: users.total })}
                             </span>
-                            <div className="flex items-center gap-1 flex-wrap">
-                                {users.links.map((link, idx) =>
-              link.url ?
-              <button
-                key={idx}
-                onClick={() => router.visit(link.url!)}
-                className={`min-w-[28px] rounded-md px-2.5 py-1 text-[12px] transition-colors text-center ${
-                link.active ?
-                'bg-slate-900 font-medium text-white shadow-sm' :
-                'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`
-                }
-                dangerouslySetInnerHTML={{ __html: link.label }} /> :
-
-
-              <span
-                key={idx}
-                className="min-w-[28px] rounded-md px-2.5 py-1 text-[12px] text-slate-300 cursor-not-allowed text-center"
-                dangerouslySetInnerHTML={{ __html: link.label }} />
-
-
-              )}
-                            </div>
+                            <Pagination links={users.links} />
                         </div>
           }
                 </div>

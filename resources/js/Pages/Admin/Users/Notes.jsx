@@ -24,6 +24,9 @@ import {
     Grid,
     Columns,
     ExternalLink,
+    Lock,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
@@ -34,11 +37,39 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
 import SimpleCrypto from '@/lib/SimpleCrypto';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 const CLIPBOARD_AUTOCLEAR_MS = 30_000;
 
+// Returned by decryptText when a blob cannot be decrypted with the current master password.
+const UNDECRYPTABLE_SENTINEL = '__note_undecryptable__';
+
+const NOTE_CATEGORY_LABEL_KEYS = {
+    password: 'general.password',
+    notes: 'general.notes',
+    anydesk: 'general.anydesk',
+    archived: 'general.archived',
+};
+
+const isUndecryptable = (value) => value === UNDECRYPTABLE_SENTINEL;
+
+const toDisplayText = (value) => (isUndecryptable(value) ? __('admin.notes_encrypted_invalid_password') : value);
+
+const categoryLabel = (category) => (NOTE_CATEGORY_LABEL_KEYS[category] ? __(NOTE_CATEGORY_LABEL_KEYS[category]) : category);
+
+function DecryptedText({ value, fallback = '' }) {
+    if (!isUndecryptable(value)) return <>{value || fallback}</>;
+    return (
+        <span className="inline-flex items-center gap-1">
+            <Lock size={12} className="shrink-0" aria-hidden="true" />
+            {__('admin.notes_encrypted_invalid_password')}
+        </span>
+    );
+}
+
 export default function Notes({ user, notes, stats }) {
     const { props } = usePage();
+    const { confirm, confirmDialog } = useConfirm();
 
     const flash = props?.flash ?? {};
 
@@ -143,7 +174,7 @@ export default function Notes({ user, notes, stats }) {
         try {
             tempCrypto = new SimpleCrypto(pwd);
         } catch (err) {
-            setError('Invalid encryption password format.');
+            setError(__('admin.notes_invalid_password_format'));
             return;
         }
 
@@ -166,8 +197,8 @@ export default function Notes({ user, notes, stats }) {
                 decryptedVal = null;
             }
 
-            if (decryptedVal === null || decryptedVal === undefined || decryptedVal === '' || String(decryptedVal).startsWith('🔒')) {
-                setError(__('general.invalid_master_password_please_try_again') || 'Invalid master password. Please try again.');
+            if (decryptedVal === null || decryptedVal === undefined || decryptedVal === '' || isUndecryptable(decryptedVal)) {
+                setError(__('general.invalid_master_password_please_try_again'));
                 return;
             }
         }
@@ -201,11 +232,11 @@ export default function Notes({ user, notes, stats }) {
         try {
             const dec = cryptoInstance.decrypt(text);
             if (dec === null || dec === undefined || dec === '') {
-                return '🔒 [Encrypted Data - Invalid Password]';
+                return UNDECRYPTABLE_SENTINEL;
             }
             return typeof dec === 'string' ? dec : String(dec);
         } catch (_) {
-            return '🔒 [Encrypted Data - Invalid Password]';
+            return UNDECRYPTABLE_SENTINEL;
         }
     }, [cryptoInstance]);
 
@@ -216,11 +247,11 @@ export default function Notes({ user, notes, stats }) {
 
     const submitNote = (mode = 'create') => {
         if (!isPasswordSet || !cryptoInstance) {
-            setError('Please set your master password first.');
+            setError(__('admin.notes_set_master_password_first'));
             return;
         }
         if (!title.trim() || !content.trim()) {
-            setError('Title and content are required.');
+            setError(__('admin.notes_title_and_content_required'));
             return;
         }
 
@@ -274,8 +305,8 @@ export default function Notes({ user, notes, stats }) {
         const decTitle = decryptText(note.title);
         const decContent = decryptText(note.content);
         setEditingNote(note);
-        setTitle(decTitle && !decTitle.startsWith('🔒') ? decTitle : '');
-        setContent(decContent && !decContent.startsWith('🔒') ? decContent : '');
+        setTitle(decTitle && !isUndecryptable(decTitle) ? decTitle : '');
+        setContent(decContent && !isUndecryptable(decContent) ? decContent : '');
         setCategory(note.category === 'archived' ? 'notes' : note.category);
         setExpiresAt(note.expires_at ? note.expires_at.slice(0, 10) : '');
         setError(null);
@@ -298,14 +329,25 @@ export default function Notes({ user, notes, stats }) {
         router.post(url, {}, { preserveScroll: true });
     };
 
-    const handleDelete = (noteId) => {
-        if (!confirm('Are you sure you want to delete this note permanently?')) return;
+    const handleDelete = async (noteId) => {
+        const accepted = await confirm({
+            title: __('admin.notes_delete_confirm'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         router.delete(`/admin/users/${user.id}/notes/${noteId}`, { preserveScroll: true });
     };
 
-    const handleBulk = (action) => {
+    const confirmBulkDelete = () => confirm({
+        title: __('admin.notes_bulk_delete_confirm', { count: selectedIds.length }),
+        variant: 'danger',
+        confirmLabel: __('general.delete'),
+    });
+
+    const handleBulk = async (action) => {
         if (selectedIds.length === 0) return;
-        if (action === 'delete' && !confirm(`Permanently delete ${selectedIds.length} note(s)?`)) return;
+        if (action === 'delete' && !(await confirmBulkDelete())) return;
         router.post(`/admin/users/${user.id}/notes/bulk`, { action, note_ids: selectedIds }, {
             preserveScroll: true,
             onSuccess: () => setSelectedIds([]),
@@ -316,7 +358,7 @@ export default function Notes({ user, notes, stats }) {
         if (!selectedNote) return;
         const dec = selectedNote.decryptedContent
             ?? decryptText(selectedNote.content);
-        if (!dec || (typeof dec === 'string' && dec.startsWith('🔒'))) return;
+        if (!dec || isUndecryptable(dec)) return;
         try {
             await navigator.clipboard.writeText(String(dec));
             setCopied(true);
@@ -329,12 +371,12 @@ export default function Notes({ user, notes, stats }) {
                 }
             }, CLIPBOARD_AUTOCLEAR_MS);
         } catch (_) {
-            setError('Clipboard not available.');
+            setError(__('admin.notes_clipboard_unavailable'));
         }
     };
 
     const handleCopyCard = async (text, id) => {
-        if (!text || (typeof text === 'string' && text.startsWith('🔒'))) return;
+        if (!text || isUndecryptable(text)) return;
         try {
             await navigator.clipboard.writeText(String(text));
             setCopiedId(id);
@@ -347,7 +389,7 @@ export default function Notes({ user, notes, stats }) {
                 }
             }, CLIPBOARD_AUTOCLEAR_MS);
         } catch (_) {
-            setError('Clipboard not available.');
+            setError(__('admin.notes_clipboard_unavailable'));
         }
     };
 
@@ -376,7 +418,7 @@ export default function Notes({ user, notes, stats }) {
                 ...n,
                 decryptedTitle: decTitle,
                 decryptedContent: decContent,
-                parsed: decContent && !decContent.startsWith('🔒') ? parseNoteContent(decContent, n.category) : null,
+                parsed: decContent && !isUndecryptable(decContent) ? parseNoteContent(decContent, n.category) : null,
             };
         });
     }, [items, decryptText]);
@@ -428,8 +470,9 @@ export default function Notes({ user, notes, stats }) {
     })();
 
     return (
-        <AdminSidebarLayout title={`Secure Notes: ${user.name}`} header="Secure Notes">
-            <Head title={`Secure Notes - ${user.name}`} />
+        <AdminSidebarLayout title={__('admin.notes_page_title', { name: user.name })} header={__('general.secure_notes')}>
+            <Head title={__('admin.notes_page_title', { name: user.name })} />
+            {confirmDialog}
 
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-6">
                 <div>
@@ -449,7 +492,7 @@ export default function Notes({ user, notes, stats }) {
                         className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
                     >
                         <Plus size={16} className="me-2" />
-                        {__('general.create_note') || 'Create Note'}
+                        {__('general.create_note')}
                     </Button>
                     <Button asChild variant="outline" className="border-slate-200">
                         <Link href={`/admin/users/${user.id}/files`}>{__('general.files')}</Link>
@@ -570,7 +613,8 @@ export default function Notes({ user, notes, stats }) {
                                     type="button"
                                     className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
                                     onClick={() => setViewMode('list')}
-                                    title={__('general.list_view') || 'List View'}
+                                    title={__('general.list_view')}
+                                    aria-label={__('general.list_view')}
                                 >
                                     <List size={15} />
                                 </button>
@@ -578,7 +622,8 @@ export default function Notes({ user, notes, stats }) {
                                     type="button"
                                     className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'card' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
                                     onClick={() => setViewMode('card')}
-                                    title={__('general.card_view') || 'Card View'}
+                                    title={__('general.card_view')}
+                                    aria-label={__('general.card_view')}
                                 >
                                     <LayoutGrid size={15} />
                                 </button>
@@ -586,7 +631,8 @@ export default function Notes({ user, notes, stats }) {
                                     type="button"
                                     className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'compact' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
                                     onClick={() => setViewMode('compact')}
-                                    title={__('general.compact_view') || 'Compact Grid'}
+                                    title={__('general.compact_view')}
+                                    aria-label={__('general.compact_view')}
                                 >
                                     <Grid size={15} />
                                 </button>
@@ -594,7 +640,8 @@ export default function Notes({ user, notes, stats }) {
                                     type="button"
                                     className={`h-8 w-8 rounded flex items-center justify-center transition-all ${viewMode === 'split' ? 'bg-white text-slate-900 shadow-sm border border-slate-200 font-bold' : 'text-slate-500 hover:text-slate-900'}`}
                                     onClick={() => setViewMode('split')}
-                                    title={__('general.split_view') || 'Split View'}
+                                    title={__('general.split_view')}
+                                    aria-label={__('general.split_view')}
                                 >
                                     <Columns size={15} />
                                 </button>
@@ -670,7 +717,7 @@ export default function Notes({ user, notes, stats }) {
                     {viewMode === 'list' && (
                         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse text-sm">
+                                <table className="w-full text-start border-collapse text-sm">
                                     <thead>
                                         <tr className="border-b border-slate-200 bg-slate-50 text-slate-550 font-semibold text-xs uppercase">
                                             <th className="p-3 w-10">
@@ -686,11 +733,11 @@ export default function Notes({ user, notes, stats }) {
                                                     aria-label={__('general.select_all_notes')}
                                                 />
                                             </th>
-                                            <th className="p-3">{__('general.title') || 'Title'}</th>
-                                            <th className="p-3">{__('general.category') || 'Category'}</th>
-                                            <th className="p-3">{__('general.details') || 'Details'}</th>
-                                            <th className="p-3">{__('general.created_at') || 'Created At'}</th>
-                                            <th className="p-3 text-right">{__('general.actions') || 'Actions'}</th>
+                                            <th className="p-3">{__('general.title')}</th>
+                                            <th className="p-3">{__('general.category')}</th>
+                                            <th className="p-3">{__('general.details')}</th>
+                                            <th className="p-3">{__('general.created_at')}</th>
+                                            <th className="p-3 text-end">{__('general.actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -763,35 +810,37 @@ export default function Notes({ user, notes, stats }) {
                                     disabled={notes.current_page === 1}
                                     className="relative inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                                 >
-                                    {__('general.previous') || 'Previous'}
+                                    {__('general.previous')}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     onClick={() => handlePageChange(notes.current_page + 1)}
                                     disabled={notes.current_page === notes.last_page}
-                                    className="relative ml-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    className="relative ms-3 inline-flex items-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                                 >
-                                    {__('general.next') || 'Next'}
+                                    {__('general.next')}
                                 </Button>
                             </div>
                             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                                 <div>
                                     <p className="text-sm text-slate-700">
-                                        Showing <span className="font-medium">{((notes.current_page - 1) * notes.per_page) + 1}</span> to{' '}
-                                        <span className="font-medium">{Math.min(notes.current_page * notes.per_page, notes.total)}</span> of{' '}
-                                        <span className="font-medium">{notes.total}</span> results
+                                        {__('admin.pagination_showing_results', {
+                                            from: ((notes.current_page - 1) * notes.per_page) + 1,
+                                            to: Math.min(notes.current_page * notes.per_page, notes.total),
+                                            total: notes.total,
+                                        })}
                                     </p>
                                 </div>
                                 <div>
-                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label={__('admin.pagination')}>
                                         <Button
                                             variant="outline"
                                             onClick={() => handlePageChange(notes.current_page - 1)}
                                             disabled={notes.current_page === 1}
-                                            className="relative inline-flex items-center rounded-l-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
+                                            className="relative inline-flex items-center rounded-s-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
                                         >
-                                            <span className="sr-only">Previous</span>
-                                            &larr;
+                                            <span className="sr-only">{__('general.previous')}</span>
+                                            <ChevronLeft size={16} className="rtl:rotate-180" aria-hidden="true" />
                                         </Button>
                                         {Array.from({ length: notes.last_page }, (_, i) => i + 1).map((p) => (
                                             <button
@@ -811,10 +860,10 @@ export default function Notes({ user, notes, stats }) {
                                             variant="outline"
                                             onClick={() => handlePageChange(notes.current_page + 1)}
                                             disabled={notes.current_page === notes.last_page}
-                                            className="relative inline-flex items-center rounded-r-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
+                                            className="relative inline-flex items-center rounded-e-md px-3 py-2 text-slate-400 hover:bg-slate-50 disabled:opacity-50 border-slate-200"
                                         >
-                                            <span className="sr-only">Next</span>
-                                            &rarr;
+                                            <span className="sr-only">{__('general.next')}</span>
+                                            <ChevronRight size={16} className="rtl:rotate-180" aria-hidden="true" />
                                         </Button>
                                     </nav>
                                 </div>
@@ -834,11 +883,11 @@ export default function Notes({ user, notes, stats }) {
                     <div className="bg-slate-50 border-b border-slate-100 p-6 flex flex-col gap-2">
                         <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 font-sora">
                             {selectedNote && getCategoryIcon(selectedNote.category)}
-                            {selectedNote?.decryptedTitle || __('general.encrypted_content_hidden')}
+                            <DecryptedText value={selectedNote?.decryptedTitle} fallback={__('general.encrypted_content_hidden')} />
                         </DialogTitle>
                         <DialogDescription className="text-slate-500 text-xs font-medium flex items-center gap-2">
                             <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded capitalize">
-                                {selectedNote?.category}
+                                {selectedNote && categoryLabel(selectedNote.category)}
                             </span>
                             {selectedNote && new Date(selectedNote.created_at).toLocaleString()}
                         </DialogDescription>
@@ -871,7 +920,7 @@ export default function Notes({ user, notes, stats }) {
                                     value={
                                         !isPasswordSet
                                             ? __('general.unlock_to_view_content')
-                                            : (selectedNote.decryptedContent ?? __('general.encrypted_content_hidden'))
+                                            : (toDisplayText(selectedNote.decryptedContent) ?? __('general.encrypted_content_hidden'))
                                     }
                                     aria-label={__('general.secure_content')}
                                     className="min-h-[200px] font-mono text-sm bg-slate-50/50 border-slate-200 resize-y p-5 pt-12 text-slate-700 leading-relaxed focus-visible:ring-slate-300"
@@ -1158,7 +1207,8 @@ function ParsedCredentials({ parsed, noteId, onCopyCard, showLabels = true, comp
                             type="button"
                             onClick={() => toggleReveal(fieldKey)}
                             className="p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition"
-                            title={isRevealed ? __('general.hide') || 'Hide' : __('general.show') || 'Show'}
+                            title={isRevealed ? __('general.hide') : __('general.show')}
+                            aria-label={isRevealed ? __('general.hide') : __('general.show')}
                         >
                             {isRevealed ? <EyeOff size={13} /> : <Eye size={13} />}
                         </button>
@@ -1167,7 +1217,8 @@ function ParsedCredentials({ parsed, noteId, onCopyCard, showLabels = true, comp
                         type="button"
                         onClick={() => onCopyCard(val, `${noteId}-${fieldKey}`)}
                         className="p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition"
-                        title={__('general.copy_text') || 'Copy Text'}
+                        title={__('general.copy_text')}
+                        aria-label={__('general.copy_text')}
                     >
                         <Copy size={13} />
                     </button>
@@ -1177,12 +1228,12 @@ function ParsedCredentials({ parsed, noteId, onCopyCard, showLabels = true, comp
     };
 
     return (
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 w-full text-left">
-            {renderField(__('general.username') || 'Username', parsed.username, false, false, 'username')}
-            {renderField(__('general.password') || 'Password', parsed.password, true, false, 'password')}
-            {renderField(__('general.url') || 'URL', parsed.url, false, true, 'url')}
-            {renderField(__('general.anydesk_id') || 'AnyDesk ID', parsed.anydeskId, false, false, 'anydeskId')}
-            {renderField(__('general.anydesk_password') || 'AnyDesk Password', parsed.anydeskPassword, true, false, 'anydeskPassword')}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 w-full text-start">
+            {renderField(__('general.username'), parsed.username, false, false, 'username')}
+            {renderField(__('general.password'), parsed.password, true, false, 'password')}
+            {renderField(__('general.url'), parsed.url, false, true, 'url')}
+            {renderField(__('general.anydesk_id'), parsed.anydeskId, false, false, 'anydeskId')}
+            {renderField(__('general.anydesk_password'), parsed.anydeskPassword, true, false, 'anydeskPassword')}
             {parsed.customFields && parsed.customFields.map((f, i) =>
                 renderField(
                     f.key,
@@ -1235,7 +1286,7 @@ function CardViewItem({
                             )}
                             <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize flex items-center gap-1 border border-slate-200 shrink-0">
                                 {getCategoryIcon(note.category)}
-                                {note.category}
+                                {categoryLabel(note.category)}
                             </span>
                             {note.is_expired && (
                                 <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
@@ -1248,7 +1299,7 @@ function CardViewItem({
                                 </span>
                             )}
                         </div>
-                        {note.decryptedTitle && !String(note.decryptedTitle).startsWith('🔒') && (
+                        {note.decryptedTitle && !isUndecryptable(note.decryptedTitle) && (
                             <h3 className="text-lg font-bold text-slate-900 break-words">{note.decryptedTitle}</h3>
                         )}
                         <span className="text-[11px] text-slate-400 font-medium">
@@ -1296,7 +1347,7 @@ function CardViewItem({
             </div>
 
             <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center gap-3 mt-auto">
-                {isPasswordSet && note.decryptedContent !== null && !String(note.decryptedContent).startsWith('🔒') ? (
+                {isPasswordSet && note.decryptedContent !== null && !isUndecryptable(note.decryptedContent) ? (
                     <div className="flex items-center justify-between flex-1 min-w-0 gap-2">
                         <span className="text-slate-500 line-clamp-1 font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
                             {note.decryptedContent}
@@ -1304,6 +1355,7 @@ function CardViewItem({
                         <button
                             type="button"
                             title={__('general.copy_text')}
+                            aria-label={__('general.copy_text')}
                             onClick={() => handleCopyCard(note.decryptedContent, note.id)}
                             className={`p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 shrink-0 transition-colors ${
                                 copiedId === note.id ? 'text-green-600 hover:text-green-700' : ''
@@ -1318,7 +1370,7 @@ function CardViewItem({
                         {__('general.encrypted_content_hidden')}
                     </div>
                 )}
-                {isPasswordSet && note.decryptedContent && !String(note.decryptedContent).startsWith('🔒') && (
+                {isPasswordSet && note.decryptedContent && !isUndecryptable(note.decryptedContent) && (
                     <Button
                         variant="outline"
                         size="sm"
@@ -1361,8 +1413,8 @@ function CompactViewItem({
                         onCheckedChange={() => toggleSelect(note.id)}
                         aria-label={__('general.select_note')}
                     />
-                    <div className="text-slate-700 truncate font-semibold text-sm" title={note.decryptedTitle}>
-                        {note.decryptedTitle || note.title}
+                    <div className="text-slate-700 truncate font-semibold text-sm" title={toDisplayText(note.decryptedTitle)}>
+                        <DecryptedText value={note.decryptedTitle} fallback={note.title} />
                     </div>
                 </div>
                 <div className="flex items-center gap-0.5 shrink-0">
@@ -1378,12 +1430,13 @@ function CompactViewItem({
                     {new Date(note.created_at).toLocaleDateString()}
                 </span>
                 <div className="flex items-center gap-1">
-                    {isPasswordSet && note.decryptedContent && !String(note.decryptedContent).startsWith('🔒') ? (
+                    {isPasswordSet && note.decryptedContent && !isUndecryptable(note.decryptedContent) ? (
                         <button
                             type="button"
                             onClick={() => handleViewNote(note)}
                             className="p-1 rounded text-slate-600 hover:bg-slate-100 transition"
                             title={__('general.view_note')}
+                            aria-label={__('general.view_note')}
                         >
                             <Eye size={12} />
                         </button>
@@ -1395,6 +1448,7 @@ function CompactViewItem({
                         onClick={() => handleEditNote(note)}
                         className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
                         title={__('general.edit')}
+                        aria-label={__('general.edit')}
                     >
                         <Pencil size={12} />
                     </button>
@@ -1403,6 +1457,7 @@ function CompactViewItem({
                         onClick={() => handleDelete(note.id)}
                         className="p-1 rounded text-red-400 hover:text-red-650 hover:bg-red-50 transition"
                         title={__('general.delete')}
+                        aria-label={__('general.delete')}
                     >
                         <Trash2 size={12} />
                     </button>
@@ -1426,7 +1481,7 @@ function ListViewRow({
     handleDelete,
     getCategoryIcon,
 }) {
-    const isEncrypted = !isPasswordSet || !note.decryptedContent || String(note.decryptedContent).startsWith('🔒');
+    const isEncrypted = !isPasswordSet || !note.decryptedContent || isUndecryptable(note.decryptedContent);
 
     return (
         <tr className={`hover:bg-slate-50/50 transition-colors ${selectedIds.includes(note.id) ? 'bg-slate-50' : ''}`}>
@@ -1441,8 +1496,8 @@ function ListViewRow({
                 <div className="flex flex-col gap-1 min-w-[140px] max-w-[200px]">
                     <div className="flex items-center gap-1.5 flex-wrap">
                         {note.is_pinned && <Pin size={12} className="text-slate-800 fill-slate-800 shrink-0" />}
-                        <span className="break-words font-semibold text-sm text-slate-900" title={note.decryptedTitle}>
-                            {note.decryptedTitle || note.title}
+                        <span className="break-words font-semibold text-sm text-slate-900" title={toDisplayText(note.decryptedTitle)}>
+                            <DecryptedText value={note.decryptedTitle} fallback={note.title} />
                         </span>
                     </div>
                     {note.is_expired && (
@@ -1455,21 +1510,22 @@ function ListViewRow({
             <td className="p-3 align-top">
                 <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs font-medium capitalize border border-slate-200 whitespace-nowrap">
                     {getCategoryIcon(note.category)}
-                    {note.category}
+                    {categoryLabel(note.category)}
                 </span>
             </td>
             <td className="p-3 align-top">
                 {isEncrypted ? (
                     <span className="text-xs text-slate-400 font-medium inline-flex items-center gap-1.5 py-1">
                         <Key size={13} className="text-slate-400" />
-                        {__('general.encrypted_content_hidden') || '🔒 [Encrypted]'}
+                        {__('general.encrypted_content_hidden')}
                     </span>
                 ) : (
                     <div className="relative group bg-slate-50 hover:bg-slate-100/70 transition-colors border border-slate-200 rounded-lg p-2.5 text-xs">
                         <div className="absolute top-1.5 end-1.5 flex items-center gap-1">
                             <button
                                 type="button"
-                                title={__('general.copy_text') || 'Copy Text'}
+                                title={__('general.copy_text')}
+                                aria-label={__('general.copy_text')}
                                 onClick={() => handleCopyCard(note.decryptedContent, note.id)}
                                 className={`p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors bg-white/80 shadow-xs border border-slate-200 ${
                                     copiedId === note.id ? 'text-green-600 border-green-300 bg-green-50' : ''
@@ -1492,7 +1548,7 @@ function ListViewRow({
                     </div>
                 )}
             </td>
-            <td className="p-3 align-top text-right whitespace-nowrap">
+            <td className="p-3 align-top text-end whitespace-nowrap">
                 <div className="inline-flex items-center gap-1">
                     <IconButton
                         title={note.is_pinned ? __('general.unpin') : __('general.pin')}
@@ -1517,7 +1573,7 @@ function ListViewRow({
                     <IconButton title={__('general.delete')} danger onClick={() => handleDelete(note.id)}>
                         <Trash2 size={12} />
                     </IconButton>
-                    {isPasswordSet && note.decryptedContent && !String(note.decryptedContent).startsWith('🔒') && (
+                    {isPasswordSet && note.decryptedContent && !isUndecryptable(note.decryptedContent) && (
                         <IconButton title={__('general.view_note')} onClick={() => handleViewNote(note)}>
                             <FileText size={12} />
                         </IconButton>
@@ -1564,9 +1620,9 @@ function SplitViewLayout({
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white min-h-[500px]">
             {/* Left list pane (4/12 columns) */}
-            <div className="lg:col-span-4 border-r border-slate-200 flex flex-col bg-slate-50/50">
+            <div className="lg:col-span-4 border-e border-slate-200 flex flex-col bg-slate-50/50">
                 <div className="p-3 border-b border-slate-200 bg-white font-bold text-xs uppercase tracking-wider text-slate-500 flex justify-between items-center">
-                    <span>{__('general.notes_list') || 'Notes List'}</span>
+                    <span>{__('general.notes_list')}</span>
                     <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px]">
                         {filteredNotes.length}
                     </span>
@@ -1577,19 +1633,19 @@ function SplitViewLayout({
                             key={note.id}
                             type="button"
                             onClick={() => setActiveId(note.id)}
-                            className={`w-full text-left p-3.5 border-b border-slate-100 transition-colors flex flex-col gap-1.5 ${
-                                activeId === note.id ? 'bg-white border-l-4 border-l-slate-900 shadow-sm font-semibold' : 'hover:bg-slate-100/50'
+                            className={`w-full text-start p-3.5 border-b border-slate-100 transition-colors flex flex-col gap-1.5 ${
+                                activeId === note.id ? 'bg-white border-s-4 border-s-slate-900 shadow-sm font-semibold' : 'hover:bg-slate-100/50'
                             }`}
                         >
                             <div className="flex justify-between items-start gap-2 w-full">
                                 <div className="flex items-center gap-1.5 min-w-0">
                                     {note.is_pinned && <Pin size={11} className="text-slate-800 fill-slate-800 shrink-0" />}
                                     <span className="font-semibold text-sm text-slate-900 truncate">
-                                        {note.decryptedTitle || note.title}
+                                        <DecryptedText value={note.decryptedTitle} fallback={note.title} />
                                     </span>
                                 </div>
                                 <span className="bg-slate-200/70 text-slate-700 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold shrink-0">
-                                    {note.category}
+                                    {categoryLabel(note.category)}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-[10px] text-slate-400 w-full">
@@ -1617,7 +1673,7 @@ function SplitViewLayout({
                                     <div className="flex items-center gap-2 flex-wrap mb-1">
                                         <span className="bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
                                             {getCategoryIcon(activeNote.category)}
-                                            {activeNote.category}
+                                            {categoryLabel(activeNote.category)}
                                         </span>
                                         {activeNote.is_pinned && (
                                             <span className="bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded text-xs font-semibold">
@@ -1631,11 +1687,11 @@ function SplitViewLayout({
                                         )}
                                     </div>
                                     <h2 className="text-xl font-bold text-slate-900 break-words">
-                                        {activeNote.decryptedTitle || activeNote.title}
+                                        <DecryptedText value={activeNote.decryptedTitle} fallback={activeNote.title} />
                                     </h2>
                                     <p className="text-xs text-slate-400 font-medium mt-1">
                                         {__('general.created_at')}: {new Date(activeNote.created_at).toLocaleString()}
-                                        {activeNote.author?.name ? ` · Author: ${activeNote.author.name}` : ''}
+                                        {activeNote.author?.name ? ` · ${__('general.report_author')}: ${activeNote.author.name}` : ''}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
@@ -1669,7 +1725,7 @@ function SplitViewLayout({
                             {isPasswordSet && activeNote.parsed && (
                                 <div className="mb-4">
                                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                                        {__('general.parsed_credentials') || 'Parsed Credentials'}
+                                        {__('general.parsed_credentials')}
                                     </h4>
                                     <ParsedCredentials
                                         parsed={activeNote.parsed}
@@ -1682,7 +1738,7 @@ function SplitViewLayout({
                             {/* Full Secure Content Textarea */}
                             <div>
                                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                                    {__('general.secure_content') || 'Secure Content'}
+                                    {__('general.secure_content')}
                                 </h4>
                                 <div className="relative">
                                     <div className="absolute top-2 end-2 z-10">
@@ -1704,8 +1760,9 @@ function SplitViewLayout({
                                         value={
                                             !isPasswordSet
                                                 ? __('general.unlock_to_view_content')
-                                                : (activeDecryptedContent ?? __('general.encrypted_content_hidden'))
+                                                : (toDisplayText(activeDecryptedContent) ?? __('general.encrypted_content_hidden'))
                                         }
+                                        aria-label={__('general.secure_content')}
                                         className="w-full min-h-[180px] font-mono text-sm bg-slate-50 border border-slate-200 rounded-lg p-4 pt-12 text-slate-700 resize-none outline-none focus:ring-0"
                                     />
                                 </div>
@@ -1715,7 +1772,7 @@ function SplitViewLayout({
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-400 text-sm">
                         <FileText size={48} className="mb-3 text-slate-200" />
-                        <span>{__('general.select_note_to_view_details') || 'Select a note from the left to view details'}</span>
+                        <span>{__('general.select_note_to_view_details')}</span>
                     </div>
                 )}
             </div>

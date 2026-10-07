@@ -46,7 +46,7 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
 
     return (
         <PublicLayout>
-            <Head title={`${__('general.pricing') || 'Pricing'} | Musoftwares Studio`}>
+            <Head title={`${__('general.pricing')} | Musoftwares Studio`}>
                 <meta name="description" content="Transparent pricing for SaaS subscriptions and dedicated engineering blocks." />
             </Head>
 
@@ -55,14 +55,14 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
                 {/* Reusable Studio Hero Section */}
                 <div className="reveal-section">
                     <StudioHeader
-                        badge={__('general.pricing') || 'Transparent Pricing'}
+                        badge={__('general.pricing')}
                         title={
                             <>
                                 Transparent Investment. <br className="hidden sm:inline" />
                                 <span className="text-[#0071e3]">Zero Hidden Surprises.</span>
                             </>
                         }
-                        subtitle={__('general.no_hidden_fees_choose_a_prebuilt_saas_su') || 'Choose from our cloud-ready platforms or book dedicated engineering blocks for bespoke development.'}
+                        subtitle={__('general.no_hidden_fees_choose_a_prebuilt_saas_su')}
                     />
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center -mt-8 mb-20">
@@ -70,13 +70,13 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
                             onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to discuss pricing options.")}
                             className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] text-xs font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            {__('general.talk_with_architect') || 'TALK WITH ARCHITECT'}
+                            {__('general.talk_with_architect')}
                         </button>
                         <Link
                             href="/estimator"
                             className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] text-xs font-semibold tracking-wide transition-all shadow-sm"
                         >
-                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'} ➔
+                            {__('general.calculate_estimate')} ➔
                         </Link>
                     </div>
                 </div>
@@ -85,10 +85,10 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
                 <section className="px-6 max-w-[1400px] mx-auto mb-20 sm:mb-28 reveal-section">
                     <div className="text-center mb-14">
                         <h2 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] mb-3 tracking-tight font-sans">
-                            {__('general.engineering_blocks') || 'Engineering Sprints & Retainers'}
+                            {__('general.engineering_blocks')}
                         </h2>
                         <p className="text-sm font-sans text-[#1d1d1f]/60 max-w-2xl mx-auto leading-relaxed">
-                            {__('general.for_businesses_that_need_custom_developm') || 'Direct engineering hours with dedicated architecture, code reviews, and rapid delivery.'}
+                            {__('general.for_businesses_that_need_custom_developm')}
                         </p>
                     </div>
 
@@ -97,27 +97,27 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
                         <div className="bg-white border border-black/5 rounded-[24px] p-8 sm:p-10 flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all">
                             <div>
                                 <div className="text-xs font-semibold text-[#1d1d1f]/60 mb-6 uppercase tracking-wider">
-                                    {__('general.maintenance_retainer') || 'Fix & Improve'}
+                                    {__('general.maintenance_retainer')}
                                 </div>
                                 <div className="mb-4 flex items-baseline gap-2">
                                     <span className="text-4xl sm:text-5xl font-semibold text-[#1d1d1f]">$45</span>
                                     <span className="text-xs text-[#1d1d1f]/50">/ 5h block</span>
                                 </div>
                                 <p className="text-sm text-[#1d1d1f]/70 mb-8 leading-relaxed font-sans">
-                                    {__('general.ideal_for_existing_projects_that_need_bu') || 'Ideal for urgent bug fixes, server maintenance, or minor system updates.'}
+                                    {__('general.ideal_for_existing_projects_that_need_bu')}
                                 </p>
                                 <ul className="space-y-3.5 mb-10 text-xs font-sans">
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                                        <span>{__('general.bug_fixes_and_patches') || 'Codebase debugging & patches'}</span>
+                                        <span>{__('general.bug_fixes_and_patches')}</span>
                                     </li>
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                                        <span>{__('general.server_monitoring') || 'Server monitoring & health check'}</span>
+                                        <span>{__('general.server_monitoring')}</span>
                                     </li>
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                                        <span>{__('general.security_updates') || 'Security & package updates'}</span>
+                                        <span>{__('general.security_updates')}</span>
                                     </li>
                                 </ul>
                             </div>
@@ -132,27 +132,27 @@ export default function Pricing({ currency = 'USD', serviceItems = [], targetMod
                         {/* Build New (Signature Apple Blue Block) */}
                         <div className="bg-[#0071e3]/5 border-2 border-[#0071e3] rounded-[24px] p-8 sm:p-10 flex flex-col justify-between h-full relative shadow-[0_12px_30px_rgba(0,113,227,0.12)]">
                             <div className="absolute top-6 end-6 text-[10px] font-semibold uppercase tracking-wider bg-[#0071e3] text-white px-3 py-1 rounded-full shadow-xs">
-                                {__('general.most_popular') || 'Recommended'}
+                                {__('general.most_popular')}
                             </div>
                             <div>
                                 <div className="text-xs font-semibold text-[#0071e3] mb-6 uppercase tracking-wider">
-                                    {__('general.custom_build') || 'Feature Sprint'}
+                                    {__('general.custom_build')}
                                 </div>
                                 <div className="mb-4 flex items-baseline gap-2">
                                     <span className="text-4xl sm:text-5xl font-semibold text-[#1d1d1f]">$110</span>
                                     <span className="text-xs text-[#1d1d1f]/50">/ 12h sprint</span>
                                 </div>
                                 <p className="text-sm text-[#1d1d1f]/70 mb-8 leading-relaxed font-sans">
-                                    {__('general.for_building_new_mvps_saas_platforms_or') || 'Perfect for developing specific new modules or integrating third-party APIs.'}
+                                    {__('general.for_building_new_mvps_saas_platforms_or')}
                                 </p>
                                 <ul className="space-y-3.5 mb-10 text-xs font-sans">
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                                        <span>{__('general.fullstack_development') || 'Full-stack feature engineering'}</span>
+                                        <span>{__('general.fullstack_development')}</span>
                                     </li>
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />
-                                        <span>{__('general.database_architecture') || 'Database & API integrations'}</span>
+                                        <span>{__('general.database_architecture')}</span>
                                     </li>
                                     <li className="flex items-start gap-3 text-[#1d1d1f]/80">
                                         <Check className="w-4 h-4 text-[#0071e3] shrink-0 mt-0.5" />

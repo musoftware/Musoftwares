@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, Link, router } from '@inertiajs/react';
+import Pagination from '@/Components/Pagination';
 import {
   Building2,
   Users,
@@ -67,11 +68,11 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
   };
 
   const handleImpersonate = (userId: number) => {
-    router.get(route('admin.erp.impersonate', userId));
+    router.post(route('admin.erp.impersonate', userId));
   };
 
   return (
-    <AdminSidebarLayout title={__('general.erp_overview')} header="ERP Overview">
+    <AdminSidebarLayout title={__('general.erp_overview')} header={__('general.erp_overview')}>
             <Head title={__('general.erp_admin_oversight')} />
 
             <div className="space-y-6">
@@ -239,27 +240,11 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
 
                     {/* Pagination Links */}
                     {tenants.last_page > 1 &&
-          <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-4 text-xs text-slate-500 font-medium">
-                            <span className="me-auto">
-                                Page {tenants.current_page} of {tenants.last_page}
+          <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
+                            <span>
+                                {__('general.page_of', { current: tenants.current_page, last: tenants.last_page })}
                             </span>
-                            <div className="flex items-center gap-1">
-                                {tenants.links.map((link, idx) => {
-                if (link.url === null) return null;
-                return (
-                  <Link
-                    key={idx}
-                    href={link.url}
-                    dangerouslySetInnerHTML={{ __html: link.label }}
-                    className={`px-3 py-1.5 rounded transition ${
-                    link.active ?
-                    'bg-slate-900 text-white font-bold' :
-                    'hover:bg-slate-100 text-slate-600'}`
-                    } />);
-
-
-              })}
-                            </div>
+                            <Pagination links={tenants.links} />
                         </div>
           }
                 </Card>

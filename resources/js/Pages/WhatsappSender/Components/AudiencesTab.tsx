@@ -1,5 +1,7 @@
+import { __ } from '@/lib/i18n';
 import React, { useState } from 'react';
 import { useForm, router } from '@inertiajs/react';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     Users,
     UserPlus,
@@ -27,6 +29,7 @@ interface Props {
 export default function AudiencesTab({ businessId, contactGroups }: Props) {
     const [searchQuery, setSearchQuery] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const groupForm = useForm({
         whatsapp_business_id: businessId,
@@ -58,8 +61,8 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                         <Users className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-base font-bold text-white">Contacts & Audience Segments</h2>
-                        <p className="text-xs text-slate-400">Manage target customer groups, subscriber lists, and CSV imports</p>
+                        <h2 className="text-base font-bold text-white">{__('whatsapp.audiences_title')}</h2>
+                        <p className="text-xs text-slate-400">{__('whatsapp.audiences_desc')}</p>
                     </div>
                 </div>
 
@@ -70,7 +73,8 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search audiences..."
+                            placeholder={__('whatsapp.audiences_search')}
+                            aria-label={__('whatsapp.audiences_search')}
                             className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
                         />
                     </div>
@@ -80,7 +84,7 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                         className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 transition-all shadow-md shrink-0"
                     >
                         <Plus className="w-4 h-4" />
-                        Create Segment
+                        {__('whatsapp.audiences_create')}
                     </button>
                 </div>
             </div>
@@ -90,9 +94,9 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                 {filteredGroups.length === 0 ? (
                     <div className="col-span-full bg-slate-900/40 border border-slate-800 rounded-2xl p-12 text-center text-slate-500 space-y-2">
                         <Users className="w-10 h-10 text-slate-600 mx-auto" />
-                        <h3 className="text-sm font-bold text-slate-300">No Audience Segments Created</h3>
+                        <h3 className="text-sm font-bold text-slate-300">{__('whatsapp.audiences_empty')}</h3>
                         <p className="text-xs max-w-sm mx-auto text-slate-500">
-                            Create audience segments to send targeted broadcast campaigns to specific customer groups.
+                            {__('whatsapp.audiences_empty_desc')}
                         </p>
                     </div>
                 ) : (
@@ -101,23 +105,23 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                             <div className="flex items-start justify-between">
                                 <div>
                                     <h3 className="text-sm font-bold text-white">{group.name}</h3>
-                                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{group.description || 'No description provided.'}</p>
+                                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">{group.description || __('whatsapp.audiences_no_description')}</p>
                                 </div>
                                 <button
-                                    onClick={() => {
-                                        if (confirm(`Are you sure you want to delete audience segment "${group.name}"?`)) {
-                                            router.delete(`/whatsapp-sender/contact-groups/${group.id}`);
-                                        }
+                                    onClick={async () => {
+                                        if (!(await confirm({ title: __('whatsapp.audiences_delete'), description: __('whatsapp.audiences_delete_desc', { name: group.name }), variant: 'danger' }))) return;
+                                        router.delete(`/whatsapp-sender/contact-groups/${group.id}`);
                                     }}
                                     className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
-                                    title="Delete Segment"
+                                    title={__('whatsapp.audiences_delete')}
+                                    aria-label={__('whatsapp.audiences_delete')}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
 
                             <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                                <span className="text-slate-400">Total Contacts:</span>
+                                <span className="text-slate-400">{__('whatsapp.audiences_total_contacts')}</span>
                                 <span className="text-sky-400 font-bold font-mono text-sm">{group.contacts_count}</span>
                             </div>
                         </div>
@@ -129,27 +133,29 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
             {showCreateModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-                        <h3 className="text-base font-bold text-white">Create Audience Segment</h3>
+                        <h3 className="text-base font-bold text-white">{__('whatsapp.audiences_create_title')}</h3>
 
                         <form onSubmit={handleCreateGroup} className="space-y-4">
                             <div>
-                                <label className="text-xs font-semibold text-slate-400 block mb-1">Segment Name</label>
+                                <label htmlFor="audience-name" className="text-xs font-semibold text-slate-400 block mb-1">{__('whatsapp.audiences_name')}</label>
                                 <input
+                                    id="audience-name"
                                     type="text"
                                     value={groupForm.data.name}
                                     onChange={e => groupForm.setData('name', e.target.value)}
-                                    placeholder="e.g. VIP Customers, July Leads..."
+                                    placeholder={__('whatsapp.audiences_name_placeholder')}
                                     required
                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-semibold text-slate-400 block mb-1">Description (Optional)</label>
+                                <label htmlFor="audience-description" className="text-xs font-semibold text-slate-400 block mb-1">{__('whatsapp.audiences_description')}</label>
                                 <textarea
+                                    id="audience-description"
                                     value={groupForm.data.description}
                                     onChange={e => groupForm.setData('description', e.target.value)}
-                                    placeholder="Segment criteria or audience details..."
+                                    placeholder={__('whatsapp.audiences_description_placeholder')}
                                     rows={3}
                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500 resize-none"
                                 />
@@ -161,20 +167,21 @@ export default function AudiencesTab({ businessId, contactGroups }: Props) {
                                     onClick={() => setShowCreateModal(false)}
                                     className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-700"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={groupForm.processing}
                                     className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md"
                                 >
-                                    Create Segment
+                                    {__('whatsapp.audiences_create')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+            {confirmDialog}
         </div>
     );
 }

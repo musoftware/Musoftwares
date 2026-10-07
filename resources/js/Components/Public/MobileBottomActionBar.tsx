@@ -35,7 +35,7 @@ export default function MobileBottomActionBar({
 
     const openWhatsApp = () => {
         const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
-        const msg = encodeURIComponent(__('general.whatsapp_float_default_msg') || "Hello Mahmoud, I'd like to discuss a project with Musoftware!");
+        const msg = encodeURIComponent(__('general.whatsapp_float_default_msg'));
         window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
     };
 
@@ -52,7 +52,7 @@ export default function MobileBottomActionBar({
                     className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
                 >
                     <LayoutGrid className="w-5 h-5 mb-0.5 text-zinc-700" />
-                    <span>{__('general.pricing') || 'Plans'}</span>
+                    <span>{__('general.pricing')}</span>
                 </Link>
 
                 {/* 2. WhatsApp Direct Action (Hero Button) */}
@@ -62,7 +62,7 @@ export default function MobileBottomActionBar({
                     className="flex-[2] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 transition shadow-sm text-xs font-bold uppercase tracking-wider cursor-pointer"
                 >
                     <MessageCircle className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
-                    <span>{__('general.chat_whatsapp') || 'WhatsApp'}</span>
+                    <span>{__('general.chat_whatsapp')}</span>
                 </button>
 
                 {/* 3. Account / Login / Dashboard */}
@@ -72,7 +72,7 @@ export default function MobileBottomActionBar({
                         className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
                     >
                         <User className="w-5 h-5 mb-0.5 text-zinc-700" />
-                        <span>{__('general.dashboard') || 'Account'}</span>
+                        <span>{__('general.dashboard')}</span>
                     </Link>
                 ) : (
                     <Link
@@ -80,7 +80,7 @@ export default function MobileBottomActionBar({
                         className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
                     >
                         <User className="w-5 h-5 mb-0.5 text-zinc-700" />
-                        <span>{__('general.login') || 'Login'}</span>
+                        <span>{__('general.login')}</span>
                     </Link>
                 )}
             </div>

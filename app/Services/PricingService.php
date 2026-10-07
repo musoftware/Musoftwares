@@ -2,8 +2,32 @@
 
 namespace App\Services;
 
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use RuntimeException;
+
 class PricingService extends BaseService
 {
+    /**
+     * Currency of every price in config('saas.modules') and getServiceItems() (when no converter is given).
+     */
+    public const BASE_CURRENCY_CODE = 'EGP';
+
+    /**
+     * Convert a base (EGP) price into another currency at today's rate.
+     *
+     * @throws RuntimeException when the base currency row is missing
+     */
+    public function convertBasePrice(float $basePrice, int $toCurrencyId): float
+    {
+        $baseCurrency = Currency::resolve(self::BASE_CURRENCY_CODE);
+        if (! $baseCurrency) {
+            throw new RuntimeException('Pricing base currency '.self::BASE_CURRENCY_CODE.' is missing from the currencies table.');
+        }
+
+        return (float) CurrenciesExchange::RateToday($basePrice, $baseCurrency->id, $toCurrencyId);
+    }
+
     /**
      * Get all modules, addons, and tools configured for pricing,
      * converted to a uniform ServiceItem format.

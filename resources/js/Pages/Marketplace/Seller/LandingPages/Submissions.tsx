@@ -44,7 +44,7 @@ export default function Submissions({ service, landingPage, submissions }: Submi
 
     return (
         <MarketplaceLayout>
-            <Head title={`Leads & Inquiries — ${service?.title}`} />
+            <Head title={__('marketplace.lp_leads_page_title', { title: service?.title })} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <div className="flex items-center justify-between">
@@ -53,7 +53,7 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                         className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Landing Pages
+                        {__('general.back_to_landing_pages')}
                     </Link>
 
                     <a
@@ -61,27 +61,28 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-medium hover:bg-slate-800 transition shadow-sm"
                     >
                         <Download className="w-3.5 h-3.5" />
-                        Export Leads CSV
+                        {__('marketplace.lp_export_leads_csv')}
                     </a>
                 </div>
 
                 <ModulePageHeader
-                    title={`Captured Leads: "${service?.title}"`}
-                    description={`Client form submissions collected from /s/${landingPage?.slug || ''}`}
+                    title={__('marketplace.lp_captured_leads', { title: service?.title })}
+                    description={__('marketplace.lp_captured_leads_desc', { path: `/s/${landingPage?.slug || ''}` })}
                 />
 
                 <SellerNav />
 
                 <OperationalCard
-                    title="Form Submissions & Inquiry Records"
-                    description="Client questionnaires and lead contact details."
+                    title={__('marketplace.lp_submissions_title')}
+                    description={__('marketplace.lp_submissions_desc')}
                 >
                     <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="relative w-full sm:w-80">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder="Search by name or email..."
+                                placeholder={__('marketplace.lp_search_leads')}
+                                aria-label={__('marketplace.lp_search_leads')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
@@ -93,9 +94,9 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                         <table className="w-full text-left text-sm">
                             <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wider text-xs font-semibold">
                                 <tr>
-                                    <th className="px-6 py-3">Date</th>
-                                    <th className="px-6 py-3">Lead Contact</th>
-                                    <th className="px-6 py-3">Submitted Questionnaire Data</th>
+                                    <th className="px-6 py-3">{__('general.date')}</th>
+                                    <th className="px-6 py-3">{__('marketplace.lp_lead_contact')}</th>
+                                    <th className="px-6 py-3">{__('marketplace.lp_submitted_data')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -104,7 +105,7 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                                         <td colSpan={3} className="px-6 py-12 text-center text-slate-400">
                                             <div className="flex flex-col items-center justify-center space-y-2">
                                                 <FileText className="w-8 h-8 text-slate-300 stroke-[1.5]" />
-                                                <p className="text-sm">No form submissions received yet.</p>
+                                                <p className="text-sm">{__('marketplace.lp_no_submissions')}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -115,8 +116,8 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                                                 {formatDate(sub.created_at)}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className="font-semibold text-slate-900">{sub.name || 'Anonymous Lead'}</div>
-                                                <div className="text-xs text-indigo-600 font-mono">{sub.email || 'No email provided'}</div>
+                                                <div className="font-semibold text-slate-900">{sub.name || __('marketplace.lp_anonymous_lead')}</div>
+                                                <div className="text-xs text-indigo-600 font-mono">{sub.email || __('marketplace.lp_no_email')}</div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {sub.data && typeof sub.data === 'object' ? (
@@ -129,7 +130,7 @@ export default function Submissions({ service, landingPage, submissions }: Submi
                                                         ))}
                                                     </div>
                                                 ) : (
-                                                    <span className="text-xs text-slate-400">—</span>
+                                                    <span className="text-xs text-slate-400">-</span>
                                                 )}
                                             </td>
                                         </tr>

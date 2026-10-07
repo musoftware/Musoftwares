@@ -95,7 +95,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
 
     return (
         <AuthenticatedLayout>
-            <Head title="Software & Tools Store | متجر البرامج والأدوات" />
+            <Head title={__('tools.store_page_title')} />
 
             <PageShell>
                 <div className="space-y-8">
@@ -105,14 +105,14 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
                                     <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                                    Desktop Automation & Tools
+                                    {__('tools.store_badge')}
                                 </span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f8fafc]">
-                                Software & Tools Store
+                                {__('tools.store_page_title')}
                             </h1>
                             <p className="text-sm text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1 max-w-2xl font-sans">
-                                Professional Windows desktop software and automation tools. Purchase or activate licenses instantly linked to your email address for seamless device unlock.
+                                {__('tools.store_subheading')}
                             </p>
                         </div>
 
@@ -122,7 +122,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-semibold text-[#1d1d1f] dark:text-zinc-100 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 transition-all shadow-xs"
                             >
                                 <Key className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                My Licenses ({userLicensesCount})
+                                {__('tools.store_my_licenses_count', { count: userLicensesCount })}
                             </Link>
                         </div>
                     </div>
@@ -133,7 +133,8 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                             <Search className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
-                                placeholder="Search software by name, category..."
+                                placeholder={__('tools.store_search_placeholder')}
+                                aria-label={__('tools.store_search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-zinc-900/80 border border-black/10 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0071e3] text-[#1d1d1f] dark:text-[#f8fafc] placeholder:text-[#1d1d1f]/40 dark:placeholder:text-zinc-500"
@@ -141,7 +142,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                         </div>
 
                         <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-sans">
-                            Showing <span className="font-semibold text-[#1d1d1f] dark:text-white">{filteredTools.length}</span> tools
+                            {__('tools.store_showing_count', { count: filteredTools.length })}
                         </div>
                     </div>
 
@@ -162,13 +163,13 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                             {tool.has_license ? (
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
                                                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                                                    Active License
+                                                    {__('tools.store_active_license')}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 text-[#1d1d1f]/70 dark:text-zinc-300 border border-black/5 dark:border-white/10">
                                                     {tool.requires_payment && tool.price > 0 
                                                         ? `${tool.price} ${tool.currency}` 
-                                                        : 'Free License'}
+                                                        : __('tools.store_free_license')}
                                                 </span>
                                             )}
 
@@ -192,7 +193,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                     </div>
 
                                     <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans mt-2 leading-relaxed">
-                                        {tool.tagline || tool.description || 'Windows desktop automation utility with instant device licensing.'}
+                                        {tool.tagline || tool.description || __('tools.store_default_tagline')}
                                     </p>
 
                                     {/* Feature highlights */}
@@ -209,7 +210,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
 
                                     {tool.license_expires_at && (
                                         <div className="mt-3 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
-                                            Valid until: {new Date(tool.license_expires_at).toLocaleDateString()}
+                                            {__('tools.store_valid_until', { date: new Date(tool.license_expires_at).toLocaleDateString() })}
                                         </div>
                                     )}
                                 </div>
@@ -223,7 +224,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                             className="inline-flex items-center gap-1.5 text-xs text-[#1d1d1f]/70 dark:text-zinc-400 hover:text-[#0071e3] transition-colors"
                                         >
                                             <Download className="w-3.5 h-3.5" />
-                                            Download Tool
+                                            {__('tools.store_download_tool')}
                                         </a>
                                     ) : (
                                         <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-mono">
@@ -237,7 +238,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                         size="sm"
                                         className="rounded-xl px-4 text-xs font-semibold"
                                     >
-                                        {tool.has_license ? 'Renew / Bind Device' : 'Activate Software'}
+                                        {tool.has_license ? __('tools.store_renew_bind') : __('tools.store_activate_software')}
                                         <ArrowRight className="w-3.5 h-3.5 ms-1.5" />
                                     </Button>
                                 </div>
@@ -248,8 +249,8 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                     {filteredTools.length === 0 && (
                         <div className="text-center py-16 bg-white dark:bg-zinc-900/60 rounded-3xl border border-black/5 dark:border-white/10">
                             <Laptop className="w-12 h-12 text-[#1d1d1f]/20 dark:text-zinc-600 mx-auto mb-3" />
-                            <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-white">No software tools found</h3>
-                            <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 mt-1">Try refining your search term.</p>
+                            <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-white">{__('tools.store_empty_title')}</h3>
+                            <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 mt-1">{__('tools.store_empty_hint')}</p>
                         </div>
                     )}
                 </div>
@@ -262,17 +263,17 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                 <Key className="w-5 h-5" />
                             </div>
                             <DialogTitle className="text-lg font-bold">
-                                Activate Software: {selectedTool?.name}
+                                {__('tools.store_activate_title', { name: selectedTool?.name ?? '' })}
                             </DialogTitle>
                             <DialogDescription className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 font-sans">
-                                Enter the email address to bind this license to. When you launch the program on your computer and type this email, your device will activate automatically.
+                                {__('tools.store_activate_desc')}
                             </DialogDescription>
                         </DialogHeader>
 
                         <form onSubmit={handleSubmit} className="space-y-4 py-2">
                             <div className="space-y-1.5">
                                 <Label htmlFor="email" className="text-xs font-semibold">
-                                    Email Address (Required)
+                                    {__('tools.store_email_required')}
                                 </Label>
                                 <div className="relative">
                                     <Mail className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -291,40 +292,40 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="device_id" className="text-xs font-semibold">
-                                    Device / Hardware ID (Optional)
+                                    {__('tools.store_device_optional')}
                                 </Label>
                                 <div className="relative">
                                     <Monitor className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                     <Input
                                         id="device_id"
                                         type="text"
-                                        placeholder="e.g. DESKTOP-XYZ123 (or enter inside desktop app)"
+                                        placeholder={__('tools.store_device_placeholder')}
                                         value={data.device_id}
                                         onChange={(e) => setData('device_id', e.target.value)}
                                         className="pl-9 text-sm rounded-xl font-mono"
                                     />
                                 </div>
                                 <p className="text-[11px] text-[#1d1d1f]/40 dark:text-zinc-500">
-                                    If left empty, you can simply launch the desktop tool and enter your email there to activate your device on demand.
+                                    {__('tools.store_device_hint')}
                                 </p>
                             </div>
 
                             <div className="p-3 bg-[#f5f5f7] dark:bg-zinc-800/60 rounded-xl border border-black/5 dark:border-white/10 space-y-1">
                                 <div className="flex items-center justify-between text-xs font-semibold">
-                                    <span>License Validity:</span>
-                                    <span className="text-emerald-600 dark:text-emerald-400">1 Year (365 Days)</span>
+                                    <span>{__('tools.store_license_validity')}</span>
+                                    <span className="text-emerald-600 dark:text-emerald-400">{__('tools.store_one_year')}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-xs font-semibold">
-                                    <span>Pricing:</span>
+                                    <span>{__('tools.store_pricing')}</span>
                                     <span>
                                         {selectedTool?.requires_payment && selectedTool?.price > 0
                                             ? `${selectedTool?.price} ${selectedTool?.currency}`
-                                            : 'Free License'}
+                                            : __('tools.store_free_license')}
                                     </span>
                                 </div>
                                 {selectedTool?.whatsapp_number && (
                                     <div className="flex items-center justify-between text-xs pt-1 border-t border-black/5 dark:border-white/5">
-                                        <span className="text-[#1d1d1f]/60 dark:text-zinc-400">WhatsApp Support:</span>
+                                        <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('tools.store_whatsapp_support')}</span>
                                         <span className="font-mono">{selectedTool.whatsapp_number}</span>
                                     </div>
                                 )}
@@ -332,7 +333,7 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
 
                             {selectedTool?.payment_instructions && (
                                 <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200/60 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-200">
-                                    <p className="font-semibold mb-1">Payment Instructions:</p>
+                                    <p className="font-semibold mb-1">{__('tools.store_payment_instructions')}</p>
                                     <p className="whitespace-pre-line text-[11px]">{selectedTool.payment_instructions}</p>
                                 </div>
                             )}
@@ -344,14 +345,14 @@ export default function StoreToolsIndex({ tools = [], softwares = [], userLicens
                                     onClick={() => setIsDialogOpen(false)}
                                     className="rounded-xl"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={processing}
                                     className="rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white"
                                 >
-                                    {processing ? 'Activating...' : 'Confirm & Activate'}
+                                    {processing ? __('tools.store_activating') : __('tools.store_confirm_activate')}
                                 </Button>
                             </DialogFooter>
                         </form>

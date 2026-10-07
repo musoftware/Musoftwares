@@ -42,6 +42,25 @@ import { useFCM } from '@/hooks/useFCM';
 import { PageTransition } from '@/Components/ui/PageTransition';
 import { UnifiedMenuItem } from '@/Components/ui/UnifiedMenuItem';
 
+type NavLinkProps = PropsWithChildren<{ href: string; active: boolean }>;
+
+// Top navigation link: Apple pill geometry with a clear active state
+function NavLink({ href, active, children }: NavLinkProps) {
+    return (
+        <Link
+            href={href}
+            className={cn(
+                'inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150',
+                active
+                    ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold dark:bg-[#0071e3]/20 dark:text-[#3898ec]'
+                    : 'text-[#1d1d1f]/70 dark:text-zinc-300 hover:bg-black/5 dark:hover:bg-white/10 hover:text-[#1d1d1f] dark:hover:text-white'
+            )}
+        >
+            {children}
+        </Link>
+    );
+}
+
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
         <AuthenticatedContent {...props} />
@@ -167,20 +186,6 @@ function AuthenticatedContent({
     };
 
 
-    // Stable NavItem: Apple pill geometry with sleek, harmonious active state
-    const NavLink = ({ href, active, children }: any) => (
-        <Link
-            href={href}
-            className={cn(
-                'inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium tracking-normal transition-all duration-150',
-                active
-                    ? 'bg-[#0071e3]/10 text-[#0071e3] font-semibold dark:bg-[#0071e3]/20 dark:text-[#3898ec]'
-                    : 'text-[#1d1d1f]/70 dark:text-zinc-300 hover:bg-black/5 dark:hover:bg-white/10 hover:text-[#1d1d1f] dark:hover:text-white'
-            )}
-        >
-            {children}
-        </Link>
-    );
 
     return (
         <div className="min-h-screen max-w-full overflow-x-clip bg-[#f5f5f7] dark:bg-[#090d16] font-sans text-[#1d1d1f] dark:text-[#f8fafc] flex flex-col selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
@@ -203,6 +208,9 @@ function AuthenticatedContent({
                     </div>
                     <Link
                         href={route('admin.stop-impersonate')}
+                        method="post"
+                        as="button"
+                        type="button"
                         className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0 ms-2"
                     >{__('general.stop_impersonation')}</Link>
                 </div>

@@ -48,14 +48,14 @@ export default function Edit({ event }: Props) {
     return (
         <WorkspaceLayout
             title={__('general.edit_event_type')}
-            workspaceName="Booking Settings"
+            workspaceName={__('booking.settings_workspace')}
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
-                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
-                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
-                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
+                { id: 'dashboard', label: __('general.dashboard'), icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: __('booking.nav_appointments'), icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'events', label: __('booking.nav_event_types'), icon: Calendar, href: '/booking/events', isActive: true },
+                { id: 'providers', label: __('booking.nav_providers'), icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: __('booking.nav_exceptions'), icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title={__('general.edit_event_type')} />
@@ -92,12 +92,13 @@ export default function Edit({ event }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label>URL Slug (Read-only)</Label>
+                                <Label htmlFor="slug">{__('booking.url_slug_readonly')}</Label>
                                 <div className="flex items-center">
                                     <span className="text-muted-foreground bg-slate-50 border border-e-0 border-input rounded-s-md px-3 h-10 flex items-center text-sm">
                                         /book/
                                     </span>
                                     <Input 
+                                        id="slug"
                                         value={event.slug}
                                         disabled
                                         className="rounded-s-none bg-slate-50 text-slate-500 cursor-not-allowed"
@@ -127,7 +128,7 @@ export default function Edit({ event }: Props) {
                         <CardContent>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="duration_minutes">Duration (Minutes)</Label>
+                                <Label htmlFor="duration_minutes">{__('booking.duration_minutes')}</Label>
                                 <Input 
                                     id="duration_minutes" 
                                     type="number"
@@ -147,6 +148,7 @@ export default function Edit({ event }: Props) {
                                     <p className="text-sm text-muted-foreground">{__('general.allow_invitees_to_book_this_event_type')}</p>
                                 </div>
                                 <Switch 
+                                    aria-label={__('general.active_status')}
                                     checked={data.is_active}
                                     onCheckedChange={checked => setData('is_active', checked)}
                                 />
@@ -167,6 +169,7 @@ export default function Edit({ event }: Props) {
                                     <p className="text-sm text-muted-foreground">{__('general.ask_for_payment_when_booking')}</p>
                                 </div>
                                 <Switch 
+                                    aria-label={__('general.require_payment')}
                                     checked={data.requires_payment}
                                     onCheckedChange={checked => setData('requires_payment', checked)}
                                 />

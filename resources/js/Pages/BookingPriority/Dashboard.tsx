@@ -25,7 +25,7 @@ export default function PriorityDashboard({ stats, recentEscalations }) {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Emergency Escalations (30d)</CardTitle>
+                        <CardTitle className="text-sm font-medium">{__('booking.emergency_escalations_30d')}</CardTitle>
                         <AlertTriangle className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>

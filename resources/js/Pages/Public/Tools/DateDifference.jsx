@@ -167,7 +167,7 @@ Calculation Context:
 
             <FloatingWhatsAppButton 
                 phoneNumber={phoneNumber} 
-                defaultMessage="Hello Mahmoud, I'm interested in building a custom calendar, scheduling rule, or booking portal." 
+                defaultMessage={__('tools.date_whatsapp_message')} 
             />
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white pt-24 pb-16 lg:pt-36">
@@ -176,7 +176,7 @@ Calculation Context:
                 <section className="reveal-section max-w-7xl mx-auto px-6 lg:px-8 mb-16 text-center">
                     <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-6 bg-white mx-auto">
                         <Calendar className="h-3 w-3 text-slate-800" />
-                        {__('tools.tools_directory') || 'Free Tools'}
+                        {__('tools.tools_directory')}
                     </div>
                     <h1 className="gsap-fade-up text-4xl lg:text-6xl font-extrabold text-[#111111] tracking-tight mb-4">
                         {__('tools.date_title')}
@@ -195,9 +195,9 @@ Calculation Context:
                             <CardHeader>
                                 <CardTitle className="text-xl font-bold flex items-center gap-2 text-slate-900">
                                     <Clock className="h-5 w-5 text-slate-500" />
-                                    Configure Dates
+                                    {__('tools.date_configure_dates')}
                                 </CardTitle>
-                                <CardDescription>Select start and end dates to compute the time differences.</CardDescription>
+                                <CardDescription>{__('tools.date_configure_dates_desc')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
@@ -260,12 +260,12 @@ Calculation Context:
                                         </div>
 
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100/80">
-                                            <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider block mb-1">Total {__('tools.date_days')}</span>
+                                            <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider block mb-1">{__('tools.date_total_days')}</span>
                                             <span className="text-2xl font-black text-slate-900">{diffResults.totalDays.toLocaleString()}</span>
                                         </div>
 
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100/80">
-                                            <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider block mb-1">Total {__('tools.date_hours')}</span>
+                                            <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider block mb-1">{__('tools.date_total_hours')}</span>
                                             <span className="text-2xl font-black text-slate-900">{diffResults.totalHours.toLocaleString()}</span>
                                         </div>
 
@@ -295,7 +295,7 @@ Calculation Context:
                             </div>
                         ) : (
                             <div className="p-8 text-center text-slate-400 font-bold border border-dashed rounded-2xl border-slate-200">
-                                Please select valid dates.
+                                {__('tools.date_select_valid_dates')}
                             </div>
                         )}
                     </div>
@@ -321,14 +321,14 @@ Calculation Context:
                                 <div className="space-y-2">
                                     <Label htmlFor="scopingPrompt" className="text-slate-300 font-semibold text-xs uppercase tracking-wider flex items-center gap-1">
                                         <MessageSquare className="h-3 w-3 text-slate-400" />
-                                        Describe your custom booking or slot rules:
+                                        {__('tools.date_scoping_label')}
                                     </Label>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                         <Input
                                             id="scopingPrompt"
                                             value={scopingPrompt}
                                             onChange={(e) => setScopingPrompt(e.target.value)}
-                                            placeholder="e.g. A booking system for clinic appointments that limits doctors to 5 slots..."
+                                            placeholder={__('tools.date_scoping_placeholder')}
                                             className="bg-slate-800/80 border-slate-700 text-white placeholder-slate-500 focus-visible:ring-white h-11 flex-1"
                                         />
                                         <Button

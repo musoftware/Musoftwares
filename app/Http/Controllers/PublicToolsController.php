@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Currency;
 use App\Models\CurrenciesExchange;
 use App\Models\GuestTicket;
+use App\Support\SafeUrl;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
@@ -137,35 +139,20 @@ class PublicToolsController extends Controller
             'url' => 'required|string'
         ]);
 
-        $url = $request->input('url');
-        
-        // Normalize URL protocol
-        if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
-            $url = "https://" . $url;
-        }
+        $url = $this->normalizeUrl((string) $request->input('url'));
+        $target = SafeUrl::inspect($url);
 
-        $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'] ?? '';
-
-        if (empty($host)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'الرابط غير صالح. يرجى التأكد من كتابة الرابط بشكل صحيح.'
-            ]);
+        if ($target === null) {
+            return $this->unsafeUrlResponse();
         }
 
         // 1. HTTP cURL check
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-        
-        $response = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
+        $result = SafeUrl::fetch($url, [
+            CURLOPT_HEADER => true,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        ]);
+        $response = $result['body'] ?? false;
+        $info = $result['info'] ?? [];
 
         if ($response === false) {
             return response()->json([
@@ -200,14 +187,8 @@ class PublicToolsController extends Controller
         // Double check Laravel /up route if not detected yet
         if (!$isLaravel) {
             $upUrl = rtrim($url, '/') . '/up';
-            $chUp = curl_init();
-            curl_setopt($chUp, CURLOPT_URL, $upUrl);
-            curl_setopt($chUp, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($chUp, CURLOPT_NOBODY, true);
-            curl_setopt($chUp, CURLOPT_TIMEOUT, 3);
-            curl_exec($chUp);
-            $upCode = curl_getinfo($chUp, CURLINFO_HTTP_CODE);
-            curl_close($chUp);
+            $upResult = SafeUrl::fetch($upUrl, [CURLOPT_NOBODY => true, CURLOPT_TIMEOUT => 3], false);
+            $upCode = $upResult['info']['http_code'] ?? 0;
             if ($upCode == 200) {
                 $isLaravel = true;
                 $tech = 'Laravel';
@@ -218,8 +199,7 @@ class PublicToolsController extends Controller
         $sslDaysLeft = null;
         $sslExpired = false;
         try {
-            $g = stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
-            $r = @stream_socket_client("ssl://{$host}:443", $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $g);
+            $r = $this->openPinnedSslSocket($target, 5);
             if ($r) {
                 $cont = stream_context_get_params($r);
                 if (isset($cont["options"]["ssl"]["peer_certificate"])) {
@@ -359,20 +339,15 @@ class PublicToolsController extends Controller
             'url' => 'required|string'
         ]);
 
-        $url = $request->input('url');
-        if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
-            $url = "https://" . $url;
+        $url = $this->normalizeUrl((string) $request->input('url'));
+
+        // Only fetch headers for a fast connection benchmark
+        $result = SafeUrl::fetch($url, [CURLOPT_HEADER => true, CURLOPT_NOBODY => true]);
+        if ($result === null) {
+            return $this->unsafeUrlResponse();
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_NOBODY, true); // only fetch headers for fast connection benchmark
-        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
-        curl_exec($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
+        $info = $result['info'];
 
         $responseTime = $info['total_time'];
         if ($responseTime == 0) {
@@ -410,25 +385,17 @@ class PublicToolsController extends Controller
             'url' => 'required|string'
         ]);
 
-        $url = $request->input('url');
-        if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
-            $url = "https://" . $url;
+        $url = $this->normalizeUrl((string) $request->input('url'));
+        $target = SafeUrl::inspect($url);
+
+        if ($target === null) {
+            return $this->unsafeUrlResponse();
         }
 
-        $parsedUrl = parse_url($url);
-        $host = $parsedUrl['host'] ?? '';
-
         // HTTP cURL check
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
-        $response = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
+        $result = SafeUrl::fetch($url, [CURLOPT_HEADER => true, CURLOPT_USERAGENT => 'Mozilla/5.0']);
+        $response = $result['body'] ?? false;
+        $info = $result['info'] ?? [];
 
         if ($response === false) {
             return response()->json([
@@ -443,8 +410,7 @@ class PublicToolsController extends Controller
         // Check SSL
         $sslActive = false;
         try {
-            $g = stream_context_create(["ssl" => ["capture_peer_cert" => true]]);
-            $r = @stream_socket_client("ssl://{$host}:443", $errno, $errstr, 4, STREAM_CLIENT_CONNECT, $g);
+            $r = $this->openPinnedSslSocket($target, 4);
             if ($r) {
                 $sslActive = true;
             }
@@ -526,19 +492,14 @@ class PublicToolsController extends Controller
             'url' => 'required|string'
         ]);
 
-        $url = $request->input('url');
-        if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
-            $url = "https://" . $url;
+        $url = $this->normalizeUrl((string) $request->input('url'));
+
+        $result = SafeUrl::fetch($url, [CURLOPT_USERAGENT => 'Mozilla/5.0']);
+        if ($result === null) {
+            return $this->unsafeUrlResponse();
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
-        $body = curl_exec($ch);
-        curl_close($ch);
+        $body = $result['body'];
 
         if ($body === false) {
             return response()->json([
@@ -550,7 +511,7 @@ class PublicToolsController extends Controller
         // Count pixel occurrences
         $fbCount = substr_count(strtolower($body), 'connect.facebook.net/en_us/fbevents.js') + substr_count(strtolower($body), 'fbq(');
         $hasFb = $fbCount > 0;
-        
+
         $gaCount = substr_count(strtolower($body), 'googletagmanager.com/gtag/js') + substr_count(strtolower($body), 'g-');
         $hasGa = $gaCount > 0;
 
@@ -618,19 +579,14 @@ class PublicToolsController extends Controller
             'url' => 'required|string'
         ]);
 
-        $url = $request->input('url');
-        if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
-            $url = "https://" . $url;
+        $url = $this->normalizeUrl((string) $request->input('url'));
+
+        $result = SafeUrl::fetch($url, [CURLOPT_USERAGENT => 'Mozilla/5.0']);
+        if ($result === null) {
+            return $this->unsafeUrlResponse();
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 6);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
-        $body = curl_exec($ch);
-        curl_close($ch);
+        $body = $result['body'];
 
         if ($body === false) {
             return response()->json([
@@ -717,5 +673,39 @@ class PublicToolsController extends Controller
             'success' => true,
             'message' => 'Thank you for subscribing to our technical updates!',
         ]);
+    }
+    /**
+     * Add https:// when the visitor typed a bare domain.
+     */
+    private function normalizeUrl(string $url): string
+    {
+        $url = trim($url);
+
+        return preg_match('~^[a-z][a-z0-9+.-]*://~i', $url) ? $url : 'https://'.$url;
+    }
+
+    /**
+     * Generic reply for URLs we refuse to fetch (bad scheme, private or internal address).
+     */
+    private function unsafeUrlResponse(): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'الرابط غير صالح. يرجى إدخال رابط موقع عام يبدأ بـ http أو https.',
+        ], 422);
+    }
+
+    /**
+     * Open a TLS socket to the already-checked IP, keeping the host name for SNI and certificate checks.
+     *
+     * @param  array{url: string, host: string, port: int, ip: string}  $target
+     * @return resource|false
+     */
+    private function openPinnedSslSocket(array $target, int $timeout)
+    {
+        $ip = str_contains($target['ip'], ':') ? '['.$target['ip'].']' : $target['ip'];
+        $context = stream_context_create(['ssl' => ['capture_peer_cert' => true, 'peer_name' => $target['host']]]);
+
+        return @stream_socket_client("ssl://{$ip}:443", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $context);
     }
 }

@@ -45,7 +45,7 @@ export default function Index({ webhooks, filters = {} }: Props) {
             case 'failed':
                 return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 me-1" /> {__('general.failed')}</Badge>;
             default:
-                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 me-1" /> {__('general.pending')}</Badge>;
+                return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 me-1" /> {__('general.status_pending')}</Badge>;
         }
     };
 
@@ -66,7 +66,7 @@ export default function Index({ webhooks, filters = {} }: Props) {
     const hasActiveFilters = !!(search || status !== 'all');
 
     return (
-        <AdminSidebarLayout title={__('general.incoming_webhooks')} header="Incoming Webhooks">
+        <AdminSidebarLayout title={__('general.incoming_webhooks')} header={__('general.incoming_webhooks')}>
             <Head title={__('general.incoming_webhooks')} />
 
             <div className="space-y-6">
@@ -75,13 +75,13 @@ export default function Index({ webhooks, filters = {} }: Props) {
                         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                             <Webhook className="w-6 h-6 text-slate-900" /> {__('general.incoming_webhooks')}
                         </h1>
-                        <p className="text-slate-500 mt-1">{__('general.monitor_webhooks_received_from_external')}</p>
+                        <p className="text-slate-500 mt-1">{__('admin.settings_webhooks_subheading')}</p>
                     </div>
                 </div>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>{__('general.recent_webhooks')}</CardTitle>
+                        <CardTitle>{__('admin.settings_webhooks_recent')}</CardTitle>
                         <CardDescription>{__('general.a_log_of_all_incoming_requests_sent_to_t')}</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -89,7 +89,8 @@ export default function Index({ webhooks, filters = {} }: Props) {
                             <div className="relative flex-1 min-w-48 max-w-sm">
                                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
-                                    placeholder={__('general.search_webhooks') || 'Search by source or event...'}
+                                    placeholder={__('general.search_webhooks')}
+                                    aria-label={__('general.search_webhooks')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
@@ -99,14 +100,15 @@ export default function Index({ webhooks, filters = {} }: Props) {
                             <select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
+                                aria-label={__('general.status')}
                                 className="h-9 rounded-md border border-slate-200 px-3 text-sm bg-white"
                             >
                                 <option value="all">{__('general.all_statuses')}</option>
                                 <option value="processed">{__('general.processed')}</option>
-                                <option value="pending">{__('general.pending')}</option>
+                                <option value="pending">{__('general.status_pending')}</option>
                                 <option value="failed">{__('general.failed')}</option>
                             </select>
-                            <Button onClick={applyFilters} variant="outline" size="sm">{__('general.apply') || 'Apply'}</Button>
+                            <Button onClick={applyFilters} variant="outline" size="sm">{__('general.apply')}</Button>
                             {hasActiveFilters && (
                                 <Button onClick={clearFilters} variant="ghost" size="sm">
                                     <FilterX className="w-3.5 h-3.5 me-1" />{__('general.clear')}
@@ -117,14 +119,14 @@ export default function Index({ webhooks, filters = {} }: Props) {
                         {data.length === 0 ? (
                             <EmptyState
                                 icon={Webhook}
-                                title={__('general.no_incoming_webhooks_logged_yet') || 'No webhooks yet'}
-                                description={__('general.webhook_will_appear_here') || 'Incoming webhook events will appear here.'}
+                                title={__('general.no_incoming_webhooks_logged_yet')}
+                                description={__('general.webhook_will_appear_here')}
                             />
                         ) : (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>ID</TableHead>
+                                        <TableHead>{__('general.id')}</TableHead>
                                         <TableHead>{__('general.source')}</TableHead>
                                         <TableHead>{__('general.event_type')}</TableHead>
                                         <TableHead>{__('general.status')}</TableHead>

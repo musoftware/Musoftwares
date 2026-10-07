@@ -12,6 +12,7 @@ use Tests\TestCase;
 class AdminInvoiceTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $admin;
 
@@ -20,6 +21,7 @@ class AdminInvoiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->seed(RolesAndPermissionsSeeder::class);
 

@@ -35,6 +35,7 @@ import {
     Activity, Clock, FileWarning, Package, CheckCircle2,
     AlertCircle, XCircle, Pencil
 } from 'lucide-react';
+import Pagination from '@/Components/Pagination';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
@@ -105,6 +106,11 @@ function ServiceThumb({ gallery, title }: { gallery: string[] | null; title: str
     );
 }
 
+function SortIcon({ col, sortBy, sortDir }: { col: string; sortBy: string; sortDir: string }) {
+    if (sortBy !== col) return null;
+    return sortDir === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function All({ auth, services, categories, filters, stats }: any) {
@@ -158,11 +164,6 @@ export default function All({ auth, services, categories, filters, stats }: any)
         setSortDir('desc');
         router.get(route('admin.marketplace.services.all'));
     };
-
-    const SortIcon = ({ col }: { col: string }) =>
-        sortBy === col ? (
-            sortDir === 'asc' ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />
-        ) : null;
 
     // ── Confirm helpers ───────────────────────────────────────────────────────
 
@@ -310,6 +311,8 @@ export default function All({ auth, services, categories, filters, stats }: any)
                             {search && (
                                 <button
                                     onClick={() => { setSearch(''); applyFilters({ search: '' }); }}
+                                    aria-label={__('general.clear_search')}
+                                    title={__('general.clear_search')}
                                     className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                                 >
                                     <X className="h-3.5 w-3.5" />
@@ -377,7 +380,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                     >
                                         <div className="flex items-center gap-1">
                                             {__('admin.service')}
-                                            <SortIcon col="title" />
+                                            <SortIcon col="title" sortBy={sortBy} sortDir={sortDir} />
                                         </div>
                                     </TableHead>
                                     <TableHead>{__('admin.seller')}</TableHead>
@@ -389,7 +392,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                     >
                                         <div className="flex items-center gap-1">
                                             {__('admin.orders')}
-                                            <SortIcon col="orders_count" />
+                                            <SortIcon col="orders_count" sortBy={sortBy} sortDir={sortDir} />
                                         </div>
                                     </TableHead>
                                     <TableHead
@@ -398,7 +401,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                     >
                                         <div className="flex items-center gap-1">
                                             {__('admin.status')}
-                                            <SortIcon col="status" />
+                                            <SortIcon col="status" sortBy={sortBy} sortDir={sortDir} />
                                         </div>
                                     </TableHead>
                                     <TableHead
@@ -407,7 +410,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                     >
                                         <div className="flex items-center gap-1">
                                             {__('admin.date')}
-                                            <SortIcon col="created_at" />
+                                            <SortIcon col="created_at" sortBy={sortBy} sortDir={sortDir} />
                                         </div>
                                     </TableHead>
                                     <TableHead className="text-end w-[60px]">{__('admin.actions')}</TableHead>
@@ -512,6 +515,8 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             size="icon"
                                                             className="h-8 w-8 text-slate-500 hover:text-black data-[state=open]:bg-slate-100"
                                                             id={`service-actions-${service.id}`}
+                                                            aria-label={__('admin.actions')}
+                                                            title={__('admin.actions')}
                                                         >
                                                             <MoreVertical className="h-4 w-4" />
                                                         </Button>
@@ -606,25 +611,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                 <div className="text-sm text-slate-500">
                                     {__('admin.showing')} {' '}<span className="font-medium text-slate-900">{services.from ?? 0}</span>{' '}-{' '}<span className="font-medium text-slate-900">{services.to ?? 0}</span>{' '}{__('admin.of')}{' '}<span className="font-medium text-slate-900">{services.total}</span>{' '}{__('admin.services_count')}
                                 </div>
-                                <div className="flex gap-1 flex-wrap justify-center">
-                                    {services.links.map((link: any, idx: number) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => {
-                                                if (link.url) router.get(link.url, {}, { preserveScroll: true });
-                                            }}
-                                            disabled={!link.url}
-                                            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                                                link.active
-                                                    ? 'bg-slate-900 text-white shadow-sm'
-                                                    : !link.url
-                                                    ? 'text-slate-300 cursor-not-allowed'
-                                                    : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
-                                            }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
-                                    ))}
-                                </div>
+                                <Pagination links={services.links} />
                             </div>
                         )}
                     </div>

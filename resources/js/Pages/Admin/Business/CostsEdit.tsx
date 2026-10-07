@@ -13,6 +13,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
 import {
@@ -33,7 +34,7 @@ import { __ } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/utils';
 
 export default function CostsEdit() {
-    const { cost, users, projects, currencies, businessCurrency, categories, business_currency_code } = usePage<any>().props;
+    const { cost, projects, currencies, businessCurrency, categories, business_currency_code } = usePage<any>().props;
 
     const { data, setData, put, processing, errors } = useForm({
         amount: cost?.amount ? String(cost.amount) : '',
@@ -213,10 +214,10 @@ export default function CostsEdit() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <Label className="text-slate-700 text-sm">{__('general.client_user')}</Label>
-                                        <PremiumCombobox
+                                        <UserSearchCombobox
                                             value={data.user_id}
                                             onChange={(val) => setData('user_id', val as string)}
-                                            options={[{ value: '', label: __('general.none') }, ...users.map((u: any) => ({ value: String(u.id), label: u.name }))]}
+                                            emptyOptionLabel={__('general.none')}
                                             placeholder={__('general.search_client')}
                                         />
                                     </div>

@@ -6,7 +6,7 @@ import { Label } from '@/Components/ui/label';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 import { cn } from '@/lib/utils';
-import { PROJECT_STATUS_OPTIONS } from './ProjectFormFields';
+import { PROJECT_STATUS_OPTIONS, projectStatusLabel } from './ProjectFormFields';
 import type {
     ProjectFiltersState,
     ProjectOwnerOption,
@@ -153,7 +153,7 @@ export function ProjectFiltersPanel({
                                         STATUS_PILL_STYLES[s] ?? '',
                                     )}
                                 >
-                                    {s.replace('_', ' ')}
+                                    {projectStatusLabel(s)}
                                 </button>
                             );
                         })}

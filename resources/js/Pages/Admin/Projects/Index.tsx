@@ -15,12 +15,14 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import ProjectActionsSheet from './ProjectActionsSheet';
-import { ProjectFormFields, EMPTY_PROJECT_FORM, formToPayload, projectToForm } from './Components/ProjectFormFields';
+import { ProjectFormFields, EMPTY_PROJECT_FORM, formToPayload, projectToForm, projectStatusLabel } from './Components/ProjectFormFields';
 import { ProjectCard } from './Components/ProjectCard';
 import { ProjectFiltersPanel, type FilterPartial } from './Components/ProjectFiltersPanel';
 import { UnpaidInvoicesSheet } from './Components/UnpaidInvoicesSheet';
 import { cn, formatMoney } from '@/lib/utils';
 import type { ProjectsIndexProps, Project, ProjectViewMode } from '@/types/project';
+import { useConfirm } from '@/hooks/useConfirm';
+import { __ } from '@/lib/i18n';
 
 type FormState = ReturnType<typeof projectToForm>;
 
@@ -41,6 +43,7 @@ export default function Index(props: ProjectsIndexProps) {
 
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [filtersOpen, setFiltersOpen] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const openProjectSheet = (project: Project) => {
         setSelectedProject(project);
@@ -65,7 +68,7 @@ export default function Index(props: ProjectsIndexProps) {
     const handleEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingProject) return;
-        
+
         // Use POST with _method spoofing to support uploading files in PHP updates
         router.post(route('admin.projects.update', editingProject.id), {
             ...formToPayload(editForm),
@@ -79,22 +82,26 @@ export default function Index(props: ProjectsIndexProps) {
         });
     };
 
-    const handleArchive = (id: number) => {
-        if (confirm(__('general.confirm_archive_project'))) {
-            router.post(route('admin.projects.archive', id));
-        }
+    const handleArchive = async (id: number) => {
+        const accepted = await confirm({ title: __('general.confirm_archive_project'), confirmLabel: __('admin.projects_archive_action') });
+        if (!accepted) return;
+        router.post(route('admin.projects.archive', id));
     };
 
-    const handleRestore = (id: number) => {
-        if (confirm(__('general.confirm_restore_project'))) {
-            router.post(route('admin.projects.restore', id));
-        }
+    const handleRestore = async (id: number) => {
+        const accepted = await confirm({ title: __('general.confirm_restore_project'), confirmLabel: __('admin.projects_restore_action') });
+        if (!accepted) return;
+        router.post(route('admin.projects.restore', id));
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm(__('general.confirm_delete_project'))) {
-            router.delete(route('admin.projects.destroy', id));
-        }
+    const handleDelete = async (id: number) => {
+        const accepted = await confirm({
+            title: __('general.confirm_delete_project'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.projects.destroy', id));
     };
 
     const toggleSelected = (id: number) => {
@@ -111,9 +118,15 @@ export default function Index(props: ProjectsIndexProps) {
         }
     };
 
-    const submitBulk = (action: 'archive' | 'restore' | 'delete') => {
+    const submitBulk = async (action: 'archive' | 'restore' | 'delete') => {
         if (selectedIds.length === 0) return;
-        if (!confirm(__('general.confirm_bulk_project_action', { count: selectedIds.length, action }))) return;
+        const actionLabel = __(`admin.projects_${action}_action`);
+        const accepted = await confirm({
+            title: __('admin.projects_bulk_confirm', { count: selectedIds.length, action: actionLabel }),
+            variant: action === 'delete' ? 'danger' : 'default',
+            confirmLabel: actionLabel,
+        });
+        if (!accepted) return;
         router.post(
             route('admin.projects.bulk-action'),
             { ids: selectedIds, action },
@@ -260,7 +273,7 @@ export default function Index(props: ProjectsIndexProps) {
                 <Checkbox
                     checked={selectedIds.includes(project.id)}
                     onCheckedChange={() => toggleSelected(project.id)}
-                    aria-label={__('general.select_project', { name: project.project_name })}
+                    aria-label={__('admin.projects_select_project', { name: project.project_name })}
                 />
             ),
         },
@@ -280,8 +293,8 @@ export default function Index(props: ProjectsIndexProps) {
                         <p className="text-xs text-slate-500 line-clamp-1">{project.description}</p>
                     )}
                     {(project.counts?.invoices_unpaid ?? 0) > 0 && (
-                        <div 
-                            className="mt-1 flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded w-fit cursor-pointer hover:bg-red-100 transition-colors" 
+                        <div
+                            className="mt-1 flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded w-fit cursor-pointer hover:bg-red-100 transition-colors"
                             title={__('general.unpaid_invoices_count', { count: project.counts?.invoices_unpaid ?? 0 })}
                             onClick={() => handleShowUnpaidInvoices(project)}
                         >
@@ -310,7 +323,7 @@ export default function Index(props: ProjectsIndexProps) {
                         </div>
                     </div>
                 ) : (
-                    'Unknown'
+                    __('general.unknown')
                 ),
         },
         {
@@ -333,7 +346,7 @@ export default function Index(props: ProjectsIndexProps) {
                     hold_on: 'bg-amber-100 text-amber-800',
                     closed: 'bg-slate-200 text-slate-700',
                 };
-                return <span className={cn('inline-flex rounded-full px-2 text-xs font-semibold leading-5 capitalize', styles[status] ?? 'bg-slate-100 text-slate-700')}>{status.replace('_', ' ')}</span>;
+                return <span className={cn('inline-flex rounded-full px-2 text-xs font-semibold leading-5 capitalize', styles[status] ?? 'bg-slate-100 text-slate-700')}>{projectStatusLabel(status)}</span>;
             },
         },
         {
@@ -372,7 +385,7 @@ export default function Index(props: ProjectsIndexProps) {
     ];
 
     return (
-        <AdminSidebarLayout title={__('general.projects')} header="Projects Manager">
+        <AdminSidebarLayout title={__('general.projects')} header={__('admin.projects_manager_header')}>
             <Head title={__('general.projects')} />
             <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -535,8 +548,9 @@ export default function Index(props: ProjectsIndexProps) {
                                     size="sm"
                                     disabled={currentPage <= 1}
                                     onClick={() => onGridPage(currentPage - 1)}
+                                    aria-label={__('general.previous_page')}
                                 >
-                                    <ChevronLeft className="h-4 w-4" />
+                                    <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
                                 </Button>
                                 <span className="text-sm text-slate-600">
                                     {__('general.page')} <span className="font-semibold text-slate-900">{currentPage}</span> / {lastPage}
@@ -546,8 +560,9 @@ export default function Index(props: ProjectsIndexProps) {
                                     size="sm"
                                     disabled={currentPage >= lastPage}
                                     onClick={() => onGridPage(currentPage + 1)}
+                                    aria-label={__('general.next_page')}
                                 >
-                                    <ChevronRight className="h-4 w-4" />
+                                    <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                                 </Button>
                             </div>
                         )}
@@ -627,6 +642,7 @@ export default function Index(props: ProjectsIndexProps) {
                 isOpen={unpaidSheetOpen}
                 onClose={() => setUnpaidSheetOpen(false)}
             />
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

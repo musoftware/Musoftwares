@@ -28,7 +28,7 @@
 
         <!-- Article Body -->
         <article class="prose max-w-none text-[#1d1d1f]/80 leading-relaxed space-y-6 pt-6 border-t border-black/5">
-            {!! $article->content !!}
+            {!! \App\Support\HtmlSanitizer::clean($article->content) !!}
         </article>
 
         <!-- CTA Box -->

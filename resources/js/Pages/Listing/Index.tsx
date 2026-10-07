@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Search, MapPin, Briefcase, Calendar, MessageSquare, ArrowRight, DollarSign } from 'lucide-react';
+import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface Listing {
     id: number;
@@ -45,18 +47,18 @@ export default function Index({ listings, cities, filters }: IndexProps) {
     return (
         <PublicLayout>
             <Head>
-                <title>بوابة الوظائف الشاغرة | Musoftwares Jobs</title>
-                <meta name="description" content="تصفح وابحث عن أحدث الوظائف الشاغرة وفرص العمل المعلنة في مصر. تواصل مباشرة مع أصحاب الأعمال." />
+                <title>{__('listing.index_page_title')}</title>
+                <meta name="description" content={__('listing.index_meta_description')} />
             </Head>
 
             <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
                 {/* Hero Section */}
                 <div className="max-w-6xl mx-auto text-center mb-12">
                     <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-4 font-sans">
-                        ابحث عن وظيفتك القادمة
+                        {__('listing.index_heading')}
                     </h1>
                     <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                        منصة Musoftwares تجمع لك أحدث الوظائف الشاغرة من كبرى شركات التوظيف مباشرة وبدون وسيط.
+                        {__('listing.index_subheading')}
                     </p>
                 </div>
 
@@ -67,7 +69,8 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                             <Search className="absolute right-4 top-3.5 h-5 w-5 text-slate-500" />
                             <input
                                 type="text"
-                                placeholder="ابحث عن مسمى وظيفي أو مهارة..."
+                                placeholder={__('listing.index_search_placeholder')}
+                                aria-label={__('listing.index_search_placeholder')}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pr-12 pl-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-right transition-colors"
@@ -78,9 +81,10 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                             <select
                                 value={selectedCity}
                                 onChange={(e) => handleCityChange(e.target.value)}
+                                aria-label={__('listing.index_filter_city')}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-blue-500 text-right transition-colors"
                             >
-                                <option value="">كل المدن</option>
+                                <option value="">{__('listing.index_all_cities')}</option>
                                 {cities.map((city) => (
                                     <option key={city} value={city}>{city}</option>
                                 ))}
@@ -91,7 +95,7 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                             type="submit"
                             className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium rounded-xl shadow-lg hover:shadow-indigo-500/20 transition-all duration-300"
                         >
-                            بحث
+                            {__('listing.index_search')}
                         </button>
                     </form>
                 </div>
@@ -101,8 +105,8 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                     {listings.data.length === 0 ? (
                         <div className="text-center py-16 bg-slate-900/40 border border-slate-800 rounded-2xl">
                             <Briefcase className="h-16 w-16 mx-auto text-slate-600 mb-4" />
-                            <h3 className="text-xl font-bold text-slate-300">لا توجد وظائف مطابقة للبحث</h3>
-                            <p className="text-slate-500 mt-2">يرجى تجربة كلمات بحث أخرى أو تغيير تصفية المدن.</p>
+                            <h3 className="text-xl font-bold text-slate-300">{__('listing.index_empty_title')}</h3>
+                            <p className="text-slate-500 mt-2">{__('listing.index_empty_hint')}</p>
                         </div>
                     ) : (
                         <div className="grid gap-6">
@@ -137,7 +141,7 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                                                 
                                                 <span className="text-sm font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-3 py-1 rounded-full flex items-center gap-1">
                                                     <DollarSign className="h-4 w-4" />
-                                                    {listing.price > 0 ? `${listing.price} ${listing.currency}` : 'قابل للتفاوض / غير محدد'}
+                                                    {listing.price > 0 ? `${listing.price} ${listing.currency}` : __('listing.negotiable_or_unspecified')}
                                                 </span>
                                             </div>
 
@@ -157,7 +161,7 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                                                 )}
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="h-4 w-4 text-slate-400" />
-                                                    نُشر {listing.created_at}
+                                                    {__('listing.index_posted', { date: listing.created_at })}
                                                 </span>
                                             </div>
 
@@ -165,7 +169,7 @@ export default function Index({ listings, cities, filters }: IndexProps) {
                                                 href={`/listing/${listing.id}`}
                                                 className="flex items-center gap-1 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
                                             >
-                                                تفاصيل الوظيفة
+                                                {__('listing.index_job_details')}
                                                 <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                                             </Link>
                                         </div>
@@ -178,23 +182,8 @@ export default function Index({ listings, cities, filters }: IndexProps) {
 
                 {/* Pagination */}
                 {listings.last_page > 1 && (
-                    <div className="max-w-5xl mx-auto mt-12 flex justify-center gap-2">
-                        {listings.links.map((link, idx) => {
-                            if (link.url === null) return null;
-                            const isActive = link.active;
-                            return (
-                                <Link
-                                    key={idx}
-                                    href={link.url}
-                                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200 ${
-                                        isActive
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-850 hover:text-slate-100'
-                                    }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            );
-                        })}
+                    <div className="max-w-5xl mx-auto mt-6">
+                        <Pagination links={listings.links} />
                     </div>
                 )}
             </div>

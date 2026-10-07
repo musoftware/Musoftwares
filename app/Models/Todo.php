@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Trait\ChatModelTrait;
+use App\Traits\ChatModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

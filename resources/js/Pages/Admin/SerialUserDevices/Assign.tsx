@@ -49,12 +49,12 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
             expires_at: form.expires_at || null,
         }, {
             onSuccess: () => {
-                toastSuccess(__('general.assignment_created') || 'Device assigned successfully');
+                toastSuccess(__('general.assignment_created'));
                 setForm({ user_id: '', device_id: '', status: 'active', expires_at: '', notes: '' });
             },
             onError: (errs: any) => {
                 setErrors(errs);
-                toastError(errs.error || errs.message || __('general.error_occurred') || 'Something went wrong');
+                toastError(errs.error || errs.message || __('general.error_occurred'));
             },
         });
     };
@@ -62,12 +62,12 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
     const selectedDevice = availableDevices.find(d => d.device_id === form.device_id);
 
     return (
-        <AdminSidebarLayout title={__('general.assign_device')} header="Assign Device">
+        <AdminSidebarLayout title={__('general.assign_device')} header={__('general.assign_device')}>
             <Head title={__('general.assign_device')} />
             <div className="max-w-3xl mx-auto space-y-6">
                 <div className="flex items-center gap-3">
-                    <Link href={route('admin.serial-user-devices.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
+                    <Link href={route('admin.serial-user-devices.index')} className="text-slate-500 hover:text-slate-900 transition-colors" aria-label={__('general.back')}>
+                        <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                     </Link>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900">{__('general.assign_device_to_user')}</h1>
@@ -133,8 +133,8 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
 
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <Label>{__('general.license_expiration', {}, 'License Expiration (Optional)')}</Label>
-                                    <span className="text-xs text-muted-foreground">{__('general.leave_blank_for_lifetime', {}, 'Leave blank for lifetime')}</span>
+                                    <Label>{__('general.license_expiration')}</Label>
+                                    <span className="text-xs text-muted-foreground">{__('general.leave_blank_for_lifetime')}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1.5 pb-1">
                                     <Button
@@ -144,7 +144,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(30)}
                                     >
-                                        +30 {__('general.days', {}, 'Days')}
+                                        +30 {__('general.days')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -153,7 +153,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(90)}
                                     >
-                                        +90 {__('general.days', {}, 'Days')}
+                                        +90 {__('general.days')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -162,7 +162,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(180)}
                                     >
-                                        +6 {__('general.months', {}, 'Months')}
+                                        +6 {__('general.months')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -171,7 +171,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(365)}
                                     >
-                                        +1 {__('general.year', {}, 'Year')}
+                                        +1 {__('general.year')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -180,7 +180,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(null)}
                                     >
-                                        {__('general.lifetime', {}, 'Lifetime (Clear)')}
+                                        {__('general.lifetime')}
                                     </Button>
                                 </div>
                                 <Input
@@ -193,7 +193,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Notes (optional)</Label>
+                                <Label>{__('general.notes')} ({__('general.optional')})</Label>
                                 <Textarea
                                     placeholder={__('general.internal_notes_about_this_assignment')}
                                     rows={3}

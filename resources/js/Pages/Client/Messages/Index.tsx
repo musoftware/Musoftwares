@@ -85,7 +85,7 @@ function relativeTime(dateStr?: string) {
     const hour = 60 * minute;
     const day = 24 * hour;
 
-    if (diff < minute) return __('general.just_now') || 'Just now';
+    if (diff < minute) return __('general.just_now');
     if (diff < hour) return `${Math.floor(diff / minute)}m`;
     if (diff < day) return `${Math.floor(diff / hour)}h`;
     if (diff < 7 * day) return `${Math.floor(diff / day)}d`;
@@ -189,16 +189,16 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
     };
 
     const tabsConfig = [
-        { id: 'all', label: __('general.all_messages') || 'All Messages', icon: MessageSquare },
-        { id: 'service_orders', label: __('general.service_orders') || 'Service Orders', icon: ShoppingBag },
-        { id: 'custom_projects', label: __('general.custom_projects') || 'Custom Projects', icon: Briefcase },
-        { id: 'support_tickets', label: __('general.support_tickets') || 'Support Tickets', icon: ShieldAlert },
-        { id: 'direct_messages', label: __('general.direct_messages') || 'Direct Messages', icon: UserCheck },
+        { id: 'all', label: __('general.all_messages'), icon: MessageSquare },
+        { id: 'service_orders', label: __('general.service_orders'), icon: ShoppingBag },
+        { id: 'custom_projects', label: __('general.custom_projects'), icon: Briefcase },
+        { id: 'support_tickets', label: __('general.support_tickets'), icon: ShieldAlert },
+        { id: 'direct_messages', label: __('general.direct_messages'), icon: UserCheck },
     ];
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('general.messages') || 'Messages & Support'} />
+            <Head title={__('general.messages')} />
 
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
                 {/* Top Header & Tabs Bar */}
@@ -207,10 +207,10 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                         <div>
                             <h1 className="flex items-center gap-2.5 text-2xl font-bold text-slate-900">
                                 <Headphones className="h-7 w-7 text-indigo-600" />
-                                {__('general.messages') || 'Messages & Communications'}
+                                {__('general.messages')}
                             </h1>
                             <p className="mt-0.5 text-xs text-slate-500">
-                                {__('general.messages_intro') || 'All service chats, orders, custom projects, and support requests in one place.'}
+                                {__('general.messages_intro')}
                             </p>
                         </div>
 
@@ -219,7 +219,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                             className="inline-flex items-center gap-2 self-start rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 md:self-auto"
                         >
                             <Plus className="h-4 w-4" />
-                            {__('general.new_direct_chat') || 'New Direct Message'}
+                            {__('general.new_direct_chat')}
                         </PrimaryButton>
                     </div>
 
@@ -270,7 +270,8 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                 <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
-                                    placeholder={__('general.search_conversations') || 'Search conversations...'}
+                                    placeholder={__('general.search_conversations')}
+                                    aria-label={__('general.search_conversations')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pe-3 ps-9 text-xs transition-all focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -279,6 +280,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                     <button
                                         type="button"
                                         onClick={() => setSearchQuery('')}
+                                        aria-label={__('client.messages_clear_search')}
                                         className="absolute end-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                     >
                                         <X className="h-3.5 w-3.5" />
@@ -293,10 +295,10 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                 <div className="p-8 text-center">
                                     <MessageSquare className="mx-auto mb-2 h-8 w-8 text-slate-300" />
                                     <p className="text-xs font-semibold text-slate-500">
-                                        {__('general.no_conversations') || 'No conversations found'}
+                                        {__('general.no_conversations')}
                                     </p>
                                     <p className="mt-1 text-[11px] text-slate-400">
-                                        {__('general.no_conversations_tab_desc') || 'There are no active conversations under this service tab.'}
+                                        {__('general.no_conversations_tab_desc')}
                                     </p>
                                 </div>
                             ) : (
@@ -334,7 +336,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                                 </div>
 
                                                 <p className="mb-1.5 truncate text-[11px] text-slate-500">
-                                                    {lastMsg?.body || __('general.no_messages_yet') || 'No messages yet'}
+                                                    {lastMsg?.body || __('general.no_messages_yet')}
                                                 </p>
 
                                                 <div className="flex items-center justify-between gap-1">
@@ -369,11 +371,10 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                     <MessageSquare className="h-8 w-8" />
                                 </div>
                                 <h3 className="text-base font-bold text-slate-800">
-                                    {__('general.pick_a_conversation') || 'Select a conversation'}
+                                    {__('general.pick_a_conversation')}
                                 </h3>
                                 <p className="mt-1 max-w-sm text-xs text-slate-500">
-                                    {__('general.select_a_conversation_desc') ||
-                                        'Choose a conversation from the sidebar or click "New Direct Message" to contact support.'}
+                                    {__('general.select_a_conversation_desc')}
                                 </p>
                             </div>
                         ) : (
@@ -407,7 +408,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                             href={activeConv.target_url}
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
                                         >
-                                            <span>{__('general.view_details') || 'View Details'}</span>
+                                            <span>{__('general.view_details')}</span>
                                             <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
                                         </a>
                                     )}
@@ -434,11 +435,12 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
                                 <Send className="h-5 w-5 text-indigo-600" />
-                                {__('general.new_direct_chat') || 'New Direct Message'}
+                                {__('general.new_direct_chat')}
                             </h2>
                             <button
                                 type="button"
                                 onClick={() => setIsNewModalOpen(false)}
+                                aria-label={__('general.close')}
                                 className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                             >
                                 <X className="h-5 w-5" />
@@ -447,30 +449,29 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
 
                         <form onSubmit={startDirectMessage} className="space-y-4">
                             <div>
-                                <InputLabel htmlFor="recipient" value={__('general.select_support_recipient') || 'Contact Support / Admin Team'} />
+                                <InputLabel htmlFor="recipient" value={__('general.select_support_recipient')} />
                                 <p className="mb-1.5 text-xs text-slate-500">
-                                    {__('general.direct_chats_can_only_be_initiated_with_support_or_admin_staff') ||
-                                        'Direct chats can only be sent to support or administration staff.'}
+                                    {__('general.direct_chats_can_only_be_initiated_with_support_or_admin_staff')}
                                 </p>
                                 <PremiumCombobox
                                     className="mt-1"
                                     value={data.recipient_id}
                                     onChange={(val) => setData('recipient_id', val ? String(val) : '')}
                                     options={users.map((u) => ({ value: String(u.id), label: `${u.name} (${u.role || 'Support'})` }))}
-                                    placeholder={`-- ${__('general.choose_a_recipient') || 'Choose Support Agent'} --`}
+                                    placeholder={`-- ${__('general.choose_a_recipient')} --`}
                                     searchPlaceholder={__('general.search_users')}
                                 />
                                 <InputError message={errors.recipient_id} className="mt-1" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="message" value={__('general.message') || 'Initial Message'} />
+                                <InputLabel htmlFor="message" value={__('general.message')} />
                                 <textarea
                                     id="message"
                                     rows={4}
                                     value={data.message}
                                     onChange={(e) => setData('message', e.target.value)}
-                                    placeholder={__('general.type_your_first_message') || 'Type your message here...'}
+                                    placeholder={__('general.type_your_first_message')}
                                     className="mt-1 block w-full rounded-xl border border-slate-200 text-xs shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
@@ -479,14 +480,14 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
 
                             <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
                                 <SecondaryButton type="button" onClick={() => setIsNewModalOpen(false)}>
-                                    {__('general.cancel') || 'Cancel'}
+                                    {__('general.cancel')}
                                 </SecondaryButton>
                                 <PrimaryButton
                                     type="submit"
                                     disabled={processing || !data.recipient_id || !data.message.trim()}
                                     className="bg-indigo-600 text-white hover:bg-indigo-700"
                                 >
-                                    {__('general.start_chat') || 'Start Chat'}
+                                    {__('general.start_chat')}
                                 </PrimaryButton>
                             </div>
                         </form>

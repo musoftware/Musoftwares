@@ -7,10 +7,9 @@ import RecurringScheduleForm, {
 } from '@/Components/RecurringScheduleForm';
 import { __ } from '@/lib/i18n';
 
-export default function Edit({ salary, currencies, users }) {
+export default function Edit({ salary, currencies }) {
     const pageErrors = (router as any)?.page?.props?.errors ?? {};
     const currenciesList = Array.isArray(currencies) ? currencies : (currencies ? Object.values(currencies) : []);
-    const usersList = Array.isArray(users) ? users : (users ? Object.values(users) : []);
 
     const [form] = useState<RecurringScheduleValues>({
         user_id: salary.user_id,
@@ -36,7 +35,7 @@ export default function Edit({ salary, currencies, users }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.edit_recurring_salary')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.edit_recurring_salary')} header={__('admin.business_operations')}>
             <Head title={__('general.edit_recurring_salary')} />
 
             <div className="mb-4">
@@ -56,7 +55,6 @@ export default function Edit({ salary, currencies, users }) {
                     mode="edit"
                     initialValues={form}
                     currencies={currenciesList}
-                    users={usersList}
                     errors={pageErrors}
                     submitting={submitting}
                     onSubmit={handleSubmit}

@@ -71,10 +71,11 @@ class ClientDashboardLoyaltyTierTest extends TestCase
             'loyalty_tier_id' => $silverTier->id,
             'onboarding_completed' => true,
         ]);
-        $user->updateQuietly([
+        // loyalty_* columns are not mass assignable, so set them with forceFill.
+        $user->forceFill([
             'loyalty_points_balance' => 200,
             'loyalty_lifetime_points' => 200,
-        ]);
+        ])->saveQuietly();
         $user->assignRole('client');
 
         // 3. Request /dashboard

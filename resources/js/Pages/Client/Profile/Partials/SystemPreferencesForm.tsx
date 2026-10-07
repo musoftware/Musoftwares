@@ -37,12 +37,11 @@ export default function SystemPreferencesForm({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
-                    {__('general.system_preferences') || 'System Preferences'}
+                    {__('general.system_preferences')}
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    {__('general.dashboard_layout_description') || 
-                     'Manage dashboard layout settings and custom API integrations.'}
+                    {__('general.dashboard_layout_description')}
                 </p>
             </header>
 
@@ -58,24 +57,23 @@ export default function SystemPreferencesForm({
                         htmlFor="enable_3d_dashboard"
                         className="text-sm font-medium text-gray-700 cursor-pointer select-none"
                     >
-                        {__('general.enable_3d_dashboard') || 'Enable 3D Holographic Dashboard'}
+                        {__('general.enable_3d_dashboard')}
                     </label>
                 </div>
 
                 <div className="border-t border-gray-200 my-6 pt-6">
                     <h3 className="text-md font-medium text-gray-900">
-                        {__('general.ai_settings') || 'AI & API Key Configurations'}
+                        {__('general.ai_settings')}
                     </h3>
                     <p className="mt-1 text-sm text-gray-600">
-                        {__('general.ai_settings_description') || 
-                         'Provide your own API keys to enable or override AI features (such as AutoSMS payment processing). If empty, platform limits apply.'}
+                        {__('general.ai_settings_description')}
                     </p>
                 </div>
 
                 {/* AI Preferences Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="col-span-1 md:col-span-2">
-                        <InputLabel htmlFor="default_ai_model" value={__('general.default_ai_provider') || 'Default AI Provider'} />
+                        <InputLabel htmlFor="default_ai_model" value={__('general.default_ai_provider')} />
                         <select
                             id="default_ai_model"
                             name="default_ai_model"
@@ -90,7 +88,7 @@ export default function SystemPreferencesForm({
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="openai_api_key" value="OpenAI API Key" />
+                        <InputLabel htmlFor="openai_api_key" value={__('client.prefs_openai_key')} />
                         <TextInput
                             id="openai_api_key"
                             type="password"
@@ -104,7 +102,7 @@ export default function SystemPreferencesForm({
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="openai_model" value="OpenAI Model" />
+                        <InputLabel htmlFor="openai_model" value={__('client.prefs_openai_model')} />
                         <TextInput
                             id="openai_model"
                             type="text"
@@ -117,7 +115,7 @@ export default function SystemPreferencesForm({
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="gemini_api" value="Gemini API Key" />
+                        <InputLabel htmlFor="gemini_api" value={__('client.prefs_gemini_key')} />
                         <TextInput
                             id="gemini_api"
                             type="password"
@@ -131,7 +129,7 @@ export default function SystemPreferencesForm({
                     </div>
 
                     <div>
-                        <InputLabel htmlFor="gemini_model" value="Gemini Model" />
+                        <InputLabel htmlFor="gemini_model" value={__('client.prefs_gemini_model')} />
                         <TextInput
                             id="gemini_model"
                             type="text"

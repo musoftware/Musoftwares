@@ -165,14 +165,14 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
                         <CheckCircle2 size={12} className="me-1" />
-                        {__('admin.cleared_commissions') || 'تم الصرف'}
+                        {__('admin.cleared_commissions')}
                     </span>
                 );
             case 'due':
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
                         <AlertCircle size={12} className="me-1" />
-                        {__('admin.due_commissions') || 'مستحقة الصرف الآن'}
+                        {__('admin.due_commissions')}
                     </span>
                 );
             case 'pending':
@@ -180,7 +180,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                         <Clock size={12} className="me-1" />
-                        {__('admin.pending_commissions') || 'قيد الانتظار'}
+                        {__('admin.pending_commissions')}
                     </span>
                 );
         }
@@ -198,20 +198,20 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
         if (item.days_remaining > 0) {
             return (
                 <span className="text-xs font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                    {item.days_remaining === 1 ? 'غداً' : `بعد ${item.days_remaining} يوم`}
+                    {item.days_remaining === 1 ? __('admin.commissions_tomorrow') : __('admin.commissions_in_days', { days: item.days_remaining })}
                 </span>
             );
         } else if (item.days_remaining === 0) {
             return (
                 <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                    اليوم
+                    {__('admin.commissions_today')}
                 </span>
             );
         } else {
             const absDays = Math.abs(item.days_remaining);
             return (
                 <span className="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                    متأخرة بـ {absDays} يوم
+                    {__('admin.commissions_overdue_days', { days: absDays })}
                 </span>
             );
         }
@@ -219,23 +219,23 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
 
     return (
         <AdminSidebarLayout
-            title={__('admin.commissions_schedule') || 'جدول استحقاق العمولات'}
+            title={__('admin.commissions_schedule')}
             header={
                 <div className="flex items-center gap-2">
                     <Briefcase className="h-5 w-5 text-slate-800" />
                     <span className="font-bold text-slate-900 font-sora">
-                        {__('admin.commissions_schedule') || 'جدول استحقاق العمولات'}
+                        {__('admin.commissions_schedule')}
                     </span>
                 </div>
             }
         >
-            <Head title={__('admin.commissions_schedule') || 'جدول استحقاق العمولات'} />
+            <Head title={__('admin.commissions_schedule')} />
 
             <div className="space-y-6">
                 {/* Page Description */}
                 <div>
                     <p className="text-sm text-slate-500">
-                        {__('admin.commissions_schedule_desc') || 'متابعة مواعيد استحقاق عمولات التسويق والإحالة وحالة صرفها للمحفظة والتحكم بها.'}
+                        {__('admin.commissions_schedule_desc')}
                     </p>
                 </div>
 
@@ -245,13 +245,13 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    {__('admin.pending_commissions') || 'قيد الانتظار'}
+                                    {__('admin.pending_commissions')}
                                 </p>
                                 <h3 className="text-2xl font-bold font-sora text-slate-900 mt-1">
                                     {stats.pending_count}
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-1">
-                                    داخل فترة الحجز المحددة
+                                    {__('admin.commissions_pending_hint')}
                                 </p>
                             </div>
                             <div className="p-2.5 bg-slate-100 rounded-lg text-slate-700">
@@ -264,13 +264,13 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    {__('admin.due_commissions') || 'مستحقة الصرف الآن'}
+                                    {__('admin.due_commissions')}
                                 </p>
                                 <h3 className="text-2xl font-bold font-sora text-amber-600 mt-1">
                                     {stats.due_count}
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-1">
-                                    حان موعد نزولها للمحفظة
+                                    {__('admin.commissions_due_hint')}
                                 </p>
                             </div>
                             <div className="p-2.5 bg-amber-50 rounded-lg text-amber-600">
@@ -283,13 +283,13 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    {__('admin.cleared_commissions') || 'تم الصرف للمحفظة'}
+                                    {__('admin.cleared_commissions')}
                                 </p>
                                 <h3 className="text-2xl font-bold font-sora text-green-600 mt-1">
                                     {stats.cleared_count}
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-1">
-                                    أودعت بالفعل في رصيد المستخدمين
+                                    {__('admin.commissions_cleared_hint')}
                                 </p>
                             </div>
                             <div className="p-2.5 bg-green-50 rounded-lg text-green-600">
@@ -302,13 +302,13 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                         <div className="flex justify-between items-start">
                             <div>
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    {__('admin.next_upcoming_release') || 'أقرب موعد نزول قادم'}
+                                    {__('admin.next_upcoming_release')}
                                 </p>
                                 <h3 className="text-lg font-bold font-sora text-slate-900 mt-2 truncate">
                                     {stats.next_upcoming_date || '—'}
                                 </h3>
                                 <p className="text-xs text-slate-400 mt-1">
-                                    تاريخ نزول الدفعة القادمة
+                                    {__('admin.commissions_next_release_hint')}
                                 </p>
                             </div>
                             <div className="p-2.5 bg-slate-100 rounded-lg text-slate-700">
@@ -331,7 +331,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                         >
-                            {__('general.all') || 'الكل'} ({stats.total_count})
+                            {__('general.all')} ({stats.total_count})
                         </button>
                         <button
                             type="button"
@@ -342,7 +342,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                         >
-                            {__('admin.pending_commissions') || 'قيد الانتظار'} ({stats.pending_count})
+                            {__('admin.pending_commissions')} ({stats.pending_count})
                         </button>
                         <button
                             type="button"
@@ -353,7 +353,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                         >
-                            {__('admin.due_commissions') || 'مستحقة الصرف الآن'} ({stats.due_count})
+                            {__('admin.due_commissions')} ({stats.due_count})
                         </button>
                         <button
                             type="button"
@@ -364,7 +364,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                         >
-                            {__('admin.cleared_commissions') || 'تم الصرف'} ({stats.cleared_count})
+                            {__('admin.cleared_commissions')} ({stats.cleared_count})
                         </button>
                     </div>
 
@@ -372,13 +372,13 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                     <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
                         <div className="lg:col-span-2">
                             <Label className="text-xs text-slate-600 mb-1 block">
-                                {__('general.search') || 'بحث'}
+                                {__('general.search')}
                             </Label>
                             <div className="relative">
                                 <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
                                     type="text"
-                                    placeholder="بحث بالمستفيد، العميل المحال، أو رقم الفاتورة..."
+                                    placeholder={__('admin.commissions_search_placeholder')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="ps-9 text-sm"
@@ -388,7 +388,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
 
                         <div>
                             <Label className="text-xs text-slate-600 mb-1 block">
-                                من تاريخ نزول
+                                {__('admin.commissions_release_date_from')}
                             </Label>
                             <Input
                                 type="date"
@@ -400,7 +400,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
 
                         <div>
                             <Label className="text-xs text-slate-600 mb-1 block">
-                                إلى تاريخ نزول
+                                {__('admin.commissions_release_date_to')}
                             </Label>
                             <Input
                                 type="date"
@@ -413,10 +413,10 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                         <div className="flex items-center gap-2">
                             <Button type="submit" className="flex-1 text-xs">
                                 <Filter size={14} className="me-1.5" />
-                                {__('general.apply') || 'تطبيق'}
+                                {__('general.apply')}
                             </Button>
                             {(search || dateFrom || dateTo || status !== 'all') && (
-                                <Button type="button" variant="outline" size="icon" onClick={handleReset} title="إعادة تعيين">
+                                <Button type="button" variant="outline" size="icon" onClick={handleReset} title={__('admin.commissions_reset_filters')} aria-label={__('admin.commissions_reset_filters')}>
                                     <X size={16} />
                                 </Button>
                             )}
@@ -434,25 +434,25 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                         #
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.recipient_marketer') || 'المستفيد (المسوق)'}
+                                        {__('admin.recipient_marketer')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.referred_source') || 'المصدر (العميل المحال / الفاتورة)'}
+                                        {__('admin.referred_source')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.amount') || 'المبلغ'}
+                                        {__('admin.amount')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.release_date') || 'تاريخ النزول'}
+                                        {__('admin.release_date')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.time_remaining') || 'المتبقي'}
+                                        {__('admin.time_remaining')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs">
-                                        {__('admin.status') || 'الحالة'}
+                                        {__('admin.status')}
                                     </TableHead>
                                     <TableHead className="font-semibold text-slate-700 text-xs text-end">
-                                        {__('general.actions') || 'الإجراءات'}
+                                        {__('general.actions')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -510,7 +510,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                                                 href={`/admin/invoices/${item.referred_invoice_id}`}
                                                                 className="font-mono text-slate-800 hover:underline"
                                                             >
-                                                                فاتورة #{item.invoice_number || item.referred_invoice_id}
+                                                                {__('admin.commissions_invoice_number', { number: item.invoice_number || item.referred_invoice_id })}
                                                             </Link>
                                                         </div>
                                                     )}
@@ -531,7 +531,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                                 </div>
                                                 {item.created_at && (
                                                     <div className="text-[11px] text-slate-400">
-                                                        أنشئت: {item.created_at.split(' ')[0]}
+                                                        {__('admin.commissions_created_on', { date: item.created_at.split(' ')[0] })}
                                                     </div>
                                                 )}
                                             </TableCell>
@@ -557,11 +557,11 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                                         onClick={() => openClearModal(item)}
                                                     >
                                                         <Zap size={13} className="me-1 text-amber-600" />
-                                                        {__('admin.clear_now') || 'صرف الآن'}
+                                                        {__('admin.clear_now')}
                                                     </Button>
                                                 ) : (
                                                     <span className="text-xs text-slate-400 font-mono">
-                                                        معاملة #{item.transaction_id}
+                                                        {__('admin.commissions_transaction_number', { id: item.transaction_id ?? '' })}
                                                     </span>
                                                 )}
                                             </TableCell>
@@ -575,10 +575,10 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                                                     <Briefcase size={22} />
                                                 </div>
                                                 <p className="font-medium text-slate-700 mb-1">
-                                                    {__('admin.no_commissions_found') || 'لا توجد عمولات مطابقة لمعايير البحث.'}
+                                                    {__('admin.no_commissions_found')}
                                                 </p>
                                                 <p className="text-xs text-slate-400">
-                                                    جرب تغيير معايير البحث أو تصفية الحالة.
+                                                    {__('admin.commissions_empty_hint')}
                                                 </p>
                                             </div>
                                         </TableCell>
@@ -592,7 +592,7 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                     {commissions.data && commissions.data.length > 0 && (
                         <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="text-xs text-slate-500">
-                                عرض <span className="font-semibold text-slate-800">{commissions.from || 0}</span> إلى <span className="font-semibold text-slate-800">{commissions.to || 0}</span> من أصل <span className="font-semibold text-slate-800">{commissions.total}</span> عمولة
+                                {__('admin.commissions_showing_range', { from: commissions.from || 0, to: commissions.to || 0, total: commissions.total })}
                             </div>
                             <Pagination links={commissions.links} />
                         </div>
@@ -605,27 +605,27 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            {__('admin.clear_now') || 'صرف العمولة فوراً'}
+                            {__('admin.clear_now')}
                         </DialogTitle>
                         <DialogDescription>
-                            {__('admin.clear_now_confirm') || 'هل أنت متأكد من صرف هذه العمولة وإيداعها في محفظة المستخدم فوراً دون انتظار الجدولة التلقائية؟'}
+                            {__('admin.clear_now_confirm')}
                         </DialogDescription>
                     </DialogHeader>
 
                     {clearingItem && (
                         <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm space-y-2 my-2">
                             <div className="flex justify-between">
-                                <span className="text-slate-500">المستفيد:</span>
+                                <span className="text-slate-500">{__('admin.commissions_recipient_label')}</span>
                                 <span className="font-semibold text-slate-900">{clearingItem.user?.name}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-slate-500">مبلغ العمولة:</span>
+                                <span className="text-slate-500">{__('admin.commissions_amount_label')}</span>
                                 <span className="font-bold text-slate-900 font-mono">
                                     {clearingItem.amount} {clearingItem.currency}
                                 </span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-slate-500">تاريخ الاستحقاق الأصلي:</span>
+                                <span className="text-slate-500">{__('admin.commissions_original_due_date')}</span>
                                 <span className="text-slate-800">{clearingItem.convert_to_balance_on || '—'}</span>
                             </div>
                         </div>
@@ -638,14 +638,14 @@ export default function CommissionsIndex({ commissions, filters, stats }: IndexP
                             onClick={() => setIsClearingOpen(false)}
                             disabled={isSubmitting}
                         >
-                            {__('general.cancel') || 'إلغاء'}
+                            {__('general.cancel')}
                         </Button>
                         <Button
                             type="button"
                             onClick={handleConfirmClear}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'جاري الصرف...' : (__('admin.clear_now') || 'تأكيد الصرف')}
+                            {isSubmitting ? __('admin.commissions_clearing') : __('admin.clear_now')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

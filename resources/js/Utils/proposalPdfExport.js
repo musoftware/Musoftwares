@@ -159,9 +159,9 @@ export async function downloadProposalPdf({
                 <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: rgba(15, 23, 42, 0.7); font-weight: 600;">
                     <span>⏱ ${isAr ? 'الجدول الزمني التقديري:' : 'Estimated Timeline:'} <strong style="color: #0284C7;">~${costBreakdown.estimatedDays} ${isAr ? 'يوم عمل' : 'business days'}</strong></span>
                     <span>•</span>
-                    <span>💰 ${isAr ? 'الاستثمار الإجمالي:' : 'Total Investment:'} <strong style="color: #0F172A;">${totalDisplay}</strong></span>
+                    <span>${isAr ? 'الاستثمار الإجمالي:' : 'Total Investment:'} <strong style="color: #0F172A;">${totalDisplay}</strong></span>
                     <span>•</span>
-                    <span>🛡 ${isAr ? 'ضمان الملكية:' : 'Ownership:'} <strong style="color: #10B981;">${isAr ? 'كود مصدري ملكية 100%' : '100% Full Source Code'}</strong></span>
+                    <span>${isAr ? 'ضمان الملكية:' : 'Ownership:'} <strong style="color: #10B981;">${isAr ? 'كود مصدري ملكية 100%' : '100% Full Source Code'}</strong></span>
                 </div>
             </div>
 
@@ -185,25 +185,25 @@ export async function downloadProposalPdf({
                 <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; font-weight: 700; line-height: 1.4;">
                     ${costBreakdown.itemizedPlatforms.map(platform => `
                         <div style="display: flex; align-items: flex-start; gap: 10px;">
-                            <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;">✓</span>
+                            <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span>${platform.title}: ${platform.count} ${isAr ? (platform.unit === 'Page' ? 'صفحة متجاوبة' : 'شاشة تفاعلية') : `${platform.unit}s`}</span>
                         </div>
                     `).join('')}
 
                     ${costBreakdown.itemizedAddons.slice(0, 4).map(addon => `
                         <div style="display: flex; align-items: flex-start; gap: 10px;">
-                            <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;">✓</span>
+                            <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                             <span>${addon.title}</span>
                         </div>
                     `).join('')}
 
                     <div style="display: flex; align-items: flex-start; gap: 10px;">
-                        <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;">✓</span>
+                        <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                         <span>${isAr ? 'لوحة تحكم إدارية مركزية وبنية تحتية سحابية عالية الأمان' : 'Central Admin Dashboard & High-Performance Cloud Architecture'}</span>
                     </div>
 
                     <div style="display: flex; align-items: flex-start; gap: 10px;">
-                        <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;">✓</span>
+                        <span style="background: #ffffff; color: #10B981; border-radius: 6px; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; margin-top: 1px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                         <span>${isAr ? 'ملكية الكود المصدر وقواعد البيانات 100% بدون أي اشتراكات خفية' : '100% Full Source Code & Database Ownership with Zero Lock-in'}</span>
                     </div>
                 </div>
@@ -219,8 +219,8 @@ export async function downloadProposalPdf({
                     color: #ffffff;
                 ">
                     ${isAr
-                        ? '💡 نصيحة مهندس الأنظمة: ما تدفع آلاف الدولارات على أنظمة ضخمة وميزات معقدة وأنت لسا ما اختبرت السوق بالـ MVP الأساسي اللي يرجعلك استثمارك بأسرع وقت!'
-                        : '💡 System Architect Insight: Avoid massive upfront costs for complex unproven features. Launch the core MVP first to validate demand, retain 30-50% cash reserve, and scale upon real user traction!'}
+                        ? 'نصيحة مهندس الأنظمة: ما تدفع آلاف الدولارات على أنظمة ضخمة وميزات معقدة وأنت لسا ما اختبرت السوق بالـ MVP الأساسي اللي يرجعلك استثمارك بأسرع وقت!'
+                        : 'System Architect Insight: Avoid massive upfront costs for complex unproven features. Launch the core MVP first to validate demand, retain 30-50% cash reserve, and scale upon real user traction!'}
                 </div>
             </div>
 
@@ -304,7 +304,7 @@ export async function downloadProposalPdf({
                 <div>
                     <div style="font-size: 11px; font-weight: 800; color: #0F172A;">MAHMOUD AMIN M.</div>
                     <div style="font-size: 10px; color: rgba(15, 23, 42, 0.6); font-weight: 600;">Principal Systems Architect &bull; Musoftware Enterprise</div>
-                    <div style="font-size: 9px; color: #10B981; font-weight: 700; margin-top: 2px;">✔ Digitally Verified Architecture Lead</div>
+                    <div style="font-size: 9px; color: #10B981; font-weight: 700; margin-top: 2px;">Digitally Verified Architecture Lead</div>
                 </div>
 
                 <div style="text-align: ${isAr ? 'left' : 'right'};">
@@ -329,8 +329,8 @@ export async function downloadProposalPdf({
             ">
                 <span>
                     ${isAr
-                        ? '🚀 صُممت هذه الدراسة الهندسية عبر حاسبة Musoftware التفاعلية — خطط ميزانية مشروعك مجاناً عبر:'
-                        : '🚀 Engineered via the Musoftware Interactive Architecture Estimator — calculate your project for free:'}
+                        ? 'صُممت هذه الدراسة الهندسية عبر حاسبة Musoftware التفاعلية — خطط ميزانية مشروعك مجاناً عبر:'
+                        : 'Engineered via the Musoftware Interactive Architecture Estimator — calculate your project for free:'}
                     <strong style="color: #38BDF8; margin-${isAr ? 'right' : 'left'}: 4px;">musoftwares.com/estimator</strong>
                 </span>
                 <span style="font-size: 10px; opacity: 0.8; font-family: monospace;">#${code}</span>

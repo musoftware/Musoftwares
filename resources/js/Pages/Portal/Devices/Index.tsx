@@ -42,6 +42,8 @@ import {
     Package as PackageIcon,
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 interface SoftwarePackage {
     id: number;
@@ -173,6 +175,7 @@ export default function ResellerDevicesIndex({
     walletBalance = 0,
     walletCurrency = 'USD',
 }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedSoftware, setSelectedSoftware] = useState(filters.software_id || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
@@ -259,17 +262,21 @@ export default function ResellerDevicesIndex({
         });
     };
 
-    const handleUnassign = (device: DeviceAssignment) => {
-        if (confirm(`Are you sure you want to unassign device ${device.device_id}? The customer will lose software access.`)) {
-            router.delete(`/portal/devices/${device.id}`);
-        }
+    const handleUnassign = async (device: DeviceAssignment) => {
+        const accepted = await confirm({
+            title: __('portal.devices_unassign_title'),
+            description: __('portal.devices_unassign_confirm', { device: device.device_id }),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(`/portal/devices/${device.id}`);
     };
 
     // Calculate expiry indicator
     const getExpiryInfo = (expiresAtStr: string | null, status: string) => {
         if (!expiresAtStr) {
             return {
-                label: 'Lifetime',
+                label: __('general.lifetime'),
                 isExpired: false,
                 isExpiringSoon: false,
                 colorClass: 'text-zinc-600 dark:text-zinc-400',
@@ -283,7 +290,7 @@ export default function ResellerDevicesIndex({
 
         if (diffDays <= 0) {
             return {
-                label: `Expired (${expiryDate.toLocaleDateString()})`,
+                label: __('portal.devices_expired_on_date', { date: expiryDate.toLocaleDateString() }),
                 isExpired: true,
                 isExpiringSoon: false,
                 colorClass: 'text-red-600 dark:text-red-400 font-semibold',
@@ -292,7 +299,7 @@ export default function ResellerDevicesIndex({
 
         if (diffDays <= 7) {
             return {
-                label: `${diffDays} days left (${expiryDate.toLocaleDateString()})`,
+                label: __('portal.devices_days_left_date', { days: diffDays, date: expiryDate.toLocaleDateString() }),
                 isExpired: false,
                 isExpiringSoon: true,
                 colorClass: 'text-amber-600 dark:text-amber-400 font-medium',
@@ -300,7 +307,7 @@ export default function ResellerDevicesIndex({
         }
 
         return {
-            label: `${diffDays} days left (${expiryDate.toLocaleDateString()})`,
+            label: __('portal.devices_days_left_date', { days: diffDays, date: expiryDate.toLocaleDateString() }),
             isExpired: false,
             isExpiringSoon: false,
             colorClass: 'text-zinc-700 dark:text-zinc-300',
@@ -395,7 +402,7 @@ export default function ResellerDevicesIndex({
 
     return (
         <AuthenticatedLayout>
-            <Head title="Reseller Device Management" />
+            <Head title={__('portal.devices_page_title')} />
 
             <div className="p-6 max-w-7xl mx-auto space-y-6">
                 {/* Header with Title and Reseller Balance */}
@@ -404,19 +411,19 @@ export default function ResellerDevicesIndex({
                         <div className="flex items-center gap-2 mb-1">
                             <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded bg-[#0071e3]/10 text-[#0071e3]">
                                 <Shield className="w-3.5 h-3.5" />
-                                Reseller Portal
+                                {__('portal.devices_reseller_portal')}
                             </span>
                             {canViewAllDevices && (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                                    Full Scope (All Allocated Software Devices)
+                                    {__('portal.devices_full_scope')}
                                 </span>
                             )}
                         </div>
                         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                            Software Devices & License Control
+                            {__('portal.devices_heading')}
                         </h1>
                         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                            Manage customer software assignments, activate 1-day free trials, and renew paid licenses.
+                            {__('portal.devices_subheading')}
                         </p>
                     </div>
 
@@ -424,7 +431,7 @@ export default function ResellerDevicesIndex({
                         {/* Wallet Balance Badge */}
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xs text-xs">
                             <CreditCard className="w-4 h-4 text-[#0071e3]" />
-                            <span className="text-zinc-500 font-medium">Balance:</span>
+                            <span className="text-zinc-500 font-medium">{__('portal.devices_balance_label')}</span>
                             <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                                 {walletBalance.toFixed(2)} {walletCurrency}
                             </span>
@@ -432,7 +439,7 @@ export default function ResellerDevicesIndex({
                                 href="/wallet"
                                 className="text-[11px] font-semibold text-[#0071e3] hover:underline ms-1"
                             >
-                                Recharge
+                                {__('portal.devices_recharge')}
                             </Link>
                         </div>
 
@@ -441,7 +448,7 @@ export default function ResellerDevicesIndex({
                             className="bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-xs font-medium flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Assign Device</span>
+                            <span>{__('portal.devices_assign_device')}</span>
                         </Button>
                     </div>
                 </div>
@@ -449,31 +456,31 @@ export default function ResellerDevicesIndex({
                 {/* Top Metrics Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 shadow-xs">
-                        <div className="text-xs font-medium text-zinc-500">Allocated Software</div>
+                        <div className="text-xs font-medium text-zinc-500">{__('portal.devices_allocated_software')}</div>
                         <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                             {stats.total_softwares}
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 shadow-xs">
-                        <div className="text-xs font-medium text-zinc-500">Total Devices</div>
+                        <div className="text-xs font-medium text-zinc-500">{__('portal.devices_total_devices')}</div>
                         <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">
                             {stats.total_devices}
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 shadow-xs">
-                        <div className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Active Devices</div>
+                        <div className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{__('portal.devices_active_devices')}</div>
                         <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                             {stats.active_devices}
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 shadow-xs">
-                        <div className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring (&lt; 7 Days)</div>
+                        <div className="text-xs font-medium text-amber-600 dark:text-amber-400">{__('portal.devices_expiring_7_days')}</div>
                         <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
                             {stats.expiring_soon}
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 shadow-xs col-span-2 lg:col-span-1">
-                        <div className="text-xs font-medium text-red-600 dark:text-red-400">Expired Licenses</div>
+                        <div className="text-xs font-medium text-red-600 dark:text-red-400">{__('portal.devices_expired_licenses')}</div>
                         <div className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                             {stats.expired_devices}
                         </div>
@@ -486,7 +493,8 @@ export default function ResellerDevicesIndex({
                         <div className="relative flex-1 w-full">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                             <Input
-                                placeholder="Search by Device ID, Customer Name, Email, or Notes..."
+                                placeholder={__('portal.devices_search_placeholder')}
+                                aria-label={__('general.search')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="pl-9 text-xs h-9"
@@ -500,9 +508,10 @@ export default function ResellerDevicesIndex({
                                     setSelectedSoftware(e.target.value);
                                     handleFilter('software_id', e.target.value);
                                 }}
+                                aria-label={__('portal.devices_filter_software')}
                                 className="text-xs h-9 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3"
                             >
-                                <option value="">All Softwares</option>
+                                <option value="">{__('portal.devices_all_softwares')}</option>
                                 {allocatedSoftwares.map((sw) => (
                                     <option key={sw.serial_software_id} value={sw.serial_software_id}>
                                         {sw.software_name}
@@ -516,17 +525,18 @@ export default function ResellerDevicesIndex({
                                     setSelectedStatus(e.target.value);
                                     handleFilter('status', e.target.value);
                                 }}
+                                aria-label={__('portal.devices_filter_status')}
                                 className="text-xs h-9 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3"
                             >
-                                <option value="">All Statuses</option>
-                                <option value="active">Active Only</option>
-                                <option value="expiring_soon">Expiring Soon (&lt; 7 Days)</option>
-                                <option value="expired">Expired Only</option>
-                                <option value="inactive">Inactive / Suspended</option>
+                                <option value="">{__('general.all_statuses')}</option>
+                                <option value="active">{__('portal.devices_active_only')}</option>
+                                <option value="expiring_soon">{__('portal.devices_expiring_soon_7_days')}</option>
+                                <option value="expired">{__('portal.devices_expired_only')}</option>
+                                <option value="inactive">{__('portal.devices_inactive_suspended')}</option>
                             </select>
 
                             <Button type="submit" size="sm" variant="outline" className="h-9 text-xs">
-                                Filter
+                                {__('general.filter')}
                             </Button>
                         </div>
                     </form>
@@ -538,11 +548,11 @@ export default function ResellerDevicesIndex({
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-[11px] font-semibold uppercase text-zinc-500">
-                                    <th className="px-5 py-3">Customer</th>
-                                    <th className="px-5 py-3">Software &amp; Device</th>
-                                    <th className="px-5 py-3">Expiration &amp; Term</th>
-                                    <th className="px-5 py-3">Status</th>
-                                    <th className="px-5 py-3 text-right">Actions</th>
+                                    <th className="px-5 py-3">{__('general.customer')}</th>
+                                    <th className="px-5 py-3">{__('portal.devices_software_and_device')}</th>
+                                    <th className="px-5 py-3">{__('portal.devices_expiration_and_term')}</th>
+                                    <th className="px-5 py-3">{__('general.status')}</th>
+                                    <th className="px-5 py-3 text-right">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-xs">
@@ -550,16 +560,16 @@ export default function ResellerDevicesIndex({
                                     <tr>
                                         <td colSpan={5} className="px-5 py-12 text-center text-zinc-500">
                                             <Laptop className="w-8 h-8 text-zinc-300 dark:text-zinc-700 mx-auto mb-2" />
-                                            <p className="font-medium text-sm">No device assignments found</p>
+                                            <p className="font-medium text-sm">{__('portal.devices_empty_title')}</p>
                                             <p className="text-xs text-zinc-400 mt-0.5">
-                                                Click "Assign Device" above to bind a customer license.
+                                                {__('portal.devices_empty_hint')}
                                             </p>
                                         </td>
                                     </tr>
                                 ) : (
                                     devices.data.map((device) => {
                                         const firstDevice = device.devices?.[0];
-                                        const softwareName = firstDevice?.software?.name || 'Software License';
+                                        const softwareName = firstDevice?.software?.name || __('portal.devices_software_license');
                                         const expiryInfo = getExpiryInfo(device.expires_at, device.status);
                                         const lastCheck = firstDevice?.last_check_date;
 
@@ -571,14 +581,14 @@ export default function ResellerDevicesIndex({
                                             >
                                                 <td className="px-5 py-4">
                                                     <div className="font-semibold text-zinc-900 dark:text-zinc-100">
-                                                        {device.user?.name || 'Unassigned User'}
+                                                        {device.user?.name || __('portal.devices_unassigned_user')}
                                                     </div>
                                                     <div className="text-[11px] text-zinc-500">
-                                                        {device.user?.email || 'No email registered'}
+                                                        {device.user?.email || __('portal.devices_no_email')}
                                                     </div>
                                                     {device.notes && (
                                                         <div className="text-[11px] text-zinc-400 italic mt-0.5 line-clamp-1">
-                                                            Note: {device.notes}
+                                                            {__('portal.devices_note_value', { note: device.notes })}
                                                         </div>
                                                     )}
                                                 </td>
@@ -597,7 +607,7 @@ export default function ResellerDevicesIndex({
                                                     </div>
                                                     {firstDevice?.machine_name && (
                                                         <div className="text-[11px] text-zinc-400">
-                                                            Machine: {firstDevice.machine_name}
+                                                            {__('portal.devices_machine_value', { name: firstDevice.machine_name })}
                                                         </div>
                                                     )}
                                                 </td>
@@ -615,12 +625,12 @@ export default function ResellerDevicesIndex({
                                                     </div>
                                                     {lastCheck && (
                                                         <div className="text-[11px] text-zinc-400 mt-1">
-                                                            Last check: {new Date(lastCheck).toLocaleDateString()}
+                                                            {__('portal.devices_last_check_value', { date: new Date(lastCheck).toLocaleDateString() })}
                                                         </div>
                                                     )}
                                                     {device.has_used_trial && (
                                                         <div className="text-[10px] text-zinc-400 mt-0.5">
-                                                            Trial already used
+                                                            {__('portal.devices_trial_used')}
                                                         </div>
                                                     )}
                                                 </td>
@@ -628,15 +638,15 @@ export default function ResellerDevicesIndex({
                                                 <td className="px-5 py-4">
                                                     {device.status === 'active' && !expiryInfo.isExpired ? (
                                                         <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2 py-0.5 rounded-md">
-                                                            <CheckCircle2 className="w-3 h-3" /> Active
+                                                            <CheckCircle2 className="w-3 h-3" /> {__('general.active')}
                                                         </span>
                                                     ) : expiryInfo.isExpired ? (
                                                         <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 px-2 py-0.5 rounded-md">
-                                                            <XCircle className="w-3 h-3" /> Expired
+                                                            <XCircle className="w-3 h-3" /> {__('general.expired')}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded-md">
-                                                            Inactive
+                                                            {__('general.inactive')}
                                                         </span>
                                                     )}
                                                 </td>
@@ -651,13 +661,13 @@ export default function ResellerDevicesIndex({
                                                             className="h-8 text-xs font-medium border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
                                                         >
                                                             <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                                                            +1 Month
+                                                            {__('portal.devices_plus_1_month')}
                                                         </Button>
 
                                                         {/* More Options Dropdown */}
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
-                                                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0" aria-label={__('portal.devices_more_options')}>
                                                                     <MoreVertical className="w-4 h-4 text-zinc-500" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
@@ -667,7 +677,7 @@ export default function ResellerDevicesIndex({
                                                                     className="text-xs cursor-pointer font-medium"
                                                                 >
                                                                     <Monitor className="w-3.5 h-3.5 mr-2 text-zinc-500" />
-                                                                    View Details
+                                                                    {__('general.view_details')}
                                                                 </DropdownMenuItem>
 
                                                                 <DropdownMenuItem
@@ -682,7 +692,7 @@ export default function ResellerDevicesIndex({
                                                                     className="text-xs cursor-pointer"
                                                                 >
                                                                     <Calendar className="w-3.5 h-3.5 mr-2 text-zinc-500" />
-                                                                    Custom Renewal Term...
+                                                                    {__('portal.devices_custom_renewal_term')}
                                                                 </DropdownMenuItem>
 
                                                                 <DropdownMenuItem
@@ -692,12 +702,12 @@ export default function ResellerDevicesIndex({
                                                                     {device.status === 'active' ? (
                                                                         <>
                                                                             <XCircle className="w-3.5 h-3.5 mr-2 text-amber-500" />
-                                                                            Suspend / Deactivate
+                                                                            {__('portal.devices_suspend_deactivate')}
                                                                         </>
                                                                     ) : (
                                                                         <>
                                                                             <CheckCircle2 className="w-3.5 h-3.5 mr-2 text-emerald-500" />
-                                                                            Re-activate
+                                                                            {__('portal.devices_reactivate')}
                                                                         </>
                                                                     )}
                                                                 </DropdownMenuItem>
@@ -707,7 +717,7 @@ export default function ResellerDevicesIndex({
                                                                     className="text-xs cursor-pointer text-red-600 focus:text-red-600"
                                                                 >
                                                                     <Trash2 className="w-3.5 h-3.5 mr-2" />
-                                                                    Unassign Device
+                                                                    {__('portal.devices_unassign_device')}
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
@@ -723,27 +733,11 @@ export default function ResellerDevicesIndex({
 
                     {/* Pagination */}
                     {devices.links && devices.links.length > 3 && (
-                        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
                             <span className="text-xs text-zinc-500">
-                                Showing {devices.data.length} of {devices.total} device assignments
+                                {__('portal.devices_showing_count', { count: devices.data.length, total: devices.total })}
                             </span>
-                            <div className="flex items-center gap-1">
-                                {devices.links.map((link, idx) => (
-                                    <button
-                                        key={idx}
-                                        disabled={!link.url || link.active}
-                                        onClick={() => link.url && router.visit(link.url)}
-                                        className={`px-3 py-1 text-xs rounded border transition-colors ${
-                                            link.active
-                                                ? 'bg-[#0071e3] text-white border-[#0071e3]'
-                                                : link.url
-                                                ? 'hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
-                                                : 'text-zinc-400 border-transparent cursor-not-allowed'
-                                        }`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
+                            <Pagination links={devices.links} />
                         </div>
                     )}
                 </div>
@@ -753,25 +747,26 @@ export default function ResellerDevicesIndex({
             <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
                 <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-lg font-bold">Assign Device to Customer</DialogTitle>
+                        <DialogTitle className="text-lg font-bold">{__('portal.devices_assign_title')}</DialogTitle>
                         <DialogDescription className="text-xs text-zinc-500">
-                            Bind a client hardware device, grant a 1-day free trial or deduct reseller cost from your wallet balance.
+                            {__('portal.devices_assign_desc')}
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleAssignSubmit} className="space-y-4 pt-2">
                         {/* Software Product Selection */}
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-semibold">Software Product</Label>
+                            <Label className="text-xs font-semibold">{__('portal.devices_software_product')}</Label>
                             <select
                                 value={assignForm.data.serial_software_id}
                                 onChange={(e) => assignForm.setData('serial_software_id', e.target.value)}
+                                aria-label={__('portal.devices_software_product')}
                                 className="w-full h-9 text-xs rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3"
                                 required
                             >
                                 {allocatedSoftwares.map((sw) => (
                                     <option key={sw.serial_software_id} value={sw.serial_software_id}>
-                                        {sw.software_name} (Active Quota: {sw.active_devices_count} / {sw.is_unlimited ? 'Unlimited' : sw.max_devices})
+                                        {__('portal.devices_quota_option', { name: sw.software_name, used: sw.active_devices_count, max: sw.is_unlimited ? __('portal.devices_unlimited') : (sw.max_devices ?? '') })}
                                     </option>
                                 ))}
                             </select>
@@ -782,11 +777,12 @@ export default function ResellerDevicesIndex({
 
                         {/* Customer Information */}
                         <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                            <Label className="text-xs font-semibold">Customer Account</Label>
+                            <Label className="text-xs font-semibold">{__('portal.devices_customer_account')}</Label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <div className="space-y-1">
                                     <Input
-                                        placeholder="Customer Full Name"
+                                        placeholder={__('portal.devices_customer_full_name')}
+                                        aria-label={__('portal.devices_customer_full_name')}
                                         value={assignForm.data.customer_name}
                                         onChange={(e) => assignForm.setData('customer_name', e.target.value)}
                                         required
@@ -799,7 +795,8 @@ export default function ResellerDevicesIndex({
                                 <div className="space-y-1">
                                     <Input
                                         type="email"
-                                        placeholder="Email Address"
+                                        placeholder={__('portal.devices_email_address')}
+                                        aria-label={__('portal.devices_email_address')}
                                         value={assignForm.data.customer_email}
                                         onChange={(e) => assignForm.setData('customer_email', e.target.value)}
                                         required
@@ -812,7 +809,8 @@ export default function ResellerDevicesIndex({
                             </div>
                             <div className="space-y-1">
                                 <Input
-                                    placeholder="Phone / WhatsApp Number (Optional)"
+                                    placeholder={__('portal.devices_phone_optional')}
+                                    aria-label={__('portal.devices_phone_optional')}
                                     value={assignForm.data.customer_phone}
                                     onChange={(e) => assignForm.setData('customer_phone', e.target.value)}
                                     className="h-9 text-xs"
@@ -823,10 +821,10 @@ export default function ResellerDevicesIndex({
                         {/* Device ID Selection */}
                         <div className="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                             <div className="flex items-center justify-between">
-                                <Label className="text-xs font-semibold">Device ID (Hardware Fingerprint)</Label>
+                                <Label className="text-xs font-semibold">{__('portal.devices_device_id_label')}</Label>
                                 {availableDevices.length > 0 && (
                                     <span className="text-[11px] text-zinc-500">
-                                        {availableDevices.length} unassigned detected
+                                        {__('portal.devices_unassigned_detected', { count: availableDevices.length })}
                                     </span>
                                 )}
                             </div>
@@ -836,17 +834,19 @@ export default function ResellerDevicesIndex({
                                     <select
                                         value={assignForm.data.device_id}
                                         onChange={(e) => assignForm.setData('device_id', e.target.value)}
+                                        aria-label={__('portal.devices_device_id_label')}
                                         className="w-full h-10 text-xs rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 font-mono"
                                     >
-                                        <option value="">-- Choose detected device or enter below --</option>
+                                        <option value="">{__('portal.devices_choose_detected')}</option>
                                         {availableDevices.map((d) => (
                                             <option key={d.id} value={d.device_id}>
-                                                {d.device_id.substring(0, 18)}... ({d.machine_name || 'Machine'} - {d.software?.name})
+                                                {d.device_id.substring(0, 18)}... ({d.machine_name || __('portal.devices_machine')} - {d.software?.name})
                                             </option>
                                         ))}
                                     </select>
                                     <Input
-                                        placeholder="Or paste Device ID manually"
+                                        placeholder={__('portal.devices_paste_manually')}
+                                        aria-label={__('portal.devices_paste_manually')}
                                         value={assignForm.data.device_id}
                                         onChange={(e) => assignForm.setData('device_id', e.target.value)}
                                         required
@@ -855,7 +855,8 @@ export default function ResellerDevicesIndex({
                                 </div>
                             ) : (
                                 <Input
-                                    placeholder="Paste Device ID reported by client software"
+                                    placeholder={__('portal.devices_paste_reported')}
+                                    aria-label={__('portal.devices_device_id_label')}
                                     value={assignForm.data.device_id}
                                     onChange={(e) => assignForm.setData('device_id', e.target.value)}
                                     required
@@ -870,9 +871,9 @@ export default function ResellerDevicesIndex({
                         {/* Duration & Pricing Selection */}
                         <div className="space-y-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                             <div className="flex items-center justify-between">
-                                <Label className="text-xs font-semibold">License Duration &amp; Pricing</Label>
+                                <Label className="text-xs font-semibold">{__('portal.devices_duration_pricing')}</Label>
                                 <span className="text-[11px] text-zinc-500">
-                                    Reseller Cost vs Customer Retail
+                                    {__('portal.devices_cost_vs_retail')}
                                 </span>
                             </div>
 
@@ -889,7 +890,7 @@ export default function ResellerDevicesIndex({
                                     <div className="flex items-center gap-2">
                                         <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                         <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                                            1-Day Free Trial (تجربة مجانية لمدة يوم واحد)
+                                            {__('portal.devices_free_trial_1_day')}
                                         </span>
                                     </div>
                                     <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
@@ -897,7 +898,7 @@ export default function ResellerDevicesIndex({
                                     </span>
                                 </div>
                                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
-                                    Strictly limited to 1 day per machine. Cannot be claimed again even if the device is unassigned or deleted.
+                                    {__('portal.devices_trial_rule')}
                                 </p>
                             </div>
 
@@ -905,7 +906,7 @@ export default function ResellerDevicesIndex({
                             {currentAssignSoftware?.packages && currentAssignSoftware.packages.length > 0 ? (
                                 <div className="space-y-2">
                                     <Label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wide">
-                                        Available Paid Packages
+                                        {__('portal.devices_available_packages')}
                                     </Label>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {currentAssignSoftware.packages.map((pkg) => (
@@ -925,13 +926,13 @@ export default function ResellerDevicesIndex({
                                                     </span>
                                                 </div>
                                                 <div className="mt-2 flex items-baseline justify-between text-xs">
-                                                    <span className="text-zinc-500">Reseller Cost:</span>
+                                                    <span className="text-zinc-500">{__('portal.devices_reseller_cost')}</span>
                                                     <span className="font-bold text-[#0071e3]">
                                                         {pkg.reseller_price !== null && pkg.reseller_price !== undefined ? pkg.reseller_price : pkg.price} {pkg.currency}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-baseline justify-between text-[11px] text-zinc-400">
-                                                    <span>Customer Retail:</span>
+                                                    <span>{__('portal.devices_customer_retail')}</span>
                                                     <span>{pkg.price} {pkg.currency}</span>
                                                 </div>
                                             </div>
@@ -941,15 +942,15 @@ export default function ResellerDevicesIndex({
                             ) : (
                                 <div className="space-y-2">
                                     <Label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wide">
-                                        Paid License Durations
+                                        {__('portal.devices_paid_durations')}
                                     </Label>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                         {[
-                                            { id: '1_month', label: '1 Month', mult: 1 },
-                                            { id: '3_months', label: '3 Months', mult: 3 },
-                                            { id: '6_months', label: '6 Months', mult: 6 },
-                                            { id: '1_year', label: '1 Year', mult: 12 },
-                                            { id: 'lifetime', label: 'Lifetime', mult: 1 },
+                                            { id: '1_month', label: __('portal.devices_one_month'), mult: 1 },
+                                            { id: '3_months', label: __('portal.devices_three_months'), mult: 3 },
+                                            { id: '6_months', label: __('portal.devices_six_months'), mult: 6 },
+                                            { id: '1_year', label: __('portal.devices_one_year'), mult: 12 },
+                                            { id: 'lifetime', label: __('general.lifetime'), mult: 1 },
                                         ].map((preset) => {
                                             const baseCost = currentAssignSoftware?.reseller_price !== null && currentAssignSoftware?.reseller_price !== undefined
                                                 ? currentAssignSoftware.reseller_price
@@ -970,10 +971,10 @@ export default function ResellerDevicesIndex({
                                                 >
                                                     <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">{preset.label}</div>
                                                     <div className="text-[11px] font-semibold text-[#0071e3] mt-1">
-                                                        Cost: {cost} {currentAssignSoftware?.currency || 'USD'}
+                                                        {__('portal.devices_cost_value', { amount: cost, currency: currentAssignSoftware?.currency || 'USD' })}
                                                     </div>
                                                     <div className="text-[10px] text-zinc-400">
-                                                        Retail: {retail} {currentAssignSoftware?.currency || 'USD'}
+                                                        {__('portal.devices_retail_value', { amount: retail, currency: currentAssignSoftware?.currency || 'USD' })}
                                                     </div>
                                                 </div>
                                             );
@@ -985,13 +986,13 @@ export default function ResellerDevicesIndex({
                             {/* Wallet Summary Card */}
                             <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 space-y-2">
                                 <div className="flex items-center justify-between text-xs">
-                                    <span className="text-zinc-500">Your Wallet Balance:</span>
+                                    <span className="text-zinc-500">{__('portal.devices_wallet_balance')}</span>
                                     <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                                         {walletBalance.toFixed(2)} {walletCurrency}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-xs">
-                                    <span className="text-zinc-500">Cost to Deduct:</span>
+                                    <span className="text-zinc-500">{__('portal.devices_cost_to_deduct')}</span>
                                     <span className={`font-bold font-mono ${assignCostInfo.isTrial ? 'text-emerald-600' : 'text-[#0071e3]'}`}>
                                         {assignCostInfo.cost.toFixed(2)} {assignCostInfo.currency}
                                     </span>
@@ -999,7 +1000,7 @@ export default function ResellerDevicesIndex({
                                 {assignCostInfo.cost > 0 && walletBalance < assignCostInfo.cost && (
                                     <div className="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1.5 pt-1 border-t border-red-200 dark:border-red-900/50">
                                         <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                        <span>Insufficient balance. Please top up your wallet before activating.</span>
+                                        <span>{__('portal.devices_insufficient_assign')}</span>
                                     </div>
                                 )}
                             </div>
@@ -1010,9 +1011,10 @@ export default function ResellerDevicesIndex({
 
                         {/* Notes */}
                         <div className="space-y-1 pt-2">
-                            <Label className="text-xs font-semibold">Notes (Branch / License reference)</Label>
+                            <Label className="text-xs font-semibold">{__('portal.devices_notes_label')}</Label>
                             <Textarea
-                                placeholder="Optional customer notes or branch name..."
+                                placeholder={__('portal.devices_notes_placeholder')}
+                                aria-label={__('portal.devices_notes_label')}
                                 value={assignForm.data.notes}
                                 onChange={(e) => assignForm.setData('notes', e.target.value)}
                                 rows={2}
@@ -1027,14 +1029,14 @@ export default function ResellerDevicesIndex({
                                 onClick={() => setIsAssignModalOpen(false)}
                                 className="text-xs"
                             >
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={assignForm.processing || (assignCostInfo.cost > 0 && walletBalance < assignCostInfo.cost)}
                                 className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs"
                             >
-                                {assignForm.processing ? 'Processing...' : assignCostInfo.isTrial ? 'Activate 1-Day Trial' : 'Confirm & Deduct from Wallet'}
+                                {assignForm.processing ? __('general.processing') : assignCostInfo.isTrial ? __('portal.devices_activate_trial') : __('portal.devices_confirm_deduct')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -1045,9 +1047,9 @@ export default function ResellerDevicesIndex({
             <Dialog open={renewModalDevice !== null} onOpenChange={(open) => !open && setRenewModalDevice(null)}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-lg font-bold">Renew Device License</DialogTitle>
+                        <DialogTitle className="text-lg font-bold">{__('portal.devices_renew_title')}</DialogTitle>
                         <DialogDescription className="text-xs text-zinc-500">
-                            Extend the active license term for {renewModalDevice?.user?.name || renewModalDevice?.device_id}.
+                            {__('portal.devices_renew_desc', { name: renewModalDevice?.user?.name || renewModalDevice?.device_id || '' })}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -1055,18 +1057,18 @@ export default function ResellerDevicesIndex({
                         {/* Notice: Free Trial not allowed on renewal */}
                         <div className="p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                            <span>Renewals require paid activation deducted from your wallet balance.</span>
+                            <span>{__('portal.devices_renew_paid_notice')}</span>
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-xs font-semibold">Select Renewal Term</Label>
+                            <Label className="text-xs font-semibold">{__('portal.devices_select_renewal_term')}</Label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {[
-                                    { id: '1_month', label: '+1 Month', mult: 1 },
-                                    { id: '3_months', label: '+3 Months', mult: 3 },
-                                    { id: '6_months', label: '+6 Months', mult: 6 },
-                                    { id: '1_year', label: '+1 Year', mult: 12 },
-                                    { id: 'lifetime', label: 'Lifetime', mult: 1 },
+                                    { id: '1_month', label: __('portal.devices_plus_1_month'), mult: 1 },
+                                    { id: '3_months', label: __('portal.devices_plus_3_months'), mult: 3 },
+                                    { id: '6_months', label: __('portal.devices_plus_6_months'), mult: 6 },
+                                    { id: '1_year', label: __('portal.devices_plus_1_year'), mult: 12 },
+                                    { id: 'lifetime', label: __('general.lifetime'), mult: 1 },
                                 ].map((preset) => (
                                     <button
                                         type="button"
@@ -1087,27 +1089,27 @@ export default function ResellerDevicesIndex({
                         {/* Renewal Cost & Wallet Balance Summary */}
                         <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 space-y-2">
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-zinc-500">Your Wallet Balance:</span>
+                                <span className="text-zinc-500">{__('portal.devices_wallet_balance')}</span>
                                 <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                                     {walletBalance.toFixed(2)} {walletCurrency}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                                <span className="text-zinc-500">Renewal Cost:</span>
+                                <span className="text-zinc-500">{__('portal.devices_renewal_cost')}</span>
                                 <span className="font-bold font-mono text-[#0071e3]">
                                     {renewCostInfo.cost.toFixed(2)} {renewCostInfo.currency}
                                 </span>
                             </div>
                             {renewCostInfo.customerPrice > 0 && (
                                 <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                                    <span>Suggested Retail Price:</span>
+                                    <span>{__('portal.devices_suggested_retail_price')}</span>
                                     <span>{renewCostInfo.customerPrice.toFixed(2)} {renewCostInfo.currency}</span>
                                 </div>
                             )}
                             {renewCostInfo.cost > 0 && walletBalance < renewCostInfo.cost && (
                                 <div className="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1.5 pt-1 border-t border-red-200 dark:border-red-900/50">
                                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                    <span>Insufficient wallet balance. Please top up before renewing.</span>
+                                    <span>{__('portal.devices_insufficient_renew')}</span>
                                 </div>
                             )}
                         </div>
@@ -1119,19 +1121,20 @@ export default function ResellerDevicesIndex({
                                 onClick={() => setRenewModalDevice(null)}
                                 className="text-xs"
                             >
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={renewForm.processing || (renewCostInfo.cost > 0 && walletBalance < renewCostInfo.cost)}
                                 className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs"
                             >
-                                {renewForm.processing ? 'Processing...' : 'Confirm & Deduct from Wallet'}
+                                {renewForm.processing ? __('general.processing') : __('portal.devices_confirm_deduct')}
                             </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

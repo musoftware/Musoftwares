@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AdminSettings;
@@ -14,6 +15,7 @@ use App\Models\WhatsAppChannel;
 use App\Services\SystemConfigurationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AdminSettingController extends Controller
@@ -230,11 +232,13 @@ class AdminSettingController extends Controller
         $baseRate = FinanceHelper::calculateOverheadHourlyRate();
         $businessCurrency = AdminSettings::GetValue('business_currency', 2);
 
-        $rate = CurrenciesExchange::RateToday(
-            $baseRate,
-            $businessCurrency,
-            $currencyId
-        );
+        try {
+            $rate = CurrenciesExchange::RateToday($baseRate, $businessCurrency, $currencyId);
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Calculated hourly rate unavailable: missing exchange rate.', ['currency_id' => $currencyId, 'error' => $e->getMessage()]);
+
+            return response()->json(['rate' => null]);
+        }
 
         return response()->json(['rate' => round($rate, 2)]);
     }

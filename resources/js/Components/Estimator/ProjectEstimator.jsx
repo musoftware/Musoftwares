@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import { useState, useMemo } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { useToast } from '@/Components/ui/use-toast';
@@ -739,8 +740,8 @@ Please let me know when we can review the technical specification!`;
         e.preventDefault();
         if (!leadName || !leadMobile) {
             toast({
-                title: 'Incomplete Details',
-                description: 'Please provide your name and phone number.',
+                title: __('frontend.estimator_incomplete_details'),
+                description: __('frontend.estimator_name_phone_required'),
                 variant: 'destructive',
             });
             return;
@@ -771,14 +772,14 @@ Please let me know when we can review the technical specification!`;
             if (res.data.success) {
                 setLeadSaved(true);
                 toast({
-                    title: 'Proposal Request Received!',
-                    description: 'Our engineering team will contact you with a formal quotation and timeline.',
+                    title: __('frontend.estimator_request_received'),
+                    description: __('frontend.estimator_request_received_desc'),
                 });
             }
         } catch (error) {
             toast({
-                title: 'Submission Failed',
-                description: 'Could not send your request. Please message us directly on WhatsApp.',
+                title: __('frontend.estimator_submission_failed'),
+                description: __('frontend.estimator_submission_failed_desc'),
                 variant: 'destructive',
             });
         } finally {
@@ -791,8 +792,8 @@ Please let me know when we can review the technical specification!`;
         if (isGeneratingPdf) return;
         setIsGeneratingPdf(lang);
         toast({
-            title: lang === 'ar' ? 'جاري تجهيز وثيقة العرض...' : 'Preparing Proposal PDF...',
-            description: lang === 'ar' ? 'يتم الآن تصميم وتوليد ملف الـ PDF عالي الدقة بطابع الورق الطبيعي.' : 'Rendering high-resolution Kraft-paper proposal PDF...',
+            title: __('frontend.estimator_pdf_preparing'),
+            description: __('frontend.estimator_pdf_preparing_desc'),
         });
 
         try {
@@ -807,14 +808,14 @@ Please let me know when we can review the technical specification!`;
             });
 
             toast({
-                title: lang === 'ar' ? 'تم تنزيل العرض بنجاح! 📄' : 'Proposal Downloaded! 📄',
-                description: lang === 'ar' ? `تم حفظ الملف: ${res.fileName}` : `Saved file: ${res.fileName}`,
+                title: __('frontend.estimator_pdf_downloaded'),
+                description: __('frontend.estimator_pdf_saved_file', { file: res.fileName }),
             });
         } catch (error) {
             console.error('PDF generation error:', error);
             toast({
-                title: lang === 'ar' ? 'فشل التوليد' : 'Download Failed',
-                description: lang === 'ar' ? 'تعذر إنشاء ملف الـ PDF، يرجى المحاولة مجدداً.' : 'Could not generate proposal PDF, please retry.',
+                title: __('frontend.estimator_pdf_failed'),
+                description: __('frontend.estimator_pdf_failed_desc'),
                 variant: 'destructive',
             });
         } finally {
@@ -831,7 +832,7 @@ Please let me know when we can review the technical specification!`;
                     <div className="text-center max-w-3xl mx-auto space-y-3 pt-2">
                         <span className="text-[12px] font-medium tracking-normal text-[#1d1d1f]/80 bg-[#f5f5f7] border border-black/5 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5 shadow-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3]"></span>
-                            Architecture Cost Engine
+                            {__('frontend.estimator_badge')}
                         </span>
                         <h2 className="text-[32px] sm:text-[46px] font-semibold tracking-[-0.02em] text-[#1d1d1f] font-sans leading-[1.08]">
                             {title}
@@ -852,10 +853,10 @@ Please let me know when we can review the technical specification!`;
                         <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div className="space-y-0.5">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 1</span>
-                                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f] font-sans">Select Project Platform(s)</h3>
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">{__('frontend.estimator_step', { step: 1 })}</span>
+                                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f] font-sans">{__('frontend.estimator_step1_title')}</h3>
                                     <p className="text-[13px] text-[#1d1d1f]/60 font-sans">
-                                        Choose one or combine multiple platforms for an integrated system.
+                                        {__('frontend.estimator_step1_desc')}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2 flex-wrap">
@@ -892,7 +893,7 @@ Please let me know when we can review the technical specification!`;
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Website / Web App</h4>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">{__('frontend.estimator_platform_web')}</h4>
                                         <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$10 per page</p>
                                     </div>
                                 </button>
@@ -920,7 +921,7 @@ Please let me know when we can review the technical specification!`;
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Landing Page</h4>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">{__('frontend.estimator_platform_landing')}</h4>
                                         <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$60 per page (Animated &amp; CMS)</p>
                                     </div>
                                 </button>
@@ -948,7 +949,7 @@ Please let me know when we can review the technical specification!`;
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Mobile App</h4>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">{__('frontend.estimator_platform_mobile')}</h4>
                                         <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$15 per screen (iOS &amp; Android)</p>
                                     </div>
                                 </button>
@@ -976,7 +977,7 @@ Please let me know when we can review the technical specification!`;
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">Desktop Software</h4>
+                                        <h4 className="font-semibold text-[#1d1d1f] text-sm">{__('frontend.estimator_platform_desktop')}</h4>
                                         <p className="text-xs text-[#1d1d1f]/60 mt-0.5">$25 per screen (.NET / Native)</p>
                                     </div>
                                 </button>
@@ -987,9 +988,9 @@ Please let me know when we can review the technical specification!`;
                         <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex items-center justify-between">
                                 <div className="space-y-0.5">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 2</span>
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">{__('frontend.estimator_step', { step: 2 })}</span>
                                     <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f]">
-                                        Screen / Page Counters
+                                        {__('frontend.estimator_step2_title')}
                                     </h3>
                                 </div>
                                 <span className="text-xs text-[#1d1d1f]/70 bg-[#f5f5f7] border border-black/5 px-3 py-1 rounded-full font-medium">
@@ -1035,6 +1036,7 @@ Please let me know when we can review the technical specification!`;
                                                     step="1"
                                                     value={currentCount}
                                                     onChange={(e) => updateScreens(pKey, e.target.value)}
+                                                    aria-label={pRate.unit}
                                                     className="w-full h-2 bg-[#e5e5ea] rounded-full appearance-none cursor-pointer accent-[#0071e3]"
                                                 />
                                             </div>
@@ -1065,9 +1067,9 @@ Please let me know when we can review the technical specification!`;
                         <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.03)] space-y-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div className="space-y-0.5">
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">Step 3</span>
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0071e3]">{__('frontend.estimator_step', { step: 3 })}</span>
                                     <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#1d1d1f]">
-                                        Modules &amp; Engineering Services
+                                        {__('frontend.estimator_modules_title')}
                                     </h3>
                                 </div>
                                 {costBreakdown.itemizedAddons.length > 0 && (
@@ -1076,7 +1078,7 @@ Please let me know when we can review the technical specification!`;
                                         onClick={() => setSelectedOptions({})}
                                         className="text-xs text-[#1d1d1f]/60 hover:text-[#0071e3] underline cursor-pointer font-medium"
                                     >
-                                        ✕ Clear All ({costBreakdown.itemizedAddons.length})
+                                        {__('frontend.estimator_clear_all', { count: costBreakdown.itemizedAddons.length })}
                                     </button>
                                 )}
                             </div>
@@ -1146,7 +1148,7 @@ Please let me know when we can review the technical specification!`;
                             <div className="flex items-center justify-between border-b border-black/5 pb-4">
                                 <div className="flex items-center gap-2">
                                     <Calculator className="h-4 w-4 text-[#0071e3]" />
-                                    <h3 className="font-semibold text-sm tracking-tight text-[#1d1d1f]">Estimated Budget</h3>
+                                    <h3 className="font-semibold text-sm tracking-tight text-[#1d1d1f]">{__('frontend.estimator_budget_title')}</h3>
                                 </div>
                                 
                                 {/* Currency Switcher */}
@@ -1174,19 +1176,19 @@ Please let me know when we can review the technical specification!`;
 
                             {/* Total Display */}
                             <div className="space-y-1">
-                                <span className="text-xs text-[#1d1d1f]/60 block font-medium">Estimated Total</span>
+                                <span className="text-xs text-[#1d1d1f]/60 block font-medium">{__('frontend.estimator_total')}</span>
                                 <div className="text-[34px] sm:text-[40px] font-semibold text-[#1d1d1f] tracking-tight leading-none">
                                     {isUsd ? `$${costBreakdown.finalTotalUsd.toLocaleString()}` : `${costBreakdown.finalTotalEgp.toLocaleString()} EGP`}
                                 </div>
                                 <div className="flex items-center justify-between text-xs text-[#1d1d1f]/70 pt-2 border-t border-black/5 mt-3">
-                                    <span>Estimated Timeline</span>
-                                    <span className="text-[#0071e3] font-semibold">~{costBreakdown.estimatedDays} business days</span>
+                                    <span>{__('frontend.estimator_timeline')}</span>
+                                    <span className="text-[#0071e3] font-semibold">{__('frontend.estimator_business_days', { days: costBreakdown.estimatedDays })}</span>
                                 </div>
                             </div>
 
                             {/* Line Items Breakdown */}
                             <div className="space-y-2.5 pt-3 border-t border-black/5 text-xs">
-                                <div className="text-[#1d1d1f] font-semibold">Architecture Scope</div>
+                                <div className="text-[#1d1d1f] font-semibold">{__('frontend.estimator_scope')}</div>
                                 
                                 {costBreakdown.itemizedPlatforms.map(item => (
                                     <div key={item.key} className="flex justify-between text-[#1d1d1f]/80">
@@ -1204,7 +1206,7 @@ Please let me know when we can review the technical specification!`;
 
                                 {costBreakdown.multiPlatformDiscount > 0 && (
                                     <div className="flex justify-between text-[#0071e3] font-semibold pt-2 border-t border-black/5">
-                                        <span>Multi-Platform Discount (10%)</span>
+                                        <span>{__('frontend.estimator_multi_discount')}</span>
                                         <span>-{formatPrice(costBreakdown.multiPlatformDiscount)}</span>
                                     </div>
                                 )}
@@ -1219,7 +1221,7 @@ Please let me know when we can review the technical specification!`;
                                     className="w-full flex items-center justify-center gap-2 py-3.5 rounded-[980px] bg-[#25D366] hover:bg-[#20ba59] text-white font-medium text-xs tracking-tight transition-all shadow-md shadow-green-500/20"
                                 >
                                     <MessageSquare className="w-4 h-4" />
-                                    <span>Discuss Scope on WhatsApp</span>
+                                    <span>{__('frontend.estimator_discuss_whatsapp')}</span>
                                 </a>
 
                                 {/* Executive Kraft-Paper Proposal PDF Download Box */}
@@ -1246,12 +1248,12 @@ Please let me know when we can review the technical specification!`;
                                             {isGeneratingPdf === 'ar' ? (
                                                 <>
                                                     <Loader2 className="w-3 h-3 animate-spin text-[#ff5722]" />
-                                                    <span>جاري التوليد...</span>
+                                                    <span>{__('frontend.estimator_generating')}</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Download className="w-3 h-3 text-[#ff5722]" />
-                                                    <span>تحميل بالعربية 📄</span>
+                                                    <span>{__('frontend.estimator_pdf_arabic')}</span>
                                                 </>
                                             )}
                                         </button>
@@ -1265,12 +1267,12 @@ Please let me know when we can review the technical specification!`;
                                             {isGeneratingPdf === 'en' ? (
                                                 <>
                                                     <Loader2 className="w-3 h-3 animate-spin text-[#0071e3]" />
-                                                    <span>Generating...</span>
+                                                    <span>{__('frontend.estimator_generating')}</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Download className="w-3 h-3 text-[#0071e3]" />
-                                                    <span>English PDF 📄</span>
+                                                    <span>{__('frontend.estimator_pdf_english')}</span>
                                                 </>
                                             )}
                                         </button>
@@ -1281,7 +1283,7 @@ Please let me know when we can review the technical specification!`;
                                     href="/estimator"
                                     className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-[980px] bg-[#f5f5f7] hover:bg-[#e8e8ed] text-[#1d1d1f] text-xs font-medium transition-colors"
                                 >
-                                    <span>Open Dedicated Estimator Page</span>
+                                    <span>{__('frontend.estimator_open_page')}</span>
                                     <ArrowUpRight className="w-3.5 h-3.5" />
                                 </Link>
                             </div>
@@ -1291,23 +1293,24 @@ Please let me know when we can review the technical specification!`;
                         <div className="bg-[#f5f5f7] p-6 rounded-[24px] border border-black/5 space-y-4">
                             <div className="space-y-0.5">
                                 <h4 className="font-semibold text-xs text-[#1d1d1f]">
-                                    Request Official Engineering Proposal
+                                    {__('frontend.estimator_request_title')}
                                 </h4>
                                 <p className="text-[11px] text-[#1d1d1f]/60">
-                                    Submit your scope and our lead architect will prepare a formal timeline &amp; NDA.
+                                    {__('frontend.estimator_request_desc')}
                                 </p>
                             </div>
 
                             {leadSaved ? (
                                 <div className="p-3.5 rounded-xl bg-white border border-green-500/30 text-green-700 text-xs flex items-center gap-2">
                                     <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-                                    <span>Proposal requested! We will reach out within 24 hours.</span>
+                                    <span>{__('frontend.estimator_request_sent')}</span>
                                 </div>
                             ) : (
                                 <form onSubmit={handleLeadSubmit} className="space-y-2.5 text-xs">
                                     <input
                                         type="text"
-                                        placeholder="Your Full Name *"
+                                        placeholder={__('frontend.estimator_full_name')}
+                                        aria-label={__('frontend.estimator_full_name')}
                                         required
                                         value={leadName}
                                         onChange={(e) => setLeadName(e.target.value)}
@@ -1315,7 +1318,8 @@ Please let me know when we can review the technical specification!`;
                                     />
                                     <input
                                         type="tel"
-                                        placeholder="Phone / WhatsApp Number *"
+                                        placeholder={__('frontend.estimator_phone')}
+                                        aria-label={__('frontend.estimator_phone')}
                                         required
                                         value={leadMobile}
                                         onChange={(e) => setLeadMobile(e.target.value)}
@@ -1323,7 +1327,8 @@ Please let me know when we can review the technical specification!`;
                                     />
                                     <input
                                         type="email"
-                                        placeholder="Work Email (Optional)"
+                                        placeholder={__('frontend.estimator_email_optional')}
+                                        aria-label={__('frontend.estimator_email_optional')}
                                         value={leadEmail}
                                         onChange={(e) => setLeadEmail(e.target.value)}
                                         className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
@@ -1333,7 +1338,7 @@ Please let me know when we can review the technical specification!`;
                                         disabled={submitting}
                                         className="w-full py-2.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all cursor-pointer disabled:opacity-50 shadow-sm"
                                     >
-                                        {submitting ? 'Submitting Scope...' : 'Submit Engineering Scope ➔'}
+                                        {submitting ? __('frontend.estimator_submitting') : __('frontend.estimator_submit')}
                                     </button>
                                 </form>
                             )}

@@ -10,7 +10,34 @@ import AudiencesTab from './Components/AudiencesTab';
 import AdPerformanceTab from './Components/AdPerformanceTab';
 import BusinessProfileTab from './Components/BusinessProfileTab';
 import OnboardingWizard from './Components/OnboardingWizard';
-import { ExternalLink, Smartphone } from 'lucide-react';
+import { AlertTriangle, BarChart3, Check, MessageSquare, Phone, Send, Settings, Sparkles, Users } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+
+const TAB_LABEL_KEYS: Record<string, string> = {
+    connectors: 'whatsapp.workspace_tab_connectors',
+    profile: 'whatsapp.workspace_tab_profile',
+    audiences: 'whatsapp.workspace_tab_audiences',
+    ad_performance: 'whatsapp.workspace_tab_ad_performance',
+    send: 'whatsapp.workspace_tab_send',
+    templates: 'whatsapp.workspace_tab_templates',
+    groups: 'whatsapp.workspace_tab_groups',
+    schedules: 'whatsapp.workspace_tab_schedules',
+    logs: 'whatsapp.workspace_tab_logs',
+    flows: 'whatsapp.workspace_tab_flows',
+    bots: 'whatsapp.workspace_tab_bots',
+    subscribers: 'whatsapp.workspace_tab_subscribers',
+};
+
+const TAB_ICONS: Record<string, LucideIcon> = {
+    connectors: Settings,
+    profile: Sparkles,
+    audiences: Users,
+    ad_performance: BarChart3,
+    send: Send,
+};
 
 interface Business {
     id: number;
@@ -146,6 +173,7 @@ export default function Workspace({
 }: Props) {
     const pageProps = usePage<any>().props;
     const flash = pageProps?.flash;
+    const { confirm, confirmDialog } = useConfirm();
 
     const [activeChannel, setActiveChannel] = useState<'whatsapp' | 'telegram'>('whatsapp');
     const queryTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
@@ -295,6 +323,10 @@ export default function Workspace({
             onSuccess: () => tgGroupForm.reset('name', 'description'),
         });
     };
+
+    const testModeToggleLabel = business.is_test_mode
+        ? __('whatsapp.workspace_switch_to_live')
+        : __('whatsapp.workspace_switch_to_sandbox');
 
     // Copy link helper
     const guestLink = `${window.location.origin}/whatsapp-sender/guest/connect/${business.uuid}`;
@@ -458,7 +490,7 @@ export default function Workspace({
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${business.name} - Hub Workspace`} />
+            <Head title={__('whatsapp.workspace_page_title', { name: business.name })} />
 
             <div className="flex min-h-[calc(100vh-64px)] bg-zinc-50 dark:bg-zinc-950 font-sans">
                 {/* Left Mini Sidebar with Icons only */}
@@ -473,14 +505,15 @@ export default function Workspace({
                                 ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-950/20 shadow-md shadow-emerald-500/10'
                                 : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                             }`}
-                        title="WhatsApp Hub"
+                        title={__('whatsapp.workspace_whatsapp_hub')}
+                        aria-label={__('whatsapp.workspace_whatsapp_hub')}
                     >
                         <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
                             <circle cx="12" cy="12" r="12" fill="#25D366" />
                             <path d="M12.012 5.5c-3.585 0-6.5 2.915-6.5 6.5 0 1.144.298 2.257.865 3.242L5.5 18.5l3.429-.9c.945.516 2.012.79 3.083.79 3.585 0 6.5-2.915 6.5-6.5s-2.915-6.5-6.5-6.5zm3.834 8.763c-.168.473-.97.857-1.338.91-.334.05-.765.09-2.32-.54-1.99-.8-3.264-2.812-3.363-2.946-.098-.133-.796-1.062-.796-2.025 0-.963.502-1.435.684-1.624.18-.188.397-.236.53-.236.133 0 .266.002.38.006.122.006.286-.05.447.35.168.412.574 1.402.624 1.504.05.102.083.222.014.358-.067.137-.102.222-.205.34-.103.12-.216.266-.308.358-.103.102-.21.214-.09.42.12.205.53 1.077 1.138 1.617.608.54 1.118.708 1.318.808.2.102.318.082.437-.055.12-.137.502-.587.637-.787.135-.2.268-.17.45-.102.184.068 1.17.55 1.37.646.2.1.336.143.38.222.05.078.05.454-.12.928z" fill="#FFFFFF" />
                         </svg>
                         <span className="absolute left-20 bg-zinc-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-30 shadow-lg">
-                            WhatsApp Hub
+                            {__('whatsapp.workspace_whatsapp_hub')}
                         </span>
                     </button>
 
@@ -494,14 +527,15 @@ export default function Workspace({
                                 ? 'border-sky-500 bg-sky-500/10 dark:bg-sky-950/20 shadow-md shadow-sky-500/10'
                                 : 'border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800'
                             }`}
-                        title="Telegram Hub"
+                        title={__('whatsapp.workspace_telegram_hub')}
+                        aria-label={__('whatsapp.workspace_telegram_hub')}
                     >
                         <svg viewBox="0 0 24 24" width="24" height="24" className="w-6 h-6">
                             <circle cx="12" cy="12" r="12" fill="#0088CC" />
                             <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.47-.52-.17l-9.49 5.96-4.11-1.28c-.9-.28-.92-.9.19-1.33l16.1-6.2c.74-.27 1.39.17 1.13 1.25l-2.73 12.87c-.2.93-.76 1.16-1.54.73l-4.17-3.07-2.01 1.94c-.22.22-.41.41-.83.41z" fill="#FFFFFF" />
                         </svg>
                         <span className="absolute left-20 bg-zinc-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-30 shadow-lg">
-                            Telegram Hub
+                            {__('whatsapp.workspace_telegram_hub')}
                         </span>
                     </button>
                 </div>
@@ -522,7 +556,7 @@ export default function Workspace({
                             {flash?.meta_response && (
                                 <div className="mt-2 border-t border-emerald-500/20 pt-2 space-y-1">
                                     <span className="text-xxs font-bold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">
-                                        Facebook Meta Graph API Raw Response:
+                                        {__('whatsapp.workspace_meta_raw_response')}
                                     </span>
                                     <pre className="bg-zinc-950 text-emerald-400 text-xs p-3 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
                                         {JSON.stringify(flash.meta_response, null, 2)}
@@ -544,7 +578,7 @@ export default function Workspace({
                             {flash?.meta_response && (
                                 <div className="mt-2 border-t border-red-500/20 pt-2 space-y-1">
                                     <span className="text-xxs font-bold uppercase tracking-wider block text-red-700 dark:text-red-400">
-                                        Facebook Meta Graph API Error Payload:
+                                        {__('whatsapp.workspace_meta_error_payload')}
                                     </span>
                                     <pre className="bg-zinc-950 text-red-400 text-xs p-3 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
                                         {JSON.stringify(flash.meta_response, null, 2)}
@@ -558,11 +592,11 @@ export default function Workspace({
                     {business.is_test_mode && (
                         <div className="bg-amber-500/10 border border-amber-500/30 dark:bg-amber-950/40 rounded-2xl p-4 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                                <span className="p-2 bg-amber-500 text-white rounded-xl font-bold text-xs">TEST MODE</span>
+                                <span className="p-2 bg-amber-500 text-white rounded-xl font-bold text-xs">{__('whatsapp.workspace_test_mode_badge')}</span>
                                 <div>
-                                    <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300">Meta WhatsApp Sandbox Mode Active</h4>
+                                    <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300">{__('whatsapp.workspace_sandbox_active')}</h4>
                                     <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
-                                        Operating in test mode with Meta pre-loaded Sandbox account. Ideal for Meta App Reviewers to verify templates & messages.
+                                        {__('whatsapp.workspace_sandbox_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -570,7 +604,7 @@ export default function Workspace({
                                 href={route('whatsapp.meta-app-guide')}
                                 className="text-xs text-amber-800 dark:text-amber-300 underline font-medium hover:text-amber-900"
                             >
-                                View Meta Review Guide &rarr;
+                                {__('whatsapp.workspace_view_review_guide')} &rarr;
                             </Link>
                         </div>
                     )}
@@ -581,7 +615,7 @@ export default function Workspace({
                             <div className="flex flex-wrap items-center gap-3">
                                 <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{business.name}</h1>
                                 <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs px-2.5 py-1 rounded-full font-medium border border-emerald-200/50 dark:border-emerald-900/30">
-                                    Active Workspace
+                                    {__('whatsapp.workspace_active_workspace')}
                                 </span>
 
                                  {/* Stripe-style Test/Live Mode Toggle */}
@@ -596,7 +630,8 @@ export default function Workspace({
                                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                                              business.is_test_mode ? 'bg-amber-500' : 'bg-emerald-500'
                                          }`}
-                                         title={business.is_test_mode ? 'Click to Switch to Live Production Mode' : 'Click to Switch to Sandbox Test Mode'}
+                                         title={testModeToggleLabel}
+                                         aria-label={testModeToggleLabel}
                                      >
                                          <span
                                              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
@@ -608,14 +643,15 @@ export default function Workspace({
                                          business.is_test_mode ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'
                                      }`}>
                                          <span className={`w-1.5 h-1.5 rounded-full ${business.is_test_mode ? 'bg-amber-500' : 'bg-emerald-500 animate-pulse'}`} />
-                                         {business.is_test_mode ? 'Test Mode (Sandbox)' : 'Live Production'}
+                                         {business.is_test_mode ? __('whatsapp.workspace_test_mode_sandbox') : __('whatsapp.workspace_live_production')}
                                      </span>
                                  </div>
 
                                 <button
                                     onClick={() => setShowEditModal(true)}
                                     className="p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-950 transition duration-200 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center justify-center shrink-0"
-                                    title="Edit Business Settings"
+                                    title={__('whatsapp.workspace_edit_business_settings')}
+                                    aria-label={__('whatsapp.workspace_edit_business_settings')}
                                 >
                                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                                         <circle cx="12" cy="12" r="3" />
@@ -624,17 +660,17 @@ export default function Workspace({
                                 </button>
                             </div>
                             <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-sm">
-                                Client: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{business.client_name || 'N/A'}</span>
-                                {business.client_email && ` | Email: ${business.client_email}`}
-                                {business.client_mobile && ` | Mobile: ${business.client_mobile}`}
-                                {business.client_whatsapp && ` | WhatsApp: ${business.client_whatsapp}`}
+                                {__('whatsapp.workspace_client_label')} <span className="font-semibold text-zinc-700 dark:text-zinc-300">{business.client_name || __('general.n_a')}</span>
+                                {business.client_email && ` | ${__('whatsapp.workspace_email_value', { value: business.client_email })}`}
+                                {business.client_mobile && ` | ${__('whatsapp.workspace_mobile_value', { value: business.client_mobile })}`}
+                                {business.client_whatsapp && ` | ${__('whatsapp.workspace_whatsapp_value', { value: business.client_whatsapp })}`}
                             </p>
                         </div>
 
                         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full md:w-auto">
                             {/* Balance display */}
                             <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl px-5 py-3 text-right">
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-medium">Business Balance</span>
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-medium">{__('whatsapp.workspace_business_balance')}</span>
                                 <span className="text-2xl font-black text-zinc-900 dark:text-zinc-50">
                                     ${parseFloat(business.wallet_balance).toFixed(2)} <span className="text-xs font-normal text-zinc-500">{business.currency}</span>
                                 </span>
@@ -649,6 +685,7 @@ export default function Workspace({
                                         step="0.01"
                                         value={rechargeForm.data.amount}
                                         onChange={e => rechargeForm.setData('amount', e.target.value)}
+                                        aria-label={__('whatsapp.workspace_recharge_amount')}
                                         className="pl-7 pr-3 py-2 w-24 text-sm bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-200"
                                     />
                                 </div>
@@ -657,7 +694,7 @@ export default function Workspace({
                                     disabled={rechargeForm.processing}
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-sm px-4 py-2 rounded-xl font-medium transition duration-200"
                                 >
-                                    Recharge
+                                    {__('whatsapp.workspace_recharge')}
                                 </button>
                             </form>
                         </div>
@@ -666,21 +703,22 @@ export default function Workspace({
                     {/* Invite guest link Card */}
                     <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Guest Client Connect Invite Link</h2>
-                            <p className="text-xs text-zinc-500 mt-1">Send this invitation link to your client so they can easily pair their Meta WhatsApp Business account directly.</p>
+                            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">{__('whatsapp.workspace_guest_link_title')}</h2>
+                            <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_guest_link_desc')}</p>
                         </div>
                         <div className="flex items-center gap-2 w-full md:w-auto">
                             <input
                                 type="text"
                                 readOnly
                                 value={guestLink}
+                                aria-label={__('whatsapp.workspace_guest_link_title')}
                                 className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs px-3 py-2.5 rounded-xl w-full md:w-80 text-zinc-600 dark:text-zinc-300"
                             />
                             <button
                                 onClick={() => copyToClipboard(guestLink)}
                                 className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700/80 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition"
                             >
-                                {copied ? 'Copied!' : 'Copy'}
+                                {copied ? __('whatsapp.workspace_copied') : __('general.copy')}
                             </button>
                         </div>
                     </div>
@@ -699,16 +737,8 @@ export default function Workspace({
                                         : 'border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300'
                                     }`}
                             >
-                                {tab === 'connectors' ? '⚙️ Accounts & Health' :
-                                    tab === 'profile' ? '✨ Business Profile' :
-                                    tab === 'audiences' ? '👥 Contacts & Audiences' :
-                                        tab === 'ad_performance' ? '📊 CTWA Ad Analytics' :
-                                            tab === 'send' ? '🚀 Broadcast & Campaigns' :
-                                                tab === 'groups' ? 'WhatsApp Groups' :
-                                                    tab === 'bots' ? 'Telegram Bots' :
-                                                        tab === 'flows' ? 'Chat Flows (Bot Builder)' :
-                                                            tab === 'subscribers' ? 'Telegram Subscribers' :
-                                                                tab}
+                                {TAB_ICONS[tab] && React.createElement(TAB_ICONS[tab], { className: 'w-4 h-4' })}
+                                {__(TAB_LABEL_KEYS[tab])}
                             </button>
                         ))}
                     </div>
@@ -760,12 +790,12 @@ export default function Workspace({
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Unified dispatch form */}
                                 <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Campaign / Message</h3>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_create_campaign')}</h3>
                                     <form onSubmit={handleSend} className="space-y-5">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
-                                                    {activeChannel === 'telegram' ? 'Select Sender Bot' : 'Select Sender Device'}
+                                                    {activeChannel === 'telegram' ? __('whatsapp.workspace_select_sender_bot') : __('whatsapp.workspace_select_sender_device')}
                                                 </label>
                                                 {activeChannel === 'whatsapp' ? (
                                                     <select
@@ -776,7 +806,7 @@ export default function Workspace({
                                                         {accounts.map(acc => (
                                                             <option key={acc.id} value={acc.id}>{acc.name} ({acc.phone_number_id})</option>
                                                         ))}
-                                                        {accounts.length === 0 && <option value="">No WhatsApp account connected</option>}
+                                                        {accounts.length === 0 && <option value="">{__('whatsapp.workspace_no_whatsapp_account')}</option>}
                                                     </select>
                                                 ) : (
                                                     <select
@@ -787,20 +817,20 @@ export default function Workspace({
                                                         {bots.map(bot => (
                                                             <option key={bot.id} value={bot.id}>{bot.name} (@{bot.username})</option>
                                                         ))}
-                                                        {bots.length === 0 && <option value="">No Telegram bots registered</option>}
+                                                        {bots.length === 0 && <option value="">{__('whatsapp.workspace_no_telegram_bots')}</option>}
                                                     </select>
                                                 )}
                                             </div>
 
                                             <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Recipient Source</label>
+                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">{__('whatsapp.workspace_recipient_source')}</label>
                                                 <select
                                                     value={sendForm.data.recipient_source}
                                                     onChange={e => sendForm.setData('recipient_source', e.target.value)}
                                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                 >
-                                                    <option value="single">Single Recipient</option>
-                                                    <option value="group">Bulk Contact Group</option>
+                                                    <option value="single">{__('whatsapp.workspace_single_recipient')}</option>
+                                                    <option value="group">{__('whatsapp.workspace_bulk_contact_group')}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -809,28 +839,28 @@ export default function Workspace({
                                             {sendForm.data.recipient_source === 'single' ? (
                                                 <div>
                                                     <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">
-                                                        {activeChannel === 'telegram' ? 'Recipient Chat ID' : 'Recipient Phone Number'}
+                                                        {activeChannel === 'telegram' ? __('whatsapp.workspace_recipient_chat_id') : __('whatsapp.workspace_recipient_phone')}
                                                     </label>
                                                     <input
                                                         type="text"
                                                         value={sendForm.data.recipient_phone}
                                                         onChange={e => sendForm.setData('recipient_phone', e.target.value)}
-                                                        placeholder={activeChannel === 'telegram' ? 'e.g. 123456789' : 'e.g. 201001234567'}
+                                                        placeholder={activeChannel === 'telegram' ? __('whatsapp.workspace_example', { value: '123456789' }) : __('whatsapp.workspace_example', { value: '201001234567' })}
                                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                     />
                                                 </div>
                                             ) : (
                                                 <div>
-                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Select Target Contact Group</label>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">{__('whatsapp.workspace_select_target_group')}</label>
                                                     <select
                                                         value={sendForm.data.whatsapp_contact_group_id}
                                                         onChange={e => sendForm.setData('whatsapp_contact_group_id', e.target.value)}
                                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                                     >
                                                         {contactGroups.map(gp => (
-                                                            <option key={gp.id} value={gp.id}>{gp.name} ({gp.contacts_count} contacts)</option>
+                                                            <option key={gp.id} value={gp.id}>{gp.name} ({__('whatsapp.workspace_contacts_count', { count: gp.contacts_count })})</option>
                                                         ))}
-                                                        {contactGroups.length === 0 && <option value="">No contact groups available</option>}
+                                                        {contactGroups.length === 0 && <option value="">{__('whatsapp.workspace_no_contact_groups')}</option>}
                                                     </select>
                                                 </div>
                                             )}
@@ -838,32 +868,32 @@ export default function Workspace({
 
 
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Format</label>
+                                            <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">{__('whatsapp.workspace_message_format')}</label>
                                             <select
                                                 value={sendForm.data.message_type}
                                                 onChange={e => sendForm.setData('message_type', e.target.value)}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
-                                                <option value="text">Raw Text Message</option>
-                                                <option value="template">Meta Template Message</option>
+                                                <option value="text">{__('whatsapp.workspace_raw_text_message')}</option>
+                                                <option value="template">{__('whatsapp.workspace_meta_template_message')}</option>
                                             </select>
                                         </div>
 
                                         {sendForm.data.message_type === 'text' ? (
                                             <div>
-                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Message Body (HTML Allowed for Telegram)</label>
+                                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">{__('whatsapp.workspace_message_body_label')}</label>
                                                 <textarea
                                                     rows={4}
                                                     value={sendForm.data.message_body}
                                                     onChange={e => sendForm.setData('message_body', e.target.value)}
-                                                    placeholder="Write your notification message here..."
+                                                    placeholder={__('whatsapp.workspace_message_body_placeholder')}
                                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                                 />
                                             </div>
                                         ) : (
                                             <div className="space-y-4 bg-zinc-50 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
                                                 <div>
-                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2 font-medium">Select Approved Template</label>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2 font-medium">{__('whatsapp.workspace_select_approved_template')}</label>
                                                     <select
                                                         value={sendForm.data.template_name}
                                                         onChange={e => {
@@ -883,31 +913,31 @@ export default function Workspace({
                                                                 const isApproved = tpl.status === 'APPROVED';
                                                                 return (
                                                                     <option key={tpl.id} value={tpl.name} disabled={!isApproved}>
-                                                                        {tpl.name} ({tpl.language}) — [{tpl.status}]{!isApproved ? ' (Cannot Send)' : ''}
+                                                                        {tpl.name} ({tpl.language}) — [{tpl.status}]{!isApproved ? ` (${__('whatsapp.workspace_cannot_send')})` : ''}
                                                                     </option>
                                                                 );
                                                             })}
-                                                        {templates.length === 0 && <option value="">No templates registered</option>}
+                                                        {templates.length === 0 && <option value="">{__('whatsapp.workspace_no_templates')}</option>}
                                                     </select>
                                                 </div>
 
                                                 {selectedTemplate && (
                                                     <div className="space-y-3">
-                                                        <span className="text-xs text-zinc-500 font-medium">Template Text Content:</span>
+                                                        <span className="text-xs text-zinc-500 font-medium">{__('whatsapp.workspace_template_text_content')}</span>
                                                         <p className="text-sm bg-white dark:bg-zinc-900 p-3 rounded-xl border border-zinc-100 dark:border-zinc-850 font-mono text-zinc-700 dark:text-zinc-300">
                                                             {bodyText}
                                                         </p>
 
                                                         {variableCount > 0 && (
                                                             <div className="space-y-3 pt-2">
-                                                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide block">Map Template Variables</span>
+                                                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide block">{__('whatsapp.workspace_map_template_variables')}</span>
                                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                                     {Array.from({ length: variableCount }).map((_, idx) => (
                                                                         <div key={idx}>
-                                                                            <label className="text-xs text-zinc-500 block mb-1">Variable {"{{"}{idx + 1}{"}}"}</label>
+                                                                            <label className="text-xs text-zinc-500 block mb-1">{__('whatsapp.workspace_variable_n', { index: idx + 1 })}</label>
                                                                             <input
                                                                                 type="text"
-                                                                                placeholder="Static value or 'name'/'phone'"
+                                                                                placeholder={__('whatsapp.workspace_variable_placeholder')}
                                                                                 value={mappedVariables[`var_${idx + 1}`] || ''}
                                                                                 onChange={e => setMappedVariables({
                                                                                     ...mappedVariables,
@@ -919,7 +949,7 @@ export default function Workspace({
                                                                     ))}
                                                                 </div>
                                                                 <p className="text-xxs text-zinc-400">
-                                                                    Tip: Type <code>name</code> or <code>phone</code> to map variables dynamically to contact fields, or enter custom text.
+                                                                    {__('whatsapp.workspace_tip_type')} <code>name</code> {__('whatsapp.workspace_or')} <code>phone</code> {__('whatsapp.workspace_tip_map_suffix')}
                                                                 </p>
                                                             </div>
                                                         )}
@@ -932,12 +962,14 @@ export default function Workspace({
                                         <div className="border-t border-zinc-150 dark:border-zinc-800 pt-5 space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div>
-                                                    <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Schedule for Future Delivery</h4>
-                                                    <p className="text-xs text-zinc-500">Enable to process this campaign later at a specific Cairo timezone date/time.</p>
+                                                    <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{__('whatsapp.workspace_schedule_future')}</h4>
+                                                    <p className="text-xs text-zinc-500">{__('whatsapp.workspace_schedule_future_desc')}</p>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => sendForm.setData('is_scheduled', !sendForm.data.is_scheduled)}
+                                                    aria-label={__('whatsapp.workspace_schedule_future')}
+                                                    aria-pressed={sendForm.data.is_scheduled}
                                                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${sendForm.data.is_scheduled ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-200 dark:bg-zinc-850'
                                                         }`}
                                                 >
@@ -948,7 +980,7 @@ export default function Workspace({
 
                                             {sendForm.data.is_scheduled && (
                                                 <div>
-                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Delivery Time (Cairo Timezone - Africa/Cairo)</label>
+                                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">{__('whatsapp.workspace_delivery_time')}</label>
                                                     <input
                                                         type="datetime-local"
                                                         value={sendForm.data.scheduled_at}
@@ -964,7 +996,7 @@ export default function Workspace({
                                             disabled={sendForm.processing}
                                             className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-3 rounded-xl font-semibold tracking-tight transition duration-200"
                                         >
-                                            {sendForm.data.is_scheduled ? 'Schedule Delivery' : 'Send Immediately'}
+                                            {sendForm.data.is_scheduled ? __('whatsapp.workspace_schedule_delivery') : __('whatsapp.workspace_send_immediately')}
                                         </button>
                                     </form>
                                 </div>
@@ -972,29 +1004,29 @@ export default function Workspace({
                                 {/* Sidebar Guidelines & Fee Info */}
                                 <div className="bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-3xl p-6 space-y-6">
                                     <div>
-                                        <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg">Platform Message Fees</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Wallet deductions are processed automatically upon each successfully processed delivery attempt.</p>
+                                        <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-lg">{__('whatsapp.workspace_platform_fees')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_platform_fees_desc')}</p>
                                         <div className="mt-4 border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-2">
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-zinc-500">WhatsApp Dispatch Fee:</span>
-                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                                <span className="text-zinc-500">{__('whatsapp.workspace_whatsapp_fee')}</span>
+                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">{__('whatsapp.workspace_fee_per_message', { fee: business.per_message_fee })}</span>
                                             </div>
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-zinc-500">Telegram Bot Dispatch Fee:</span>
-                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">${business.per_message_fee} USD / msg</span>
+                                                <span className="text-zinc-500">{__('whatsapp.workspace_telegram_fee')}</span>
+                                                <span className="font-bold text-zinc-850 dark:text-zinc-200">{__('whatsapp.workspace_fee_per_message', { fee: business.per_message_fee })}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-4 rounded-2xl">
-                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Dynamic Fields Mapping</h4>
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{__('whatsapp.workspace_dynamic_fields')}</h4>
                                         <p className="text-xxs text-zinc-500 leading-relaxed">
-                                            You can map variables inside your templates (e.g. <code>{"{{"}1{"}}"}</code>) to specific properties in contact segments:
+                                            {__('whatsapp.workspace_dynamic_fields_prefix')} <code>{"{{"}1{"}}"}</code>{__('whatsapp.workspace_dynamic_fields_suffix')}
                                         </p>
                                         <ul className="text-xxs text-zinc-500 list-disc list-inside space-y-1 mt-2">
-                                            <li><code>name</code> - Resolves contact Name</li>
-                                            <li><code>phone</code> - Resolves contact Phone / Telegram Chat ID</li>
-                                            <li><code>custom_fields.FIELD_NAME</code> - Resolves CSV imported fields</li>
+                                            <li><code>name</code> - {__('whatsapp.workspace_resolves_name')}</li>
+                                            <li><code>phone</code> - {__('whatsapp.workspace_resolves_phone')}</li>
+                                            <li><code>custom_fields.FIELD_NAME</code> - {__('whatsapp.workspace_resolves_custom')}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -1007,8 +1039,8 @@ export default function Workspace({
                                 <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div className="flex justify-between items-center">
                                         <div>
-                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Telegram Bots</h3>
-                                            <p className="text-xs text-zinc-500 mt-1">Register bot tokens to send notifications. Webhook setup will trigger automatically.</p>
+                                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_tab_bots')}</h3>
+                                            <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_bots_desc')}</p>
                                         </div>
                                     </div>
 
@@ -1020,39 +1052,38 @@ export default function Workspace({
                                                         <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{bot.name}</span>
                                                         <span className="text-xs text-zinc-500">(@{bot.username})</span>
                                                     </div>
-                                                    <div className="text-xs text-emerald-500 font-semibold mt-1">Webhook Active</div>
+                                                    <div className="text-xs text-emerald-500 font-semibold mt-1">{__('whatsapp.workspace_webhook_active')}</div>
                                                 </div>
                                                 <button
-                                                    onClick={() => {
-                                                        if (confirm('Are you sure you want to delete this Telegram bot?')) {
-                                                            router.delete(`/whatsapp-sender/telegram-bots/${bot.id}`);
-                                                        }
+                                                    onClick={async () => {
+                                                        if (!(await confirm({ title: __('whatsapp.workspace_delete_bot_title'), description: __('whatsapp.workspace_delete_bot_confirm'), variant: 'danger' }))) return;
+                                                        router.delete(`/whatsapp-sender/telegram-bots/${bot.id}`);
                                                     }}
                                                     className="text-red-500 hover:text-red-650 text-xs font-semibold"
                                                 >
-                                                    Remove
+                                                    {__('whatsapp.workspace_remove')}
                                                 </button>
                                             </div>
                                         ))}
                                         {bots.length === 0 && (
-                                            <p className="text-sm text-zinc-400 text-center py-6">No Telegram bots registered yet.</p>
+                                            <p className="text-sm text-zinc-400 text-center py-6">{__('whatsapp.workspace_no_bots_yet')}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div>
-                                        <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">Register New Bot</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Provide your bot's FatherToken to link it to this business workspace.</p>
+                                        <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_register_new_bot')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_register_bot_desc')}</p>
                                     </div>
                                     <form onSubmit={handleAddBot} className="space-y-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Telegram Bot Token</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('whatsapp.workspace_bot_token')}</label>
                                             <input
                                                 type="text"
                                                 value={botForm.data.token}
                                                 onChange={e => botForm.setData('token', e.target.value)}
-                                                placeholder="Enter token from @BotFather"
+                                                placeholder={__('whatsapp.workspace_bot_token_placeholder')}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                             />
                                             {botForm.errors.token && <span className="text-xs text-red-500 mt-1 block">{botForm.errors.token}</span>}
@@ -1062,7 +1093,7 @@ export default function Workspace({
                                             disabled={botForm.processing}
                                             className="w-full bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
                                         >
-                                            Verify & Register Bot
+                                            {__('whatsapp.workspace_verify_register_bot')}
                                         </button>
                                     </form>
                                 </div>
@@ -1073,7 +1104,7 @@ export default function Workspace({
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Create Template Form */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Meta Template</h3>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_create_meta_template')}</h3>
 
                                     {templateForm.errors.whatsapp_business_id && (
                                         <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl text-xs font-medium text-red-700 dark:text-red-300">
@@ -1084,7 +1115,7 @@ export default function Workspace({
                                     <form onSubmit={handleCreateTemplate} className="space-y-4">
                                         <div>
                                             <label className="text-xs font-semibold text-zinc-500 block mb-1">
-                                                Template Name (auto-slugified to lowercase alphanumeric & underscores)
+                                                {__('whatsapp.workspace_template_name_label')}
                                             </label>
                                             <input
                                                 type="text"
@@ -1095,7 +1126,7 @@ export default function Workspace({
                                                     const val = raw.toLowerCase().replace(/[^a-z0-9_]/g, '_');
                                                     templateForm.setData('name', val);
                                                 }}
-                                                placeholder="e.g. promo_coupon or offer_1"
+                                                placeholder={__('whatsapp.workspace_template_name_placeholder')}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm font-mono"
                                             />
                                             {templateForm.errors.name && (
@@ -1103,47 +1134,47 @@ export default function Workspace({
                                             )}
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Category</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('general.category')}</label>
                                             <select
                                                 value={templateForm.data.category}
                                                 onChange={e => templateForm.setData('category', e.target.value)}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
-                                                <option value="UTILITY">UTILITY</option>
-                                                <option value="MARKETING">MARKETING</option>
-                                                <option value="AUTHENTICATION">AUTHENTICATION</option>
+                                                <option value="UTILITY">{__('whatsapp.workspace_category_utility')}</option>
+                                                <option value="MARKETING">{__('whatsapp.workspace_category_marketing')}</option>
+                                                <option value="AUTHENTICATION">{__('whatsapp.workspace_category_authentication')}</option>
                                             </select>
                                             {templateForm.errors.category && (
                                                 <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.category}</span>
                                             )}
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Language</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('general.language')}</label>
                                             <select
                                                 value={templateForm.data.language}
                                                 onChange={e => templateForm.setData('language', e.target.value)}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             >
-                                                <option value="en_US">English (US)</option>
-                                                <option value="en_GB">English (UK)</option>
-                                                <option value="ar">Arabic (العربية)</option>
-                                                <option value="es">Spanish (Español)</option>
-                                                <option value="fr">French (Français)</option>
-                                                <option value="de">German (Deutsch)</option>
-                                                <option value="it">Italian (Italiano)</option>
-                                                <option value="pt_BR">Portuguese (Brasil)</option>
-                                                <option value="tr">Turkish (Türkçe)</option>
-                                                <option value="ru">Russian (Русский)</option>
-                                                <option value="hi">Hindi (हिन्दी)</option>
-                                                <option value="id">Indonesian (Bahasa)</option>
-                                                <option value="ur">Urdu (اردو)</option>
+                                                <option value="en_US">{__('whatsapp.workspace_lang_en_us')}</option>
+                                                <option value="en_GB">{__('whatsapp.workspace_lang_en_gb')}</option>
+                                                <option value="ar">{__('whatsapp.workspace_lang_ar')}</option>
+                                                <option value="es">{__('whatsapp.workspace_lang_es')}</option>
+                                                <option value="fr">{__('whatsapp.workspace_lang_fr')}</option>
+                                                <option value="de">{__('whatsapp.workspace_lang_de')}</option>
+                                                <option value="it">{__('whatsapp.workspace_lang_it')}</option>
+                                                <option value="pt_BR">{__('whatsapp.workspace_lang_pt_br')}</option>
+                                                <option value="tr">{__('whatsapp.workspace_lang_tr')}</option>
+                                                <option value="ru">{__('whatsapp.workspace_lang_ru')}</option>
+                                                <option value="hi">{__('whatsapp.workspace_lang_hi')}</option>
+                                                <option value="id">{__('whatsapp.workspace_lang_id')}</option>
+                                                <option value="ur">{__('whatsapp.workspace_lang_ur')}</option>
                                             </select>
                                             {templateForm.errors.language && (
                                                 <span className="text-xs text-red-500 mt-1 block">{templateForm.errors.language}</span>
                                             )}
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Body Text (with variable indicators like {"{{"}1{"}}"})</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('whatsapp.workspace_body_text_label')}</label>
                                             <textarea
                                                 rows={4}
                                                 value={templateForm.data.components[0].text}
@@ -1152,7 +1183,7 @@ export default function Workspace({
                                                     updated[0].text = e.target.value;
                                                     templateForm.setData('components', updated);
                                                 }}
-                                                placeholder="Write body content here..."
+                                                placeholder={__('whatsapp.workspace_body_placeholder')}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             />
                                             {templateForm.errors.components && (
@@ -1170,10 +1201,10 @@ export default function Workspace({
                                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                     </svg>
-                                                    <span>Submitting to Meta...</span>
+                                                    <span>{__('whatsapp.workspace_submitting_to_meta')}</span>
                                                 </>
                                             ) : (
-                                                <span>Submit Template to Meta</span>
+                                                <span>{__('whatsapp.workspace_submit_to_meta')}</span>
                                             )}
                                         </button>
                                     </form>
@@ -1182,12 +1213,12 @@ export default function Workspace({
                                 {/* Templates Table List */}
                                 <div className="lg:col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div className="flex justify-between items-center">
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Synced Templates</h3>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_synced_templates')}</h3>
                                         <button
                                             onClick={() => router.post(`/whatsapp-sender/templates/${business.id}/sync`)}
                                             className="bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 dark:bg-zinc-950 dark:border-zinc-800 text-xs px-4 py-2 rounded-xl font-semibold transition duration-200 text-zinc-800 dark:text-zinc-200"
                                         >
-                                            Sync from Facebook
+                                            {__('whatsapp.workspace_sync_from_facebook')}
                                         </button>
                                     </div>
 
@@ -1195,11 +1226,11 @@ export default function Workspace({
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                    <th className="py-3 px-2 font-semibold">Name</th>
-                                                    <th className="py-3 px-2 font-semibold">Category</th>
-                                                    <th className="py-3 px-2 font-semibold">Language</th>
-                                                    <th className="py-3 px-2 font-semibold">Status</th>
-                                                    <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.name')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.category')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.language')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.status')}</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">{__('general.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1216,21 +1247,20 @@ export default function Workspace({
                                                         </td>
                                                         <td className="py-3 px-2 text-right">
                                                             <button
-                                                                onClick={() => {
-                                                                    if (confirm('Are you sure you want to delete this template from Meta?')) {
-                                                                        router.delete(`/whatsapp-sender/templates/${tpl.id}`);
-                                                                    }
+                                                                onClick={async () => {
+                                                                    if (!(await confirm({ title: __('whatsapp.workspace_delete_template_title'), description: __('whatsapp.workspace_delete_template_confirm'), variant: 'danger' }))) return;
+                                                                    router.delete(`/whatsapp-sender/templates/${tpl.id}`);
                                                                 }}
                                                                 className="text-red-500 hover:text-red-600 text-xs font-semibold"
                                                             >
-                                                                Delete
+                                                                {__('general.delete')}
                                                             </button>
                                                         </td>
                                                     </tr>
                                                 ))}
                                                 {templates.length === 0 && (
                                                     <tr>
-                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No synced templates found.</td>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">{__('whatsapp.workspace_no_synced_templates')}</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -1244,20 +1274,20 @@ export default function Workspace({
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Contact Groups setup list */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Segment Group</h3>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_create_segment_group')}</h3>
                                     <form onSubmit={handleCreateGroup} className="space-y-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('whatsapp.workspace_group_name')}</label>
                                             <input
                                                 type="text"
                                                 value={groupForm.data.name}
                                                 onChange={e => groupForm.setData('name', e.target.value)}
-                                                placeholder="e.g. Premium Customers"
+                                                placeholder={__('whatsapp.workspace_group_name_placeholder')}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('general.description')}</label>
                                             <textarea
                                                 rows={2}
                                                 value={groupForm.data.description}
@@ -1270,12 +1300,12 @@ export default function Workspace({
                                             disabled={groupForm.processing}
                                             className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
                                         >
-                                            Create Group
+                                            {__('whatsapp.workspace_create_group')}
                                         </button>
                                     </form>
 
                                     <div className="space-y-3 mt-6">
-                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Available Contact Segments</h4>
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{__('whatsapp.workspace_available_segments')}</h4>
                                         {contactGroups.map(gp => (
                                             <div
                                                 key={gp.id}
@@ -1288,7 +1318,7 @@ export default function Workspace({
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
                                                     <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
-                                                        {gp.contacts_count} contacts
+                                                        {__('whatsapp.workspace_contacts_count', { count: gp.contacts_count })}
                                                     </span>
                                                 </div>
                                                 {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
@@ -1303,32 +1333,31 @@ export default function Workspace({
                                         <>
                                             <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
                                                 <div>
-                                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{selectedGroup.name} Workspace</h3>
-                                                    <p className="text-xs text-zinc-500 mt-1">{selectedGroup.description || 'No description provided.'}</p>
+                                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_group_workspace', { name: selectedGroup.name })}</h3>
+                                                    <p className="text-xs text-zinc-500 mt-1">{selectedGroup.description || __('whatsapp.workspace_no_description')}</p>
                                                 </div>
                                                 <button
-                                                    onClick={() => {
-                                                        if (confirm('Are you sure you want to delete this group? All contacts in this group will be deleted.')) {
-                                                            router.delete(`/whatsapp-sender/contact-groups/${selectedGroup.id}`);
-                                                            setSelectedGroup(null);
-                                                        }
+                                                    onClick={async () => {
+                                                        if (!(await confirm({ title: __('whatsapp.workspace_delete_group_title'), description: __('whatsapp.workspace_delete_group_confirm'), variant: 'danger' }))) return;
+                                                        router.delete(`/whatsapp-sender/contact-groups/${selectedGroup.id}`);
+                                                        setSelectedGroup(null);
                                                     }}
                                                     className="text-red-500 hover:text-red-600 text-xs font-semibold"
                                                 >
-                                                    Delete Group
+                                                    {__('whatsapp.workspace_delete_group')}
                                                 </button>
                                             </div>
 
                                             <form onSubmit={handleImportContacts} className="space-y-4">
                                                 <div>
                                                     <label className="text-xs font-semibold text-zinc-500 block mb-1">
-                                                        Paste contacts text (Format: <code>phone_or_chat_id,name</code> per line, example: <code>201001234567,John Doe</code>)
+                                                        {__('whatsapp.workspace_paste_contacts_prefix')} <code>phone_or_chat_id,name</code> {__('whatsapp.workspace_paste_contacts_middle')} <code>201001234567,John Doe</code>)
                                                     </label>
                                                     <textarea
                                                         rows={5}
                                                         value={importForm.data.contacts_text}
                                                         onChange={e => importForm.setData('contacts_text', e.target.value)}
-                                                        placeholder="201001234567,John Doe&#10;201009876543,Alice Smith&#10;123456789,Telegram User"
+                                                        placeholder={__('whatsapp.workspace_contacts_placeholder')}
                                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono"
                                                     />
                                                 </div>
@@ -1337,15 +1366,15 @@ export default function Workspace({
                                                     disabled={importForm.processing}
                                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-250 text-white dark:text-zinc-900 text-xs px-4 py-2.5 rounded-xl font-bold transition duration-200"
                                                 >
-                                                    Import / Save Contacts
+                                                    {__('whatsapp.workspace_import_contacts')}
                                                 </button>
                                             </form>
                                         </>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                                            <span className="text-4xl text-zinc-300">👥</span>
-                                            <h3 className="text-zinc-500 dark:text-zinc-400 font-bold">No Contact Group Selected</h3>
-                                            <p className="text-zinc-400 dark:text-zinc-500 text-xs max-w-sm">Select a contact group from the left panel to import list numbers, customize CSV fields, and schedule bulk notifications.</p>
+                                            <Users className="w-10 h-10 text-zinc-300" aria-hidden="true" />
+                                            <h3 className="text-zinc-500 dark:text-zinc-400 font-bold">{__('whatsapp.workspace_no_group_selected')}</h3>
+                                            <p className="text-zinc-400 dark:text-zinc-500 text-xs max-w-sm">{__('whatsapp.workspace_no_group_selected_desc')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -1355,21 +1384,21 @@ export default function Workspace({
                         {activeTab === 'schedules' && (
                             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                 <div>
-                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Active Scheduler Campaigns</h3>
-                                    <p className="text-xs text-zinc-500 mt-1">Pending and executed schedules managed under Cairo Timezone.</p>
+                                    <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_active_schedules')}</h3>
+                                    <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_active_schedules_desc')}</p>
                                 </div>
 
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-sm border-collapse">
                                         <thead>
                                             <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                <th className="py-3 px-2 font-semibold">Channel</th>
-                                                <th className="py-3 px-2 font-semibold">Sender Device / Bot</th>
-                                                <th className="py-3 px-2 font-semibold">Recipient</th>
-                                                <th className="py-3 px-2 font-semibold">Type</th>
-                                                <th className="py-3 px-2 font-semibold">Scheduled Date (Cairo Time)</th>
-                                                <th className="py-3 px-2 font-semibold">Status</th>
-                                                <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                                <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_channel')}</th>
+                                                <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_sender_device_bot')}</th>
+                                                <th className="py-3 px-2 font-semibold">{__('general.recipient')}</th>
+                                                <th className="py-3 px-2 font-semibold">{__('general.type')}</th>
+                                                <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_scheduled_date')}</th>
+                                                <th className="py-3 px-2 font-semibold">{__('general.status')}</th>
+                                                <th className="py-3 px-2 font-semibold text-right">{__('general.actions')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1385,7 +1414,7 @@ export default function Workspace({
                                                         {sch.channel === 'telegram' ? sch.telegram_bot?.name : sch.account?.name}
                                                     </td>
                                                     <td className="py-3 px-2 text-zinc-600 dark:text-zinc-400">
-                                                        {sch.group ? `Group: ${sch.group.name}` : sch.recipient_phone}
+                                                        {sch.group ? __('whatsapp.workspace_group_prefix', { name: sch.group.name }) : sch.recipient_phone}
                                                     </td>
                                                     <td className="py-3 px-2 text-zinc-500 text-xs capitalize">{sch.message_type}</td>
                                                     <td className="py-3 px-2 text-zinc-500 text-xs font-mono">{new Date(sch.scheduled_at).toLocaleString('en-US', { timeZone: 'Africa/Cairo' })}</td>
@@ -1400,14 +1429,13 @@ export default function Workspace({
                                                     <td className="py-3 px-2 text-right">
                                                         {sch.status === 'pending' && (
                                                             <button
-                                                                onClick={() => {
-                                                                    if (confirm('Are you sure you want to cancel this scheduled delivery?')) {
-                                                                        router.delete(`/whatsapp-sender/schedules/${sch.id}`);
-                                                                    }
+                                                                onClick={async () => {
+                                                                    if (!(await confirm({ title: __('whatsapp.workspace_cancel_schedule_title'), description: __('whatsapp.workspace_cancel_schedule_confirm'), variant: 'danger' }))) return;
+                                                                    router.delete(`/whatsapp-sender/schedules/${sch.id}`);
                                                                 }}
                                                                 className="text-red-500 hover:text-red-600 text-xs font-semibold"
                                                             >
-                                                                Cancel
+                                                                {__('general.cancel')}
                                                             </button>
                                                         )}
                                                     </td>
@@ -1415,7 +1443,7 @@ export default function Workspace({
                                             ))}
                                             {schedules.length === 0 && (
                                                 <tr>
-                                                    <td colSpan={7} className="py-6 text-center text-zinc-400">No scheduled message logs found.</td>
+                                                    <td colSpan={7} className="py-6 text-center text-zinc-400">{__('whatsapp.workspace_no_schedules')}</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -1429,21 +1457,21 @@ export default function Workspace({
                                 {/* Message Logs */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Unified Message Logs</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Audit log of successfully dispatched notifications across both channels.</p>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_message_logs')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_message_logs_desc')}</p>
                                     </div>
 
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                    <th className="py-3 px-2 font-semibold">Channel</th>
-                                                    <th className="py-3 px-2 font-semibold">Sender Device / Bot</th>
-                                                    <th className="py-3 px-2 font-semibold">Recipient</th>
-                                                    <th className="py-3 px-2 font-semibold">Content Preview</th>
-                                                    <th className="py-3 px-2 font-semibold">Fee Charged</th>
-                                                    <th className="py-3 px-2 font-semibold">Status</th>
-                                                    <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_channel')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_sender_device_bot')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.recipient')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_content_preview')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_fee_charged')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.status')}</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">{__('whatsapp.workspace_timestamp')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1472,7 +1500,7 @@ export default function Workspace({
                                                 ))}
                                                 {logs.length === 0 && (
                                                     <tr>
-                                                        <td colSpan={7} className="py-6 text-center text-zinc-400">No message logs available.</td>
+                                                        <td colSpan={7} className="py-6 text-center text-zinc-400">{__('whatsapp.workspace_no_logs')}</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -1483,19 +1511,19 @@ export default function Workspace({
                                 {/* Wallet Ledger Transactions */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">Business Wallet Transaction History</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Audit log of wallet recharges and bulk campaign deductions.</p>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_wallet_history')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_wallet_history_desc')}</p>
                                     </div>
 
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                    <th className="py-3 px-2 font-semibold">Transaction Type</th>
-                                                    <th className="py-3 px-2 font-semibold">Amount</th>
-                                                    <th className="py-3 px-2 font-semibold">Balance After</th>
-                                                    <th className="py-3 px-2 font-semibold">Description</th>
-                                                    <th className="py-3 px-2 font-semibold text-right">Timestamp</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_transaction_type')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.amount')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_balance_after')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.description')}</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">{__('whatsapp.workspace_timestamp')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1512,7 +1540,7 @@ export default function Workspace({
                                                 ))}
                                                 {transactions.length === 0 && (
                                                     <tr>
-                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No transaction logs found.</td>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">{__('whatsapp.workspace_no_transactions')}</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -1526,14 +1554,14 @@ export default function Workspace({
                             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6 font-sans">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Visual Chat Flows</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Configure automated chatbot response flows for triggers, keywords, delay pacers, and conditions.</p>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_visual_flows')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_visual_flows_desc')}</p>
                                     </div>
                                     <button
                                         onClick={() => setIsCreatingFlow(true)}
                                         className="bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-bold px-4 py-2.5 rounded-xl transition duration-200"
                                     >
-                                        + New Chat Flow
+                                        + {__('whatsapp.workspace_new_flow')}
                                     </button>
                                 </div>
 
@@ -1550,11 +1578,11 @@ export default function Workspace({
                                             <div>
                                                 <h4 className="font-bold text-base text-zinc-900 dark:text-zinc-100">{flow.name}</h4>
                                                 <p className="text-xs text-zinc-500 mt-1 font-medium">
-                                                    Trigger: <span className="font-semibold text-zinc-700 dark:text-zinc-300 capitalize">{flow.trigger_type}</span>
+                                                    {__('whatsapp.workspace_trigger_label')} <span className="font-semibold text-zinc-700 dark:text-zinc-300 capitalize">{flow.trigger_type}</span>
                                                 </p>
                                                 {flow.trigger_type === 'keyword' && (
                                                     <p className="text-xxs text-zinc-400 mt-1 truncate max-w-xs">
-                                                        Keywords: {flow.trigger_keywords?.join(', ')}
+                                                        {__('whatsapp.workspace_keywords_value', { keywords: flow.trigger_keywords?.join(', ') ?? '' })}
                                                     </p>
                                                 )}
                                             </div>
@@ -1566,7 +1594,7 @@ export default function Workspace({
                                                         className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition ${flow.is_active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-zinc-150 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
                                                             }`}
                                                     >
-                                                        {flow.is_active ? 'Active' : 'Inactive'}
+                                                        {flow.is_active ? __('general.active') : __('general.inactive')}
                                                     </button>
                                                 </div>
 
@@ -1575,17 +1603,16 @@ export default function Workspace({
                                                         onClick={() => setEditingFlow(flow)}
                                                         className="text-zinc-650 dark:text-zinc-400 hover:text-zinc-900 text-xs font-semibold px-2 py-1"
                                                     >
-                                                        Edit Canvas
+                                                        {__('whatsapp.workspace_edit_canvas')}
                                                     </button>
                                                     <button
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure you want to delete this flow?')) {
-                                                                router.delete(`/whatsapp-sender/bot-flows/${flow.id}`);
-                                                            }
+                                                        onClick={async () => {
+                                                            if (!(await confirm({ title: __('whatsapp.workspace_delete_flow_title'), description: __('whatsapp.workspace_delete_flow_confirm'), variant: 'danger' }))) return;
+                                                            router.delete(`/whatsapp-sender/bot-flows/${flow.id}`);
                                                         }}
                                                         className="text-red-500 hover:text-red-650 text-xs font-semibold px-2 py-1"
                                                     >
-                                                        Delete
+                                                        {__('general.delete')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -1593,7 +1620,7 @@ export default function Workspace({
                                     ))}
                                     {flows.length === 0 && (
                                         <div className="col-span-full py-12 text-center text-zinc-400 text-sm">
-                                            No chatbot response flows configured yet. Click "+ New Chat Flow" to design your first conversation logic.
+                                            {__('whatsapp.workspace_no_flows')}
                                         </div>
                                     )}
                                 </div>
@@ -1605,34 +1632,34 @@ export default function Workspace({
                                 {/* Create subscriber group */}
                                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm space-y-6">
                                     <div>
-                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Create Subscriber Group</h3>
-                                        <p className="text-xs text-zinc-500 mt-1">Organize bot subscribers into custom target cohorts.</p>
+                                        <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_create_subscriber_group')}</h3>
+                                        <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_subscriber_group_desc')}</p>
                                     </div>
 
                                     <form onSubmit={handleCreateTgGroup} className="space-y-4">
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Select Bot</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('whatsapp.workspace_select_bot')}</label>
                                             <select
                                                 value={tgGroupForm.data.telegram_bot_id}
                                                 onChange={e => tgGroupForm.setData('telegram_bot_id', e.target.value)}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                             >
                                                 {bots.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                                                {bots.length === 0 && <option value="">No bots registered</option>}
+                                                {bots.length === 0 && <option value="">{__('whatsapp.workspace_no_telegram_bots')}</option>}
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Group Name</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('whatsapp.workspace_group_name')}</label>
                                             <input
                                                 type="text"
                                                 value={tgGroupForm.data.name}
                                                 onChange={e => tgGroupForm.setData('name', e.target.value)}
-                                                placeholder="e.g. Daily Subscribers"
+                                                placeholder={__('whatsapp.workspace_subscriber_group_placeholder')}
                                                 className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2.5 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">Description</label>
+                                            <label className="text-xs font-semibold text-zinc-500 block mb-1">{__('general.description')}</label>
                                             <textarea
                                                 rows={2}
                                                 value={tgGroupForm.data.description}
@@ -1645,12 +1672,12 @@ export default function Workspace({
                                             disabled={tgGroupForm.processing}
                                             className="w-full bg-zinc-900 dark:bg-zinc-50 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 py-2.5 rounded-xl text-sm font-semibold transition"
                                         >
-                                            Create Subscriber Group
+                                            {__('whatsapp.workspace_create_subscriber_group')}
                                         </button>
                                     </form>
 
                                     <div className="space-y-3 mt-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Subscriber Segments</h4>
+                                        <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{__('whatsapp.workspace_subscriber_segments')}</h4>
                                         {telegramSubscriberGroups.map(gp => (
                                             <div
                                                 key={gp.id}
@@ -1663,7 +1690,7 @@ export default function Workspace({
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">{gp.name}</span>
                                                     <span className="text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-650 dark:text-zinc-300 px-2.5 py-0.5 rounded-full font-semibold">
-                                                        {gp.subscribers_count} members
+                                                        {__('whatsapp.workspace_members_count', { count: gp.subscribers_count })}
                                                     </span>
                                                 </div>
                                                 {gp.description && <p className="text-xs text-zinc-400 mt-2 line-clamp-1">{gp.description}</p>}
@@ -1677,21 +1704,20 @@ export default function Workspace({
                                     <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
                                         <div>
                                             <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
-                                                {selectedSubscriberGroup ? `${selectedSubscriberGroup.name} Members` : 'All Telegram Subscribers'}
+                                                {selectedSubscriberGroup ? __('whatsapp.workspace_group_members', { name: selectedSubscriberGroup.name }) : __('whatsapp.workspace_all_subscribers')}
                                             </h3>
-                                            <p className="text-xs text-zinc-500 mt-1">Subscribers who have initiated communication with registered bots.</p>
+                                            <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_all_subscribers_desc')}</p>
                                         </div>
                                         {selectedSubscriberGroup && (
                                             <button
-                                                onClick={() => {
-                                                    if (confirm('Are you sure you want to delete this subscriber group?')) {
-                                                        router.delete(`/whatsapp-sender/telegram-subscriber-groups/${selectedSubscriberGroup.id}`);
-                                                        setSelectedSubscriberGroup(null);
-                                                    }
+                                                onClick={async () => {
+                                                    if (!(await confirm({ title: __('whatsapp.workspace_delete_subscriber_group_title'), description: __('whatsapp.workspace_delete_subscriber_group_confirm'), variant: 'danger' }))) return;
+                                                    router.delete(`/whatsapp-sender/telegram-subscriber-groups/${selectedSubscriberGroup.id}`);
+                                                    setSelectedSubscriberGroup(null);
                                                 }}
                                                 className="text-red-500 hover:text-red-650 text-xs font-semibold"
                                             >
-                                                Delete Group
+                                                {__('whatsapp.workspace_delete_group')}
                                             </button>
                                         )}
                                     </div>
@@ -1700,11 +1726,11 @@ export default function Workspace({
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
-                                                    <th className="py-3 px-2 font-semibold">Chat ID</th>
-                                                    <th className="py-3 px-2 font-semibold">Username</th>
-                                                    <th className="py-3 px-2 font-semibold">Name</th>
-                                                    <th className="py-3 px-2 font-semibold">Assigned Cohort</th>
-                                                    <th className="py-3 px-2 font-semibold text-right">Actions</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_chat_id')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_username')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('general.name')}</th>
+                                                    <th className="py-3 px-2 font-semibold">{__('whatsapp.workspace_assigned_group')}</th>
+                                                    <th className="py-3 px-2 font-semibold text-right">{__('general.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1713,7 +1739,7 @@ export default function Workspace({
                                                     .map(sub => (
                                                         <tr key={sub.id} className="border-b border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20">
                                                             <td className="py-3 px-2 font-mono text-xs text-zinc-700 dark:text-zinc-300 font-bold">{sub.chat_id}</td>
-                                                            <td className="py-3 px-2 text-zinc-500 text-xs">@{sub.username || 'n/a'}</td>
+                                                            <td className="py-3 px-2 text-zinc-500 text-xs">@{sub.username || __('general.n_a')}</td>
                                                             <td className="py-3 px-2 text-zinc-700 dark:text-zinc-200 font-medium">
                                                                 {sub.first_name} {sub.last_name}
                                                             </td>
@@ -1723,9 +1749,10 @@ export default function Workspace({
                                                                     onChange={e => router.put(`/whatsapp-sender/telegram-subscribers/${sub.id}/group`, {
                                                                         telegram_subscriber_group_id: e.target.value || null
                                                                     })}
+                                                                    aria-label={__('whatsapp.workspace_assigned_group')}
                                                                     className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg py-1 px-2 text-xs focus:outline-none text-zinc-700 dark:text-zinc-300"
                                                                 >
-                                                                    <option value="">Unassigned</option>
+                                                                    <option value="">{__('general.unassigned')}</option>
                                                                     {telegramSubscriberGroups.map(g => (
                                                                         <option key={g.id} value={g.id}>{g.name}</option>
                                                                     ))}
@@ -1733,21 +1760,20 @@ export default function Workspace({
                                                             </td>
                                                             <td className="py-3 px-2 text-right">
                                                                 <button
-                                                                    onClick={() => {
-                                                                        if (confirm('Are you sure you want to remove this subscriber?')) {
-                                                                            router.delete(`/whatsapp-sender/telegram-subscribers/${sub.id}`);
-                                                                        }
+                                                                    onClick={async () => {
+                                                                        if (!(await confirm({ title: __('whatsapp.workspace_remove_subscriber_title'), description: __('whatsapp.workspace_remove_subscriber_confirm'), variant: 'danger' }))) return;
+                                                                        router.delete(`/whatsapp-sender/telegram-subscribers/${sub.id}`);
                                                                     }}
                                                                     className="text-red-500 hover:text-red-650 text-xs font-semibold"
                                                                 >
-                                                                    Remove
+                                                                    {__('whatsapp.workspace_remove')}
                                                                 </button>
                                                             </td>
                                                         </tr>
                                                     ))}
                                                 {telegramSubscribers.length === 0 && (
                                                     <tr>
-                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">No active subscribers discovered yet.</td>
+                                                        <td colSpan={5} className="py-6 text-center text-zinc-400">{__('whatsapp.workspace_no_subscribers')}</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -1780,12 +1806,12 @@ export default function Workspace({
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-lg w-full rounded-3xl p-6 shadow-2xl space-y-6">
                         <div>
-                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Edit Client Business Profile</h3>
-                            <p className="text-xs text-zinc-400 mt-1">Modify company properties and custom app credentials.</p>
+                            <h3 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">{__('whatsapp.workspace_edit_business_title')}</h3>
+                            <p className="text-xs text-zinc-400 mt-1">{__('whatsapp.workspace_edit_business_desc')}</p>
                         </div>
                         <form onSubmit={handleEditBusiness} className="space-y-4">
                             <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Company / Business Name</label>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_company_name')}</label>
                                 <input
                                     type="text"
                                     required
@@ -1796,7 +1822,7 @@ export default function Workspace({
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Contact Name</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_client_contact_name')}</label>
                                     <input
                                         type="text"
                                         value={editForm.data.client_name}
@@ -1805,7 +1831,7 @@ export default function Workspace({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Email Address</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_client_email')}</label>
                                     <input
                                         type="email"
                                         value={editForm.data.client_email}
@@ -1816,7 +1842,7 @@ export default function Workspace({
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client Mobile Number</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_client_mobile')}</label>
                                     <input
                                         type="text"
                                         value={editForm.data.client_mobile}
@@ -1825,7 +1851,7 @@ export default function Workspace({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Client WhatsApp Number</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_client_whatsapp')}</label>
                                     <input
                                         type="text"
                                         value={editForm.data.client_whatsapp}
@@ -1837,17 +1863,17 @@ export default function Workspace({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App ID (Optional)</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_custom_app_id')}</label>
                                     <input
                                         type="text"
                                         value={editForm.data.facebook_client_id}
                                         onChange={e => editForm.setData('facebook_client_id', e.target.value)}
-                                        placeholder="e.g. 104829384920"
+                                        placeholder={__('whatsapp.workspace_example', { value: '104829384920' })}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Custom Meta App Secret (Optional)</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_custom_app_secret')}</label>
                                     <input
                                         type="password"
                                         value={editForm.data.facebook_client_secret}
@@ -1861,7 +1887,7 @@ export default function Workspace({
                             {isAdmin && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Per Message Fee ($ USD)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_per_message_fee')}</label>
                                         <input
                                             type="number"
                                             step="0.0001"
@@ -1871,7 +1897,7 @@ export default function Workspace({
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Bot Reply Fee ($ USD)</label>
+                                        <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_bot_reply_fee')}</label>
                                         <input
                                             type="number"
                                             step="0.0001"
@@ -1889,14 +1915,14 @@ export default function Workspace({
                                     onClick={() => setShowEditModal(false)}
                                     className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={editForm.processing}
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    Save Changes
+                                    {__('whatsapp.workspace_save_changes')}
                                 </button>
                             </div>
                         </form>
@@ -1910,19 +1936,19 @@ export default function Workspace({
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-6">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">إضافة حساب Meta yدوياً</h3>
-                                <p className="text-xs text-zinc-500 mt-1">أدخل بيانات الحساب المستخرجة من لوحة Meta Developer Portal.</p>
+                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_add_account_title')}</h3>
+                                <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_add_account_desc')}</p>
                             </div>
-                            <button onClick={() => setShowAddAccountModal(false)} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
+                            <button type="button" onClick={() => setShowAddAccountModal(false)} aria-label={__('general.close')} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
                         </div>
 
                         <form onSubmit={handleAddAccount} className="space-y-4">
                             <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Account Display Name</label>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_account_display_name')}</label>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="e.g. Meta Test Number (+20 15 58548650)"
+                                    placeholder={__('whatsapp.workspace_account_name_placeholder')}
                                     value={accountForm.data.name}
                                     onChange={e => accountForm.setData('name', e.target.value)}
                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
@@ -1931,11 +1957,11 @@ export default function Workspace({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Phone Number ID</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_phone_number_id')}</label>
                                     <input
                                         type="text"
                                         required
-                                        placeholder="e.g. 1280491895139233"
+                                        placeholder={__('whatsapp.workspace_example', { value: '1280491895139233' })}
                                         value={accountForm.data.phone_number_id}
                                         onChange={e => accountForm.setData('phone_number_id', e.target.value)}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
@@ -1943,10 +1969,10 @@ export default function Workspace({
                                     {accountForm.errors.phone_number_id && <span className="text-xxs text-red-500 mt-1 block">{accountForm.errors.phone_number_id}</span>}
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">WABA ID (Optional)</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_waba_id_optional')}</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. 109283748291029"
+                                        placeholder={__('whatsapp.workspace_example', { value: '109283748291029' })}
                                         value={accountForm.data.waba_id}
                                         onChange={e => accountForm.setData('waba_id', e.target.value)}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
@@ -1955,11 +1981,11 @@ export default function Workspace({
                             </div>
 
                             <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Access Token (Permanent or Temporary)</label>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_access_token_label')}</label>
                                 <textarea
                                     rows={3}
                                     required
-                                    placeholder="e.g. EAAsewqHOtVsBS..."
+                                    placeholder={__('whatsapp.workspace_example', { value: 'EAAsewqHOtVsBS...' })}
                                     value={accountForm.data.access_token}
                                     onChange={e => accountForm.setData('access_token', e.target.value)}
                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs font-mono text-zinc-700 dark:text-zinc-300"
@@ -1973,14 +1999,14 @@ export default function Workspace({
                                     onClick={() => setShowAddAccountModal(false)}
                                     className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={accountForm.processing}
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    {accountForm.processing ? 'Verifying & Saving...' : 'Save Meta Account'}
+                                    {accountForm.processing ? __('whatsapp.workspace_verifying_saving') : __('whatsapp.workspace_save_meta_account')}
                                 </button>
                             </div>
                         </form>
@@ -1994,19 +2020,19 @@ export default function Workspace({
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-6">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">تعديل حساب Meta / WhatsApp</h3>
-                                <p className="text-xs text-zinc-500 mt-1">تعديل بيانات الحساب ومُعرفات Meta Developer Portal.</p>
+                                <h3 className="text-lg font-bold text-zinc-950 dark:text-zinc-50 font-sans">{__('whatsapp.workspace_edit_account_title')}</h3>
+                                <p className="text-xs text-zinc-500 mt-1">{__('whatsapp.workspace_edit_account_desc')}</p>
                             </div>
-                            <button onClick={() => { setShowEditAccountModal(false); setEditingAccount(null); }} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
+                            <button type="button" onClick={() => { setShowEditAccountModal(false); setEditingAccount(null); }} aria-label={__('general.close')} className="text-zinc-400 hover:text-zinc-600 font-bold text-xl">&times;</button>
                         </div>
 
                         <form onSubmit={handleUpdateAccount} className="space-y-4">
                             <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Account Display Name / Phone</label>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_account_display_name_phone')}</label>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="e.g. +20 12 26024269"
+                                    placeholder={__('whatsapp.workspace_example', { value: '+20 12 26024269' })}
                                     value={editAccountForm.data.name}
                                     onChange={e => editAccountForm.setData('name', e.target.value)}
                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm text-zinc-700 dark:text-zinc-300"
@@ -2016,11 +2042,11 @@ export default function Workspace({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Phone Number ID</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_phone_number_id')}</label>
                                     <input
                                         type="text"
                                         required
-                                        placeholder="e.g. 1327754942721420"
+                                        placeholder={__('whatsapp.workspace_example', { value: '1327754942721420' })}
                                         value={editAccountForm.data.phone_number_id}
                                         onChange={e => editAccountForm.setData('phone_number_id', e.target.value)}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
@@ -2028,10 +2054,10 @@ export default function Workspace({
                                     {editAccountForm.errors.phone_number_id && <span className="text-xxs text-red-500 mt-1 block">{editAccountForm.errors.phone_number_id}</span>}
                                 </div>
                                 <div>
-                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">WABA ID</label>
+                                    <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_waba_id')}</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. 1223248954207318"
+                                        placeholder={__('whatsapp.workspace_example', { value: '1223248954207318' })}
                                         value={editAccountForm.data.waba_id}
                                         onChange={e => editAccountForm.setData('waba_id', e.target.value)}
                                         className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-sm font-mono text-zinc-700 dark:text-zinc-300"
@@ -2041,10 +2067,10 @@ export default function Workspace({
                             </div>
 
                             <div>
-                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Access Token (Optional - Leave blank to keep existing token)</label>
+                                <label className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">{__('whatsapp.workspace_access_token_optional')}</label>
                                 <textarea
                                     rows={3}
-                                    placeholder="Leave blank to keep existing token or paste a new token..."
+                                    placeholder={__('whatsapp.workspace_access_token_placeholder')}
                                     value={editAccountForm.data.access_token}
                                     onChange={e => editAccountForm.setData('access_token', e.target.value)}
                                     className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 text-xs font-mono text-zinc-700 dark:text-zinc-300"
@@ -2058,14 +2084,14 @@ export default function Workspace({
                                     onClick={() => { setShowEditAccountModal(false); setEditingAccount(null); }}
                                     className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-250 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={editAccountForm.processing}
                                     className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs px-4 py-2 rounded-xl font-bold transition"
                                 >
-                                    {editAccountForm.processing ? 'Saving...' : 'Save Changes'}
+                                    {editAccountForm.processing ? __('general.saving') : __('whatsapp.workspace_save_changes')}
                                 </button>
                             </div>
                         </form>
@@ -2081,17 +2107,18 @@ export default function Workspace({
                         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-3">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-2xl bg-red-500/10 text-red-500 flex items-center justify-center font-bold text-lg">
-                                    ⚠️
+                                    <AlertTriangle className="w-5 h-5" aria-hidden="true" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
-                                        WhatsApp Disconnected
+                                        {__('whatsapp.workspace_disconnected')}
                                     </h3>
                                     <p className="text-xs text-zinc-500">{reconnectAccount.name}</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setReconnectAccount(null)}
+                                aria-label={__('general.close')}
                                 className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xl font-bold"
                             >
                                 &times;
@@ -2100,17 +2127,17 @@ export default function Workspace({
 
                         <div className="space-y-4">
                             <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                                رقمك غير متصل بميتا حالياً بسبب عدم التحقق. اختر طريقة استلام كود التحقق لتفعيل الرقم:
+                                {__('whatsapp.workspace_reconnect_desc')}
                             </p>
 
                             {flash?.success && (
                                 <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 p-3 rounded-2xl text-xs font-semibold space-y-1">
                                     <div className="flex items-center gap-1.5 font-bold">
-                                        <span>✓</span>
+                                        <Check className="w-4 h-4" aria-hidden="true" />
                                         <span>{flash.success}</span>
                                     </div>
                                     <p className="text-xxs text-emerald-700/80 dark:text-emerald-400/80">
-                                        أدخل الكود المكون من 6 أرقام المستلم في الحقل أدناه ثم اضغط تأكيد وتفعيل.
+                                        {__('whatsapp.workspace_reconnect_code_hint')}
                                     </p>
                                 </div>
                             )}
@@ -2118,13 +2145,13 @@ export default function Workspace({
                             {flash?.error && (
                                 <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 p-3.5 rounded-2xl text-xs font-semibold space-y-2">
                                     <div className="flex items-center gap-1.5 font-bold">
-                                        <span>⚠️</span>
+                                        <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                                         <span>{flash.error}</span>
                                     </div>
                                     {flash?.meta_response && (
                                         <div className="pt-2 border-t border-red-200 dark:border-red-900/60 space-y-1">
                                             <span className="text-xxs font-bold text-red-700 dark:text-red-400 block uppercase">
-                                                Meta Graph API Error Payload:
+                                                {__('whatsapp.workspace_meta_graph_error_payload')}
                                             </span>
                                             <pre className="bg-zinc-950 text-red-400 text-xxs p-2.5 rounded-xl font-mono overflow-x-auto border border-zinc-800 dir-ltr text-left">
                                                 {JSON.stringify(flash.meta_response, null, 2)}
@@ -2136,7 +2163,7 @@ export default function Workspace({
 
                             {/* Step 1: Request Code Buttons */}
                             <div className="space-y-2">
-                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">1. طلب كود التحقق (Request Code)</span>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">{__('whatsapp.workspace_step_request_code')}</span>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
                                         type="button"
@@ -2155,8 +2182,8 @@ export default function Workspace({
                                         }}
                                         className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer disabled:opacity-50"
                                     >
-                                        <span className="text-base">💬</span>
-                                        <span>إرسال عبر SMS</span>
+                                        <MessageSquare className="w-4 h-4" aria-hidden="true" />
+                                        <span>{__('whatsapp.workspace_send_via_sms')}</span>
                                     </button>
 
                                     <button
@@ -2176,8 +2203,8 @@ export default function Workspace({
                                         }}
                                         className="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-800 dark:text-sky-300 p-3 rounded-2xl text-xs font-bold transition flex flex-col items-center gap-1.5 cursor-pointer disabled:opacity-50"
                                     >
-                                        <span className="text-base">📞</span>
-                                        <span>إرسال عبر مكالمة</span>
+                                        <Phone className="w-4 h-4" aria-hidden="true" />
+                                        <span>{__('whatsapp.workspace_send_via_call')}</span>
                                     </button>
                                 </div>
                             </div>
@@ -2187,7 +2214,7 @@ export default function Workspace({
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     if (!reconnectPin.trim() || reconnectPin.length !== 6) {
-                                        alert('يرجى إدخال كود التحقق المكون من 6 أرقام');
+                                        toast.error(__('whatsapp.workspace_pin_required'));
                                         return;
                                     }
                                     setIsRegisteringPin(true);
@@ -2202,12 +2229,13 @@ export default function Workspace({
                                 }}
                                 className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-3"
                             >
-                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">2. أدخل كود التحقق المكون من 6 أرقام</span>
+                                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 block">{__('whatsapp.workspace_step_enter_code')}</span>
                                 <input
                                     type="text"
                                     maxLength={6}
                                     required
-                                    placeholder="مثال: 123456"
+                                    placeholder={__('whatsapp.workspace_example', { value: '123456' })}
+                                    aria-label={__('whatsapp.workspace_step_enter_code')}
                                     value={reconnectPin}
                                     onChange={e => setReconnectPin(e.target.value)}
                                     className="w-full text-center tracking-widest text-lg font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -2218,13 +2246,14 @@ export default function Workspace({
                                     disabled={isRegisteringPin || reconnectPin.length !== 6}
                                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 rounded-xl transition shadow-md disabled:opacity-50 cursor-pointer"
                                 >
-                                    {isRegisteringPin ? 'جاري التفعيل...' : '🚀 تأكيد وتفعيل الرقم (Register)'}
+                                    {isRegisteringPin ? __('whatsapp.workspace_activating') : __('whatsapp.workspace_confirm_activate')}
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
             )}
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

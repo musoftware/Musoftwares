@@ -22,7 +22,7 @@ class ServiceSerialController extends Controller
         $serials = ServiceSerial::with(['service', 'usedBy'])
             ->whereHas('service', fn ($q) => $q->where('seller_id', $userId))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)->withQueryString();
 
         $services = Service::where('seller_id', $userId)
             ->select('id', 'title', 'generate_serials')

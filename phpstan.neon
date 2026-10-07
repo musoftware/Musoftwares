@@ -3,26 +3,22 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
-    phpVersion: 80300 # Force PHP 8.3 analysis despite local PHP 8.1 CLI
+    # Analyse as the lowest PHP version allowed by composer.json ("php": "^8.4").
+    phpVersion: 80400
 
     paths:
         - app/
         - Modules/
 
-    # Level 1 catches undefined variables, properties, and methods
+    # Level 1 catches undefined variables, properties, and methods.
     level: 1
 
-    reportUnmatchedIgnoredErrors: false
-
-    ignoreErrors:
-        -
-            message: '#^Class App\\Services\\WhatsAppNotificationService not found\.$#'
-            paths:
-                - Modules/WebTools/Http/Controllers/Financial/PayGuestController.php
-                - Modules/WebTools/Http/Controllers/Financial/WithdrawInstapayController.php
+    # Fail when a baseline or ignore entry no longer matches, so stale entries get removed.
+    reportUnmatchedIgnoredErrors: true
 
     excludePaths:
         - Modules/SmsPaymentGateway/sdk/
         - */database/factories/*
         - */database/seeders/*
         - */Tests/*
+        - */tests/*

@@ -16,6 +16,7 @@ import { __ } from '@/lib/i18n';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { timeAgo } from '@/lib/utils';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export interface AdminNote {
     id: number;
@@ -41,14 +42,20 @@ interface ProjectAdminNotesSidebarProps {
     boardCategories?: { id: number; name: string }[];
 }
 
-const DEFAULT_CATEGORIES = [
-    'General',
-    'Client Info',
-    'Requirements',
-    'Finance',
-    'Technical',
-    'Meeting Notes'
-];
+/** Stored category values (sent to the server) mapped to their display translation keys. */
+const DEFAULT_CATEGORY_LABEL_KEYS: Record<string, string> = {
+    'General': 'admin.admin_notes_category_general',
+    'Client Info': 'admin.admin_notes_category_client_info',
+    'Requirements': 'admin.admin_notes_category_requirements',
+    'Finance': 'admin.admin_notes_category_finance',
+    'Technical': 'admin.admin_notes_category_technical',
+    'Meeting Notes': 'admin.admin_notes_category_meeting_notes',
+};
+
+const DEFAULT_CATEGORIES = Object.keys(DEFAULT_CATEGORY_LABEL_KEYS);
+
+const categoryLabel = (category: string): string =>
+    DEFAULT_CATEGORY_LABEL_KEYS[category] ? __(DEFAULT_CATEGORY_LABEL_KEYS[category]) : category;
 
 export default function ProjectAdminNotesSidebar({
     projectId,
@@ -68,6 +75,7 @@ export default function ProjectAdminNotesSidebar({
     const [editContent, setEditContent] = useState('');
     const [editCategory, setEditCategory] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     // Merge default categories, board categories, and any unique categories existing in the notes
     const categoryOptions = useMemo(() => {
@@ -107,7 +115,7 @@ export default function ProjectAdminNotesSidebar({
 
         const category = categoryType === 'custom' ? customCategory.trim() : selectedCategory;
         if (!category) {
-            toast.error(__('general.error') || 'Category is required');
+            toast.error(__('general.error'));
             return;
         }
 
@@ -127,9 +135,9 @@ export default function ProjectAdminNotesSidebar({
             setIsPinned(false);
             setCustomCategory('');
             setCategoryType('select');
-            toast.success(__('general.note_created_successfully') || 'Admin note added successfully!');
+            toast.success(__('general.note_created_successfully'));
         } catch (error: any) {
-            toast.error(error.response?.data?.message || __('general.error') || 'Failed to save admin note');
+            toast.error(error.response?.data?.message || __('general.error'));
         } finally {
             setIsSaving(false);
         }
@@ -150,9 +158,9 @@ export default function ProjectAdminNotesSidebar({
 
             onNotesChange(notes.map(n => n.id === noteId ? response.data : n));
             setEditingNoteId(null);
-            toast.success(__('general.note_updated_successfully') || 'Note updated successfully!');
+            toast.success(__('general.note_updated_successfully'));
         } catch (error: any) {
-            toast.error(error.response?.data?.message || __('general.error') || 'Failed to update note');
+            toast.error(error.response?.data?.message || __('general.error'));
         } finally {
             setIsSaving(false);
         }
@@ -170,21 +178,26 @@ export default function ProjectAdminNotesSidebar({
             );
 
             onNotesChange(notes.map(n => n.id === note.id ? response.data : n));
-            toast.success(note.is_pinned ? 'Note unpinned' : 'Note pinned');
+            toast.success(note.is_pinned ? __('admin.admin_notes_unpinned') : __('admin.admin_notes_pinned'));
         } catch (error: any) {
-            toast.error(__('general.error') || 'Failed to toggle pin');
+            toast.error(__('general.error'));
         }
     };
 
     const handleDeleteNote = async (noteId: number) => {
-        if (!window.confirm(__('general.confirm_delete') || 'Are you sure you want to delete this note?')) return;
+        const accepted = await confirm({
+            title: __('general.confirm_delete'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
 
         try {
             await axios.delete(route('admin.projects.admin-notes.destroy', { project: projectId, note: noteId }));
             onNotesChange(notes.filter(n => n.id !== noteId));
-            toast.success(__('general.note_deleted_successfully') || 'Note deleted successfully!');
+            toast.success(__('general.note_deleted_successfully'));
         } catch (error: any) {
-            toast.error(__('general.error') || 'Failed to delete note');
+            toast.error(__('general.error'));
         }
     };
 
@@ -201,11 +214,11 @@ export default function ProjectAdminNotesSidebar({
                     <div className="flex items-center gap-2">
                         <StickyNote className="h-5 w-5 text-amber-500" />
                         <SheetTitle className="text-xl font-bold text-slate-900">
-                            {__('general.admin_notes') || 'Internal Admin Notes'}
+                            {__('general.admin_notes')}
                         </SheetTitle>
                     </div>
                     <SheetDescription className="text-xs text-slate-400 mt-1">
-                        {__('general.admin_notes_desc') || 'These notes are private and visible only to administrators and staff.'}
+                        {__('general.admin_notes_desc')}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -215,14 +228,14 @@ export default function ProjectAdminNotesSidebar({
                     <form onSubmit={handleAddNote} className="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                             <Tag className="h-3 w-3 text-slate-400" />
-                            {__('general.add_note') || 'Add Admin Note'}
+                            {__('general.add_note')}
                         </h4>
 
                         <div className="space-y-2">
                             <Textarea
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
-                                placeholder={__('general.write_your_note_here') || 'Write your note here...'}
+                                placeholder={__('general.write_your_note_here')}
                                 className="min-h-[80px] bg-white border-slate-200 text-sm focus-visible:ring-slate-400 focus-visible:ring-1"
                                 required
                             />
@@ -244,16 +257,16 @@ export default function ProjectAdminNotesSidebar({
                                         className="w-full text-xs bg-white border border-slate-200 rounded-md px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-1 focus:ring-slate-400"
                                     >
                                         {categoryOptions.map(cat => (
-                                            <option key={cat} value={cat}>{cat}</option>
+                                            <option key={cat} value={cat}>{categoryLabel(cat)}</option>
                                         ))}
-                                        <option value="__custom__">+ {__('general.custom_category') || 'Custom category...'}</option>
+                                        <option value="__custom__">+ {__('general.custom_category')}</option>
                                     </select>
                                 ) : (
                                     <div className="flex items-center gap-1">
                                         <Input
                                             value={customCategory}
                                             onChange={(e) => setCustomCategory(e.target.value)}
-                                            placeholder={__('general.category_name') || 'Category Name'}
+                                            placeholder={__('general.category_name')}
                                             className="h-8 text-xs bg-white border-slate-200"
                                             required
                                         />
@@ -263,6 +276,7 @@ export default function ProjectAdminNotesSidebar({
                                             size="sm"
                                             onClick={() => setCategoryType('select')}
                                             className="h-8 px-2 hover:bg-slate-200 text-slate-500"
+                                            aria-label={__('general.cancel')}
                                         >
                                             <X className="h-3 w-3" />
                                         </Button>
@@ -279,7 +293,7 @@ export default function ProjectAdminNotesSidebar({
                                         className="h-3 w-3 rounded text-slate-900 border-slate-300 focus:ring-slate-500"
                                     />
                                     <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-                                        {__('general.pin') || 'Pin'}
+                                        {__('general.pin')}
                                     </span>
                                 </label>
                             </div>
@@ -290,7 +304,7 @@ export default function ProjectAdminNotesSidebar({
                                 disabled={isSaving}
                                 className="h-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-3 rounded-md shrink-0"
                             >
-                                {isSaving ? '...' : __('general.save') || 'Save'}
+                                {isSaving ? '...' : __('general.save')}
                             </Button>
                         </div>
                     </form>
@@ -309,7 +323,7 @@ export default function ProjectAdminNotesSidebar({
                                             : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                                     }`}
                                 >
-                                    {cat === 'all' ? __('general.all') || 'All' : cat}
+                                    {cat === 'all' ? __('general.all') : categoryLabel(cat)}
                                 </button>
                             ))}
                         </div>
@@ -321,7 +335,7 @@ export default function ProjectAdminNotesSidebar({
                             <div className="text-center py-12 bg-slate-50/50 border border-dashed border-slate-200 rounded-xl">
                                 <StickyNote className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                                 <p className="text-sm font-semibold text-slate-400">
-                                    {__('general.no_notes_found') || 'No internal notes found.'}
+                                    {__('general.no_notes_found')}
                                 </p>
                             </div>
                         ) : (
@@ -356,6 +370,7 @@ export default function ProjectAdminNotesSidebar({
                                                         size="sm"
                                                         onClick={() => setEditingNoteId(null)}
                                                         className="h-8 w-8 p-0 bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                        aria-label={__('general.cancel')}
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </Button>
@@ -365,6 +380,7 @@ export default function ProjectAdminNotesSidebar({
                                                         onClick={() => handleUpdateNote(note.id)}
                                                         disabled={isSaving}
                                                         className="h-8 w-8 p-0 bg-slate-900 text-white hover:bg-slate-800"
+                                                        aria-label={__('general.save')}
                                                     >
                                                         <Check className="h-4 w-4" />
                                                     </Button>
@@ -377,7 +393,7 @@ export default function ProjectAdminNotesSidebar({
                                             <div className="flex justify-between items-start gap-4 mb-2">
                                                 {note.category && (
                                                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-200/80 text-slate-700">
-                                                        {note.category}
+                                                        {categoryLabel(note.category)}
                                                     </span>
                                                 )}
                                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -387,7 +403,8 @@ export default function ProjectAdminNotesSidebar({
                                                         className={`p-1 rounded hover:bg-slate-200 transition ${
                                                             note.is_pinned ? 'text-amber-500' : 'text-slate-400 hover:text-slate-600'
                                                         }`}
-                                                        title={note.is_pinned ? 'Unpin' : 'Pin'}
+                                                        title={note.is_pinned ? __('admin.admin_notes_unpin') : __('general.pin')}
+                                                        aria-label={note.is_pinned ? __('admin.admin_notes_unpin') : __('general.pin')}
                                                     >
                                                         <Pin className="h-3.5 w-3.5" />
                                                     </button>
@@ -395,7 +412,8 @@ export default function ProjectAdminNotesSidebar({
                                                         type="button"
                                                         onClick={() => startEditing(note)}
                                                         className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition"
-                                                        title="Edit"
+                                                        title={__('general.edit')}
+                                                        aria-label={__('general.edit')}
                                                     >
                                                         <Pencil className="h-3.5 w-3.5" />
                                                     </button>
@@ -403,7 +421,8 @@ export default function ProjectAdminNotesSidebar({
                                                         type="button"
                                                         onClick={() => handleDeleteNote(note.id)}
                                                         className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-red-600 transition"
-                                                        title="Delete"
+                                                        title={__('general.delete')}
+                                                        aria-label={__('general.delete')}
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
                                                     </button>
@@ -412,7 +431,7 @@ export default function ProjectAdminNotesSidebar({
 
                                             {/* Pin indicator for non-hover state */}
                                             {note.is_pinned && (
-                                                <Pin className="absolute top-4 right-4 h-3.5 w-3.5 text-amber-500 fill-amber-500 group-hover:hidden" />
+                                                <Pin className="absolute top-4 end-4 h-3.5 w-3.5 text-amber-500 fill-amber-500 group-hover:hidden" />
                                             )}
 
                                             <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">
@@ -423,7 +442,7 @@ export default function ProjectAdminNotesSidebar({
                                             <div className="mt-3 pt-3 border-t border-slate-100/50 flex justify-between items-center text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                                                 <span className="flex items-center gap-1">
                                                     <User className="h-3 w-3" />
-                                                    {note.author?.name || 'Admin'}
+                                                    {note.author?.name || __('admin.admin_notes_author_fallback')}
                                                 </span>
                                                 <span className="flex items-center gap-1">
                                                     <Calendar className="h-3 w-3" />
@@ -437,6 +456,7 @@ export default function ProjectAdminNotesSidebar({
                         )}
                     </div>
                 </div>
+                {confirmDialog}
             </SheetContent>
         </Sheet>
     );

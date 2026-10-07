@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     ArrowLeft, Wallet, Plus, Trash2, Smartphone
 } from 'lucide-react';
@@ -15,6 +16,7 @@ interface WalletProps {
 }
 
 export default function Wallets({ wallets }: WalletProps) {
+    const { confirm, confirmDialog } = useConfirm();
     const { data, setData, post, processing, errors, reset } = useForm({
         payment_type: 'Wallet',
         phone_number: '',
@@ -27,10 +29,14 @@ export default function Wallets({ wallets }: WalletProps) {
         });
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to remove this wallet?')) {
-            router.delete(route('sms-payment-gateway.wallets.delete', id));
-        }
+    const handleDelete = async (id: number) => {
+        const accepted = await confirm({
+            title: __('sms_gateway.wallets_remove_title'),
+            description: __('sms_gateway.wallets_remove_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('sms-payment-gateway.wallets.delete', id));
     };
 
     return (
@@ -71,14 +77,14 @@ export default function Wallets({ wallets }: WalletProps) {
                                                 value={data.payment_type}
                                                 onChange={e => setData('payment_type', e.target.value)}
                                             >
-                                                <option value="Wallet">E-Wallet (Vodafone/Etisalat/etc)</option>
+                                                <option value="Wallet">{__('sms_gateway.wallets_ewallet_option')}</option>
                                                 <option value="Instapay">{__('general.instapay_alias')}</option>
                                             </select>
                                             {errors.payment_type && <p className="text-sm text-red-600">{errors.payment_type}</p>}
                                         </div>
                                         
                                         <div className="space-y-2">
-                                            <Label htmlFor="phone_number">Identifier (Number / Alias)</Label>
+                                            <Label htmlFor="phone_number">{__('sms_gateway.wallets_identifier_label')}</Label>
                                             <Input
                                                 id="phone_number"
                                                 type="text"
@@ -123,7 +129,7 @@ export default function Wallets({ wallets }: WalletProps) {
                                                             <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider">{wallet.payment_type}</p>
                                                         </div>
                                                     </div>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(wallet.id)} className="text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(wallet.id)} aria-label={__('sms_gateway.wallets_remove_title')} className="text-slate-400 hover:text-rose-600 hover:bg-rose-50">
                                                         <Trash2 className="w-4 h-4" />
                                                     </Button>
                                                 </div>
@@ -136,6 +142,7 @@ export default function Wallets({ wallets }: WalletProps) {
                     </div>
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

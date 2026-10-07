@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { Head } from '@inertiajs/react';
 
@@ -17,8 +18,8 @@ export default function GuestRegister({ business, facebookLoginUrl }: Props) {
             <div className="absolute bottom-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-emerald-500/10 blur-[120px]" />
 
             <Head>
-                <title>{`Connect WhatsApp to ${business.name} - Musoftware`}</title>
-                <meta name="description" content={`Link your business WhatsApp phone number to ${business.name} securely.`} />
+                <title>{__('whatsapp.guest_register_page_title', { name: business.name })}</title>
+                <meta name="description" content={__('whatsapp.guest_register_meta_desc', { name: business.name })} />
             </Head>
 
             <div className="max-w-md w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 text-center">
@@ -30,10 +31,10 @@ export default function GuestRegister({ business, facebookLoginUrl }: Props) {
                 </div>
 
                 <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2">
-                    Connect WhatsApp Number
+                    {__('whatsapp.guest_register_title')}
                 </h1>
                 <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                    You have been invited to link your Facebook WhatsApp Business account to <span className="font-semibold text-slate-200">{business.name}</span>. This allows managing your numbers and sending template messages.
+                    {__('whatsapp.guest_register_desc', { name: business.name })}
                 </p>
 
                 <div className="space-y-4">
@@ -45,21 +46,21 @@ export default function GuestRegister({ business, facebookLoginUrl }: Props) {
                         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                             <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                         </svg>
-                        <span>Connect with Facebook</span>
+                        <span>{__('whatsapp.guest_register_connect_fb')}</span>
                     </a>
 
                     <div className="flex items-center justify-center gap-2 text-xs text-slate-500 mt-6">
                         <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                         </svg>
-                        <span>Secure OAuth integration via Meta Cloud API</span>
+                        <span>{__('whatsapp.guest_register_secure')}</span>
                     </div>
                 </div>
             </div>
 
             {/* Footer */}
             <div className="mt-8 text-center text-slate-600 text-xs relative z-10">
-                Powered by Musoftware Business Platform &copy; {new Date().getFullYear()}
+                {__('whatsapp.guest_powered_by', { year: new Date().getFullYear() })}
             </div>
         </div>
     );

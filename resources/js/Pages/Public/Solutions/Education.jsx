@@ -4,6 +4,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import { GraduationCap, Video, BookOpen, ArrowRight, CheckCircle2 } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -43,33 +44,33 @@ export default function Education({ auth }) {
 
     const features = [
         {
-            title: "Video Protection",
+            title: __('frontend.solution_education_f1_title'),
             icon: Video,
-            desc: "Prevent unauthorized downloads and sharing with encrypted HLS streaming and dynamic watermarking.",
-            bullets: ["HLS encrypted streams", "Dynamic watermarking", "Device limits"]
+            desc: __('frontend.solution_education_f1_desc'),
+            bullets: [__('frontend.solution_education_f1_b1'), __('frontend.solution_education_f1_b2'), __('frontend.solution_education_f1_b3')]
         },
         {
-            title: "Interactive Learning",
+            title: __('frontend.solution_education_f2_title'),
             icon: BookOpen,
-            desc: "Engage students with interactive quizzes, assignments, and real-time progress tracking.",
-            bullets: ["Automated grading", "Progress analytics", "Discussion forums"]
+            desc: __('frontend.solution_education_f2_desc'),
+            bullets: [__('frontend.solution_education_f2_b1'), __('frontend.solution_education_f2_b2'), __('frontend.solution_education_f2_b3')]
         },
         {
-            title: "Certification Engine",
+            title: __('frontend.solution_education_f3_title'),
             icon: GraduationCap,
-            desc: "Automatically generate and email secure, verifiable PDF certificates upon course completion.",
-            bullets: ["Custom PDF templates", "QR code verification", "Automated delivery"]
+            desc: __('frontend.solution_education_f3_desc'),
+            bullets: [__('frontend.solution_education_f3_b1'), __('frontend.solution_education_f3_b2'), __('frontend.solution_education_f3_b3')]
         }
     ];
 
     return (
         <PublicLayout auth={auth}>
             <Head>
-                <title>E-Learning Solutions | Musoftware</title>
-                <meta name="description" content="Launch your own digital academy. Secure, video-centric platforms for selling courses." />
+                <title>{`${__('frontend.solution_education_meta_title')} | Musoftware`}</title>
+                <meta name="description" content={__('frontend.solution_education_meta_desc')} />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage="Hello Mahmoud, I want to discuss an E-Learning Solution." />
+            <FloatingWhatsAppButton phoneNumber={phoneNumber} defaultMessage={__('frontend.solution_education_whatsapp_message')} />
 
             <div ref={mainRef} className="w-full bg-[#fcfcfc] text-[#111111] font-sans selection:bg-[#111111] selection:text-white overflow-x-hidden">
                 
@@ -78,19 +79,19 @@ export default function Education({ auth }) {
                     <div className="max-w-4xl">
                         <div className="gsap-fade-up inline-flex items-center gap-2 px-3 py-1 border border-[#e5e5e5] text-xs font-semibold text-[#666666] tracking-widest uppercase mb-8 bg-white">
                             <span className="flex h-1.5 w-1.5 rounded-full bg-[#111111]"></span>
-                            Solution
+                            {__('frontend.solution_badge')}
                         </div>
                         <h1 className="gsap-fade-up text-5xl lg:text-7xl font-extrabold text-[#111111] tracking-tight leading-[1.05] mb-6">
-                            Digital Academies.
+                            {__('frontend.solution_education_hero_title')}
                         </h1>
                         <p className="gsap-fade-up text-xl text-[#666666] font-normal leading-relaxed max-w-2xl mb-10">
-                            Launch your own digital academy. We create secure, video-centric platforms for selling courses with progress tracking and interactive exams.
+                            {__('frontend.solution_education_hero_desc')}
                         </p>
                         <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I want to discuss an E-Learning Solution.")}
+                            onClick={() => openWhatsApp(__('frontend.solution_education_whatsapp_message'))}
                             className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-8 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            Discuss Your Needs
+                            {__('frontend.solution_discuss_needs')}
                         </Button>
                     </div>
                 </section>
@@ -98,8 +99,8 @@ export default function Education({ auth }) {
                 {/* Features Grid */}
                 <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto reveal-section">
                     <div className="text-center mb-16">
-                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">Educational Tools</h2>
-                        <p className="gsap-fade-up text-lg text-[#666666]">Built for modern instructors and students.</p>
+                        <h2 className="gsap-fade-up text-4xl font-extrabold mb-4">{__('frontend.solution_education_section_title')}</h2>
+                        <p className="gsap-fade-up text-lg text-[#666666]">{__('frontend.solution_education_section_desc')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -129,16 +130,16 @@ export default function Education({ auth }) {
                 <section className="py-24 bg-[#f5f5f7] text-[#1d1d1f] border-t border-black/5 text-center reveal-section px-6">
                     <div className="max-w-3xl mx-auto">
                         <h2 className="gsap-fade-up text-3xl md:text-5xl font-bold tracking-tight mb-6">
-                            Ready to launch your academy?
+                            {__('frontend.solution_education_cta_title')}
                         </h2>
                         <p className="gsap-fade-up text-lg text-[#1d1d1f]/70 mb-10 leading-relaxed">
-                            Stop paying high fees to third-party platforms. Own your content and your student data.
+                            {__('frontend.solution_education_cta_desc')}
                         </p>
                         <Button 
-                            onClick={() => openWhatsApp("Hello Mahmoud, I need to build a digital academy.")}
+                            onClick={() => openWhatsApp(__('frontend.solution_education_cta_message'))}
                             className="gsap-fade-up bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-[980px] px-10 py-4 text-sm font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-3 mx-auto cursor-pointer"
                         >
-                            Book a Consultation <ArrowRight className="w-4 h-4" />
+                            {__('frontend.solution_book_consultation')} <ArrowRight className="w-4 h-4" />
                         </Button>
                     </div>
                 </section>

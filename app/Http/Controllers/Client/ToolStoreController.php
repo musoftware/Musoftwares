@@ -4,17 +4,14 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\SerialDevice;
-use App\Models\SerialSoftware;
 use App\Models\SerialSoftwareLicense;
 use App\Models\SerialUserDevice;
 use App\Models\StoreTool;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -75,85 +72,79 @@ class ToolStoreController extends Controller
     }
 
     /**
-     * Purchase or activate software license for a store tool by email.
+     * Activate a free store tool license for the signed-in user.
+     * Paid tools are activated by an admin after a confirmed manual payment.
      */
     public function purchase(Request $request, StoreTool $storeTool): RedirectResponse
     {
         $validated = $request->validate([
-            'email'     => ['required', 'email', 'max:255'],
-            'name'      => ['nullable', 'string', 'max:255'],
-            'phone'     => ['nullable', 'string', 'max:50'],
             'device_id' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $email = strtolower(trim($validated['email']));
-        $cairoNow = now()->setTimezone('Africa/Cairo');
-        $expiry = (clone $cairoNow)->addYear(); // 1 year standard license
+        if (! $storeTool->is_published) {
+            abort(404);
+        }
 
-        DB::transaction(function () use ($email, $validated, $storeTool, $expiry, $cairoNow) {
-            // Find or create user
-            $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
+        if ($this->requiresPayment($storeTool)) {
+            return back()->with('error', __('This tool requires payment. Please follow the payment instructions and our team will activate your license.'));
+        }
 
-            if (! $user) {
-                $user = User::create([
-                    'name'     => ! empty($validated['name']) ? trim($validated['name']) : explode('@', $email)[0],
-                    'email'    => $email,
-                    'password' => Hash::make(Str::random(16)),
-                ]);
+        $user = $request->user();
+        $deviceId = trim((string) ($validated['device_id'] ?? ''));
 
-                if (! empty($validated['phone']) && \Illuminate\Support\Facades\Schema::hasColumn('users', 'mobile_1')) {
-                    $user->update(['mobile_1' => $validated['phone']]);
-                }
-            }
+        if ($deviceId !== '' && $this->deviceOwnedByAnotherUser($deviceId, $user->id)) {
+            throw ValidationException::withMessages([
+                'device_id' => __('This device is already linked to another account.'),
+            ]);
+        }
 
-            // If the tool is linked to a SerialSoftware, activate the license
-            if ($storeTool->serial_software_id) {
-                $serialSoftwareId = $storeTool->serial_software_id;
-
-                SerialSoftwareLicense::withTrashed()->updateOrCreate(
-                    [
-                        'user_id'            => $user->id,
-                        'serial_software_id' => $serialSoftwareId,
-                    ],
-                    [
-                        'status'     => SerialSoftwareLicense::STATUS_ACTIVE,
-                        'expires_at' => $expiry,
-                        'deleted_at' => null,
-                    ]
-                );
-
-                // If device_id is provided, immediately bind and activate device
-                if (! empty($validated['device_id'])) {
-                    $deviceId = trim($validated['device_id']);
-
-                    SerialUserDevice::withTrashed()->updateOrCreate(
-                        ['device_id' => $deviceId],
-                        [
-                            'user_id'    => $user->id,
-                            'status'     => SerialUserDevice::STATUS_ACTIVE,
-                            'expires_at' => $expiry,
-                            'deleted_at' => null,
-                        ]
-                    );
-
-                    SerialDevice::updateOrCreate(
-                        [
-                            'serial_software_id' => $serialSoftwareId,
-                            'device_id'          => $deviceId,
-                        ],
-                        [
-                            'status'          => SerialDevice::STATUS_ACTIVE,
-                            'last_check_date' => $cairoNow,
-                        ]
-                    );
-                }
-            }
-        });
+        if ($storeTool->serial_software_id) {
+            DB::transaction(fn () => $this->activateLicense($user, (int) $storeTool->serial_software_id, $deviceId));
+        }
 
         return back()->with('success', __('License for :tool activated successfully on email :email.', [
             'tool'  => $storeTool->name,
-            'email' => $email,
+            'email' => $user->email,
         ]));
+    }
+
+    private function requiresPayment(StoreTool $storeTool): bool
+    {
+        return (bool) $storeTool->requires_payment || (float) $storeTool->price > 0;
+    }
+
+    private function deviceOwnedByAnotherUser(string $deviceId, int $userId): bool
+    {
+        return SerialUserDevice::withTrashed()
+            ->where('device_id', $deviceId)
+            ->whereNotNull('user_id')
+            ->where('user_id', '!=', $userId)
+            ->exists();
+    }
+
+    private function activateLicense(User $user, int $serialSoftwareId, string $deviceId): void
+    {
+        $cairoNow = now()->setTimezone('Africa/Cairo');
+        $expiry = (clone $cairoNow)->addYear();
+
+        SerialSoftwareLicense::withTrashed()->updateOrCreate(
+            ['user_id' => $user->id, 'serial_software_id' => $serialSoftwareId],
+            ['status' => SerialSoftwareLicense::STATUS_ACTIVE, 'expires_at' => $expiry, 'deleted_at' => null]
+        );
+
+        if ($deviceId === '') {
+            return;
+        }
+
+        SerialUserDevice::withTrashed()->updateOrCreate(
+            ['device_id' => $deviceId],
+            ['user_id' => $user->id, 'status' => SerialUserDevice::STATUS_ACTIVE, 'expires_at' => $expiry, 'deleted_at' => null]
+        );
+
+        SerialDevice::updateOrCreate(
+            ['serial_software_id' => $serialSoftwareId, 'device_id' => $deviceId],
+            ['status' => SerialDevice::STATUS_ACTIVE, 'last_check_date' => $cairoNow]
+        );
     }
 
     /**

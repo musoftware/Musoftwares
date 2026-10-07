@@ -210,10 +210,8 @@ public/downloads/runtime/mac/musoftware-runtime-mac-silicon.dmg
 u962989541_db (3).sql
 db_backup.sql
 u962989541_db (4).sql
-playwright-report/*
 test-results/*
 debug_invoice.php
-composer.phar
 vendor.zip
 tsc_output_utf8.txt
 tsc_output.txt
@@ -255,3 +253,22 @@ pest*.txt
 tsc_output*.txt
 err.txt
 out.txt
+
+###############################################################################
+# SECRETS - never commit (copy from the matching *.example file)
+###############################################################################
+.env.local
+.env.testing
+deploy/.ssh-config
+storage/app/firebase-credentials.json
+
+###############################################################################
+# LOCAL-ONLY TOOLING, NOTES AND OUTPUT
+###############################################################################
+/composer.phar
+/playwright-report/
+/.specstory/
+/tools/screenshots/
+/mer/
+/invoices_md/
+/backlog.txt

@@ -175,7 +175,7 @@ class PaymentLinkWebhookTest extends TestCase
     public function test_process_kashier_handles_merchant_order_id_fallback(): void
     {
         $user = User::factory()->create();
-        $link = PaymentLink::factory()->create(['user_id' => $user->id, 'amount' => 2299.92]);
+        $link = PaymentLink::factory()->create(['user_id' => $user->id, 'amount' => 2299.92, 'currency_id' => \App\Models\Currency::where('currency', 'EGP')->value('id')]); // Kashier charges EGP; link priced in EGP
 
         $payload = [
             'platform' => 'kashier',

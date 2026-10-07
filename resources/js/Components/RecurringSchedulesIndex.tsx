@@ -1,3 +1,4 @@
+import Pagination from '@/Components/Pagination';
 import React, { useState, useMemo } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
@@ -121,9 +122,9 @@ export function RecurringSchedulesIndex({
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(nextActive ? __('general.activated') || 'Activated' : __('general.deactivated') || 'Deactivated');
+                    toast.success(nextActive ? __('general.activated') : __('general.deactivated'));
                 },
-                onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+                onError: () => toast.error(__('general.error_occurred')),
             },
         );
     };
@@ -133,11 +134,11 @@ export function RecurringSchedulesIndex({
         router.delete(route(deleteRoute, pendingDelete.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -283,23 +284,14 @@ export function RecurringSchedulesIndex({
                     <div className="me-auto text-sm text-gray-500">
                         {__('general.showing')} {items.from} {__('general.to')} {items.to} {__('general.of')} {items.total} {__('general.entries')}
                     </div>
-                    <div className="flex space-x-1">
-                        {items.links.map((link: any, idx: number) => (
-                            <Link
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-2 border rounded text-sm ${link.active ? 'bg-black text-white border-black font-semibold' : 'bg-white text-gray-700 hover:bg-gray-50'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
+                    <Pagination links={items.links} />
                 </div>
             )}
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete_schedule') || 'Delete schedule?'}
-                description={__('general.confirm_delete_schedule_desc') || `This will permanently delete "${pendingDelete?.title}".`}
+                title={__('general.delete_schedule')}
+                description={__('general.confirm_delete_schedule_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

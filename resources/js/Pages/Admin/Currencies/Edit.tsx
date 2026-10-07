@@ -54,8 +54,8 @@ export default function Edit({ currency }: Props) {
             <div className="w-full max-w-3xl space-y-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
-                        <Link href={route('admin.currencies.index')}>
-                            <ArrowLeft className="h-4 w-4" />
+                        <Link href={route('admin.currencies.index')} aria-label={__('general.back')} title={__('general.back')}>
+                            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
                         </Link>
                     </Button>
                     <div>
@@ -106,7 +106,7 @@ export default function Edit({ currency }: Props) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="country_codes">{__('admin.countries')} (أكواد الدول يفصل بينها فاصلة)</Label>
+                            <Label htmlFor="country_codes">{__('admin.countries')} {__('admin.currencies_country_codes_hint_label')}</Label>
                             <Input
                                 id="country_codes"
                                 value={countryCodesString}
@@ -114,7 +114,7 @@ export default function Edit({ currency }: Props) {
                                 placeholder="US, CA, SA, EG"
                             />
                             <p className="text-xs text-slate-500">
-                                أدخل أكواد الدول بصيغة ISO ذات حرفين (مثل: US, SA, EG, AE).
+                                {__('admin.currencies_country_codes_help')}
                             </p>
                         </div>
 
@@ -127,7 +127,7 @@ export default function Edit({ currency }: Props) {
                                 className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                             />
                             <Label htmlFor="is_default" className="font-medium cursor-pointer">
-                                {__('admin.set_as_default_currency') || 'تعيين كعملة افتراضية للنظام (عند عدم وجود دولة الزائر)'}
+                                {__('admin.set_as_default_currency')}
                             </Label>
                         </div>
 

@@ -8,11 +8,13 @@ use App\Models\PartnerUsageLog;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class ClientPartnerGatewayTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     private User $clientUser;
     private PartnerClient $partner;
@@ -20,6 +22,8 @@ class ClientPartnerGatewayTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // This suite writes wallet/cost ledger rows, which convert amounts to the business currency.
+        $this->seedUsdEgpRates();
         $this->seed(RolesAndPermissionsSeeder::class);
 
         $usd = Currency::firstOrCreate(

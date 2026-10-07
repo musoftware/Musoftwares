@@ -28,10 +28,10 @@ export default function Register() {
 
         let label = '';
         if (score === 0) label = '';
-        else if (score === 1) label = __('general.weak') || 'Weak';
-        else if (score === 2) label = __('general.fair') || 'Fair';
-        else if (score === 3) label = __('general.good') || 'Good';
-        else if (score === 4) label = __('general.strong') || 'Strong';
+        else if (score === 1) label = __('general.weak');
+        else if (score === 2) label = __('general.fair');
+        else if (score === 3) label = __('general.good');
+        else if (score === 4) label = __('general.strong');
 
         setPasswordStrength({ score, label });
     };
@@ -203,10 +203,10 @@ export default function Register() {
                             htmlFor="terms"
                             className="text-xs font-medium text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 cursor-pointer select-none leading-tight"
                         >
-                            {__('general.i_agree_to_the') || 'I agree to the'}{' '}
-                            <Link href="/terms-of-service" className="font-semibold text-[#0071e3] hover:underline">{__('general.terms_of_service') || 'Terms of Service'}</Link>
-                            {' '}{__('general.and') || 'and'}{' '}
-                            <Link href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('general.privacy_policy') || 'Privacy Policy'}</Link>
+                            {__('general.i_agree_to_the')}{' '}
+                            <Link href="/terms-of-service" className="font-semibold text-[#0071e3] hover:underline">{__('general.terms_of_service')}</Link>
+                            {' '}{__('general.and')}{' '}
+                            <Link href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('general.privacy_policy')}</Link>
                         </Label>
                     </div>
 

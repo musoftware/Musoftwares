@@ -179,6 +179,20 @@ function StatusBadge({ status }) {
     );
 }
 
+const STATUS_FILTER_LABEL_KEYS = {
+    all: 'general.all',
+    pending: 'admin.pending',
+    overdue: 'general.overdue',
+    cleared: 'general.cleared',
+};
+
+function SortIcon({ column, sortKey, sortDir }) {
+    if (sortKey !== column) return <ChevronDown className="h-3 w-3 opacity-30" />;
+    return sortDir === 'desc'
+        ? <ChevronDown className="h-3 w-3 text-slate-700" />
+        : <ChevronUp className="h-3 w-3 text-slate-700" />;
+}
+
 // ─────────────────────────────────────────────────────────────
 // Main page
 // ─────────────────────────────────────────────────────────────
@@ -224,13 +238,6 @@ export default function EarningAnalyze({
         else { setSortKey(key); setSortDir('desc'); }
     };
 
-    const SortIcon = ({ k }) => {
-        if (sortKey !== k) return <ChevronDown className="h-3 w-3 opacity-30" />;
-        return sortDir === 'desc'
-            ? <ChevronDown className="h-3 w-3 text-slate-700" />
-            : <ChevronUp className="h-3 w-3 text-slate-700" />;
-    };
-
     // Filter recent earnings (client-side on the 50 loaded rows)
     const filteredRecent = useMemo(() => {
         if (statusFilter === 'all') return recent_earnings || [];
@@ -244,7 +251,7 @@ export default function EarningAnalyze({
     const payoutWidth = Math.min(100, settlement?.payout_ratio ?? 0);
 
     return (
-        <AdminSidebarLayout title={__('general.earning_analysis')} header="Earning Analysis">
+        <AdminSidebarLayout title={__('general.earning_analysis')} header={__('general.earning_analysis')}>
             <Head title={__('general.earning_analysis_admin')} />
 
             {/* ── Section 1: KPIs ───────────────────────────────────────── */}
@@ -255,33 +262,33 @@ export default function EarningAnalyze({
                         icon={DollarSign}
                         label={__('general.total_commissions')}
                         value={fmt(stats?.total_earnings)}
-                        sub="All-time referral earnings (business currency)"
-                        tooltip="Sum of all referral commission earnings, normalized to your business currency using historical exchange rates."
+                        sub={__('admin.earning_total_commissions_sub')}
+                        tooltip={__('admin.earning_total_commissions_tip')}
                     />
                     <MetricCard
                         icon={Users}
                         label={__('general.unique_earners')}
                         value={(stats?.total_earners ?? 0).toLocaleString()}
-                        sub="Users who earned commissions"
+                        sub={__('admin.earning_unique_earners_sub')}
                         href="/admin/users"
                     />
                     <MetricCard
                         icon={CheckCircle2}
                         label={__('general.cleared')}
                         value={fmt(stats?.cleared_earnings)}
-                        sub="Already paid to user wallets"
+                        sub={__('admin.earning_cleared_sub')}
                         success
-                        tooltip="Earnings that have been released from the clearing period and credited to user wallet balances."
+                        tooltip={__('admin.earning_cleared_tip')}
                     />
                     <MetricCard
                         icon={Clock}
                         label={__('general.pending_clearing')}
                         value={fmt(stats?.pending_clearing)}
                         sub={stats?.overdue_clearing > 0
-                            ? `⚠ ${fmt(stats.overdue_clearing)} overdue`
-                            : `${fmt(stats?.in_window_clearing)} in holding window`}
+                            ? __('admin.earning_overdue_amount', { amount: fmt(stats.overdue_clearing) })
+                            : __('admin.earning_in_holding_window', { amount: fmt(stats?.in_window_clearing) })}
                         warning={stats?.overdue_clearing > 0}
-                        tooltip="Total earnings not yet released. Overdue = past clearing date and needs processing. In-window = still within the holding period."
+                        tooltip={__('admin.earning_pending_clearing_tip')}
                     />
                 </div>
 
@@ -290,8 +297,7 @@ export default function EarningAnalyze({
                     <div className="mt-3 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
                         <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
                         <div className="text-sm text-red-800">
-                            <span className="font-semibold">{fmt(stats.overdue_clearing)}</span> in earnings are overdue for clearing.
-                            The scheduler will process these automatically on the next run.
+                            {__('admin.earning_overdue_banner', { amount: fmt(stats.overdue_clearing) })}
                         </div>
                     </div>
                 )}
@@ -305,15 +311,15 @@ export default function EarningAnalyze({
                         icon={DollarSign}
                         label={__('general.opening_balance')}
                         value={fmt(annual?.opening_balance)}
-                        sub={`Jan 1, ${new Date().getFullYear()}`}
-                        tooltip="Total platform transaction balance as of January 1st this year. Serves as the fiscal year baseline."
+                        sub={__('admin.earning_opening_balance_date', { year: new Date().getFullYear() })}
+                        tooltip={__('admin.earning_opening_balance_tip')}
                     />
                     <MetricCard
                         icon={Wallet}
                         label={__('general.current_balance')}
                         value={fmt(annual?.closing_balance)}
-                        sub="Updated in real-time"
-                        tooltip="The sum of all platform transactions (business_amount) up to today. Represents total liquid funds on the platform."
+                        sub={__('admin.earning_current_balance_sub')}
+                        tooltip={__('admin.earning_current_balance_tip')}
                         href="/admin/transactions"
                     />
                     <Card className="border-slate-200">
@@ -325,7 +331,7 @@ export default function EarningAnalyze({
                                         {growthPositive ? '+' : ''}{fmt(annual?.net_growth)}
                                     </p>
                                     <p className="text-xs text-slate-400 mt-1">
-                                        {annual?.growth_pct >= 0 ? '+' : ''}{annual?.growth_pct ?? 0}% vs opening
+                                        {__('admin.earning_growth_vs_opening', { percent: `${annual?.growth_pct >= 0 ? '+' : ''}${annual?.growth_pct ?? 0}` })}
                                     </p>
                                 </div>
                                 <div className="rounded-lg p-2 bg-slate-50 flex-shrink-0">
@@ -356,27 +362,27 @@ export default function EarningAnalyze({
                         icon={DollarSign}
                         label={__('general.floating_cash')}
                         value={fmt(liquidity?.floating_cash)}
-                        sub="Total platform cash right now"
-                        tooltip="All liquid funds held across all platform accounts."
+                        sub={__('admin.earning_floating_cash_sub')}
+                        tooltip={__('admin.earning_floating_cash_tip')}
                         href="/admin/transactions"
                     />
                     <MetricCard
                         icon={ArrowDownCircle}
                         label={__('general.unpaid_invoices')}
                         value={fmt(liquidity?.unpaid_invoices)}
-                        sub="Funds allocated to pending invoices"
+                        sub={__('admin.earning_unpaid_invoices_sub')}
                         danger={liquidity?.unpaid_invoices > 0}
-                        tooltip="Total value of invoices that have been issued but not yet settled. These are immediate liabilities."
+                        tooltip={__('admin.earning_unpaid_invoices_tip')}
                         href="/admin/invoices/unpaid"
                     />
                     <MetricCard
                         icon={CheckCircle2}
                         label={__('general.available_liquidity')}
                         value={fmt(liquidity?.available_liquidity)}
-                        sub="Floating cash minus obligations"
+                        sub={__('admin.earning_available_liquidity_sub')}
                         success={liquidity?.available_liquidity >= 0}
                         danger={liquidity?.available_liquidity < 0}
-                        tooltip="The true free capital = Floating Cash − Unpaid Invoices. This is what's genuinely available for new obligations."
+                        tooltip={__('admin.earning_available_liquidity_tip')}
                     />
                 </div>
             </div>
@@ -388,15 +394,15 @@ export default function EarningAnalyze({
                     <MetricCard
                         label={__('general.total_earning_pool')}
                         value={fmt(settlement?.total_pool)}
-                        sub="All-time referral commissions"
-                        tooltip="The total cumulative value of all earnings ever generated through referrals."
+                        sub={__('admin.earning_total_pool_sub')}
+                        tooltip={__('admin.earning_total_pool_tip')}
                     />
                     <MetricCard
                         label={__('general.paid_out')}
                         value={fmt(settlement?.withdrawn)}
-                        sub="Approved withdrawal payouts"
+                        sub={__('admin.earning_paid_out_sub')}
                         success
-                        tooltip="Total amount that has been approved and paid out to users via withdrawal requests."
+                        tooltip={__('admin.earning_paid_out_tip')}
                         icon={ArrowUpRight}
                         href="/admin/withdraw-requests"
                     />
@@ -404,17 +410,17 @@ export default function EarningAnalyze({
                         label={__('general.in_clearing')}
                         value={fmt(settlement?.pending_clearing)}
                         sub={settlement?.clearing_start && settlement?.clearing_end
-                            ? `${settlement.clearing_start} → ${settlement.clearing_end}`
-                            : 'No pending clearing dates'}
+                            ? __('admin.earning_clearing_range', { start: settlement.clearing_start, end: settlement.clearing_end })
+                            : __('admin.earning_no_pending_clearing_dates')}
                         warning
-                        tooltip="Earnings locked in the holding period. These are committed but not yet withdrawable."
+                        tooltip={__('admin.earning_in_clearing_tip')}
                     />
                     <MetricCard
                         label={__('general.ready_to_withdraw')}
                         value={fmt(settlement?.ready_for_withdrawal)}
-                        sub="Net available for payout now"
+                        sub={__('admin.earning_ready_to_withdraw_sub')}
                         success={settlement?.ready_for_withdrawal > 0}
-                        tooltip="= Total Pool − Paid Out − In Clearing. This is the net amount users can withdraw today."
+                        tooltip={__('admin.earning_ready_to_withdraw_tip')}
                     />
                 </div>
 
@@ -434,7 +440,7 @@ export default function EarningAnalyze({
                             />
                         </div>
                         <p className="text-xs text-slate-400 mt-1.5">
-                            {fmt(settlement?.withdrawn)} paid out of {fmt(settlement?.total_pool)} total pool
+                            {__('admin.earning_paid_out_of_pool', { paid: fmt(settlement?.withdrawn), total: fmt(settlement?.total_pool) })}
                         </p>
                     </CardContent>
                 </Card>
@@ -448,13 +454,13 @@ export default function EarningAnalyze({
                         icon={ArrowUpRight}
                         label={__('general.total_referral_visits')}
                         value={(referral_funnel?.total_views ?? 0).toLocaleString()}
-                        sub="Unique referral link clicks"
+                        sub={__('admin.earning_referral_visits_sub')}
                     />
                     <MetricCard
                         icon={Users}
                         label={__('general.registrations_via_referral')}
                         value={(referral_funnel?.total_registers ?? 0).toLocaleString()}
-                        sub="Users who signed up through a referral"
+                        sub={__('admin.earning_registrations_sub')}
                     />
                 </div>
             </div>
@@ -517,7 +523,7 @@ export default function EarningAnalyze({
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-800">
                         <Award className="h-4 w-4 text-slate-500" />{__('general.top_earners')}</CardTitle>
-                    <CardDescription>Ranked by referral commission (business currency)</CardDescription>
+                    <CardDescription>{__('admin.earning_top_earners_description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                     {sortedEarners.length > 0 ? (
@@ -531,7 +537,7 @@ export default function EarningAnalyze({
                                         onClick={() => toggleSort('referral_count')}
                                     >
                                         <span className="flex items-center gap-1">
-                                            {__('general.referrals')}<SortIcon k="referral_count" />
+                                            {__('general.referrals')}<SortIcon column="referral_count" sortKey={sortKey} sortDir={sortDir} />
                                         </span>
                                     </TableHead>
                                     <TableHead
@@ -539,7 +545,7 @@ export default function EarningAnalyze({
                                         onClick={() => toggleSort('total_earned')}
                                     >
                                         <span className="flex items-center justify-end gap-1">
-                                            {__('general.earned')}<SortIcon k="total_earned" />
+                                            {__('general.earned')}<SortIcon column="total_earned" sortKey={sortKey} sortDir={sortDir} />
                                         </span>
                                     </TableHead>
                                     <TableHead className="w-12 text-end text-xs"></TableHead>
@@ -577,6 +583,8 @@ export default function EarningAnalyze({
                                                 <Link
                                                     href={`/admin/users/${earner.user_id}`}
                                                     className="inline-flex items-center text-slate-400 hover:text-slate-800 transition-colors"
+                                                    aria-label={__('general.view_profile')}
+                                                    title={__('general.view_profile')}
                                                 >
                                                     <ExternalLink className="h-3.5 w-3.5" />
                                                 </Link>
@@ -612,7 +620,7 @@ export default function EarningAnalyze({
                                 className={`text-xs h-7 px-2.5 ${statusFilter === s ? 'bg-slate-900 text-white hover:bg-slate-800' : 'text-slate-500'}`}
                                 onClick={() => setStatusFilter(s)}
                             >
-                                {s.charAt(0).toUpperCase() + s.slice(1)}
+                                {__(STATUS_FILTER_LABEL_KEYS[s])}
                             </Button>
                         ))}
                     </div>
@@ -622,7 +630,7 @@ export default function EarningAnalyze({
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50">
-                                    <TableHead className="w-10 text-xs">ID</TableHead>
+                                    <TableHead className="w-10 text-xs">{__('general.id')}</TableHead>
                                     <TableHead className="text-xs">{__('general.earner')}</TableHead>
                                     <TableHead className="text-xs">{__('general.referred_user')}</TableHead>
                                     <TableHead className="text-end text-xs">{__('general.amount')}</TableHead>

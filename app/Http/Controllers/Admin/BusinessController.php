@@ -243,7 +243,6 @@ class BusinessController extends Controller
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
         $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
-        $usersList = User::orderBy('name')->select('id', 'name')->get();
         $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
         $categoriesList = Transaction::whereIn('type', ['received', 'refunded', 'sent'])
             ->whereNotNull('category')
@@ -276,9 +275,9 @@ class BusinessController extends Controller
             ],
             'options' => [
                 'projects' => $projectsList,
-                'users' => $usersList,
                 'currencies' => $currenciesList,
                 'categories' => $categoriesList,
+                'selected_user' => $this->findUserSummary($userId),
             ],
             'stats' => [
                 'total_received' => abs($received),
@@ -463,7 +462,6 @@ class BusinessController extends Controller
 
         $bCurrency = CurrencyHelper::getBusinessCurrency();
         $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
-        $usersList = User::orderBy('name')->select('id', 'name')->get();
         $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
         $categoriesList = CostTransaction::excludingSalaries()
             ->whereNotNull('category')
@@ -497,9 +495,9 @@ class BusinessController extends Controller
             ],
             'options' => [
                 'projects' => $projectsList,
-                'users' => $usersList,
                 'currencies' => $currenciesList,
                 'categories' => $categoriesList,
+                'selected_user' => $this->findUserSummary($userId),
                 'payment_methods' => self::COST_PAYMENT_METHODS,
             ],
             'stats' => [
@@ -804,7 +802,6 @@ class BusinessController extends Controller
 
     public function create_cost()
     {
-        $users = User::orderBy('name')->select('id', 'name')->get();
         $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
         $businessCurrency = CurrencyHelper::getBusinessCurrency();
@@ -819,7 +816,6 @@ class BusinessController extends Controller
             ->values();
 
         return Inertia::render('Admin/Business/CostsCreate', [
-            'users' => $users,
             'projects' => $projects,
             'currencies' => $currencies,
             'businessCurrency' => $businessCurrency,
@@ -923,7 +919,6 @@ class BusinessController extends Controller
     {
         $cost = CostTransaction::withTrashed()->findOrFail($id);
 
-        $users = User::orderBy('name')->select('id', 'name')->get();
         $projects = Project::whereNotIn('status', ['Completed', 'Cancelled'])->orderBy('project_name')->select('id', 'project_name', 'project_name as name', 'user_id')->limit(200)->get();
         $currencies = array_values(Currency::as_array());
         $businessCurrency = CurrencyHelper::getBusinessCurrency();
@@ -939,7 +934,6 @@ class BusinessController extends Controller
 
         return Inertia::render('Admin/Business/CostsEdit', [
             'cost' => $cost,
-            'users' => $users,
             'projects' => $projects,
             'currencies' => $currencies,
             'businessCurrency' => $businessCurrency,
@@ -1108,7 +1102,6 @@ class BusinessController extends Controller
             : [];
 
         // Dropdown options
-        $clients = User::select('id', 'name', 'email')->orderBy('name')->get();
         $projects = Project::select('id', 'project_name as name', 'user_id')->get();
         $txnCategories = Transaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
         $costCategories = CostTransaction::whereNotNull('category')->distinct()->pluck('category')->toArray();
@@ -1593,7 +1586,6 @@ class BusinessController extends Controller
                 'income_by_category'  => $incomeByCategory,
                 'expenses_by_category'=> $expensesByCategory,
             ],
-            'clients'             => $clients,
             'projects'            => $projects,
             'categories'          => $availableCategories,
             'current_year_months' => $currentYearMonths,
@@ -1677,5 +1669,18 @@ class BusinessController extends Controller
                 'business_currency_symbol' => $bCurrency['symbol'] ?? '$',
             ],
         ]);
+    }
+
+    /**
+     * Id and name of the user picked in a filter, for the active filter label.
+     * The user picker itself searches asynchronously, so no full users list is sent.
+     */
+    private function findUserSummary($userId): ?User
+    {
+        if (empty($userId)) {
+            return null;
+        }
+
+        return User::select('id', 'name')->find((int) $userId);
     }
 }

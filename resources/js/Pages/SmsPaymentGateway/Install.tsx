@@ -21,7 +21,7 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(macrodroidUrl);
         setCopied(true);
-        toast.success('Copied to clipboard');
+        toast.success(__('admin.copied_to_clipboard'));
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -121,8 +121,8 @@ export default function Install({ androidAppUrl, macrodroidUrl, macrodroidToken 
                                 <div className="space-y-2">
                                     <h3 className="text-sm font-medium">{__('admin.your_secure_webhook')}</h3>
                                     <div className="flex items-center gap-2">
-                                        <Input readOnly value={macrodroidUrl} className="font-mono text-xs bg-muted/50" />
-                                        <Button variant="outline" size="icon" onClick={copyToClipboard}>
+                                        <Input readOnly value={macrodroidUrl} aria-label={__('admin.your_secure_webhook')} className="font-mono text-xs bg-muted/50" />
+                                        <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label={__('general.copy')}>
                                             {copied ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                                         </Button>
                                     </div>

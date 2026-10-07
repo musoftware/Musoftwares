@@ -12,6 +12,7 @@ import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney as formatCurrency, cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
@@ -36,10 +37,27 @@ const LANE_META: Record<string, { labelKey: string; bg: string; text: string; bo
     done: { labelKey: 'general.lane_done', bg: 'bg-emerald-50 text-emerald-700', text: 'text-emerald-700', border: 'border-emerald-100' },
 };
 
-const TYPE_META: Record<string, { icon: React.ElementType; color: string }> = {
-    note: { icon: StickyNote, color: 'text-amber-700 bg-amber-50 ring-amber-200' },
-    task: { icon: ListTodo, color: 'text-sky-700 bg-sky-50 ring-sky-200' },
-    todo: { icon: List, color: 'text-violet-700 bg-violet-50 ring-violet-200' },
+const TYPE_META: Record<string, { icon: React.ElementType; color: string; labelKey: string }> = {
+    note: { icon: StickyNote, color: 'text-amber-700 bg-amber-50 ring-amber-200', labelKey: 'general.note' },
+    task: { icon: ListTodo, color: 'text-sky-700 bg-sky-50 ring-sky-200', labelKey: 'general.task' },
+    todo: { icon: List, color: 'text-violet-700 bg-violet-50 ring-violet-200', labelKey: 'general.todo' },
+};
+
+const PRIORITY_LABEL_KEYS: Record<string, string> = {
+    low: 'general.low',
+    normal: 'general.normal',
+    high: 'general.high',
+    urgent: 'general.urgent',
+};
+
+const NOTE_COLOR_LABEL_KEYS: Record<string, string> = {
+    yellow: 'admin.color_yellow',
+    green: 'admin.color_green',
+    blue: 'admin.color_blue',
+    red: 'admin.color_red',
+    purple: 'admin.color_purple',
+    pink: 'admin.color_pink',
+    slate: 'admin.color_slate',
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -60,6 +78,8 @@ export default function Show({
     categories?: any[]; 
     lanes?: string[]; 
 }) {
+    const { confirm, confirmDialog } = useConfirm();
+
     // Editable state
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -86,9 +106,9 @@ export default function Show({
                 lane: targetLane
             });
             setLocalBoardCards(prev => prev.map(c => c.type === card.type && c.id === card.id ? { ...c, lane: targetLane } : c));
-            toast.success('Card moved successfully');
+            toast.success(__('general.card_moved'));
         } catch (err) {
-            toast.error('Failed to move card');
+            toast.error(__('admin.invoice_board_card_move_failed'));
         }
     };
 
@@ -97,11 +117,11 @@ export default function Show({
             const res = await axios.post(route(`admin.invoices.board.store-${type}`, { invoice: invoice.id }), payload);
             if (res.data?.ok && res.data?.card) {
                 setLocalBoardCards(prev => [...prev, res.data.card]);
-                toast.success(`${type} added successfully`);
+                toast.success(__('admin.invoice_board_card_added'));
                 setCardModal({ isOpen: false, mode: 'create', type: null });
             }
         } catch (err) {
-            toast.error(`Failed to add ${type}`);
+            toast.error(__('admin.invoice_board_card_add_failed'));
         }
     };
 
@@ -109,21 +129,27 @@ export default function Show({
         try {
             await axios.put(route(`admin.invoices.board.update-${type}`, { invoice: invoice.id, [type]: id }), payload);
             setLocalBoardCards(prev => prev.map(c => c.type === type && c.id === id ? { ...c, ...payload, title: payload.title || payload.task_name || c.title } : c));
-            toast.success(`${type} updated successfully`);
+            toast.success(__('admin.invoice_board_card_updated'));
             setCardModal({ isOpen: false, mode: 'create', type: null });
         } catch (err) {
-            toast.error(`Failed to update ${type}`);
+            toast.error(__('admin.invoice_board_card_update_failed'));
         }
     };
 
     const handleDeleteCard = async (card: any) => {
-        if (!confirm(`Are you sure you want to delete this ${card.type}?`)) return;
+        const accepted = await confirm({
+            title: __('admin.invoice_board_delete_card_title'),
+            description: __('admin.invoice_board_delete_card_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         try {
             await axios.delete(route(`admin.invoices.board.destroy-${card.type}`, { invoice: invoice.id, [card.type]: card.id }));
             setLocalBoardCards(prev => prev.filter(c => !(c.type === card.type && c.id === card.id)));
-            toast.success(`${card.type} deleted successfully`);
+            toast.success(__('general.card_deleted'));
         } catch (err) {
-            toast.error(`Failed to delete ${card.type}`);
+            toast.error(__('admin.invoice_board_card_delete_failed'));
         }
     };
     
@@ -167,23 +193,23 @@ export default function Show({
                 });
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(sUrl);
-                    toast.success(__('admin.link_copied') || 'Shortlink copied to clipboard!');
+                    toast.success(__('admin.link_copied'));
                 }
             } else {
-                toast.error(__('general.error_occurred') || 'Failed to generate shortlink');
+                toast.error(__('general.error_occurred'));
                 setShareModalState(prev => ({ ...prev, loading: false }));
             }
         } catch (error: any) {
             console.error("Failed to generate shortlink", error);
-            toast.error(__('general.error_occurred') || 'Failed to generate shortlink');
+            toast.error(__('general.error_occurred'));
             setShareModalState(prev => ({ ...prev, loading: false }));
         }
     };
 
-    const handleCopyText = (text: string, label: string = 'Link') => {
+    const handleCopyText = (text: string) => {
         if (!text) return;
         navigator.clipboard.writeText(text);
-        toast.success(`${label} ${__('general.copied_to_clipboard') || 'copied to clipboard!'}`);
+        toast.success(__('general.copied_to_clipboard'));
     };
 
     const [isSendingNotification, setIsSendingNotification] = useState<'fcm' | 'email' | null>(null);
@@ -301,13 +327,46 @@ export default function Show({
         });
     };
 
-    const handleAddTimerItem = () => {
-        if (isEditing) {
-            if (!confirm('You are in edit mode and may have unsaved changes. Do you want to continue and open the Timer page? Unsaved edits will be lost.')) {
-                return;
-            }
-        }
+    const handleAddTimerItem = async () => {
+        const accepted = !isEditing || await confirm({
+            title: __('admin.invoice_unsaved_edits_title'),
+            description: __('admin.invoice_unsaved_edits_open_timer_desc'),
+            variant: 'danger',
+            confirmLabel: __('admin.invoice_open_timer_page'),
+        });
+        if (!accepted) return;
         router.post(route('admin.invoices.create-timer', { invoice: String(invoice.id) }));
+    };
+
+    const handleQuickMarkPaid = async () => {
+        const accepted = await confirm({
+            title: __('admin.invoice_mark_paid_confirm_title'),
+            confirmLabel: __('general.mark_as_paid'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.invoices.external-pay', { invoice: String(invoice.id) }));
+    };
+
+    const handleCancelInvoice = async () => {
+        const accepted = await confirm({
+            title: __('admin.invoice_cancel_confirm_title'),
+            description: __('admin.invoice_cancel_confirm_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.cancel_invoice'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.invoices.cancel', { invoice: String(invoice.id) }));
+    };
+
+    const handleDeleteInvoice = async () => {
+        const accepted = await confirm({
+            title: __('admin.invoice_delete_confirm_title'),
+            description: __('admin.invoice_delete_confirm_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete_invoice'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] });
     };
 
     const handleDeleteItem = (index: number) => {
@@ -469,8 +528,8 @@ export default function Show({
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(invoice.is_suspended 
-                    ? (__('admin.invoice_unsuspended') || 'Invoice unsuspended')
-                    : (__('admin.invoice_suspended') || 'Invoice suspended')
+                    ? (__('admin.invoice_unsuspended'))
+                    : (__('admin.invoice_suspended'))
                 );
             }
         });
@@ -512,7 +571,7 @@ export default function Show({
     const currentTotal = currentSubtotal + parseFloat(String(invoice.tax || 0)) - parseFloat(String(discount || 0));
 
     return (
-        <AdminSidebarLayout title={`Invoice #${invoice.invoice_number}`} header="Invoice Management">
+        <AdminSidebarLayout title={__('admin.invoice_number_ref', { number: invoice.invoice_number })} header={__('admin.invoice_management')}>
             {/* Header Section */}
             <div className="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4 border-b pb-4">
                 <div className="flex-1 min-w-0">
@@ -523,7 +582,7 @@ export default function Show({
                         {getStatusBadge(invoice.status)}
                         {invoice.is_suspended && (
                             <span className="inline-flex items-center rounded-full bg-amber-500 px-3 py-1 text-sm font-medium text-white">
-                                {__('admin.suspended') || 'Suspended'}
+                                {__('admin.suspended')}
                             </span>
                         )}
                         {getJobStatusBadge(invoice.job_status)}
@@ -531,8 +590,8 @@ export default function Show({
                             <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
                                 <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                                 {invoice.status === 'unpaid' 
-                                    ? (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }) || 'Locked (Created > 3 days ago)')
-                                    : (__('general.locked') || 'Locked')}
+                                    ? (__('admin.cannot_add_timers_to_old_invoices', { days: 3 }))
+                                    : (__('general.locked'))}
                             </span>
                         )}
                     </div>
@@ -549,10 +608,10 @@ export default function Show({
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
                     <div className="flex bg-gray-100 rounded-md p-1">
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.open(route('admin.invoices.print-pdf', { invoice: String(invoice.id) }), '_blank')}>
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" aria-label={__('general.print')} title={__('general.print')} onClick={() => window.open(route('admin.invoices.print-pdf', { invoice: String(invoice.id) }), '_blank')}>
                             <Printer className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.location.href = route('admin.invoices.download-pdf', { invoice: String(invoice.id) })}>
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" aria-label={__('general.download_pdf')} title={__('general.download_pdf')} onClick={() => window.location.href = route('admin.invoices.download-pdf', { invoice: String(invoice.id) })}>
                             <Download className="w-4 h-4" />
                         </Button>
                     </div>
@@ -575,7 +634,7 @@ export default function Show({
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4 text-white font-semibold">
-                                <Layers className="w-4 h-4 me-2" /> {__('admin.actions') || 'Actions'} <ChevronDown className="w-4 h-4 ms-2" />
+                                <Layers className="w-4 h-4 me-2" /> {__('admin.actions')} <ChevronDown className="w-4 h-4 ms-2" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
@@ -584,18 +643,18 @@ export default function Show({
                                     {invoice.is_suspended ? (
                                         <>
                                             <Check className="w-4 h-4 me-2 text-emerald-600" />
-                                            {__('admin.unsuspend') || 'Unsuspend'}
+                                            {__('admin.unsuspend')}
                                         </>
                                     ) : (
                                         <>
                                             <X className="w-4 h-4 me-2 text-rose-600" />
-                                            {__('admin.suspend') || 'Suspend'}
+                                            {__('admin.suspend')}
                                         </>
                                     )}
                                 </DropdownMenuItem>
                             )}
                             <DropdownMenuItem onClick={() => handleOpenShareModal('1_month')} className="cursor-pointer">
-                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Link'}
+                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link')}
                             </DropdownMenuItem>
                             {invoice.status !== 'paid' && (
                                 <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })} className="cursor-pointer">
@@ -603,7 +662,7 @@ export default function Show({
                                 </DropdownMenuItem>
                             )}
                             <DropdownMenuItem onClick={() => window.location.href = route('admin.transactions.create', { user: invoice.user?.id, type: 'receive' })} className="cursor-pointer">
-                                <Plus className="w-4 h-4 me-2" /> {__('general.receive_money') || 'Receive Money'}
+                                <Plus className="w-4 h-4 me-2" /> {__('general.receive_money')}
                             </DropdownMenuItem>
                             {invoice.status !== 'paid' && (
                                 <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'external_pay', amount: '' })} className="cursor-pointer">
@@ -612,8 +671,8 @@ export default function Show({
                             )}
                             <div className="h-px bg-slate-100 my-1" />
                             <div className="px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                                <span>{__('admin.share') || 'Share Shortlink'}</span>
-                                <span className="text-[10px] text-emerald-600 font-semibold uppercase">Shortlink</span>
+                                <span>{__('admin.share')}</span>
+                                <span className="text-[10px] text-emerald-600 font-semibold uppercase">{__('admin.invoice_shortlink')}</span>
                             </div>
                             <DropdownMenuItem onClick={() => handleOpenShareModal('24_hours')} className="cursor-pointer">
                                 <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
@@ -629,7 +688,7 @@ export default function Show({
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleOpenShareModal('never')} className="cursor-pointer">
                                 <Link2 className="w-3.5 h-3.5 me-2 text-slate-500" />
-                                {__('general.no_expiry') || 'No Expiry'}
+                                {__('general.no_expiry')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -639,7 +698,7 @@ export default function Show({
 
             {/* Tabs Navigation */}
             <div className="mb-6 border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <nav className="-mb-px flex space-x-8" aria-label={__('general.tabs')}>
                     <button
                         onClick={() => setActiveTab('details')}
                         className={cn(
@@ -649,7 +708,7 @@ export default function Show({
                                 : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                         )}
                     >
-                        {__('admin.invoice_details') || 'Invoice Details'}
+                        {__('admin.invoice_details')}
                     </button>
                     {invoice.project_id && (
                         <button
@@ -662,7 +721,7 @@ export default function Show({
                             )}
                         >
                             <FolderKanban className="w-4 h-4" />
-                            {__('admin.invoice_board') || 'Invoice Board'}
+                            {__('admin.invoice_board')}
                             {localBoardCards.length > 0 && (
                                 <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full text-xs font-bold">
                                     {localBoardCards.length}
@@ -691,11 +750,11 @@ export default function Show({
                             <div>
                                 {invoice.user?.id ? (
                                     <Link href={route('admin.users.show', invoice.user.id)} className="font-bold text-gray-900 hover:underline">
-                                        {invoice.user.name || 'Unknown Client'}
+                                        {invoice.user.name || __('admin.unknown_client')}
                                     </Link>
                                 ) : (
                                     <span className="font-bold text-gray-900">
-                                        {invoice.user?.name || 'Unknown Client'}
+                                        {invoice.user?.name || __('admin.unknown_client')}
                                     </span>
                                 )}
                                 <div className="text-sm text-gray-500">{invoice.user?.email}</div>
@@ -728,7 +787,7 @@ export default function Show({
                                             }}
                                             className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-0.5"
                                         >
-                                            <Edit2 className="w-3 h-3" /> {__('general.change') || 'Change'}
+                                            <Edit2 className="w-3 h-3" /> {__('general.change')}
                                         </button>
                                     )}
                                 </div>
@@ -744,7 +803,7 @@ export default function Show({
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100/50 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors"
                                         >
                                             <Folder className="w-3.5 h-3.5 text-slate-400" />
-                                            {__('admin.assign_to_project') || 'Assign to Project'}
+                                            {__('admin.assign_to_project')}
                                         </button>
                                     </div>
                                 )
@@ -825,16 +884,16 @@ export default function Show({
                         {invoice.timer_metrics && (
                             <div className="w-full bg-gray-50 rounded-lg p-3 space-y-2 text-xs border border-gray-100 mb-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-medium">{__('general.full_real_value') || 'القيمة الفعلية بسعر الساعة'}</span>
+                                    <span className="text-gray-500 font-medium">{__('general.full_real_value')}</span>
                                     <span className="font-bold text-blue-700">{invoice.timer_metrics.full_real_value_str}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-medium">{__('general.billed_amount') || 'المبلغ الصافي بالفاتورة'}</span>
+                                    <span className="text-gray-500 font-medium">{__('general.billed_amount')}</span>
                                     <span className="font-bold text-emerald-700">{invoice.timer_metrics.billed_amount_str}</span>
                                 </div>
                                 {invoice.timer_metrics.has_discount && (
                                     <div className="flex justify-between items-center pt-1 border-t border-gray-200">
-                                        <span className="text-purple-700 font-bold">{__('general.discount_savings') || 'إجمالي الخصم / الوفر'}</span>
+                                        <span className="text-purple-700 font-bold">{__('general.discount_savings')}</span>
                                         <span className="font-black text-purple-700">-{invoice.timer_metrics.discount_savings_str}</span>
                                     </div>
                                 )}
@@ -884,7 +943,7 @@ export default function Show({
                                 
                                 <div className="flex justify-between items-center">
                                     <span className="text-xs font-bold text-gray-500">
-                                        {invoice.affiliate_data.is_paid ? 'Commission Estimated' : 'Commission Amount'}
+                                        {invoice.affiliate_data.is_paid ? __('admin.invoice_commission_estimated') : __('admin.invoice_commission_amount')}
                                     </span>
                                     <span className={`font-bold ${invoice.affiliate_data.is_paid ? 'text-gray-400' : 'text-gray-900'}`}>
                                         {invoice.affiliate_data.estimated_amount_str}
@@ -905,7 +964,7 @@ export default function Show({
             {isUnpaid && invoice.is_editable !== false && !isEditing && (
                 <div className="bg-white border rounded-lg p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">Quick Build:</span>
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider me-2">{__('admin.invoice_quick_build')}</span>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-slate-200 hover:text-slate-900 hover:bg-slate-50">
                                 <Layers className="w-4 h-4 me-2 text-slate-900" />{__('general.qty_item')}</Button>
@@ -917,7 +976,7 @@ export default function Show({
                                 <Clock className="w-4 h-4 me-2" />{__('general.log_time')}</Button>
                         </div>
                     </div>
-                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.external-pay', { invoice: String(invoice.id) })); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
+                    <Button onClick={handleQuickMarkPaid} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
                         <CreditCard className="w-4 h-4 me-2" />{__('general.mark_as_paid')}</Button>
                 </div>
             )}
@@ -1031,7 +1090,7 @@ export default function Show({
                                     </td>
                                     {isEditing && (
                                         <td className="px-4 py-3 text-center">
-                                            <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteItem(index)} className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50">
+                                            <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteItem(index)} aria-label={__('general.delete')} title={__('general.delete')} className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50">
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </td>
@@ -1050,7 +1109,7 @@ export default function Show({
                                     <td colSpan={7} className="px-4 py-3">
                                         <div className="flex justify-end gap-4 items-center">
                                             <div className="text-sm text-gray-500">
-                                                Draft Total: <span className="font-bold text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
+                                                {__('admin.invoice_draft_total')} <span className="font-bold text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
                                             </div>
                                             <div className="flex gap-2">
                                                 {selectedItemsForMerge.length > 1 && (
@@ -1087,7 +1146,7 @@ export default function Show({
                             className="text-slate-900 bg-slate-50 hover:bg-slate-50"
                         >
                             <ChartLine className="w-4 h-4 me-2" />
-                            {showPricingInsights ? 'Hide Pricing Insights' : 'Show Pricing Insights'}
+                            {showPricingInsights ? __('admin.invoice_hide_pricing_insights') : __('admin.invoice_show_pricing_insights')}
                         </Button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1140,7 +1199,7 @@ export default function Show({
                                     )}
                                 </div>
                                 <div className="text-xs text-gray-400 mt-2">
-                                    Base amount before discount: {formatCurrency(parseFloat(invoice.sub_total) + parseFloat(String(invoice.tax || 0)), invoice.currency)}
+                                    {__('admin.invoice_base_amount_before_discount', { amount: formatCurrency(parseFloat(invoice.sub_total) + parseFloat(String(invoice.tax || 0)), invoice.currency) })}
                                 </div>
                             </CardContent>
                         </Card>
@@ -1219,7 +1278,7 @@ export default function Show({
                                                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
                                                         line.line_type === 'user_credit' ? 'bg-slate-50 text-slate-900' : 'bg-gray-200 text-gray-800'
                                                     }`}>
-                                                        {line.line_type === 'user_credit' ? 'User Credit' : 'Direct Cost'}
+                                                        {line.line_type === 'user_credit' ? __('admin.cost_line_user_credit') : __('general.direct_cost')}
                                                     </span>
                                                     <span className="font-bold text-gray-900">{formatCurrency(line.amount, invoice.currency)}</span>
                                                 </div>
@@ -1281,6 +1340,8 @@ export default function Show({
                                                                     newLines.splice(index, 1);
                                                                     setCostLines(newLines);
                                                                 }}
+                                                                aria-label={__('general.delete')}
+                                                                title={__('general.delete')}
                                                                 className="h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -1466,13 +1527,13 @@ export default function Show({
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
-                            onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', { invoice: String(invoice.id) })); }}
+                            onClick={handleCancelInvoice}
                         >
                             <X className="w-4 h-4 me-2" />{__('general.cancel_invoice')}</Button>
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
-                            onClick={() => { if(confirm('Are you sure you want to DELETE this invoice? This cannot be undone.')) router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] }); }}
+                            onClick={handleDeleteInvoice}
                         >
                             <Trash2 className="w-4 h-4 me-2" />{__('general.delete_invoice')}</Button>
                     </div>
@@ -1486,9 +1547,9 @@ export default function Show({
                     {/* Board Header / Controls */}
                     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-lg border shadow-sm">
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">{__('admin.invoice_board') || 'Invoice Board'}</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{__('admin.invoice_board')}</h3>
                             <p className="text-xs text-gray-500 mt-1">
-                                {__('admin.invoice_board_desc') || 'Manage sticky notes, tasks, and todos linked to this invoice. These items will also appear on the project board.'}
+                                {__('admin.invoice_board_desc')}
                             </p>
                         </div>
                         <div className="flex gap-2">
@@ -1526,7 +1587,7 @@ export default function Show({
                                     <div className="space-y-3 flex-1 overflow-y-auto">
                                         {laneCards.length === 0 ? (
                                             <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400">
-                                                {__('general.no_items') || 'No items'}
+                                                {__('general.no_items')}
                                             </div>
                                         ) : (
                                             laneCards.map((card) => {
@@ -1545,17 +1606,21 @@ export default function Show({
                                                         <div className="flex items-center justify-between">
                                                             <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1", typeMeta?.color)}>
                                                                 <Icon className="w-3 h-3" />
-                                                                {card.type}
+                                                                {typeMeta ? __(typeMeta.labelKey) : card.type}
                                                             </span>
                                                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                 <button 
                                                                     onClick={() => setCardModal({ isOpen: true, mode: 'edit', type: card.type, card })}
+                                                                    aria-label={__('general.edit')}
+                                                                    title={__('general.edit')}
                                                                     className="p-1 hover:bg-slate-100 rounded text-slate-500 hover:text-slate-700 cursor-pointer"
                                                                 >
                                                                     <Edit2 className="w-3.5 h-3.5" />
                                                                 </button>
                                                                 <button 
                                                                     onClick={() => handleDeleteCard(card)}
+                                                                    aria-label={__('general.delete')}
+                                                                    title={__('general.delete')}
                                                                     className="p-1 hover:bg-red-50 rounded text-red-500 hover:text-red-700 cursor-pointer"
                                                                 >
                                                                     <Trash2 className="w-3.5 h-3.5" />
@@ -1584,12 +1649,14 @@ export default function Show({
                                                         <div className="mt-2 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                                                             {card.type === 'task' && card.priority && (
                                                                 <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider", PRIORITY_STYLES[card.priority])}>
-                                                                    {card.priority}
+                                                                    {__(PRIORITY_LABEL_KEYS[card.priority] ?? 'general.normal')}
                                                                 </span>
                                                             )}
                                                             {card.type === 'todo' && (
                                                                 <span className="text-[10px] font-medium text-slate-500">
-                                                                    {card.completed ? '✓ Completed' : 'Pending'}
+                                                                    {card.completed ? (
+                                                                        <span className="inline-flex items-center gap-1"><Check className="w-3 h-3" aria-hidden="true" />{__('general.completed')}</span>
+                                                                    ) : __('general.status_pending')}
                                                                 </span>
                                                             )}
                                                             
@@ -1624,12 +1691,12 @@ export default function Show({
                     <DialogHeader>
                         <DialogTitle>
                             {cardModal.mode === 'create' 
-                                ? `${__('general.create') || 'Create'} ${cardModal.type}`
-                                : `${__('general.edit') || 'Edit'} ${cardModal.type}`
+                                ? `${__('general.create')} ${__(TYPE_META[cardModal.type ?? 'note'].labelKey)}`
+                                : `${__('general.edit')} ${__(TYPE_META[cardModal.type ?? 'note'].labelKey)}`
                             }
                         </DialogTitle>
                         <DialogDescription>
-                            {__('admin.invoice_board_modal_desc') || 'Enter the details for this board card.'}
+                            {__('admin.invoice_board_modal_desc')}
                         </DialogDescription>
                     </DialogHeader>
                     
@@ -1651,23 +1718,23 @@ export default function Show({
                         {cardModal.type === 'note' && (
                             <>
                                 <div className="space-y-1">
-                                    <Label htmlFor="title">{__('general.title') || 'Title'}</Label>
-                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Note title" className="focus-visible:ring-slate-900" />
+                                    <Label htmlFor="title">{__('general.title')}</Label>
+                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder={__('admin.board_note_title_placeholder')} className="focus-visible:ring-slate-900" />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="content">{__('general.content') || 'Content'}</Label>
-                                    <textarea id="content" name="content" defaultValue={cardModal.card?.content || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Sticky note content..." required />
+                                    <Label htmlFor="content">{__('general.content')}</Label>
+                                    <textarea id="content" name="content" defaultValue={cardModal.card?.content || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder={__('admin.board_note_content_placeholder')} required />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="color">{__('general.color') || 'Color'}</Label>
+                                    <Label htmlFor="color">{__('general.color')}</Label>
                                     <select id="color" name="color" defaultValue={cardModal.card?.color || 'yellow'} className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 cursor-pointer">
-                                        <option value="yellow">Yellow</option>
-                                        <option value="green">Green</option>
-                                        <option value="blue">Blue</option>
-                                        <option value="red">Red</option>
-                                        <option value="purple">Purple</option>
-                                        <option value="pink">Pink</option>
-                                        <option value="slate">Slate</option>
+                                        <option value="yellow">{__(NOTE_COLOR_LABEL_KEYS.yellow)}</option>
+                                        <option value="green">{__(NOTE_COLOR_LABEL_KEYS.green)}</option>
+                                        <option value="blue">{__(NOTE_COLOR_LABEL_KEYS.blue)}</option>
+                                        <option value="red">{__(NOTE_COLOR_LABEL_KEYS.red)}</option>
+                                        <option value="purple">{__(NOTE_COLOR_LABEL_KEYS.purple)}</option>
+                                        <option value="pink">{__(NOTE_COLOR_LABEL_KEYS.pink)}</option>
+                                        <option value="slate">{__(NOTE_COLOR_LABEL_KEYS.slate)}</option>
                                     </select>
                                 </div>
                             </>
@@ -1677,20 +1744,20 @@ export default function Show({
                         {cardModal.type === 'task' && (
                             <>
                                 <div className="space-y-1">
-                                    <Label htmlFor="task_name">{__('general.task_name') || 'Task Name'}</Label>
-                                    <Input id="task_name" name="task_name" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Implement feature" required className="focus-visible:ring-slate-900" />
+                                    <Label htmlFor="task_name">{__('general.task_name')}</Label>
+                                    <Input id="task_name" name="task_name" defaultValue={cardModal.card?.title || ''} placeholder={__('admin.board_task_name_placeholder')} required className="focus-visible:ring-slate-900" />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="task_description">{__('general.task_description') || 'Description'}</Label>
-                                    <textarea id="task_description" name="task_description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Task details..." />
+                                    <Label htmlFor="task_description">{__('general.task_description')}</Label>
+                                    <textarea id="task_description" name="task_description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder={__('admin.board_task_details_placeholder')} />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="priority">{__('general.priority') || 'Priority'}</Label>
+                                    <Label htmlFor="priority">{__('general.priority')}</Label>
                                     <select id="priority" name="priority" defaultValue={cardModal.card?.priority || 'normal'} className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 cursor-pointer">
-                                        <option value="low">Low</option>
-                                        <option value="normal">Normal</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
+                                        <option value="low">{__(PRIORITY_LABEL_KEYS.low)}</option>
+                                        <option value="normal">{__(PRIORITY_LABEL_KEYS.normal)}</option>
+                                        <option value="high">{__(PRIORITY_LABEL_KEYS.high)}</option>
+                                        <option value="urgent">{__(PRIORITY_LABEL_KEYS.urgent)}</option>
                                     </select>
                                 </div>
                             </>
@@ -1700,17 +1767,17 @@ export default function Show({
                         {cardModal.type === 'todo' && (
                             <>
                                 <div className="space-y-1">
-                                    <Label htmlFor="title">{__('general.title') || 'Title'}</Label>
-                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder="e.g. Check list item" required className="focus-visible:ring-slate-900" />
+                                    <Label htmlFor="title">{__('general.title')}</Label>
+                                    <Input id="title" name="title" defaultValue={cardModal.card?.title || ''} placeholder={__('admin.board_todo_title_placeholder')} required className="focus-visible:ring-slate-900" />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="description">{__('general.description') || 'Description'}</Label>
-                                    <textarea id="description" name="description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Todo details..." />
+                                    <Label htmlFor="description">{__('general.description')}</Label>
+                                    <textarea id="description" name="description" defaultValue={cardModal.card?.description || ''} rows={4} className="flex min-h-[80px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder={__('admin.board_todo_details_placeholder')} />
                                 </div>
                                 {cardModal.mode === 'edit' && (
                                     <div className="flex items-center space-x-2">
                                         <input type="checkbox" id="completed" name="completed" defaultChecked={cardModal.card?.completed} className="rounded border-gray-300 text-slate-900 focus:ring-slate-900 cursor-pointer" value="1" />
-                                        <Label htmlFor="completed">{__('general.completed') || 'Completed'}</Label>
+                                        <Label htmlFor="completed">{__('general.completed')}</Label>
                                     </div>
                                 )}
                             </>
@@ -1718,10 +1785,10 @@ export default function Show({
 
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setCardModal({ isOpen: false, mode: 'create', type: null })}>
-                                {__('general.cancel') || 'Cancel'}
+                                {__('general.cancel')}
                             </Button>
                             <Button type="submit" className="bg-slate-900 hover:bg-slate-900 text-white font-semibold cursor-pointer">
-                                {cardModal.mode === 'create' ? (__('general.create') || 'Create') : (__('general.save') || 'Save')}
+                                {cardModal.mode === 'create' ? (__('general.create')) : (__('general.save'))}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -1737,7 +1804,7 @@ export default function Show({
                             {__('general.pay_service')}
                         </DialogTitle>
                         <DialogDescription>
-                            {__('general.pay_service_desc', { default: 'Record a service payment for this invoice.' })}
+                            {__('general.pay_service_desc')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -1810,12 +1877,12 @@ export default function Show({
                         </div>
 
                         <div className="space-y-2">
-                            <Label>{__('general.tasks_details') || 'Tasks Details (Optional)'}</Label>
+                            <Label>{__('general.tasks_details')}</Label>
                             <textarea 
                                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 value={(payServiceForm as any).tasks_details || ''}
                                 onChange={e => setPayServiceForm({...payServiceForm, tasks_details: e.target.value})}
-                                placeholder="Task A: 5 points&#10;Task B: 10 points"
+                                placeholder={__('admin.pay_service_tasks_placeholder')}
                                 rows={4}
                             />
                         </div>
@@ -1881,7 +1948,7 @@ export default function Show({
                         </DialogTitle>
                         <DialogDescription>
                             {actionModal.type === 'bill_balance' ? __('general.confirm_bill_balance') :
-                             actionModal.type === 'external_pay' ? __('general.confirm_mark_paid') || 'Are you sure you want to mark this invoice as paid?' :
+                             actionModal.type === 'external_pay' ? __('general.confirm_mark_paid') :
                              __('general.enter_payment_amount')}
                         </DialogDescription>
                     </DialogHeader>
@@ -1974,29 +2041,29 @@ export default function Show({
             <Dialog open={jobStatusModal} onOpenChange={setJobStatusModal}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{__('general.update_status') || 'Update Job Status'}</DialogTitle>
-                        <DialogDescription>{__('general.select_job_status') || 'Select the current job status for this invoice.'}</DialogDescription>
+                        <DialogTitle>{__('general.update_status')}</DialogTitle>
+                        <DialogDescription>{__('general.select_job_status')}</DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                         <PremiumCombobox
                             value={jobStatusForm}
                             onChange={(val) => setJobStatusForm(val as string)}
                             options={[
-                                { value: 'pending', label: 'Pending' },
-                                { value: 'processing', label: 'Processing' },
-                                { value: 'done', label: 'Done' }
+                                { value: 'pending', label: __('general.status_pending') },
+                                { value: 'processing', label: __('general.processing') },
+                                { value: 'done', label: __('general.done') }
                             ]}
                             placeholder={__('general.select_job_status')}
                         />
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setJobStatusModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
+                        <Button variant="outline" onClick={() => setJobStatusModal(false)}>{__('general.cancel')}</Button>
                         <Button onClick={() => {
                             router.post(route('admin.invoices.change-job-status', { invoice: String(invoice.id) }), { job_status: jobStatusForm }, {
                                 onSuccess: () => setJobStatusModal(false),
                                 preserveScroll: true
                             });
-                        }} className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.save_changes') || 'Save Status'}</Button>
+                        }} className="bg-slate-900 hover:bg-slate-900 text-white">{__('general.save_changes')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -2032,7 +2099,7 @@ export default function Show({
                         )}
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setTransferModal(false)}>{__('general.cancel') || 'Cancel'}</Button>
+                        <Button variant="outline" onClick={() => setTransferModal(false)}>{__('general.cancel')}</Button>
                         <Button
                             disabled={!invoice.user?.projects?.length}
                             onClick={() => {
@@ -2057,10 +2124,10 @@ export default function Show({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-900">
                             <CreditCard className="w-5 h-5 text-emerald-600" />
-                            {__('admin.share_signed_invoice_link') || 'Share Signed Invoice Shortlink'}
+                            {__('admin.share_signed_invoice_link')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500">
-                            {__('shortlink.share_invoice_shortlink_desc') || 'A secure, shortened link for the client to view and pay invoice'} #{invoice.invoice_number}
+                            {__('shortlink.share_invoice_shortlink_desc')} #{invoice.invoice_number}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -2068,14 +2135,14 @@ export default function Show({
                         {/* Expiration selector */}
                         <div className="space-y-1.5">
                             <Label className="text-xs font-semibold text-slate-600">
-                                {__('admin.duration') || 'Link Validity'}
+                                {__('admin.duration')}
                             </Label>
                             <div className="grid grid-cols-4 gap-2">
                                 {[
-                                    { id: '24_hours', label: __('admin.share_24_hours') || '24h' },
-                                    { id: '3_days', label: __('admin.share_3_days') || '3 Days' },
-                                    { id: '1_month', label: __('admin.share_1_month') || '1 Month' },
-                                    { id: 'never', label: __('general.no_expiry') || 'No Expiry' },
+                                    { id: '24_hours', label: __('admin.share_24_hours') },
+                                    { id: '3_days', label: __('admin.share_3_days') },
+                                    { id: '1_month', label: __('admin.share_1_month') },
+                                    { id: 'never', label: __('general.no_expiry') },
                                 ].map(opt => (
                                     <button
                                         key={opt.id}
@@ -2100,27 +2167,27 @@ export default function Show({
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                                     <Link2 className="w-3.5 h-3.5 text-emerald-600" />
-                                    {__('shortlink.short_link') || 'Short Link'}
+                                    {__('shortlink.short_link')}
                                 </span>
                                 <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                                    {__('shortlink.recommended_for_sharing') || 'Recommended'}
+                                    {__('shortlink.recommended_for_sharing')}
                                 </span>
                             </div>
                             <div className="relative">
                                 <Input
                                     readOnly
-                                    value={shareModalState.loading ? 'Generating...' : (shareModalState.shortUrl || '')}
+                                    value={shareModalState.loading ? __('admin.generating_link') : (shareModalState.shortUrl || '')}
                                     className="h-10 pe-24 font-mono text-xs bg-slate-50 border-slate-300 text-slate-900 select-all"
                                 />
                                 <Button
                                     type="button"
                                     size="sm"
                                     disabled={shareModalState.loading || !shareModalState.shortUrl}
-                                    onClick={() => handleCopyText(shareModalState.shortUrl, 'Shortlink')}
+                                    onClick={() => handleCopyText(shareModalState.shortUrl)}
                                     className="absolute end-1.5 top-1.5 h-7 px-3 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-semibold"
                                 >
                                     <Copy className="w-3.5 h-3.5 me-1.5" />
-                                    {__('general.copy') || 'Copy'}
+                                    {__('general.copy')}
                                 </Button>
                             </div>
                         </div>
@@ -2129,7 +2196,7 @@ export default function Show({
                         {shareModalState.destinationUrl && (
                             <div className="space-y-1">
                                 <span className="text-[11px] font-medium text-slate-400">
-                                    {__('shortlink.destination_url') || 'Full Signed URL'}:
+                                    {__('shortlink.destination_url')}:
                                 </span>
                                 <div className="p-2 bg-slate-50 border border-slate-100 rounded-md text-[10px] font-mono text-slate-500 break-all max-h-16 overflow-y-auto">
                                     {shareModalState.destinationUrl}
@@ -2141,7 +2208,7 @@ export default function Show({
                             <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-lg">
                                 <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                                 <span>
-                                    {__('admin.expires_at') || 'Expires at'}: <strong>{shareModalState.expiresAt}</strong>
+                                    {__('admin.expires_at')}: <strong>{shareModalState.expiresAt}</strong>
                                 </span>
                             </div>
                         )}
@@ -2157,18 +2224,19 @@ export default function Show({
                             className="text-xs text-slate-600 hover:text-slate-900"
                         >
                             <ExternalLink className="w-3.5 h-3.5 me-1.5" />
-                            {__('general.open_in_new_tab') || 'Test Link'}
+                            {__('general.open_in_new_tab')}
                         </Button>
                         <Button
                             type="button"
                             onClick={() => setShareModalState(prev => ({ ...prev, isOpen: false }))}
                             className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-9 px-4"
                         >
-                            {__('general.done') || 'Done'}
+                            {__('general.done')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

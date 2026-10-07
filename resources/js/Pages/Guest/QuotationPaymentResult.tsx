@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import ThemeToggle from '@/Components/ThemeToggle';
+import { __ } from '@/lib/i18n';
 import { 
     CheckCircle2, XCircle, ArrowLeft, RotateCcw, 
     FileText, User, ShieldCheck, Sparkles, MessageCircle
@@ -38,7 +39,7 @@ export default function QuotationPaymentResult({ status, message, order, retryUr
 
     return (
         <div className="min-h-screen bg-background flex flex-col justify-between text-foreground selection:bg-primary selection:text-white transition-colors duration-200">
-            <Head title={isSuccess ? 'تم الدفع بنجاح - مسوفتوير' : 'فشلت عملية الدفع - مسوفتوير'} />
+            <Head title={isSuccess ? __('quotations.guest_result_success_title') : __('quotations.guest_result_failed_title')} />
 
             {/* Header */}
             <header className="bg-card/80 backdrop-blur-md border-b border-border py-4 px-6 sticky top-0 z-30">
@@ -65,7 +66,7 @@ export default function QuotationPaymentResult({ status, message, order, retryUr
                             )}
                         </div>
                         <h1 className="text-2xl font-extrabold text-white">
-                            {isSuccess ? 'تم استلام الدفعة المقدمة بنجاح!' : 'تعذر إتمام عملية الدفع'}
+                            {isSuccess ? __('quotations.guest_result_success_heading') : __('quotations.guest_result_failed_heading')}
                         </h1>
                         <p className="text-xs text-white/90 mt-1 max-w-sm mx-auto">
                             {message}
@@ -74,21 +75,21 @@ export default function QuotationPaymentResult({ status, message, order, retryUr
 
                     <CardContent className="p-6 sm:p-8 space-y-6">
                         {isSuccess && order && (
-                            <div className="bg-muted/40 dark:bg-slate-800/40 rounded-2xl p-5 border border-border space-y-3 text-right text-xs sm:text-sm">
+                            <div className="bg-muted/40 dark:bg-slate-800/40 rounded-2xl p-5 border border-border space-y-3 text-start text-xs sm:text-sm">
                                 <div className="flex items-center justify-between pb-2 border-b border-border">
-                                    <span className="text-muted-foreground">رقم طلب العرض:</span>
+                                    <span className="text-muted-foreground">{__('quotations.guest_result_order_number')}</span>
                                     <span className="font-mono font-bold text-foreground">{order.order_number}</span>
                                 </div>
                                 <div className="flex items-center justify-between pb-2 border-b border-border">
-                                    <span className="text-muted-foreground">المشروع:</span>
+                                    <span className="text-muted-foreground">{__('quotations.guest_result_project')}</span>
                                     <span className="font-bold text-foreground line-clamp-1">{order.quotation?.title}</span>
                                 </div>
                                 <div className="flex items-center justify-between pb-2 border-b border-border">
-                                    <span className="text-muted-foreground">الاسم والبريد:</span>
+                                    <span className="text-muted-foreground">{__('quotations.guest_result_name_email')}</span>
                                     <span className="font-medium text-foreground">{order.client_name} ({order.client_email})</span>
                                 </div>
                                 <div className="flex items-center justify-between pt-1 text-emerald-600 dark:text-emerald-400">
-                                    <span className="font-bold">المبلغ المسدد (50%):</span>
+                                    <span className="font-bold">{__('quotations.guest_result_amount_paid')}</span>
                                     <span className="font-mono font-extrabold text-base">{order.deposit_amount} {order.currency}</span>
                                 </div>
                             </div>
@@ -96,36 +97,36 @@ export default function QuotationPaymentResult({ status, message, order, retryUr
 
                         {isSuccess ? (
                             <div className="space-y-4">
-                                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-foreground text-xs leading-relaxed text-right space-y-1">
-                                    <p className="font-bold text-primary">ما هي الخطوات القادمة؟</p>
+                                <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 text-foreground text-xs leading-relaxed text-start space-y-1">
+                                    <p className="font-bold text-primary">{__('quotations.guest_result_next_steps')}</p>
                                     <p className="text-muted-foreground">
-                                        تم إنشاء حسابك في المنصة وإصدار الفاتورة الرسمية. سيتواصل معك مدير المشروع والمهندس المسؤول خلال دقائق عبر الهاتف أو الواتساب لبدء أولى خطوات التنفيذ الفعلي ومتابعة المخرجات.
+                                        {__('quotations.guest_result_next_steps_desc')}
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <Link href="/login" className="flex-1">
                                         <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
-                                            تسجيل الدخول إلى حسابك
+                                            {__('quotations.guest_result_login')}
                                         </Button>
                                     </Link>
                                     <Link href="/" className="flex-1">
                                         <Button variant="outline" className="w-full border-border text-foreground hover:bg-muted">
-                                            العودة للرئيسية
+                                            {__('quotations.guest_result_back_home')}
                                         </Button>
                                     </Link>
                                 </div>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <p className="text-xs text-muted-foreground text-right">
-                                    قد تكون المشكلة بسبب رفض من البنك أو انتهاء جلسة السداد. يمكنك إعادة المحاولة الآن.
+                                <p className="text-xs text-muted-foreground text-start">
+                                    {__('quotations.guest_result_failed_hint')}
                                 </p>
                                 {retryUrl && (
                                     <Link href={retryUrl}>
                                         <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
                                             <RotateCcw className="w-4 h-4" />
-                                            إعادة محاولة الدفع
+                                            {__('quotations.guest_result_retry')}
                                         </Button>
                                     </Link>
                                 )}
@@ -137,7 +138,7 @@ export default function QuotationPaymentResult({ status, message, order, retryUr
 
             {/* Footer */}
             <footer className="text-center py-6 text-xs text-muted-foreground">
-                © {new Date().getFullYear()} Musoftware. جميع الحقوق محفوظة.
+                © {new Date().getFullYear()} Musoftware. {__('quotations.guest_result_rights')}
             </footer>
         </div>
     );

@@ -12,15 +12,19 @@ use App\Services\AI\Tools\CreateInvoiceTool;
 use App\Services\AI\Tools\CreateTodosTool;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class TodoAppAiSimulationTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        // This suite writes wallet/cost ledger rows, which convert amounts to the business currency.
+        $this->seedUsdEgpRates();
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 

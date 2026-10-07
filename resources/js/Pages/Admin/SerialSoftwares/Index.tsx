@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -110,7 +111,33 @@ interface Props {
   stats: Stats;
 }
 
+interface SortHeaderProps {
+  column: string;
+  sortBy?: string;
+  direction?: string;
+  onSort: (column: string) => void;
+  children: React.ReactNode;
+}
+
+function SortHeaderIcon({ isActive, direction }: { isActive: boolean; direction?: string }) {
+  if (!isActive) return <ChevronsUpDown className="w-3 h-3 opacity-40" />;
+  return direction === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />;
+}
+
+function SortHeader({ column, sortBy, direction, onSort, children }: SortHeaderProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(column)}
+      className="inline-flex items-center gap-1 hover:text-foreground transition-colors text-xs font-medium uppercase tracking-wide">
+      {children}
+      <SortHeaderIcon isActive={sortBy === column} direction={direction} />
+    </button>
+  );
+}
+
 export default function SerialSoftwaresIndex({ softwares, filters, stats }: Props) {
+  const { confirm, confirmDialog } = useConfirm();
   const [form, setForm] = useState({ name: '', default_status: 'active' });
   const [showAddForm, setShowAddForm] = useState(false);
   const [search, setSearch] = useState(filters.search || '');
@@ -173,9 +200,15 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
     );
   };
 
-  const handleDeleteKey = (keyId: number) => {
+  const handleDeleteKey = async (keyId: number) => {
     if (!activeSoftwareForKeys) return;
-    if (!confirm(__('general.confirm_delete_software_key'))) return;
+    const accepted = await confirm({
+      title: __('general.are_you_sure'),
+      description: __('general.confirm_delete_software_key'),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
     router.delete(
       route('admin.serial-softwares.keys.destroy', [activeSoftwareForKeys.id, keyId]),
       {
@@ -254,31 +287,17 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
     router.patch(route('admin.serial-softwares.status', sw.id), { status }, { preserveScroll: true });
   };
 
-  const destroy = (sw: Software) => {
-    if (!confirm(__('general.confirm_delete_software_modal', { name: sw.name }))) return;
+  const destroy = async (sw: Software) => {
+    const accepted = await confirm({
+      title: __('general.delete_software'),
+      description: __('general.confirm_delete_software_modal', { name: sw.name }),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
     router.delete(route('admin.serial-softwares.destroy', sw.id), { preserveScroll: true });
   };
 
-  const SortHeader = ({ column, children }: {column: string;children: React.ReactNode;}) => {
-    const isActive = filters.sort_by === column;
-    return (
-      <button
-        onClick={() => handleSort(column)}
-        className="inline-flex items-center gap-1 hover:text-foreground transition-colors text-xs font-medium uppercase tracking-wide">
-        
-                {children}
-                {isActive ?
-        filters.direction === 'asc' ?
-        <ChevronUp className="w-3 h-3" /> :
-
-        <ChevronDown className="w-3 h-3" /> :
-
-
-        <ChevronsUpDown className="w-3 h-3 opacity-40" />
-        }
-            </button>);
-
-  };
 
   return (
     <AdminSidebarLayout title={__('general.serial_softwares')} header={__('general.serial_softwares')}>
@@ -463,23 +482,23 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>
-                                            <SortHeader column="name">{__('general.software')}</SortHeader>
+                                            <SortHeader sortBy={filters.sort_by} direction={filters.direction} onSort={handleSort} column="name">{__('general.software')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center">
-                                            <SortHeader column="total_devices">{__('general.total')}</SortHeader>
+                                            <SortHeader sortBy={filters.sort_by} direction={filters.direction} onSort={handleSort} column="total_devices">{__('general.total')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center">
-                                            <SortHeader column="active_count">{__('general.active')}</SortHeader>
+                                            <SortHeader sortBy={filters.sort_by} direction={filters.direction} onSort={handleSort} column="active_count">{__('general.active')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="text-center hidden sm:table-cell">{__('general.inactive')}</TableHead>
                                         <TableHead className="text-center hidden sm:table-cell">{__('general.blocked')}</TableHead>
-                                        <TableHead className="text-center">{__('general.custom_keys', {}, 'Keys')}</TableHead>
-                                        <TableHead className="text-center">{__('general.pricing', {}, 'Payment / Pricing')}</TableHead>
+                                        <TableHead className="text-center">{__('general.custom_keys')}</TableHead>
+                                        <TableHead className="text-center">{__('general.pricing')}</TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            <SortHeader column="default_status">{__('general.default_status')}</SortHeader>
+                                            <SortHeader sortBy={filters.sort_by} direction={filters.direction} onSort={handleSort} column="default_status">{__('general.default_status')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="hidden lg:table-cell">
-                                            <SortHeader column="created_at">{__('general.registered')}</SortHeader>
+                                            <SortHeader sortBy={filters.sort_by} direction={filters.direction} onSort={handleSort} column="created_at">{__('general.registered')}</SortHeader>
                                         </TableHead>
                                         <TableHead className="w-10"></TableHead>
                                     </TableRow>
@@ -520,7 +539,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                         {sw.is_active === false && (
                                                             <span className="text-[10px] text-red-600 dark:text-red-400 font-semibold flex items-center gap-0.5">
                                                                 <ShieldAlert className="w-3 h-3" />
-                                                                {__('general.disabled_as_whole', {}, 'Disabled as whole')}
+                                                                {__('general.disabled_as_whole')}
                                                             </span>
                                                         )}
                                                     </div>
@@ -556,7 +575,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                     size="sm"
                                                     onClick={() => openKeysModal(sw)}
                                                     className="h-7 text-xs gap-1.5 font-normal hover:bg-muted"
-                                                    title={__('general.manage_keys', {}, 'Manage Keys')}
+                                                    title={__('general.manage_keys')}
+                                                    aria-label={__('general.manage_keys')}
                                                 >
                                                     <Key className="w-3.5 h-3.5 text-muted-foreground" />
                                                     <span>{sw.custom_keys?.length ?? 0}</span>
@@ -568,21 +588,21 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                 <Link
                                                     href={route('admin.serial-softwares.settings', sw.id)}
                                                     className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs hover:bg-muted transition-colors"
-                                                    title={__('general.edit_settings', {}, 'Configure full software settings')}
+                                                    title={__('general.edit_settings')}
                                                 >
                                                     {sw.pricing_type === 'packages' ? (
                                                         <span className="inline-flex items-center gap-1 text-primary font-medium">
                                                             <PackageIcon className="w-3.5 h-3.5" />
-                                                            <span>{sw.packages_count ? `${sw.packages_count} Plans` : __('general.packages', {}, 'Packages')}</span>
+                                                            <span>{sw.packages_count ? `${sw.packages_count} Plans` : __('general.packages')}</span>
                                                         </span>
                                                     ) : sw.requires_payment ? (
                                                         <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium">
                                                             <CreditCard className="w-3.5 h-3.5" />
-                                                            <span>{sw.price ? `${sw.price} ${sw.currency || ''}`.trim() : __('general.paid', {}, 'Paid')}</span>
+                                                            <span>{sw.price ? `${sw.price} ${sw.currency || ''}`.trim() : __('general.paid')}</span>
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1 text-muted-foreground">
-                                                            <span>{__('general.free_instant', {}, 'Free / Direct')}</span>
+                                                            <span>{__('general.free_instant')}</span>
                                                         </span>
                                                     )}
                                                 </Link>
@@ -620,7 +640,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                         <DropdownMenuItem
                                                             onClick={() => router.visit(route('admin.serial-softwares.settings', sw.id))}>
                                                             <Sliders className="w-4 h-4 me-2 text-primary" />
-                                                            {__('general.settings_and_pricing', {}, 'Settings & Pricing')}
+                                                            {__('general.settings_and_pricing')}
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem
@@ -634,14 +654,14 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             onClick={() => openKeysModal(sw)}>
                             
                                                             <Key className="w-4 h-4 me-2" />
-                                                            {__('general.manage_keys', {}, 'Manage Custom Keys')}
+                                                            {__('general.manage_keys')}
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem
                             onClick={() => openPaymentModal(sw)}>
                             
                                                             <CreditCard className="w-4 h-4 me-2" />
-                                                            {__('general.payment_settings', {}, 'Payment & Pricing')}
+                                                            {__('general.payment_settings')}
                                                         </DropdownMenuItem>
 
                                                         {/* Mobile: show status changer in dropdown */}
@@ -691,10 +711,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Key className="w-5 h-5 text-muted-foreground" />
-                            <span>{__('general.software_keys', {}, 'Software Keys')}: {activeSoftwareForKeys?.name}</span>
+                            <span>{__('general.software_keys')}: {activeSoftwareForKeys?.name}</span>
                         </DialogTitle>
                         <DialogDescription>
-                            {__('general.software_keys_desc', {}, 'Configure default key-value parameters for this software. Devices can inherit or override these settings.')}
+                            {__('general.software_keys_desc')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -703,21 +723,21 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             {/* Existing Keys Table */}
                             <div className="space-y-2">
                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                    {__('general.existing_keys', {}, 'Defined Keys')} ({activeSoftwareForKeys.custom_keys?.length ?? 0})
+                                    {__('general.existing_keys')} ({activeSoftwareForKeys.custom_keys?.length ?? 0})
                                 </Label>
 
                                 {(!activeSoftwareForKeys.custom_keys || activeSoftwareForKeys.custom_keys.length === 0) ? (
                                     <div className="p-4 border rounded-lg text-center text-sm text-muted-foreground bg-muted/30">
-                                        {__('general.no_keys_defined_yet', {}, 'No keys defined yet. Add the first key below (e.g. max_accounts).')}
+                                        {__('general.no_keys_defined_yet')}
                                     </div>
                                 ) : (
                                     <div className="border rounded-lg overflow-hidden">
                                         <Table>
                                             <TableHeader>
                                                 <TableRow className="bg-muted/40">
-                                                    <TableHead className="text-xs font-semibold">{__('general.key_name', {}, 'Key')}</TableHead>
-                                                    <TableHead className="text-xs font-semibold">{__('general.default_value', {}, 'Default Value')}</TableHead>
-                                                    <TableHead className="text-xs font-semibold">{__('general.description', {}, 'Description')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.key_name')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.default_value')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.description')}</TableHead>
                                                     <TableHead className="w-12 text-end"></TableHead>
                                                 </TableRow>
                                             </TableHeader>
@@ -728,7 +748,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                             {k.key}
                                                         </TableCell>
                                                         <TableCell className="font-mono text-xs text-muted-foreground">
-                                                            {k.default_value !== null && k.default_value !== '' ? k.default_value : <span className="italic text-xs text-muted-foreground/60">(empty)</span>}
+                                                            {k.default_value !== null && k.default_value !== '' ? k.default_value : <span className="italic text-xs text-muted-foreground/60">{__('general.empty')}</span>}
                                                         </TableCell>
                                                         <TableCell className="text-xs text-muted-foreground max-w-xs truncate" title={k.description ?? ''}>
                                                             {k.description || '—'}
@@ -739,7 +759,8 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                                                 size="sm"
                                                                 className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
                                                                 onClick={() => handleDeleteKey(k.id)}
-                                                                title={__('general.delete', {}, 'Delete')}
+                                                                title={__('general.delete')}
+                                                                aria-label={__('general.delete')}
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
                                                             </Button>
@@ -757,15 +778,15 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             {/* Add / Update Key Form */}
                             <form onSubmit={handleSaveKey} className="space-y-4">
                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                    {__('general.add_or_update_key', {}, 'Add or Update Key')}
+                                    {__('general.add_or_update_key')}
                                 </Label>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="sw-key-name" className="text-xs">{__('general.key_name', {}, 'Key Name')}</Label>
+                                        <Label htmlFor="sw-key-name" className="text-xs">{__('general.key_name')}</Label>
                                         <Input
                                             id="sw-key-name"
-                                            placeholder="e.g. max_accounts"
+                                            placeholder={__('admin.serial_software_key_placeholder')}
                                             value={keyForm.key}
                                             onChange={(e) => setKeyForm({ ...keyForm, key: e.target.value })}
                                             className="h-8 font-mono text-xs"
@@ -773,10 +794,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="sw-default-val" className="text-xs">{__('general.default_value', {}, 'Default Value')}</Label>
+                                        <Label htmlFor="sw-default-val" className="text-xs">{__('general.default_value')}</Label>
                                         <Input
                                             id="sw-default-val"
-                                            placeholder="e.g. 1"
+                                            placeholder={__('admin.serial_software_default_value_placeholder')}
                                             value={keyForm.default_value}
                                             onChange={(e) => setKeyForm({ ...keyForm, default_value: e.target.value })}
                                             className="h-8 font-mono text-xs"
@@ -785,10 +806,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="sw-key-desc" className="text-xs">{__('general.description', {}, 'Description (Optional)')}</Label>
+                                    <Label htmlFor="sw-key-desc" className="text-xs">{__('general.description')}</Label>
                                     <Input
                                         id="sw-key-desc"
-                                        placeholder="e.g. Maximum allowed WhatsApp accounts"
+                                        placeholder={__('admin.serial_software_key_description_placeholder')}
                                         value={keyForm.description}
                                         onChange={(e) => setKeyForm({ ...keyForm, description: e.target.value })}
                                         className="h-8 text-xs"
@@ -802,7 +823,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                         size="sm"
                                         onClick={() => setActiveSoftwareForKeys(null)}
                                     >
-                                        {__('general.close', {}, 'Close')}
+                                        {__('general.close')}
                                     </Button>
                                     <Button
                                         type="submit"
@@ -811,7 +832,7 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                         className="gap-1.5"
                                     >
                                         <Plus className="w-3.5 h-3.5" />
-                                        <span>{keySubmitting ? __('general.saving', {}, 'Saving...') : __('general.save_key', {}, 'Save Key')}</span>
+                                        <span>{keySubmitting ? __('general.saving') : __('general.save_key')}</span>
                                     </Button>
                                 </div>
                             </form>
@@ -826,10 +847,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <CreditCard className="w-5 h-5 text-primary" />
-                            <span>{__('general.payment_settings_title', {}, 'Payment & Pricing Settings')}</span>
+                            <span>{__('general.payment_settings_title')}</span>
                         </DialogTitle>
                         <DialogDescription>
-                            {__('general.payment_settings_desc', {}, 'Configure required payment and payment instructions before new devices can be activated for')} <span className="font-semibold text-foreground">{activeSoftwareForPayment?.name}</span>.
+                            {__('general.payment_settings_desc')} <span className="font-semibold text-foreground">{activeSoftwareForPayment?.name}</span>.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -839,10 +860,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             <div className="flex items-center justify-between p-3.5 rounded-lg border bg-muted/30">
                                 <div className="space-y-0.5 pe-4">
                                     <Label htmlFor="sw-requires-payment" className="text-sm font-medium cursor-pointer">
-                                        {__('general.require_payment_before_activation', {}, 'Require Payment Before Activation')}
+                                        {__('general.require_payment_before_activation')}
                                     </Label>
                                     <p className="text-xs text-muted-foreground">
-                                        {__('general.require_payment_hint', {}, 'When enabled, new clients/devices will remain inactive and prompted to pay first.')}
+                                        {__('general.require_payment_hint')}
                                     </p>
                                 </div>
                                 <Switch
@@ -856,14 +877,14 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div className="space-y-1.5">
                                     <Label htmlFor="sw-price" className="text-xs">
-                                        {__('general.price', {}, 'Software / Subscription Price')}
+                                        {__('general.price')}
                                     </Label>
                                     <Input
                                         id="sw-price"
                                         type="number"
                                         step="0.01"
                                         min="0"
-                                        placeholder="e.g. 49.99"
+                                        placeholder={__('admin.serial_software_price_placeholder')}
                                         value={paymentForm.price}
                                         onChange={(e) => setPaymentForm({ ...paymentForm, price: e.target.value })}
                                         className="h-9"
@@ -871,11 +892,11 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label htmlFor="sw-currency" className="text-xs">
-                                        {__('general.currency', {}, 'Currency')}
+                                        {__('general.currency')}
                                     </Label>
                                     <Input
                                         id="sw-currency"
-                                        placeholder="e.g. USD, EGP, SAR"
+                                        placeholder={__('admin.serial_software_currency_placeholder')}
                                         value={paymentForm.currency}
                                         onChange={(e) => setPaymentForm({ ...paymentForm, currency: e.target.value.toUpperCase() })}
                                         className="h-9 font-mono"
@@ -887,29 +908,29 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                             <div className="space-y-1.5">
                                 <Label htmlFor="sw-whatsapp" className="text-xs flex items-center gap-1.5">
                                     <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
-                                    <span>{__('general.whatsapp_number', {}, 'Admin WhatsApp Number (With Country Code)')}</span>
+                                    <span>{__('general.whatsapp_number')}</span>
                                 </Label>
                                 <Input
                                     id="sw-whatsapp"
-                                    placeholder="e.g. +201012345678"
+                                    placeholder={__('admin.serial_software_whatsapp_placeholder')}
                                     value={paymentForm.whatsapp_number}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, whatsapp_number: e.target.value })}
                                     className="h-9"
                                 />
                                 <p className="text-[11px] text-muted-foreground">
-                                    {__('general.whatsapp_hint', {}, 'Clients will see a direct 1-click button to contact this WhatsApp number with their Device ID.')}
+                                    {__('general.whatsapp_hint')}
                                 </p>
                             </div>
 
                             {/* Payment Instructions / Notes */}
                             <div className="space-y-1.5">
                                 <Label htmlFor="sw-instructions" className="text-xs">
-                                    {__('general.payment_instructions', {}, 'Payment Instructions / Notes (Shown to Client)')}
+                                    {__('general.payment_instructions')}
                                 </Label>
                                 <Textarea
                                     id="sw-instructions"
                                     rows={3}
-                                    placeholder="e.g. Transfer fee to Vodafone Cash / USDT / Bank Account and send transfer receipt via WhatsApp."
+                                    placeholder={__('admin.serial_software_payment_instructions_placeholder')}
                                     value={paymentForm.payment_instructions}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_instructions: e.target.value })}
                                     className="text-xs resize-none"
@@ -921,10 +942,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
                                         <Label htmlFor="sw-show-price" className="text-xs font-medium cursor-pointer">
-                                            {__('general.show_price_in_dialog', {}, 'إظهار السعر في نافذة التفعيل')}
+                                            {__('general.show_price_in_dialog')}
                                         </Label>
                                         <p className="text-[11px] text-muted-foreground">
-                                            {__('general.show_price_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء صف السعر والعملة داخل نافذة التفعيل للعميل.')}
+                                            {__('general.show_price_in_dialog_desc')}
                                         </p>
                                     </div>
                                     <Switch
@@ -937,10 +958,10 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                 <div className="flex items-center justify-between">
                                     <div className="space-y-0.5">
                                         <Label htmlFor="sw-show-wa" className="text-xs font-medium cursor-pointer">
-                                            {__('general.show_whatsapp_in_dialog', {}, 'إظهار زر الواتساب في نافذة التفعيل')}
+                                            {__('general.show_whatsapp_in_dialog')}
                                         </Label>
                                         <p className="text-[11px] text-muted-foreground">
-                                            {__('general.show_whatsapp_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء زر المراسلة المباشرة عبر واتساب.')}
+                                            {__('general.show_whatsapp_in_dialog_desc')}
                                         </p>
                                     </div>
                                     <Switch
@@ -958,19 +979,20 @@ export default function SerialSoftwaresIndex({ softwares, filters, stats }: Prop
                                     size="sm"
                                     onClick={() => setActiveSoftwareForPayment(null)}
                                 >
-                                    {__('general.cancel', {}, 'Cancel')}
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     size="sm"
                                     disabled={paymentSubmitting}
                                 >
-                                    <span>{paymentSubmitting ? __('general.saving', {}, 'Saving...') : __('general.save_changes', {}, 'Save Settings')}</span>
+                                    <span>{paymentSubmitting ? __('general.saving') : __('general.save_changes')}</span>
                                 </Button>
                             </div>
                         </form>
                     )}
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>);
 }

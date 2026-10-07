@@ -23,19 +23,19 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
     const currency = client.currency;
 
     return (
-        <AdminSidebarLayout title={__('general.user_reports')} header="User Reports">
-            <Head title={`Reports - ${client.name}`} />
+        <AdminSidebarLayout title={__('general.user_reports')} header={__('general.user_reports')}>
+            <Head title={__('admin.user_reports_title', { name: client.name })} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Link href={`/admin/users/${client.id}`} className="text-gray-500 hover:text-gray-700">
-                            <ArrowLeft className="h-6 w-6" />
+                        <Link href={`/admin/users/${client.id}`} className="text-gray-500 hover:text-gray-700" aria-label={__('general.back_to_user')} title={__('general.back_to_user')}>
+                            <ArrowLeft className="h-6 w-6 rtl:rotate-180" />
                         </Link>
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">{__('general.timer_reports')}</h2>
-                            <p className="text-sm text-gray-500">View time tracking reports for {client.name}</p>
+                            <p className="text-sm text-gray-500">{__('admin.user_reports_description', { name: client.name })}</p>
                         </div>
                     </div>
                 </div>

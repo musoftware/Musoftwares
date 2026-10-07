@@ -124,7 +124,7 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
         progressBarBg: 'bg-emerald-500',
         icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
         textClass: 'text-emerald-700',
-        badgeText: __('general.dso_safe') || 'DSO Safe',
+        badgeText: __('general.dso_safe'),
     };
 
     if (dsoData.status === 'warning_1') {
@@ -133,7 +133,7 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
             progressBarBg: 'bg-amber-500',
             icon: <AlertTriangle className="h-4 w-4 text-amber-600" />,
             textClass: 'text-amber-700 font-semibold',
-            badgeText: __('general.dso_limit_warning_1') || 'Warning: 2 Days Left',
+            badgeText: __('general.dso_limit_warning_1'),
         };
     } else if (dsoData.status === 'warning_2') {
         statusConfig = {
@@ -141,7 +141,7 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
             progressBarBg: 'bg-orange-600',
             icon: <AlertCircle className="h-4 w-4 text-orange-600" />,
             textClass: 'text-orange-800 font-bold',
-            badgeText: __('general.dso_limit_warning_2') || 'Critical Warning: 1 Day Left',
+            badgeText: __('general.dso_limit_warning_2'),
         };
     } else if (dsoData.status === 'suspended' || timeLeft.isOverdue) {
         statusConfig = {
@@ -149,7 +149,7 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
             progressBarBg: 'bg-rose-600',
             icon: <ShieldAlert className="h-4 w-4 text-rose-600 animate-bounce" />,
             textClass: 'text-rose-700 font-bold',
-            badgeText: __('general.dso_suspended') || 'Serials Automatically Suspended',
+            badgeText: __('general.dso_suspended'),
         };
     }
 
@@ -163,7 +163,7 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
                     </span>
                 </div>
                 <div className="text-[11px] text-slate-400 font-mono">
-                    {__('general.oldest_invoice') || 'Oldest Invoice'}: <span className="font-semibold text-slate-600">#{dsoData.oldest_invoice_id}</span> ({dsoData.oldest_invoice_created_at.substring(0, 10)})
+                    {__('general.oldest_invoice')}: <span className="font-semibold text-slate-600">#{dsoData.oldest_invoice_id}</span> ({dsoData.oldest_invoice_created_at.substring(0, 10)})
                 </div>
             </div>
 
@@ -176,9 +176,9 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
                     />
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-400 font-mono">
-                    <span>0 {__('general.dso_days') || 'Days'}</span>
-                    <span className="font-semibold text-slate-600">{dsoData.age_days} / {globalLimit} {__('general.dso_days') || 'Days'}</span>
-                    <span>{globalLimit} {__('general.dso_days') || 'Days'}</span>
+                    <span>0 {__('general.dso_days')}</span>
+                    <span className="font-semibold text-slate-600">{dsoData.age_days} / {globalLimit} {__('general.dso_days')}</span>
+                    <span>{globalLimit} {__('general.dso_days')}</span>
                 </div>
             </div>
 
@@ -186,11 +186,11 @@ function DsoCountdown({ dsoData, globalLimit }: DsoCountdownProps) {
             <div className="flex items-center justify-between pt-2 border-t border-slate-100">
                 <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5 text-slate-400" />
-                    {__('general.dso_time_remaining') || 'DSO Time Remaining'}:
+                    {__('general.dso_time_remaining')}:
                 </span>
                 {timeLeft.isOverdue ? (
                     <span className="text-xs font-bold text-rose-600 uppercase tracking-wide bg-rose-50 border border-rose-100 px-2 py-0.5 rounded animate-pulse">
-                        {__('general.dso_suspended') || 'Serials Automatically Suspended'}
+                        {__('general.dso_suspended')}
                     </span>
                 ) : (
                     <div className="flex gap-1.5 text-slate-700">
@@ -247,12 +247,12 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
             body: emailBody,
         }, {
             onSuccess: () => {
-                toast.success(__('general.reminder_sent_successfully') || 'Reminder sent successfully!');
+                toast.success(__('general.reminder_sent_successfully'));
                 setEmailModalClient(null);
                 setSending(false);
             },
             onError: (errors: any) => {
-                toast.error(errors.error || __('general.error_sending_reminder') || 'Failed to send reminder.');
+                toast.error(errors.error || __('general.error_sending_reminder'));
                 setSending(false);
             }
         });
@@ -297,20 +297,20 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
         }
 
         navigator.clipboard.writeText(text);
-        toast.success(__('general.dues_summary_copied') || 'Summary copied to clipboard successfully!');
+        toast.success(__('general.dues_summary_copied'));
     };
 
     return (
         <AdminSidebarLayout>
-            <Head title={__('general.clients_dues_board') || 'Clients Dues Board'} />
+            <Head title={__('general.clients_dues_board')} />
 
             <div className="space-y-6 max-w-7xl mx-auto p-4 md:p-6">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                        {__('general.clients_dues_board') || 'Clients Dues Board'}
+                        {__('general.clients_dues_board')}
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        {__('general.clients_dues_board_desc') || 'A simplified list of clients with outstanding invoice balances, with quick copy and reminder capabilities.'}
+                        {__('general.clients_dues_board_desc')}
                     </p>
                 </div>
 
@@ -318,9 +318,9 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3 text-amber-800 shadow-sm animate-pulse">
                         <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
                         <div>
-                            <h4 className="font-semibold text-sm">{__('general.dso_system_disabled') || 'DSO System is disabled'}</h4>
+                            <h4 className="font-semibold text-sm">{__('general.dso_system_disabled')}</h4>
                             <p className="text-xs text-amber-700 mt-0.5">
-                                {__('general.enable_dso_system_help') || 'The collection limit warning and automatic serial suspension system is currently turned off in settings.'}
+                                {__('general.enable_dso_system_help')}
                             </p>
                         </div>
                     </div>
@@ -331,10 +331,10 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
                             <FileText className="h-12 w-12 text-slate-300 mb-4" />
                             <h3 className="font-semibold text-slate-700 text-lg">
-                                {__('general.no_unpaid_invoices') || 'No Unpaid Invoices'}
+                                {__('general.no_unpaid_invoices')}
                             </h3>
                             <p className="text-sm text-slate-400 mt-1">
-                                {__('general.all_clients_fully_paid') || 'All clients have fully settled their invoices.'}
+                                {__('general.all_clients_fully_paid')}
                             </p>
                         </CardContent>
                     </Card>
@@ -363,7 +363,7 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
 
                                             <div className="flex flex-col md:items-end gap-1">
                                                 <div className="text-xs text-slate-400">
-                                                    {client.unpaid_count} {client.unpaid_count === 1 ? __('general.invoice') || 'Invoice' : __('general.invoices') || 'Invoices'}
+                                                    {client.unpaid_count} {client.unpaid_count === 1 ? __('general.invoice') : __('general.invoices')}
                                                 </div>
                                                 <div className="font-mono font-bold text-sm text-rose-600 bg-rose-50 border border-rose-100 rounded px-2.5 py-0.5 mt-0.5">
                                                     {client.dues_summary}
@@ -378,7 +378,7 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                     className="gap-1.5 text-xs text-slate-700 hover:bg-slate-100"
                                                 >
                                                     <Copy className="h-3.5 w-3.5" />
-                                                    {__('general.copy_dues_summary') || 'Copy Summary'}
+                                                    {__('general.copy_dues_summary')}
                                                 </Button>
 
                                                 <Button
@@ -388,7 +388,7 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                     className="gap-1.5 text-xs text-slate-700 hover:bg-slate-100"
                                                 >
                                                     <Mail className="h-3.5 w-3.5" />
-                                                    {__('general.send_email_reminder') || 'Send Email'}
+                                                    {__('general.send_email_reminder')}
                                                 </Button>
 
                                                 {/* User Management Quick Links */}
@@ -403,7 +403,8 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                             href={`/admin/users/${client.id}/notes`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            title={__('general.secure_notes') || 'Secure Notes'}
+                                                            title={__('general.secure_notes')}
+                                                            aria-label={__('general.secure_notes')}
                                                         >
                                                             <Lock className="h-3.5 w-3.5" />
                                                         </a>
@@ -419,7 +420,8 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                             href={`/admin/users/${client.id}/files`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            title={__('general.files') || 'Files'}
+                                                            title={__('general.files')}
+                                                            aria-label={__('general.files')}
                                                         >
                                                             <Folder className="h-3.5 w-3.5" />
                                                         </a>
@@ -435,7 +437,8 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                             href={`/admin/transactions/create?user=${client.id}&type=receive`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            title={__('general.receive_amount') || 'Receive Amount'}
+                                                            title={__('general.receive_amount')}
+                                                            aria-label={__('general.receive_amount')}
                                                         >
                                                             <DollarSign className="h-3.5 w-3.5" />
                                                         </a>
@@ -451,7 +454,8 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                             href={`/admin/invoices/unpaid?client_id=${client.id}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            title={__('general.due_invoices') || 'Due Invoices'}
+                                                            title={__('general.due_invoices')}
+                                                            aria-label={__('general.due_invoices')}
                                                         >
                                                             <Receipt className="h-3.5 w-3.5" />
                                                         </a>
@@ -479,10 +483,10 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                             <Table>
                                                 <TableHeader className="bg-slate-50/20">
                                                     <TableRow>
-                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500">{__('general.id') || 'ID'}</TableHead>
-                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500">{__('general.date') || 'Date'}</TableHead>
-                                                        <TableHead className="font-semibold text-xs text-slate-500">{__('general.items') || 'Items'}</TableHead>
-                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500 text-right">{__('general.unpaid') || 'Unpaid'}</TableHead>
+                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500">{__('general.id')}</TableHead>
+                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500">{__('general.date')}</TableHead>
+                                                        <TableHead className="font-semibold text-xs text-slate-500">{__('general.items')}</TableHead>
+                                                        <TableHead className="w-[120px] font-semibold text-xs text-slate-500 text-right">{__('general.unpaid')}</TableHead>
                                                         <TableHead className="w-[80px]"></TableHead>
                                                     </TableRow>
                                                 </TableHeader>
@@ -513,7 +517,7 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                                                     href={`/admin/invoices/${inv.id}`}
                                                                     className="inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800 gap-0.5"
                                                                 >
-                                                                    {__('general.view') || 'View'}
+                                                                    {__('general.view')}
                                                                     <ExternalLink className="h-3 w-3" />
                                                                 </Link>
                                                             </TableCell>
@@ -535,15 +539,15 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                 {emailModalClient && (
                     <DialogContent className="max-w-lg">
                         <DialogHeader>
-                            <DialogTitle>{__('general.send_email_reminder') || 'Send Email Reminder'}</DialogTitle>
+                            <DialogTitle>{__('general.send_email_reminder')}</DialogTitle>
                             <DialogDescription>
-                                {__('general.customize_email_reminder_desc') || 'Tailor the email subject and body before sending it to the client.'}
+                                {__('general.customize_email_reminder_desc')}
                             </DialogDescription>
                         </DialogHeader>
 
                         <form onSubmit={handleSendEmail} className="space-y-4 my-2">
                             <div className="space-y-1.5">
-                                <Label htmlFor="email_recipient">{__('general.recipient') || 'Recipient'}</Label>
+                                <Label htmlFor="email_recipient">{__('general.recipient')}</Label>
                                 <Input
                                     id="email_recipient"
                                     type="text"
@@ -554,26 +558,26 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="email_subject">{__('general.custom_email_subject') || 'Email Subject'}</Label>
+                                <Label htmlFor="email_subject">{__('general.custom_email_subject')}</Label>
                                 <Input
                                     id="email_subject"
                                     type="text"
                                     value={emailSubject}
                                     onChange={(e) => setEmailSubject(e.target.value)}
-                                    placeholder="Enter subject"
+                                    placeholder={__('admin.dues_email_subject_placeholder')}
                                     required
                                     className="border-slate-200 focus:ring-slate-400 focus:border-slate-400 text-sm"
                                 />
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label htmlFor="email_body">{__('general.custom_email_body') || 'Email Body'}</Label>
+                                <Label htmlFor="email_body">{__('general.custom_email_body')}</Label>
                                 <Textarea
                                     id="email_body"
                                     rows={8}
                                     value={emailBody}
                                     onChange={(e) => setEmailBody(e.target.value)}
-                                    placeholder="Enter message body..."
+                                    placeholder={__('admin.dues_email_body_placeholder')}
                                     required
                                     className="border-slate-200 focus:ring-slate-400 focus:border-slate-400 text-sm font-mono"
                                 />
@@ -587,14 +591,14 @@ export default function DuesBoard({ clients, dso_enabled, global_dso_limit }: Pr
                                     disabled={sending}
                                     className="text-xs"
                                 >
-                                    {__('general.cancel') || 'Cancel'}
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={sending}
                                     className="text-xs bg-slate-900 hover:bg-slate-800 text-white"
                                 >
-                                    {sending ? (__('general.sending') || 'Sending...') : (__('general.send') || 'Send')}
+                                    {sending ? (__('general.sending')) : (__('general.send'))}
                                 </Button>
                             </DialogFooter>
                         </form>

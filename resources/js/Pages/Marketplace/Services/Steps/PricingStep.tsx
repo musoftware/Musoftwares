@@ -142,7 +142,7 @@ export default function PricingStep({ data, setData, errors }: any) {
 
                                 <div>
                                     <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
-                                        {__('general.old_price') || 'Old Price'}
+                                        {__('general.old_price')}
                                     </Label>
                                     <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all bg-slate-50/50">
                                         <input

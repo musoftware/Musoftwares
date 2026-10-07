@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 export default function History({ transfers }) {
     return (
@@ -173,26 +174,9 @@ export default function History({ transfers }) {
                     </CardContent>
                     
                     {/* Pagination Links */}
-                    {transfers.links && transfers.links.length > 3 && (
-                        <div className="p-4 border-t flex items-center justify-end gap-1">
-                            {transfers.links.map((link, idx) => {
-                                const isCurrent = link.active;
-                                return (
-                                    <Button
-                                        key={idx}
-                                        asChild={!!link.url}
-                                        variant={isCurrent ? 'default' : 'outline'}
-                                        size="sm"
-                                        className={`shadow-none ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                                    >
-                                        {link.url ? (
-                                            <Link href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        ) : (
-                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        )}
-                                    </Button>
-                                );
-                            })}
+                    {transfers.links?.length > 3 && (
+                        <div className="px-4 pb-4 border-t">
+                            <Pagination links={transfers.links} />
                         </div>
                     )}
                 </Card>

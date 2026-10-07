@@ -7,6 +7,7 @@ use GeoIp2\Database\Reader;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OnboardingService extends BaseService
 {
@@ -116,7 +117,7 @@ class OnboardingService extends BaseService
                     }
                 }
             } catch (\Exception $e) {
-                // Ignore if IP not found in DB or DB missing
+                Log::debug('Onboarding: GeoIP country lookup failed', ['ip' => $ip, 'error' => $e->getMessage()]);
             }
         }
 

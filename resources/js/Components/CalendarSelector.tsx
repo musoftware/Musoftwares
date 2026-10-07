@@ -57,13 +57,13 @@ export default function CalendarSelector({
     const startDayOffset = getDay(startOfCurrentMonth);
 
     const weekDays = [
-        __('general.cal_sun') || 'Su',
-        __('general.cal_mon') || 'Mo',
-        __('general.cal_tue') || 'Tu',
-        __('general.cal_wed') || 'We',
-        __('general.cal_thu') || 'Th',
-        __('general.cal_fri') || 'Fr',
-        __('general.cal_sat') || 'Sa',
+        __('general.cal_sun'),
+        __('general.cal_mon'),
+        __('general.cal_tue'),
+        __('general.cal_wed'),
+        __('general.cal_thu'),
+        __('general.cal_fri'),
+        __('general.cal_sat'),
     ];
 
     const handleDayClick = (date: Date) => {
@@ -78,7 +78,7 @@ export default function CalendarSelector({
                 <DialogHeader className="pb-2 border-b border-slate-100 flex flex-row items-center justify-between">
                     <DialogTitle className="text-sm font-black uppercase tracking-wider text-slate-500 flex items-center gap-2">
                         <CalendarIcon className="h-4.5 w-4.5 text-indigo-500" />
-                        {__('general.board_calendar') || 'Board Calendar'}
+                        {__('general.board_calendar')}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -91,12 +91,14 @@ export default function CalendarSelector({
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={handlePrevMonth}
+                                aria-label={__('general.previous_month')}
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </button>
                             <button
                                 onClick={handleNextMonth}
+                                aria-label={__('general.next_month')}
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors"
                             >
                                 <ChevronRight className="h-4 w-4" />

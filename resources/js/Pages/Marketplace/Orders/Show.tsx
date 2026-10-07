@@ -3,6 +3,9 @@ import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
+import { useConfirm } from '@/hooks/useConfirm';
+import { PromptModal } from '@/Components/ui/ConfirmModal';
 import { formatMoney as formatCurrency, formatDate } from '@/lib/utils';
 
 export default function Show({ order, conversation }: any) {
@@ -11,35 +14,45 @@ export default function Show({ order, conversation }: any) {
     const isSeller = auth.user.id === order.seller_id;
     const [deliveryNote, setDeliveryNote] = useState('');
     const [deliveryLinks, setDeliveryLinks] = useState('');
+    const [isRevisionPromptOpen, setIsRevisionPromptOpen] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
-    const handleDeliver = (e: React.FormEvent) => {
+    const handleDeliver = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (
-            confirm(__('general.confirm_submit_delivery'))
-        ) {
-            const combinedNote = deliveryLinks ? `${deliveryNote}\nLinks: ${deliveryLinks}` : deliveryNote;
-            router.post(route('marketplace.orders.deliver', order.id), {
-                note: combinedNote,
-            });
-        }
+        const accepted = await confirm({
+            title: __('general.submit_delivery'),
+            description: __('general.confirm_submit_delivery'),
+        });
+        if (!accepted) return;
+        const combinedNote = deliveryLinks ? `${deliveryNote}\nLinks: ${deliveryLinks}` : deliveryNote;
+        router.post(route('marketplace.orders.deliver', order.id), {
+            note: combinedNote,
+        });
     };
 
-    const handleAcceptDelivery = () => {
-        if (
-            confirm(
-                __('general.confirm_accept_delivery'),
-            )
-        ) {
-            router.post(route('marketplace.orders.complete', order.id));
-        }
+    const handleAcceptDelivery = async () => {
+        const accepted = await confirm({
+            title: __('general.accept_complete'),
+            description: __('general.confirm_accept_delivery'),
+        });
+        if (!accepted) return;
+        router.post(route('marketplace.orders.complete', order.id));
     };
 
-    const handleRequestRevision = () => {
-        const note = prompt(__('general.enter_revision_details') || 'Please enter revision details:');
-        if (note) {
-            router.post(route('marketplace.orders.revision', order.id), {
-                revision_note: note,
-            });
+    const submitRevisionRequest = (note: string) => {
+        setIsRevisionPromptOpen(false);
+        router.post(route('marketplace.orders.revision', order.id), {
+            revision_note: note,
+        });
+    };
+
+    const copySerialCode = async (code: string) => {
+        try {
+            await navigator.clipboard.writeText(code);
+            toast.success(__('general.copied'));
+        } catch (error) {
+            console.error('Clipboard copy failed', error);
+            toast.error(__('general.error_occurred'));
         }
     };
 
@@ -65,11 +78,11 @@ export default function Show({ order, conversation }: any) {
 
     // Calculate dynamic countdown text (e.g. "3d 12h")
     const diffMs = deadlineDate.getTime() - now.getTime();
-    let timeLeftStr = '—';
+    let timeLeftStr = '-';
     if (diffMs > 0) {
         const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
         const diffHours = Math.floor((diffMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-        timeLeftStr = `${diffDays}d ${diffHours}h`;
+        timeLeftStr = __('marketplace.order_time_left', { days: diffDays, hours: diffHours });
     }
 
     // Use actual commission from the backend
@@ -78,7 +91,16 @@ export default function Show({ order, conversation }: any) {
 
     return (
         <MarketplaceLayout>
-            <Head title={`Order #${order.id}`} />
+            <Head title={__('marketplace.order_page_title', { id: order.id })} />
+            {confirmDialog}
+            <PromptModal
+                isOpen={isRevisionPromptOpen}
+                title={__('general.request_revision')}
+                label={__('general.enter_revision_details')}
+                confirmLabel={__('general.request_revision')}
+                onConfirm={submitRevisionRequest}
+                onCancel={() => setIsRevisionPromptOpen(false)}
+            />
 
             <div className="min-h-screen bg-gray-50 dark:bg-[#090d16] py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -175,17 +197,17 @@ export default function Show({ order, conversation }: any) {
 
                                     <div className="mb-6">
                                         <h5 className="mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">
-                                            Message:
+                                            {__('general.delivery_message')}
                                         </h5>
                                         <p className="rounded-lg border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/[0.03] p-4 text-sm text-gray-600 dark:text-slate-300">
-                                            {order.delivery_payload?.message || "No message provided."}
+                                            {order.delivery_payload?.message || __('general.no_message_provided')}
                                         </p>
                                     </div>
 
                                     {order.delivery_payload?.links && (
                                         <div className="mb-6">
                                             <h5 className="mb-2 text-sm font-medium text-gray-700 dark:text-slate-300">
-                                                Delivery Links:
+                                                {__('general.delivery_links')}
                                             </h5>
                                             <div className="flex cursor-pointer items-center rounded-lg border border-gray-200 dark:border-white/10 p-3 transition hover:bg-gray-50 dark:hover:bg-white/[0.03]">
                                                 <a
@@ -207,10 +229,10 @@ export default function Show({ order, conversation }: any) {
                                                     <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z" />
                                                     </svg>
-                                                    {__('general.delivered_digital_key') || 'Delivered License Key / Serial Code'}
+                                                    {__('general.delivered_digital_key')}
                                                 </h5>
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-200/60 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200">
-                                                    {__('general.instant_digital_delivery') || 'Instant Digital Delivery'}
+                                                    {__('general.instant_digital_delivery')}
                                                 </span>
                                             </div>
                                             <div className="flex items-center justify-between bg-white dark:bg-[#090d16] rounded-lg border border-emerald-300/80 dark:border-emerald-500/30 p-3.5 shadow-sm">
@@ -218,13 +240,11 @@ export default function Show({ order, conversation }: any) {
                                                     {order.delivery_payload.serial_code}
                                                 </span>
                                                 <button
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(order.delivery_payload.serial_code);
-                                                        alert(__('general.copied') || 'Copied to clipboard!');
-                                                    }}
+                                                    type="button"
+                                                    onClick={() => copySerialCode(order.delivery_payload.serial_code)}
                                                     className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition"
                                                 >
-                                                    {__('general.copy') || 'Copy Key'}
+                                                    {__('general.copy')}
                                                 </button>
                                             </div>
                                         </div>
@@ -250,7 +270,7 @@ export default function Show({ order, conversation }: any) {
                                                     ></path>
                                                 </svg>{__('general.accept_complete')}</button>
                                             <button
-                                                onClick={handleRequestRevision}
+                                                onClick={() => setIsRevisionPromptOpen(true)}
                                                 className="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-indigo-600 dark:border-indigo-500 bg-white dark:bg-transparent px-4 py-2.5 font-bold text-indigo-600 dark:text-indigo-400 transition hover:bg-indigo-50 dark:hover:bg-white/5"
                                             >
                                                 <svg
@@ -310,7 +330,7 @@ export default function Show({ order, conversation }: any) {
                                                         >
                                                             <span className="mb-1 ms-1 text-xs text-gray-500 dark:text-slate-400">
                                                                 {isMe
-                                                                    ? 'You'
+                                                                    ? __('marketplace.order_chat_you')
                                                                     : msg.sender
                                                                           ?.name}
                                                             </span>
@@ -390,6 +410,7 @@ export default function Show({ order, conversation }: any) {
                                     >
                                         <button
                                             type="button"
+                                            aria-label={__('general.attach_file')}
                                             className="text-gray-400 dark:text-slate-400 transition hover:text-indigo-600 dark:hover:text-indigo-400"
                                         >
                                             <svg
@@ -410,11 +431,13 @@ export default function Show({ order, conversation }: any) {
                                             type="text"
                                             name="body"
                                             placeholder={__('general.type_your_message')}
+                                            aria-label={__('general.type_your_message')}
                                             autoComplete="off"
                                             className="flex-1 rounded-full border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-500 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         />
                                         <button
                                             type="submit"
+                                            aria-label={__('general.send')}
                                             className="flex items-center justify-center rounded-full bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-700"
                                         >
                                             <svg
@@ -488,7 +511,7 @@ export default function Show({ order, conversation }: any) {
                                                         d="M5 13l4 4L19 7"
                                                     ></path>
                                                 </svg>
-                                                3 Revisions
+                                                {__('marketplace.order_revisions_count', { count: 3 })}
                                             </div>
                                             <div className="flex items-start text-sm text-gray-600 dark:text-slate-300">
                                                 <svg

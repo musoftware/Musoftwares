@@ -40,26 +40,26 @@ export default function Index({ favorites }: FavoritesIndexProps) {
 
     return (
         <MarketplaceLayout>
-            <Head title={__('general.saved_favorites') || 'My Saved Wishlist'} />
+            <Head title={__('general.saved_favorites')} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <ModulePageHeader
-                    title={__('general.saved_favorites') || 'Saved Services & Wishlist'}
-                    description={__('general.saved_favorites_sub') || 'Quick access to your bookmarked marketplace service listings.'}
+                    title={__('general.saved_favorites')}
+                    description={__('general.saved_favorites_sub')}
                 />
 
                 <OperationalCard
-                    title={__('general.bookmarked_gigs') || 'Wishlist Items'}
-                    description={`${favorites.total || favorites.data.length} services saved.`}
+                    title={__('general.bookmarked_gigs')}
+                    description={__('marketplace.fav_services_saved', { count: favorites.total || favorites.data.length })}
                 >
                     {favorites.data.length === 0 ? (
                         <div className="p-12 text-center text-slate-400 space-y-3">
                             <Heart className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 stroke-[1.5]" />
                             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                {__('general.no_saved_favorites_yet') || 'Your wishlist is currently empty.'}
+                                {__('general.no_saved_favorites_yet')}
                             </p>
                             <p className="text-xs text-slate-400 dark:text-slate-500 max-w-md mx-auto">
-                                Click the heart icon on any service listing to bookmark it for quick access later.
+                                {__('marketplace.fav_empty_desc')}
                             </p>
                             <div className="pt-2">
                                 <Link
@@ -67,7 +67,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium hover:bg-slate-800 dark:hover:bg-slate-100 transition"
                                 >
                                     <ShoppingBag className="w-4 h-4" />
-                                    Browse Catalog Services
+                                    {__('marketplace.fav_browse_catalog')}
                                 </Link>
                             </div>
                         </div>
@@ -91,7 +91,8 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                             <button
                                                 onClick={() => handleRemove(srv.id)}
                                                 className="absolute top-3 right-3 p-2 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-red-500 dark:text-red-400 hover:bg-red-500 hover:text-white transition shadow-sm"
-                                                title="Remove from favorites"
+                                                title={__('general.remove_from_favorites')}
+                                                aria-label={__('general.remove_from_favorites')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -100,7 +101,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                         <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                                             <div className="space-y-1.5">
                                                 <div className="text-xs text-slate-400 font-medium">
-                                                    Seller: {srv.seller?.name || 'Verified Creator'}
+                                                    {__('marketplace.dash_seller_label')} {srv.seller?.name || __('marketplace.fav_verified_creator')}
                                                 </div>
                                                 <h4 className="font-bold text-slate-900 dark:text-white text-base line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">
                                                     {srv.title}
@@ -118,7 +119,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                                                     href={`/marketplace/services/${srv.id}`}
                                                     className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                                                 >
-                                                    View Details <ArrowRight className="w-3.5 h-3.5" />
+                                                    {__('general.view_details')} <ArrowRight className="w-3.5 h-3.5" />
                                                 </Link>
                                             </div>
                                         </div>

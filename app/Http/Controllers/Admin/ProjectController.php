@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Modules\Shortlink\Services\ShortlinkService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -599,7 +600,7 @@ class ProjectController extends Controller
             try {
                 return Carbon::createFromFormat('!Y-m-d', $date, 'Africa/Cairo');
             } catch (\Throwable $e) {
-                // fall through
+                Log::debug('Invalid board date, falling back to default', ['date' => $date, 'error' => $e->getMessage()]);
             }
         }
 

@@ -42,6 +42,38 @@ import {
     ResponsiveContainer
 } from 'recharts';
 
+interface BalanceTooltipProps {
+    active?: boolean;
+    payload?: any[];
+    label?: any;
+    year: number;
+    currencyCode: string;
+}
+
+function BalanceTooltip({ active, payload, label, year, currencyCode }: BalanceTooltipProps) {
+    if (!active || !payload || payload.length === 0) return null;
+
+    const profitLabel = __('general.profit');
+    const valueColor = (entry: any) => {
+        if (entry.name !== profitLabel) return 'text-slate-900';
+        return entry.value < 0 ? 'text-red-600' : 'text-green-600';
+    };
+
+    return (
+        <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
+            <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label} {year}</p>
+            {payload.map((entry: any, idx: number) => (
+                <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
+                    <span className="text-slate-400 capitalize">{entry.name}:</span>
+                    <span className={`font-mono font-semibold ${valueColor(entry)}`}>
+                        {formatMoney(entry.value, currencyCode)}
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function BalanceReport() {
     const { stats } = usePage<any>().props;
 
@@ -64,33 +96,14 @@ export default function BalanceReport() {
         return String(value);
     };
 
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
-                    <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label} {stats.year}</p>
-                    {payload.map((entry: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
-                            <span className="text-slate-400 capitalize">{entry.name}:</span>
-                            <span className={`font-mono font-semibold ${entry.name === __('general.profit') && entry.value < 0 ? 'text-red-600' : entry.name === __('general.profit') ? 'text-green-600' : 'text-slate-900'}`}>
-                                {formatMoney(entry.value, stats.business_currency_code)}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
         <AdminSidebarLayout 
             title={__('general.balance_report')} 
             header={__('general.balance_report')}
             actions={
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" onClick={handlePrevYear}>
-                        <ChevronLeft className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={handlePrevYear} aria-label={__('admin.previous_year')} title={__('admin.previous_year')}>
+                        <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
                     </Button>
                     <Select value={String(stats.year)} onValueChange={(val) => router.get(route('admin.reports.balance'), { year: val }, { preserveState: true })}>
                         <SelectTrigger className="w-[100px]">
@@ -102,8 +115,8 @@ export default function BalanceReport() {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" size="icon" onClick={handleNextYear}>
-                        <ChevronRight className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={handleNextYear} aria-label={__('admin.next_year')} title={__('admin.next_year')}>
+                        <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                     </Button>
                 </div>
             }
@@ -189,7 +202,7 @@ export default function BalanceReport() {
                                     tickFormatter={formatYAxis}
                                     dx={-10}
                                 />
-                                <RechartsTooltip content={<CustomTooltip />} />
+                                <RechartsTooltip content={<BalanceTooltip year={stats.year} currencyCode={stats.business_currency_code} />} />
                                 <Area 
                                     type="monotone" 
                                     dataKey="income" 

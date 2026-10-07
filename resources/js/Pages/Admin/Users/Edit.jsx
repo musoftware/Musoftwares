@@ -9,8 +9,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { Switch } from '@/Components/ui/switch';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function Edit({ user, currencies = [], plans = [], statuses = [], roles = [], emails = [] }) {
+    const { confirm, confirmDialog } = useConfirm();
     const [newAliasEmail, setNewAliasEmail] = useState('');
     const [newAliasVerified, setNewAliasVerified] = useState(true);
     const [addingAlias, setAddingAlias] = useState(false);
@@ -31,15 +33,26 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
         });
     };
 
-    const handleRemoveAlias = (alias) => {
-        if (!confirm(__('general.confirm_remove_alias', { email: alias.email }) || `Are you sure you want to remove ${alias.email}?`)) return;
+    const handleRemoveAlias = async (alias) => {
+        const accepted = await confirm({
+            title: __('general.confirm_remove_alias'),
+            description: alias.email,
+            variant: 'danger',
+            confirmLabel: __('admin.remove'),
+        });
+        if (!accepted) return;
         router.delete(`/admin/users/${user.id}/emails/${alias.id}`, {
             preserveScroll: true,
         });
     };
 
-    const handleMakePrimaryAlias = (alias) => {
-        if (!confirm(__('general.confirm_make_primary_alias', { email: alias.email }) || `Make ${alias.email} the primary email for this account?`)) return;
+    const handleMakePrimaryAlias = async (alias) => {
+        const accepted = await confirm({
+            title: __('general.confirm_make_primary_alias'),
+            description: alias.email,
+            confirmLabel: __('general.make_primary'),
+        });
+        if (!accepted) return;
         router.post(`/admin/users/${user.id}/emails/${alias.id}/make-primary`, {}, {
             preserveScroll: true,
         });
@@ -103,6 +116,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
     return (
         <AdminSidebarLayout>
             <Head title={`${__('general.edit_account')}: ${user.name}`} />
+            {confirmDialog}
 
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-8">
@@ -175,15 +189,15 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                         <div>
                                             <h6 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                                 <Mail className="h-4 w-4 text-slate-700" />
-                                                {__('general.additional_email_addresses') || 'عناوين البريد الإلكتروني الإضافية (Email Aliases)'}
+                                                {__('general.additional_email_addresses')}
                                             </h6>
                                             <p className="text-xs text-slate-500 mt-0.5">
-                                                {__('general.additional_emails_desc') || 'يمكن للمستخدم تسجيل الدخول بنفس كلمة المرور واستلام الإشعارات باستخدام أي من عناوين البريد المضافة.'}
+                                                {__('general.additional_emails_desc')}
                                             </p>
                                         </div>
                                         <Link href={`/admin/users/${user.id}/emails`}>
                                             <Button type="button" variant="outline" size="sm" className="text-xs">
-                                                {__('general.manage_all_aliases') || 'إدارة ودمج الحسابات'}
+                                                {__('general.manage_all_aliases')}
                                             </Button>
                                         </Link>
                                     </div>
@@ -198,7 +212,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                         <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full font-semibold ${
                                                             alias.verified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                                                         }`}>
-                                                            {alias.verified ? (__('general.verified') || 'مؤكد') : (__('general.pending') || 'معلق')}
+                                                            {alias.verified ? (__('general.verified')) : (__('general.pending'))}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-1 shrink-0">
@@ -209,7 +223,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                             className="h-7 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2"
                                                             onClick={() => handleMakePrimaryAlias(alias)}
                                                         >
-                                                            {__('general.make_primary') || 'جعله رئيسي'}
+                                                            {__('general.make_primary')}
                                                         </Button>
                                                         <Button
                                                             type="button"
@@ -217,6 +231,8 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                             size="sm"
                                                             className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2"
                                                             onClick={() => handleRemoveAlias(alias)}
+                                                            aria-label={__('admin.remove')}
+                                                            title={__('admin.remove')}
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />
                                                         </Button>
@@ -226,7 +242,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                         </div>
                                     ) : (
                                         <p className="text-xs text-slate-500 italic">
-                                            {__('general.no_additional_emails') || 'لا توجد عناوين بريد إلكتروني إضافية مضافة لهذا الحساب.'}
+                                            {__('general.no_additional_emails')}
                                         </p>
                                     )}
 
@@ -237,7 +253,8 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                 type="email"
                                                 value={newAliasEmail}
                                                 onChange={(e) => setNewAliasEmail(e.target.value)}
-                                                placeholder={__('general.add_another_email_placeholder') || 'أدخل بريد إلكتروني إضافي... (مثال: secondary@example.com)'}
+                                                placeholder={__('general.add_another_email_placeholder')}
+                                                aria-label={__('general.add_another_email_placeholder')}
                                                 className="grow text-xs sm:text-sm bg-white"
                                             />
                                             <div className="flex items-center gap-2 shrink-0 justify-between sm:justify-start">
@@ -248,7 +265,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                         onChange={(e) => setNewAliasVerified(e.target.checked)}
                                                         className="rounded border-slate-300 text-slate-900 focus:ring-slate-900 h-3.5 w-3.5"
                                                     />
-                                                    {__('general.mark_verified') || 'مؤكد'}
+                                                    {__('general.mark_verified')}
                                                 </label>
                                                 <Button
                                                     type="button"
@@ -258,7 +275,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                                     className="text-xs"
                                                 >
                                                     <Plus className="h-3.5 w-3.5 me-1" />
-                                                    {addingAlias ? (__('general.adding') || 'جاري الإضافة...') : (__('general.add_email') || 'إضافة بريد')}
+                                                    {addingAlias ? (__('general.adding')) : (__('general.add_email'))}
                                                 </Button>
                                             </div>
                                         </div>
@@ -322,12 +339,12 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                             <div className="flex items-center justify-between p-4 mb-6 rounded-xl border bg-slate-50/50">
                                 <div>
                                     <Label htmlFor="enable_custom_hour_rate" className="font-semibold text-sm cursor-pointer">
-                                        {__('general.enable_custom_hour_rate') || 'تفعيل سعر ساعة مخصص'}
+                                        {__('general.enable_custom_hour_rate')}
                                     </Label>
                                     <p className="text-xs text-gray-500 mt-0.5">
                                         {data.enable_custom_hour_rate
-                                            ? (__('general.custom_hour_rate_active_desc') || 'سيتم استخدام سعر الساعة المخصص أدناه في الفواتير والمؤقتات بدلاً من سعر النظام.')
-                                            : (__('general.custom_hour_rate_inactive_desc') || 'عند الإيقاف، سيتم استخدام سعر النظام الأساسي تلقائيًا.')}
+                                            ? (__('general.custom_hour_rate_active_desc'))
+                                            : (__('general.custom_hour_rate_inactive_desc'))}
                                     </p>
                                 </div>
                                 <Switch
@@ -479,7 +496,7 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="enable_3d_dashboard" name="enable_3d_dashboard" checked={data.enable_3d_dashboard} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
-                                        <Label htmlFor="enable_3d_dashboard" className="cursor-pointer font-medium">{__('general.enable_3d_dashboard') || 'Enable 3D Holographic Dashboard'}</Label>
+                                        <Label htmlFor="enable_3d_dashboard" className="cursor-pointer font-medium">{__('general.enable_3d_dashboard')}</Label>
                                     </div>
                                 </div>
                             </div>

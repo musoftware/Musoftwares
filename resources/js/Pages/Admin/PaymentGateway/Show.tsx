@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -129,12 +130,14 @@ function SecretField({ label, value, copyKey, copied, onCopy }: {
                     onClick={() => setVisible(v => !v)}
                     className="rounded px-2 py-1 text-xs text-gray-400 hover:text-gray-700 border border-gray-200"
                 >
-                    {visible ? 'Hide' : 'Show'}
+                    {visible ? __('general.hide') : __('admin.payment_gateway_show_secret')}
                 </button>
                 <button
                     type="button"
                     onClick={() => onCopy(value, copyKey)}
                     className="rounded p-1.5 text-gray-400 hover:text-black border border-gray-200"
+                    aria-label={__('admin.payment_gateway_copy_value', { label })}
+                    title={__('admin.payment_gateway_copy_value', { label })}
                 >
                     {copied === copyKey
                         ? <Check className="h-3.5 w-3.5 text-green-600" />
@@ -148,10 +151,10 @@ function SecretField({ label, value, copyKey, copied, onCopy }: {
 
 function StatusBadge({ status }: { status: string }) {
     const map: Record<string, { label: string; cls: string; icon: any }> = {
-        success:   { label: 'Success',   cls: 'bg-green-100 text-green-700',  icon: CheckCircle },
-        failed:    { label: 'Failed',    cls: 'bg-red-100 text-red-700',      icon: XCircle },
-        cancelled: { label: 'Cancelled', cls: 'bg-gray-100 text-gray-500',    icon: XCircle },
-        pending:   { label: 'Pending',   cls: 'bg-yellow-100 text-yellow-700', icon: Clock },
+        success:   { label: __('admin.payment_gateway_status_success'),   cls: 'bg-green-100 text-green-700',  icon: CheckCircle },
+        failed:    { label: __('admin.payment_gateway_status_failed'),    cls: 'bg-red-100 text-red-700',      icon: XCircle },
+        cancelled: { label: __('admin.payment_gateway_status_cancelled'), cls: 'bg-gray-100 text-gray-500',    icon: XCircle },
+        pending:   { label: __('admin.payment_gateway_status_pending'),   cls: 'bg-yellow-100 text-yellow-700', icon: Clock },
     };
     const { label, cls, icon: Icon } = map[status] ?? map.pending;
     return (
@@ -234,8 +237,8 @@ export default function Show({ client, payments, stats }: Props) {
     const items = payments?.data ?? [];
 
     return (
-        <AdminSidebarLayout title={client.name} header="Payment Gateway">
-            <Head title={`Gateway — ${client.name}`} />
+        <AdminSidebarLayout title={client.name} header={__('general.payment_gateway')}>
+            <Head title={__('admin.payment_gateway_show_title', { name: client.name })} />
 
             {/* ── Back + Header ──────────────────────────────────────────── */}
             <div className="mb-6 flex items-center justify-between">
@@ -245,7 +248,7 @@ export default function Show({ client, payments, stats }: Props) {
                         {__('general.back')}</Button>
                     <div>
                         <h1 className="text-xl font-bold text-gray-900">{client.name}</h1>
-                        <p className="text-sm text-gray-400">{client.website ?? 'No website'}</p>
+                        <p className="text-sm text-gray-400">{client.website ?? __('admin.payment_gateway_no_website')}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -263,11 +266,11 @@ export default function Show({ client, payments, stats }: Props) {
                     icon={DollarSign}
                     label={__('general.total_volume')}
                     value={formatCurrency(stats.total_volume, payments[0]?.currency)}
-                    sub={`${stats.successful_count} successful payments`}
+                    sub={__('admin.payment_gateway_successful_payments', { count: stats.successful_count })}
                 />
                 <StatCard
                     icon={TrendingUp}
-                    label={`Our Commission (${stats.commission_rate}%)`}
+                    label={__('admin.payment_gateway_our_commission_rate', { rate: stats.commission_rate })}
                     value={formatCurrency(stats.total_commission, payments[0]?.currency)}
                     accent="text-green-700"
                 />
@@ -280,7 +283,7 @@ export default function Show({ client, payments, stats }: Props) {
                     icon={Activity}
                     label={__('general.payments')}
                     value={String(stats.total_payments)}
-                    sub={`${stats.pending_count} pending · ${stats.failed_count} failed`}
+                    sub={__('admin.payment_gateway_pending_failed', { pending: stats.pending_count, failed: stats.failed_count })}
                 />
             </div>
 
@@ -338,7 +341,7 @@ export default function Show({ client, payments, stats }: Props) {
                             <tr key={p.id} className="border-b hover:bg-gray-50 transition-colors">
                                 <td className="p-4">
                                     <div className="font-mono text-xs text-gray-700">{p.internal_order_id}</div>
-                                    <div className="text-xs text-gray-400">ext: {p.external_order_id}</div>
+                                    <div className="text-xs text-gray-400">{__('admin.payment_gateway_external_order', { id: p.external_order_id })}</div>
                                 </td>
                                 <td className="p-4">
                                     <div className="text-sm text-gray-800">{p.customer_name ?? '—'}</div>
@@ -374,23 +377,7 @@ export default function Show({ client, payments, stats }: Props) {
             </div>
 
             {/* ── Pagination ────────────────────────────────────────────── */}
-            {payments?.links && (
-                <div className="mt-4 flex justify-center gap-1">
-                    {payments.links.map((link, i) => (
-                        <button
-                            key={i}
-                            disabled={!link.url}
-                            onClick={() => link.url && router.visit(link.url)}
-                            className={`px-3 py-1 rounded text-sm border ${
-                                link.active
-                                    ? 'bg-black text-white border-black'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 disabled:opacity-40'
-                            }`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
-                </div>
-            )}
+            <Pagination links={payments?.links ?? []} />
 
             {/* ── Edit Modal ────────────────────────────────────────────── */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -408,7 +395,7 @@ export default function Show({ client, payments, stats }: Props) {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label>Commission Rate (%)</Label>
+                                    <Label>{__('admin.payment_gateway_commission_rate')}</Label>
                                     <Input
                                         type="number" min="1" max="100" step="0.5"
                                         value={editForm.commission_rate}
@@ -451,9 +438,7 @@ export default function Show({ client, payments, stats }: Props) {
                     <div className="py-2">
                         <div className="rounded-lg bg-red-50 border border-red-200 p-3 flex items-start gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                            <p className="text-sm text-red-700">{__('general.the_current')}<strong>client_secret</strong> and <strong>webhook_secret</strong> will be invalidated immediately.
-                                You must update your integration code with the new credentials.
-                            </p>
+                            <p className="text-sm text-red-700">{__('admin.payment_gateway_regen_warning')}</p>
                         </div>
                     </div>
                     <DialogFooter>
@@ -467,25 +452,25 @@ export default function Show({ client, payments, stats }: Props) {
             {/* ── Integration Docs Modal ────────────────────────────────── */}
             <Dialog open={isDocsOpen} onOpenChange={setIsDocsOpen}>
                 <DialogContent className="max-w-3xl">
-                    <DialogHeader><DialogTitle>Integration Guide — {client.name}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{__('admin.payment_gateway_guide_title', { name: client.name })}</DialogTitle></DialogHeader>
                     <div className="max-h-[70vh] space-y-4 overflow-y-auto py-2 pe-1">
                         <div className="rounded-lg border border-gray-200 p-4 text-sm space-y-2">
-                            <p className="font-semibold text-gray-700">1. Endpoint</p>
+                            <p className="font-semibold text-gray-700">{__('admin.payment_gateway_guide_endpoint')}</p>
                             <code className="block rounded bg-gray-100 px-3 py-2 text-xs">
                                 POST {window.location.origin}/api/payment-gateway/initiate
                             </code>
-                            <p className="font-semibold text-gray-700 pt-2">2. Authentication Headers</p>
+                            <p className="font-semibold text-gray-700 pt-2">{__('admin.payment_gateway_guide_auth_headers')}</p>
                             <code className="block rounded bg-gray-100 px-3 py-2 text-xs whitespace-pre">
                                 {`X-Client-Id:     ${client.client_id}\nX-Client-Secret: ${client.client_secret}`}
                             </code>
-                            <p className="font-semibold text-gray-700 pt-2">3. Status Check</p>
+                            <p className="font-semibold text-gray-700 pt-2">{__('admin.payment_gateway_guide_status_check')}</p>
                             <code className="block rounded bg-gray-100 px-3 py-2 text-xs">
                                 GET {window.location.origin}/api/payment-gateway/status/{'{order_id}'}
                             </code>
                         </div>
                         <CodeSnippet clientId={client.client_id} clientSecret={client.client_secret} />
                         <div className="rounded-lg border border-gray-200 p-4 text-sm">
-                            <p className="font-semibold text-gray-700 mb-2">Webhook Verification (PHP)</p>
+                            <p className="font-semibold text-gray-700 mb-2">{__('admin.payment_gateway_guide_webhook_verification')}</p>
                             <pre className="overflow-x-auto rounded bg-gray-950 p-3 text-xs text-green-400">
 {`$signature = hash_hmac('sha256', json_encode($payload), '${client.webhook_secret}');
 $isValid = hash_equals($signature, $request->header('X-Gateway-Signature'));`}

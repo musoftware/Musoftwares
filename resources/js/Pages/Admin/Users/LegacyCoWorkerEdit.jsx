@@ -33,15 +33,17 @@ export default function LegacyCoWorkerEdit({ worker, techTags = [] }) {
     };
 
     return (
-        <AdminSidebarLayout title={`Edit ${worker.person_name}`} header="Edit Co-Worker">
-            <Head title={`Edit ${worker.person_name}`} />
+        <AdminSidebarLayout title={__('admin.edit_named', { name: worker.person_name })} header={__('general.edit_legacy_co_worker')}>
+            <Head title={__('admin.edit_named', { name: worker.person_name })} />
 
             <div className="mb-6 flex items-center gap-4">
                 <Link
                     href={`/admin/users/legacy-coworker/${worker.id}`}
                     className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors"
+                    aria-label={__('general.back')}
+                    title={__('general.back')}
                 >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">{__('general.edit_legacy_co_worker')}</h1>

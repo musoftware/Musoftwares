@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Billing;
 
 use App\Builders\KashierCheckoutBuilder;
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\KashierHelper;
+use App\Helpers\KashierSignedAmount;
 use App\Helpers\TextHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CurrenciesExchange;
@@ -44,8 +46,8 @@ class InvoiceController extends Controller
                     'amount' => round((float) $inv->total(), 2),
                     'paid_amount' => round((float) $inv->paid, 2),
                     'remaining' => $inv->unpaid_total(),
-                    'wallet_amount' => round((float) CurrenciesExchange::RateToday($inv->total(), $inv->currency_id, $walletCurrencyId), 2),
-                    'wallet_remaining' => round((float) CurrenciesExchange::RateToday($inv->unpaid_total(), $inv->currency_id, $walletCurrencyId), 2),
+                    'wallet_amount' => $this->walletAmountOrNull($inv->total(), $inv->currency_id, $walletCurrencyId),
+                    'wallet_remaining' => $this->walletAmountOrNull($inv->unpaid_total(), $inv->currency_id, $walletCurrencyId),
                     'currency' => $curr ? [
                         'id' => $curr->id,
                         'currency' => $curr->currency,
@@ -98,8 +100,11 @@ class InvoiceController extends Controller
         }
         $walletCurrency = Currency::find($walletCurrencyId);
 
-        $remaining = $invoice->unpaid_total();
-        $remainingInWalletCurrency = CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+        $remainingInWalletCurrency = $this->walletAmountOrNull($invoice->unpaid_total(), $invoice->currency_id, $walletCurrencyId);
+        if ($remainingInWalletCurrency === null) {
+            // Without a rate the wallet-vs-gateway choice cannot be made safely; do not render a wrong amount.
+            return redirect()->route('billing.invoices.index')->with('error', __('errors.something_went_wrong'));
+        }
 
         return Inertia::render('Client/Billing/InvoicePay', [
             'invoice' => [
@@ -128,8 +133,21 @@ class InvoiceController extends Controller
             ],
             'client_balance' => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,
-            'remaining_in_wallet_currency' => round((float) $remainingInWalletCurrency, 2),
+            'remaining_in_wallet_currency' => $remainingInWalletCurrency,
         ]);
+    }
+
+    /**
+     * Display-only conversion: a missing rate (already logged by CurrenciesExchange) becomes null
+     * so the invoice list still renders. Money-moving code must call RateToday directly and fail.
+     */
+    private function walletAmountOrNull(float $amount, $fromCurrencyId, $walletCurrencyId): ?float
+    {
+        try {
+            return round((float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $walletCurrencyId), 2);
+        } catch (MissingExchangeRateException) {
+            return null;
+        }
     }
 
     /**
@@ -156,7 +174,11 @@ class InvoiceController extends Controller
             return response()->json(['success' => false, 'message' => 'User is missing a currency configuration'], 500);
         }
 
-        $remainingInWalletCurrency = CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+        try {
+            $remainingInWalletCurrency = CurrenciesExchange::RateToday($remaining, $invoice->currency_id, $walletCurrencyId);
+        } catch (MissingExchangeRateException) {
+            return response()->json(['success' => false, 'message' => __('errors.something_went_wrong')], 503);
+        }
 
         // If wallet balance covers the remaining amount, pay via wallet
         if ((float) $user->balance() >= $remainingInWalletCurrency) {
@@ -267,22 +289,55 @@ class InvoiceController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Invoice not found'], 404);
         }
 
-        if (($data['status'] ?? '') === 'SUCCESS') {
-            if ($invoice->status !== 'paid') {
-                try {
-                    $invoice->mark_as_paid();
-                    Log::info("User Invoice payment successful for invoice #{$invoice->id}");
-                } catch (\Exception $e) {
-                    Log::error("User Invoice payment failed to mark as paid for invoice #{$invoice->id}: ".$e->getMessage());
-
-                    return response()->json(['status' => 'error', 'message' => 'Failed to process payment internally'], 500);
-                }
-            }
-        } else {
+        if (($data['status'] ?? '') !== 'SUCCESS') {
             Log::info("User Invoice payment failed for invoice #{$invoice->id}, Status: ".($data['status'] ?? 'unknown'));
+
+            return response()->json(['status' => 'success']);
+        }
+
+        if ($invoice->status === 'paid') {
+            return response()->json(['status' => 'success']);
+        }
+
+        try {
+            // A missing exchange rate throws here and ends as a 500, so Kashier retries later.
+            if (! $this->signedPaymentCoversInvoice($data, $invoice)) {
+                return response()->json(['status' => 'error', 'message' => 'Paid amount is less than the amount due'], 422);
+            }
+
+            $invoice->mark_as_paid();
+            Log::info("User Invoice payment successful for invoice #{$invoice->id}");
+        } catch (\Exception $e) {
+            Log::error("User Invoice payment failed to mark as paid for invoice #{$invoice->id}: ".$e->getMessage());
+
+            return response()->json(['status' => 'error', 'message' => 'Failed to process payment internally'], 500);
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * Compare the signed Kashier charge with what is still due on the invoice. Logs every rejection.
+     */
+    private function signedPaymentCoversInvoice(array $data, Invoice $invoice): bool
+    {
+        $paid = KashierSignedAmount::fromWebhookData($data);
+        $amountDue = $invoice->unpaid_total();
+        $invoiceCurrencyId = (int) ($invoice->currency_id ?? $invoice->currency);
+
+        $covers = $paid !== null && $invoiceCurrencyId > 0 && $paid->covers($amountDue, $invoiceCurrencyId);
+        if (! $covers) {
+            Log::warning('User Invoice Kashier webhook rejected: paid amount is less than amount due.', [
+                'invoice_id' => $invoice->id,
+                'trx' => $data['transactionId'] ?? null,
+                'amount_due' => $amountDue,
+                'invoice_currency_id' => $invoiceCurrencyId,
+                'paid' => $data['amount'] ?? null,
+                'paid_currency' => $data['currency'] ?? null,
+            ]);
+        }
+
+        return $covers;
     }
 
     /**

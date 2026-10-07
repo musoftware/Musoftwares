@@ -70,10 +70,10 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
-                    toastSuccess(__('general.expiration_updated', {}, 'License expiration updated successfully'));
+                    toastSuccess(__('general.expiration_updated'));
                     setEditingExpiration(null);
                 },
-                onError: () => toastError(__('general.error_occurred', {}, 'Failed to update expiration')),
+                onError: () => toastError(__('general.error_occurred')),
                 onFinish: () => setSavingExpiration(false),
             }
         );
@@ -96,8 +96,8 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
     const updateStatus = (assignment: Assignment, status: string | null) => {
         if (!status) return;
         router.patch(route('admin.serial-user-devices.status', assignment.id), { status }, {
-            onSuccess: () => toastSuccess(__('general.status_updated') || 'Status updated'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.status_updated')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -106,13 +106,13 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
         const id = pendingDelete.id;
         setPendingDelete(null);
         router.delete(route('admin.serial-user-devices.destroy', id), {
-            onSuccess: () => toastSuccess(__('general.removed') || 'Assignment removed'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.removed')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
     return (
-        <AdminSidebarLayout title={__('general.serial_user_devices')} header="Serial User Devices">
+        <AdminSidebarLayout title={__('general.serial_user_devices')} header={__('general.serial_user_devices')}>
             <Head title={__('general.user_device_assignments')} />
             <div className="space-y-6">
                 <div className="flex items-center justify-between flex-wrap gap-3">
@@ -134,7 +134,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                        { label: __('general.total') || 'Total Assignments', value: stats.total },
+                        { label: __('general.total'), value: stats.total },
                         { label: __('general.active'), value: stats.active },
                         { label: __('general.inactive'), value: stats.inactive },
                     ].map(({ label, value }) => (
@@ -164,7 +164,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
-                            {statuses.map(s => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+                            {statuses.map(s => <SelectItem key={s} value={s}>{__(`general.${s}`)}</SelectItem>)}
                         </SelectContent>
                     </Select>
                 </div>
@@ -179,7 +179,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.assigned_user')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.notes')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.assigned')}</th>
-                                        <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.license_expiration', {}, 'Expiration')}</th>
+                                        <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.license_expiration')}</th>
                                         <th className="text-start px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.status')}</th>
                                         <th className="text-end px-4 py-3 text-slate-500 font-semibold uppercase tracking-wider text-xs">{__('general.actions')}</th>
                                     </tr>
@@ -206,7 +206,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                                     {a.expires_at ? (
                                                         a.is_expired ? (
                                                             <Badge variant="destructive" className="text-xs">
-                                                                {__('general.expired', {}, 'Expired')} ({a.expires_at_formatted})
+                                                                {__('general.expired')} ({a.expires_at_formatted})
                                                             </Badge>
                                                         ) : (
                                                             <Badge
@@ -217,12 +217,12 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                                                         : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                                                                 }`}
                                                             >
-                                                                {__('general.remaining_days', { days: String(a.remaining_days ?? 0) }, `${a.remaining_days ?? 0}d left`)}
+                                                                {__('admin.serial_user_devices_days_left', { days: a.remaining_days ?? 0 })}
                                                             </Badge>
                                                         )
                                                     ) : (
                                                         <Badge variant="outline" className="text-xs bg-slate-100 text-slate-700">
-                                                            {__('general.lifetime', {}, 'Lifetime')}
+                                                            {__('general.lifetime')}
                                                         </Badge>
                                                     )}
                                                     <Button
@@ -230,7 +230,8 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                                         variant="ghost"
                                                         onClick={() => openExpirationModal(a)}
                                                         className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                                                        title={__('general.edit_expiration', {}, 'Edit Expiration')}
+                                                        title={__('general.edit_expiration')}
+                                                        aria-label={__('general.edit_expiration')}
                                                     >
                                                         <Calendar className="w-3.5 h-3.5" />
                                                     </Button>
@@ -242,7 +243,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                                         <SelectValue />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {statuses.map(s => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+                                                        {statuses.map(s => <SelectItem key={s} value={s}>{__(`general.${s}`)}</SelectItem>)}
                                                     </SelectContent>
                                                 </Select>
                                             </td>
@@ -269,7 +270,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Calendar className="w-5 h-5 text-muted-foreground" />
-                            <span>{__('general.edit_license_expiration', {}, 'Edit License Expiration')}</span>
+                            <span>{__('general.edit_license_expiration')}</span>
                         </DialogTitle>
                     </DialogHeader>
                     {editingExpiration && (
@@ -284,16 +285,16 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                     <span className="font-medium text-end">{editingExpiration.user?.name ?? '—'}</span>
                                 </div>
                                 <div className="flex justify-between gap-4">
-                                    <span className="text-muted-foreground">{__('general.current_status', {}, 'Current Expiration')}:</span>
+                                    <span className="text-muted-foreground">{__('general.current_status')}:</span>
                                     <span className="font-medium text-end">
-                                        {editingExpiration.expires_at ? editingExpiration.expires_at_formatted : __('general.lifetime', {}, 'Lifetime (No Expiration)')}
+                                        {editingExpiration.expires_at ? editingExpiration.expires_at_formatted : __('general.lifetime')}
                                     </span>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                    {__('general.quick_presets', {}, 'Quick Presets')}
+                                    {__('general.quick_presets')}
                                 </Label>
                                 <div className="flex flex-wrap gap-1.5">
                                     <Button
@@ -303,7 +304,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(30)}
                                     >
-                                        +30 {__('general.days', {}, 'Days')}
+                                        +30 {__('general.days')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -312,7 +313,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(90)}
                                     >
-                                        +90 {__('general.days', {}, 'Days')}
+                                        +90 {__('general.days')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -321,7 +322,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(180)}
                                     >
-                                        +6 {__('general.months', {}, 'Months')}
+                                        +6 {__('general.months')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -330,7 +331,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(365)}
                                     >
-                                        +1 {__('general.year', {}, 'Year')}
+                                        +1 {__('general.year')}
                                     </Button>
                                     <Button
                                         type="button"
@@ -339,14 +340,14 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                         className="h-7 text-xs"
                                         onClick={() => setPresetDays(null)}
                                     >
-                                        {__('general.lifetime', {}, 'Lifetime (Clear)')}
+                                        {__('general.lifetime')}
                                     </Button>
                                 </div>
                             </div>
 
                             <div className="space-y-1.5">
                                 <Label htmlFor="expires-at-input" className="text-xs">
-                                    {__('general.expiration_date', {}, 'Expiration Date (Leave blank for Lifetime)')}
+                                    {__('general.expiration_date')}
                                 </Label>
                                 <Input
                                     id="expires-at-input"
@@ -371,7 +372,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                     size="sm"
                                     disabled={savingExpiration}
                                 >
-                                    {savingExpiration ? __('general.saving', {}, 'Saving...') : __('general.save_changes', {}, 'Save Changes')}
+                                    {savingExpiration ? __('general.saving') : __('general.save_changes')}
                                 </Button>
                             </div>
                         </form>
@@ -381,8 +382,8 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.remove_assignment') || 'Remove assignment?'}
-                description={__('general.confirm_remove_assignment_desc') || `This will remove the assignment for device "${pendingDelete?.device_id}".`}
+                title={__('general.remove_assignment')}
+                description={__('general.confirm_remove_assignment_desc')}
                 confirmLabel={__('general.remove')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

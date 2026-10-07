@@ -10,7 +10,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import {
     ArrowLeft,
-    BookOpen,
     FolderTree,
     Loader2,
     Pencil,
@@ -73,7 +72,7 @@ export default function Index({ categories }: Props) {
             put(route('admin.digitalproducts.categories.update', editingCategory.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(__('general.category_updated_successfully') || 'Category updated successfully!');
+                    toast.success(__('general.category_updated_successfully'));
                     handleCancelEdit();
                 },
                 onError: (errs) => {
@@ -85,7 +84,7 @@ export default function Index({ categories }: Props) {
             post(route('admin.digitalproducts.categories.store'), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(__('general.category_created_successfully') || 'Category created successfully!');
+                    toast.success(__('general.category_created_successfully'));
                     reset();
                 },
                 onError: (errs) => {
@@ -102,14 +101,14 @@ export default function Index({ categories }: Props) {
         router.delete(route('admin.digitalproducts.categories.destroy', pendingDeleteCategory.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.category_deleted_successfully') || 'Category deleted successfully!');
+                toast.success(__('general.category_deleted_successfully'));
                 setPendingDeleteCategory(null);
                 if (editingCategory?.id === pendingDeleteCategory.id) {
                     handleCancelEdit();
                 }
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'An error occurred');
+                toast.error(__('general.error_occurred'));
                 setPendingDeleteCategory(null);
             },
         });
@@ -117,26 +116,26 @@ export default function Index({ categories }: Props) {
 
     return (
         <AdminSidebarLayout
-            title={__('general.book_categories') || 'Digital Book Categories'}
+            title={__('general.book_categories')}
             header={
                 <div className="flex items-center gap-2">
-                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
+                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors" aria-label={__('general.back')}>
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
                     </Link>
                     <FolderTree className="h-5 w-5 text-slate-700" />
-                    <span>{__('general.book_categories') || 'Digital Book Categories'}</span>
+                    <span>{__('general.book_categories')}</span>
                 </div>
             }
             actions={
                 <Link href={route('admin.digitalproducts.create')}>
                     <Button size="sm" className="h-9 gap-1.5 bg-slate-900 hover:bg-slate-800 text-white shadow-sm">
                         <Plus className="h-4 w-4" />
-                        <span>{__('general.upload_new_book') || 'Upload Book'}</span>
+                        <span>{__('general.upload_new_book')}</span>
                     </Button>
                 </Link>
             }
         >
-            <Head title={__('general.book_categories') || 'Book Categories'} />
+            <Head title={__('general.book_categories')} />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -148,8 +147,8 @@ export default function Index({ categories }: Props) {
                                 <span className="flex items-center gap-2">
                                     <FolderPlus className="h-4 w-4 text-blue-600" />
                                     {editingCategory
-                                        ? __('general.edit_category') || `Edit Category: ${editingCategory.name}`
-                                        : __('general.add_new_category') || 'Add New Category'}
+                                        ? __('admin.digital_products_edit_category_title', { name: editingCategory.name })
+                                        : __('general.add_new_category')}
                                 </span>
                                 {editingCategory && (
                                     <Button
@@ -160,7 +159,7 @@ export default function Index({ categories }: Props) {
                                         onClick={handleCancelEdit}
                                     >
                                         <X className="h-3.5 w-3.5 me-1" />
-                                        <span>{__('general.cancel') || 'Cancel'}</span>
+                                        <span>{__('general.cancel')}</span>
                                     </Button>
                                 )}
                             </CardTitle>
@@ -170,13 +169,13 @@ export default function Index({ categories }: Props) {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.category_name') || 'Category Name'} <span className="text-red-500">*</span>
+                                        {__('general.category_name')} <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
                                         className="h-9 text-xs"
-                                        placeholder="e.g. Artificial Intelligence"
+                                        placeholder={__('admin.digital_products_category_name_placeholder')}
                                         required
                                     />
                                     {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
@@ -184,20 +183,20 @@ export default function Index({ categories }: Props) {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.slug') || 'Slug (Optional)'}
+                                        {__('general.slug')}
                                     </Label>
                                     <Input
                                         value={data.slug}
                                         onChange={(e) => setData('slug', e.target.value)}
                                         className="h-9 text-xs font-mono"
-                                        placeholder="e.g. artificial-intelligence"
+                                        placeholder={__('admin.digital_products_category_slug_placeholder')}
                                     />
                                     {errors.slug && <p className="text-xs text-red-600">{errors.slug}</p>}
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.sort_order') || 'Sort Order'}
+                                        {__('general.sort_order')}
                                     </Label>
                                     <Input
                                         type="number"
@@ -209,14 +208,14 @@ export default function Index({ categories }: Props) {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.description') || 'Description'}
+                                        {__('general.description')}
                                     </Label>
                                     <Textarea
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={3}
                                         className="text-xs"
-                                        placeholder="Brief summary of books in this category..."
+                                        placeholder={__('admin.digital_products_category_description_placeholder')}
                                     />
                                 </div>
 
@@ -234,8 +233,8 @@ export default function Index({ categories }: Props) {
                                     )}
                                     <span>
                                         {editingCategory
-                                            ? __('general.update_category') || 'Update Category'
-                                            : __('general.create_category') || 'Create Category'}
+                                            ? __('general.update_category')
+                                            : __('general.create_category')}
                                     </span>
                                 </Button>
                             </form>
@@ -248,8 +247,8 @@ export default function Index({ categories }: Props) {
                     <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
                         <CardHeader className="pb-3 bg-slate-50 border-b border-slate-100">
                             <CardTitle className="text-sm font-bold text-slate-900 flex items-center justify-between">
-                                <span>{__('general.available_categories') || 'Available Categories'}</span>
-                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
+                                <span>{__('general.available_categories')}</span>
+                                <span className="text-xs font-semibold text-slate-500">
                                     {categories.length}
                                 </span>
                             </CardTitle>
@@ -259,7 +258,7 @@ export default function Index({ categories }: Props) {
                             {categories.length === 0 ? (
                                 <div className="p-10 text-center text-slate-400 text-xs">
                                     <FolderTree className="h-8 w-8 mx-auto text-slate-300 mb-2" />
-                                    <p>{__('general.no_categories_yet') || 'No categories created yet.'}</p>
+                                    <p>{__('general.no_categories_yet')}</p>
                                 </div>
                             ) : (
                                 categories.map((cat) => (
@@ -279,7 +278,7 @@ export default function Index({ categories }: Props) {
 
                                         <div className="flex items-center gap-2 flex-shrink-0">
                                             <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                                {cat.products_count} {__('general.books') || 'books'}
+                                                {cat.products_count} {__('general.books')}
                                             </span>
 
                                             <Button
@@ -288,7 +287,8 @@ export default function Index({ categories }: Props) {
                                                 size="sm"
                                                 className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900 border-slate-200"
                                                 onClick={() => handleStartEdit(cat)}
-                                                title={__('general.edit') || 'Edit'}
+                                                title={__('general.edit')}
+                                                aria-label={__('general.edit')}
                                             >
                                                 <Pencil className="h-3.5 w-3.5" />
                                             </Button>
@@ -299,7 +299,8 @@ export default function Index({ categories }: Props) {
                                                 size="sm"
                                                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-slate-200"
                                                 onClick={() => setPendingDeleteCategory(cat)}
-                                                title={__('general.delete') || 'Delete'}
+                                                title={__('general.delete')}
+                                                aria-label={__('general.delete')}
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
@@ -317,12 +318,9 @@ export default function Index({ categories }: Props) {
                 isOpen={Boolean(pendingDeleteCategory)}
                 onCancel={() => setPendingDeleteCategory(null)}
                 onConfirm={confirmDelete}
-                title={__('general.confirm_delete_category') || 'Delete Category'}
-                description={
-                    __('general.confirm_delete_category_message') ||
-                    `Are you sure you want to delete category "${pendingDeleteCategory?.name}"? Any books under this category will become uncategorized.`
-                }
-                confirmLabel={__('general.delete') || 'Delete'}
+                title={__('general.confirm_delete_category')}
+                description={__('general.confirm_delete_category_message')}
+                confirmLabel={__('general.delete')}
                 variant="danger"
             />
         </AdminSidebarLayout>

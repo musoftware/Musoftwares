@@ -23,6 +23,7 @@ export function initMouseScroll(container: HTMLElement, options: MouseScrollOpti
         return () => {};
     }
     (container as any).__mouseScrollInitialized = true;
+    container.dataset.mouseScrollReady = 'true';
 
     const proximityRatio = options.proximityRatio ?? 0.2;
     const maxSpeed = options.maxSpeed ?? 16;
@@ -232,18 +233,24 @@ export function initMouseScroll(container: HTMLElement, options: MouseScrollOpti
         container.removeEventListener('scroll', checkBoundaries);
         window.removeEventListener('resize', checkBoundaries);
         (container as any).__mouseScrollInitialized = false;
+        delete container.dataset.mouseScrollReady;
     };
 }
 
-export function initAllMouseScrollContainers(): void {
+const PENDING_CONTAINER_SELECTOR =
+    '[data-mouse-scroll]:not([data-mouse-scroll-ready]), .mouse-scroll-container:not([data-mouse-scroll-ready])';
+
+/**
+ * Initialize scroll containers that are not set up yet.
+ * Pass `root` to only scan a newly added subtree instead of the whole document.
+ */
+export function initAllMouseScrollContainers(root?: ParentNode): void {
     if (typeof document === 'undefined') return;
-    const elements = document.querySelectorAll<HTMLElement>('[data-mouse-scroll], .mouse-scroll-container');
-    elements.forEach((el) => {
+    const scope = root ?? document;
+    if (scope instanceof HTMLElement && scope.matches(PENDING_CONTAINER_SELECTOR)) {
+        initMouseScroll(scope);
+    }
+    scope.querySelectorAll<HTMLElement>(PENDING_CONTAINER_SELECTOR).forEach((el) => {
         initMouseScroll(el);
     });
-}
-
-// Global hook for browsers
-if (typeof window !== 'undefined') {
-    (window as any).initAllMouseScrollContainers = initAllMouseScrollContainers;
 }

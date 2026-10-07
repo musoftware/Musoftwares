@@ -27,14 +27,40 @@ class TrackingController extends Controller
             ]);
         }
 
-        $redirectUrl = $request->query('redirect');
+        return redirect()->away($this->safeRedirectTarget($campaign, (string) $request->query('redirect', '')));
+    }
 
-        if ($redirectUrl) {
-            return redirect()->away($redirectUrl);
+    /**
+     * Only allow the campaign's stored URL or a URL on this site. Anything else goes home.
+     */
+    private function safeRedirectTarget(NotificationCampaign $campaign, string $requested): string
+    {
+        $home = url('/');
+        $stored = (string) $campaign->target_url;
+
+        if ($requested === '') {
+            return $stored !== '' && $this->isWebUrl($stored) ? $stored : $home;
         }
 
-        // Fallback if no redirect is specified, redirect to home
-        return redirect()->to('/');
+        if ($stored !== '' && hash_equals($stored, $requested) && $this->isWebUrl($stored)) {
+            return $stored;
+        }
+
+        return $this->isSameHost($requested) ? $requested : $home;
+    }
+
+    private function isWebUrl(string $url): bool
+    {
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        return in_array($scheme, ['http', 'https'], true) && parse_url($url, PHP_URL_HOST) !== null;
+    }
+
+    private function isSameHost(string $url): bool
+    {
+        $appHost = strtolower((string) parse_url(url('/'), PHP_URL_HOST));
+
+        return $this->isWebUrl($url) && strtolower((string) parse_url($url, PHP_URL_HOST)) === $appHost;
     }
 
     /**

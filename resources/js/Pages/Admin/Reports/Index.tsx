@@ -45,7 +45,7 @@ export default function ReportsIndex({
   };
 
   const chartData = revenueChartData || [];
-  const pieData = moduleBreakdown || [{ name: 'No data', value: 0, color: '#94a3b8' }];
+  const pieData = moduleBreakdown || [{ name: __('admin.dashboard_no_data'), value: 0, color: '#94a3b8' }];
 
   const toggleValues = () => {
     const newValue = !showValues;
@@ -62,7 +62,7 @@ export default function ReportsIndex({
   return (
     <AdminSidebarLayout
       title={__('general.reports_analytics')}
-      header="System Reports"
+      header={__('general.system_reports')}
       user={auth?.user}>
       
             <div className="space-y-6 pb-10">
@@ -76,7 +76,7 @@ export default function ReportsIndex({
                     </div>
                     <div className="flex items-center gap-3">
                         <Button variant="outline" size="sm" onClick={toggleValues}>
-                            {showValues ? 'Hide Values' : 'Show Values'}
+                            {showValues ? __('admin.dashboard_hide_values') : __('admin.dashboard_show_values')}
                         </Button>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ export default function ReportsIndex({
                 <Tabs defaultValue="overview" className="w-full space-y-6">
                     <TabsList className="bg-white border border-slate-200 p-1 rounded-lg w-full justify-start h-auto overflow-x-auto">
                         <TabsTrigger value="overview" className="px-4 py-2 text-sm font-medium">{__('general.system_overview')}</TabsTrigger>
-                        <TabsTrigger value="pnl" className="px-4 py-2 text-sm font-medium">Profit & Loss (P&L)</TabsTrigger>
+                        <TabsTrigger value="pnl" className="px-4 py-2 text-sm font-medium">{__('admin.reports_profit_and_loss')}</TabsTrigger>
                         <TabsTrigger value="health" className="px-4 py-2 text-sm font-medium">{__('general.system_health')}</TabsTrigger>
                         <TabsTrigger value="ops" className="px-4 py-2 text-sm font-medium">{__('general.operational_metrics')}</TabsTrigger>
                     </TabsList>
@@ -111,8 +111,8 @@ export default function ReportsIndex({
                                                 <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: businessCurrency, maximumFractionDigits: 0 }).format(value)} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
                                                 <RechartsTooltip formatter={(value: any) => [formatCurrency(value, businessCurrency), undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
                                                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                                <Line type="monotone" dataKey="income" name="Income" stroke="#10b981" strokeWidth={2} activeDot={{ r: 6 }} dot={false} />
-                                                <Line type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} dot={false} />
+                                                <Line type="monotone" dataKey="income" name={__('general.income')} stroke="#10b981" strokeWidth={2} activeDot={{ r: 6 }} dot={false} />
+                                                <Line type="monotone" dataKey="expenses" name={__('general.expenses')} stroke="#ef4444" strokeWidth={2} dot={false} />
                                             </LineChart>
                                         </ResponsiveContainer> :
 
@@ -147,8 +147,9 @@ export default function ReportsIndex({
                     <TabsContent value="pnl" className="space-y-6 outline-none">
                         <form onSubmit={handlePnlFilter} className="flex flex-col sm:flex-row items-end gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <div className="w-full sm:w-auto">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">{__('general.from_date')}</label>
+                                <label htmlFor="pnl-from" className="mb-1 block text-sm font-medium text-slate-700">{__('general.from_date')}</label>
                                 <input
+                  id="pnl-from"
                   type="date"
                   value={pnlData.from}
                   onChange={(e) => setPnlData('from', e.target.value)}
@@ -156,8 +157,9 @@ export default function ReportsIndex({
                 
                             </div>
                             <div className="w-full sm:w-auto">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">{__('general.to_date')}</label>
+                                <label htmlFor="pnl-to" className="mb-1 block text-sm font-medium text-slate-700">{__('general.to_date')}</label>
                                 <input
+                  id="pnl-to"
                   type="date"
                   value={pnlData.to}
                   onChange={(e) => setPnlData('to', e.target.value)}
@@ -314,7 +316,7 @@ export default function ReportsIndex({
                                     <span className="text-4xl font-bold text-slate-900">
                                         {operationalStats?.totalProjects > 0 ? maskValue(Math.round(operationalStats?.completedProjects / operationalStats?.totalProjects * 100)) : 0}%
                                     </span>
-                                    <span className="text-sm text-slate-500 mb-1">completed</span>
+                                    <span className="text-sm text-slate-500 mb-1">{__('general.completed')}</span>
                                 </div>
                                 <div className="mt-4 w-full bg-slate-100 rounded-full h-2">
                                     <div
@@ -333,7 +335,7 @@ export default function ReportsIndex({
                                     <span className="text-4xl font-bold text-slate-900">
                                         {operationalStats?.totalTasks > 0 ? maskValue(Math.round(operationalStats?.completedTasks / operationalStats?.totalTasks * 100)) : 0}%
                                     </span>
-                                    <span className="text-sm text-slate-500 mb-1">completed</span>
+                                    <span className="text-sm text-slate-500 mb-1">{__('general.completed')}</span>
                                 </div>
                                 <div className="mt-4 w-full bg-slate-100 rounded-full h-2">
                                     <div
@@ -352,7 +354,7 @@ export default function ReportsIndex({
                                     <span className="text-4xl font-bold text-slate-900">
                                         {stats?.totalUsers > 0 ? maskValue(Math.round(operationalStats?.activeUsers30d / stats?.totalUsers * 100)) : 0}%
                                     </span>
-                                    <span className="text-sm text-slate-500 mb-1">active (30d)</span>
+                                    <span className="text-sm text-slate-500 mb-1">{__('admin.dashboard_active_30_days')}</span>
                                 </div>
                                 <div className="mt-4 w-full bg-slate-100 rounded-full h-2">
                                     <div

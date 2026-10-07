@@ -7,17 +7,26 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { SellerNav } from '@/Components/Marketplace/Seller/SellerNav';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function SellerProducts({ products }: any) {
-    const handleDelete = (id: number, title: string) => {
-        if (confirm(__('general.are_you_sure_you_want_to_delete_this_service') || `Are you sure you want to delete "${title}"?`)) {
-            router.delete(route('marketplace.services.destroy', id));
-        }
+    const { confirm, confirmDialog } = useConfirm();
+
+    const handleDelete = async (id: number, title: string) => {
+        const accepted = await confirm({
+            title: __('marketplace.delete_service_title'),
+            description: __('marketplace.delete_service_desc', { title }),
+            confirmLabel: __('general.delete'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('marketplace.services.destroy', id));
     };
 
     return (
         <MarketplaceLayout>
             <Head title={__('general.my_products')} />
+            {confirmDialog}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <ModulePageHeader 
                     title={__('general.my_products')}
@@ -68,7 +77,7 @@ export default function SellerProducts({ products }: any) {
                                          onClick={() => handleDelete(product.id, product.title)}
                                          className="text-rose-600 hover:text-rose-800 text-xs font-medium"
                                      >
-                                         {__('general.delete') || 'Delete'}
+                                         {__('general.delete')}
                                      </button>
                                  </div>
                              </div>

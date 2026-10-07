@@ -14,22 +14,22 @@ Artisan::command('inspire', function () {
 
 Schedule::command(FetchExchangeRates::class)->dailyAt('00:00');
 
-Schedule::command(RenewSubscriptions::class)->dailyAt('03:00');
+Schedule::command(RenewSubscriptions::class)->dailyAt('03:00')->withoutOverlapping(10);
 Schedule::command(\App\Console\Commands\SendSubscriptionExpiryReminders::class)->dailyAt('03:15')->timezone('Africa/Cairo');
-Schedule::command(\App\Console\Commands\RenewPlatformSubscriptions::class)->dailyAt('03:30');
+Schedule::command(\App\Console\Commands\RenewPlatformSubscriptions::class)->dailyAt('03:30')->withoutOverlapping(10);
 Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 
 // Recurring Business Commands
-Schedule::command(\App\Console\Commands\AddRecurringCosts::class)->everyMinute();
-Schedule::command(\App\Console\Commands\AddRecurringSalaries::class)->everyMinute();
-Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute();
-Schedule::command(\App\Console\Commands\AddRecurringInvoices::class)->everyMinute();
+Schedule::command(\App\Console\Commands\AddRecurringCosts::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(\App\Console\Commands\AddRecurringSalaries::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(\App\Console\Commands\AddRecurringInvoices::class)->everyMinute()->withoutOverlapping(10);
 
 // Process matured referral earnings every minute
-Schedule::command(ProcessEarningsClearing::class)->everyMinute();
+Schedule::command(ProcessEarningsClearing::class)->everyMinute()->withoutOverlapping(10);
 
 // Process pending FBMB database lookups every minute
-Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->everyMinute();
+Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->everyMinute()->withoutOverlapping(10);
 
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
@@ -90,6 +90,13 @@ Schedule::command(\App\Console\Commands\ProcessWinbackCampaigns::class)
     ->dailyAt('09:00')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
+
+// Deduct loyalty points daily for overdue unpaid invoices marked as done at 00:05 Cairo Time
+Schedule::command(\App\Console\Commands\DeductOverdueInvoiceLoyaltyPenalties::class)
+    ->dailyAt('00:05')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(5);
+
 
 
 

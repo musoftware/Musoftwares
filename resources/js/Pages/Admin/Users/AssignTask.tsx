@@ -20,7 +20,7 @@ export default function AssignTask({ client }: Props) {
     const { auth } = usePage().props as any;
     
     const { data, setData, post, processing, errors } = useForm({
-        title: `${client.name}'s Task - ${new Date().toISOString().split('T')[0]}`,
+        title: `${__('admin.assign_task_default_name', { name: client.name })} - ${new Date().toISOString().split('T')[0]}`,
         description: ''
     });
 
@@ -31,7 +31,7 @@ export default function AssignTask({ client }: Props) {
 
     return (
         <AdminSidebarLayout title={__('general.assign_task')} header={__('general.assign_task')} user={auth?.user}>
-            <Head title={`Assign Task: ${client.name}`} />
+            <Head title={`${__('general.assign_task')}: ${client.name}`} />
 
             <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -54,7 +54,7 @@ export default function AssignTask({ client }: Props) {
                                 <Briefcase className="h-5 w-5 me-2 text-primary" />
                                 {__('general.task_details')}</CardTitle>
                             <CardDescription>
-                                {__('general.this_will_create_a_new_task_named')} {client.name}'s Task {__('general.and_link_it_to_their_erp_account')}.
+                                {__('admin.assign_task_description', { task: __('admin.assign_task_default_name', { name: client.name }) })}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -70,7 +70,7 @@ export default function AssignTask({ client }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Description (Optional)</Label>
+                                <Label htmlFor="description">{__('general.description_optional')}</Label>
                                 <Textarea
                                     id="description"
                                     value={data.description}

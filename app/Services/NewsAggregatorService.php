@@ -8,6 +8,7 @@ use App\Models\WebsiteService;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class NewsAggregatorService
 {
@@ -44,7 +45,7 @@ class NewsAggregatorService
                     ];
                 }
             } catch (\Throwable $e) {
-                // Ignore if table missing in testing
+                Log::warning('News aggregator: blog articles unavailable', ['error' => $e->getMessage()]);
             }
 
             // 2. Marketplace (Featured Plugins, Tools & Packages)
@@ -73,7 +74,7 @@ class NewsAggregatorService
                     ];
                 }
             } catch (\Throwable $e) {
-                // Ignore if marketplace module is dormant
+                Log::warning('News aggregator: marketplace items unavailable', ['error' => $e->getMessage()]);
             }
 
             // 3. Bespoke Services & Case Studies (Enterprise Architecture)
@@ -97,7 +98,7 @@ class NewsAggregatorService
                     }
                 }
             } catch (\Throwable $e) {
-                // Ignore
+                Log::warning('News aggregator: enterprise services unavailable', ['error' => $e->getMessage()]);
             }
 
             // Always ensure at least the 3 primary architectural hero slides exist as high-fidelity anchors

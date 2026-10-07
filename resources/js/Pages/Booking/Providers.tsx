@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
 import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, CalendarOff } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { toast } from 'sonner';
 
 
 interface EventType {
@@ -50,13 +51,13 @@ interface BookingProvider {
 }
 
 const WEEKDAYS = [
-    { value: 1, label: 'Monday' },
-    { value: 2, label: 'Tuesday' },
-    { value: 3, label: 'Wednesday' },
-    { value: 4, label: 'Thursday' },
-    { value: 5, label: 'Friday' },
-    { value: 6, label: 'Saturday' },
-    { value: 0, label: 'Sunday' },
+    { value: 1, label: 'booking.day_monday' },
+    { value: 2, label: 'booking.day_tuesday' },
+    { value: 3, label: 'booking.day_wednesday' },
+    { value: 4, label: 'booking.day_thursday' },
+    { value: 5, label: 'booking.day_friday' },
+    { value: 6, label: 'booking.day_saturday' },
+    { value: 0, label: 'booking.day_sunday' },
 ];
 
 export default function Providers({ providers, eventTypes }: { providers: BookingProvider[], eventTypes: EventType[] }) {
@@ -241,7 +242,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         
         // Check if override for this date already exists
         if (oneTimeRules.some(r => r.date === newOverride.date)) {
-            alert('An override schedule already exists for this date.');
+            toast.error(__('booking.override_exists'));
             return;
         }
 
@@ -311,14 +312,14 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
     return (
         <WorkspaceLayout
             title={__('general.booking_providers')}
-            workspaceName="Booking Settings"
+            workspaceName={__('booking.settings_workspace')}
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
-                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
-                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: true },
-                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
+                { id: 'dashboard', label: __('general.dashboard'), icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: __('booking.nav_appointments'), icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'events', label: __('booking.nav_event_types'), icon: Calendar, href: '/booking/events', isActive: false },
+                { id: 'providers', label: __('booking.nav_providers'), icon: Users, href: '/booking/providers', isActive: true },
+                { id: 'exceptions', label: __('booking.nav_exceptions'), icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title={__('general.booking_providers_schedules')} />
@@ -343,7 +344,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                             <Users className="w-4 h-4 me-2" />{__('general.providers_registry')}</TabsTrigger>
                         <TabsTrigger value="schedule" className="data-[state=active]:bg-white data-[state=active]:shadow-sm" disabled={!selectedProvider}>
                             <Calendar className="w-4 h-4 me-2" />
-                            {selectedProvider ? `${selectedProvider.name}'s Schedule` : 'Schedule Builder'}
+                            {selectedProvider ? __('booking.provider_schedule', { name: selectedProvider.name }) : __('booking.schedule_builder')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -356,9 +357,9 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                     <div className="flex justify-between items-center">
                                         <CardTitle className="text-xl font-semibold flex items-center gap-2">
                                             <User className="h-5 w-5 text-slate-800" />
-                                            {isEditing ? 'Edit Provider Profile' : 'Register New Provider'}
+                                            {isEditing ? __('booking.edit_provider_profile') : __('booking.register_new_provider')}
                                         </CardTitle>
-                                        <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="h-8 w-8 p-0 rounded-full">
+                                        <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="h-8 w-8 p-0 rounded-full" aria-label={__('general.close')}>
                                             <X className="h-4 w-4" />
                                         </Button>
                                     </div>
@@ -453,7 +454,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                 />
                                                                 <div className="text-sm">
                                                                     <span className="font-medium text-slate-900 block leading-tight">{event.title}</span>
-                                                                    <span className="text-xs text-slate-500">{event.duration_minutes} mins</span>
+                                                                    <span className="text-xs text-slate-500">{__('booking.minutes_count', { count: event.duration_minutes })}</span>
                                                                 </div>
                                                             </label>
                                                         );
@@ -477,7 +478,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                                             {__('general.cancel')}</Button>
                                         <Button type="submit" disabled={profileForm.processing} className="bg-slate-900 text-white hover:bg-slate-800">
-                                            {isEditing ? 'Save Changes' : 'Register Provider'}
+                                            {isEditing ? __('general.save_changes') : __('booking.register_provider')}
                                         </Button>
                                     </CardFooter>
                                 </form>
@@ -509,13 +510,14 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                 </h4>
                                                                 <p className="text-xs font-medium text-slate-700 flex items-center mt-0.5">
                                                                     <Stethoscope className="w-3.5 h-3.5 me-1" />
-                                                                    {provider.specialty || 'General Practitioner'}
+                                                                    {provider.specialty || __('booking.general_practitioner')}
                                                                 </p>
                                                             </div>
                                                         </div>
 
-                                                        <div className="flex items-center" title={provider.is_active ? 'Set Inactive' : 'Set Active'}>
+                                                        <div className="flex items-center" title={provider.is_active ? __('general.set_inactive') : __('booking.set_active')}>
                                                             <Switch
+                                                                aria-label={provider.is_active ? __('general.set_inactive') : __('booking.set_active')}
                                                                 checked={provider.is_active}
                                                                 onCheckedChange={() => toggleProviderActive(provider)}
                                                             />
@@ -610,7 +612,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                 className="rounded border-slate-300 text-slate-900 focus:ring-slate-500 h-4.5 w-4.5 shrink-0"
                                                             />
                                                             <label htmlFor={`day-chk-${value}`} className="font-semibold text-slate-800 cursor-pointer min-w-28 text-sm sm:text-base select-none">
-                                                                {label}
+                                                                {__(label)}
                                                             </label>
                                                         </div>
 
@@ -618,16 +620,18 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                             <div className="flex flex-col gap-2 mt-3 sm:mt-0">
                                                                 {dayRule.shifts.map((shift, shiftIndex) => (
                                                                     <div key={shiftIndex} className="flex items-center gap-2">
-                                                                        <span className="text-xs text-slate-400 font-medium">Work hours:</span>
+                                                                        <span className="text-xs text-slate-400 font-medium">{__('booking.work_hours')}</span>
                                                                         <Input
                                                                             type="time"
+                                                                            aria-label={__('general.from')}
                                                                             value={shift.start_time}
                                                                             onChange={e => handleWeeklyTimeChange(value, shiftIndex, 'start_time', e.target.value)}
                                                                             className="w-28 text-sm text-slate-700 bg-white"
                                                                         />
-                                                                        <span className="text-slate-400 text-sm">to</span>
+                                                                        <span className="text-slate-400 text-sm">{__('general.to')}</span>
                                                                         <Input
                                                                             type="time"
+                                                                            aria-label={__('general.to')}
                                                                             value={shift.end_time}
                                                                             onChange={e => handleWeeklyTimeChange(value, shiftIndex, 'end_time', e.target.value)}
                                                                             className="w-28 text-sm text-slate-700 bg-white"
@@ -637,6 +641,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                             variant="ghost" 
                                                                             size="icon"
                                                                             onClick={() => removeWeeklyShift(value, shiftIndex)}
+                                                                            aria-label={__('booking.remove_shift')}
                                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8"
                                                                         >
                                                                             <Trash2 className="w-4 h-4" />
@@ -714,7 +719,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <Label className="text-xs text-slate-500">To</Label>
+                                                        <Label className="text-xs text-slate-500">{__('general.to')}</Label>
                                                         <Input
                                                             type="time"
                                                             value={newOverride.end_time}
@@ -750,12 +755,12 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                 {rule.is_enabled ? (
                                                                     <span className="flex items-center gap-1 text-emerald-600 font-medium">
                                                                         <Check className="w-3 h-3" />
-                                                                        Custom Hours: {rule.start_time} - {rule.end_time}
+                                                                        {__('booking.custom_hours', { start: rule.start_time, end: rule.end_time })}
                                                                     </span>
                                                                 ) : (
                                                                     <span className="flex items-center gap-1 text-red-600 font-medium">
                                                                         <X className="w-3 h-3" />
-                                                                        Blocked Day (Holiday)
+                                                                        {__('booking.blocked_day_holiday')}
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -764,6 +769,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                             variant="ghost" 
                                                             size="sm" 
                                                             onClick={() => handleRemoveOverride(idx)} 
+                                                            aria-label={__('booking.remove_override')}
                                                             className="h-8 w-8 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
                                                         >
                                                             <Trash2 className="w-4 h-4" />

@@ -1,59 +1,130 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Musoftwares
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The Musoftwares business platform: client portal, admin panel, invoicing, wallets, loyalty, projects,
+CRM/ERP tools and a set of product modules. Built with Laravel 12, Inertia and React.
 
-## About Laravel
+It runs on simple hosting only: Apache, PHP, MySQL and cron. No Redis, no Supervisor, no Node process
+in production. See `.agents/rules/simple-hosting-stack-apache-mysql-cronjobs-only.md`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.4 or newer (the lock file needs 8.4.1+). Locally we use `C:\tools\php83\php.exe`.
+- MySQL 8 (or MariaDB) for local and production data. Tests use in-memory SQLite.
+- Composer 2 (`composer.phar` is git-ignored; download your own copy if needed).
+- Node 22 and npm. Only needed to build the frontend. Production never runs Node.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Local setup
 
-## Learning Laravel
+```bash
+composer install
+npm ci
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# Local settings live in .env.local (git-ignored). Start from the example:
+cp .env.example .env.local
+# Edit .env.local: set DB_CONNECTION=mysql and your local DB name, user and password.
+# Use CACHE_STORE=database, SESSION_DRIVER=database and QUEUE_CONNECTION=database.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+C:\tools\php83\php.exe artisan key:generate --env=local
+C:\tools\php83\php.exe artisan migrate --env=local
+npm run build
+```
 
-## Laravel Sponsors
+Start the app. Always pass `--env=local`, or Laravel reads `.env` (production settings):
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+C:\tools\php83\php.exe artisan serve --host=127.0.0.1 --port=8000 --env=local
+```
 
-### Premium Partners
+`serve.bat` does the same. `start-local-stack.bat` also starts the GoldSaverSys app next to it.
+Use `npm run dev` for hot reload while working on the frontend.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Modules
 
-## Contributing
+Feature modules live in `Modules/` (nwidart/laravel-modules):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Module | Purpose |
+| --- | --- |
+| DigitalProducts | Digital products and ebook library |
+| Fbmb | Facebook ID to mobile lookup |
+| Listing | Property listings and scraper |
+| Marketplace | Marketplace for services and products |
+| PasswordSync | Encrypted password vault sync API |
+| PaymentGateway | Kashier payment gateway service for external clients |
+| Series | Video series with progress and notes |
+| Shared | Shared code used by other modules |
+| Shortlink | Internal URL shortener |
+| SmsPaymentGateway | SMS based payment matching (Android app, hosted checkout, API) |
+| WhatsappSender | WhatsApp Cloud API sender |
+| WrittenCoursesEngine | Written courses |
 
-## Code of Conduct
+## Tests
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+PHP tests (Pest). Copy the test env once, then run in parallel:
 
-## Security Vulnerabilities
+```bash
+cp .env.testing.example .env.testing
+C:\tools\php83\php.exe artisan key:generate --env=testing
+C:\tools\php83\php.exe vendor/bin/pest --parallel
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Frontend unit tests (Vitest) and browser tests (Playwright, against a running local server):
 
-## License
+```bash
+npm test
+npx playwright install chromium   # first time only
+npm run test:e2e
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Other checks:
+
+```bash
+npx tsc --noEmit
+C:\tools\php83\php.exe vendor/bin/phpstan analyse --memory-limit=2G
+C:\tools\php83\php.exe vendor/bin/pint --test path/to/changed/File.php
+```
+
+Pint uses the Laravel preset (`pint.json`). Only format the files you change.
+Do not reformat the whole repo in one go.
+
+CI (`.github/workflows/e2e-testing.yml`) runs Pint on changed files, PHPStan, Pest, and the
+TypeScript check plus build.
+
+## Scheduler and queue (cron)
+
+All background work runs from cron. Add these lines on the server:
+
+```cron
+* * * * * cd /path/to/app && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /path/to/app && php artisan queue:work --stop-when-empty --max-time=55 >> /dev/null 2>&1
+```
+
+Scheduled tasks are defined in `routes/console.php`.
+
+## Deploy
+
+Copy `deploy/.ssh-config.example` to `deploy/.ssh-config` and fill it in. Prefer `SSH_KEY`
+(a key file) over `SSH_PASSWORD`. Connect to the server once by hand to accept its host key.
+
+Fast deploy:
+
+```bash
+deploy-fast.bat              # same as: powershell -File deploy\fast.ps1
+deploy-fast.bat -DryRun      # list the files that would be uploaded
+deploy-fast.bat -Build       # run npm run build first
+```
+
+`deploy\fast.ps1` is gated:
+
+1. It refuses to deploy uncommitted changes. Pass `-AllowDirty` to override.
+2. It runs the Pest suite locally and stops if anything fails. `-SkipTests` skips it only after
+   you type `SKIP-TESTS`.
+3. After upload it shows pending migrations on the server and runs `migrate --force` only after
+   you type `MIGRATE`.
+
+Other scripts in `deploy/` cover single tasks (push PHP files, push vendor, migrate, clear cache).
+
+## Rules for contributors
+
+Engineering rules live in `AGENTS.md` and `.agents/rules/`. Read them before changing code.
+Secrets never go in git: `.env*` files (except the `*.example` ones) and `deploy/.ssh-config`
+are ignored.

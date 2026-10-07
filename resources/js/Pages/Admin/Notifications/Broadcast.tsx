@@ -16,6 +16,7 @@ import { Link } from '@inertiajs/react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, Eye } from 'lucide-react';
 import { AsyncCombobox } from '@/Components/ui/AsyncCombobox';
+import { campaignStatusLabel, campaignAudienceLabel } from './campaignStatus';
 
 export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: any[], roles?: any[] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -85,8 +86,10 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                             <div className="space-y-2">
                                 <Label>{__('admin.audience_type')}</Label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div 
-                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'global' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
+                                    <button
+                                        type="button"
+                                        aria-pressed={data.audience_type === 'global'}
+                                        className={`border rounded-lg p-4 cursor-pointer transition-all text-start ${data.audience_type === 'global' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
                                         onClick={() => setData('audience_type', 'global')}
                                     >
                                         <div className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
@@ -96,9 +99,11 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                         <div className="text-sm text-slate-500">
                                             {__('admin.global_broadcast_desc')}
                                         </div>
-                                    </div>
-                                    <div 
-                                        className={`border rounded-lg p-4 cursor-pointer transition-all ${data.audience_type === 'personal' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        aria-pressed={data.audience_type === 'personal'}
+                                        className={`border rounded-lg p-4 cursor-pointer transition-all text-start ${data.audience_type === 'personal' ? 'border-slate-900 bg-slate-50' : 'hover:border-slate-300'}`}
                                         onClick={() => setData('audience_type', 'personal')}
                                     >
                                         <div className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
@@ -108,7 +113,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                         <div className="text-sm text-slate-500">
                                             {__('admin.personal_broadcast_desc')}
                                         </div>
-                                    </div>
+                                    </button>
                                 </div>
                                 {errors.audience_type && <div className="text-sm text-red-500">{errors.audience_type}</div>}
                             </div>
@@ -145,13 +150,15 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                             <Label>{__('admin.select_roles')}</Label>
                                             <div className="flex flex-wrap gap-2">
                                                 {roles?.map((role) => (
-                                                    <div 
-                                                        key={role.id} 
+                                                    <button
+                                                        type="button"
+                                                        key={role.id}
+                                                        aria-pressed={data.roles.includes(role.id)}
                                                         onClick={() => handleRoleToggle(role.id)}
-                                                        className={`px-3 py-1.5 rounded-full border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
+                                                        className={`px-3 py-1.5 rounded-md border text-sm cursor-pointer transition-colors ${data.roles.includes(role.id) ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'}`}
                                                     >
                                                         {role.name}
-                                                    </div>
+                                                    </button>
                                                 ))}
                                             </div>
                                             {errors.roles && <div className="text-sm text-red-500">{errors.roles}</div>}
@@ -176,8 +183,10 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                                 type="button" 
                                                                 onClick={() => handleRemoveUser(user.id)}
                                                                 className="text-slate-500 hover:text-red-500"
+                                                                aria-label={__('admin.notifications_remove_user', { name: user.name })}
+                                                                title={__('admin.notifications_remove_user', { name: user.name })}
                                                             >
-                                                                <X className="w-3 h-3" />
+                                                                <X className="w-3 h-3" aria-hidden="true" />
                                                             </button>
                                                         </div>
                                                     ))}
@@ -269,7 +278,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                 <TableCell className="text-slate-500 text-sm">{formatDate(campaign.created_at)}</TableCell>
                                                 <TableCell>
                                                     <Badge variant={campaign.audience_type === 'personal' ? 'default' : 'outline'}>
-                                                        {campaign.audience_type === 'personal' ? 'Personal' : 'Global'}
+                                                        {campaignAudienceLabel(campaign.audience_type)}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-center">
@@ -283,7 +292,7 @@ export default function Broadcast({ campaigns = [], roles = [] }: { campaigns?: 
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge className={campaign.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''} variant={campaign.status === 'completed' ? 'default' : 'secondary'}>
-                                                        {__(campaign.status)}
+                                                        {campaignStatusLabel(campaign.status)}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-end">

@@ -14,12 +14,14 @@ use Tests\TestCase;
 class RecurringInvoiceAutoPayTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->currency = Currency::firstOrCreate(
             ['currency' => 'USD'],

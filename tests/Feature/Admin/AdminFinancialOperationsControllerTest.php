@@ -6,15 +6,19 @@ use App\Models\CostTransaction;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class AdminFinancialOperationsControllerTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        // This suite writes wallet/cost ledger rows, which convert amounts to the business currency.
+        $this->seedUsdEgpRates();
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 

@@ -36,6 +36,8 @@ import {
     Mail
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 interface ServiceItem {
     id: number;
@@ -95,6 +97,7 @@ export default function AdminMicroServicesIndex({
         active_services: 0,
     },
 }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [activeTab, setActiveTab] = useState<'orders' | 'services'>('orders');
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
@@ -155,12 +158,17 @@ export default function AdminMicroServicesIndex({
         }
     };
 
-    const handleDeleteService = (service: ServiceItem) => {
-        if (confirm(`هل أنت متأكد من حذف الخدمة "${service.title}"؟`)) {
-            router.delete(route('admin.micro-services.destroy', service.id), {
-                preserveScroll: true,
-            });
-        }
+    const handleDeleteService = async (service: ServiceItem) => {
+        const accepted = await confirm({
+            title: __('admin.delete_service'),
+            description: __('admin.micro_services_delete_confirm', { title: service.title }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.micro-services.destroy', service.id), {
+            preserveScroll: true,
+        });
     };
 
     const handleOpenCompleteOrder = (order: OrderItem) => {
@@ -198,8 +206,8 @@ export default function AdminMicroServicesIndex({
 
     return (
         <AdminSidebarLayout
-            title="الخدمات المصغرة | Micro Services"
-            header="إدارة الخدمات المصغرة والطلبات"
+            title={__('admin.micro_services_title')}
+            header={__('admin.micro_services_header')}
             actions={
                 <div className="flex items-center gap-2">
                     <Button
@@ -208,7 +216,7 @@ export default function AdminMicroServicesIndex({
                         className="bg-black text-white dark:bg-white dark:text-black hover:opacity-90 rounded-xl text-xs flex items-center gap-1.5"
                     >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>إضافة خدمة جديدة</span>
+                        <span>{__('admin.micro_services_add_service')}</span>
                     </Button>
                 </div>
             }
@@ -217,25 +225,25 @@ export default function AdminMicroServicesIndex({
                 {/* Stats Bento Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-xs">
-                        <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400">إجمالي الطلبات</div>
+                        <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400">{__('admin.micro_services_total_orders')}</div>
                         <div className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
                             {stats.total_orders}
                         </div>
                     </div>
                     <div className="bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4 shadow-xs">
-                        <div className="text-xs font-semibold text-amber-600 dark:text-amber-400">طلبات قيد التنفيذ</div>
+                        <div className="text-xs font-semibold text-amber-600 dark:text-amber-400">{__('admin.micro_services_pending_orders')}</div>
                         <div className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
                             {stats.pending_orders}
                         </div>
                     </div>
                     <div className="bg-white dark:bg-zinc-900 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl p-4 shadow-xs">
-                        <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">طلبات مكتملة</div>
+                        <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{__('admin.micro_services_completed_orders')}</div>
                         <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                             {stats.completed_orders}
                         </div>
                     </div>
                     <div className="bg-white dark:bg-zinc-900 border border-purple-200 dark:border-purple-500/20 rounded-2xl p-4 shadow-xs">
-                        <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">خدمات مفعلة</div>
+                        <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">{__('admin.micro_services_active_services')}</div>
                         <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">
                             {stats.active_services}
                         </div>
@@ -254,10 +262,10 @@ export default function AdminMicroServicesIndex({
                                     : 'border-transparent text-slate-500 hover:text-black dark:hover:text-white'
                             }`}
                         >
-                            <span>طلبات العملاء</span>
+                            <span>{__('admin.micro_services_client_orders')}</span>
                             {stats.pending_orders > 0 && (
                                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 font-mono font-bold">
-                                    {stats.pending_orders} بحاجة لتنفيذ
+                                    {__('admin.micro_services_needs_action', { count: stats.pending_orders })}
                                 </span>
                             )}
                         </button>
@@ -271,7 +279,7 @@ export default function AdminMicroServicesIndex({
                             }`}
                         >
                             <Layers className="w-4 h-4" />
-                            <span>دليل الخدمات المتاحة ({services.length})</span>
+                            <span>{__('admin.micro_services_catalog_tab', { count: services.length })}</span>
                         </button>
                     </div>
                 </div>
@@ -286,12 +294,12 @@ export default function AdminMicroServicesIndex({
                                     <Input
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        placeholder="بحث باسم العميل، الإيميل، التفاصيل..."
+                                        placeholder={__('admin.micro_services_search_placeholder')}
                                         className="ps-9 text-xs rounded-xl"
                                     />
                                 </div>
                                 <Button type="submit" variant="secondary" className="text-xs rounded-xl">
-                                    بحث
+                                    {__('general.search')}
                                 </Button>
                             </form>
 
@@ -304,7 +312,7 @@ export default function AdminMicroServicesIndex({
                                         !statusFilter ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-xs' : 'text-slate-600 dark:text-zinc-400'
                                     }`}
                                 >
-                                    الكل ({stats.total_orders})
+                                    {__('admin.micro_services_filter_all', { count: stats.total_orders })}
                                 </button>
                                 <button
                                     type="button"
@@ -313,7 +321,7 @@ export default function AdminMicroServicesIndex({
                                         statusFilter === 'pending' ? 'bg-white dark:bg-zinc-900 text-amber-600 font-bold shadow-xs' : 'text-slate-600 dark:text-zinc-400'
                                     }`}
                                 >
-                                    قيد التنفيذ ({stats.pending_orders})
+                                    {__('admin.micro_services_filter_pending', { count: stats.pending_orders })}
                                 </button>
                                 <button
                                     type="button"
@@ -322,7 +330,7 @@ export default function AdminMicroServicesIndex({
                                         statusFilter === 'completed' ? 'bg-white dark:bg-zinc-900 text-emerald-600 font-bold shadow-xs' : 'text-slate-600 dark:text-zinc-400'
                                     }`}
                                 >
-                                    مكتملة ({stats.completed_orders})
+                                    {__('admin.micro_services_filter_completed', { count: stats.completed_orders })}
                                 </button>
                             </div>
                         </div>
@@ -332,20 +340,20 @@ export default function AdminMicroServicesIndex({
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-zinc-950/50">
-                                        <TableHead className="w-16">رقم</TableHead>
-                                        <TableHead>العميل</TableHead>
-                                        <TableHead>الخدمة المطلوبة</TableHead>
-                                        <TableHead>المبلغ المدفوع</TableHead>
-                                        <TableHead>بيانات وتفاصيل الطلب</TableHead>
-                                        <TableHead>الحالة</TableHead>
-                                        <TableHead className="text-end">الإجراء</TableHead>
+                                        <TableHead className="w-16">{__('admin.micro_services_order_number')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_client')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_requested_service')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_amount_paid')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_order_details')}</TableHead>
+                                        <TableHead>{__('general.status')}</TableHead>
+                                        <TableHead className="text-end">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {orders.data.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={7} className="text-center py-12 text-slate-500">
-                                                لا توجد طلبات تطابق المعايير المحددة.
+                                                {__('admin.micro_services_no_orders')}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -382,7 +390,7 @@ export default function AdminMicroServicesIndex({
                                                     </p>
                                                     {order.admin_notes && (
                                                         <div className="mt-1 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 p-1.5 rounded-lg border border-emerald-200/50">
-                                                            رد الإدارة: {order.admin_notes}
+                                                            {__('admin.micro_services_admin_reply', { notes: order.admin_notes })}
                                                         </div>
                                                     )}
                                                 </TableCell>
@@ -390,12 +398,12 @@ export default function AdminMicroServicesIndex({
                                                     {order.status === 'completed' ? (
                                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                                                             <CheckCircle2 className="w-3 h-3" />
-                                                            <span>مكتملة</span>
+                                                            <span>{__('admin.micro_services_status_completed')}</span>
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                                             <Clock className="w-3 h-3" />
-                                                            <span>قيد التنفيذ</span>
+                                                            <span>{__('admin.micro_services_status_in_progress')}</span>
                                                         </span>
                                                     )}
                                                 </TableCell>
@@ -407,10 +415,10 @@ export default function AdminMicroServicesIndex({
                                                             className="rounded-xl text-xs bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 shadow-xs"
                                                         >
                                                             <Check className="w-3.5 h-3.5" />
-                                                            <span>تحديد كمكتملة</span>
+                                                            <span>{__('admin.micro_services_mark_completed')}</span>
                                                         </Button>
                                                     ) : (
-                                                        <span className="text-[11px] text-slate-400">تم التسليم</span>
+                                                        <span className="text-[11px] text-slate-400">{__('admin.micro_services_delivered')}</span>
                                                     )}
                                                 </TableCell>
                                             </TableRow>
@@ -419,6 +427,7 @@ export default function AdminMicroServicesIndex({
                                 </TableBody>
                             </Table>
                         </div>
+                        <Pagination links={orders.links} />
                     </div>
                 ) : (
                     /* Services Catalog Management */
@@ -427,20 +436,20 @@ export default function AdminMicroServicesIndex({
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50 dark:bg-zinc-950/50">
-                                        <TableHead>عنوان الخدمة</TableHead>
-                                        <TableHead>الوصف البسيط (سطر)</TableHead>
-                                        <TableHead>السعر الأساسي (EGP)</TableHead>
-                                        <TableHead>أيام التسليم</TableHead>
-                                        <TableHead>عدد الطلبات</TableHead>
-                                        <TableHead>الحالة</TableHead>
-                                        <TableHead className="text-end">الإجراءات</TableHead>
+                                        <TableHead>{__('admin.micro_services_service_title')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_short_description')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_base_price')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_delivery_days')}</TableHead>
+                                        <TableHead>{__('admin.micro_services_orders_count')}</TableHead>
+                                        <TableHead>{__('general.status')}</TableHead>
+                                        <TableHead className="text-end">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {services.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={7} className="text-center py-12 text-slate-500">
-                                                لا توجد خدمات مصغرة مضافة بعد. اضغط على "إضافة خدمة جديدة" للبدء.
+                                                {__('admin.micro_services_no_services')}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -456,7 +465,7 @@ export default function AdminMicroServicesIndex({
                                                     {service.formatted_price}
                                                 </TableCell>
                                                 <TableCell className="text-xs text-slate-600 dark:text-zinc-400">
-                                                    {service.delivery_days} {service.delivery_days === 1 ? 'يوم' : 'أيام'}
+                                                    {service.delivery_days === 1 ? __('admin.micro_services_one_day') : __('admin.micro_services_days_count', { count: service.delivery_days })}
                                                 </TableCell>
                                                 <TableCell className="text-xs font-mono font-semibold">
                                                     {service.orders_count}
@@ -464,11 +473,11 @@ export default function AdminMicroServicesIndex({
                                                 <TableCell>
                                                     {service.is_active ? (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600">
-                                                            مفعلة
+                                                            {__('admin.micro_services_service_active')}
                                                         </span>
                                                     ) : (
                                                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/10 text-slate-500">
-                                                            معطلة
+                                                            {__('admin.micro_services_service_inactive')}
                                                         </span>
                                                     )}
                                                 </TableCell>
@@ -479,6 +488,8 @@ export default function AdminMicroServicesIndex({
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => openEditServiceModal(service)}
+                                                            aria-label={__('general.edit')}
+                                                            title={__('general.edit')}
                                                             className="h-8 w-8 p-0 rounded-lg"
                                                         >
                                                             <Edit className="w-3.5 h-3.5" />
@@ -488,6 +499,8 @@ export default function AdminMicroServicesIndex({
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handleDeleteService(service)}
+                                                            aria-label={__('general.delete')}
+                                                            title={__('general.delete')}
                                                             className="h-8 w-8 p-0 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
@@ -510,23 +523,23 @@ export default function AdminMicroServicesIndex({
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold flex items-center gap-2">
                             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                            <span>تأكيد إكمال الطلب #{completingOrder?.id}</span>
+                            <span>{__('admin.micro_services_complete_title', { id: completingOrder?.id ?? '' })}</span>
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 pt-1">
-                            خدمة: {completingOrder?.service_title} للعميل {completingOrder?.client_name}
+                            {__('admin.micro_services_complete_description', { service: completingOrder?.service_title ?? '', client: completingOrder?.client_name ?? '' })}
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleConfirmCompleteOrder} className="space-y-4 pt-2">
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-slate-700 dark:text-zinc-200">
-                                ملاحظات التسليم / رد الإدارة (اختياري)
+                                {__('admin.micro_services_delivery_notes_label')}
                             </label>
                             <Textarea
                                 rows={3}
                                 value={completeForm.data.admin_notes}
                                 onChange={(e) => completeForm.setData('admin_notes', e.target.value)}
-                                placeholder="اكتب هنا أي تفاصيل أو روابط أو ملاحظات تود إظهارها للعميل عند اكتمال الخدمة..."
+                                placeholder={__('admin.micro_services_delivery_notes_placeholder')}
                                 className="w-full text-xs rounded-xl"
                             />
                         </div>
@@ -538,14 +551,14 @@ export default function AdminMicroServicesIndex({
                                 onClick={() => setCompletingOrder(null)}
                                 className="rounded-xl text-xs"
                             >
-                                إلغاء
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={completeForm.processing}
                                 className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
                             >
-                                {completeForm.processing ? 'جاري التأكيد...' : 'تحديد الخدمة كمكتملة'}
+                                {completeForm.processing ? __('admin.micro_services_confirming') : __('admin.micro_services_mark_service_completed')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -558,20 +571,20 @@ export default function AdminMicroServicesIndex({
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-purple-600" />
-                            <span>{editingService ? 'تعديل الخدمة المصغرة' : 'إضافة خدمة مصغرة جديدة'}</span>
+                            <span>{editingService ? __('admin.micro_services_edit_service') : __('admin.micro_services_new_service')}</span>
                         </DialogTitle>
                         <DialogDescription className="text-xs text-slate-500 pt-1">
-                            أدخل عنوان الخدمة ووصفها البسيط (سطر واحد) وسعرها الأساسي.
+                            {__('admin.micro_services_form_description')}
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleSaveService} className="space-y-4 pt-2">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold">اسم / عنوان الخدمة *</label>
+                            <label className="text-xs font-bold">{__('admin.micro_services_title_label')}</label>
                             <Input
                                 value={serviceForm.data.title}
                                 onChange={(e) => serviceForm.setData('title', e.target.value)}
-                                placeholder="مثال: تنصيب وتفعيل قالب على ووردبريس"
+                                placeholder={__('admin.micro_services_title_placeholder')}
                                 className="text-xs rounded-xl"
                                 required
                             />
@@ -581,11 +594,11 @@ export default function AdminMicroServicesIndex({
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold">وصف الخدمة البسيط (سطر واحد) *</label>
+                            <label className="text-xs font-bold">{__('admin.micro_services_description_label')}</label>
                             <Input
                                 value={serviceForm.data.description}
                                 onChange={(e) => serviceForm.setData('description', e.target.value)}
-                                placeholder="مثال: نقوم برفع ملفات القالب وتثبيت الإضافات وضبط الإعدادات الأساسية خلال 24 ساعة."
+                                placeholder={__('admin.micro_services_description_placeholder')}
                                 className="text-xs rounded-xl"
                                 required
                             />
@@ -596,7 +609,7 @@ export default function AdminMicroServicesIndex({
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold">السعر الأساسي (EGP) *</label>
+                                <label className="text-xs font-bold">{__('admin.micro_services_price_label')}</label>
                                 <Input
                                     type="number"
                                     step="0.01"
@@ -613,7 +626,7 @@ export default function AdminMicroServicesIndex({
                             </div>
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold">مدة التنفيذ (بالأيام) *</label>
+                                <label className="text-xs font-bold">{__('admin.micro_services_duration_label')}</label>
                                 <Input
                                     type="number"
                                     min="1"
@@ -635,7 +648,7 @@ export default function AdminMicroServicesIndex({
                                 className="rounded text-black focus:ring-0"
                             />
                             <label htmlFor="is_active_toggle" className="text-xs font-semibold cursor-pointer">
-                                تفعيل الخدمة وظهورها للعملاء في الدليل
+                                {__('admin.micro_services_active_label')}
                             </label>
                         </div>
 
@@ -646,19 +659,20 @@ export default function AdminMicroServicesIndex({
                                 onClick={() => setServiceModalOpen(false)}
                                 className="rounded-xl text-xs"
                             >
-                                إلغاء
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={serviceForm.processing}
                                 className="rounded-xl bg-black text-white dark:bg-white dark:text-black text-xs font-semibold"
                             >
-                                {serviceForm.processing ? 'جاري الحفظ...' : editingService ? 'حفظ التعديلات' : 'إضافة الخدمة'}
+                                {serviceForm.processing ? __('general.saving') : editingService ? __('general.save_changes') : __('admin.micro_services_add_submit')}
                             </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

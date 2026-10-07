@@ -8,10 +8,9 @@ import RecurringScheduleForm, {
 import { Link } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
 
-export default function Edit({ invoice, currencies, users }) {
+export default function Edit({ invoice, currencies }) {
     const pageErrors = (router as any)?.page?.props?.errors ?? {};
     const currenciesList = Array.isArray(currencies) ? currencies : (currencies ? Object.values(currencies) : []);
-    const usersList = Array.isArray(users) ? users : (users ? Object.values(users) : []);
 
     const [form] = useState<RecurringScheduleValues>({
         user_id: invoice.user_id,
@@ -39,7 +38,7 @@ export default function Edit({ invoice, currencies, users }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.edit_recurring_invoice')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.edit_recurring_invoice')} header={__('admin.business_operations')}>
             <Head title={__('general.edit_recurring_invoice')} />
 
             <div className="mb-4">
@@ -59,8 +58,6 @@ export default function Edit({ invoice, currencies, users }) {
                     mode="edit"
                     initialValues={form}
                     currencies={currenciesList}
-                    users={usersList}
-                    searchUsersEndpoint={route('admin.projects.search-clients')}
                     errors={pageErrors}
                     submitting={submitting}
                     onSubmit={handleSubmit}

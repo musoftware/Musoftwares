@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -95,6 +96,7 @@ interface Props {
 }
 
 export default function SerialSoftwareSettings({ software, commonCurrencies }: Props) {
+  const { confirm, confirmDialog } = useConfirm();
   // Main Settings Form State
   const [form, setForm] = useState({
     name: software.name,
@@ -219,10 +221,14 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     );
   };
 
-  const handleDeleteKey = (keyId: number) => {
-    if (!confirm(__('general.confirm_delete_software_key'))) {
-      return;
-    }
+  const handleDeleteKey = async (keyId: number) => {
+    const accepted = await confirm({
+      title: __('general.are_you_sure'),
+      description: __('general.confirm_delete_software_key'),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
     router.delete(route('admin.serial-softwares.keys.destroy', [software.id, keyId]), {
       preserveScroll: true,
     });
@@ -319,10 +325,14 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
     }
   };
 
-  const handleDeletePackage = (packageId: number) => {
-    if (!confirm(__('general.confirm_delete_package'))) {
-      return;
-    }
+  const handleDeletePackage = async (packageId: number) => {
+    const accepted = await confirm({
+      title: __('general.are_you_sure'),
+      description: __('general.confirm_delete_package'),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
     router.delete(route('admin.serial-softwares.packages.destroy', [software.id, packageId]), {
       preserveScroll: true,
     });
@@ -330,10 +340,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
   return (
     <AdminSidebarLayout
-      title={`${software.name} - ${__('general.settings', {}, 'Settings')}`}
+      title={`${software.name} - ${__('general.settings')}`}
       header={software.name}
     >
-      <Head title={`${software.name} - ${__('general.settings', {}, 'Settings')}`} />
+      <Head title={`${software.name} - ${__('general.settings')}`} />
 
       <div className="p-4 sm:p-6 space-y-6 w-full max-w-7xl mx-auto">
         {/* Top Header & Breadcrumbs */}
@@ -345,12 +355,12 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 className="hover:text-foreground flex items-center gap-1 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>{__('general.serial_softwares', {}, 'Softwares')}</span>
+                <span>{__('general.serial_softwares')}</span>
               </Link>
               <span>/</span>
               <span className="font-medium text-foreground">{software.name}</span>
               <span>/</span>
-              <span>{__('general.settings', {}, 'Settings')}</span>
+              <span>{__('general.settings')}</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -358,12 +368,12 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               {form.is_active ? (
                 <Badge variant="outline" className="border-green-500/30 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 text-xs gap-1 font-normal">
                   <ShieldCheck className="w-3 h-3" />
-                  <span>{__('general.active', {}, 'Active')}</span>
+                  <span>{__('general.active')}</span>
                 </Badge>
               ) : (
                 <Badge variant="destructive" className="text-xs gap-1 font-normal">
                   <ShieldAlert className="w-3 h-3" />
-                  <span>{__('general.deactivated', {}, 'Disabled as a Whole')}</span>
+                  <span>{__('general.deactivated')}</span>
                 </Badge>
               )}
             </div>
@@ -375,7 +385,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>{__('general.back_to_list', {}, 'Back to List')}</span>
+              <span>{__('general.back_to_list')}</span>
             </Link>
 
             <Button
@@ -385,7 +395,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               className="gap-2"
             >
               <Save className="w-4 h-4" />
-              <span>{saving ? __('general.saving', {}, 'Saving...') : __('general.save_changes', {}, 'Save Changes')}</span>
+              <span>{saving ? __('general.saving') : __('general.save_changes')}</span>
             </Button>
           </div>
         </div>
@@ -396,10 +406,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <ShieldAlert className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <p className="font-semibold text-sm">
-                {__('general.software_master_disabled_title', {}, 'Software Is Deactivated As A Whole (Kill Switch Active)')}
+                {__('general.software_master_disabled_title')}
               </p>
               <p className="text-xs text-red-700 dark:text-red-300">
-                {__('general.software_master_disabled_desc', {}, 'All API check-ins and startups for this software will be immediately denied. No devices can connect or run while this master toggle is disabled.')}
+                {__('general.software_master_disabled_desc')}
               </p>
             </div>
           </div>
@@ -411,10 +421,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Sliders className="w-4 h-4 text-primary" />
-                <span>{__('general.general_status_settings', {}, 'Master Status & Software Identity')}</span>
+                <span>{__('general.general_status_settings')}</span>
               </CardTitle>
               <CardDescription>
-                {__('general.general_status_desc', {}, 'Control the global availability switch and default behavior for new devices.')}
+                {__('general.general_status_desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -423,20 +433,20 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <Label htmlFor="master-active" className="text-sm font-semibold cursor-pointer">
-                      {__('general.software_active_as_whole', {}, 'Software Active As A Whole (Master Switch)')}
+                      {__('general.software_active_as_whole')}
                     </Label>
                     {form.is_active ? (
                       <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 font-medium">
-                        {__('general.running', {}, 'Running')}
+                        {__('general.running')}
                       </span>
                     ) : (
                       <span className="text-xs px-2 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-medium">
-                        {__('general.stopped', {}, 'Completely Stopped')}
+                        {__('general.stopped')}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {__('general.master_active_hint', {}, 'When turned off, the API returns Inactive for all devices checking in with this software, effectively stopping execution everywhere.')}
+                    {__('general.master_active_hint')}
                   </p>
                 </div>
                 <Switch
@@ -451,10 +461,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label className="text-xs font-semibold">
-                      {__('general.program_logo', {}, 'Program Logo')}
+                      {__('general.program_logo')}
                     </Label>
                     <p className="text-[11px] text-muted-foreground">
-                      {__('general.program_logo_hint', {}, 'Upload a logo for this software (PNG, JPG, SVG, WebP, max 2MB). Shown in client desktop activation & licensing dialogs.')}
+                      {__('general.program_logo_hint')}
                     </p>
                   </div>
                 </div>
@@ -464,14 +474,14 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     <div className="relative group shrink-0">
                       <img
                         src={logoPreview}
-                        alt="Software Logo"
+                        alt={__('admin.serial_software_logo_alt')}
                         className="w-20 h-20 object-contain rounded-xl border bg-background p-1.5 shadow-xs"
                       />
                     </div>
                   ) : (
                     <div className="w-20 h-20 rounded-xl border border-dashed flex flex-col items-center justify-center bg-muted/30 text-muted-foreground shrink-0">
                       <ImageIcon className="w-8 h-8 opacity-40 mb-1" />
-                      <span className="text-[10px]">{__('general.no_logo', {}, 'No logo')}</span>
+                      <span className="text-[10px]">{__('general.no_logo')}</span>
                     </div>
                   )}
 
@@ -491,7 +501,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                       onClick={() => document.getElementById('software-logo-input')?.click()}
                     >
                       <Upload className="w-3.5 h-3.5" />
-                      <span>{logoPreview ? __('general.change_logo', {}, 'Change Logo') : __('general.upload_logo', {}, 'Upload Logo')}</span>
+                      <span>{logoPreview ? __('general.change_logo') : __('general.upload_logo')}</span>
                     </Button>
 
                     {logoPreview && (
@@ -503,7 +513,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         onClick={handleRemoveLogo}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>{__('general.remove_logo', {}, 'Remove Logo')}</span>
+                        <span>{__('general.remove_logo')}</span>
                       </Button>
                     )}
                   </div>
@@ -514,7 +524,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="sw-name" className="text-xs font-semibold">
-                    {__('general.software_program_name', {}, 'Program Name / Identifier')}
+                    {__('general.software_program_name')}
                   </Label>
                   <Input
                     id="sw-name"
@@ -524,13 +534,13 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     className="font-medium"
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    {__('general.program_name_hint', {}, 'Matches the program_name string sent by the desktop client application.')}
+                    {__('general.program_name_hint')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="sw-default-status" className="text-xs font-semibold">
-                    {__('general.default_status_for_new_devices', {}, 'Default Status for Newly Discovered Devices')}
+                    {__('general.default_status_for_new_devices')}
                   </Label>
                   <Select
                     value={form.default_status}
@@ -540,12 +550,12 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">{__('general.active', {}, 'Active (Auto-activate new machines)')}</SelectItem>
-                      <SelectItem value="inactive">{__('general.inactive', {}, 'Inactive (Require admin or payment to activate)')}</SelectItem>
+                      <SelectItem value="active">{__('general.active')}</SelectItem>
+                      <SelectItem value="inactive">{__('general.inactive')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-[11px] text-muted-foreground">
-                    {__('general.default_status_hint', {}, 'Applies only when a completely new device checks in for the first time.')}
+                    {__('general.default_status_hint')}
                   </p>
                 </div>
               </div>
@@ -559,10 +569,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="space-y-1">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Clock className="w-4 h-4 text-emerald-600" />
-                    <span>{__('general.free_trial_configuration', {}, 'Free Trial for New Devices')}</span>
+                    <span>{__('general.free_trial_configuration')}</span>
                   </CardTitle>
                   <CardDescription>
-                    {__('general.free_trial_desc', {}, 'Allow new devices to request a temporary free trial. The trial does NOT activate automatically on check-in; it must be requested via the API link or activation dialog.')}
+                    {__('general.free_trial_desc')}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -572,7 +582,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     id="sw-trial-enabled"
                   />
                   <Label htmlFor="sw-trial-enabled" className="text-xs font-semibold cursor-pointer">
-                    {form.trial_enabled ? __('general.enabled', {}, 'Enabled') : __('general.disabled', {}, 'Disabled')}
+                    {form.trial_enabled ? __('general.enabled') : __('general.disabled')}
                   </Label>
                 </div>
               </div>
@@ -583,7 +593,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="sw-trial-days" className="text-xs font-semibold">
-                        {__('general.trial_duration_days', {}, 'Trial Duration (Days)')}
+                        {__('general.trial_duration_days')}
                       </Label>
                       <Input
                         id="sw-trial-days"
@@ -596,15 +606,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         className="h-9 text-xs"
                       />
                       <p className="text-[11px] text-muted-foreground">
-                        {__('general.trial_duration_hint', {}, 'Number of days the device remains active before authorization expires (default: 1 day).')}
+                        {__('general.trial_duration_hint')}
                       </p>
                     </div>
                     <div className="p-3 bg-background/80 rounded-lg border border-border/60 text-xs text-muted-foreground flex flex-col justify-center">
                       <span className="font-semibold text-foreground mb-1">
-                        {__('general.trial_claim_rule', {}, 'Single-Claim Rule (Anti-Abuse)')}
+                        {__('general.trial_claim_rule')}
                       </span>
                       <span>
-                        {__('general.trial_claim_rule_desc', {}, 'Each device ID can only claim this trial once per software. Once the trial expires, the device becomes inactive and requires an admin license.')}
+                        {__('general.trial_claim_rule_desc')}
                       </span>
                     </div>
                   </div>
@@ -618,10 +628,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CreditCard className="w-4 h-4 text-primary" />
-                <span>{__('general.pricing_and_packages_model', {}, 'Pricing Model & Packages')}</span>
+                <span>{__('general.pricing_and_packages_model')}</span>
               </CardTitle>
               <CardDescription>
-                {__('general.pricing_model_desc', {}, 'Choose whether this software is Free, uses a Single Paid plan (Forever / Monthly / Annual), or provides Multi-Packages with distinct key-values.')}
+                {__('general.pricing_model_desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -638,15 +648,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm">{__('general.free_mode', {}, 'Free Software')}</span>
+                      <span className="font-semibold text-sm">{__('general.free_mode')}</span>
                       {form.pricing_type === 'free' && <CheckCircle2 className="w-4 h-4 text-primary" />}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {__('general.free_mode_desc', {}, 'Direct activation for all devices. No payment required or prompted on startup.')}
+                      {__('general.free_mode_desc')}
                     </p>
                   </div>
                   <div className="pt-3 mt-2 border-t text-xs font-medium text-muted-foreground">
-                    {__('general.instant_access', {}, '100% Free / Direct')}
+                    {__('general.instant_access')}
                   </div>
                 </div>
 
@@ -661,15 +671,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm">{__('general.single_paid_plan', {}, 'Single Price Plan')}</span>
+                      <span className="font-semibold text-sm">{__('general.single_paid_plan')}</span>
                       {form.pricing_type === 'single' && <CheckCircle2 className="w-4 h-4 text-primary" />}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {__('general.single_paid_desc', {}, 'One price with Lifetime, Monthly, Annual, or Custom Days billing cycle.')}
+                      {__('general.single_paid_desc')}
                     </p>
                   </div>
                   <div className="pt-3 mt-2 border-t text-xs font-medium text-muted-foreground">
-                    {__('general.single_tier', {}, 'Single Pricing Tier')}
+                    {__('general.single_tier')}
                   </div>
                 </div>
 
@@ -684,15 +694,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-sm">{__('general.multi_packages', {}, 'Multi-Packages / Tiers')}</span>
+                      <span className="font-semibold text-sm">{__('general.multi_packages')}</span>
                       {form.pricing_type === 'packages' && <CheckCircle2 className="w-4 h-4 text-primary" />}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {__('general.multi_packages_desc', {}, 'Multiple packages (e.g. Starter, Pro, Enterprise) each with distinct prices and custom key-value limits.')}
+                      {__('general.multi_packages_desc')}
                     </p>
                   </div>
                   <div className="pt-3 mt-2 border-t text-xs font-medium text-muted-foreground">
-                    {__('general.packages_count', { count: (software.packages || []).length }, `${(software.packages || []).length} Packages defined`)}
+                    {__('admin.serial_software_packages_defined', { count: (software.packages || []).length })}
                   </div>
                 </div>
               </div>
@@ -701,23 +711,23 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               {form.pricing_type === 'single' && (
                 <div className="p-4 rounded-xl border bg-muted/20 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold">{__('general.single_plan_details', {}, 'Single Plan Configuration')}</h3>
+                    <h3 className="text-sm font-semibold">{__('general.single_plan_details')}</h3>
                     <Badge variant="outline" className="text-xs font-normal">
-                      {__('general.requires_payment', {}, 'Requires Payment')}
+                      {__('general.requires_payment')}
                     </Badge>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-1.5">
                       <Label htmlFor="single-price" className="text-xs font-semibold">
-                        {__('general.customer_price', {}, 'Customer Price (Retail)')}
+                        {__('general.customer_price')}
                       </Label>
                       <Input
                         id="single-price"
                         type="number"
                         step="0.01"
                         min="0"
-                        placeholder="e.g. 49.99"
+                        placeholder={__('admin.serial_software_price_placeholder')}
                         value={form.price}
                         onChange={(e) => setForm({ ...form, price: e.target.value })}
                         required={form.pricing_type === 'single'}
@@ -726,14 +736,14 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
                     <div className="space-y-1.5">
                       <Label htmlFor="single-reseller-price" className="text-xs font-semibold">
-                        {__('general.reseller_price', {}, 'Reseller Price (Cost)')}
+                        {__('general.reseller_price')}
                       </Label>
                       <Input
                         id="single-reseller-price"
                         type="number"
                         step="0.01"
                         min="0"
-                        placeholder="e.g. 29.99"
+                        placeholder={__('admin.serial_software_reseller_price_placeholder')}
                         value={form.reseller_price}
                         onChange={(e) => setForm({ ...form, reseller_price: e.target.value })}
                       />
@@ -741,7 +751,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
                     <div className="space-y-1.5">
                       <Label htmlFor="single-currency" className="text-xs font-semibold">
-                        {__('general.currency', {}, 'Currency')}
+                        {__('general.currency')}
                       </Label>
                       <Input
                         id="single-currency"
@@ -755,7 +765,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
                     <div className="space-y-1.5">
                       <Label htmlFor="single-cycle" className="text-xs font-semibold">
-                        {__('general.billing_cycle', {}, 'Billing Cycle / Duration')}
+                        {__('general.billing_cycle')}
                       </Label>
                       <Select
                         value={form.billing_cycle}
@@ -765,10 +775,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="lifetime">{__('general.cycle_lifetime', {}, 'Lifetime / Forever (One-time)')}</SelectItem>
-                          <SelectItem value="monthly">{__('general.cycle_monthly', {}, 'Monthly (Every Month)')}</SelectItem>
-                          <SelectItem value="annual">{__('general.cycle_annual', {}, 'Annual (Every Year)')}</SelectItem>
-                          <SelectItem value="custom">{__('general.cycle_custom', {}, 'Custom Days Period')}</SelectItem>
+                          <SelectItem value="lifetime">{__('general.cycle_lifetime')}</SelectItem>
+                          <SelectItem value="monthly">{__('general.cycle_monthly')}</SelectItem>
+                          <SelectItem value="annual">{__('general.cycle_annual')}</SelectItem>
+                          <SelectItem value="custom">{__('general.cycle_custom')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -777,13 +787,13 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   {form.billing_cycle === 'custom' && (
                     <div className="w-full sm:w-1/3 space-y-1.5 pt-2">
                       <Label htmlFor="single-days" className="text-xs font-semibold">
-                        {__('general.custom_duration_days', {}, 'Duration In Days')}
+                        {__('general.custom_duration_days')}
                       </Label>
                       <Input
                         id="single-days"
                         type="number"
                         min="1"
-                        placeholder="e.g. 30, 90, 180"
+                        placeholder={__('admin.serial_software_billing_days_placeholder')}
                         value={form.billing_days}
                         onChange={(e) => setForm({ ...form, billing_days: e.target.value })}
                         required={form.billing_cycle === 'custom'}
@@ -798,9 +808,9 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-sm font-semibold">{__('general.defined_packages', {}, 'Packages & Tiers')}</h3>
+                      <h3 className="text-sm font-semibold">{__('general.defined_packages')}</h3>
                       <p className="text-xs text-muted-foreground">
-                        {__('general.defined_packages_desc', {}, 'Each package can have its own price, billing interval, and specific overrides for master key-values.')}
+                        {__('general.defined_packages_desc')}
                       </p>
                     </div>
 
@@ -811,7 +821,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                       className="gap-1.5"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>{__('general.add_package', {}, 'Add Package')}</span>
+                      <span>{__('general.add_package')}</span>
                     </Button>
                   </div>
 
@@ -819,14 +829,14 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     <div className="p-8 border rounded-xl text-center space-y-3 bg-muted/20">
                       <PackageIcon className="w-10 h-10 text-muted-foreground/40 mx-auto" />
                       <div className="space-y-1">
-                        <p className="text-sm font-medium">{__('general.no_packages_yet', {}, 'No packages created yet')}</p>
+                        <p className="text-sm font-medium">{__('general.no_packages_yet')}</p>
                         <p className="text-xs text-muted-foreground">
-                          {__('general.no_packages_hint', {}, 'Create your first package (e.g. Starter, Pro, Lifetime) to offer tiered pricing.')}
+                          {__('general.no_packages_hint')}
                         </p>
                       </div>
                       <Button type="button" variant="outline" size="sm" onClick={openNewPackageModal}>
                         <Plus className="w-3.5 h-3.5 me-1.5" />
-                        <span>{__('general.create_first_package', {}, 'Create First Package')}</span>
+                        <span>{__('general.create_first_package')}</span>
                       </Button>
                     </div>
                   ) : (
@@ -834,12 +844,12 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                       <Table>
                         <TableHeader>
                           <TableRow className="bg-muted/40">
-                            <TableHead>{__('general.package_name', {}, 'Package')}</TableHead>
-                            <TableHead>{__('general.customer_price', {}, 'Customer Price')}</TableHead>
-                            <TableHead>{__('general.reseller_price', {}, 'Reseller Price')}</TableHead>
-                            <TableHead>{__('general.cycle', {}, 'Cycle')}</TableHead>
-                            <TableHead>{__('general.key_overrides', {}, 'Key Values')}</TableHead>
-                            <TableHead>{__('general.status', {}, 'Status')}</TableHead>
+                            <TableHead>{__('general.package_name')}</TableHead>
+                            <TableHead>{__('general.customer_price')}</TableHead>
+                            <TableHead>{__('general.reseller_price')}</TableHead>
+                            <TableHead>{__('general.cycle')}</TableHead>
+                            <TableHead>{__('general.key_overrides')}</TableHead>
+                            <TableHead>{__('general.status')}</TableHead>
                             <TableHead className="w-24 text-end"></TableHead>
                           </TableRow>
                         </TableHeader>
@@ -852,7 +862,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                                     <span className="font-semibold text-sm">{pkg.name}</span>
                                     {pkg.is_default && (
                                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                                        {__('general.default', {}, 'Default')}
+                                        {__('general.default')}
                                       </Badge>
                                     )}
                                   </div>
@@ -870,9 +880,9 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                               <TableCell>
                                 <Badge variant="outline" className="text-xs capitalize font-normal">
                                   {pkg.billing_cycle === 'lifetime'
-                                    ? __('general.lifetime', {}, 'Lifetime')
+                                    ? __('general.lifetime')
                                     : pkg.billing_cycle === 'custom'
-                                    ? `${pkg.billing_days || 0} ${__('general.days', {}, 'Days')}`
+                                    ? `${pkg.billing_days || 0} ${__('general.days')}`
                                     : pkg.billing_cycle}
                                 </Badge>
                               </TableCell>
@@ -886,16 +896,16 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                                     ))
                                   ) : (
                                     <span className="text-xs text-muted-foreground italic">
-                                      {__('general.inherits_defaults', {}, 'Inherits defaults')}
+                                      {__('general.inherits_defaults')}
                                     </span>
                                   )}
                                 </div>
                               </TableCell>
                               <TableCell>
                                 {pkg.is_active ? (
-                                  <span className="text-xs text-green-600 font-medium">{__('general.active', {}, 'Active')}</span>
+                                  <span className="text-xs text-green-600 font-medium">{__('general.active')}</span>
                                 ) : (
-                                  <span className="text-xs text-muted-foreground">{__('general.disabled', {}, 'Disabled')}</span>
+                                  <span className="text-xs text-muted-foreground">{__('general.disabled')}</span>
                                 )}
                               </TableCell>
                               <TableCell className="text-end">
@@ -906,7 +916,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                                     size="sm"
                                     className="h-7 w-7 p-0 hover:bg-muted"
                                     onClick={() => openEditPackageModal(pkg)}
-                                    title={__('general.edit', {}, 'Edit')}
+                                    title={__('general.edit')}
+                                    aria-label={__('general.edit')}
                                   >
                                     <Edit2 className="w-3.5 h-3.5" />
                                   </Button>
@@ -916,7 +927,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                                     size="sm"
                                     className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
                                     onClick={() => handleDeletePackage(pkg.id)}
-                                    title={__('general.delete', {}, 'Delete')}
+                                    title={__('general.delete')}
+                                    aria-label={__('general.delete')}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </Button>
@@ -936,9 +948,9 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="flex items-center gap-2">
                   <PhoneCall className="w-4 h-4 text-primary" />
                   <div>
-                    <h3 className="text-sm font-semibold">{__('general.activation_contact_settings', {}, 'إعدادات التواصل ونافذة التفعيل')}</h3>
+                    <h3 className="text-sm font-semibold">{__('general.activation_contact_settings')}</h3>
                     <p className="text-xs text-muted-foreground">
-                      {__('general.activation_contact_settings_desc', {}, 'التحكم في بيانات التواصل وطريقة ظهور السعر والواتساب في نافذة تفعيل البرنامج لدى العميل.')}
+                      {__('general.activation_contact_settings_desc')}
                     </p>
                   </div>
                 </div>
@@ -946,27 +958,27 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="software-whatsapp" className="text-xs font-semibold">
-                      {__('general.whatsapp_number', {}, 'Admin WhatsApp Number (With Country Code)')}
+                      {__('general.whatsapp_number')}
                     </Label>
                     <Input
                       id="software-whatsapp"
-                      placeholder="e.g. +201012345678"
+                      placeholder={__('admin.serial_software_whatsapp_placeholder')}
                       value={form.whatsapp_number}
                       onChange={(e) => setForm({ ...form, whatsapp_number: e.target.value })}
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      {__('general.whatsapp_hint', {}, 'Clients will see a direct 1-click button to contact this WhatsApp number with their Device ID.')}
+                      {__('general.whatsapp_hint')}
                     </p>
                   </div>
 
                   <div className="space-y-1.5">
                     <Label htmlFor="software-instructions" className="text-xs font-semibold">
-                      {__('general.payment_instructions', {}, 'Payment Instructions / Notes')}
+                      {__('general.payment_instructions')}
                     </Label>
                     <Textarea
                       id="software-instructions"
                       rows={3}
-                      placeholder="e.g. Transfer fee to Vodafone Cash / USDT / Bank Account and send transfer receipt via WhatsApp."
+                      placeholder={__('admin.serial_software_payment_instructions_placeholder')}
                       value={form.payment_instructions}
                       onChange={(e) => setForm({ ...form, payment_instructions: e.target.value })}
                       className="text-xs resize-none"
@@ -979,10 +991,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   <div className="flex items-center justify-between gap-3">
                     <div className="space-y-0.5">
                       <Label htmlFor="setting-show-price" className="text-xs font-medium cursor-pointer">
-                        {__('general.show_price_in_dialog', {}, 'إظهار السعر في نافذة التفعيل')}
+                        {__('general.show_price_in_dialog')}
                       </Label>
                       <p className="text-[11px] text-muted-foreground">
-                        {__('general.show_price_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء صف السعر والعملة داخل نافذة التفعيل للعميل.')}
+                        {__('general.show_price_in_dialog_desc')}
                       </p>
                     </div>
                     <Switch
@@ -995,10 +1007,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                   <div className="flex items-center justify-between gap-3">
                     <div className="space-y-0.5">
                       <Label htmlFor="setting-show-wa" className="text-xs font-medium cursor-pointer">
-                        {__('general.show_whatsapp_in_dialog', {}, 'إظهار زر الواتساب في نافذة التفعيل')}
+                        {__('general.show_whatsapp_in_dialog')}
                       </Label>
                       <p className="text-[11px] text-muted-foreground">
-                        {__('general.show_whatsapp_in_dialog_desc', {}, 'التحكم في ظهور أو إخفاء زر المراسلة المباشرة عبر واتساب.')}
+                        {__('general.show_whatsapp_in_dialog_desc')}
                       </p>
                     </div>
                     <Switch
@@ -1017,26 +1029,26 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Key className="w-4 h-4 text-primary" />
-                <span>{__('general.master_custom_keys', {}, 'Master Key-Value Parameters')}</span>
+                <span>{__('general.master_custom_keys')}</span>
               </CardTitle>
               <CardDescription>
-                {__('general.master_keys_desc', {}, 'Define custom parameter keys for this software (e.g. max_accounts, daily_limit, export_enabled). These provide default values for devices, and can be customized per package in Multi-Package mode.')}
+                {__('general.master_keys_desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Existing Master Keys Table */}
               {(!software.custom_keys || software.custom_keys.length === 0) ? (
                 <div className="p-4 border rounded-lg text-center text-sm text-muted-foreground bg-muted/20">
-                  {__('general.no_master_keys_yet', {}, 'No custom parameter keys defined yet. Add the first key below.')}
+                  {__('general.no_master_keys_yet')}
                 </div>
               ) : (
                 <div className="border rounded-lg overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/40">
-                        <TableHead className="text-xs font-semibold">{__('general.key_name', {}, 'Key Identifier')}</TableHead>
-                        <TableHead className="text-xs font-semibold">{__('general.default_value', {}, 'Default Value')}</TableHead>
-                        <TableHead className="text-xs font-semibold">{__('general.description', {}, 'Description')}</TableHead>
+                        <TableHead className="text-xs font-semibold">{__('general.key_name')}</TableHead>
+                        <TableHead className="text-xs font-semibold">{__('general.default_value')}</TableHead>
+                        <TableHead className="text-xs font-semibold">{__('general.description')}</TableHead>
                         <TableHead className="w-12 text-end"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -1050,7 +1062,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                             {k.default_value !== null && k.default_value !== '' ? (
                               k.default_value
                             ) : (
-                              <span className="italic text-muted-foreground/60">(empty)</span>
+                              <span className="italic text-muted-foreground/60">{__('general.empty')}</span>
                             )}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">
@@ -1063,7 +1075,8 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                               size="sm"
                               className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10"
                               onClick={() => handleDeleteKey(k.id)}
-                              title={__('general.delete', {}, 'Delete')}
+                              title={__('general.delete')}
+                              aria-label={__('general.delete')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
@@ -1080,17 +1093,17 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               {/* Add / Update Master Key Form */}
               <div className="space-y-3">
                 <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                  {__('general.add_new_master_key', {}, 'Add New Key Parameter')}
+                  {__('general.add_new_master_key')}
                 </Label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="new-key-name" className="text-xs">
-                      {__('general.key_identifier', {}, 'Key Name (e.g. max_accounts)')}
+                      {__('general.key_identifier')}
                     </Label>
                     <Input
                       id="new-key-name"
-                      placeholder="e.g. max_accounts"
+                      placeholder={__('admin.serial_software_key_placeholder')}
                       value={keyForm.key}
                       onChange={(e) => setKeyForm({ ...keyForm, key: e.target.value })}
                       className="h-9 font-mono text-xs"
@@ -1099,11 +1112,11 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
                   <div className="space-y-1.5">
                     <Label htmlFor="new-key-default" className="text-xs">
-                      {__('general.default_value', {}, 'Default Value')}
+                      {__('general.default_value')}
                     </Label>
                     <Input
                       id="new-key-default"
-                      placeholder="e.g. 1"
+                      placeholder={__('admin.serial_software_default_value_placeholder')}
                       value={keyForm.default_value}
                       onChange={(e) => setKeyForm({ ...keyForm, default_value: e.target.value })}
                       className="h-9 font-mono text-xs"
@@ -1112,12 +1125,12 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
                   <div className="space-y-1.5">
                     <Label htmlFor="new-key-desc" className="text-xs">
-                      {__('general.description', {}, 'Description (Optional)')}
+                      {__('general.description')}
                     </Label>
                     <div className="flex gap-2">
                       <Input
                         id="new-key-desc"
-                        placeholder="e.g. Maximum accounts"
+                        placeholder={__('admin.serial_software_key_description_placeholder')}
                         value={keyForm.description}
                         onChange={(e) => setKeyForm({ ...keyForm, description: e.target.value })}
                         className="h-9 text-xs flex-1"
@@ -1129,7 +1142,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         className="gap-1.5 shrink-0"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>{keySubmitting ? __('general.saving', {}, '...') : __('general.add', {}, 'Add')}</span>
+                        <span>{keySubmitting ? __('general.saving') : __('general.add')}</span>
                       </Button>
                     </div>
                   </div>
@@ -1143,43 +1156,43 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <PhoneCall className="w-4 h-4 text-primary" />
-                <span>{__('general.payment_contact_and_instructions', {}, 'Payment Contact & Client Instructions')}</span>
+                <span>{__('general.payment_contact_and_instructions')}</span>
               </CardTitle>
               <CardDescription>
-                {__('general.payment_contact_desc', {}, 'Configure payment instructions and WhatsApp support details presented to client desktop applications.')}
+                {__('general.payment_contact_desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="sw-whatsapp-number" className="text-xs font-semibold">
-                  {__('general.whatsapp_number', {}, 'Admin WhatsApp Number (With International Country Code)')}
+                  {__('general.whatsapp_number')}
                 </Label>
                 <Input
                   id="sw-whatsapp-number"
-                  placeholder="e.g. +201015218548"
+                  placeholder={__('admin.serial_software_whatsapp_placeholder')}
                   value={form.whatsapp_number}
                   onChange={(e) => setForm({ ...form, whatsapp_number: e.target.value })}
                   className="max-w-md font-mono"
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  {__('general.whatsapp_hint', {}, 'Clients will see a direct 1-click button to contact this WhatsApp number with their Device ID.')}
+                  {__('general.whatsapp_hint')}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="sw-payment-notes" className="text-xs font-semibold">
-                  {__('general.payment_instructions', {}, 'Payment Instructions / Notes (Shown to Client)')}
+                  {__('general.payment_instructions')}
                 </Label>
                 <Textarea
                   id="sw-payment-notes"
                   rows={4}
-                  placeholder="e.g. Transfer fee to Vodafone Cash / USDT (TRC20) / Bank Account and send transfer receipt via WhatsApp."
+                  placeholder={__('admin.serial_software_payment_instructions_placeholder')}
                   value={form.payment_instructions}
                   onChange={(e) => setForm({ ...form, payment_instructions: e.target.value })}
                   className="text-xs"
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  {__('general.instructions_hint', {}, 'Appears directly on client activation and renewal modal screens.')}
+                  {__('general.instructions_hint')}
                 </p>
               </div>
             </CardContent>
@@ -1188,11 +1201,11 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
           {/* Sticky Bottom Save Bar */}
           <div className="flex items-center justify-between p-4 rounded-xl border bg-card shadow-sm">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{__('general.total_devices', {}, 'Total Devices')}: <strong>{software.total_devices}</strong></span>
+              <span>{__('general.total_devices')}: <strong>{software.total_devices}</strong></span>
               <span>•</span>
-              <span className="text-green-600 font-medium">{__('general.active', {}, 'Active')}: {software.active_count}</span>
+              <span className="text-green-600 font-medium">{__('general.active')}: {software.active_count}</span>
               <span>•</span>
-              <span>{__('general.inactive', {}, 'Inactive')}: {software.inactive_count}</span>
+              <span>{__('general.inactive')}: {software.inactive_count}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1200,7 +1213,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 href={route('admin.serial-softwares.index')}
                 className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
               >
-                {__('general.cancel', {}, 'Cancel')}
+                {__('general.cancel')}
               </Link>
               <Button
                 type="submit"
@@ -1208,7 +1221,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 className="gap-2 px-5"
               >
                 <Save className="w-4 h-4" />
-                <span>{saving ? __('general.saving', {}, 'Saving Changes...') : __('general.save_settings', {}, 'Save All Settings')}</span>
+                <span>{saving ? __('general.saving') : __('general.save_settings')}</span>
               </Button>
             </div>
           </div>
@@ -1221,10 +1234,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <PackageIcon className="w-5 h-5 text-primary" />
-              <span>{editingPackage ? __('general.edit_package', {}, 'Edit Package') : __('general.add_new_package', {}, 'Add New Package')}</span>
+              <span>{editingPackage ? __('general.edit_package') : __('general.add_new_package')}</span>
             </DialogTitle>
             <DialogDescription>
-              {__('general.package_modal_desc', {}, 'Configure package pricing, billing frequency, and key-value limits.')}
+              {__('general.package_modal_desc')}
             </DialogDescription>
           </DialogHeader>
 
@@ -1232,10 +1245,10 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             {/* Name, Customer Price, Reseller Price, Currency */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-name" className="text-xs font-semibold">{__('general.package_name', {}, 'Package Name')}</Label>
+                <Label htmlFor="pkg-name" className="text-xs font-semibold">{__('general.package_name')}</Label>
                 <Input
                   id="pkg-name"
-                  placeholder="e.g. Pro Monthly"
+                  placeholder={__('admin.serial_software_package_name_placeholder')}
                   value={packageForm.name}
                   onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                   required
@@ -1243,7 +1256,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-price" className="text-xs font-semibold">{__('general.customer_price', {}, 'Customer Price')}</Label>
+                <Label htmlFor="pkg-price" className="text-xs font-semibold">{__('general.customer_price')}</Label>
                 <Input
                   id="pkg-price"
                   type="number"
@@ -1257,7 +1270,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-reseller-price" className="text-xs font-semibold">{__('general.reseller_price', {}, 'Reseller Price')}</Label>
+                <Label htmlFor="pkg-reseller-price" className="text-xs font-semibold">{__('general.reseller_price')}</Label>
                 <Input
                   id="pkg-reseller-price"
                   type="number"
@@ -1270,7 +1283,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-currency" className="text-xs font-semibold">{__('general.currency', {}, 'Currency')}</Label>
+                <Label htmlFor="pkg-currency" className="text-xs font-semibold">{__('general.currency')}</Label>
                 <Input
                   id="pkg-currency"
                   placeholder="USD"
@@ -1285,7 +1298,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             {/* Cycle and Duration */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="pkg-cycle" className="text-xs font-semibold">{__('general.billing_cycle', {}, 'Billing Cycle')}</Label>
+                <Label htmlFor="pkg-cycle" className="text-xs font-semibold">{__('general.billing_cycle')}</Label>
                 <Select
                   value={packageForm.billing_cycle}
                   onValueChange={(val: any) => setPackageForm({ ...packageForm, billing_cycle: val })}
@@ -1294,22 +1307,22 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="monthly">{__('general.monthly', {}, 'Monthly')}</SelectItem>
-                    <SelectItem value="annual">{__('general.annual', {}, 'Annual (Yearly)')}</SelectItem>
-                    <SelectItem value="lifetime">{__('general.lifetime', {}, 'Lifetime / Forever')}</SelectItem>
-                    <SelectItem value="custom">{__('general.custom_days', {}, 'Custom Days')}</SelectItem>
+                    <SelectItem value="monthly">{__('general.monthly')}</SelectItem>
+                    <SelectItem value="annual">{__('general.annual')}</SelectItem>
+                    <SelectItem value="lifetime">{__('general.lifetime')}</SelectItem>
+                    <SelectItem value="custom">{__('general.custom_days')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {packageForm.billing_cycle === 'custom' ? (
                 <div className="space-y-1.5">
-                  <Label htmlFor="pkg-days" className="text-xs font-semibold">{__('general.days_count', {}, 'Number of Days')}</Label>
+                  <Label htmlFor="pkg-days" className="text-xs font-semibold">{__('general.days_count')}</Label>
                   <Input
                     id="pkg-days"
                     type="number"
                     min="1"
-                    placeholder="e.g. 7, 30, 90"
+                    placeholder={__('admin.serial_software_billing_days_placeholder')}
                     value={packageForm.billing_days}
                     onChange={(e) => setPackageForm({ ...packageForm, billing_days: e.target.value })}
                     required
@@ -1317,7 +1330,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <Label htmlFor="pkg-sort" className="text-xs font-semibold">{__('general.sort_order', {}, 'Display Order')}</Label>
+                  <Label htmlFor="pkg-sort" className="text-xs font-semibold">{__('general.sort_order')}</Label>
                   <Input
                     id="pkg-sort"
                     type="number"
@@ -1330,11 +1343,11 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
             {/* Description */}
             <div className="space-y-1.5">
-              <Label htmlFor="pkg-desc" className="text-xs font-semibold">{__('general.description', {}, 'Description / Highlights')}</Label>
+              <Label htmlFor="pkg-desc" className="text-xs font-semibold">{__('general.description')}</Label>
               <Textarea
                 id="pkg-desc"
                 rows={2}
-                placeholder="e.g. Unlimited bulk sending, priority support, all export formats"
+                placeholder={__('admin.serial_software_package_description_placeholder')}
                 value={packageForm.description}
                 onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
                 className="text-xs"
@@ -1345,7 +1358,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                 <Label htmlFor="pkg-active" className="text-xs font-medium cursor-pointer">
-                  {__('general.active_package', {}, 'Package Available / Active')}
+                  {__('general.active_package')}
                 </Label>
                 <Switch
                   id="pkg-active"
@@ -1356,7 +1369,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
 
               <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                 <Label htmlFor="pkg-default" className="text-xs font-medium cursor-pointer">
-                  {__('general.default_recommended', {}, 'Default / Recommended')}
+                  {__('general.default_recommended')}
                 </Label>
                 <Switch
                   id="pkg-default"
@@ -1369,15 +1382,15 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
             {/* KEY-VALUE OVERRIDES FOR THIS PACKAGE */}
             <div className="space-y-2 pt-2 border-t">
               <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                {__('general.package_key_overrides', {}, 'Package Key-Value Limits')}
+                {__('general.package_key_overrides')}
               </Label>
               <p className="text-xs text-muted-foreground">
-                {__('general.key_overrides_hint', {}, 'Configure custom values for this package. Leave empty to use software default.')}
+                {__('general.key_overrides_hint')}
               </p>
 
               {(!software.custom_keys || software.custom_keys.length === 0) ? (
                 <p className="text-xs text-muted-foreground italic p-2 border rounded bg-muted/10">
-                  {__('general.no_master_keys_to_override', {}, 'No master keys defined yet. You can add master keys in Section 3.')}
+                  {__('general.no_master_keys_to_override')}
                 </p>
               ) : (
                 <div className="space-y-2 border rounded-lg p-3 bg-muted/20">
@@ -1387,7 +1400,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                         <span className="font-mono text-xs font-semibold">{k.key}</span>
                         {k.default_value && (
                           <span className="text-[10px] text-muted-foreground block">
-                            {__('general.default', {}, 'Default')}: {k.default_value}
+                            {__('general.default')}: {k.default_value}
                           </span>
                         )}
                       </div>
@@ -1420,7 +1433,7 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 size="sm"
                 onClick={() => setPackageModalOpen(false)}
               >
-                {__('general.cancel', {}, 'Cancel')}
+                {__('general.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -1429,12 +1442,13 @@ export default function SerialSoftwareSettings({ software, commonCurrencies }: P
                 className="gap-1.5"
               >
                 <Check className="w-3.5 h-3.5" />
-                <span>{packageSubmitting ? __('general.saving', {}, 'Saving...') : __('general.save_package', {}, 'Save Package')}</span>
+                <span>{packageSubmitting ? __('general.saving') : __('general.save_package')}</span>
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+      {confirmDialog}
     </AdminSidebarLayout>
   );
 }

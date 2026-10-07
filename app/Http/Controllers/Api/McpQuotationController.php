@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Log;
 
 class McpQuotationController extends Controller
 {
@@ -537,7 +538,7 @@ class McpQuotationController extends Controller
                 }
             }
         } catch (\Throwable $e) {
-            // Fallback gracefully
+            Log::warning('MCP quotation: module catalog lookup failed', ['error' => $e->getMessage()]);
         }
 
         // Process platforms / pages (support 'platforms', 'pages', 'screens', 'items')
@@ -685,7 +686,7 @@ class McpQuotationController extends Controller
             }
             file_put_contents("{$dir}/{$code}.json", json_encode($quoteData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         } catch (\Throwable $e) {
-            // Ignore filesystem fallback error
+            Log::warning('MCP quotation: failed to write file backup', ['code' => $code, 'error' => $e->getMessage()]);
         }
 
         $publicUrl = route('public.quotation.show', ['code' => $code]);

@@ -16,6 +16,7 @@ use Tests\TestCase;
 class RecurringInvoiceNotifyClientTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected Currency $currency;
     protected User $admin;
@@ -23,6 +24,7 @@ class RecurringInvoiceNotifyClientTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         $this->currency = Currency::where('currency', 'USD')->first() ?? Currency::create([
             'currency' => 'USD',

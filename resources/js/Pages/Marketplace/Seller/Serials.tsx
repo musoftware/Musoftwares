@@ -11,7 +11,8 @@ import {
     Copy,
     Check,
     Eye,
-    EyeOff
+    EyeOff,
+    X
 } from 'lucide-react';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
@@ -125,13 +126,13 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
 
     return (
         <MarketplaceLayout>
-            <Head title={__('general.digital_keys') || 'Digital Key Inventory'} />
+            <Head title={__('general.digital_keys')} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <ModulePageHeader
-                        title={__('general.digital_keys') || 'Digital Key Inventory'}
-                        description={__('general.manage_digital_serials_description') || 'Manage instant-delivery license keys and digital vouchers for your service packages.'}
+                        title={__('general.digital_keys')}
+                        description={__('general.manage_digital_serials_description')}
                     />
 
                     <div className="flex items-center gap-3">
@@ -140,14 +141,14 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition shadow-sm"
                         >
                             <Plus className="w-4 h-4" />
-                            {__('general.add_single_key') || 'Add Single Key'}
+                            {__('general.add_single_key')}
                         </button>
                         <button
                             onClick={() => setShowBulkModal(true)}
                             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition shadow-sm"
                         >
                             <Upload className="w-4 h-4" />
-                            {__('general.bulk_import') || 'Bulk Import'}
+                            {__('general.bulk_import')}
                         </button>
                     </div>
                 </div>
@@ -156,32 +157,33 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <MetricCard
-                        label={__('general.total_keys') || 'Total Inventory Keys'}
+                        label={__('general.total_keys')}
                         value={totalStock}
                         icon={Key}
                     />
                     <MetricCard
-                        label={__('general.available_stock') || 'Available for Claim'}
+                        label={__('general.available_stock')}
                         value={availableCount}
                         icon={CheckCircle2}
                     />
                     <MetricCard
-                        label={__('general.claimed_keys') || 'Sold / Delivered Keys'}
+                        label={__('general.claimed_keys')}
                         value={claimedCount}
                         icon={Clock}
                     />
                 </div>
 
                 <OperationalCard
-                    title={__('general.key_inventory_list') || 'Serial Key Records'}
-                    description={__('general.key_inventory_sub') || 'Real-time stock of digital codes assigned to your active services.'}
+                    title={__('general.key_inventory_list')}
+                    description={__('general.key_inventory_sub')}
                 >
                     <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div className="relative w-full sm:w-80">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder={__('general.search_serials') || 'Search key code or service...'}
+                                placeholder={__('general.search_serials')}
+                                aria-label={__('general.search_serials')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
@@ -193,11 +195,11 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                         <table className="w-full text-left text-sm">
                             <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wider text-xs font-semibold">
                                 <tr>
-                                    <th className="px-6 py-3">{__('general.serial_code') || 'Serial Key / Code'}</th>
-                                    <th className="px-6 py-3">{__('general.service') || 'Associated Service'}</th>
-                                    <th className="px-6 py-3">{__('general.status') || 'Status'}</th>
-                                    <th className="px-6 py-3">{__('general.claimed_by') || 'Claimed By / Buyer'}</th>
-                                    <th className="px-6 py-3 text-right">{__('general.actions') || 'Actions'}</th>
+                                    <th className="px-6 py-3">{__('general.serial_code')}</th>
+                                    <th className="px-6 py-3">{__('general.service')}</th>
+                                    <th className="px-6 py-3">{__('general.status')}</th>
+                                    <th className="px-6 py-3">{__('general.claimed_by')}</th>
+                                    <th className="px-6 py-3 text-right">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -206,7 +208,7 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                         <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                                             <div className="flex flex-col items-center justify-center space-y-2">
                                                 <Key className="w-8 h-8 text-slate-300 stroke-[1.5]" />
-                                                <p className="text-sm">{__('general.no_serials_found') || 'No digital serial keys found in inventory.'}</p>
+                                                <p className="text-sm">{__('general.no_serials_found')}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -223,23 +225,24 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                                         <button
                                                             onClick={() => toggleReveal(serial.id)}
                                                             className="text-slate-400 hover:text-slate-600 p-1"
-                                                            title="Toggle Visibility"
+                                                            title={__('general.toggle_visibility')}
+                                                            aria-label={__('general.toggle_visibility')}
                                                         >
                                                             {isRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                                                         </button>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-slate-700 font-medium">
-                                                    {serial.service?.title || 'General Service'}
+                                                    {serial.service?.title || __('marketplace.serials_general_service')}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {serial.is_used ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                                            {__('general.claimed') || 'Claimed / Used'}
+                                                            {__('general.claimed')}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                            {__('general.available') || 'Available Stock'}
+                                                            {__('general.available')}
                                                         </span>
                                                     )}
                                                 </td>
@@ -250,7 +253,7 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                                             <div className="text-xs text-slate-400">{serial.used_by.email}</div>
                                                         </div>
                                                     ) : (
-                                                        <span className="text-slate-400 text-xs">—</span>
+                                                        <span className="text-slate-400 text-xs">-</span>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
@@ -259,7 +262,7 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-medium transition"
                                                     >
                                                         {copiedId === serial.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                                                        {copiedId === serial.id ? __('general.copied') || 'Copied' : __('general.copy') || 'Copy'}
+                                                        {copiedId === serial.id ? __('general.copied') : __('general.copy')}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -276,16 +279,17 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
                         <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-slate-900">{__('general.add_single_key') || 'Add Single Serial Key'}</h3>
-                                <button onClick={() => setShowSingleModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+                                <h3 className="text-lg font-semibold text-slate-900">{__('general.add_single_key')}</h3>
+                                <button type="button" onClick={() => setShowSingleModal(false)} aria-label={__('general.close')} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
                             </div>
 
                             <form onSubmit={handleSingleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.service') || 'Service'}</label>
+                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.service')}</label>
                                     <select
                                         value={singleForm.data.service_id}
                                         onChange={(e) => singleForm.setData('service_id', Number(e.target.value))}
+                                        aria-label={__('general.service')}
                                         className="w-full rounded-xl border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                                         required
                                     >
@@ -296,10 +300,11 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.serial_code') || 'Serial Code'}</label>
+                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.serial_code')}</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. MSFT-2026-KEY-9981"
+                                        placeholder="MSFT-2026-KEY-9981"
+                                        aria-label={__('general.serial_code')}
                                         value={singleForm.data.serial_code}
                                         onChange={(e) => singleForm.setData('serial_code', e.target.value)}
                                         className="w-full rounded-xl border border-slate-200 py-2.5 px-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
@@ -313,14 +318,14 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                         onClick={() => setShowSingleModal(false)}
                                         className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
                                     >
-                                        {__('general.cancel') || 'Cancel'}
+                                        {__('general.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={singleForm.processing}
                                         className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition"
                                     >
-                                        {__('general.save_key') || 'Save Key'}
+                                        {__('general.save_key')}
                                     </button>
                                 </div>
                             </form>
@@ -333,16 +338,17 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
                         <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-6 shadow-2xl">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-slate-900">{__('general.bulk_import_keys') || 'Bulk Import Digital Serials'}</h3>
-                                <button onClick={() => setShowBulkModal(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+                                <h3 className="text-lg font-semibold text-slate-900">{__('general.bulk_import_keys')}</h3>
+                                <button type="button" onClick={() => setShowBulkModal(false)} aria-label={__('general.close')} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4" /></button>
                             </div>
 
                             <form onSubmit={handleBulkSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.service') || 'Service'}</label>
+                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.service')}</label>
                                     <select
                                         value={bulkForm.data.service_id}
                                         onChange={(e) => bulkForm.setData('service_id', Number(e.target.value))}
+                                        aria-label={__('general.service')}
                                         className="w-full rounded-xl border border-slate-200 py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                                         required
                                     >
@@ -353,16 +359,17 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.serial_codes_list') || 'Serial Codes (One Code Per Line)'}</label>
+                                    <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">{__('general.serial_codes_list')}</label>
                                     <textarea
                                         rows={6}
                                         placeholder={"KEY-AAAA-1111\nKEY-BBBB-2222\nKEY-CCCC-3333"}
+                                        aria-label={__('general.serial_codes_list')}
                                         value={bulkForm.data.serial_codes_text}
                                         onChange={(e) => bulkForm.setData('serial_codes_text', e.target.value)}
                                         className="w-full rounded-xl border border-slate-200 p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                                         required
                                     />
-                                    <p className="text-xs text-slate-400 mt-1">Paste multiple keys separated by new lines.</p>
+                                    <p className="text-xs text-slate-400 mt-1">{__('marketplace.serials_bulk_hint')}</p>
                                 </div>
 
                                 <div className="flex items-center justify-end gap-3 pt-2">
@@ -371,14 +378,14 @@ export default function SellerSerials({ serials, services }: SerialsPageProps) {
                                         onClick={() => setShowBulkModal(false)}
                                         className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800"
                                     >
-                                        {__('general.cancel') || 'Cancel'}
+                                        {__('general.cancel')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={bulkForm.processing}
                                         className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition"
                                     >
-                                        {__('general.import_keys') || 'Import Keys'}
+                                        {__('general.import_keys')}
                                     </button>
                                 </div>
                             </form>

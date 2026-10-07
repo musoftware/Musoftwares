@@ -72,11 +72,11 @@ export default function Create({ services }) {
         post(route('admin.plans.store'), {
             onSuccess: () => {
                 toastSuccess(
-                    __('admin.subscription_assigned_successfully') || 'Subscription assigned successfully.',
+                    __('admin.subscription_assigned_successfully'),
                 );
             },
             onError: () => {
-                toastError(__('general.error_occurred') || 'Something went wrong.');
+                toastError(__('general.error_occurred'));
             },
         });
     };

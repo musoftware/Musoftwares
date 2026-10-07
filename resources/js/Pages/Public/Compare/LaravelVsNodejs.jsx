@@ -23,72 +23,72 @@ import StudioHeader from '@/Components/Studio/StudioHeader';
 export default function LaravelVsNodejs() {
     const comparisonMetrics = [
         {
-            category: 'Financial Ledgers & Data Integrity',
+            category: __('frontend.compare_lvn_m1_category'),
             icon: Database,
             laravel: {
-                title: 'ACID-Compliant Monolith (Superior)',
-                desc: 'Native database transactions, BCMath arbitrary precision, and Eloquent state machines guarantee zero fractional currency loss and absolute ledger consistency.',
+                title: __('frontend.compare_lvn_m1_laravel_title'),
+                desc: __('frontend.compare_lvn_m1_laravel_desc'),
                 status: 'winner',
             },
             nodejs: {
-                title: 'Distributed Transaction Complexity',
-                desc: 'Prone to floating-point rounding issues unless custom decimal libraries are enforced. Requires 2PC (Two-Phase Commit) or Saga patterns across microservices.',
+                title: __('frontend.compare_lvn_m1_node_title'),
+                desc: __('frontend.compare_lvn_m1_node_desc'),
                 status: 'draw',
             },
         },
         {
-            category: 'Real-Time & High-Throughput WebSockets',
+            category: __('frontend.compare_lvn_m2_category'),
             icon: Zap,
             laravel: {
-                title: 'Laravel Reverb & Event Broadcasting',
-                desc: 'Sub-millisecond real-time event broadcasting native to Laravel 12. Handles 100k+ concurrent connections with zero node process orchestration overhead.',
+                title: __('frontend.compare_lvn_m2_laravel_title'),
+                desc: __('frontend.compare_lvn_m2_laravel_desc'),
                 status: 'winner',
             },
             nodejs: {
-                title: 'Native Event-Driven Async I/O',
-                desc: 'Exceptional I/O concurrency on the V8 engine using Fastify/uWebSockets.js. Ideal for raw telemetry, streaming chats, and IoT sensor ingest.',
+                title: __('frontend.compare_lvn_m2_node_title'),
+                desc: __('frontend.compare_lvn_m2_node_desc'),
                 status: 'winner',
             },
         },
         {
-            category: 'Queue Workflows & Background Workers',
+            category: __('frontend.compare_lvn_m3_category'),
             icon: Cpu,
             laravel: {
-                title: 'Laravel Horizon & Native Queues',
-                desc: 'Built-in Redis job batching, retries, exponential backoff, rate limiting, and real-time dashboard observability out of the box with zero third-party boilerplates.',
+                title: __('frontend.compare_lvn_m3_laravel_title'),
+                desc: __('frontend.compare_lvn_m3_laravel_desc'),
                 status: 'winner',
             },
             nodejs: {
-                title: 'BullMQ & Custom Micro-Workers',
-                desc: 'Requires separate worker cluster setups (BullMQ, Redis, PM2). Highly performant but demands significant devops maintenance and glue code.',
+                title: __('frontend.compare_lvn_m3_node_title'),
+                desc: __('frontend.compare_lvn_m3_node_desc'),
                 status: 'draw',
             },
         },
         {
-            category: 'Security, Auth & Compliance',
+            category: __('frontend.compare_lvn_m4_category'),
             icon: Shield,
             laravel: {
-                title: 'Hardened Tri-Path Defense',
-                desc: 'Strict CSRF protection, AES-256 session encryption, Spatie RBAC permissions, Sanctum API tokens, and automatic SQL injection sanitization.',
+                title: __('frontend.compare_lvn_m4_laravel_title'),
+                desc: __('frontend.compare_lvn_m4_laravel_desc'),
                 status: 'winner',
             },
             nodejs: {
-                title: 'Fragmented Package Ecosystem',
-                desc: 'Relies on disparate npm packages (Passport, Express-Validator, Helmet, CORS) which introduces supply-chain security risks and maintenance overhead.',
+                title: __('frontend.compare_lvn_m4_node_title'),
+                desc: __('frontend.compare_lvn_m4_node_desc'),
                 status: 'draw',
             },
         },
         {
-            category: 'Time-to-Market & TCO (Total Cost of Ownership)',
+            category: __('frontend.compare_lvn_m5_category'),
             icon: Scale,
             laravel: {
-                title: '60% Faster Delivery Time',
-                desc: 'Inertia.js bridges modern React directly to server models without maintaining double API schemas, saving hundreds of engineering hours.',
+                title: __('frontend.compare_lvn_m5_laravel_title'),
+                desc: __('frontend.compare_lvn_m5_laravel_desc'),
                 status: 'winner',
             },
             nodejs: {
-                title: 'Higher Architecture Overhead',
-                desc: 'Requires duplicate TypeScript type declarations, redundant API endpoints, and orchestrating multiple front/back repositories.',
+                title: __('frontend.compare_lvn_m5_node_title'),
+                desc: __('frontend.compare_lvn_m5_node_desc'),
                 status: 'draw',
             },
         },
@@ -96,22 +96,22 @@ export default function LaravelVsNodejs() {
 
     const verdictHighlights = [
         {
-            title: 'When to Choose Laravel 12',
+            title: __('frontend.compare_lvn_verdict_laravel_title'),
             points: [
-                'Enterprise ERP, CRM, and Multi-Branch POS Systems',
-                'Multi-Currency Financial Ledgers and Double-Entry Accounting',
-                'Business-Critical SaaS with strict RBAC and billing flows',
-                'Fast execution speed with full React UI fidelity (Inertia.js)',
+                __('frontend.compare_lvn_verdict_laravel_p1'),
+                __('frontend.compare_lvn_verdict_laravel_p2'),
+                __('frontend.compare_lvn_verdict_laravel_p3'),
+                __('frontend.compare_lvn_verdict_laravel_p4'),
             ],
             color: 'border-[#0071e3]/30 bg-[#0071e3]/5',
         },
         {
-            title: 'When to Choose Node.js / Fastify',
+            title: __('frontend.compare_lvn_verdict_node_title'),
             points: [
-                'Real-time IoT Telemetry and Sensor Ingestion Hubs',
-                'High-Concurrency Edge Web Scrapers & Browser Automation',
-                'Lightweight micro-gateways routing raw binary packets',
-                'Pure GraphQL streaming proxy layers',
+                __('frontend.compare_lvn_verdict_node_p1'),
+                __('frontend.compare_lvn_verdict_node_p2'),
+                __('frontend.compare_lvn_verdict_node_p3'),
+                __('frontend.compare_lvn_verdict_node_p4'),
             ],
             color: 'border-black/10 bg-[#f5f5f7]',
         },
@@ -120,37 +120,37 @@ export default function LaravelVsNodejs() {
     return (
         <PublicLayout>
             <Head>
-                <title>Laravel vs Node.js: 2026 Enterprise Architecture Benchmark | Musoftwares</title>
-                <meta name="description" content="Technical comparison and performance benchmark: Laravel 12 + Inertia vs Node.js for Enterprise ERP, SaaS platforms, and real-time APIs." />
+                <title>{`${__('frontend.compare_lvn_meta_title')} | Musoftwares`}</title>
+                <meta name="description" content={__('frontend.compare_lvn_meta_desc')} />
             </Head>
 
             <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <StudioHeader
-                    badge="Tech Architecture & Benchmarks"
+                    badge={__('frontend.compare_lvn_badge')}
                     title={
                         <>
-                            Laravel vs Node.js <br className="hidden sm:inline" />
-                            <span className="text-[#0071e3]">Enterprise Architecture Benchmark</span>
+                            {__('frontend.compare_lvn_hero_title')} <br className="hidden sm:inline" />
+                            <span className="text-[#0071e3]">{__('frontend.compare_lvn_hero_highlight')}</span>
                         </>
                     }
-                    subtitle="A data-driven engineering comparison between monolithic Laravel 12 + Inertia vs Node.js microservices for mission-critical business platforms."
+                    subtitle={__('frontend.compare_lvn_subtitle')}
                 />
 
                 {/* Quick Actions */}
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 px-6">
                     <Link href="/estimator">
                         <button className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer">
-                            Calculate Project Scope ➔
+                            {__('frontend.compare_lvn_calc_scope')} ➔
                         </button>
                     </Link>
                     <button 
-                        onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to consult on selecting the right tech stack for my enterprise project (Laravel vs Node.js).")}
+                        onClick={() => openWhatsAppChat(__('frontend.compare_lvn_consult_message'))}
                         className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm cursor-pointer flex items-center gap-2"
                     >
                         <MessageSquare className="w-4 h-4 text-[#0071e3]" />
-                        <span>Consult Lead Architect</span>
+                        <span>{__('frontend.compare_lvn_consult_architect')}</span>
                     </button>
                 </div>
 
@@ -161,13 +161,13 @@ export default function LaravelVsNodejs() {
                         <div className="absolute top-0 right-0 w-96 h-96 bg-[#0071e3]/5 rounded-full blur-3xl pointer-events-none" />
                         <div className="relative z-10 space-y-4 max-w-4xl">
                             <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
-                                Executive Summary
+                                {__('frontend.compare_lvn_exec_summary')}
                             </span>
                             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
-                                The Modern "Majestic Monolith" Outperforms Fragmented Microservices
+                                {__('frontend.compare_lvn_exec_title')}
                             </h2>
                             <p className="text-sm sm:text-base text-[#1d1d1f]/70 leading-relaxed font-sans">
-                                In 2026, building enterprise SaaS with a modern <strong className="text-[#1d1d1f]">Laravel 12 + Inertia.js + PostgreSQL</strong> stack delivers up to <strong className="text-[#0071e3]">60% faster development cycles</strong> and zero schema-drift bugs compared to disjointed Node.js microservices. Node.js excels at raw async network streaming, but Laravel dominates in business logic, financial ledgers, and operational durability.
+                                {__('frontend.compare_lvn_exec_p1')} <strong className="text-[#1d1d1f]">Laravel 12 + Inertia.js + PostgreSQL</strong> {__('frontend.compare_lvn_exec_p2')} <strong className="text-[#0071e3]">{__('frontend.compare_lvn_exec_p2_highlight')}</strong> {__('frontend.compare_lvn_exec_p3')}
                             </p>
                         </div>
                     </div>
@@ -176,10 +176,10 @@ export default function LaravelVsNodejs() {
                     <div className="space-y-8">
                         <div className="text-center max-w-3xl mx-auto space-y-2">
                             <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
-                                Architectural Showdown
+                                {__('frontend.compare_lvn_showdown')}
                             </span>
                             <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
-                                Head-to-Head Technical Matrix
+                                {__('frontend.compare_lvn_matrix_title')}
                             </h3>
                         </div>
 
@@ -203,10 +203,10 @@ export default function LaravelVsNodejs() {
                                                 <div className="flex items-center justify-between text-[#1d1d1f] font-semibold text-sm">
                                                     <span className="text-[#0071e3] flex items-center gap-1.5">
                                                         <CheckCircle2 className="h-4 w-4" />
-                                                        Laravel 12 Architecture
+                                                        {__('frontend.compare_lvn_laravel_column')}
                                                     </span>
                                                     <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-[#0071e3]/10 text-[#0071e3] font-semibold">
-                                                        Recommended
+                                                        {__('frontend.compare_lvn_recommended')}
                                                     </span>
                                                 </div>
                                                 <div className="font-semibold text-[#1d1d1f]">{metric.laravel.title}</div>
@@ -220,10 +220,10 @@ export default function LaravelVsNodejs() {
                                                 <div className="flex items-center justify-between text-[#1d1d1f] font-semibold text-sm">
                                                     <span className="text-[#1d1d1f]/70 flex items-center gap-1.5">
                                                         <Server className="h-4 w-4" />
-                                                        Node.js / Express Stack
+                                                        {__('frontend.compare_lvn_node_column')}
                                                     </span>
                                                     <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-black/5 text-[#1d1d1f]/60 font-semibold">
-                                                        Specialized
+                                                        {__('frontend.compare_lvn_specialized')}
                                                     </span>
                                                 </div>
                                                 <div className="font-semibold text-[#1d1d1f]/80">{metric.nodejs.title}</div>
@@ -261,23 +261,23 @@ export default function LaravelVsNodejs() {
                     {/* Studio Call To Action */}
                     <div className="bg-[#f5f5f7] p-8 sm:p-12 border border-black/5 rounded-[28px] text-center space-y-6">
                         <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold block">
-                            Our Studio Advantage
+                            {__('frontend.compare_lvn_studio_advantage')}
                         </span>
                         <h3 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight font-sans">
-                            We Engineer Both Stacks with Production Mastery
+                            {__('frontend.compare_lvn_studio_title')}
                         </h3>
                         <p className="text-sm text-[#1d1d1f]/60 max-w-2xl mx-auto font-sans leading-relaxed">
-                            Musoftwares engineers multi-tenant SaaS platforms, real-time Meta bots, and high-performance desktop tools tailored precisely to your operational requirements.
+                            {__('frontend.compare_lvn_studio_desc')}
                         </p>
                         <div className="pt-2 flex items-center justify-center gap-4 flex-wrap text-xs">
                             <Link href="/estimator">
                                 <button className="px-8 py-3.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold tracking-wide transition-colors cursor-pointer shadow-md shadow-blue-500/20">
-                                    Launch Architecture Estimator
+                                    {__('frontend.compare_lvn_launch_estimator')}
                                 </button>
                             </Link>
                             <Link href="/portfolio">
                                 <button className="px-8 py-3.5 rounded-[980px] bg-white hover:bg-[#e5e5ea] text-[#1d1d1f] border border-black/10 font-semibold tracking-wide transition-colors cursor-pointer shadow-sm">
-                                    Explore Studio Case Studies
+                                    {__('frontend.compare_lvn_case_studies')}
                                 </button>
                             </Link>
                         </div>

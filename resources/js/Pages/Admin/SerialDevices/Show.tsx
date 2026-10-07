@@ -23,6 +23,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     ArrowLeft,
     Check,
@@ -120,6 +121,7 @@ export default function SerialDeviceShow({
     users,
     statuses,
 }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [copiedDeviceId, setCopiedDeviceId] = useState(false);
     const [copiedDirectory, setCopiedDirectory] = useState(false);
 
@@ -150,14 +152,19 @@ export default function SerialDeviceShow({
         });
     };
 
-    const handleDeleteDevice = () => {
-        if (confirm(__('general.confirm_delete_device') ?? 'Are you sure you want to delete this device?')) {
-            router.delete(route('admin.serial-devices.destroy', device.id), {
-                onSuccess: () => {
-                    router.visit(route('admin.serial-devices.index'));
-                },
-            });
-        }
+    const handleDeleteDevice = async () => {
+        const accepted = await confirm({
+            title: __('general.are_you_sure'),
+            description: __('general.confirm_delete_device'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.serial-devices.destroy', device.id), {
+            onSuccess: () => {
+                router.visit(route('admin.serial-devices.index'));
+            },
+        });
     };
 
     const handleAssignClient = (userId: string | number | null) => {
@@ -193,13 +200,19 @@ export default function SerialDeviceShow({
         });
     };
 
-    const handleRemoveKeyOverride = (keyItem: CustomKeyItem) => {
-        if (!keyItem.override_id) return;
-        if (confirm(__('general.revert_key_to_default_confirm', { key: keyItem.key }))) {
-            router.delete(route('admin.serial-devices.keys.remove', [device.id, keyItem.override_id]), {
-                preserveScroll: true,
-            });
-        }
+    const handleRemoveKeyOverride = async (keyItem: CustomKeyItem) => {
+        const overrideId = keyItem.override_id;
+        if (!overrideId) return;
+        const accepted = await confirm({
+            title: __('general.are_you_sure'),
+            description: __('general.revert_key_to_default_confirm', { key: keyItem.key }),
+            variant: 'danger',
+            confirmLabel: __('general.revert_to_default'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.serial-devices.keys.remove', [device.id, overrideId]), {
+            preserveScroll: true,
+        });
     };
 
     const statusBadgeVariant = (status: string) => {
@@ -216,9 +229,9 @@ export default function SerialDeviceShow({
     return (
         <AdminSidebarLayout
             title={device.machine_name || device.device_id}
-            header={__('general.device_details') ?? 'Device Details'}
+            header={__('general.device_details')}
         >
-            <Head title={`${device.machine_name || device.device_id} - ${__('general.device_details') ?? 'Device Details'}`} />
+            <Head title={`${device.machine_name || device.device_id} - ${__('general.device_details')}`} />
 
             <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
                 {/* Top Navigation & Breadcrumbs */}
@@ -228,8 +241,8 @@ export default function SerialDeviceShow({
                             href={route('admin.serial-devices.index')}
                             className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mb-1"
                         >
-                            <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-                            {__('general.back_to_devices', {}, 'Back to Registered Devices')}
+                            <ArrowLeft className="w-3.5 h-3.5 me-1 rtl:rotate-180" />
+                            {__('general.back_to_devices')}
                         </Link>
                         <div className="flex flex-wrap items-center gap-3">
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-mono">
@@ -257,12 +270,12 @@ export default function SerialDeviceShow({
                                 {copiedDeviceId ? (
                                     <>
                                         <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                        <span className="text-emerald-600 font-medium">{__('general.copied', {}, 'Copied!')}</span>
+                                        <span className="text-emerald-600 font-medium">{__('general.copied')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Copy className="w-3.5 h-3.5" />
-                                        <span>{__('general.copy_id', {}, 'Copy ID')}</span>
+                                        <span>{__('general.copy_id')}</span>
                                     </>
                                 )}
                             </button>
@@ -275,8 +288,8 @@ export default function SerialDeviceShow({
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="font-medium">
-                                    <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                                    <span>{__('general.change_status', {}, 'Change Status')}</span>
+                                    <RefreshCw className="w-3.5 h-3.5 me-1.5" />
+                                    <span>{__('general.change_status')}</span>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-44">
@@ -299,8 +312,8 @@ export default function SerialDeviceShow({
                             onClick={handleDeleteDevice}
                             className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
                         >
-                            <Trash2 className="w-3.5 h-3.5 mr-1" />
-                            <span>{__('general.delete', {}, 'Delete')}</span>
+                            <Trash2 className="w-3.5 h-3.5 me-1" />
+                            <span>{__('general.delete')}</span>
                         </Button>
                     </div>
                 </div>
@@ -314,45 +327,45 @@ export default function SerialDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Monitor className="w-4 h-4 text-muted-foreground" />
-                                    <span>{__('general.hardware_telemetry', {}, 'System & Hardware Telemetry')}</span>
+                                    <span>{__('general.hardware_telemetry')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    {__('general.hardware_telemetry_desc', {}, 'Detailed operating environment collected during application check-in.')}
+                                    {__('general.hardware_telemetry_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.machine_name', {}, 'Machine Name')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.machine_name')}</p>
                                         <p className="font-semibold text-foreground mt-0.5">{device.machine_name || '—'}</p>
                                     </div>
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.os_user_domain', {}, 'OS User / Domain')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.os_user_domain')}</p>
                                         <p className="font-semibold text-foreground mt-0.5">
                                             {device.user_name || '—'} {device.user_domain ? `(${device.user_domain})` : ''}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.os_version', {}, 'Operating System')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.os_version')}</p>
                                         <p className="font-medium text-foreground mt-0.5">{device.os_version || '—'}</p>
                                     </div>
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.runtime_framework', {}, 'Runtime Framework')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.runtime_framework')}</p>
                                         <p className="font-medium text-foreground mt-0.5">{device.framework_version || '—'}</p>
                                     </div>
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.architecture', {}, 'Architecture')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.architecture')}</p>
                                         <div className="flex items-center gap-2 mt-1">
                                             <Badge variant="outline" className="text-xs font-mono">
-                                                {__('general.os_label', {}, 'OS')}: {device.is_64bit_os === null ? '—' : device.is_64bit_os ? __('general.bit_64', {}, '64-bit') : __('general.bit_32', {}, '32-bit')}
+                                                {__('general.os_label')}: {device.is_64bit_os === null ? '—' : device.is_64bit_os ? __('general.bit_64') : __('general.bit_32')}
                                             </Badge>
                                             <Badge variant="outline" className="text-xs font-mono">
-                                                {__('general.process_label', {}, 'Process')}: {device.is_64bit_process === null ? '—' : device.is_64bit_process ? __('general.bit_64', {}, '64-bit') : __('general.bit_32', {}, '32-bit')}
+                                                {__('general.process_label')}: {device.is_64bit_process === null ? '—' : device.is_64bit_process ? __('general.bit_64') : __('general.bit_32')}
                                             </Badge>
                                         </div>
                                     </div>
                                     <div className="p-3 rounded-lg border bg-muted/20">
-                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.culture_locale', {}, 'Culture & Locale')}</p>
+                                        <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.culture_locale')}</p>
                                         <p className="font-mono text-xs text-foreground mt-1">
                                             {device.current_culture || '—'} / {device.current_ui_culture || '—'}
                                         </p>
@@ -360,7 +373,7 @@ export default function SerialDeviceShow({
                                 </div>
 
                                 <div className="p-3 rounded-lg border bg-muted/20 space-y-1">
-                                    <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.executable_directory', {}, 'Application Directory')}</p>
+                                    <p className="text-xs text-muted-foreground uppercase font-medium">{__('general.executable_directory')}</p>
                                     <div className="flex items-center justify-between gap-2">
                                         <p className="font-mono text-xs text-foreground break-all">
                                             {device.current_directory || '—'}
@@ -372,6 +385,8 @@ export default function SerialDeviceShow({
                                                 size="sm"
                                                 onClick={() => copyToClipboard(device.current_directory!, 'dir')}
                                                 className="h-7 text-xs flex-shrink-0"
+                                                aria-label={copiedDirectory ? __('general.copied') : __('general.copy')}
+                                                title={__('general.copy')}
                                             >
                                                 {copiedDirectory ? (
                                                     <Check className="w-3 h-3 text-emerald-600" />
@@ -392,10 +407,10 @@ export default function SerialDeviceShow({
                                     <div>
                                         <CardTitle className="text-base font-semibold flex items-center gap-2">
                                             <Key className="w-4 h-4 text-muted-foreground" />
-                                            <span>{__('general.custom_configuration_keys', {}, 'Active Configuration Keys & Dynamic Overrides')}</span>
+                                            <span>{__('general.custom_configuration_keys')}</span>
                                         </CardTitle>
                                         <CardDescription>
-                                            {__('general.custom_keys_description', {}, 'These configuration key-value pairs are returned dynamically to this machine during startup/check-in.')}
+                                            {__('general.custom_keys_description')}
                                         </CardDescription>
                                     </div>
                                 </div>
@@ -404,19 +419,19 @@ export default function SerialDeviceShow({
                                 {customKeys.length === 0 ? (
                                     <div className="p-6 text-center text-sm text-muted-foreground">
                                         <Key className="w-8 h-8 mx-auto text-muted-foreground/50 mb-2" />
-                                        <p className="font-medium">{__('general.no_keys_configured', {}, 'No custom keys configured for this software')}</p>
-                                        <p className="text-xs mt-1">{__('general.configure_keys_under_software_management', {}, 'Configure keys under Software Management to distribute dynamic parameters.')}</p>
+                                        <p className="font-medium">{__('general.no_keys_configured')}</p>
+                                        <p className="text-xs mt-1">{__('general.configure_keys_under_software_management')}</p>
                                     </div>
                                 ) : (
                                     <div className="overflow-x-auto">
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead>{__('general.key_name', {}, 'Key Name')}</TableHead>
-                                                    <TableHead>{__('general.default_value', {}, 'Software Default')}</TableHead>
-                                                    <TableHead>{__('general.effective_value', {}, 'Active Device Value')}</TableHead>
-                                                    <TableHead>{__('general.status', {}, 'Status')}</TableHead>
-                                                    <TableHead className="text-end">{__('general.actions', {}, 'Actions')}</TableHead>
+                                                    <TableHead>{__('general.key_name')}</TableHead>
+                                                    <TableHead>{__('general.default_value')}</TableHead>
+                                                    <TableHead>{__('general.effective_value')}</TableHead>
+                                                    <TableHead>{__('general.status')}</TableHead>
+                                                    <TableHead className="text-end">{__('general.actions')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -429,19 +444,19 @@ export default function SerialDeviceShow({
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="font-mono text-xs text-muted-foreground">
-                                                            {item.default_value || <span className="italic text-muted-foreground/60">(empty)</span>}
+                                                            {item.default_value || <span className="italic text-muted-foreground/60">{__('general.empty')}</span>}
                                                         </TableCell>
                                                         <TableCell className="font-mono text-xs font-medium text-foreground">
-                                                            {item.effective_value || <span className="italic text-muted-foreground/60">(empty)</span>}
+                                                            {item.effective_value || <span className="italic text-muted-foreground/60">{__('general.empty')}</span>}
                                                         </TableCell>
                                                         <TableCell>
                                                             {item.is_overridden ? (
                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                                                    {__('general.custom_override', {}, 'Custom Override')}
+                                                                    {__('general.custom_override')}
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                                                                    {__('general.default', {}, 'Default')}
+                                                                    {__('general.default')}
                                                                 </span>
                                                             )}
                                                         </TableCell>
@@ -457,7 +472,7 @@ export default function SerialDeviceShow({
                                                                     }}
                                                                     className="h-7 text-xs"
                                                                 >
-                                                                    {item.is_overridden ? __('general.edit', {}, 'Edit') : __('general.override', {}, 'Override')}
+                                                                    {item.is_overridden ? __('general.edit') : __('general.override')}
                                                                 </Button>
                                                                 {item.is_overridden && (
                                                                     <Button
@@ -467,7 +482,7 @@ export default function SerialDeviceShow({
                                                                         onClick={() => handleRemoveKeyOverride(item)}
                                                                         className="h-7 text-xs text-red-600 hover:text-red-700"
                                                                     >
-                                                                        {__('general.reset', {}, 'Reset')}
+                                                                        {__('general.reset')}
                                                                     </Button>
                                                                 )}
                                                             </div>
@@ -489,10 +504,10 @@ export default function SerialDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <User className="w-4 h-4 text-muted-foreground" />
-                                    <span>{__('general.client_assignment', {}, 'Client Assignment')}</span>
+                                    <span>{__('general.client_assignment')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    {__('general.client_assignment_desc', {}, 'Customer assigned to this machine license.')}
+                                    {__('general.client_assignment_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm">
@@ -512,44 +527,44 @@ export default function SerialDeviceShow({
                                                 href={route('admin.users.show', assignment.user.id)}
                                                 className="text-xs text-foreground font-medium hover:underline inline-flex items-center gap-1"
                                             >
-                                                <span>{__('general.profile', {}, 'Profile')}</span>
+                                                <span>{__('general.profile')}</span>
                                                 <ExternalLink className="w-3 h-3" />
                                             </Link>
                                         </div>
 
                                         {assignment.user.phone && (
                                             <div className="text-xs text-muted-foreground">
-                                                {__('general.phone', {}, 'Phone')}: <span className="text-foreground font-medium">{assignment.user.phone}</span>
+                                                {__('general.phone')}: <span className="text-foreground font-medium">{assignment.user.phone}</span>
                                             </div>
                                         )}
 
                                         {assignment.reseller && (
                                             <div className="text-xs text-muted-foreground border-t pt-2">
-                                                {__('general.assigned_via_reseller', {}, 'Assigned via Reseller')}: <span className="font-semibold text-foreground">{assignment.reseller.name}</span>
+                                                {__('general.assigned_via_reseller')}: <span className="font-semibold text-foreground">{assignment.reseller.name}</span>
                                             </div>
                                         )}
                                     </div>
                                 ) : (
                                     <div className="p-4 rounded-xl border border-dashed text-center text-muted-foreground space-y-1">
                                         <UserX className="w-6 h-6 mx-auto text-muted-foreground/60 mb-1" />
-                                        <p className="font-medium text-xs">{__('general.no_client_assigned', {}, 'Unassigned Device')}</p>
-                                        <p className="text-[11px]">{__('general.device_unassigned_help', {}, 'Select a customer below to bind software access to their account.')}</p>
+                                        <p className="font-medium text-xs">{__('general.no_client_assigned')}</p>
+                                        <p className="text-[11px]">{__('general.device_unassigned_help')}</p>
                                     </div>
                                 )}
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                        {assignment?.user ? __('general.change_or_transfer_client', {}, 'Change or Transfer Client') : __('general.assign_to_client', {}, 'Assign to Client')}
+                                        {assignment?.user ? __('general.change_or_transfer_client') : __('general.assign_to_client')}
                                     </Label>
                                     <PremiumCombobox
                                         value={assignment?.user?.id ? String(assignment.user.id) : ''}
                                         onChange={handleAssignClient}
                                         options={[
-                                            { value: '', label: __('general.unassigned_remove_client', {}, 'Unassigned (Remove Client)') },
+                                            { value: '', label: __('general.unassigned_remove_client') },
                                             ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))
                                         ]}
-                                        placeholder={__('general.select_client', {}, 'Select Client...')}
-                                        searchPlaceholder={__('general.search_users', {}, 'Search users...')}
+                                        placeholder={__('general.select_client')}
+                                        searchPlaceholder={__('general.search_users')}
                                     />
                                 </div>
                             </CardContent>
@@ -560,29 +575,29 @@ export default function SerialDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Shield className="w-4 h-4 text-muted-foreground" />
-                                    <span>{__('general.license_expiration', {}, 'License Expiration')}</span>
+                                    <span>{__('general.license_expiration')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    {__('general.manage_license_validity', {}, 'Manage lifetime access or set custom expiration date.')}
+                                    {__('general.manage_license_validity')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm">
                                 {/* Current Status Display */}
                                 <div className="p-3 rounded-lg border bg-muted/20 flex items-center justify-between">
-                                    <span className="text-xs text-muted-foreground font-medium">{__('general.current_status', {}, 'Current Status')}</span>
+                                    <span className="text-xs text-muted-foreground font-medium">{__('general.current_status')}</span>
                                     {assignment?.expires_at ? (
                                         assignment.is_expired ? (
                                              <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded border border-red-200 dark:border-red-800">
-                                                <XCircle className="w-3.5 h-3.5" /> {__('general.expired', {}, 'Expired')} ({assignment.expires_at})
+                                                <XCircle className="w-3.5 h-3.5" /> {__('general.expired')} ({assignment.expires_at})
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                                                <CheckCircle2 className="w-3.5 h-3.5" /> {assignment.remaining_days} {__('general.remaining_days', {}, 'days left')} ({assignment.expires_at})
+                                                <CheckCircle2 className="w-3.5 h-3.5" /> {assignment.remaining_days} {__('general.remaining_days')} ({assignment.expires_at})
                                             </span>
                                         )
                                     ) : (
                                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded border">
-                                            {__('general.lifetime_license', {}, 'Lifetime License')}
+                                            {__('general.lifetime_license')}
                                         </span>
                                     )}
                                 </div>
@@ -599,14 +614,14 @@ export default function SerialDeviceShow({
                                                 className="rounded border-border text-foreground focus:ring-foreground"
                                             />
                                             <label htmlFor="isLifetimeCheck" className="text-xs font-medium cursor-pointer">
-                                                {__('general.lifetime_access', {}, 'Grant Lifetime License (No Expiration)')}
+                                                {__('general.lifetime_access')}
                                             </label>
                                         </div>
 
                                         {!isLifetime && (
                                             <div className="space-y-1">
                                                 <Label htmlFor="expiresAtInput" className="text-xs text-muted-foreground">
-                                                    {__('general.custom_expiration_date', {}, 'Expiration Date')}
+                                                    {__('general.custom_expiration_date')}
                                                 </Label>
                                                 <Input
                                                     id="expiresAtInput"
@@ -620,12 +635,12 @@ export default function SerialDeviceShow({
                                         )}
 
                                         <Button type="submit" size="sm" className="w-full h-8 text-xs font-medium">
-                                            {__('general.save_license_term', {}, 'Save License Term')}
+                                            {__('general.save_license_term')}
                                         </Button>
                                     </form>
                                 ) : (
                                     <p className="text-xs text-muted-foreground italic text-center py-2">
-                                        {__('general.assign_client_to_enable_license_term_controls', {}, 'Assign a client to enable license term controls.')}
+                                        {__('general.assign_client_to_enable_license_term_controls')}
                                     </p>
                                 )}
                             </CardContent>
@@ -636,28 +651,28 @@ export default function SerialDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Clock className="w-4 h-4 text-muted-foreground" />
-                                    <span>{__('general.activity_timestamps', {}, 'Activity & Telemetry Timestamps')}</span>
+                                    <span>{__('general.activity_timestamps')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    {__('general.all_timestamps_cairo_timezone', {}, 'All timestamps are recorded in Cairo timezone (Africa/Cairo).')}
+                                    {__('general.all_timestamps_cairo_timezone')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3 text-xs">
                                 <div className="flex items-center justify-between py-1.5 border-b">
-                                    <span className="text-muted-foreground">{__('general.registered_first_seen', {}, 'First Seen / Registered')}</span>
+                                    <span className="text-muted-foreground">{__('general.registered_first_seen')}</span>
                                     <span className="font-mono text-foreground font-medium">{device.created_at || '—'}</span>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5 border-b">
-                                    <span className="text-muted-foreground">{__('general.last_check_in', {}, 'Last Check-In')}</span>
+                                    <span className="text-muted-foreground">{__('general.last_check_in')}</span>
                                     <div className="text-end">
-                                        <p className="font-mono text-foreground font-semibold">{device.last_check_date_full || __('general.never', {}, 'Never')}</p>
+                                        <p className="font-mono text-foreground font-semibold">{device.last_check_date_full || __('general.never')}</p>
                                         {device.last_check_date && (
                                             <p className="text-[10px] text-muted-foreground">{device.last_check_date}</p>
                                         )}
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5">
-                                    <span className="text-muted-foreground">{__('general.last_updated', {}, 'Last Record Update')}</span>
+                                    <span className="text-muted-foreground">{__('general.last_updated')}</span>
                                     <span className="font-mono text-foreground">{device.updated_at || '—'}</span>
                                 </div>
                             </CardContent>
@@ -672,16 +687,16 @@ export default function SerialDeviceShow({
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-base">
                             <Key className="w-4 h-4" />
-                            <span>{__('general.override_configuration_key', {}, 'Override Configuration Key')}</span>
+                            <span>{__('general.override_configuration_key')}</span>
                         </DialogTitle>
                         <DialogDescription className="text-xs">
-                            {__('general.override_key_description', { key: overrideKeyModal?.key || '', machine: device.machine_name || device.device_id }, 'Set a custom value for key on machine.')}
+                            {__('general.override_key_description', { key: overrideKeyModal?.key || '', machine: device.machine_name || device.device_id })}
                         </DialogDescription>
                     </DialogHeader>
                     {overrideKeyModal && (
                         <form onSubmit={handleSaveKeyOverride} className="space-y-4 pt-2">
                             <div className="space-y-1">
-                                <Label className="text-xs text-muted-foreground">{__('general.software_default_value', {}, 'Software Default Value')}</Label>
+                                <Label className="text-xs text-muted-foreground">{__('general.software_default_value')}</Label>
                                 <Input
                                     value={overrideKeyModal.default_value || ''}
                                     readOnly
@@ -691,13 +706,13 @@ export default function SerialDeviceShow({
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="overrideInput" className="text-xs font-semibold">
-                                    {__('general.device_override_value', {}, 'Device Override Value')}
+                                    {__('general.device_override_value')}
                                 </Label>
                                 <Input
                                     id="overrideInput"
                                     value={overrideValueInput}
                                     onChange={(e) => setOverrideValueInput(e.target.value)}
-                                    placeholder={__('general.enter_device_specific_value', {}, 'Enter device-specific value...')}
+                                    placeholder={__('general.enter_device_specific_value')}
                                     className="text-xs font-mono h-9"
                                     autoFocus
                                     required
@@ -710,16 +725,17 @@ export default function SerialDeviceShow({
                                     size="sm"
                                     onClick={() => setOverrideKeyModal(null)}
                                 >
-                                    {__('general.cancel', {}, 'Cancel')}
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button type="submit" size="sm">
-                                    {__('general.save_override', {}, 'Save Override')}
+                                    {__('general.save_override')}
                                 </Button>
                             </DialogFooter>
                         </form>
                     )}
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

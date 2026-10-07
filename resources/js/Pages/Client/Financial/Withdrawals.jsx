@@ -64,7 +64,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                     className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-amber-500/20"
                                 >
                                     <ShieldAlert className="w-4 h-4" />
-                                    <span>Verify KYC Identity</span>
+                                    <span>{__('client.withdraw_verify_kyc')}</span>
                                 </Link>
                             ) : (!payoutMethods || payoutMethods.length === 0) ? (
                                 <Link
@@ -109,7 +109,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
 
                         <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60 bg-[#f5f5f7] px-4 py-2.5 rounded-xl border border-black/5">
                             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>Available balance ready for instant payout dispatch.</span>
+                            <span>{__('client.withdraw_balance_ready')}</span>
                         </div>
                     </div>
 
@@ -159,7 +159,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                                         #{w.id}
                                                     </td>
                                                     <td className="py-4 px-4 text-xs sm:text-sm font-semibold text-[#1d1d1f] capitalize">
-                                                        {w.payout_method ? w.payout_method.type.replace('_', ' ') : 'Standard Method'}
+                                                        {w.payout_method ? __(`client.payout_type_${w.payout_method.type}`) : __('client.withdraw_standard_method')}
                                                     </td>
                                                     <td className="py-4 px-4 font-mono font-bold text-xs sm:text-sm text-[#1d1d1f]">
                                                         {formatMoney(w.amount, w.currency || currency)}
@@ -255,7 +255,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                 >
                                     {payoutMethods?.map((pm) => (
                                         <option key={pm.id} value={pm.id}>
-                                            {pm.type.replace('_', ' ').toUpperCase()} — {pm.details?.bank_name || pm.details?.instapay_username || pm.details?.mobile_number || pm.details?.paypal_email || 'Account'}
+                                            {__(`client.payout_type_${pm.type}`)} — {pm.details?.bank_name || pm.details?.instapay_username || pm.details?.mobile_number || pm.details?.paypal_email || __('client.withdraw_account')}
                                         </option>
                                     ))}
                                 </select>

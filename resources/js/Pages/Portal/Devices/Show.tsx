@@ -28,6 +28,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface UserInfo {
     id: number;
@@ -115,6 +116,7 @@ export default function ResellerDeviceShow({
     walletBalance = 0,
     walletCurrency = 'USD',
 }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [copiedDeviceId, setCopiedDeviceId] = useState(false);
     const [copiedDirectory, setCopiedDirectory] = useState(false);
 
@@ -163,15 +165,17 @@ export default function ResellerDeviceShow({
         }
     };
 
-    const handleQuickRenew = () => {
-        const costStr = costInfo.cost > 0 ? ` for ${costInfo.cost.toFixed(2)} ${costInfo.currency}` : '';
-        if (confirm(`Extend license by 1 Month for customer ${device.user?.name || device.device_id}${costStr}?`)) {
-            router.post(`/portal/devices/${device.id}/renew`, {
-                duration_preset: '1_month',
-            }, {
-                preserveScroll: true,
-            });
-        }
+    const handleQuickRenew = async () => {
+        const name = device.user?.name || device.device_id;
+        const description = costInfo.cost > 0
+            ? __('portal.devices_quick_renew_confirm_cost', { name, amount: costInfo.cost.toFixed(2), currency: costInfo.currency })
+            : __('portal.devices_quick_renew_confirm', { name });
+        if (!(await confirm({ title: __('portal.devices_quick_renew_title'), description }))) return;
+        router.post(`/portal/devices/${device.id}/renew`, {
+            duration_preset: '1_month',
+        }, {
+            preserveScroll: true,
+        });
     };
 
     const handleRenewSubmit = (e: React.FormEvent) => {
@@ -197,19 +201,23 @@ export default function ResellerDeviceShow({
         });
     };
 
-    const handleUnassign = () => {
-        if (confirm(`Are you sure you want to unassign device ${device.device_id}? The customer will immediately lose software access.`)) {
-            router.delete(`/portal/devices/${device.id}`, {
-                onSuccess: () => {
-                    router.visit('/portal/devices');
-                },
-            });
-        }
+    const handleUnassign = async () => {
+        const accepted = await confirm({
+            title: __('portal.devices_unassign_title'),
+            description: __('portal.devices_unassign_confirm_now', { device: device.device_id }),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(`/portal/devices/${device.id}`, {
+            onSuccess: () => {
+                router.visit('/portal/devices');
+            },
+        });
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title={`Customer License: ${device.user?.name || device.device_id}`} />
+            <Head title={__('portal.devices_customer_license_title', { name: device.user?.name || device.device_id })} />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 {/* Header Navigation */}
@@ -220,23 +228,23 @@ export default function ResellerDeviceShow({
                             className="inline-flex items-center text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors mb-1"
                         >
                             <ArrowLeft className="w-3.5 h-3.5 mr-1" />
-                            <span>Back to My Allocated Devices</span>
+                            <span>{__('portal.devices_back_to_devices')}</span>
                         </Link>
                         <div className="flex flex-wrap items-center gap-3">
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-                                {device.user?.name || 'Customer License'}
+                                {device.user?.name || __('portal.devices_customer_license')}
                             </h1>
                             {device.status === 'active' && !expiryInfo.is_expired ? (
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full">
-                                    <CheckCircle2 className="w-3.5 h-3.5" /> Active
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> {__('general.active')}
                                 </span>
                             ) : expiryInfo.is_expired ? (
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 px-2.5 py-0.5 rounded-full">
-                                    <XCircle className="w-3.5 h-3.5" /> Expired
+                                    <XCircle className="w-3.5 h-3.5" /> {__('general.expired')}
                                 </span>
                             ) : (
                                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-0.5 rounded-full">
-                                    Inactive
+                                    {__('general.inactive')}
                                 </span>
                             )}
                             {device.telemetry?.software && (
@@ -258,12 +266,12 @@ export default function ResellerDeviceShow({
                                 {copiedDeviceId ? (
                                     <>
                                         <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                        <span className="text-emerald-600 font-medium">Copied!</span>
+                                        <span className="text-emerald-600 font-medium">{__('portal.devices_copied')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Copy className="w-3.5 h-3.5" />
-                                        <span>Copy Device ID</span>
+                                        <span>{__('portal.devices_copy_device_id')}</span>
                                     </>
                                 )}
                             </button>
@@ -279,7 +287,7 @@ export default function ResellerDeviceShow({
                             className="text-xs font-medium border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
                         >
                             <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                            <span>Quick Renew (+1 Month)</span>
+                            <span>{__('portal.devices_quick_renew_btn')}</span>
                         </Button>
                         <Button
                             size="sm"
@@ -290,12 +298,12 @@ export default function ResellerDeviceShow({
                             {device.status === 'active' ? (
                                 <>
                                     <XCircle className="w-3.5 h-3.5 mr-1 text-amber-500" />
-                                    <span>Deactivate</span>
+                                    <span>{__('general.deactivate')}</span>
                                 </>
                             ) : (
                                 <>
                                     <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-500" />
-                                    <span>Activate</span>
+                                    <span>{__('general.activate')}</span>
                                 </>
                             )}
                         </Button>
@@ -311,34 +319,34 @@ export default function ResellerDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Calendar className="w-4 h-4 text-[#0071e3]" />
-                                    <span>License Expiration & Renewal Terminal</span>
+                                    <span>{__('portal.devices_renewal_terminal')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    Manage duration terms, grant extensions, or set custom expiration dates.
+                                    {__('portal.devices_renewal_terminal_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 {/* Expiry Status Banner */}
                                 <div className="p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                     <div>
-                                        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">License Status</p>
+                                        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">{__('portal.devices_license_status')}</p>
                                         <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-0.5">
                                             {expiryInfo.is_lifetime
-                                                ? 'Lifetime License'
+                                                ? __('portal.devices_lifetime_license')
                                                 : expiryInfo.is_expired
-                                                ? `Expired on ${expiryInfo.expires_at}`
-                                                : `${expiryInfo.remaining_days} Days Remaining`}
+                                                ? __('portal.devices_expired_on', { date: expiryInfo.expires_at ?? '' })
+                                                : __('portal.devices_days_remaining', { days: expiryInfo.remaining_days ?? 0 })}
                                         </p>
                                         {!expiryInfo.is_lifetime && expiryInfo.expires_at_formatted && (
                                             <p className="text-xs text-zinc-500 mt-0.5">
-                                                Exact Expiry: {expiryInfo.expires_at_formatted} (Africa/Cairo)
+                                                {__('portal.devices_exact_expiry', { date: expiryInfo.expires_at_formatted })}
                                             </p>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {expiryInfo.is_expiring_soon && (
                                             <span className="text-xs font-semibold px-2 py-1 rounded bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950/40 dark:text-amber-400">
-                                                Expiring Soon (&lt; 7 Days)
+                                                {__('portal.devices_expiring_soon_7_days')}
                                             </span>
                                         )}
                                     </div>
@@ -347,16 +355,16 @@ export default function ResellerDeviceShow({
                                 {/* Renewal Form */}
                                 <form onSubmit={handleRenewSubmit} className="space-y-4">
                                     <Label className="text-xs font-semibold uppercase text-zinc-500">
-                                        Choose Renewal Term
+                                        {__('portal.devices_choose_renewal_term')}
                                     </Label>
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                         {[
-                                            { id: '1_month', label: '+1 Month' },
-                                            { id: '3_months', label: '+3 Months' },
-                                            { id: '6_months', label: '+6 Months' },
-                                            { id: '1_year', label: '+1 Year' },
-                                            { id: 'lifetime', label: 'Lifetime' },
-                                            { id: 'custom', label: 'Custom Date' },
+                                            { id: '1_month', label: __('portal.devices_plus_1_month') },
+                                            { id: '3_months', label: __('portal.devices_plus_3_months') },
+                                            { id: '6_months', label: __('portal.devices_plus_6_months') },
+                                            { id: '1_year', label: __('portal.devices_plus_1_year') },
+                                            { id: 'lifetime', label: __('general.lifetime') },
+                                            { id: 'custom', label: __('portal.devices_custom_date') },
                                         ].map((preset) => (
                                             <label
                                                 key={preset.id}
@@ -382,7 +390,7 @@ export default function ResellerDeviceShow({
                                     {renewForm.data.duration_preset === 'custom' && (
                                         <div className="space-y-1">
                                             <Label htmlFor="customDate" className="text-xs text-zinc-500">
-                                                Select Custom Expiration Date
+                                                {__('portal.devices_select_custom_date')}
                                             </Label>
                                             <Input
                                                 id="customDate"
@@ -398,27 +406,27 @@ export default function ResellerDeviceShow({
                                     {/* Cost & Wallet Balance Summary */}
                                     <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 space-y-2">
                                         <div className="flex items-center justify-between text-xs">
-                                            <span className="text-zinc-500">Your Wallet Balance:</span>
+                                            <span className="text-zinc-500">{__('portal.devices_wallet_balance')}</span>
                                             <span className="font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                                                 {walletBalance.toFixed(2)} {walletCurrency}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between text-xs">
-                                            <span className="text-zinc-500">Renewal Cost:</span>
+                                            <span className="text-zinc-500">{__('portal.devices_renewal_cost')}</span>
                                             <span className="font-bold font-mono text-[#0071e3]">
                                                 {costInfo.cost.toFixed(2)} {costInfo.currency}
                                             </span>
                                         </div>
                                         {costInfo.customerPrice > 0 && (
                                             <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                                                <span>Suggested Retail:</span>
+                                                <span>{__('portal.devices_suggested_retail')}</span>
                                                 <span>{costInfo.customerPrice.toFixed(2)} {costInfo.currency}</span>
                                             </div>
                                         )}
                                         {costInfo.cost > 0 && walletBalance < costInfo.cost && (
                                             <div className="text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1.5 pt-1 border-t border-red-200 dark:border-red-900/50">
                                                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                                <span>Insufficient wallet balance. Please top up before renewing.</span>
+                                                <span>{__('portal.devices_insufficient_renew')}</span>
                                             </div>
                                         )}
                                     </div>
@@ -428,7 +436,7 @@ export default function ResellerDeviceShow({
                                         disabled={renewForm.processing || (costInfo.cost > 0 && walletBalance < costInfo.cost)}
                                         className="w-full sm:w-auto bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs px-6"
                                     >
-                                        {renewForm.processing ? 'Processing Renewal...' : 'Apply License Renewal'}
+                                        {renewForm.processing ? __('portal.devices_processing_renewal') : __('portal.devices_apply_renewal')}
                                     </Button>
                                 </form>
                             </CardContent>
@@ -439,10 +447,10 @@ export default function ResellerDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Monitor className="w-4 h-4 text-zinc-500" />
-                                    <span>Hardware Environment & Operating Telemetry</span>
+                                    <span>{__('portal.devices_hardware_env')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    Technical data reported by the client desktop application.
+                                    {__('portal.devices_hardware_env_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm">
@@ -450,25 +458,25 @@ export default function ResellerDeviceShow({
                                     <>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
-                                                <p className="text-xs text-zinc-500 uppercase font-medium">Machine Name</p>
+                                                <p className="text-xs text-zinc-500 uppercase font-medium">{__('portal.devices_machine_name')}</p>
                                                 <p className="font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
                                                     {device.telemetry.machine_name || '—'}
                                                 </p>
                                             </div>
                                             <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
-                                                <p className="text-xs text-zinc-500 uppercase font-medium">OS User & Domain</p>
+                                                <p className="text-xs text-zinc-500 uppercase font-medium">{__('portal.devices_os_user_domain')}</p>
                                                 <p className="font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
                                                     {device.telemetry.user_name || '—'} {device.telemetry.user_domain ? `(${device.telemetry.user_domain})` : ''}
                                                 </p>
                                             </div>
                                             <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
-                                                <p className="text-xs text-zinc-500 uppercase font-medium">Operating System</p>
+                                                <p className="text-xs text-zinc-500 uppercase font-medium">{__('portal.devices_operating_system')}</p>
                                                 <p className="font-medium text-zinc-900 dark:text-zinc-100 mt-0.5">
                                                     {device.telemetry.os_version || '—'}
                                                 </p>
                                             </div>
                                             <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20">
-                                                <p className="text-xs text-zinc-500 uppercase font-medium">Runtime Framework</p>
+                                                <p className="text-xs text-zinc-500 uppercase font-medium">{__('portal.devices_runtime_framework')}</p>
                                                 <p className="font-medium text-zinc-900 dark:text-zinc-100 mt-0.5">
                                                     {device.telemetry.framework_version || '—'}
                                                 </p>
@@ -476,7 +484,7 @@ export default function ResellerDeviceShow({
                                         </div>
 
                                         <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/20 space-y-1">
-                                            <p className="text-xs text-zinc-500 uppercase font-medium">Executable Path</p>
+                                            <p className="text-xs text-zinc-500 uppercase font-medium">{__('portal.devices_executable_path')}</p>
                                             <div className="flex items-center justify-between gap-2">
                                                 <p className="font-mono text-xs text-zinc-900 dark:text-zinc-100 break-all">
                                                     {device.telemetry.current_directory || '—'}
@@ -488,6 +496,7 @@ export default function ResellerDeviceShow({
                                                         size="sm"
                                                         onClick={() => copyToClipboard(device.telemetry!.current_directory!, 'dir')}
                                                         className="h-7 text-xs flex-shrink-0"
+                                                        aria-label={__('portal.devices_copy_path')}
                                                     >
                                                         {copiedDirectory ? (
                                                             <Check className="w-3 h-3 text-emerald-600" />
@@ -502,8 +511,8 @@ export default function ResellerDeviceShow({
                                 ) : (
                                     <div className="p-6 text-center text-sm text-zinc-500">
                                         <Laptop className="w-8 h-8 mx-auto text-zinc-400 mb-2" />
-                                        <p className="font-medium text-zinc-700 dark:text-zinc-300">No hardware check-in telemetry recorded yet</p>
-                                        <p className="text-xs mt-1">Hardware specs will populate automatically once the software is launched on the client machine.</p>
+                                        <p className="font-medium text-zinc-700 dark:text-zinc-300">{__('portal.devices_no_telemetry')}</p>
+                                        <p className="text-xs mt-1">{__('portal.devices_no_telemetry_hint')}</p>
                                     </div>
                                 )}
                             </CardContent>
@@ -517,10 +526,10 @@ export default function ResellerDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <User className="w-4 h-4 text-zinc-500" />
-                                    <span>Customer Profile</span>
+                                    <span>{__('portal.devices_customer_profile')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    Client assigned to this license.
+                                    {__('portal.devices_customer_profile_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm">
@@ -544,12 +553,12 @@ export default function ResellerDeviceShow({
                                         )}
 
                                         <div className="text-xs text-zinc-500 pt-1">
-                                            Assigned on: <span className="font-medium text-zinc-900 dark:text-zinc-100">{device.created_at}</span>
+                                            {__('portal.devices_assigned_on')} <span className="font-medium text-zinc-900 dark:text-zinc-100">{device.created_at}</span>
                                         </div>
                                     </div>
                                 ) : (
                                     <p className="text-xs text-zinc-500 italic text-center py-2">
-                                        No customer profile linked to this record.
+                                        {__('portal.devices_no_customer_profile')}
                                     </p>
                                 )}
                             </CardContent>
@@ -558,9 +567,9 @@ export default function ResellerDeviceShow({
                         {/* Section 4: Internal Reseller Notes */}
                         <Card className="border-zinc-200 dark:border-zinc-800">
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-base font-semibold">Reseller Notes</CardTitle>
+                                <CardTitle className="text-base font-semibold">{__('portal.devices_reseller_notes')}</CardTitle>
                                 <CardDescription>
-                                    Private notes for your business records regarding this customer's license.
+                                    {__('portal.devices_reseller_notes_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -568,7 +577,8 @@ export default function ResellerDeviceShow({
                                     <Textarea
                                         value={notesForm.data.notes}
                                         onChange={(e) => notesForm.setData('notes', e.target.value)}
-                                        placeholder="Add payment notes, invoice references, or customer comments..."
+                                        placeholder={__('portal.devices_reseller_notes_placeholder')}
+                                        aria-label={__('portal.devices_reseller_notes')}
                                         rows={4}
                                         className="text-xs resize-none"
                                     />
@@ -578,7 +588,7 @@ export default function ResellerDeviceShow({
                                         disabled={notesForm.processing}
                                         className="w-full text-xs font-medium"
                                     >
-                                        {notesForm.processing ? 'Saving Notes...' : 'Save Notes'}
+                                        {notesForm.processing ? __('portal.devices_saving_notes') : __('general.save_notes')}
                                     </Button>
                                 </form>
                             </CardContent>
@@ -589,22 +599,22 @@ export default function ResellerDeviceShow({
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2">
                                     <Clock className="w-4 h-4 text-zinc-500" />
-                                    <span>Activity Timestamps</span>
+                                    <span>{__('portal.devices_activity_timestamps')}</span>
                                 </CardTitle>
                                 <CardDescription>
-                                    Timezone: Africa/Cairo
+                                    {__('portal.devices_timezone_cairo')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3 text-xs">
                                 <div className="flex items-center justify-between py-1.5 border-b border-zinc-200 dark:border-zinc-800">
-                                    <span className="text-zinc-500">First Assigned</span>
+                                    <span className="text-zinc-500">{__('portal.devices_first_assigned')}</span>
                                     <span className="font-mono text-zinc-900 dark:text-zinc-100 font-medium">{device.created_at}</span>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5 border-b border-zinc-200 dark:border-zinc-800">
-                                    <span className="text-zinc-500">Last Check-In</span>
+                                    <span className="text-zinc-500">{__('portal.devices_last_check_in')}</span>
                                     <div className="text-end">
                                         <p className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold">
-                                            {device.telemetry?.last_check_date_full || 'Never'}
+                                            {device.telemetry?.last_check_date_full || __('general.never')}
                                         </p>
                                         {device.telemetry?.last_check_date && (
                                             <p className="text-[10px] text-zinc-500">{device.telemetry.last_check_date}</p>
@@ -612,7 +622,7 @@ export default function ResellerDeviceShow({
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5">
-                                    <span className="text-zinc-500">Last Modified</span>
+                                    <span className="text-zinc-500">{__('portal.devices_last_modified')}</span>
                                     <span className="font-mono text-zinc-900 dark:text-zinc-100">{device.updated_at}</span>
                                 </div>
                             </CardContent>
@@ -622,10 +632,10 @@ export default function ResellerDeviceShow({
                         <Card className="border-red-200 dark:border-red-900/50 bg-red-50/20 dark:bg-red-950/10">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-semibold text-red-600 dark:text-red-400">
-                                    Revoke License Access
+                                    {__('portal.devices_revoke_access')}
                                 </CardTitle>
                                 <CardDescription className="text-xs">
-                                    Unassigning removes the device from the customer's account and halts application execution.
+                                    {__('portal.devices_revoke_access_desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -636,13 +646,14 @@ export default function ResellerDeviceShow({
                                     className="w-full text-xs font-medium text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-950/40"
                                 >
                                     <Trash2 className="w-3.5 h-3.5 mr-1" />
-                                    <span>Unassign Customer Device</span>
+                                    <span>{__('portal.devices_unassign_customer_device')}</span>
                                 </Button>
                             </CardContent>
                         </Card>
                     </div>
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

@@ -10,6 +10,8 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface DeviceProps {
     device: {
@@ -38,6 +40,8 @@ interface DeviceProps {
 
 export default function Device({ device, transactions }: DeviceProps) {
     const [maskData, setMaskData] = useState(true);
+    const [payloadTx, setPayloadTx] = useState<unknown>(null);
+    const { confirm, confirmDialog } = useConfirm();
 
     const { data, setData, put, processing, errors } = useForm({
         device_name: device.device_name || '',
@@ -66,10 +70,14 @@ export default function Device({ device, transactions }: DeviceProps) {
         put(route('sms-payment-gateway.update-device', device.id));
     };
 
-    const handleClearTransactions = () => {
-        if (confirm('Wipe all logs for this terminal?')) {
-            router.delete(route('sms-payment-gateway.clear-transactions', device.id));
-        }
+    const handleClearTransactions = async () => {
+        const accepted = await confirm({
+            title: __('sms_gateway.device_clear_logs_title'),
+            description: __('sms_gateway.device_clear_logs_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('sms-payment-gateway.clear-transactions', device.id));
     };
 
     const handleToggleSpoof = () => {
@@ -106,7 +114,7 @@ export default function Device({ device, transactions }: DeviceProps) {
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.device_details')}</h2>}
         >
-            <Head title={`Device - ${device.device_name || 'Terminal'}`} />
+            <Head title={__('sms_gateway.device_page_title', { name: device.device_name || __('sms_gateway.device_terminal') })} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -116,7 +124,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Smartphone className="w-6 h-6 text-indigo-600" />
-                                {device.device_name || 'Linked Device'}
+                                {device.device_name || __('sms_gateway.device_linked_device')}
                             </h1>
                             <p className="text-slate-500 mt-1">{__('general.comprehensive_diagnostic_data')}</p>
                         </div>
@@ -126,7 +134,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 onClick={() => setMaskData(!maskData)}
                             >
                                 {maskData ? <EyeOff className="w-4 h-4 me-2" /> : <Eye className="w-4 h-4 me-2" />}
-                                {maskData ? 'Show Stats' : 'Hide Stats'}
+                                {maskData ? __('sms_gateway.device_show_stats') : __('sms_gateway.device_hide_stats')}
                             </Button>
                             <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 me-2" />
@@ -169,7 +177,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-slate-500 uppercase">{__('general.last_sync_pulse')}</p>
-                                    <p className="text-sm font-bold">{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : 'Never'}</p>
+                                    <p className="text-sm font-bold">{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : __('general.never')}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -187,7 +195,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                             <form onSubmit={submitSettings} className="space-y-6">
                                 {Object.keys(errors || {}).length > 0 && (
                                     <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm border border-red-200">
-                                        <p className="font-semibold mb-2">Please fix the following errors:</p>
+                                        <p className="font-semibold mb-2">{__('sms_gateway.device_fix_errors')}</p>
                                         <ul className="list-disc ps-5">
                                             {Object.entries(errors || {}).map(([key, error]) => (
                                                 <li key={key}>{key}: {error}</li>
@@ -228,6 +236,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     variant="ghost" 
                                                     size="icon" 
                                                     className="absolute top-2 end-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    aria-label={__('sms_gateway.device_remove_sender')}
                                                     onClick={() => removeConfig('sim1_configs', idx)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -283,6 +292,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                     variant="ghost" 
                                                     size="icon" 
                                                     className="absolute top-2 end-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    aria-label={__('sms_gateway.device_remove_sender')}
                                                     onClick={() => removeConfig('sim2_configs', idx)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -369,7 +379,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                             +{mask(`${tx.amount} ${tx.currency}`, 'amount')}
                                                         </div>
                                                         {tx.balance && (
-                                                            <div className="text-xs">Bal: {mask(`${tx.balance} ${tx.currency}`, 'amount')}</div>
+                                                            <div className="text-xs">{__('sms_gateway.device_balance_value', { amount: mask(`${tx.balance} ${tx.currency}`, 'amount') })}</div>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3">
@@ -382,7 +392,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-end">
-                                                        <Button variant="ghost" size="icon" onClick={() => alert(JSON.stringify(tx, null, 2))}>
+                                                        <Button variant="ghost" size="icon" onClick={() => setPayloadTx(tx)} aria-label={__('sms_gateway.device_view_payload')}>
                                                             <Code className="w-4 h-4 text-indigo-500" />
                                                         </Button>
                                                     </td>
@@ -397,6 +407,18 @@ export default function Device({ device, transactions }: DeviceProps) {
 
                 </div>
             </div>
+
+            <Dialog open={payloadTx !== null} onOpenChange={(open) => !open && setPayloadTx(null)}>
+                <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>{__('sms_gateway.device_payload_title')}</DialogTitle>
+                    </DialogHeader>
+                    <pre dir="ltr" className="max-h-[60vh] overflow-auto rounded-md bg-slate-950 p-4 text-xs text-slate-100 whitespace-pre-wrap break-all">
+                        {JSON.stringify(payloadTx, null, 2)}
+                    </pre>
+                </DialogContent>
+            </Dialog>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

@@ -73,10 +73,10 @@ export default function Registers({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <div className="space-y-1">
                                     <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                        {__('general.total_referrals') || 'Total Referrals'}
+                                        {__('general.total_referrals')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('general.users_registered_via_your_link') || 'Users registered via your referral link'}
+                                        {__('general.users_registered_via_your_link')}
                                     </CardDescription>
                                 </div>
                                 <Users className="w-5 h-5 text-indigo-500" />
@@ -93,10 +93,10 @@ export default function Registers({
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <div className="space-y-1">
                                     <CardTitle className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                        {__('general.total_commissions_earned') || 'Total Commissions'}
+                                        {__('general.total_commissions_earned')}
                                     </CardTitle>
                                     <CardDescription>
-                                        {__('general.commissions_earned_from_all_payments') || 'Aggregate commission earned from all referrals'}
+                                        {__('general.commissions_earned_from_all_payments')}
                                     </CardDescription>
                                 </div>
                                 <DollarSign className="w-5 h-5 text-emerald-500" />
@@ -113,7 +113,7 @@ export default function Registers({
                         <CardHeader>
                             <CardTitle>{__('general.referred_users')}</CardTitle>
                             <CardDescription>
-                                {__('general.list_of_your_referred_users') || 'List of users registered under your referral code'}
+                                {__('general.list_of_your_referred_users')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
@@ -177,7 +177,7 @@ export default function Registers({
                                 <div className="py-12 text-center text-slate-500">
                                     <Users className="w-12 h-12 mx-auto text-slate-300 mb-3" />
                                     <p className="font-medium text-slate-700">{__('general.no_referrals_yet')}</p>
-                                    <p className="text-sm text-slate-400 mt-1">{__('general.share_link_to_start_earning') || 'Share your link to start earning commissions.'}</p>
+                                    <p className="text-sm text-slate-400 mt-1">{__('general.share_link_to_start_earning')}</p>
                                 </div>
                             )}
                         </CardContent>

@@ -33,10 +33,10 @@ export default function ResetPassword({
 
         let label = '';
         if (score === 0) label = '';
-        else if (score === 1) label = __('general.weak') || 'Weak';
-        else if (score === 2) label = __('general.fair') || 'Fair';
-        else if (score === 3) label = __('general.good') || 'Good';
-        else if (score === 4) label = __('general.strong') || 'Strong';
+        else if (score === 1) label = __('general.weak');
+        else if (score === 2) label = __('general.fair');
+        else if (score === 3) label = __('general.good');
+        else if (score === 4) label = __('general.strong');
 
         setPasswordStrength({ score, label });
     };
@@ -145,10 +145,10 @@ export default function ResetPassword({
                             className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 bg-[#f5f5f7]/50 focus:bg-white focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                         />
                         {data.password_confirmation.length > 0 && data.password !== data.password_confirmation && (
-                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{__('general.passwords_do_not_match') || 'Passwords do not match'}</p>
+                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{__('general.passwords_do_not_match')}</p>
                         )}
                         {data.password_confirmation.length > 0 && data.password === data.password_confirmation && (
-                            <p className="text-xs text-[#34c759] font-medium mt-1">{__('general.passwords_match') || 'Passwords match'}</p>
+                            <p className="text-xs text-[#34c759] font-medium mt-1">{__('general.passwords_match')}</p>
                         )}
                         {errors.password_confirmation && (
                             <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password_confirmation}</p>

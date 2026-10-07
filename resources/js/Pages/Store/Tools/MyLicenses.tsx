@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -36,7 +37,7 @@ interface MyLicensesProps {
 export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLicensesProps) {
     return (
         <AuthenticatedLayout>
-            <Head title="My Software Licenses & Devices | تراخيصي وأجهزتي" />
+            <Head title={__('tools.store_my_licenses_title')} />
 
             <PageShell>
                 <div className="space-y-8">
@@ -49,14 +50,14 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                     className="inline-flex items-center gap-1.5 text-xs text-[#0071e3] hover:underline font-semibold"
                                 >
                                     <ArrowLeft className="w-3.5 h-3.5" />
-                                    Back to Tools Store
+                                    {__('tools.store_back_to_store')}
                                 </Link>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-[#f8fafc]">
-                                My Software Licenses & Devices
+                                {__('tools.store_my_licenses_title')}
                             </h1>
                             <p className="text-sm text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1 max-w-2xl font-sans">
-                                Active desktop software licenses registered to your email, along with all authenticated computers and devices.
+                                {__('tools.store_my_licenses_desc')}
                             </p>
                         </div>
 
@@ -65,7 +66,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                 href={route('store.tools.index')}
                                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0071e3] text-white text-xs sm:text-sm font-semibold hover:bg-[#0077ed] transition-all shadow-xs"
                             >
-                                Browse More Tools
+                                {__('tools.store_browse_more')}
                             </Link>
                         </div>
                     </div>
@@ -78,12 +79,12 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                             </div>
                             <div className="space-y-1 text-xs text-[#1d1d1f]/80 dark:text-zinc-300 font-sans">
                                 <h4 className="font-bold text-sm text-[#1d1d1f] dark:text-white">
-                                    How Automatic Device Activation Works
+                                    {__('tools.store_how_activation_works')}
                                 </h4>
                                 <ol className="list-decimal list-inside space-y-1 pt-1 text-xs text-[#1d1d1f]/70 dark:text-zinc-400">
-                                    <li>Launch your software tool on your Windows PC (e.g. WAContactsExtract).</li>
-                                    <li>When prompted by the activation dialog, enter your registered account email.</li>
-                                    <li>The software connects securely to the server, validates your active license, and unlocks your computer immediately.</li>
+                                    <li>{__('tools.store_how_step1')}</li>
+                                    <li>{__('tools.store_how_step2')}</li>
+                                    <li>{__('tools.store_how_step3')}</li>
                                 </ol>
                             </div>
                         </div>
@@ -93,7 +94,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                     <div className="space-y-4">
                         <h2 className="text-lg font-bold text-[#1d1d1f] dark:text-white flex items-center gap-2">
                             <Key className="w-5 h-5 text-[#0071e3]" />
-                            Active Software Licenses ({licenses.length})
+                            {__('tools.store_active_licenses_count', { count: licenses.length })}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -110,7 +111,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                                     {lic.software_name}
                                                 </h3>
                                                 <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 font-mono mt-0.5">
-                                                    License #{lic.id}
+                                                    {__('tools.store_license_number', { id: lic.id })}
                                                 </p>
                                             </div>
 
@@ -120,19 +121,19 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                                     : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60'
                                             }`}>
                                                 {isActive ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <AlertCircle className="w-3 h-3 text-rose-600" />}
-                                                {isActive ? 'Active' : 'Inactive'}
+                                                {isActive ? __('general.active') : __('general.inactive')}
                                             </span>
                                         </div>
 
                                         <div className="space-y-2 pt-2 border-t border-black/5 dark:border-white/10 text-xs font-sans">
                                             <div className="flex items-center justify-between text-[#1d1d1f]/70 dark:text-zinc-400">
-                                                <span>Allowed Devices:</span>
-                                                <span className="font-semibold text-[#1d1d1f] dark:text-zinc-200">{lic.max_devices} Computers</span>
+                                                <span>{__('tools.store_allowed_devices')}</span>
+                                                <span className="font-semibold text-[#1d1d1f] dark:text-zinc-200">{__('tools.store_computers_count', { count: lic.max_devices })}</span>
                                             </div>
                                             <div className="flex items-center justify-between text-[#1d1d1f]/70 dark:text-zinc-400">
-                                                <span>Expires On:</span>
+                                                <span>{__('tools.store_expires_on')}</span>
                                                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                                    {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString() : 'Lifetime'}
+                                                    {lic.expires_at ? new Date(lic.expires_at).toLocaleDateString() : __('general.lifetime')}
                                                 </span>
                                             </div>
                                         </div>
@@ -144,8 +145,8 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                         {licenses.length === 0 && (
                             <div className="text-center py-10 bg-white dark:bg-zinc-900/60 rounded-2xl border border-black/5 dark:border-white/10">
                                 <Key className="w-10 h-10 text-[#1d1d1f]/20 dark:text-zinc-600 mx-auto mb-2" />
-                                <h4 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">No active software licenses yet</h4>
-                                <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 mt-1">Visit the Tools Store to get your first software license.</p>
+                                <h4 className="text-sm font-semibold text-[#1d1d1f] dark:text-white">{__('tools.store_no_licenses')}</h4>
+                                <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400 mt-1">{__('tools.store_no_licenses_hint')}</p>
                             </div>
                         )}
                     </div>
@@ -154,7 +155,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                     <div className="space-y-4 pt-4">
                         <h2 className="text-lg font-bold text-[#1d1d1f] dark:text-white flex items-center gap-2">
                             <Laptop className="w-5 h-5 text-emerald-600" />
-                            Connected Devices & Machines ({linkedDevices.length})
+                            {__('tools.store_connected_devices_count', { count: linkedDevices.length })}
                         </h2>
 
                         <div className="bg-white dark:bg-zinc-900/90 border border-black/5 dark:border-white/10 rounded-2xl overflow-hidden shadow-xs">
@@ -162,12 +163,12 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                 <table className="w-full text-left text-xs">
                                     <thead className="bg-[#f5f5f7] dark:bg-zinc-800/60 border-b border-black/5 dark:border-white/10 font-semibold text-[#1d1d1f]/70 dark:text-zinc-300">
                                         <tr>
-                                            <th className="px-4 py-3">Device / Machine</th>
-                                            <th className="px-4 py-3">Hardware ID</th>
-                                            <th className="px-4 py-3">Status</th>
-                                            <th className="px-4 py-3">OS Version</th>
-                                            <th className="px-4 py-3">Expiration Date</th>
-                                            <th className="px-4 py-3">Last Check-In</th>
+                                            <th className="px-4 py-3">{__('tools.store_device_machine')}</th>
+                                            <th className="px-4 py-3">{__('tools.store_hardware_id')}</th>
+                                            <th className="px-4 py-3">{__('general.status')}</th>
+                                            <th className="px-4 py-3">{__('tools.store_os_version')}</th>
+                                            <th className="px-4 py-3">{__('tools.store_expiration_date')}</th>
+                                            <th className="px-4 py-3">{__('tools.store_last_check_in')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-black/5 dark:divide-white/10">
@@ -178,7 +179,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                                     <td className="px-4 py-3 font-semibold text-[#1d1d1f] dark:text-zinc-100">
                                                         <div className="flex items-center gap-2">
                                                             <Monitor className="w-4 h-4 text-[#0071e3]" />
-                                                            <span>{dev.machine_name || 'Windows PC'}</span>
+                                                            <span>{dev.machine_name || __('tools.store_windows_pc')}</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-4 py-3 font-mono text-[#1d1d1f]/70 dark:text-zinc-400">
@@ -190,17 +191,17 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
                                                                 : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60'
                                                         }`}>
-                                                            {isActive ? 'Active' : 'Inactive'}
+                                                            {isActive ? __('general.active') : __('general.inactive')}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-[#1d1d1f]/60 dark:text-zinc-400 font-sans">
                                                         {dev.os_version || 'Windows'}
                                                     </td>
                                                     <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
-                                                        {dev.expires_at ? new Date(dev.expires_at).toLocaleDateString() : 'Permanent'}
+                                                        {dev.expires_at ? new Date(dev.expires_at).toLocaleDateString() : __('tools.store_permanent')}
                                                     </td>
                                                     <td className="px-4 py-3 text-[#1d1d1f]/50 dark:text-zinc-400 font-sans">
-                                                        {dev.last_check_date ? new Date(dev.last_check_date).toLocaleString() : 'Recently'}
+                                                        {dev.last_check_date ? new Date(dev.last_check_date).toLocaleString() : __('tools.store_recently')}
                                                     </td>
                                                 </tr>
                                             );
@@ -213,7 +214,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: MyLice
                                 <div className="text-center py-10">
                                     <Monitor className="w-8 h-8 text-[#1d1d1f]/20 dark:text-zinc-600 mx-auto mb-2" />
                                     <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400">
-                                        No devices linked yet. Launch any software tool and type your email to automatically register your computer.
+                                        {__('tools.store_no_devices')}
                                     </p>
                                 </div>
                             )}

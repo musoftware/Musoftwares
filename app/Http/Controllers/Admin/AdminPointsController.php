@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Points\AdjustUserPointsRequest;
 use App\Models\PointTransaction;
 use App\Models\User;
+use App\Services\LoyaltyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -66,25 +69,35 @@ class AdminPointsController extends Controller
         $reason = trim($validated['reason']);
         $label = $amount > 0 ? __('general.admin_points_credit_log', ['reason' => $reason, 'time' => now()->format('Y-m-d H:i')]) : __('general.admin_points_deduction_log', ['reason' => $reason, 'time' => now()->format('Y-m-d H:i')]);
 
-        $user->increment('points_balance', $amount);
-
-        PointTransaction::create([
-            'user_id' => $user->id,
-            'type' => $amount > 0 ? 'earned' : 'used',
-            'points' => $amount,
-            'description' => $label,
-        ]);
-
-        // Synchronize with modern Loyalty & Points engine for transparent client audit trail
+        // Legacy points ledger and loyalty ledger change together or not at all.
         try {
-            app(\App\Services\LoyaltyService::class)->adjustPointsManually(
-                user: $user,
-                points: $amount,
-                reason: $reason,
-                admin: $request->user()
-            );
+            DB::transaction(function () use ($user, $amount, $label, $reason, $request) {
+                $user->increment('points_balance', $amount);
+
+                $legacyTxn = PointTransaction::create([
+                    'user_id' => $user->id,
+                    'type' => $amount > 0 ? 'earned' : 'used',
+                    'points' => $amount,
+                    'description' => $label,
+                ]);
+
+                app(LoyaltyService::class)->adjustPointsManually(
+                    user: $user,
+                    points: $amount,
+                    reason: $reason,
+                    admin: $request->user(),
+                    idempotencyKey: 'manual_adj:point_txn:'.$legacyTxn->id,
+                );
+            });
         } catch (\Throwable $e) {
-            // Graceful fallback
+            Log::error('Admin points adjustment failed; nothing was changed.', [
+                'user_id' => $user->id,
+                'admin_id' => $request->user()?->id,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
         }
 
         $abs = abs($amount);

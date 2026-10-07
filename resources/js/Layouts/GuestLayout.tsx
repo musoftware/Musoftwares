@@ -40,7 +40,7 @@ export default function Guest({ children }: PropsWithChildren) {
                                 Musoftwares
                             </span>
                             <span className="text-[10px] uppercase tracking-wider text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 font-semibold">
-                                Studio &amp; Engineering Firm
+                                {__('frontend.guest_layout_tagline')}
                             </span>
                         </div>
                     </Link>
@@ -51,16 +51,16 @@ export default function Guest({ children }: PropsWithChildren) {
                     <div className="bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden shadow-xl shadow-black/5 p-3">
                         <img 
                             src="/images/illustrations/auth_showcase.jpg" 
-                            alt="Unified Digital Platform" 
+                            alt={__('frontend.guest_layout_showcase_alt')} 
                             className="w-full h-auto object-cover rounded-[18px]"
                         />
                     </div>
                     <div className="space-y-1 text-center">
                         <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
-                            Unified Business Backbone
+                            {__('frontend.guest_layout_showcase_title')}
                         </h3>
                         <p className="text-[11px] text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 leading-relaxed font-sans">
-                            High-throughput ERP ledgers, Meta Graph API integrations, and cloud workspace orchestration.
+                            {__('frontend.guest_layout_showcase_desc')}
                         </p>
                     </div>
                 </div>
@@ -69,9 +69,9 @@ export default function Guest({ children }: PropsWithChildren) {
                 <div className="flex items-center justify-between text-xs text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 border-t border-black/5 dark:border-white/10 pt-6 relative z-10">
                     <span>© {new Date().getFullYear()} Musoftwares Studio</span>
                     <div className="flex space-x-6 text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60">
-                        <Link href="/docs" className="hover:text-[#0071e3] transition-colors">{__('general.help') || 'Docs'}</Link>
-                        <Link href="/privacy-policy" className="hover:text-[#0071e3] transition-colors">{__('general.privacy') || 'Privacy'}</Link>
-                        <Link href="/terms-of-service" className="hover:text-[#0071e3] transition-colors">{__('general.terms') || 'Terms'}</Link>
+                        <Link href="/docs" className="hover:text-[#0071e3] transition-colors">{__('general.help')}</Link>
+                        <Link href="/privacy-policy" className="hover:text-[#0071e3] transition-colors">{__('general.privacy')}</Link>
+                        <Link href="/terms-of-service" className="hover:text-[#0071e3] transition-colors">{__('general.terms')}</Link>
                     </div>
                 </div>
             </div>

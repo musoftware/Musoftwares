@@ -29,10 +29,10 @@ export default function Create({ client }: Props) {
         post(route('points.adjust', client.id), {
             onSuccess: () => {
                 reset();
-                toastSuccess(__('general.points_adjusted') || 'Points adjusted successfully.');
+                toastSuccess(__('general.points_adjusted'));
             },
             onError: () => {
-                toastError(__('general.error_occurred') || 'Something went wrong.');
+                toastError(__('general.error_occurred'));
             },
         });
     };
@@ -98,19 +98,19 @@ export default function Create({ client }: Props) {
                                             type="number"
                                             value={data.amount}
                                             onChange={e => setData('amount', e.target.value)}
-                                            placeholder="e.g. 500 or -100"
+                                            placeholder={__('admin.points_amount_placeholder')}
                                             autoFocus
                                         />
                                         {errors.amount && <div className="text-sm text-red-500">{errors.amount}</div>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="reason">Reason / Description</Label>
+                                        <Label htmlFor="reason">{__('admin.points_reason_description')}</Label>
                                         <Input
                                             id="reason"
                                             type="text"
                                             value={data.reason}
                                             onChange={e => setData('reason', e.target.value)}
-                                            placeholder="e.g. Bonus for completing a task"
+                                            placeholder={__('admin.points_reason_placeholder')}
                                         />
                                         {errors.reason && <div className="text-sm text-red-500">{errors.reason}</div>}
                                     </div>
@@ -118,7 +118,7 @@ export default function Create({ client }: Props) {
                                 <CardFooter className="bg-muted/50 flex justify-end">
                                     <Button type="submit" disabled={processing} className="min-w-[150px]">
                                         <ArrowUpRight className="h-4 w-4 me-2" />
-                                        {processing ? 'Processing...' : __('general.submit')}
+                                        {processing ? __('general.processing') : __('general.submit')}
                                     </Button>
                                 </CardFooter>
                             </form>

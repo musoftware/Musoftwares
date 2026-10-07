@@ -34,7 +34,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
             : (Array.isArray(item.timers?.data) ? item.timers.data : []);
         return timersList.map((t: any) => ({
             ...t,
-            item_title: item.item_title || item.name || __('general.time_tracking'),
+            item_title: item.item_title || item.name || __('frontend.guest_invoice_time_tracking'),
         }));
     });
 
@@ -43,7 +43,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-16 transition-colors duration-200">
-            <Head title={`Invoice #${invoice.id}`} />
+            <Head title={__('frontend.guest_invoice_title', { id: invoice.id })} />
 
             {/* Top Navigation Bar with Brand & Theme Toggle */}
             <header className="border-b border-border/80 bg-card/60 backdrop-blur-md sticky top-0 z-30 mb-8">
@@ -72,7 +72,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                 {/* Header */}
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{__('general.invoice')} #{invoice.id}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{__('frontend.guest_invoice_title', { id: invoice.id })}</h1>
                     <p className="mt-2 text-sm text-muted-foreground">
                         {__('general.issued_on')}: {new Date(invoice.created_at).toLocaleDateString()}
                     </p>
@@ -85,7 +85,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                             <CardHeader>
                                 <CardTitle className="text-xl flex items-center text-foreground">
                                     <FileText className="w-5 h-5 me-2 text-primary" />
-                                    {__('general.invoice_items')}
+                                    {__('frontend.guest_invoice_items')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -121,7 +121,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                     <CardTitle className="text-lg flex items-center justify-between text-foreground">
                                         <span className="flex items-center font-semibold">
                                             <Clock className="w-5 h-5 me-2 text-primary dark:text-indigo-400" />
-                                            {__('general.time_tracking')} &amp; {__('general.summary')}
+                                            {__('frontend.guest_invoice_time_tracking')} &amp; {__('general.summary')}
                                         </span>
                                         <span className="font-mono text-sm font-bold bg-muted/60 dark:bg-slate-800 text-foreground px-2.5 py-1 rounded-md border border-border">
                                             {invoice.timer_metrics.total_timer_str}
@@ -136,21 +136,21 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                             <span className="font-mono text-sm font-extrabold text-foreground">{invoice.timer_metrics.total_timer_str}</span>
                                         </div>
                                         <div className="bg-blue-500/10 dark:bg-blue-950/40 p-3 rounded-xl border border-blue-500/20">
-                                            <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{__('general.full_real_value') || 'القيمة الفعلية'}</span>
+                                            <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{__('general.full_real_value')}</span>
                                             <span className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">{invoice.timer_metrics.full_real_value_str}</span>
                                         </div>
                                         <div className="bg-emerald-500/10 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-500/20">
-                                            <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">{__('general.billed_amount') || 'المبلغ الصافي'}</span>
+                                            <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">{__('general.billed_amount')}</span>
                                             <span className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-300">{invoice.timer_metrics.billed_amount_str}</span>
                                         </div>
                                         {invoice.timer_metrics.has_discount ? (
                                             <div className="bg-purple-500/10 dark:bg-purple-950/40 p-3 rounded-xl border border-purple-500/20">
-                                                <span className="block text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">{__('general.discount_savings') || 'إجمالي الخصم'}</span>
+                                                <span className="block text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">{__('general.discount_savings')}</span>
                                                 <span className="font-mono text-sm font-bold text-purple-700 dark:text-purple-300">-{invoice.timer_metrics.discount_savings_str}</span>
                                             </div>
                                         ) : (
                                             <div className="bg-muted/30 dark:bg-slate-800/50 p-3 rounded-xl border border-border">
-                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">{__('general.sessions')}</span>
+                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">{__('frontend.guest_invoice_sessions')}</span>
                                                 <span className="font-mono text-sm font-bold text-foreground">{allTimers.length}</span>
                                             </div>
                                         )}
@@ -159,19 +159,19 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                     {/* Row 2: Average Rate Insights */}
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
                                         <div className="bg-muted/30 dark:bg-slate-800/40 border border-border p-3 rounded-xl">
-                                            <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">{__('general.avg_billed_rate') || 'متوسط الساعة المفوترة'}</span>
+                                            <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">{__('general.avg_billed_rate')}</span>
                                             <span className="font-mono text-sm font-bold text-foreground">
-                                                {invoice.timer_metrics.avg_billed_rate_str} <span className="text-[10px] font-normal text-muted-foreground">{__('general.per_hour') || '/ hr'}</span>
+                                                {invoice.timer_metrics.avg_billed_rate_str} <span className="text-[10px] font-normal text-muted-foreground">{__('general.per_hour')}</span>
                                             </span>
                                         </div>
                                         <div className="bg-muted/30 dark:bg-slate-800/40 border border-border p-3 rounded-xl">
-                                            <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{__('general.avg_real_rate') || 'متوسط الساعة الفعلي'}</span>
+                                            <span className="block text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">{__('general.avg_real_rate')}</span>
                                             <span className="font-mono text-sm font-bold text-foreground">
-                                                {invoice.timer_metrics.avg_real_rate_str} <span className="text-[10px] font-normal text-muted-foreground">{__('general.per_hour') || '/ hr'}</span>
+                                                {invoice.timer_metrics.avg_real_rate_str} <span className="text-[10px] font-normal text-muted-foreground">{__('general.per_hour')}</span>
                                             </span>
                                         </div>
                                         <div className="bg-muted/30 dark:bg-slate-800/40 border border-border p-3 rounded-xl col-span-2 sm:col-span-1">
-                                            <span className="block text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">{__('general.effective_discount') || 'معدل الخصم الفعلي'}</span>
+                                            <span className="block text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">{__('general.effective_discount')}</span>
                                             <span className="font-mono text-sm font-bold text-foreground">
                                                 {invoice.timer_metrics.effective_discount_percent}%
                                             </span>
@@ -219,7 +219,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                                 className="w-full flex items-center justify-between border-border hover:bg-muted text-foreground text-xs font-semibold py-2.5"
                                             >
                                                 <span>
-                                                    {__('general.view_detailed_time_sessions') || 'عرض تفاصيل جلسات العمل المسجلة'} ({allTimers.length})
+                                                    {__('general.view_detailed_time_sessions')} ({allTimers.length})
                                                 </span>
                                                 {isTimersExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                             </Button>
@@ -230,9 +230,9 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                                     <table className="w-full text-xs">
                                                         <thead className="bg-muted/50 dark:bg-slate-800/60 border-b border-border">
                                                             <tr>
-                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('general.start')}</th>
-                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('general.end') || 'End'}</th>
-                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('general.duration')}</th>
+                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('frontend.guest_invoice_start')}</th>
+                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('general.end')}</th>
+                                                                <th className="px-3 py-2 text-start font-semibold text-muted-foreground">{__('frontend.guest_invoice_duration')}</th>
                                                                 <th className="px-3 py-2 text-end font-semibold text-muted-foreground">{invoice.currency_symbol || invoice.currency}</th>
                                                             </tr>
                                                         </thead>
@@ -299,7 +299,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm border-t border-border/60 pt-3">
-                                        <span className="text-muted-foreground font-medium">{__('general.unpaid')}</span>
+                                        <span className="text-muted-foreground font-medium">{__('frontend.guest_invoice_amount_due')}</span>
                                         <span className="font-bold text-foreground text-base">{formatCurrency(invoice.unpaid_total || invoice.total, invoice.currency)}</span>
                                     </div>
                                 </div>
@@ -336,7 +336,7 @@ export default function InvoiceShow({ invoice, pay_url }: { invoice: any, pay_ur
                                     </form>
                                 ) : (
                                     <div className="p-4 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 rounded-xl border border-emerald-500/20 text-center text-sm font-medium">
-                                        {isPaid ? __('general.invoice_already_paid') : __('general.invoice_cancelled')}
+                                        {isPaid ? __('frontend.guest_invoice_already_paid') : __('frontend.guest_invoice_cancelled')}
                                     </div>
                                 )}
                             </CardContent>

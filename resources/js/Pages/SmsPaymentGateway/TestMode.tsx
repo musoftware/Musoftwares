@@ -1,3 +1,4 @@
+import { useConfirm } from '@/hooks/useConfirm';
 import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -30,14 +31,20 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
         phone_number: '01012345678',
     });
 
+    const { confirm, confirmDialog } = useConfirm();
+
     const handleToggle = () => {
         router.post(route('sms-payment-gateway.test-mode.toggle'));
     };
 
-    const handleClear = () => {
-        if (confirm('Delete all mock transactions generated in Test Mode?')) {
-            router.delete(route('sms-payment-gateway.test-mode.clear-data'));
-        }
+    const handleClear = async () => {
+        const accepted = await confirm({
+            title: __('sms_gateway.test_mode_clear_title'),
+            description: __('sms_gateway.test_mode_clear_confirm'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('sms-payment-gateway.test-mode.clear-data'));
     };
 
     const handleSmsSubmit = (e: React.FormEvent) => {
@@ -73,7 +80,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                     <Power className="w-7 h-7" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-slate-900">Sandbox Status: {testModeEnabled ? 'Active' : 'Offline'}</h3>
+                                    <h3 className="text-lg font-bold text-slate-900">{__('sms_gateway.test_mode_sandbox_status', { status: testModeEnabled ? __('general.active') : __('sms_gateway.test_mode_offline') })}</h3>
                                     <p className="text-sm text-slate-600">{__('general.when_active_mock_payloads_are_permitted_and_explicitly_tagged_as_test_data')}</p>
                                 </div>
                             </div>
@@ -82,7 +89,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                 onClick={handleToggle}
                                 className={testModeEnabled ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-slate-800 hover:bg-slate-900'}
                             >
-                                {testModeEnabled ? 'Deactivate Test Mode' : 'Enable Test Mode'}
+                                {testModeEnabled ? __('sms_gateway.test_mode_deactivate') : __('sms_gateway.test_mode_enable')}
                             </Button>
                         </CardContent>
                     </Card>
@@ -135,7 +142,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                 ) : (
                                     <form onSubmit={handleHookSubmit} className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="amount">Mock Amount (EGP)</Label>
+                                            <Label htmlFor="amount">{__('sms_gateway.test_mode_mock_amount')}</Label>
                                             <Input
                                                 id="amount"
                                                 type="number"
@@ -181,6 +188,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                     </div>
                 </div>
             </div>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

@@ -34,6 +34,7 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 const emptyForm = {
     code: '',
@@ -102,9 +103,9 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             onSuccess: () => {
                 setIsCreateOpen(false);
                 resetForm();
-                toastSuccess(__('general.created') || 'Coupon created');
+                toastSuccess(__('general.created'));
             },
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -115,9 +116,9 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 setIsEditOpen(false);
                 setEditingCoupon(null);
                 resetForm();
-                toastSuccess(__('general.updated') || 'Coupon updated');
+                toastSuccess(__('general.updated'));
             },
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -147,8 +148,8 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
         const id = pendingDelete.id;
         setPendingDelete(null);
         router.delete(route('admin.coupons.destroy', id), {
-            onSuccess: () => toastSuccess(__('general.deleted') || 'Coupon deleted'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.deleted')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -218,7 +219,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                     </div>
                 ) : (
                     <div>
-                        <Label htmlFor="discount_percentage">Discount Percentage (%)</Label>
+                        <Label htmlFor="discount_percentage">{__('admin.coupons_discount_percentage')}</Label>
                         <Input
                             id="discount_percentage"
                             type="number"
@@ -329,13 +330,13 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
     const paginationLinks = coupons?.links;
 
     return (
-        <AdminSidebarLayout title={__('general.coupons')} header="Coupons Manager">
+        <AdminSidebarLayout title={__('general.coupons')} header={__('admin.coupons_header')}>
             <Head title={__('general.admin_coupons')} />
 
             <div className="mb-6 flex items-center justify-end gap-4">
                 <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Tag className="h-4 w-4" />
-                    <span>{coupons?.total ?? items.length} coupon{(coupons?.total ?? items.length) !== 1 ? 's' : ''}</span>
+                    <span>{__('admin.coupons_count', { count: coupons?.total ?? items.length })}</span>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -359,8 +360,8 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
             {items.length === 0 ? (
                 <EmptyState
                     icon={Tag}
-                    title={__('general.no_coupons_found') || 'No coupons found'}
-                    description={__('general.create_first_coupon_cta') || 'Create your first coupon to get started.'}
+                    title={__('general.no_coupons_found')}
+                    description={__('general.create_first_coupon_cta')}
                 />
             ) : (
                 <Card className="overflow-hidden">
@@ -398,7 +399,7 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                                     : 'bg-blue-50 text-blue-700 border border-blue-200'
                                             }`}>
-                                                {c.type}
+                                                {c.type === 'fixed' ? __('general.fixed') : __('general.percentage')}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-sm text-gray-700">
@@ -464,26 +465,12 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
                 </Card>
             )}
 
-            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-center gap-1">
-                    {paginationLinks.map((link, i) => (
-                        <Button
-                            key={i}
-                            variant={link.active ? 'default' : 'outline'}
-                            size="sm"
-                            disabled={!link.url}
-                            onClick={() => link.url && router.visit(link.url)}
-                        >
-                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                        </Button>
-                    ))}
-                </div>
-            )}
+            <Pagination links={Array.isArray(paginationLinks) ? paginationLinks : []} />
 
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Edit Coupon — {editingCoupon?.code}</DialogTitle>
+                        <DialogTitle>{__('admin.coupons_edit_title', { code: editingCoupon?.code ?? '' })}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleEditSubmit}>
                         {renderFormFields()}
@@ -498,8 +485,8 @@ export default function Index({ coupons, currencies = [] }: { coupons: Paginated
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete_coupon') || 'Delete coupon?'}
-                description={__('general.confirm_delete_coupon_desc') || `This will permanently delete coupon "${pendingDelete?.code}".`}
+                title={__('general.delete_coupon')}
+                description={__('general.confirm_delete_coupon_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

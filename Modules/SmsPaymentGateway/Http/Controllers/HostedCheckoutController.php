@@ -116,7 +116,7 @@ class HostedCheckoutController extends Controller
             ];
         }
 
-        $brandName = $settings->brand_name ?: ($session->user->name ?? '');
+        $brandName = ($settings->brand_name ?? null) ?: ($session->user->name ?? '');
 
         return view('sms-payment-gateway::checkout.hosted', [
             'session' => $session,

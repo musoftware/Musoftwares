@@ -1,5 +1,7 @@
+import { __ } from '@/lib/i18n';
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
+import { useConfirm } from '@/hooks/useConfirm';
 import {
     Smartphone,
     CheckCircle2,
@@ -62,6 +64,7 @@ export default function AccountsHealthTab({
     onManageProfile,
 }: Props) {
     const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const { confirm, confirmDialog } = useConfirm();
 
     const activeCount = accounts.filter(a => a.status === 'active').length;
     const pendingCount = accounts.filter(a => a.status === 'unregistered').length;
@@ -73,40 +76,40 @@ export default function AccountsHealthTab({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-2">
                     <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold">
-                        <span>Active WhatsApp Numbers</span>
+                        <span>{__('whatsapp.acc_health_active_numbers')}</span>
                         <Smartphone className="w-5 h-5 text-emerald-500" />
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black font-mono text-zinc-950 dark:text-zinc-50">{activeCount}</span>
-                        <span className="text-xs text-zinc-400 font-normal">/ {accounts.length} Total</span>
+                        <span className="text-xs text-zinc-400 font-normal">{__('whatsapp.acc_health_total', { count: accounts.length })}</span>
                     </div>
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-2">
                     <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold">
-                        <span>Pending Registration</span>
+                        <span>{__('whatsapp.acc_health_pending')}</span>
                         <Clock className="w-5 h-5 text-amber-500" />
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black font-mono text-amber-500">{pendingCount}</span>
-                        <span className="text-xs text-zinc-400 font-normal">Action Required</span>
+                        <span className="text-xs text-zinc-400 font-normal">{__('whatsapp.acc_health_action_required')}</span>
                     </div>
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-2">
                     <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold">
-                        <span>Disconnected / Action Needed</span>
+                        <span>{__('whatsapp.acc_health_disconnected')}</span>
                         <AlertTriangle className="w-5 h-5 text-rose-500" />
                     </div>
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-black font-mono text-rose-500">{issueCount}</span>
-                        <span className="text-xs text-zinc-400 font-normal">Needs PIN Verification</span>
+                        <span className="text-xs text-zinc-400 font-normal">{__('whatsapp.acc_health_needs_pin')}</span>
                     </div>
                 </div>
 
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm space-y-2">
                     <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold">
-                        <span>Platform Wallet Balance</span>
+                        <span>{__('whatsapp.acc_health_wallet')}</span>
                         <Shield className="w-5 h-5 text-sky-500" />
                     </div>
                     <div className="flex items-baseline gap-2">
@@ -119,9 +122,9 @@ export default function AccountsHealthTab({
             {/* Main Action Bar */}
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="space-y-0.5">
-                    <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50">Connected Phone Numbers & Health Status</h3>
+                    <h3 className="text-base font-bold text-zinc-950 dark:text-zinc-50">{__('whatsapp.acc_health_title')}</h3>
                     <p className="text-xs text-zinc-500">
-                        Manage Meta WABA Cloud API phone numbers, test API endpoints, and complete 6-digit PIN registrations.
+                        {__('whatsapp.acc_health_desc')}
                     </p>
                 </div>
 
@@ -131,7 +134,7 @@ export default function AccountsHealthTab({
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition duration-200 shadow-sm flex items-center gap-1.5 cursor-pointer"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Number (Manual WABA)
+                        {__('whatsapp.acc_health_add_number')}
                     </button>
 
                     {hasFacebookApp && (
@@ -139,7 +142,7 @@ export default function AccountsHealthTab({
                             href={facebookLoginUrl}
                             className="px-4 py-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold rounded-xl transition duration-200 shadow-sm flex items-center gap-1.5"
                         >
-                            Log in with Facebook
+                            {__('whatsapp.acc_health_fb_login')}
                         </a>
                     )}
                 </div>
@@ -150,9 +153,9 @@ export default function AccountsHealthTab({
                 {accounts.length === 0 ? (
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 text-center text-zinc-500 space-y-3 shadow-sm">
                         <Smartphone className="w-10 h-10 text-zinc-400 mx-auto" />
-                        <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">No WhatsApp Numbers Connected Yet</h4>
+                        <h4 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{__('whatsapp.acc_health_empty')}</h4>
                         <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-                            Connect your Meta WABA account to start sending automated broadcasts and receiving customer live chats.
+                            {__('whatsapp.acc_health_empty_desc')}
                         </p>
                     </div>
                 ) : (
@@ -181,17 +184,17 @@ export default function AccountsHealthTab({
                                             {isActive ? (
                                                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold flex items-center gap-1.5">
                                                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                                    Active & Ready
+                                                    {__('whatsapp.acc_health_active_ready')}
                                                 </span>
                                             ) : isPending ? (
                                                 <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-bold flex items-center gap-1.5">
                                                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                                                    Needs Setup / Registration
+                                                    {__('whatsapp.acc_health_needs_setup')}
                                                 </span>
                                             ) : (
                                                 <span className="px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-bold flex items-center gap-1.5">
                                                     <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                                                    Action Required
+                                                    {__('whatsapp.acc_health_action_required')}
                                                 </span>
                                             )}
                                         </div>
@@ -199,13 +202,13 @@ export default function AccountsHealthTab({
                                         <div className="text-xs text-zinc-500 flex items-center gap-2 flex-wrap font-mono">
                                             {acc.display_phone_number && (
                                                 <>
-                                                    <span className="font-bold text-zinc-700 dark:text-zinc-300">Number: {acc.display_phone_number}</span>
+                                                    <span className="font-bold text-zinc-700 dark:text-zinc-300">{__('whatsapp.acc_health_number', { number: acc.display_phone_number })}</span>
                                                     <span>&bull;</span>
                                                 </>
                                             )}
-                                            <span>WABA: {acc.waba_id || 'N/A'}</span>
+                                            <span>WABA: {acc.waba_id || __('general.n_a')}</span>
                                             <span>&bull;</span>
-                                            <span>Phone ID: {acc.phone_number_id}</span>
+                                            <span>{__('whatsapp.bizprofile_phone_id')} {acc.phone_number_id}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -220,7 +223,7 @@ export default function AccountsHealthTab({
                                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition shadow-sm"
                                         >
                                             <MessageSquare className="w-4 h-4" />
-                                            Open WhatsApp Web
+                                            {__('whatsapp.acc_health_open_web')}
                                         </a>
                                     ) : (
                                         <button
@@ -228,7 +231,7 @@ export default function AccountsHealthTab({
                                             className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition shadow-sm"
                                         >
                                             <Shield className="w-4 h-4" />
-                                            Register PIN Now
+                                            {__('whatsapp.acc_health_register_pin')}
                                         </button>
                                     )}
 
@@ -236,6 +239,8 @@ export default function AccountsHealthTab({
                                     <div className="relative">
                                         <button
                                             onClick={() => setOpenMenuId(openMenuId === acc.id ? null : acc.id)}
+                                            aria-label={__('whatsapp.acc_health_more_actions')}
+                                            aria-expanded={openMenuId === acc.id}
                                             className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition"
                                         >
                                             <MoreVertical className="w-4 h-4" />
@@ -249,7 +254,7 @@ export default function AccountsHealthTab({
                                                         className="w-full text-left px-4 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 flex items-center gap-2 font-semibold"
                                                     >
                                                         <Edit3 className="w-3.5 h-3.5 text-emerald-500" />
-                                                        Manage Business Profile
+                                                        {__('whatsapp.acc_health_manage_profile')}
                                                     </button>
                                                 )}
                                                 <button
@@ -257,34 +262,33 @@ export default function AccountsHealthTab({
                                                     className="w-full text-left px-4 py-2 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"
                                                 >
                                                     <RefreshCw className={`w-3.5 h-3.5 ${testingAccountId === acc.id ? 'animate-spin text-emerald-500' : ''}`} />
-                                                    Test Meta Graph API
+                                                    {__('whatsapp.acc_health_test_api')}
                                                 </button>
                                                 <button
                                                     onClick={() => { onEditAccount(acc); setOpenMenuId(null); }}
                                                     className="w-full text-left px-4 py-2 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"
                                                 >
                                                     <Edit3 className="w-3.5 h-3.5 text-sky-500" />
-                                                    Edit WABA Credentials
+                                                    {__('whatsapp.acc_health_edit_credentials')}
                                                 </button>
                                                 <button
                                                     onClick={() => { onReconnectAccount(acc); setOpenMenuId(null); }}
                                                     className="w-full text-left px-4 py-2 text-amber-600 dark:text-amber-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"
                                                 >
                                                     <Shield className="w-3.5 h-3.5" />
-                                                    Re-verify 6-Digit PIN
+                                                    {__('whatsapp.acc_health_reverify_pin')}
                                                 </button>
                                                 <div className="my-1 border-t border-zinc-200 dark:border-zinc-800"></div>
                                                 <button
-                                                    onClick={() => {
-                                                        if (confirm(`Are you sure you want to delete account "${acc.name}"?`)) {
-                                                            onDeleteAccount(acc.id);
-                                                            setOpenMenuId(null);
-                                                        }
+                                                    onClick={async () => {
+                                                        setOpenMenuId(null);
+                                                        if (!(await confirm({ title: __('whatsapp.acc_health_delete_title'), description: __('whatsapp.acc_health_delete_desc', { name: acc.name }), variant: 'danger' }))) return;
+                                                        onDeleteAccount(acc.id);
                                                     }}
                                                     className="w-full text-left px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2 font-medium"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-                                                    Delete Account
+                                                    {__('whatsapp.acc_health_delete')}
                                                 </button>
                                             </div>
                                         )}
@@ -295,6 +299,7 @@ export default function AccountsHealthTab({
                     })
                 )}
             </div>
+            {confirmDialog}
         </div>
     );
 }

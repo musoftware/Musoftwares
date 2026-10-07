@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { Copy, Edit, History } from 'lucide-react';
+import { ArrowLeft, Copy, Edit, History } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
@@ -12,7 +12,7 @@ export default function Show({ contract }) {
     const handleCopyLink = () => {
         const link = `${window.location.origin}/c/${contract.uuid}`;
         navigator.clipboard.writeText(link);
-        toast.success(__('general.public_link_copied') || 'Public link copied to clipboard');
+        toast.success(__('general.public_link_copied'));
     };
 
     return (
@@ -22,7 +22,7 @@ export default function Show({ contract }) {
         >
             <div className="mb-6 flex justify-between items-center">
                 <Link href="/admin/contracts" className="text-sm text-slate-500 hover:text-slate-900 flex items-center gap-1">
-                    &larr; {__('general.back_to_contracts')}
+                    <ArrowLeft className="w-4 h-4 rtl:rotate-180" /> {__('general.back_to_contracts')}
                 </Link>
                 <div className="flex gap-2">
                     <Button variant="outline" onClick={handleCopyLink}>

@@ -3,6 +3,7 @@
 namespace App\Services\AI;
 
 use App\Models\ContractPriceItem;
+use Illuminate\Support\Facades\Log;
 
 class ComponentBenchmarkRates
 {
@@ -35,7 +36,7 @@ class ComponentBenchmarkRates
                 return $mapped;
             }
         } catch (\Throwable $e) {
-            // DB offline or table missing fallback
+            Log::warning('Component benchmark rates: DB lookup failed, using defaults', ['error' => $e->getMessage()]);
         }
 
         return self::getDefaultComponents();

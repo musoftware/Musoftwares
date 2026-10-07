@@ -15,8 +15,8 @@ export default function Show({ transfer }) {
     const isSender = transfer.type === 'sent';
 
     return (
-        <AuthenticatedLayout header="Transfer Receipt">
-            <Head title={`Receipt #${transfer.id}`} />
+        <AuthenticatedLayout header={__('client.receipt_header')}>
+            <Head title={__('client.receipt_title', { id: transfer.id })} />
 
             <div className="max-w-[650px] mx-auto px-4 py-8 space-y-6 print:py-0 print:px-0 print:max-w-full">
                 
@@ -51,7 +51,7 @@ export default function Show({ transfer }) {
                         <div className="space-y-1">
                             <Badge variant="outline" className="font-medium bg-emerald-50 text-emerald-700 border-emerald-200 uppercase tracking-wider text-[10px]">{__('general.transaction_successful')}</Badge>
                             <CardTitle className="text-xl font-bold tracking-tight">{__('general.wallet_transfer_receipt')}</CardTitle>
-                            <CardDescription className="text-xs">Immutable Ledger Reference ID: #{transfer.id}</CardDescription>
+                            <CardDescription className="text-xs">{__('client.receipt_ledger_ref', { id: transfer.id })}</CardDescription>
                         </div>
                     </CardHeader>
                     
@@ -60,7 +60,7 @@ export default function Show({ transfer }) {
                         {/* Huge Amount Display */}
                         <div className="text-center py-4 bg-muted/5 rounded-lg border border-primary/5">
                             <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block mb-1">
-                                {isSender ? 'Amount Sent (Including Fees)' : 'Amount Received'}
+                                {isSender ? __('client.receipt_amount_sent') : __('client.receipt_amount_received')}
                             </span>
                             <div className={`text-3xl font-extrabold tracking-tight ${isSender ? 'text-rose-600' : 'text-emerald-600'}`}>
                                 {isSender ? (
@@ -79,7 +79,7 @@ export default function Show({ transfer }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b pb-6 border-dashed">
                             
                             <div className="space-y-1.5">
-                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">From (Sender)</span>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">{__('client.receipt_from')}</span>
                                 <div className="p-3 border rounded-lg bg-background flex flex-col">
                                     <span className="font-semibold text-sm text-foreground">{transfer.sender_name}</span>
                                     <span className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -89,7 +89,7 @@ export default function Show({ transfer }) {
                             </div>
 
                             <div className="space-y-1.5">
-                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">To (Receiver)</span>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">{__('client.receipt_to')}</span>
                                 <div className="p-3 border rounded-lg bg-background flex flex-col">
                                     <span className="font-semibold text-sm text-foreground">{transfer.receiver_name}</span>
                                     <span className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
@@ -106,7 +106,7 @@ export default function Show({ transfer }) {
                             
                             <div className="space-y-2.5 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">Principal Transfer Amount:</span>
+                                    <span className="text-muted-foreground">{__('client.receipt_principal')}</span>
                                     <span className="font-medium text-foreground">
                                         {Number(transfer.amount).toFixed(2)} {transfer.currency}
                                     </span>
@@ -114,7 +114,7 @@ export default function Show({ transfer }) {
 
                                 {isSender && (
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Calculated Transaction Fee (1%):</span>
+                                        <span className="text-muted-foreground">{__('client.receipt_fee')}</span>
                                         <span className="font-medium text-foreground">
                                             {Number(transfer.fee).toFixed(2)} {transfer.currency}
                                         </span>
@@ -124,13 +124,13 @@ export default function Show({ transfer }) {
                                 {transfer.currency !== transfer.converted_currency && (
                                     <>
                                         <div className="flex justify-between bg-primary/5 px-2.5 py-1.5 rounded text-xs">
-                                            <span className="text-primary font-semibold">Standard Conversion Rate:</span>
+                                            <span className="text-primary font-semibold">{__('client.receipt_rate')}</span>
                                             <span className="font-bold text-primary">
                                                 1 {transfer.currency} = {Number(transfer.exchange_rate).toFixed(4)} {transfer.converted_currency}
                                             </span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Converted Total Received:</span>
+                                            <span className="text-muted-foreground">{__('client.receipt_converted_total')}</span>
                                             <span className="font-bold text-emerald-600">
                                                 {Number(transfer.converted_amount).toFixed(2)} {transfer.converted_currency}
                                             </span>
@@ -140,7 +140,7 @@ export default function Show({ transfer }) {
 
                                 <div className="flex justify-between border-t border-dashed pt-3">
                                     <span className="text-muted-foreground flex items-center gap-1">
-                                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Timestamp:
+                                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> {__('client.receipt_timestamp')}
                                     </span>
                                     <span className="font-medium text-foreground">
                                         {new Date(transfer.processed_at).toLocaleString(undefined, {
@@ -151,7 +151,7 @@ export default function Show({ transfer }) {
                                 </div>
 
                                 <div className="flex justify-between border-b pb-3 border-dashed">
-                                    <span className="text-muted-foreground">Transaction Status:</span>
+                                    <span className="text-muted-foreground">{__('client.receipt_status')}</span>
                                     <Badge variant="outline" className="font-medium uppercase bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
                                         {transfer.status}
                                     </Badge>

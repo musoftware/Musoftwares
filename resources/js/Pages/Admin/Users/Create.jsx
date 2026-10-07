@@ -67,14 +67,14 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
     return (
         <AdminSidebarLayout>
-            <Head title={__('general.create_account') || 'Create Account'} />
+            <Head title={__('general.create_account')} />
 
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <p className="text-sm text-gray-500 font-medium tracking-wider uppercase">{__('whatsapp.ui.system')}</p>
-                        <h1 className="text-3xl font-bold text-gray-900">{__('general.create_account') || 'Create Account'}</h1>
-                        <p className="text-gray-500 mt-1">{__('general.create_a_new_user_account_in_the_platform') || 'Create a new user account in the platform.'}</p>
+                        <h1 className="text-3xl font-bold text-gray-900">{__('general.create_account')}</h1>
+                        <p className="text-gray-500 mt-1">{__('general.create_a_new_user_account_in_the_platform')}</p>
                     </div>
                     <Link href={`/admin/users`}>
                         <Button variant="outline">
@@ -110,7 +110,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                 <div className="space-y-2">
                                     <Label htmlFor="password">{__('general.password')}</Label>
                                     <Input id="password" type="password" value={data.password} onChange={e => setData('password', e.target.value)} placeholder={__('general.leave_blank_for_random')} />
-                                    <p className="text-xs text-gray-500">{__('general.leave_blank_for_random') || 'Leave empty to generate a random password'}</p>
+                                    <p className="text-xs text-gray-500">{__('general.leave_blank_for_random')}</p>
                                     {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
                                 </div>
                             </div>
@@ -171,12 +171,12 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                             <div className="flex items-center justify-between p-4 mb-6 rounded-xl border bg-slate-50/50">
                                 <div>
                                     <Label htmlFor="enable_custom_hour_rate" className="font-semibold text-sm cursor-pointer">
-                                        {__('general.enable_custom_hour_rate') || 'تفعيل سعر ساعة مخصص'}
+                                        {__('general.enable_custom_hour_rate')}
                                     </Label>
                                     <p className="text-xs text-gray-500 mt-0.5">
                                         {data.enable_custom_hour_rate
-                                            ? (__('general.custom_hour_rate_active_desc') || 'سيتم استخدام سعر الساعة المخصص أدناه في الفواتير والمؤقتات بدلاً من سعر النظام.')
-                                            : (__('general.custom_hour_rate_inactive_desc') || 'عند الإيقاف، سيتم استخدام سعر النظام الأساسي تلقائيًا.')}
+                                            ? (__('general.custom_hour_rate_active_desc'))
+                                            : (__('general.custom_hour_rate_inactive_desc'))}
                                     </p>
                                 </div>
                                 <Switch
@@ -329,7 +329,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <input type="checkbox" id="enable_3d_dashboard" name="enable_3d_dashboard" checked={data.enable_3d_dashboard} onChange={handleCheckboxChange} className="h-4 w-4 rounded border-gray-300 text-slate-900" />
-                                        <Label htmlFor="enable_3d_dashboard" className="cursor-pointer font-medium">{__('general.enable_3d_dashboard') || 'Enable 3D Holographic Dashboard'}</Label>
+                                        <Label htmlFor="enable_3d_dashboard" className="cursor-pointer font-medium">{__('general.enable_3d_dashboard')}</Label>
                                     </div>
                                 </div>
                             </div>

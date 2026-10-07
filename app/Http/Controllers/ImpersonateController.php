@@ -42,6 +42,7 @@ class ImpersonateController extends Controller
         session()->put('impersonation_started_at', $startedAt->toIso8601String());
 
         Auth::loginUsingId($id);
+        $request->session()->regenerate();
 
         return redirect()->route('dashboard');
     }
@@ -62,6 +63,7 @@ class ImpersonateController extends Controller
 
             if ($impersonatedId && $impersonatorId) {
                 Auth::loginUsingId($impersonatorId);
+                $request->session()->regenerate();
             }
         }
 

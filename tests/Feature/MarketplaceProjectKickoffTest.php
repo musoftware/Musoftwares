@@ -18,6 +18,7 @@ use Tests\TestCase;
 class MarketplaceProjectKickoffTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $buyer;
     protected User $seller;
@@ -26,6 +27,7 @@ class MarketplaceProjectKickoffTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates(); // wallet ledger and escrow convert USD amounts to the EGP business currency
         $this->withoutMiddleware(EnsureSubscriptionIsActive::class);
         $this->withoutMiddleware(VerifyCsrfToken::class);
 

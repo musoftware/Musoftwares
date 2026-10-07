@@ -102,18 +102,22 @@ return [
 
     'erp' => [
         'url' => env('ERP_URL', 'http://localhost:8001'),
+        'shared_secret' => env('ERP_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
     ],
 
     'crm' => [
         'url' => env('CRM_URL', 'http://localhost:8002'),
+        'shared_secret' => env('CRM_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
     ],
 
     'affsys' => [
         'url' => env('AFFSYS_URL', 'http://localhost:8003'),
+        'shared_secret' => env('AFFSYS_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
     ],
 
     'bookingsys' => [
         'url' => env('BOOKINGSYS_URL', 'http://localhost:8004'),
+        'shared_secret' => env('BOOKINGSYS_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
     ],
 
     'goldsaversys' => [
@@ -128,7 +132,7 @@ return [
 
     'toolsys' => [
         'url' => env('TOOLSYS_URL', 'http://localhost:8007'),
-        'shared_secret' => env('TOOLSYS_SHARED_SECRET', 'local-shared-secret-change-me'),
+        'shared_secret' => env('TOOLSYS_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),
         'timeout' => env('TOOLSYS_TIMEOUT', 10),
         'retry_times' => env('TOOLSYS_RETRY_TIMES', 2),
         'retry_sleep' => env('TOOLSYS_RETRY_SLEEP', 300),

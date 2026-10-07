@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { cn } from '@/lib/utils';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export default function OverviewStep({ data, setData, errors, categories }: any) {
@@ -63,15 +63,18 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                         value={data.title}
                         onChange={e => setData('title', e.target.value)}
                         placeholder={__('general.design_a_professional_logo_for_your_brand')}
+                        aria-label={__('general.service_title')}
                         maxLength={80}
                         className={cn('h-14 text-base ps-14 font-medium', errors.title && 'border-red-400 focus-visible:ring-red-400')}
                     />
                 </div>
                 <div className="flex justify-between text-xs text-slate-400 font-medium">
                     <span className={data.title.length < 10 ? 'text-amber-500' : 'text-emerald-600'}>
-                        {data.title.length < 10 ? `${10 - data.title.length} more characters needed` : '✓ Looks good'}
+                        {data.title.length < 10
+                            ? __('marketplace.svc_more_chars_needed', { count: 10 - data.title.length })
+                            : <span className="inline-flex items-center gap-1"><Check className="w-3 h-3" />{__('marketplace.svc_title_looks_good')}</span>}
                     </span>
-                    <span>{data.title.length}/80 max</span>
+                    <span>{__('marketplace.svc_title_max_chars', { count: data.title.length, max: 80 })}</span>
                 </div>
                 {errors.title && <p className="text-xs text-red-500 font-medium">{errors.title}</p>}
             </div>
@@ -103,13 +106,13 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <Label className="text-sm font-semibold text-slate-700">{__('general.search_tags')}</Label>
-                    <span className="text-xs text-slate-500">{data.tags.length}/10 tags</span>
+                    <span className="text-xs text-slate-500">{__('marketplace.svc_tags_count', { count: data.tags.length, max: 10 })}</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-2">
                     {data.tags.map((tag: string) => (
                         <span key={tag} className="flex items-center gap-1 bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-medium">
                             {tag}
-                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-indigo-900 transition-colors">
+                            <button type="button" onClick={() => removeTag(tag)} aria-label={__('marketplace.svc_remove_tag', { tag })} className="hover:text-indigo-900 transition-colors">
                                 <X className="w-3.5 h-3.5" />
                             </button>
                         </span>
@@ -121,10 +124,11 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                     onKeyDown={addTag}
                     onPaste={handlePaste}
                     placeholder={__('general.enter_keywords_and_press_enter')}
+                    aria-label={__('general.search_tags')}
                     disabled={data.tags.length >= 10}
                     className="h-12"
                 />
-                <p className="text-xs text-slate-500">{__('general.use_up_to_10_relevant_tags_so_buyers_can_easily_find_your_service') || 'Use up to 10 relevant tags so buyers can easily find your service'}</p>
+                <p className="text-xs text-slate-500">{__('general.use_up_to_10_relevant_tags_so_buyers_can_easily_find_your_service')}</p>
                 {errors.tags && <p className="text-xs text-red-500 font-medium">{errors.tags}</p>}
             </div>
         </div>

@@ -36,6 +36,16 @@ const statusStyles: Record<string, string> = {
     declined:  'bg-red-100 text-red-800',
 };
 
+const statusLabelKeys: Record<string, string> = {
+    pending:   'general.pending',
+    reviewing: 'general.reviewing',
+    approved:  'general.approved',
+    declined:  'general.declined',
+};
+
+const statusLabel = (status: string): string =>
+    statusLabelKeys[status] ? __(statusLabelKeys[status]) : status;
+
 export default function Index({ requests, filters }: Props) {
     const { settings } = usePage<any>().props;
     const base_currency = settings?.base_currency;
@@ -68,7 +78,7 @@ export default function Index({ requests, filters }: Props) {
     const columns = [
         {
             key: 'id',
-            label: 'ID',
+            label: __('admin.withdraw_requests_col_id'),
             sortable: true,
             className: 'w-[60px]',
             render: (row: WithdrawRequest) => (
@@ -77,7 +87,7 @@ export default function Index({ requests, filters }: Props) {
         },
         {
             key: 'user',
-            label: 'User',
+            label: __('general.user'),
             render: (row: WithdrawRequest) => 
                 row.user ? (
                     <Link href={route('admin.users.show', row.user.id)} className="flex flex-col group cursor-pointer">
@@ -92,7 +102,7 @@ export default function Index({ requests, filters }: Props) {
         },
         {
             key: 'amount',
-            label: 'Amount',
+            label: __('general.amount'),
             sortable: true,
             render: (row: WithdrawRequest) => (
                 <span className="font-semibold text-slate-800">
@@ -102,25 +112,25 @@ export default function Index({ requests, filters }: Props) {
         },
         {
             key: 'method',
-            label: 'Method',
+            label: __('admin.withdraw_requests_col_method'),
             render: (row: WithdrawRequest) => (
                 <span className="text-slate-600">{row.method?.name ?? '—'}</span>
             ),
         },
         {
             key: 'status',
-            label: 'Status',
+            label: __('general.status'),
             render: (row: WithdrawRequest) => (
                 <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusStyles[row.status] ?? 'bg-slate-100 text-slate-700'}`}
                 >
-                    {row.status}
+                    {statusLabel(row.status)}
                 </span>
             ),
         },
         {
             key: 'created_at',
-            label: 'Requested',
+            label: __('admin.withdraw_requests_col_requested'),
             sortable: true,
             render: (row: WithdrawRequest) => (
                 <span className="text-slate-500 text-sm whitespace-nowrap">
@@ -165,7 +175,7 @@ export default function Index({ requests, filters }: Props) {
     );
 
     return (
-        <AdminSidebarLayout title={__('general.withdraw_requests')} header="Withdraw Requests">
+        <AdminSidebarLayout title={__('general.withdraw_requests')} header={__('general.withdraw_requests')}>
             <Head title={__('general.withdraw_requests')} />
             <DataTable
                 columns={columns}
@@ -174,8 +184,8 @@ export default function Index({ requests, filters }: Props) {
                 filters={{ ...filters, extra: advancedFilters }}
                 onSearch={handleSearch}
                 onSort={handleSort}
-                emptyTitle="No withdraw requests"
-                emptyDescription="No withdrawal requests have been submitted yet."
+                emptyTitle={__('admin.withdraw_requests_empty_title')}
+                emptyDescription={__('admin.withdraw_requests_empty_description')}
             />
         </AdminSidebarLayout>
     );

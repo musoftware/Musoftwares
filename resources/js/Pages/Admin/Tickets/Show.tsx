@@ -17,7 +17,7 @@ import {
     ArrowLeft, CheckCircle, RotateCcw, Send, Paperclip, X,
     AlertTriangle, Clock, MessageSquare, User, Calendar, Tag,
     Star, ExternalLink, FileText, Image as ImageIcon, Zap, Lock,
-    DollarSign
+    DollarSign, Circle
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -73,9 +73,9 @@ function initials(name: string): string {
 
 function relativeTime(iso: string): string {
     const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 60) return __('admin.ticket_show_just_now');
+    if (diff < 3600) return __('admin.ticket_show_minutes_ago', { count: Math.floor(diff / 60) });
+    if (diff < 86400) return __('admin.ticket_show_hours_ago', { count: Math.floor(diff / 3600) });
     return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
@@ -92,17 +92,17 @@ const renderMarkdown = (text: string) => {
 };
 
 /* ─── Maps ──────────────────────────────────────────────────── */
-const STATUS_STYLES: Record<string, { badge: string; dot: string; label: string }> = {
-    open:          { badge: 'bg-slate-50 text-slate-900 ring-slate-200',       dot: 'bg-slate-900',    label: 'Open' },
-    agent_replied: { badge: 'bg-yellow-100 text-yellow-800 ring-yellow-200',    dot: 'bg-yellow-600',   label: 'Agent Replied' },
-    user_replied:  { badge: 'bg-slate-50 text-slate-900 ring-slate-200', dot: 'bg-slate-900',  label: 'User Replied' },
-    closed:        { badge: 'bg-green-100 text-green-800 ring-green-200', dot: 'bg-slate-900', label: 'Resolved' },
+const STATUS_STYLES: Record<string, { badge: string; dot: string; labelKey: string }> = {
+    open:          { badge: 'bg-slate-50 text-slate-900 ring-slate-200',       dot: 'bg-slate-900',    labelKey: 'admin.ticket_show_status_open' },
+    agent_replied: { badge: 'bg-yellow-100 text-yellow-800 ring-yellow-200',    dot: 'bg-yellow-600',   labelKey: 'admin.ticket_show_status_agent_replied' },
+    user_replied:  { badge: 'bg-slate-50 text-slate-900 ring-slate-200', dot: 'bg-slate-900',  labelKey: 'admin.ticket_show_status_user_replied' },
+    closed:        { badge: 'bg-green-100 text-green-800 ring-green-200', dot: 'bg-slate-900', labelKey: 'admin.ticket_show_status_resolved' },
 };
 
-const PRIORITY_STYLES: Record<string, { badge: string; icon: string }> = {
-    high:   { badge: 'bg-red-100 text-red-700 ring-red-200',         icon: '🔴' },
-    medium: { badge: 'bg-yellow-100 text-yellow-700 ring-yellow-200', icon: '🟡' },
-    low:    { badge: 'bg-slate-100 text-slate-600 ring-slate-200',   icon: '🟢' },
+const PRIORITY_STYLES: Record<string, { badge: string; iconClass: string }> = {
+    high:   { badge: 'bg-red-100 text-red-700 ring-red-200',         iconClass: 'fill-red-500 text-red-500' },
+    medium: { badge: 'bg-yellow-100 text-yellow-700 ring-yellow-200', iconClass: 'fill-yellow-500 text-yellow-500' },
+    low:    { badge: 'bg-slate-100 text-slate-600 ring-slate-200',   iconClass: 'fill-green-500 text-green-500' },
 };
 
 const AVATAR_COLORS = [
@@ -124,7 +124,7 @@ function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' | 'lg'
 /* ─── Attachment Link ───────────────────────────────────────── */
 function AttachmentLink({ path }: { path: string }) {
     const url = `/storage/${path}`;
-    const filename = path.split('/').pop() ?? 'Attachment';
+    const filename = path.split('/').pop() ?? __('admin.ticket_show_attachment');
     const isImg = isImageFile(path);
     const isAudio = /\.(mp3|wav|ogg|m4a|webm|aac)$/i.test(path);
     const isVideo = /\.(mp4|webm|mov|m4v)$/i.test(path);
@@ -196,7 +196,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
     const handlePricingSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!priceInput || Number(priceInput) < 0) {
-            toast({ title: 'يرجى إدخال مبلغ تسعير صحيح', variant: 'destructive' });
+            toast({ title: __('admin.ticket_show_invalid_price'), variant: 'destructive' });
             return;
         }
         setSubmittingPrice(true);
@@ -206,11 +206,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
             pricing_notes: pricingNotesInput,
         }, {
             onSuccess: () => {
-                toast({ title: 'تم اعتماد التسعير وإرسال إشعار FCM للعميل بنجاح!' });
+                toast({ title: __('admin.ticket_show_pricing_saved') });
                 setPricingModalOpen(false);
             },
             onError: () => {
-                toast({ title: 'تعذر حفظ التسعير، يرجى المحاولة ثانية', variant: 'destructive' });
+                toast({ title: __('admin.ticket_show_pricing_failed'), variant: 'destructive' });
             },
             onFinish: () => setSubmittingPrice(false),
         });
@@ -256,9 +256,9 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                 setReplyBody('');
                 setAttachments([]);
                 setIsInternal(false);
-                toast({ title: 'Reply sent successfully.' });
+                toast({ title: __('admin.ticket_show_reply_sent') });
             },
-            onError: () => toast({ title: 'Failed to send reply', variant: 'destructive' }),
+            onError: () => toast({ title: __('admin.ticket_show_reply_failed'), variant: 'destructive' }),
             onFinish: () => setSubmitting(false),
         });
     }, [replyBody, attachments, isInternal, submitting, ticket.id, toast]);
@@ -284,18 +284,18 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
     const handleCloseConfirm = () => {
         router.put(`/admin/tickets/${ticket.id}`, { action: 'close', comment: closeComment }, {
             onSuccess: () => {
-                toast({ title: 'Ticket closed.' });
+                toast({ title: __('admin.ticket_show_ticket_closed') });
                 setCloseModalOpen(false);
                 setCloseComment('');
             },
-            onError:   () => toast({ title: 'Action failed.', variant: 'destructive' }),
+            onError:   () => toast({ title: __('admin.ticket_show_action_failed'), variant: 'destructive' }),
         });
     };
 
     const handleReopen = () => {
         router.put(`/admin/tickets/${ticket.id}`, { action: 'reopen' }, {
-            onSuccess: () => toast({ title: 'Ticket reopened.' }),
-            onError:   () => toast({ title: 'Action failed.', variant: 'destructive' }),
+            onSuccess: () => toast({ title: __('admin.ticket_show_ticket_reopened') }),
+            onError:   () => toast({ title: __('admin.ticket_show_action_failed'), variant: 'destructive' }),
         });
     };
 
@@ -304,8 +304,8 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
         if (!empId) return;
         setAssigningId(empId);
         router.post(`/admin/tickets/${ticket.id}/assign`, { assigned_employee_id: empId }, {
-            onSuccess: () => toast({ title: 'Ticket assigned.' }),
-            onError: () => toast({ title: 'Failed to assign.', variant: 'destructive' }),
+            onSuccess: () => toast({ title: __('admin.ticket_show_ticket_assigned') }),
+            onError: () => toast({ title: __('admin.ticket_show_assign_failed'), variant: 'destructive' }),
             onFinish: () => setAssigningId('')
         });
     };
@@ -319,7 +319,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
     };
 
     return (
-        <AdminSidebarLayout title={`Ticket #${ticket.id} — ${ticket.ticket_subject}`} header="Support Desk">
+        <AdminSidebarLayout title={__('admin.ticket_show_page_title', { id: ticket.id, subject: ticket.ticket_subject })} header={__('admin.ticket_show_header')}>
 
             {/* ── Top bar ── */}
             <div className="mb-5 flex flex-wrap items-center justify-end gap-4 gap-3">
@@ -327,11 +327,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                     href="/admin/tickets"
                     className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
                 >
-                    <ArrowLeft className="h-4 w-4" />{__('general.all_tickets')}</Link>
+                    <ArrowLeft className="h-4 w-4 rtl:rotate-180" />{__('general.all_tickets')}</Link>
                 <div className="flex items-center gap-2">
                     <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${statusMeta.badge}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${statusMeta.dot}`} />
-                        {statusMeta.label}
+                        {__(statusMeta.labelKey)}
                     </span>
                     {!isClosed ? (
                         <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
@@ -349,7 +349,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
             {ticket.is_urgent && !isClosed && (
                 <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <Zap className="h-4 w-4 flex-shrink-0 text-red-500" />
-                    <span><strong>{__('general.urgent_ticket')}</strong> — High priority and still open. Please respond ASAP.</span>
+                    <span><strong>{__('general.urgent_ticket')}</strong> {__('admin.ticket_show_urgent_body')}</span>
                 </div>
             )}
             {ticket.needs_attention && !ticket.is_urgent && !isClosed && (
@@ -382,7 +382,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 </div>
                             </div>
                             <span className={`flex-shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${priorityMeta.badge}`}>
-                                {priorityMeta.icon} {ticket.priority_text}
+                                <Circle className={`h-2.5 w-2.5 ${priorityMeta.iconClass}`} aria-hidden="true" /> {ticket.priority_text}
                             </span>
                         </div>
                         <div 
@@ -397,7 +397,9 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                             <div className="h-px flex-1 bg-slate-100" />
                             <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
                                 <MessageSquare className="h-3.5 w-3.5" />
-                                {messages.length} {messages.length === 1 ? 'reply' : 'replies'}
+                                {messages.length === 1
+                                    ? __('admin.ticket_show_reply_count_one', { count: messages.length })
+                                    : __('admin.ticket_show_reply_count_many', { count: messages.length })}
                             </span>
                             <div className="h-px flex-1 bg-slate-100" />
                         </div>
@@ -436,11 +438,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
 
                             return (
                                 <div key={msg.id} className={`flex gap-3 ${isAdminMsg ? 'flex-row-reverse' : 'flex-row'}`}>
-                                    <Avatar name={msg.sender?.name ?? 'User'} size="sm" />
+                                    <Avatar name={msg.sender?.name ?? __('admin.ticket_show_user_fallback')} size="sm" />
                                     <div className={`flex flex-col gap-1 max-w-[82%] ${isAdminMsg ? 'items-end' : 'items-start'}`}>
                                         <div className="flex items-center gap-2 px-1">
                                             <span className="text-xs font-semibold text-slate-700">
-                                                {msg.sender?.name ?? 'Unknown'}
+                                                {msg.sender?.name ?? __('admin.ticket_show_unknown_sender')}
                                             </span>
                                             {isAdminMsg && (
                                                 <span className="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-900">{__('general.support_agent')}</span>
@@ -471,7 +473,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                             <div className={`border-b px-5 py-3 flex items-center justify-between ${isInternal ? 'border-yellow-200' : 'border-slate-100'}`}>
                                 <span className="text-xs font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                     {isInternal ? <Lock className="h-3.5 w-3.5 text-yellow-600" /> : <MessageSquare className="h-3.5 w-3.5" />}
-                                    {isInternal ? 'Internal Note (Hidden from client)' : 'Reply to Client'}
+                                    {isInternal ? __('admin.ticket_show_internal_note_heading') : __('admin.ticket_show_reply_to_client')}
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <label className="text-xs text-slate-500 flex items-center gap-1.5 cursor-pointer select-none">
@@ -508,7 +510,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                             : 'bg-slate-50 border-slate-200 focus:border-slate-500 focus:ring-slate-50 focus:bg-white'
                                     }`}
                                     rows={5}
-                                    placeholder={isInternal ? "Type an internal note for the team..." : "Type your reply... (Markdown supported. Ctrl+Enter to send)"}
+                                    placeholder={isInternal ? __('admin.ticket_show_internal_placeholder') : __('admin.ticket_show_reply_placeholder')}
                                     value={replyBody}
                                     onChange={(e) => setReplyBody(e.target.value)}
                                     onKeyDown={handleKeyDown}
@@ -521,7 +523,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                             <span key={idx} className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2.5 py-1 text-xs text-slate-600 border border-slate-200">
                                                 <Paperclip className="h-3 w-3 text-slate-400" />
                                                 <span className="truncate max-w-[120px]">{file.name}</span>
-                                                <button type="button" onClick={() => removeFile(idx)} className="text-slate-400 hover:text-red-500">
+                                                <button type="button" onClick={() => removeFile(idx)} className="text-slate-400 hover:text-red-500" aria-label={__('admin.ticket_show_remove_file', { name: file.name })} title={__('admin.ticket_show_remove_file', { name: file.name })}>
                                                     <X className="h-3 w-3" />
                                                 </button>
                                             </span>
@@ -546,7 +548,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                         />
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <span className="text-xs text-slate-400 tabular-nums">{replyBody.length} chars</span>
+                                        <span className="text-xs text-slate-400 tabular-nums">{__('admin.ticket_show_chars_count', { count: replyBody.length })}</span>
                                         <Button
                                             type="submit"
                                             size="sm"
@@ -560,12 +562,12 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                             {submitting ? (
                                                 <span className="flex items-center gap-1.5">
                                                     <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                                    Sending…
+                                                    {__('admin.ticket_show_sending')}
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-1.5">
                                                     <Send className="h-3.5 w-3.5" />
-                                                    {isInternal ? 'Save Note' : 'Send Reply'}
+                                                    {isInternal ? __('admin.ticket_show_save_note') : __('admin.ticket_show_send_reply')}
                                                 </span>
                                             )}
                                         </Button>
@@ -579,7 +581,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                             <div>
                                 <p className="text-sm font-semibold text-green-800">{__('general.this_ticket_has_been_resolved')}</p>
                                 {ticket.closed_at && (
-                                    <p className="text-xs text-slate-900 mt-0.5">Closed on {fullDate(ticket.closed_at)}</p>
+                                    <p className="text-xs text-slate-900 mt-0.5">{__('admin.ticket_show_closed_on', { date: fullDate(ticket.closed_at) })}</p>
                                 )}
                                 <button
                                     onClick={handleReopen}
@@ -604,7 +606,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 <dd>
                                     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${statusMeta.badge}`}>
                                         <span className={`h-1.5 w-1.5 rounded-full ${statusMeta.dot}`} />
-                                        {statusMeta.label}
+                                        {__(statusMeta.labelKey)}
                                     </span>
                                 </dd>
                             </div>
@@ -612,7 +614,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 <dt className="flex items-center gap-2 text-xs text-slate-500"><AlertTriangle className="h-3.5 w-3.5" /> {__('general.priority')}</dt>
                                 <dd>
                                     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${priorityMeta.badge}`}>
-                                        {priorityMeta.icon} {ticket.priority_text}
+                                        <Circle className={`h-2.5 w-2.5 ${priorityMeta.iconClass}`} aria-hidden="true" /> {ticket.priority_text}
                                     </span>
                                 </dd>
                             </div>
@@ -667,7 +669,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 onChange={handleAssign}
                                 disabled={!!assigningId}
                             >
-                                <option value="">-- Unassigned --</option>
+                                <option value="">{__('admin.ticket_show_unassigned')}</option>
                                 {supportAgents.map(emp => (
                                     <option key={emp.id} value={emp.id}>{emp.name}</option>
                                 ))}
@@ -680,11 +682,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                         <div className="border-b border-slate-100 px-5 py-3 flex items-center justify-between">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
                                 <DollarSign className="h-3.5 w-3.5 text-slate-900" />
-                                {__('general.pricing_and_quotation') || 'تسعير التذكرة / Quotation'}
+                                {__('general.pricing_and_quotation')}
                             </h3>
                             {ticket.pricing_status && (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200">
-                                    {ticket.pricing_status === 'quoted' ? 'تم التسعير' : ticket.pricing_status}
+                                    {ticket.pricing_status === 'quoted' ? __('admin.ticket_show_pricing_quoted') : ticket.pricing_status}
                                 </span>
                             )}
                         </div>
@@ -692,19 +694,19 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                             {ticket.price ? (
                                 <div className="space-y-2">
                                     <div className="flex items-baseline justify-between">
-                                        <span className="text-xs text-slate-500">المبلغ المحدد:</span>
+                                        <span className="text-xs text-slate-500">{__('admin.ticket_show_quoted_amount')}</span>
                                         <span className="text-xl font-bold text-slate-900 font-mono">
                                             {Number(ticket.price).toLocaleString()} {ticket.currency_symbol || '$'}
                                         </span>
                                     </div>
                                     {ticket.quoted_at && (
                                         <p className="text-[11px] text-slate-400">
-                                            تم التحديد: {relativeTime(ticket.quoted_at)}
+                                            {__('admin.ticket_show_quoted_at', { time: relativeTime(ticket.quoted_at) })}
                                         </p>
                                     )}
                                     {ticket.pricing_notes && (
                                         <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-600 border border-slate-100 mt-2">
-                                            <p className="font-semibold text-slate-700 mb-1">ملاحظات التسعير:</p>
+                                            <p className="font-semibold text-slate-700 mb-1">{__('admin.ticket_show_pricing_notes_label')}</p>
                                             <p className="whitespace-pre-wrap">{ticket.pricing_notes}</p>
                                         </div>
                                     )}
@@ -714,13 +716,13 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                         onClick={() => setPricingModalOpen(true)}
                                         className="w-full mt-2 text-xs border-slate-300 hover:bg-slate-50"
                                     >
-                                        تعديل التسعير وإرسال إشعار جديد
+                                        {__('admin.ticket_show_edit_pricing')}
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="text-center py-2 space-y-3">
                                     <p className="text-xs text-slate-500">
-                                        لم يتم تحديد تسعير لهذه التذكرة بعد.
+                                        {__('admin.ticket_show_no_pricing')}
                                     </p>
                                     <Button
                                         type="button"
@@ -728,7 +730,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                         className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-1.5"
                                     >
                                         <DollarSign className="h-3.5 w-3.5" />
-                                        تحديد سعر التذكرة (إرسال FCM)
+                                        {__('admin.ticket_show_set_pricing')}
                                     </Button>
                                 </div>
                             )}
@@ -758,11 +760,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 href="/admin/tickets"
                                 className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200"
                             >
-                                <ArrowLeft className="h-4 w-4" />{__('general.back_to_all_tickets')}</Link>
+                                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />{__('general.back_to_all_tickets')}</Link>
                         </div>
                     </div>
 
-                    <p className="text-center text-xs text-slate-400">Ticket #{ticket.id}</p>
+                    <p className="text-center text-xs text-slate-400">{__('admin.ticket_show_ticket_number', { id: ticket.id })}</p>
                 </div>
             </div>
 
@@ -798,13 +800,13 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-slate-900" />
-                            تحديد تسعير التذكرة #{ticket.id}
+                            {__('admin.ticket_show_pricing_dialog_title', { id: ticket.id })}
                         </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handlePricingSubmit} className="space-y-4 py-3">
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                قيمة التسعير / السعر المطلوب *
+                                {__('admin.ticket_show_price_label')}
                             </label>
                             <input
                                 type="number"
@@ -821,7 +823,7 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                         {currencies.length > 0 && (
                             <div>
                                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                    العملة
+                                    {__('general.currency')}
                                 </label>
                                 <select
                                     value={currencyInput}
@@ -839,11 +841,11 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
 
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                تفاصيل وملاحظات التسعير (ستظهر للعميل)
+                                {__('admin.ticket_show_pricing_details_label')}
                             </label>
                             <textarea
                                 rows={3}
-                                placeholder="مثال: يشمل العمل على تعديل كود الـ API بالإضافة إلى اختبارات التكامل..."
+                                placeholder={__('admin.ticket_show_pricing_details_placeholder')}
                                 value={pricingNotesInput}
                                 onChange={(e) => setPricingNotesInput(e.target.value)}
                                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900 placeholder:text-slate-400"
@@ -851,8 +853,8 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                         </div>
 
                         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600">
-                            <p className="font-semibold text-slate-900 mb-0.5">إشعار فوري للعميل:</p>
-                            <p>بمجرد الحفظ، سيتم إرسال إشعار فوري (Push Notification) مباشرةً لهاتف وجهاز العميل لإعلامه بالسعر المحدد ورابط التذكرة.</p>
+                            <p className="font-semibold text-slate-900 mb-0.5">{__('admin.ticket_show_instant_notice_title')}</p>
+                            <p>{__('admin.ticket_show_instant_notice_body')}</p>
                         </div>
 
                         <DialogFooter className="gap-2 sm:gap-0 pt-2">
@@ -862,14 +864,14 @@ export default function Show({ ticket, supportAgents, cannedResponses, currencie
                                 onClick={() => setPricingModalOpen(false)}
                                 disabled={submittingPrice}
                             >
-                                إلغاء
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={submittingPrice}
                                 className="bg-slate-900 hover:bg-slate-800 text-white"
                             >
-                                {submittingPrice ? 'جاري الحفظ والإرسال...' : 'اعتماد السعر وإرسال الإشعار'}
+                                {submittingPrice ? __('admin.ticket_show_saving_sending') : __('admin.ticket_show_approve_and_notify')}
                             </Button>
                         </DialogFooter>
                     </form>

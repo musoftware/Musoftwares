@@ -23,9 +23,9 @@ class ServiceOrderController extends Controller
         $tab = $request->query('tab', 'purchases');
 
         if ($tab === 'sales') {
-            $orders = ServiceOrder::with(['buyer', 'package.service'])->where('seller_id', $user->id)->latest()->paginate(15);
+            $orders = ServiceOrder::with(['buyer', 'package.service'])->where('seller_id', $user->id)->latest()->paginate(15)->withQueryString();
         } else {
-            $orders = ServiceOrder::with(['seller', 'package.service'])->where('buyer_id', $user->id)->latest()->paginate(15);
+            $orders = ServiceOrder::with(['seller', 'package.service'])->where('buyer_id', $user->id)->latest()->paginate(15)->withQueryString();
         }
 
         return view('marketplace::orders.index', compact('orders', 'tab'));

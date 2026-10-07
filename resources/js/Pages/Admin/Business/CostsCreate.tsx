@@ -13,6 +13,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
 import {
@@ -32,7 +33,7 @@ import {
 import { __ } from '@/lib/i18n';
 
 export default function CostsCreate() {
-    const { users, projects, currencies, businessCurrency, categories } = usePage<any>().props;
+    const { projects, currencies, businessCurrency, categories } = usePage<any>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
         amount: '',
@@ -199,10 +200,9 @@ export default function CostsCreate() {
                                             <User className="w-4 h-4 text-slate-400" />
                                             {__('general.client_user')}
                                         </Label>
-                                        <PremiumCombobox
+                                        <UserSearchCombobox
                                             value={data.user_id ? String(data.user_id) : ''}
                                             onChange={(val) => setData('user_id', val as string)}
-                                            options={users.map((u: any) => ({ value: String(u.id), label: u.name }))}
                                             placeholder={__('general.search_client')}
                                         />
                                         {errors.user_id && <p className="text-xs text-rose-600 mt-1">{errors.user_id}</p>}

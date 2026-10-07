@@ -174,7 +174,7 @@ export default function AddBalance({ wallet, presets = [] }) {
                             {/* Amount Summary Preview */}
                             {data.amount >= 5 && (
                                 <div className="bg-[#f5f5f7] border border-black/5 rounded-[16px] p-4 flex items-center justify-between">
-                                    <span className="text-xs font-medium text-[#1d1d1f]/70">You will deposit:</span>
+                                    <span className="text-xs font-medium text-[#1d1d1f]/70">{__('client.addbal_you_will_deposit')}</span>
                                     <span className="font-bold text-[#1d1d1f] font-mono text-base">
                                         {formatMoney(data.amount, walletCurrency)}
                                     </span>
@@ -217,14 +217,14 @@ export default function AddBalance({ wallet, presets = [] }) {
                                 className="w-full sm:w-auto h-12 px-8 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 {processing
-                                    ? 'Redirecting to payment...'
-                                    : `Pay ${formatMoney(data.amount || 0, walletCurrency)} via Kashier`
+                                    ? __('client.addbal_redirecting')
+                                    : __('client.addbal_pay_via_kashier', { amount: formatMoney(data.amount || 0, walletCurrency) })
                                 }
                             </button>
 
                             <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60">
                                 <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                                <span>256-bit SSL secured. Instant balance credit.</span>
+                                <span>{__('client.addbal_ssl_secured')}</span>
                             </div>
                         </div>
 

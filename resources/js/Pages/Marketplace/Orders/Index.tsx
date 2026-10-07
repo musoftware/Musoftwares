@@ -2,41 +2,35 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 import { formatMoney as formatCurrency, formatDate } from '@/lib/utils';
 
 export default function Index({ orders, tab, auth }: any) {
     const { mode, setMode } = useMarketplaceMode();
 
-    useEffect(() => {
-        // Sync context mode with current tab
-        if (tab === 'sales' && mode !== 'seller') {
-            setMode('seller');
-        } else if (tab === 'purchases' && mode !== 'client') {
-            setMode('client');
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tab]);
+    const tabMode = tab === 'sales' ? 'seller' : 'client';
+    const syncedTabRef = useRef<string | null>(null);
 
+    // Single source of truth: the URL tab wins when it changes, and a header mode toggle drives navigation.
     useEffect(() => {
-        // If mode changes via header toggle, reload the page with correct tab
-        if (mode === 'seller' && tab !== 'sales') {
-            router.get(route('marketplace.orders.index'), { tab: 'sales' }, { preserveState: true });
-        } else if (mode === 'client' && tab === 'sales') {
-            router.get(route('marketplace.orders.index'), { tab: 'purchases' }, { preserveState: true });
+        if (syncedTabRef.current !== tab) {
+            syncedTabRef.current = tab;
+            if (mode !== tabMode) setMode(tabMode);
+            return;
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mode]);
+        if (mode === tabMode) return;
+        router.get(
+            route('marketplace.orders.index'),
+            { tab: mode === 'seller' ? 'sales' : 'purchases' },
+            { preserveState: true },
+        );
+    }, [tab, tabMode, mode, setMode]);
 
     const handleTabChange = (newTab: string) => {
         setMode(newTab === 'sales' ? 'seller' : 'client');
-        router.get(
-            route('marketplace.orders.index'),
-            { tab: newTab },
-            { preserveState: true },
-        );
     };
 
     return (
@@ -159,7 +153,7 @@ export default function Index({ orders, tab, auth }: any) {
                                                                 {order.package
                                                                     ?.service
                                                                     ?.title ||
-                                                                    'Unknown Service'}
+                                                                    __('marketplace.order_unknown_service')}
                                                             </div>
                                                         </div>
                                                     </td>
@@ -180,7 +174,7 @@ export default function Index({ orders, tab, auth }: any) {
                                                             </div>
                                                             <div className="text-sm text-gray-900 dark:text-white">
                                                                 {otherParty?.name ||
-                                                                    'Unknown'}
+                                                                    __('general.unknown')}
                                                             </div>
                                                         </div>
                                                     </td>
@@ -265,25 +259,8 @@ export default function Index({ orders, tab, auth }: any) {
 
                         {/* Pagination */}
                         {orders.links && orders.links.length > 3 && (
-                            <div className="flex justify-center gap-2 border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-900/50 px-6 py-4">
-                                {orders.links.map((link: any, idx: number) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => {
-                                            if (link.url)
-                                                router.get(
-                                                    link.url,
-                                                    { tab },
-                                                    { preserveState: true },
-                                                );
-                                        }}
-                                        disabled={!link.url}
-                                        className={`rounded-md border px-3 py-1 text-sm font-medium transition ${link.active ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 dark:border-white/10 bg-white dark:bg-[#1e293b] text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700'} ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                        dangerouslySetInnerHTML={{
-                                            __html: link.label,
-                                        }}
-                                    />
-                                ))}
+                            <div className="border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-900/50 px-6 pb-4">
+                                <Pagination links={orders.links} />
                             </div>
                         )}
                     </div>

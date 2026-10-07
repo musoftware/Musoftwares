@@ -65,7 +65,7 @@ class MonthlySpendLoyaltyMilestonesTest extends TestCase
             'loyalty_lifetime_points' => 0,
         ]);
         LoyaltyPointTransaction::where('user_id', $this->client->id)->delete();
-        $this->client->update(['loyalty_points_balance' => 0, 'loyalty_lifetime_points' => 0]);
+        $this->client->forceFill(['loyalty_points_balance' => 0, 'loyalty_lifetime_points' => 0])->save();
 
         $this->loyaltyService = app(LoyaltyService::class);
     }

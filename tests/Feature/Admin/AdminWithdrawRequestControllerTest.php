@@ -13,10 +13,12 @@ use Tests\TestCase;
 class AdminWithdrawRequestControllerTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 

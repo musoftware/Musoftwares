@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreign('device_id')->references('id')->on('sms_payment_gateway_devices')->onDelete('cascade');
             $table->bigInteger('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedBigInteger('tenant_id')->nullable()->index();
             $table->decimal('amount', 15, 2);
             $table->string('currency', 10)->default('EGP');
             $table->string('sender', 255);

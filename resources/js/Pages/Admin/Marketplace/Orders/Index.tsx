@@ -16,6 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/Components/ui/table';
+import Pagination from '@/Components/Pagination';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { ShoppingBag, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
@@ -87,14 +88,14 @@ export default function Index({ orders, stats }) {
                 <EmptyState
                     icon={ShoppingBag}
                     title={__('general.no_marketplace_orders_found')}
-                    description={__('general.orders_will_appear_here') || 'Marketplace orders will appear here.'}
+                    description={__('general.orders_will_appear_here')}
                 />
             ) : (
                 <Card className="bg-white shadow-sm border border-gray-100 overflow-hidden">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-muted/50 hover:bg-muted/50 border-b">
-                                <TableHead className="uppercase text-xs">ID</TableHead>
+                                <TableHead className="uppercase text-xs">{__('general.id')}</TableHead>
                                 <TableHead className="uppercase text-xs">{__('general.service')}</TableHead>
                                 <TableHead className="uppercase text-xs">{__('general.buyer')}</TableHead>
                                 <TableHead className="uppercase text-xs">{__('general.seller')}</TableHead>
@@ -134,10 +135,11 @@ export default function Index({ orders, stats }) {
             )}
 
             {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div className="text-sm text-slate-500">
                         {__('general.showing')} {orders.from || 0} {__('general.to')} {orders.to || 0} {__('general.of')} {orders.total} {__('general.entries')}
                     </div>
+                    <Pagination links={paginationLinks} />
                 </div>
             )}
         </AdminSidebarLayout>

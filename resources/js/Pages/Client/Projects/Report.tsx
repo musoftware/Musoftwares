@@ -117,7 +117,8 @@ export default function ProjectReport({ project, report, comments = [] }: Props)
                             <textarea
                                 value={draft}
                                 onChange={(e) => setDraft(e.target.value)}
-                                placeholder={__('general.write_comment_or_feedback') || 'Write comment...'}
+                                placeholder={__('general.write_comment_or_feedback')}
+                                aria-label={__('general.write_comment_or_feedback')}
                                 rows={2}
                                 className="flex-1 rounded-xl bg-white border border-black/10 px-3.5 py-2 text-xs sm:text-sm text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
                             />
@@ -127,7 +128,7 @@ export default function ProjectReport({ project, report, comments = [] }: Props)
                                 className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 text-white rounded-[980px] text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                             >
                                 <Send className="h-3.5 w-3.5" />
-                                <span>{__('general.post') || 'Post'}</span>
+                                <span>{__('general.post')}</span>
                             </button>
                         </form>
                     </section>

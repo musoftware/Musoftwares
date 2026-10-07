@@ -19,10 +19,12 @@ use Tests\TestCase;
 class MarketplaceEscrowTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates(); // wallet ledger and escrow convert USD amounts to the EGP business currency
         // Since Marketplace packages require a service category, we might need a dummy category if model enforces it.
         // I will just create required models directly or use factories if they exist.
     }

@@ -41,67 +41,67 @@ export default function Solutions() {
 
     const solutions = [
         {
-            title: "ERP & Business Backbones",
+            title: __('frontend.solutions_erp_title'),
             icon: Building2,
-            desc: "Custom Enterprise Resource Planning systems tailored to your unique operational workflows, double-entry finance, inventory, and multi-branch sales.",
-            features: ["Custom business workflows", "Strict role-based access", "Real-time ledger analytics"]
+            desc: __('frontend.solutions_erp_desc'),
+            features: [__('frontend.solutions_erp_f1'), __('frontend.solutions_erp_f2'), __('frontend.solutions_erp_f3')]
         },
         {
-            title: "SaaS & Subscription Platforms",
+            title: __('frontend.solutions_saas_title'),
             icon: Briefcase,
-            desc: "Turn your software idea into a scalable business with tenant data isolation, recurring billing engines, and unified client workspaces.",
-            features: ["Zero-leak multi-tenant schema", "Instant payment integrations", "White-label customer dashboards"]
+            desc: __('frontend.solutions_saas_desc'),
+            features: [__('frontend.solutions_saas_f1'), __('frontend.solutions_saas_f2'), __('frontend.solutions_saas_f3')]
         },
         {
-            title: "E-Learning & Academy Systems",
+            title: __('frontend.solutions_elearning_title'),
             icon: GraduationCap,
-            desc: "Custom platforms for video streaming protection, student grade management, and interactive exam pipelines.",
-            features: ["DRM video protection", "Automated student grading", "Certificates & quiz engines"]
+            desc: __('frontend.solutions_elearning_desc'),
+            features: [__('frontend.solutions_elearning_f1'), __('frontend.solutions_elearning_f2'), __('frontend.solutions_elearning_f3')]
         },
         {
-            title: "Bespoke APIs & Background Microservices",
+            title: __('frontend.solutions_api_title'),
             icon: Code2,
-            desc: "High-throughput webhook consumers, message queues, and API gateways that process millions of events reliably.",
-            features: ["High-speed Redis pipelines", "Guaranteed webhook deliveries", "Sub-100ms response targets"]
+            desc: __('frontend.solutions_api_desc'),
+            features: [__('frontend.solutions_api_f1'), __('frontend.solutions_api_f2'), __('frontend.solutions_api_f3')]
         }
     ];
 
     return (
         <PublicLayout>
             <Head>
-                <title>{__('general.solutions') || 'Solutions'} | Musoftwares</title>
-                <meta name="description" content="Custom software engineering solutions tailored to solve specific business problems." />
+                <title>{__('general.solutions')} | Musoftwares</title>
+                <meta name="description" content={__('frontend.solutions_meta_desc')} />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I'd like to discuss a software solution." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage={__('frontend.solutions_whatsapp_message')} />
 
             <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] overflow-x-hidden pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <div className="reveal-section">
                     <StudioHeader
-                        badge={__('general.solutions') || 'Engineered Solutions'}
+                        badge={__('general.solutions')}
                         title={
                             <>
-                                Tailored Software Solutions. <br className="hidden sm:inline" />
-                                <span className="text-[#0071e3]">Built for Your Exact Workflow.</span>
+                                {__('frontend.solutions_hero_title')} <br className="hidden sm:inline" />
+                                <span className="text-[#0071e3]">{__('frontend.solutions_hero_highlight')}</span>
                             </>
                         }
-                        subtitle="Every industry has unique operational challenges. We build specialized software engines designed around your exact business requirements."
+                        subtitle={__('frontend.solutions_subtitle')}
                     />
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                         <button
-                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a tailored solution for my business.")}
+                            onClick={() => openWhatsAppChat(__('frontend.solutions_cta_message'))}
                             className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            DISCUSS SOLUTION ➔
+                            {__('frontend.solutions_cta')} ➔
                         </button>
                         <Link
                             href="/estimator"
                             className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                         >
-                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                            {__('general.calculate_estimate')}
                         </Link>
                     </div>
                 </div>
@@ -136,10 +136,10 @@ export default function Solutions() {
                                         </ul>
                                     </div>
                                     <button
-                                        onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
+                                        onClick={() => openWhatsAppChat(__('frontend.platform_discuss_topic_message', { topic: item.title }))}
                                         className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                                     >
-                                        <span>INITIATE ARCHITECTURE BRIEF</span>
+                                        <span>{__('frontend.solutions_initiate_brief')}</span>
                                         <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                                     </button>
                                 </div>

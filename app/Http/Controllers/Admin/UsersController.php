@@ -210,6 +210,7 @@ class UsersController extends Controller
                 $stats['services_approved'] = Service::where('seller_id', $user->id)->where('status', 'approved')->count();
             }
         } catch (\Throwable $e) {
+            Log::warning('User detail: marketplace stats unavailable', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
 
         $userDetail = (new UserResource($user))->resolve();
@@ -1281,23 +1282,28 @@ class UsersController extends Controller
     }
 
     /**
-     * JSON search for client comboboxes.
-     * Returns up to 30 users matching the query by name or email.
-     * Excludes users with the admin role.
+     * JSON search for user/client comboboxes.
+     * Returns up to 20 users matching the query by name or email.
+     * Excludes admins unless include_admins=1. With id=..., returns that one user
+     * so edit forms can show the label of the preselected user.
      */
     public function search(Request $request): \Illuminate\Http\JsonResponse
     {
-        $q = trim((string) $request->query('q', ''));
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'id' => ['nullable', 'integer', 'min:1'],
+            'include_admins' => ['nullable', 'boolean'],
+        ]);
 
         $query = User::query()
-            ->whereDoesntHave('roles', fn ($r) => $r->where('name', 'admin'))
             ->orderBy('name')
-            ->limit(30)
+            ->limit(20)
             ->select(['id', 'name', 'email']);
 
-        if ($q !== '') {
-            $like = '%' . $q . '%';
-            $query->where(fn ($w) => $w->where('name', 'like', $like)->orWhere('email', 'like', $like));
+        if (! empty($validated['id'])) {
+            $query->whereKey($validated['id']);
+        } else {
+            $this->applyUserSearchFilters($query, trim((string) ($validated['q'] ?? '')), $request->boolean('include_admins'));
         }
 
         return response()->json(
@@ -1306,5 +1312,19 @@ class UsersController extends Controller
                 'label' => "{$u->name} ({$u->email})",
             ])
         );
+    }
+
+    private function applyUserSearchFilters($query, string $term, bool $includeAdmins): void
+    {
+        if (! $includeAdmins) {
+            $query->whereDoesntHave('roles', fn ($r) => $r->where('name', 'admin'));
+        }
+
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%' . $term . '%';
+        $query->where(fn ($w) => $w->where('name', 'like', $like)->orWhere('email', 'like', $like));
     }
 }

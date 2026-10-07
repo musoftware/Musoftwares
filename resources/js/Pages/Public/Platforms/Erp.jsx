@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import StudioHeader from '@/Components/Studio/StudioHeader';
 import { openWhatsAppChat, STUDIO_PHONE } from '@/lib/whatsapp';
+import { __ } from '@/lib/i18n';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,61 +41,61 @@ export default function Erp({ auth }) {
 
     const features = [
         {
-            title: "Financial Ledgers & Double Entry",
+            title: __('frontend.platform_erp_f1_title'),
             icon: Database,
-            desc: "Accurate, real-time tracking of income, expenses, and transaction logs. Dual currency BC-math precision.",
-            bullets: ["Multi-currency dual ledger", "Automated expense categorization", "Instant invoice & PDF generation"]
+            desc: __('frontend.platform_erp_f1_desc'),
+            bullets: [__('frontend.platform_erp_f1_b1'), __('frontend.platform_erp_f1_b2'), __('frontend.platform_erp_f1_b3')]
         },
         {
-            title: "Multi-Warehouse Inventory Control",
+            title: __('frontend.platform_erp_f2_title'),
             icon: Building2,
-            desc: "Monitor stock levels, track transfer batches across branches, and automate low-stock reorder thresholds.",
-            bullets: ["Multi-branch stock isolation", "Automated reorder triggers", "Supplier & vendor logs"]
+            desc: __('frontend.platform_erp_f2_desc'),
+            bullets: [__('frontend.platform_erp_f2_b1'), __('frontend.platform_erp_f2_b2'), __('frontend.platform_erp_f2_b3')]
         },
         {
-            title: "HR, Attendance & Automated Payroll",
+            title: __('frontend.platform_erp_f3_title'),
             icon: Briefcase,
-            desc: "Manage employee contracts, track daily attendance shifts, and calculate salary deductions natively.",
-            bullets: ["Shift schedules & overtime", "Automated monthly payroll runs", "Role permissions & audit trails"]
+            desc: __('frontend.platform_erp_f3_desc'),
+            bullets: [__('frontend.platform_erp_f3_b1'), __('frontend.platform_erp_f3_b2'), __('frontend.platform_erp_f3_b3')]
         }
     ];
 
     return (
         <PublicLayout>
             <Head>
-                <title>Custom ERP Software Architecture | Musoftwares</title>
-                <meta name="description" content="Custom Enterprise Resource Planning software tailored to your company's exact operational logic." />
+                <title>{`${__('frontend.platform_erp_meta_title')} | Musoftwares`}</title>
+                <meta name="description" content={__('frontend.platform_erp_meta_desc')} />
             </Head>
 
-            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage="Hello Mahmoud, I want to discuss building a custom ERP system." />
+            <FloatingWhatsAppButton phoneNumber={STUDIO_PHONE} defaultMessage={__('frontend.platform_erp_whatsapp_message')} />
 
             <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] overflow-x-hidden pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <div className="reveal-section">
                     <StudioHeader
-                        badge="Enterprise Core"
+                        badge={__('frontend.platform_erp_badge')}
                         title={
                             <>
-                                Bespoke ERP Architecture. <br className="hidden sm:inline" />
-                                <span className="text-[#0071e3]">One Unified Business Backbone.</span>
+                                {__('frontend.platform_erp_hero_title')} <br className="hidden sm:inline" />
+                                <span className="text-[#0071e3]">{__('frontend.platform_erp_hero_highlight')}</span>
                             </>
                         }
-                        subtitle="Eliminate messy spreadsheets and disconnected tools. We engineer custom enterprise systems tailored to your specific commercial workflows."
+                        subtitle={__('frontend.platform_erp_subtitle')}
                     />
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                         <button
-                            onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom ERP platform.")}
+                            onClick={() => openWhatsAppChat(__('frontend.platform_erp_cta_message'))}
                             className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                         >
-                            DISCUSS ERP SCOPE ➔
+                            {__('frontend.platform_erp_cta')} ➔
                         </button>
                         <Link
                             href="/estimator"
                             className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                         >
-                            {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                            {__('general.calculate_estimate')}
                         </Link>
                     </div>
                 </div>
@@ -129,10 +130,10 @@ export default function Erp({ auth }) {
                                         </ul>
                                     </div>
                                     <button
-                                        onClick={() => openWhatsAppChat(`Hello Mahmoud, I want to discuss ${item.title}.`)}
+                                        onClick={() => openWhatsAppChat(__('frontend.platform_discuss_topic_message', { topic: item.title }))}
                                         className="mt-8 text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] flex items-center gap-1 rtl:gap-reverse cursor-pointer"
                                     >
-                                        <span>INITIATE MODULE BRIEF</span>
+                                        <span>{__('frontend.platform_initiate_module_brief')}</span>
                                         <ArrowUpRight className="w-4 h-4 rtl:rotate-[-90deg]" />
                                     </button>
                                 </div>

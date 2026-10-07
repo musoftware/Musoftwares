@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Calculator, FileText, Share2, Copy, Check, Sparkles, UserPlus, ArrowRight, ShieldCheck, DollarSign, Clock } from 'lucide-react';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 export default function QuickCreate({ currencies = [] }) {
     const { flash } = usePage().props;
@@ -44,8 +46,8 @@ export default function QuickCreate({ currencies = [] }) {
                     setShowClarificationModal(true);
                 }
             }
-        } catch (err) {
-            console.error('Failed to calculate valuation:', err);
+        } catch {
+            toast.error(__('admin.quick_contract_calculate_failed'));
         } finally {
             setCalculating(false);
         }
@@ -71,7 +73,7 @@ export default function QuickCreate({ currencies = [] }) {
 
     return (
         <AdminSidebarLayout>
-            <Head title="مولّد العقود والتسعير السريع" />
+            <Head title={__('admin.quick_contract_title')} />
 
             <div className="space-y-8 max-w-6xl mx-auto py-6 px-4">
                 {/* Header Title */}
@@ -79,11 +81,11 @@ export default function QuickCreate({ currencies = [] }) {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <Sparkles className="w-5 h-5 text-amber-500" />
-                            <span className="text-xs font-black uppercase tracking-widest text-amber-600">Quick Pricing Engine</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-amber-600">{__('admin.quick_contract_engine_label')}</span>
                         </div>
-                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">مولّد العقود والتسعير السريع</h1>
+                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{__('admin.quick_contract_title')}</h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            أدخل وصف المشروع نصياً، وسيقوم المحرك بحساب التسعير التلقائي ثنائي المستوى وتوليد العقد ورابط المشاركة للعميل فوراً.
+                            {__('admin.quick_contract_intro')}
                         </p>
                     </div>
                 </div>
@@ -94,12 +96,12 @@ export default function QuickCreate({ currencies = [] }) {
                         <CardHeader className="pb-3">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
-                                    ✓
+                                    <Check className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-lg text-emerald-900 font-extrabold">تم إنشاء العقد وتوليد الرابط القابل للمشاركة!</CardTitle>
+                                    <CardTitle className="text-lg text-emerald-900 font-extrabold">{__('admin.quick_contract_created_title')}</CardTitle>
                                     <CardDescription className="text-emerald-700 text-xs">
-                                        مرجع العقد: <span className="font-mono font-bold text-emerald-950">{flash.contract_ref}</span>
+                                        {__('admin.quick_contract_reference')}: <span className="font-mono font-bold text-emerald-950">{flash.contract_ref}</span>
                                     </CardDescription>
                                 </div>
                             </div>
@@ -117,17 +119,17 @@ export default function QuickCreate({ currencies = [] }) {
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0 text-xs font-bold gap-2"
                                 >
                                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                    {copied ? 'تم النسخ!' : 'نسخ الرابط'}
+                                    {copied ? __('general.link_copied') : __('admin.copy_link')}
                                 </Button>
                             </div>
 
                             <div className="flex gap-3">
                                 <Button
                                     type="button"
-                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('أهلاً بك! يمكنك معاينة العقد وتوقيعه مباشرة عبر هذا الرابط:\n' + flash.shareable_url)}`, '_blank')}
+                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(__('admin.quick_contract_whatsapp_message', { url: flash.shareable_url }))}`, '_blank')}
                                     className="bg-[#25D366] hover:bg-[#1da851] text-white font-bold text-xs gap-2 rounded-full px-6"
                                 >
-                                    <Share2 className="w-4 h-4" /> مشاركة عبر الواتساب
+                                    <Share2 className="w-4 h-4" /> {__('admin.quick_contract_share_whatsapp')}
                                 </Button>
                             </div>
                         </CardContent>
@@ -141,18 +143,18 @@ export default function QuickCreate({ currencies = [] }) {
                             <CardHeader>
                                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                                     <FileText className="w-5 h-5 text-slate-700" />
-                                    1. تفاصيل ووصف المشروع
+                                    1. {__('admin.quick_contract_step_description')}
                                 </CardTitle>
                                 <CardDescription className="text-xs">
-                                    اكتب متطلبات واحتياجات المشروع نصياً، وسيقوم المحرك بتوليد المكونات وتحديد الساعات.
+                                    {__('admin.quick_contract_step_description_hint')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold text-slate-700">نص وصف المشروع والخصائص المطلوبة *</Label>
+                                    <Label className="text-xs font-bold text-slate-700">{__('admin.quick_contract_description_label')} *</Label>
                                     <Textarea
                                         rows={7}
-                                        placeholder="مثال: موقع متجر إلكتروني لبيع المستلزمات الطبية أونلاين، يحتوي على سلة مشتريات، بوابة دفع سترايب، نظام فواتير، لوحة تحكم للطلبات، وإشعارات للعميل بالواتساب..."
+                                        placeholder={__('admin.quick_contract_description_placeholder')}
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         className="text-sm font-sans leading-relaxed border-slate-300 focus:border-amber-500 focus:ring-amber-500"
@@ -168,7 +170,7 @@ export default function QuickCreate({ currencies = [] }) {
                                         className="bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs gap-2 rounded-full px-6"
                                     >
                                         <Calculator className="w-4 h-4" />
-                                        {calculating ? 'جاري حساب التسعير بالذكاء الاصطناعي...' : 'حساب وتحليل التسعير الآن'}
+                                        {calculating ? __('admin.quick_contract_calculating') : __('admin.quick_contract_calculate_now')}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -179,26 +181,26 @@ export default function QuickCreate({ currencies = [] }) {
                             <CardHeader>
                                 <CardTitle className="text-lg font-bold flex items-center gap-2">
                                     <UserPlus className="w-5 h-5 text-slate-700" />
-                                    2. ربط العميل والعملة
+                                    2. {__('admin.quick_contract_step_client')}
                                 </CardTitle>
                                 <CardDescription className="text-xs">
-                                    يمكنك تحديد العميل الآن، أو ترك العميل فارغاً ليقوم النظام بربط العقد تلقائياً بالعميل عند تسجيل دخوله.
+                                    {__('admin.quick_contract_step_client_hint')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold text-slate-700">اختيار العميل (اختياري)</Label>
+                                    <Label className="text-xs font-bold text-slate-700">{__('admin.quick_contract_client_optional')}</Label>
                                     <PremiumCombobox
                                         value={data.client_id ? String(data.client_id) : ''}
                                         onChange={(val) => setData('client_id', val ? String(val) : '')}
                                         asyncEndpoint={route('admin.users.search')}
-                                        placeholder="-- يربط تلقائياً عند تسجيل دخول العميل --"
-                                        searchPlaceholder="بحث عن عميل..."
+                                        placeholder={`-- ${__('admin.quick_contract_client_auto_link')} --`}
+                                        searchPlaceholder={__('admin.quick_contract_search_client')}
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold text-slate-700">عملة العقد</Label>
+                                    <Label className="text-xs font-bold text-slate-700">{__('admin.quick_contract_currency')}</Label>
                                     <select
                                         value={data.currency_id}
                                         onChange={(e) => handleCurrencyChange(e.target.value)}
@@ -222,10 +224,10 @@ export default function QuickCreate({ currencies = [] }) {
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-lg font-bold flex items-center gap-2">
                                         <ShieldCheck className="w-5 h-5 text-amber-400" />
-                                        نتائج التسعير والتفكيك الفني
+                                        {__('admin.quick_contract_results_title')}
                                     </CardTitle>
                                     <span className="text-[10px] font-extrabold uppercase tracking-widest bg-amber-400 text-slate-950 px-2.5 py-1 rounded-full">
-                                        Two-Level Engine
+                                        {__('admin.quick_contract_two_level_engine')}
                                     </span>
                                 </div>
                             </CardHeader>
@@ -235,7 +237,7 @@ export default function QuickCreate({ currencies = [] }) {
                                         {/* Main Summary Numbers */}
                                         <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
                                             <div>
-                                                <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">إجمالي التكلفة</p>
+                                                <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('admin.quick_contract_total_cost')}</p>
                                                 <p className="text-2xl font-black text-slate-900 mt-1">
                                                     {valuation.converted_amount} <span className="text-xs font-bold text-amber-600">{valuation.currency_symbol}</span>
                                                 </p>
@@ -244,17 +246,17 @@ export default function QuickCreate({ currencies = [] }) {
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">الدفعة الأولى (50%)</p>
+                                                <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('admin.quick_contract_first_payment')}</p>
                                                 <p className="text-2xl font-black text-emerald-600 mt-1">
                                                     {valuation.deposit_converted || (valuation.converted_amount * 0.5).toFixed(2)} <span className="text-xs font-bold text-emerald-700">{valuation.currency_symbol}</span>
                                                 </p>
-                                                <p className="text-[10px] font-bold text-emerald-700 mt-0.5">مطلوبة لتفعيل العقد</p>
+                                                <p className="text-[10px] font-bold text-emerald-700 mt-0.5">{__('admin.quick_contract_required_to_activate')}</p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-center justify-between text-xs text-slate-600 border-b pb-3">
-                                            <span className="flex items-center gap-1.5 font-bold"><Clock className="w-4 h-4 text-slate-400" /> مدة التنفيذ المتوقعة:</span>
-                                            <span className="font-extrabold text-slate-900">{valuation.estimated_days} أيام عمل ({valuation.total_hours} ساعة)</span>
+                                            <span className="flex items-center gap-1.5 font-bold"><Clock className="w-4 h-4 text-slate-400" /> {__('admin.quick_contract_expected_duration')}:</span>
+                                            <span className="font-extrabold text-slate-900">{__('admin.quick_contract_days_and_hours', { days: valuation.estimated_days, hours: valuation.total_hours })}</span>
                                         </div>
 
                                         {/* AI Summary & Tech Stack Card */}
@@ -262,14 +264,14 @@ export default function QuickCreate({ currencies = [] }) {
                                             <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 space-y-3 text-xs">
                                                 <div className="flex items-center gap-1.5 font-extrabold text-amber-900">
                                                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                                                    <span>تحليل الذكاء الاصطناعي للمشروع (AI Scope Analysis):</span>
+                                                    <span>{__('admin.quick_contract_ai_scope_analysis')}:</span>
                                                 </div>
                                                 <p className="text-slate-700 leading-relaxed font-sans">
                                                     {valuation.ai_summary}
                                                 </p>
                                                 {valuation.tech_stack && (
                                                     <div className="pt-1 flex items-center gap-2 flex-wrap">
-                                                        <span className="text-[10px] font-bold text-slate-500">البيئة البرمجية المقترحة:</span>
+                                                        <span className="text-[10px] font-bold text-slate-500">{__('admin.quick_contract_suggested_tech_stack')}:</span>
                                                         <span className="bg-white text-slate-800 border border-amber-300 font-mono text-[10px] px-2 py-0.5 rounded-md font-bold">
                                                             {valuation.tech_stack}
                                                         </span>
@@ -281,11 +283,11 @@ export default function QuickCreate({ currencies = [] }) {
                                         {/* Key Deliverables List */}
                                         {valuation.key_features && valuation.key_features.length > 0 && (
                                             <div className="space-y-2">
-                                                <p className="text-xs font-black uppercase tracking-wider text-slate-500">المخرجات الرئيسية للمشروع (Deliverables):</p>
+                                                <p className="text-xs font-black uppercase tracking-wider text-slate-500">{__('admin.quick_contract_key_deliverables')}:</p>
                                                 <div className="grid grid-cols-1 gap-1.5">
                                                     {valuation.key_features.map((feat, fIdx) => (
                                                         <div key={fIdx} className="flex items-center gap-2 text-xs text-slate-800 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100">
-                                                            <span className="text-emerald-600 font-bold text-xs">✓</span>
+                                                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                                             <span className="font-bold">{feat}</span>
                                                         </div>
                                                     ))}
@@ -295,7 +297,7 @@ export default function QuickCreate({ currencies = [] }) {
 
                                         {/* Itemized Micro-Components */}
                                         <div className="space-y-3">
-                                            <p className="text-xs font-black uppercase tracking-wider text-slate-500">التفكيك الفني والمالي المفصّل (Micro-Components):</p>
+                                            <p className="text-xs font-black uppercase tracking-wider text-slate-500">{__('admin.quick_contract_micro_components')}:</p>
                                             <div className="max-h-72 overflow-y-auto space-y-2.5 pr-1">
                                                 {valuation.micro_components?.map((comp, idx) => (
                                                     <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
@@ -308,7 +310,7 @@ export default function QuickCreate({ currencies = [] }) {
                                                                     )}
                                                                     {comp.is_new_item && (
                                                                         <span className="bg-amber-100 text-amber-900 border border-amber-300 font-extrabold px-2 py-0.5 rounded text-[9px] flex items-center gap-1">
-                                                                            ✨ بند تسعير جديد مسجل
+                                                                            <Sparkles className="w-3 h-3" /> {__('admin.quick_contract_new_price_item')}
                                                                         </span>
                                                                     )}
                                                                 </div>
@@ -316,7 +318,7 @@ export default function QuickCreate({ currencies = [] }) {
                                                                     <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{comp.description_ar}</p>
                                                                 )}
                                                             </div>
-                                                            <div className="text-left shrink-0">
+                                                            <div className="text-end shrink-0">
                                                                 <p className="font-mono font-black text-slate-900 text-sm">
                                                                     {comp.converted_cost} <span className="text-[11px] font-bold text-amber-600">{comp.currency_symbol}</span>
                                                                 </p>
@@ -326,10 +328,10 @@ export default function QuickCreate({ currencies = [] }) {
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px]">
-                                                            <span className="text-slate-500 font-bold">⏱ الساعات المقدرة: <strong className="text-slate-800">{comp.estimated_hours} ساعة</strong></span>
+                                                            <span className="text-slate-500 font-bold inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {__('admin.quick_contract_estimated_hours')}: <strong className="text-slate-800">{__('admin.quick_contract_hours_count', { hours: comp.estimated_hours })}</strong></span>
                                                             {comp.complexity && (
                                                                 <span className="bg-slate-200/70 text-slate-700 font-bold px-2 py-0.5 rounded uppercase">
-                                                                    مستوى التعقيد: {comp.complexity}
+                                                                    {__('admin.price_item_complexity')}: {comp.complexity}
                                                                 </span>
                                                             )}
                                                         </div>
@@ -343,14 +345,14 @@ export default function QuickCreate({ currencies = [] }) {
                                             <div className="bg-gradient-to-r from-amber-500/10 via-amber-400/15 to-amber-500/10 border border-amber-400/40 rounded-xl p-3.5 flex items-center justify-between gap-3 text-xs">
                                                 <div className="flex items-center gap-2">
                                                     <Sparkles className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
-                                                    <span className="font-extrabold text-amber-950">هذا الطلب ينطوي على خيارات متعددة لتحديد النطاق.</span>
+                                                    <span className="font-extrabold text-amber-950">{__('admin.quick_contract_multiple_scope_options')}</span>
                                                 </div>
                                                 <Button
                                                     type="button"
                                                     onClick={() => setShowClarificationModal(true)}
                                                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[11px] px-3.5 py-1.5 rounded-lg shrink-0 shadow-sm gap-1"
                                                 >
-                                                    تخصيص النطاق <ArrowRight className="w-3.5 h-3.5" />
+                                                    {__('admin.quick_contract_customize_scope')} <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                                                 </Button>
                                             </div>
                                         )}
@@ -361,16 +363,16 @@ export default function QuickCreate({ currencies = [] }) {
                                             disabled={processing}
                                             className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-6 rounded-xl text-xs uppercase tracking-wider gap-2 shadow-lg"
                                         >
-                                            <ArrowRight className="w-4 h-4" />
-                                            {processing ? 'جاري إنشاء العقد وتوليد الرابط...' : 'إنشاء العقد وتوليد الرابط للعميل'}
+                                            <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+                                            {processing ? __('admin.quick_contract_creating') : __('admin.quick_contract_create')}
                                         </Button>
                                     </>
                                 ) : (
                                     <div className="text-center py-10 space-y-3">
                                         <Calculator className="w-12 h-12 text-slate-300 mx-auto" />
-                                        <p className="text-sm font-bold text-slate-600">في انتظار أدخال وصف المشروع</p>
+                                        <p className="text-sm font-bold text-slate-600">{__('admin.quick_contract_waiting_title')}</p>
                                         <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                                            اكتب المتطلبات على اليسار واضغط على "حساب وتحليل التسعير الآن" لعرض النتائج فوراً.
+                                            {__('admin.quick_contract_waiting_hint')}
                                         </p>
                                     </div>
                                 )}
@@ -385,13 +387,13 @@ export default function QuickCreate({ currencies = [] }) {
                         <DialogHeader className="pb-3 border-b border-slate-100">
                             <div className="flex items-center gap-2 text-amber-600 font-extrabold text-xs uppercase tracking-wider">
                                 <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-                                استفسار ذكي لتحديد النطاق (AI Clarification)
+                                {__('admin.quick_contract_ai_clarification')}
                             </div>
                             <DialogTitle className="text-base font-extrabold text-slate-900 mt-1 leading-relaxed">
-                                {valuation?.clarifying_question || "النص المدخل ينطوي على خيارات متعددة، يرجى تحديد النطاق ليتم التسعير بناءً عليه:"}
+                                {valuation?.clarifying_question || __('admin.quick_contract_default_clarifying_question')}
                             </DialogTitle>
                             <DialogDescription className="text-xs text-slate-500 mt-1">
-                                اختر أحد الخيارات الثلاثة التالية لإعادة احتساب الساعات والتكلفة بدقة عالية:
+                                {__('admin.quick_contract_choose_option_hint')}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -412,7 +414,7 @@ export default function QuickCreate({ currencies = [] }) {
                                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${
                                         selectedAnswer === ans ? 'border-amber-600 bg-amber-500 text-slate-950 font-extrabold text-[10px]' : 'border-slate-300 bg-white'
                                     }`}>
-                                        {selectedAnswer === ans ? '✓' : aIdx + 1}
+                                        {selectedAnswer === ans ? <Check className="w-3 h-3" /> : aIdx + 1}
                                     </div>
                                     <span className="leading-relaxed">{ans}</span>
                                 </div>
@@ -420,10 +422,10 @@ export default function QuickCreate({ currencies = [] }) {
 
                             {/* Custom Answer Input */}
                             <div className="pt-2">
-                                <Label className="text-[11px] font-bold text-slate-700">أو اكتب تفاصيل إضافية مخصصة (اختياري):</Label>
+                                <Label className="text-[11px] font-bold text-slate-700">{__('admin.quick_contract_custom_answer_label')}:</Label>
                                 <Input
                                     type="text"
-                                    placeholder="مثال: إضافة زر في لوحة التحكم يرسل إشعارات مخصصة للمستخدمين..."
+                                    placeholder={__('admin.quick_contract_custom_answer_placeholder')}
                                     value={customAnswer}
                                     onChange={(e) => {
                                         setCustomAnswer(e.target.value);
@@ -441,7 +443,7 @@ export default function QuickCreate({ currencies = [] }) {
                                 onClick={() => setShowClarificationModal(false)}
                                 className="text-xs font-bold text-slate-600 border-slate-300 hover:bg-slate-100"
                             >
-                                تخطي واعتماد التقدير المبدئي
+                                {__('admin.quick_contract_skip_clarification')}
                             </Button>
                             <Button
                                 type="button"
@@ -455,7 +457,7 @@ export default function QuickCreate({ currencies = [] }) {
                                 }}
                                 className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-6 py-2.5 rounded-xl shadow-md gap-2"
                             >
-                                تأكيد واستكمال التسعير الدقيق <ArrowRight className="w-4 h-4" />
+                                {__('admin.quick_contract_confirm_clarification')} <ArrowRight className="w-4 h-4 rtl:rotate-180" />
                             </Button>
                         </DialogFooter>
                     </DialogContent>

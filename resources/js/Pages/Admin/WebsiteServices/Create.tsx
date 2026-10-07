@@ -31,92 +31,92 @@ export default function Create() {
     };
 
     return (
-        <AdminSidebarLayout header="Create Service">
+        <AdminSidebarLayout header={__('general.create_service')}>
             <Head title={__('general.create_service')} />
             <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Title (English)</Label>
+                            <Label>{__('admin.website_services_title_en')}</Label>
                             <Input value={data.title_en} onChange={e => setData('title_en', e.target.value)} required />
                             {errors.title_en && <p className="text-sm text-red-600">{errors.title_en}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Title (Arabic)</Label>
+                            <Label>{__('admin.website_services_title_ar')}</Label>
                             <Input value={data.title_ar} onChange={e => setData('title_ar', e.target.value)} required  />
                             {errors.title_ar && <p className="text-sm text-red-600">{errors.title_ar}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Subtitle (English)</Label>
+                            <Label>{__('admin.website_services_subtitle_en')}</Label>
                             <Input value={data.subtitle_en} onChange={e => setData('subtitle_en', e.target.value)} />
                             {errors.subtitle_en && <p className="text-sm text-red-600">{errors.subtitle_en}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Subtitle (Arabic)</Label>
+                            <Label>{__('admin.website_services_subtitle_ar')}</Label>
                             <Input value={data.subtitle_ar} onChange={e => setData('subtitle_ar', e.target.value)}  />
                             {errors.subtitle_ar && <p className="text-sm text-red-600">{errors.subtitle_ar}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Description (English)</Label>
+                            <Label>{__('admin.website_services_description_en')}</Label>
                             <Textarea value={data.description_en} onChange={e => setData('description_en', e.target.value)} rows={4} />
                             {errors.description_en && <p className="text-sm text-red-600">{errors.description_en}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Description (Arabic)</Label>
+                            <Label>{__('admin.website_services_description_ar')}</Label>
                             <Textarea value={data.description_ar} onChange={e => setData('description_ar', e.target.value)} rows={4}  />
                             {errors.description_ar && <p className="text-sm text-red-600">{errors.description_ar}</p>}
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>Icon / Image (English)</Label>
+                            <Label>{__('admin.website_services_image_en')}</Label>
                             <Input type="file" onChange={e => setData('image_en', e.target.files ? e.target.files[0] : null)} accept="image/*" />
                             {errors.image_en && <p className="text-sm text-red-600">{errors.image_en}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Icon / Image (Arabic)</Label>
+                            <Label>{__('admin.website_services_image_ar')}</Label>
                             <Input type="file" onChange={e => setData('image_ar', e.target.files ? e.target.files[0] : null)} accept="image/*" />
                             {errors.image_ar && <p className="text-sm text-red-600">{errors.image_ar}</p>}
                         </div>
                     </div>
                     
                     <div className="border-t border-slate-200 pt-6 mt-6">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-4">Advanced SEO Overrides (Optional)</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-4">{__('admin.website_services_seo_overrides')}</h3>
                         <p className="text-sm text-slate-500 mb-6">{__('general.leave_these_blank_to_have_our_ai_automat')}</p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
-                                <Label>SEO Title (English)</Label>
+                                <Label>{__('admin.website_services_seo_title_en')}</Label>
                                 <Input value={data.seo_title_en} onChange={e => setData('seo_title_en', e.target.value)} maxLength={60} />
                             </div>
                             <div className="space-y-2">
-                                <Label>SEO Title (Arabic)</Label>
+                                <Label>{__('admin.website_services_seo_title_ar')}</Label>
                                 <Input value={data.seo_title_ar} onChange={e => setData('seo_title_ar', e.target.value)}  maxLength={60} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div className="space-y-2">
-                                <Label>SEO Description (English)</Label>
+                                <Label>{__('admin.website_services_seo_description_en')}</Label>
                                 <Textarea value={data.seo_description_en} onChange={e => setData('seo_description_en', e.target.value)} rows={3} maxLength={160} />
                             </div>
                             <div className="space-y-2">
-                                <Label>SEO Description (Arabic)</Label>
+                                <Label>{__('admin.website_services_seo_description_ar')}</Label>
                                 <Textarea value={data.seo_description_ar} onChange={e => setData('seo_description_ar', e.target.value)} rows={3}  maxLength={160} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>SEO Keywords (English) - Comma separated</Label>
+                                <Label>{__('admin.website_services_seo_keywords_en')}</Label>
                                 <Input value={data.seo_keywords_en} onChange={e => setData('seo_keywords_en', e.target.value)} />
                             </div>
                             <div className="space-y-2">
-                                <Label>SEO Keywords (Arabic) - Comma separated</Label>
+                                <Label>{__('admin.website_services_seo_keywords_ar')}</Label>
                                 <Input value={data.seo_keywords_ar} onChange={e => setData('seo_keywords_ar', e.target.value)}  />
                             </div>
                         </div>

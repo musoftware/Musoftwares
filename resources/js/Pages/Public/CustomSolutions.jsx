@@ -17,83 +17,83 @@ import { openWhatsAppChat } from '@/lib/whatsapp';
 export default function CustomSolutions() {
     const techCategories = [
         {
-            title: "Frontend & Interfaces",
+            title: __('frontend.custom_solutions_cat_frontend'),
             techs: ["React 19", "TypeScript", "Tailwind CSS v4", "Inertia.js", "Shadcn UI", "Next.js"]
         },
         {
-            title: "Backend Engines",
-            techs: ["Laravel 11+", "PHP 8.3", "Node.js", "Express", "REST APIs", "Webhook Pipelines"]
+            title: __('frontend.custom_solutions_cat_backend'),
+            techs: ["Laravel 11+", "PHP 8.3", "Node.js", "Express", "REST APIs", __('frontend.custom_solutions_tech_webhooks')]
         },
         {
-            title: "Databases & Ledgers",
-            techs: ["PostgreSQL", "MySQL", "Redis", "SQLite", "BC-Math Precision"]
+            title: __('frontend.custom_solutions_cat_databases'),
+            techs: ["PostgreSQL", "MySQL", "Redis", "SQLite", __('frontend.custom_solutions_tech_bcmath')]
         },
         {
-            title: "DevOps & Cloud",
-            techs: ["Docker", "Linux VPS", "Nginx", "CI/CD Pipelines", "Automated Backups"]
+            title: __('frontend.custom_solutions_cat_devops'),
+            techs: ["Docker", "Linux VPS", "Nginx", __('frontend.custom_solutions_tech_cicd'), __('frontend.custom_solutions_tech_backups')]
         },
         {
-            title: "Integrations & APIs",
-            techs: ["WhatsApp Cloud API", "Payment Gateways", "SMS OTP Gateways", "AI Agents", "OpenAI"]
+            title: __('frontend.custom_solutions_cat_integrations'),
+            techs: ["WhatsApp Cloud API", __('frontend.custom_solutions_tech_payments'), __('frontend.custom_solutions_tech_sms'), __('frontend.custom_solutions_tech_ai_agents'), "OpenAI"]
         }
     ];
 
     const capabilities = [
         {
             icon: Cpu,
-            title: "High-Concurrency Backend Architecture",
-            desc: "Scalable transaction backends engineered with asynchronous queue pipelines and sub-100ms response times."
+            title: __('frontend.custom_solutions_cap_backend_title'),
+            desc: __('frontend.custom_solutions_cap_backend_desc')
         },
         {
             icon: Database,
-            title: "Financial Precision & Dual Currency",
-            desc: "BC-math rounding, double-entry ledgers, and dynamic multi-currency conversion without float discrepancies."
+            title: __('frontend.custom_solutions_cap_finance_title'),
+            desc: __('frontend.custom_solutions_cap_finance_desc')
         },
         {
             icon: ShieldCheck,
-            title: "Multi-Tenant Data Isolation",
-            desc: "Zero-data-leak schema isolation with row-level policies and strictly authenticated client environments."
+            title: __('frontend.custom_solutions_cap_tenancy_title'),
+            desc: __('frontend.custom_solutions_cap_tenancy_desc')
         },
         {
             icon: Workflow,
-            title: "Automated Third-Party Integration",
-            desc: "Bi-directional webhook ingestion, Meta Graph API sync, and reliable background synchronization."
+            title: __('frontend.custom_solutions_cap_integration_title'),
+            desc: __('frontend.custom_solutions_cap_integration_desc')
         }
     ];
 
     return (
         <PublicLayout>
             <Head>
-                <title>{__('home.custom_dev_title') || 'Custom Architecture & Software Engineering | Musoftwares'}</title>
-                <meta name="description" content="Bespoke software architecture, database engineering, and scalable enterprise systems built to your exact specifications." />
+                <title>{__('home.custom_dev_title')}</title>
+                <meta name="description" content={__('frontend.custom_solutions_meta_desc')} />
             </Head>
 
             <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
                 
                 {/* Hero Header */}
                 <StudioHeader
-                    badge="Bespoke Engineering"
+                    badge={__('frontend.custom_solutions_badge')}
                     title={
                         <>
-                            Custom Software Architecture. <br className="hidden sm:inline" />
-                            <span className="text-[#0071e3]">Tailored To Your Scale.</span>
+                            {__('frontend.custom_solutions_title')} <br className="hidden sm:inline" />
+                            <span className="text-[#0071e3]">{__('frontend.custom_solutions_title_accent')}</span>
                         </>
                     }
-                    subtitle="We build high-performance systems from the database schema up. No disposable templates, no fragile shortcuts — pure engineering."
+                    subtitle={__('frontend.custom_solutions_subtitle')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20 -mt-8">
                     <button
-                        onClick={() => openWhatsAppChat("Hello Mahmoud, I want to discuss a custom engineering solution.")}
+                        onClick={() => openWhatsAppChat(__('frontend.custom_solutions_whatsapp_msg'))}
                         className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                     >
-                        INITIATE TECHNICAL SCOPE ➔
+                        {__('frontend.custom_solutions_initiate_scope')} ➔
                     </button>
                     <Link
                         href="/estimator"
                         className="border border-black/10 hover:border-black/30 bg-white text-[#1d1d1f] hover:bg-[#f5f5f7] px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-sm"
                     >
-                        {__('general.calculate_estimate') || 'CALCULATE ESTIMATE'}
+                        {__('general.calculate_estimate')}
                     </Link>
                 </div>
 
@@ -128,10 +128,10 @@ export default function CustomSolutions() {
                 <section className="px-6 max-w-[1400px] mx-auto border-t border-black/5 pt-16">
                     <div className="text-center mb-12">
                         <span className="text-xs uppercase tracking-wider text-[#0071e3] font-semibold">
-                            Production Technology Stack
+                            {__('frontend.custom_solutions_stack_label')}
                         </span>
                         <h2 className="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] font-sans tracking-tight mt-2">
-                            Engineered with Modern Standards
+                            {__('frontend.custom_solutions_stack_title')}
                         </h2>
                     </div>
 

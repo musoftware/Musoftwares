@@ -38,12 +38,12 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
     const breadcrumbs = [
         { label: __('general.dashboard'), href: route('dashboard') },
         { label: __('general.my_projects'), href: route('client.projects.index') },
-        { label: __('general.all_projects_board') || 'All Projects Board' },
+        { label: __('general.all_projects_board') },
     ];
 
     return (
         <AuthenticatedLayout>
-            <Head title={`${__('general.all_projects_board') || 'All Projects Board'} · ${format(day, 'MMM d, yyyy')} — Musoftwares Studio`} />
+            <Head title={`${__('general.all_projects_board')} · ${format(day, 'MMM d, yyyy')} — Musoftwares Studio`} />
 
             <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
                 
@@ -58,10 +58,10 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                                     <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0071e3]/10 text-[#0071e3]">
                                         <LayoutDashboard className="h-5 w-5" />
                                     </span>
-                                    {__('general.all_projects_board') || 'All Projects Board'}
+                                    {__('general.all_projects_board')}
                                 </h1>
                                 <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                                    {__('admin.all_projects_board_intro') || 'View and manage board items across all your active projects in one place.'}
+                                    {__('client.projects_all_board_intro')}
                                 </p>
                             </div>
                         </div>
@@ -77,14 +77,14 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                             href={route('client.projects.index')}
                             className="px-4 py-2 rounded-full text-xs font-semibold bg-white text-[#1d1d1f]/70 border border-black/5 hover:bg-[#f5f5f7] hover:text-[#1d1d1f] transition-colors"
                         >
-                            {__('general.projects_list') || 'Projects List'}
+                            {__('general.projects_list')}
                         </Link>
                         <Link
                             href={route('client.projects.all-projects-board.index')}
                             className="px-4 py-2 rounded-full text-xs font-semibold bg-[#1d1d1f] text-white shadow-xs flex items-center gap-1.5"
                         >
                             <CalendarDays className="w-3.5 h-3.5" />
-                            <span>{__('general.all_projects_board') || 'All Projects Board'}</span>
+                            <span>{__('general.all_projects_board')}</span>
                         </Link>
                     </div>
 
@@ -94,7 +94,8 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                             <button
                                 onClick={() => goToDate(prev)}
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-black/5 cursor-pointer"
-                                title={__('general.previous_day') || 'Previous Day'}
+                                title={__('general.previous_day')}
+                                aria-label={__('general.previous_day')}
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </button>
@@ -110,7 +111,8 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                             <button
                                 onClick={() => goToDate(next)}
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-black/5 cursor-pointer"
-                                title={__('general.next_day') || 'Next Day'}
+                                title={__('general.next_day')}
+                                aria-label={__('general.next_day')}
                             >
                                 <ChevronRight className="h-4 w-4" />
                             </button>
@@ -120,7 +122,7 @@ export default function AllProjectsBoard({ date, lanes, cards, categories, isAdm
                                     onClick={() => goToDate(todayStr)}
                                     className="ms-2 inline-flex h-9 items-center rounded-full bg-[#1d1d1f] px-3.5 text-xs font-semibold text-white transition-colors hover:bg-black cursor-pointer"
                                 >
-                                    {__('general.today') || 'Today'}
+                                    {__('general.today')}
                                 </button>
                             )}
                         </div>

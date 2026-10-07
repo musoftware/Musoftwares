@@ -20,6 +20,7 @@ import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { toastSuccess, toastError } from '@/Components/ui/use-toast';
 import { useState } from 'react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 export default function Index({ payouts, filters = {}, projects = [] }: any) {
     const paginationLinks = payouts.meta?.links || payouts.links;
@@ -32,8 +33,8 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
         setPendingMarkPaid(null);
         router.post(route('admin.payouts.mark-paid', id), {}, {
             preserveScroll: true,
-            onSuccess: () => toastSuccess(__('general.payout_marked_paid') || 'Payout marked as paid'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.payout_marked_paid')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -43,8 +44,8 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
         setPendingDelete(null);
         router.delete(route('admin.payouts.destroy', id), {
             preserveScroll: true,
-            onSuccess: () => toastSuccess(__('general.deleted') || 'Payout deleted'),
-            onError: () => toastError(__('general.error_occurred') || 'Something went wrong'),
+            onSuccess: () => toastSuccess(__('general.deleted')),
+            onError: () => toastError(__('general.error_occurred')),
         });
     };
 
@@ -59,12 +60,12 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
     };
 
     return (
-        <AdminSidebarLayout title="Payouts" header="Payouts Manager">
+        <AdminSidebarLayout title={__('admin.payouts_title')} header={__('admin.payouts_header')}>
             
             <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Payouts</h1>
+                <h1 className="text-2xl font-bold">{__('admin.payouts_title')}</h1>
                 <Link href={route('admin.users.index')}>
-                    <Button>Create Payout from Users List</Button>
+                    <Button>{__('admin.payouts_create_from_users')}</Button>
                 </Link>
             </div>
 
@@ -74,7 +75,7 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-muted/50 hover:bg-muted/50 border-b">
-                                    <TableHead className="hidden sm:table-cell uppercase text-xs">ID</TableHead>
+                                    <TableHead className="hidden sm:table-cell uppercase text-xs">{__('admin.payouts_col_id')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.customer')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.project')}</TableHead>
                                     <TableHead className="uppercase text-xs">{__('general.date')}</TableHead>
@@ -86,7 +87,7 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                             <TableBody>
                                 {(payouts.data as any).map((payout) => (
                                     <TableRow key={payout.id}>
-                                        <TableCell className="font-medium hidden sm:table-cell" data-label="ID">
+                                        <TableCell className="font-medium hidden sm:table-cell" data-label={__('admin.payouts_col_id')}>
                                             <Link href={route('admin.payouts.show', payout.id)} className="text-primary hover:underline font-semibold">
                                                 #{payout.id}
                                             </Link>
@@ -138,7 +139,7 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuLabel>{__('general.actions')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('admin.payouts.show', payout.id)} className="flex w-full items-center">
                                                             <FileText className="me-2 h-4 w-4 text-slate-900" />{__('general.view_details')}
@@ -163,7 +164,7 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
                                 ))}
                                 {(payouts.data as any).length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">No payouts found</TableCell>
+                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">{__('admin.payouts_empty')}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -173,29 +174,12 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
             </div>
 
             {/* Pagination */}
-            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
-                <div className="mt-4 flex justify-center md:justify-end">
-                    <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                        {paginationLinks.map((link, i) => (
-                            <Link
-                                key={i}
-                                href={link.url || '#'}
-                                className={`px-3 py-2 text-sm border ${
-                                    link.active
-                                        ? 'z-10 bg-primary border-primary text-primary-foreground font-medium'
-                                        : 'bg-background border-input text-muted-foreground hover:bg-muted'
-                                } ${i === 0 ? 'rounded-s-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-e-md' : ''}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+            <Pagination links={Array.isArray(paginationLinks) ? paginationLinks : []} />
 
             <ConfirmModal
                 isOpen={pendingMarkPaid !== null}
-                title={__('general.mark_as_paid') || 'Mark as paid?'}
-                description={__('general.confirm_mark_payout_paid_desc') || 'This will credit the user\'s wallet and add an offsetting transaction to balance it.'}
+                title={__('general.mark_as_paid')}
+                description={__('general.confirm_mark_payout_paid_desc')}
                 confirmLabel={__('general.mark_as_paid')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={confirmMarkPaid}
@@ -204,8 +188,8 @@ export default function Index({ payouts, filters = {}, projects = [] }: any) {
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete_payout') || 'Delete payout?'}
-                description={__('general.confirm_delete_payout_desc') || 'This will permanently delete the payout record.'}
+                title={__('general.delete_payout')}
+                description={__('general.confirm_delete_payout_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

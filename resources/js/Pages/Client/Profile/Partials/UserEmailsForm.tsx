@@ -6,6 +6,7 @@ import { useForm, usePage, router } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Trash2, CheckCircle2, Mail, Plus, Edit2, Check, X } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface SecondaryEmail {
     id: number;
@@ -22,6 +23,7 @@ export default function UserEmailsForm({
     className?: string;
 }) {
     const user = usePage().props.auth.user;
+    const { confirm, confirmDialog } = useConfirm();
     const { data, setData, post, delete: destroy, errors, processing, reset } = useForm({
         email: '',
     });
@@ -37,10 +39,14 @@ export default function UserEmailsForm({
         });
     };
 
-    const handleDeleteEmail = (id: number) => {
-        if (confirm(__('general.are_you_sure_you_want_to_delete_this_item'))) {
-            destroy(route('profile.emails.destroy', id));
-        }
+    const handleDeleteEmail = async (id: number) => {
+        const accepted = await confirm({
+            title: __('general.are_you_sure'),
+            description: __('general.are_you_sure_you_want_to_delete_this_item'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        destroy(route('profile.emails.destroy', id));
     };
 
     const handleMakePrimary = (id: number) => {
@@ -77,10 +83,10 @@ export default function UserEmailsForm({
             <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 className="text-lg font-medium text-gray-900 dark:text-zinc-100">
-                        {__('general.linked_emails_and_google_accounts', {}, 'Linked Emails & Google Login')}
+                        {__('general.linked_emails_and_google_accounts')}
                     </h2>
                     <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">
-                        {__('general.manage_emails_desc', {}, 'You can log in using your primary email or any of your linked emails via Google OAuth.')}
+                        {__('general.manage_emails_desc')}
                     </p>
                 </div>
                 <div>
@@ -94,7 +100,7 @@ export default function UserEmailsForm({
                             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                         </svg>
-                        <span>{__('general.link_google_account', {}, 'Link Google Account')}</span>
+                        <span>{__('general.link_google_account')}</span>
                     </a>
                 </div>
             </header>
@@ -107,7 +113,7 @@ export default function UserEmailsForm({
                         <div>
                             <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user.email}</span>
                             <span className="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                                {__('general.primary', {}, 'Primary')}
+                                {__('general.primary')}
                             </span>
                         </div>
                     </div>
@@ -124,6 +130,7 @@ export default function UserEmailsForm({
                                     value={editingValue}
                                     onChange={(e) => setEditingValue(e.target.value)}
                                     className="block w-full text-xs py-1"
+                                    aria-label={__('general.edit')}
                                     autoFocus
                                 />
                                 <button
@@ -131,7 +138,8 @@ export default function UserEmailsForm({
                                     onClick={() => saveEdit(item.id)}
                                     disabled={updating}
                                     className="p-1.5 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
-                                    title={__('general.save', {}, 'Save')}
+                                    title={__('general.save')}
+                                    aria-label={__('general.save')}
                                 >
                                     <Check className="w-4 h-4" />
                                 </button>
@@ -139,7 +147,8 @@ export default function UserEmailsForm({
                                     type="button"
                                     onClick={cancelEdit}
                                     className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-                                    title={__('general.cancel', {}, 'Cancel')}
+                                    title={__('general.cancel')}
+                                    aria-label={__('general.cancel')}
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -151,7 +160,7 @@ export default function UserEmailsForm({
                                     <div>
                                         <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{item.email}</span>
                                         <span className="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                                            {item.source === 'google' || item.source === 'self' ? __('general.linked_alias', {}, 'Linked Email') : item.source}
+                                            {item.source === 'google' || item.source === 'self' ? __('general.linked_alias') : item.source}
                                         </span>
                                     </div>
                                 </div>
@@ -161,13 +170,14 @@ export default function UserEmailsForm({
                                         onClick={() => handleMakePrimary(item.id)}
                                         className="px-2.5 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-md transition-colors"
                                     >
-                                        {__('general.make_primary', {}, 'Make Primary')}
+                                        {__('general.make_primary')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => startEdit(item)}
                                         className="p-1.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
-                                        title={__('general.edit', {}, 'Edit')}
+                                        title={__('general.edit')}
+                                        aria-label={__('general.edit')}
                                     >
                                         <Edit2 className="w-4 h-4" />
                                     </button>
@@ -175,7 +185,8 @@ export default function UserEmailsForm({
                                         type="button"
                                         onClick={() => handleDeleteEmail(item.id)}
                                         className="p-1.5 text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                                        title={__('general.delete', {}, 'Delete')}
+                                        title={__('general.delete')}
+                                        aria-label={__('general.delete')}
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -189,7 +200,7 @@ export default function UserEmailsForm({
             {/* Add Secondary Email Form */}
             <form onSubmit={submitAddEmail} className="mt-6 space-y-4">
                 <div>
-                    <InputLabel htmlFor="secondary_email" value={__('general.add_secondary_email', {}, 'Add Secondary Email')} />
+                    <InputLabel htmlFor="secondary_email" value={__('general.add_secondary_email')} />
                     <div className="mt-1 flex gap-2 sm:max-w-md">
                         <TextInput
                             id="secondary_email"
@@ -207,6 +218,7 @@ export default function UserEmailsForm({
                     <InputError className="mt-2" message={errors.email} />
                 </div>
             </form>
+            {confirmDialog}
         </section>
     );
 }

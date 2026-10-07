@@ -13,6 +13,7 @@ import {
 } from "@/Components/ui/select";
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit, Coins, RefreshCw } from 'lucide-react';
 import { Label } from '@/Components/ui/label';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
@@ -70,6 +71,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
     });
 
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     useEffect(() => {
         if (latestPrice) {
@@ -132,10 +134,9 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
         });
     };
 
-    const handleDeleteTransaction = (txId: number) => {
-        if (confirm(__('erp.confirm_delete_transaction'))) {
-            router.delete(route('isaas.gold-savers.wallets.transactions.destroy', { wallet: wallet.id, transaction: txId }));
-        }
+    const handleDeleteTransaction = async (txId: number) => {
+        if (!(await confirm({ title: __('gold_saver.delete'), description: __('gold_saver.confirm_delete_transaction'), variant: 'danger' }))) return;
+        router.delete(route('isaas.gold-savers.wallets.transactions.destroy', { wallet: wallet.id, transaction: txId }));
     };
 
     const handleUpdateWallet = (e: React.FormEvent) => {
@@ -145,17 +146,16 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
         });
     };
 
-    const handleDeleteWallet = () => {
-        if (confirm(__('erp.confirm_delete_wallet'))) {
-            router.delete(route('isaas.gold-savers.wallets.destroy', wallet.id));
-        }
+    const handleDeleteWallet = async () => {
+        if (!(await confirm({ title: __('gold_saver.delete_wallet'), description: __('gold_saver.confirm_delete_wallet'), variant: 'danger' }))) return;
+        router.delete(route('isaas.gold-savers.wallets.destroy', wallet.id));
     };
 
     return (
         <AuthenticatedLayout
             header={
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => router.get(route('isaas.gold-savers.wallets.index'))}>
+                    <Button variant="ghost" size="icon" onClick={() => router.get(route('isaas.gold-savers.wallets.index'))} aria-label={__('general.back')}>
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('erp.wallet_details')}</h2>
@@ -196,7 +196,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('erp.wallet_name')}</label>
-                                            <Input 
+                                            <Input aria-label={__('erp.wallet_name')} 
                                                 required
                                                 value={editWalletData.name} 
                                                 onChange={e => setEditWalletData({...editWalletData, name: e.target.value})} 
@@ -208,7 +208,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                 value={editWalletData.goal_type} 
                                                 onValueChange={value => setEditWalletData({...editWalletData, goal_type: value as string})}
                                             >
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger aria-label={__('general.goal_type')} className="w-full">
                                                     <SelectValue placeholder={__('general.select_goal_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -223,7 +223,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium">{__('gold_saver.target_grams')}</label>
-                                                    <Input 
+                                                    <Input aria-label={__('gold_saver.target_grams')} 
                                                         type="number" step="0.01"
                                                         value={editWalletData.target_grams} 
                                                         onChange={e => setEditWalletData({...editWalletData, target_grams: e.target.value})} 
@@ -231,7 +231,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-sm font-medium">{__('general.target_amount')}</label>
-                                                    <Input 
+                                                    <Input aria-label={__('general.target_amount')} 
                                                         type="number" step="0.01"
                                                         value={editWalletData.target_amount} 
                                                         onChange={e => setEditWalletData({...editWalletData, target_amount: e.target.value})} 
@@ -381,7 +381,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                 value={newTx.type} 
                                                 onValueChange={(value) => setNewTx({...newTx, type: (value || 'buy') as 'buy' | 'sell'})}
                                             >
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger aria-label={__('general.type')} className="w-full">
                                                     <SelectValue placeholder={__('general.select_type')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -392,7 +392,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('gold_saver.grams')}</label>
-                                            <Input 
+                                            <Input aria-label={__('gold_saver.grams')} 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.grams} 
                                                 onChange={e => setNewTx({...newTx, grams: e.target.value})} 
@@ -404,7 +404,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                                 value={String(newTx.karat)} 
                                                 onValueChange={value => setNewTx({...newTx, karat: value as string})}
                                             >
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger aria-label={__('gold_saver.karat')} className="w-full">
                                                     <SelectValue placeholder={__('general.select_karat')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -417,7 +417,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('gold_saver.price_per_gram')} ({wallet.currency})</label>
-                                            <Input 
+                                            <Input aria-label={__('gold_saver.price_per_gram')} 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.price_per_gram} 
                                                 onChange={e => setNewTx({...newTx, price_per_gram: e.target.value})} 
@@ -425,7 +425,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('general.fees')} ({wallet.currency})</label>
-                                            <Input 
+                                            <Input aria-label={__('general.fees')} 
                                                 type="number" step="0.01" min="0"
                                                 value={newTx.fees} 
                                                 onChange={e => setNewTx({...newTx, fees: e.target.value})} 
@@ -433,7 +433,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('general.date')}</label>
-                                            <Input 
+                                            <Input aria-label={__('general.date')} 
                                                 type="date" required
                                                 value={newTx.transaction_date} 
                                                 onChange={e => setNewTx({...newTx, transaction_date: e.target.value})} 
@@ -442,7 +442,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('general.notes')}</label>
-                                        <Input 
+                                        <Input aria-label={__('general.notes')} 
                                             value={newTx.notes} 
                                             onChange={e => setNewTx({...newTx, notes: e.target.value})} 
                                         />
@@ -581,7 +581,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                             value={editingTx.type} 
                                             onValueChange={(value) => setEditingTx({...editingTx, type: (value || 'buy') as 'buy' | 'sell'})}
                                         >
-                                            <SelectTrigger className="w-full">
+                                            <SelectTrigger aria-label={__('general.type')} className="w-full">
                                                 <SelectValue placeholder={__('general.select_type')} />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -592,7 +592,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('gold_saver.grams')}</label>
-                                        <Input 
+                                        <Input aria-label={__('gold_saver.grams')} 
                                             type="number" step="0.01" min="0.01" required
                                             value={editingTx.grams} 
                                             onChange={e => setEditingTx({...editingTx, grams: parseFloat(e.target.value)})} 
@@ -604,7 +604,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                             value={String(editingTx.karat)} 
                                             onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value || '21')})}
                                         >
-                                            <SelectTrigger className="w-full">
+                                            <SelectTrigger aria-label={__('gold_saver.karat')} className="w-full">
                                                 <SelectValue placeholder={__('general.select_karat')} />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -617,7 +617,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('gold_saver.price_per_gram')} ({wallet.currency})</label>
-                                        <Input 
+                                        <Input aria-label={__('gold_saver.price_per_gram')} 
                                             type="number" step="0.01" min="0.01" required
                                             value={editingTx.price_per_gram} 
                                             onChange={e => setEditingTx({...editingTx, price_per_gram: parseFloat(e.target.value)})} 
@@ -633,6 +633,7 @@ export default function ShowWallet({ wallet, karatBalances, hasGoalTracking, lat
                     </Card>
                 </div>
             )}
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

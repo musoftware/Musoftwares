@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\GoldSystemNotification;
+use App\Support\SsoSignature;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class SsoNotificationController extends Controller
 {
@@ -16,38 +16,9 @@ class SsoNotificationController extends Controller
      */
     public function notify(Request $request): JsonResponse
     {
-        $system = $request->header('X-Investor-System')
-            ?? $request->header('X-GoldSaver-System')
-            ?? $request->header('X-Sso-System');
-
-        $signature = $request->header('X-Investor-Signature')
-            ?? $request->header('X-GoldSaver-Signature')
-            ?? $request->header('X-Sso-Signature');
-
-        $timestamp = $request->header('X-Investor-Timestamp')
-            ?? $request->header('X-GoldSaver-Timestamp')
-            ?? $request->header('X-Sso-Timestamp');
-
-        if (! $signature || ! $timestamp || ! $system) {
-            return response()->json(['error' => 'missing_signature_headers'], 401);
-        }
-
-        $secret = (string) config("services.{$system}.shared_secret", config('services.goldsaversys.shared_secret', ''));
-
-        // Prevent replay attacks (allow 5 minute clock drift)
-        if (abs(now()->timestamp - (int) $timestamp) > 300) {
-            return response()->json(['error' => 'signature_expired'], 401);
-        }
-
-        $expected = hash_hmac('sha256', $timestamp.'.sso-notify', $secret);
-        if (! hash_equals($expected, $signature)) {
-            Log::warning('SSO Notification signature mismatch', [
-                'ip' => $request->ip(),
-                'received' => $signature,
-                'expected' => $expected,
-            ]);
-
-            return response()->json(['error' => 'invalid_signature'], 401);
+        $signatureError = SsoSignature::verify($request, SsoSignature::systemFromHeaders($request), 'sso-notify');
+        if ($signatureError !== null) {
+            return response()->json(['error' => $signatureError], 401);
         }
 
         $request->validate([

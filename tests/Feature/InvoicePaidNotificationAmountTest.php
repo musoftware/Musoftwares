@@ -62,14 +62,14 @@ class InvoicePaidNotificationAmountTest extends TestCase
         $notification = new InvoicePaidNotification($invoice);
         $mailMessage = $notification->toMail($user);
 
-        // Verify the email content contains the formatted amount (e£2,000.00 or e£2000.00)
+        // FinanceHelper::format_money drops .00 on whole amounts, so 2000 shows as e£2,000
         $introLines = $mailMessage->introLines;
         $amountLineFound = false;
 
         foreach ($introLines as $line) {
             if (str_contains($line, 'We have successfully received your payment of')) {
                 $amountLineFound = true;
-                $this->assertStringContainsString('2,000.00', $line);
+                $this->assertStringContainsString('2,000', $line);
             }
         }
 
@@ -77,6 +77,6 @@ class InvoicePaidNotificationAmountTest extends TestCase
 
         // Verify the FCM message contains the formatted amount
         $fcmMessage = $notification->toFcm($user);
-        $this->assertStringContainsString('2,000.00', json_encode($fcmMessage->jsonSerialize()));
+        $this->assertStringContainsString('2,000', json_encode($fcmMessage->jsonSerialize()));
     }
 }

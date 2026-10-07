@@ -7,6 +7,7 @@ use App\Models\Earning;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * ProcessEarningsClearing
@@ -16,10 +17,11 @@ use Illuminate\Support\Facades\Log;
  *
  * A "matured" earning is one where:
  *   - transaction_id IS NULL (not yet cleared)
- *   - convert_to_balance_on < NOW() (clearing date has passed)
+ *   - convert_to_balance_on < now (clearing date has passed)
  *   - amount > 0
  *
- * Processes in batches of 10 to avoid memory spikes.
+ * Each earning is re-read under a row lock inside its own transaction and
+ * skipped if it was already cleared, so a second run never credits it twice.
  */
 class ProcessEarningsClearing extends Command
 {
@@ -29,57 +31,65 @@ class ProcessEarningsClearing extends Command
 
     public function handle(): int
     {
-        $limit = (int) $this->option('limit');
-
-        $earnings = Earning::whereNull('transaction_id')
-            ->where('convert_to_balance_on', '<', DB::raw('NOW()'))
+        $earningIds = Earning::whereNull('transaction_id')
+            ->where('convert_to_balance_on', '<', now())
             ->where('amount', '>', 0)
-            ->limit($limit)
-            ->get();
-
-        if ($earnings->isEmpty()) {
-            return Command::SUCCESS;
-        }
+            ->orderBy('id')
+            ->limit((int) $this->option('limit'))
+            ->pluck('id');
 
         $processed = 0;
-
-        foreach ($earnings as $earn) {
-            try {
-                DB::transaction(function () use ($earn) {
-                    $description = 'Affiliate Commission';
-
-                    // If it's a direct referred-invoice commission
-                    if ($earn->referred_invoice_id) {
-                        $description = 'Referral Commission — Invoice #'.$earn->referred_invoice_id;
-                    }
-
-                    // Move earning to user wallet
-                    $txId = $earn->user->add_balance(
-                        $earn->amount,
-                        $description,
-                        'earned',
-                        $earn->currency_id
-                    );
-
-                    $earn->transaction_id = $txId;
-                    $earn->save();
-
-                    // Sync cached balance fields
-                    if (class_exists(BalancesHelper::class)) {
-                        BalancesHelper::UpdateBalance($earn->user, null);
-                    }
-                });
-
-                $processed++;
-            } catch (\Throwable $e) {
-                Log::error('ProcessEarningsClearing: Failed to process earning #'.$earn->id, [
-                    'error' => $e->getMessage(),
-                ]);
-            }
+        foreach ($earningIds as $earningId) {
+            $processed += $this->clearEarning((int) $earningId) ? 1 : 0;
         }
 
         $this->info("Processed {$processed} earning(s).");
 
         return Command::SUCCESS;
+    }
+
+    private function clearEarning(int $earningId): bool
+    {
+        try {
+            return DB::transaction(fn () => $this->creditLockedEarning($earningId));
+        } catch (Throwable $e) {
+            Log::error('ProcessEarningsClearing: failed to process earning', [
+                'earning_id' => $earningId,
+                'exception' => $e::class,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Must run inside a transaction: locks the earning row first.
+     */
+    private function creditLockedEarning(int $earningId): bool
+    {
+        $earn = Earning::whereKey($earningId)->lockForUpdate()->first();
+
+        if (! $earn || $earn->transaction_id !== null) {
+            return false;
+        }
+
+        $user = $earn->user;
+        if (! $user) {
+            Log::warning('ProcessEarningsClearing: earning has no user, skipped', ['earning_id' => $earningId]);
+
+            return false;
+        }
+
+        $description = $earn->referred_invoice_id
+            ? 'Referral Commission — Invoice #'.$earn->referred_invoice_id
+            : 'Affiliate Commission';
+
+        $earn->transaction_id = $user->add_balance($earn->amount, $description, 'earned', $earn->currency_id);
+        $earn->save();
+
+        BalancesHelper::UpdateBalance($user, null);
+
+        return true;
     }
 }

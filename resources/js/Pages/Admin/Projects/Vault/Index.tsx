@@ -1,18 +1,19 @@
 import React, { useRef, useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { 
-    ArrowLeft, Lock, ShieldCheck, Upload, Trash2, 
-    Download, FileCode, Package, FileText, HardDrive, 
-    Plus, Check, X, Clock
+import { Link, router } from '@inertiajs/react';
+import {
+    ArrowLeft, Lock, ShieldCheck, Upload, Trash2,
+    Download, FileCode, Package, FileText, HardDrive,
+    Plus, X, Clock
 } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { 
-    Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter 
+import {
+    Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 } from '@/Components/ui/dialog';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface VaultAssetItem {
     id: number;
@@ -44,19 +45,20 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
     const [uploading, setUploading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const { confirm, confirmDialog } = useConfirm();
 
     const getAssetMeta = (type: string) => {
         switch (type) {
             case 'source_code':
                 return {
-                    label: 'Source Code',
+                    label: __('admin.vault_type_source_code'),
                     icon: FileCode,
                     color: 'text-emerald-600 dark:text-emerald-400',
                     badge: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20',
                 };
             case 'delivery_build':
                 return {
-                    label: 'Production Build',
+                    label: __('admin.vault_type_delivery_build'),
                     icon: Package,
                     color: 'text-[#0071e3] dark:text-sky-400',
                     badge: 'bg-blue-50 dark:bg-sky-500/10 text-[#0071e3] dark:text-sky-300 border-blue-200 dark:border-sky-500/20',
@@ -64,14 +66,14 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
             case 'final_invoice':
             case 'contract':
                 return {
-                    label: type === 'contract' ? 'Signed Contract' : 'Final Invoice',
+                    label: type === 'contract' ? __('admin.vault_type_contract') : __('admin.vault_type_final_invoice'),
                     icon: FileText,
                     color: 'text-amber-600 dark:text-amber-400',
                     badge: 'bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-500/20',
                 };
             default:
                 return {
-                    label: 'Confidential Asset',
+                    label: __('admin.vault_type_other'),
                     icon: HardDrive,
                     color: 'text-zinc-500 dark:text-zinc-400',
                     badge: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-black/10 dark:border-white/10',
@@ -96,12 +98,12 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
         setErrors({});
 
         if (!title.trim()) {
-            setErrors({ title: 'Deliverable title is required.' });
+            setErrors({ title: __('admin.vault_title_required') });
             return;
         }
 
         if (!selectedFile) {
-            setErrors({ file: 'Please select a file to upload.' });
+            setErrors({ file: __('admin.vault_file_required') });
             return;
         }
 
@@ -128,10 +130,14 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
         });
     };
 
-    const handleDelete = (id: number, assetTitle: string) => {
-        if (!confirm(`Are you sure you want to permanently delete "${assetTitle}" from the client's vault?`)) {
-            return;
-        }
+    const handleDelete = async (id: number, assetTitle: string) => {
+        const accepted = await confirm({
+            title: __('admin.vault_delete_title'),
+            description: __('admin.vault_delete_confirm', { title: assetTitle }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
 
         router.delete(route('admin.projects.vault.destroy', { project: project.id, asset: id }), {
             preserveScroll: true,
@@ -140,8 +146,8 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
 
     return (
         <AdminSidebarLayout
-            title={`${project.name} · Sovereign Client Vault`}
-            header={`${project.name} — Sovereign Client Vault`}
+            title={__('admin.vault_page_title', { project: project.name })}
+            header={__('admin.vault_page_title', { project: project.name })}
         >
             <div className="space-y-6 p-6 max-w-7xl mx-auto">
                 {/* Top Bar Navigation & Actions */}
@@ -151,19 +157,19 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                             href={route('admin.projects.index')}
                             className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors"
                         >
-                            <ArrowLeft className="h-3.5 w-3.5" /> Back to Projects
+                            <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" /> {__('general.back_to_projects')}
                         </Link>
                         <div className="flex items-center gap-2 mt-1">
                             <h2 className="text-xl font-bold tracking-tight text-slate-900">
-                                Sovereign Client Vault
+                                {__('admin.vault_heading')}
                             </h2>
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                                Encrypted Storage
+                                {__('admin.vault_encrypted_storage')}
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Client: <span className="font-semibold text-slate-700">{project.client_name}</span> · Files uploaded here appear directly in the client's portal dashboard.
+                            {__('admin.vault_client_label')} <span className="font-semibold text-slate-700">{project.client_name}</span> · {__('admin.vault_portal_hint')}
                         </p>
                     </div>
 
@@ -172,7 +178,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                         className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm"
                     >
                         <Plus className="h-4 w-4" />
-                        <span>Upload Deliverable</span>
+                        <span>{__('admin.vault_upload_deliverable')}</span>
                     </Button>
                 </div>
 
@@ -184,30 +190,30 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                 <Lock className="w-6 h-6" />
                             </div>
                             <h3 className="text-base font-semibold text-slate-800">
-                                No Vault Deliverables Uploaded Yet
+                                {__('admin.vault_empty_title')}
                             </h3>
                             <p className="text-xs text-slate-500 max-w-md mx-auto">
-                                When this project is completed or ready for milestone handoff, upload source code archives, binary releases, or signed contracts here for the client to download securely.
+                                {__('admin.vault_empty_description')}
                             </p>
                             <Button
                                 onClick={() => setIsUploadOpen(true)}
                                 variant="outline"
                                 className="text-xs mt-2"
                             >
-                                <Upload className="w-3.5 h-3.5 me-1.5" /> Upload First Deliverable
+                                <Upload className="w-3.5 h-3.5 me-1.5" /> {__('admin.vault_upload_first')}
                             </Button>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs border-collapse">
+                            <table className="w-full text-start text-xs border-collapse">
                                 <thead>
                                     <tr className="border-b border-slate-100 bg-slate-50/60 text-slate-500 font-mono">
-                                        <th className="py-3 px-4">Asset Designation</th>
-                                        <th className="py-3 px-4">Classification</th>
-                                        <th className="py-3 px-4">Byte Size</th>
-                                        <th className="py-3 px-4">Client Downloads</th>
-                                        <th className="py-3 px-4">Last Accessed</th>
-                                        <th className="py-3 px-4 text-end">Actions</th>
+                                        <th className="py-3 px-4">{__('admin.vault_col_asset')}</th>
+                                        <th className="py-3 px-4">{__('admin.vault_col_classification')}</th>
+                                        <th className="py-3 px-4">{__('admin.vault_col_size')}</th>
+                                        <th className="py-3 px-4">{__('admin.vault_col_downloads')}</th>
+                                        <th className="py-3 px-4">{__('admin.vault_col_last_accessed')}</th>
+                                        <th className="py-3 px-4 text-end">{__('general.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 font-mono">
@@ -227,7 +233,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                                                 {asset.title}
                                                             </div>
                                                             <div className="text-[11px] text-slate-400 font-mono">
-                                                                Uploaded {asset.created_at}
+                                                                {__('admin.vault_uploaded_at', { date: asset.created_at ?? '' })}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -243,7 +249,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                                 <td className="py-3.5 px-4">
                                                     <span className="inline-flex items-center gap-1 font-semibold text-slate-800">
                                                         <Download className="w-3 h-3 text-slate-400" />
-                                                        {asset.download_count} times
+                                                        {__('admin.vault_download_count', { count: asset.download_count })}
                                                     </span>
                                                 </td>
                                                 <td className="py-3.5 px-4 text-slate-500">
@@ -253,7 +259,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                                             {asset.last_accessed_at}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-slate-400 italic">Not yet downloaded</span>
+                                                        <span className="text-slate-400 italic">{__('admin.vault_not_downloaded')}</span>
                                                     )}
                                                 </td>
                                                 <td className="py-3.5 px-4 text-end">
@@ -261,16 +267,17 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                                         <a
                                                             href={route('admin.projects.vault.download', { project: project.id, asset: asset.id })}
                                                             className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 rounded-md border border-slate-200 transition-colors shadow-xs"
-                                                            title="Download File"
+                                                            title={__('admin.vault_download_file')}
                                                         >
                                                             <Download className="w-3.5 h-3.5" />
-                                                            <span>Download</span>
+                                                            <span>{__('admin.vault_download')}</span>
                                                         </a>
                                                         <button
                                                             type="button"
                                                             onClick={() => handleDelete(asset.id, asset.title)}
                                                             className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
-                                                            title="Delete Deliverable"
+                                                            title={__('admin.vault_delete_title')}
+                                                            aria-label={__('admin.vault_delete_title')}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
@@ -295,24 +302,24 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                 <Lock className="w-4 h-4" />
                             </div>
                             <DialogTitle className="text-lg font-bold text-slate-900">
-                                Upload Deliverable to Sovereign Vault
+                                {__('admin.vault_upload_title')}
                             </DialogTitle>
                         </div>
                         <DialogDescription className="text-xs text-slate-500">
-                            Upload a verified milestone deliverable for <span className="font-semibold text-slate-700">{project.client_name}</span>. The client can securely view and download this asset directly on their dashboard.
+                            {__('admin.vault_upload_description', { client: project.client_name })}
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleUploadSubmit} className="space-y-4 pt-3">
                         <div className="space-y-1.5">
                             <Label htmlFor="title" className="text-xs font-semibold text-slate-700">
-                                Deliverable Title *
+                                {__('admin.vault_title_label')} *
                             </Label>
                             <Input
                                 id="title"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                placeholder="e.g. Full Source Code v1.0 / Production Build Release"
+                                placeholder={__('admin.vault_title_placeholder')}
                                 className="text-xs"
                                 disabled={uploading}
                             />
@@ -321,7 +328,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
 
                         <div className="space-y-1.5">
                             <Label htmlFor="assetType" className="text-xs font-semibold text-slate-700">
-                                Classification Category *
+                                {__('admin.vault_category_label')} *
                             </Label>
                             <select
                                 id="assetType"
@@ -330,16 +337,16 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                 className="w-full text-xs rounded-md border border-slate-200 bg-white px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                                 disabled={uploading}
                             >
-                                <option value="source_code">Source Code (Repositories, ZIP archives, scripts)</option>
-                                <option value="delivery_build">Production Build (Compiled binaries, Executables, Releases)</option>
-                                <option value="contract">Signed Deed / Contract (Legal deeds, handoff agreements)</option>
-                                <option value="final_invoice">Final Verified Invoice (Official stamped tax / payment deed)</option>
+                                <option value="source_code">{__('admin.vault_option_source_code')}</option>
+                                <option value="delivery_build">{__('admin.vault_option_delivery_build')}</option>
+                                <option value="contract">{__('admin.vault_option_contract')}</option>
+                                <option value="final_invoice">{__('admin.vault_option_final_invoice')}</option>
                             </select>
                         </div>
 
                         <div className="space-y-1.5">
                             <Label htmlFor="file" className="text-xs font-semibold text-slate-700">
-                                Deliverable File * (Max 500 MB)
+                                {__('admin.vault_file_label')}
                             </Label>
                             <div className="border-2 border-dashed border-slate-200 hover:border-slate-300 rounded-xl p-4 text-center bg-slate-50/50 transition-colors">
                                 <input
@@ -364,6 +371,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                                 if (fileInputRef.current) fileInputRef.current.value = '';
                                             }}
                                             className="text-slate-400 hover:text-rose-500 p-1"
+                                            aria-label={__('admin.vault_remove_file')}
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -376,10 +384,10 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                     >
                                         <Upload className="w-6 h-6 text-slate-400" />
                                         <span className="text-xs font-medium text-slate-600">
-                                            Click to browse and select deliverable file
+                                            {__('admin.vault_browse_file')}
                                         </span>
                                         <span className="text-[11px] text-slate-400 font-mono">
-                                            Supports .zip, .tar.gz, .exe, .pdf, .json, and all binary formats
+                                            {__('admin.vault_supported_formats')}
                                         </span>
                                     </button>
                                 )}
@@ -395,7 +403,7 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                 disabled={uploading}
                                 className="text-xs"
                             >
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
@@ -403,15 +411,16 @@ export default function AdminProjectVaultIndex({ project, assets = [] }: Props) 
                                 className="bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold"
                             >
                                 {uploading ? (
-                                    <span>Uploading & Encrypting...</span>
+                                    <span>{__('admin.vault_uploading')}</span>
                                 ) : (
-                                    <span>Store in Client Vault</span>
+                                    <span>{__('admin.vault_store')}</span>
                                 )}
                             </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

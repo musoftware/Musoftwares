@@ -37,6 +37,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Button } from '@/Components/ui/button';
+import { useConfirm } from '@/hooks/useConfirm';
 import CommentsPopover from '@/Pages/Client/Projects/Components/CommentsPopover';
 import BoardCategoryChip, { categoryPalette, type BoardCategoryLike } from './BoardCategoryChip';
 import BoardCategoryPicker, { type BoardCategory } from './BoardCategoryPicker';
@@ -133,12 +134,18 @@ const LANE_META: Record<string, { labelKey: string; icon: IconType; bg: string; 
     done: { labelKey: 'general.lane_done', icon: FaCheckCircle, bg: 'bg-emerald-50 text-emerald-700', text: 'text-emerald-700', border: 'border-emerald-100' },
 };
 
-const TYPE_META: Record<CardType, { label: string; icon: React.ElementType; color: string; ring: string }> = {
-    note: { label: 'Note', icon: StickyNote, color: 'text-amber-700 bg-amber-50 ring-amber-200', ring: 'ring-amber-200' },
-    task: { label: 'Task', icon: ListTodo, color: 'text-sky-700 bg-sky-50 ring-sky-200', ring: 'ring-sky-200' },
-    report: { label: 'Report', icon: FileText, color: 'text-emerald-700 bg-emerald-50 ring-emerald-200', ring: 'ring-emerald-200' },
-    todo: { label: 'Todo', icon: ClipboardList, color: 'text-violet-700 bg-violet-50 ring-violet-200', ring: 'ring-violet-200' },
-    file: { label: 'File', icon: Paperclip, color: 'text-orange-700 bg-orange-50 ring-orange-200', ring: 'ring-orange-200' },
+const TYPE_META: Record<CardType, { labelKey: string; icon: React.ElementType; color: string; ring: string }> = {
+    note: { labelKey: 'general.note', icon: StickyNote, color: 'text-amber-700 bg-amber-50 ring-amber-200', ring: 'ring-amber-200' },
+    task: { labelKey: 'general.task', icon: ListTodo, color: 'text-sky-700 bg-sky-50 ring-sky-200', ring: 'ring-sky-200' },
+    report: { labelKey: 'general.report', icon: FileText, color: 'text-emerald-700 bg-emerald-50 ring-emerald-200', ring: 'ring-emerald-200' },
+    todo: { labelKey: 'client.board_type_todo', icon: ClipboardList, color: 'text-violet-700 bg-violet-50 ring-violet-200', ring: 'ring-violet-200' },
+    file: { labelKey: 'client.board_type_file', icon: Paperclip, color: 'text-orange-700 bg-orange-50 ring-orange-200', ring: 'ring-orange-200' },
+};
+
+const APPROVAL_STATUS_KEYS: Record<string, string> = {
+    pending: 'general.status_pending',
+    approved: 'client.board_status_approved',
+    revision_requested: 'client.board_status_revision_requested',
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
@@ -189,7 +196,7 @@ function persistPreferences(projectId: number | string, patch: Partial<BoardPref
     const url = route('admin.projects.board.preferences.update', { project: projectId });
     axios.put(url, patch).catch(() => {
         // The board stays usable even if persistence fails; just toast the user.
-        toast.error(__('general.error') || 'Could not save board preference.');
+        toast.error(__('general.error'));
     });
 }
 
@@ -199,6 +206,7 @@ export default function ProjectBoard({
     preferences, isConsolidated = false, projects = [],
 }: ProjectBoardProps) {
     const { auth } = usePage().props as any;
+    const { confirm, confirmDialog } = useConfirm();
     const userRoles: string[] = auth?.user?.roles ?? [];
     const isAdmin: boolean = !readOnly && (userRoles.includes('admin') || userRoles.includes('super_admin'));
 
@@ -292,8 +300,8 @@ export default function ProjectBoard({
             if (response.data.ok) {
                 toast.success(
                     status === 'approved'
-                        ? __('general.deliverable_approved') || 'Deliverable approved successfully!'
-                        : __('general.revision_requested') || 'Revision requested successfully!'
+                        ? __('general.deliverable_approved')
+                        : __('general.revision_requested')
                 );
                 
                 setCards(prev => prev.map(card => {
@@ -319,7 +327,7 @@ export default function ProjectBoard({
                 setFeedbackText('');
             }
         } catch (error) {
-            toast.error(__('general.error') || 'Failed to update approval status.');
+            toast.error(__('general.error'));
         } finally {
             setBoardItemUpdating(false);
         }
@@ -431,10 +439,10 @@ export default function ProjectBoard({
     const effectiveCategories: BoardCategory[] = useMemo(() => {
         if (categories && categories.length > 0) return categories;
         return [
-            { id: -1, slug: 'urgent', name: __('general.board_category_urgent') || 'Urgent', color: 'rose', is_system: true },
-            { id: -2, slug: 'important', name: __('general.board_category_important') || 'Important', color: 'amber', is_system: true },
-            { id: -3, slug: 'normal', name: __('general.board_category_normal') || 'Normal', color: 'slate', is_system: true },
-            { id: -4, slug: 'idea', name: __('general.board_category_idea') || 'Idea', color: 'sky', is_system: true },
+            { id: -1, slug: 'urgent', name: __('general.board_category_urgent'), color: 'rose', is_system: true },
+            { id: -2, slug: 'important', name: __('general.board_category_important'), color: 'amber', is_system: true },
+            { id: -3, slug: 'normal', name: __('general.board_category_normal'), color: 'slate', is_system: true },
+            { id: -4, slug: 'idea', name: __('general.board_category_idea'), color: 'sky', is_system: true },
         ];
     }, [categories]);
 
@@ -548,9 +556,9 @@ export default function ProjectBoard({
             pos_y: 0,
         }).then(() => {
             setCards((prev) => prev.map((c) => c.type === type && c.id === id ? { ...c, lane: nextLane } : c));
-            toast.success(__('general.card_moved') || 'Card status updated!');
+            toast.success(__('general.card_moved'));
         }).catch(() => {
-            toast.error(__('general.could_not_save_card_position') || 'Failed to update status.');
+            toast.error(__('general.could_not_save_card_position'));
         });
     }, [projectId, date, readOnly, cards]);
 
@@ -586,9 +594,9 @@ export default function ProjectBoard({
                     ? { ...c, sort: orderIndex.get(`${c.type}-${c.id}`)! }
                     : c
             )));
-            toast.success(__('general.board_reorder_saved') || 'Order saved.');
+            toast.success(__('general.board_reorder_saved'));
         } catch (err) {
-            toast.error(__('general.board_reorder_failed') || 'Could not save the new order.');
+            toast.error(__('general.board_reorder_failed'));
         }
     }, [projectId, date, readOnly, cards]);
 
@@ -617,7 +625,7 @@ export default function ProjectBoard({
                 };
             }));
         } catch (err) {
-            toast.error(__('general.board_category_assign_failed') || 'Could not assign the category.');
+            toast.error(__('general.board_category_assign_failed'));
         }
     }, [projectId, date, readOnly, effectiveCategories, cards]);
 
@@ -687,7 +695,7 @@ export default function ProjectBoard({
                 __('general.card_rescheduled', { date: targetDate }, `Card rescheduled to ${targetDate}.`),
                 {
                     action: {
-                        label: __('general.view') || 'View',
+                        label: __('general.view'),
                         onClick: () => router.visit(
                             route('admin.projects.board', { project: targetProject, date: targetDate }),
                             { preserveScroll: true, preserveState: false },
@@ -697,7 +705,7 @@ export default function ProjectBoard({
             );
         } catch (err) {
             const message = (err as any)?.response?.data?.message;
-            toast.error(message || __('general.card_reschedule_failed') || 'Failed to reschedule card.');
+            toast.error(message || __('general.card_reschedule_failed'));
         }
     }, [projectId, isAdmin]);
 
@@ -796,7 +804,7 @@ export default function ProjectBoard({
                 handleSaveAiPlan();
             }
         } catch (err: any) {
-            toast.error(err?.response?.data?.error || 'Failed to generate questions. Generating plan directly.');
+            toast.error(err?.response?.data?.error || __('client.board_ai_questions_failed'));
             handleSaveAiPlan();
         } finally {
             setAiAskingQuestions(false);
@@ -807,7 +815,7 @@ export default function ProjectBoard({
         const prompt = aiPrompt.trim();
         if (!prompt || aiLoading) return;
         if (aiAllowedTypes.length === 0) {
-            toast.error('Please select at least one card type.');
+            toast.error(__('client.board_select_card_type_error'));
             return;
         }
         setAiLoading(true);
@@ -826,12 +834,12 @@ export default function ProjectBoard({
             );
 
             if (data.ok) {
-                toast.success(__('general.plan_generated_success') || 'Project plan generated by AI successfully!');
+                toast.success(__('general.plan_generated_success'));
                 setAiModalOpen(false);
                 router.reload({ preserveScroll: true } as any);
             }
         } catch (err: any) {
-            const message = err?.response?.data?.error || err?.response?.data?.message || 'Failed to generate plan';
+            const message = err?.response?.data?.error || err?.response?.data?.message || __('client.board_plan_failed');
             toast.error(message);
         } finally {
             setAiLoading(false);
@@ -864,7 +872,7 @@ export default function ProjectBoard({
                 setActiveModal(null);
                 toast.success(isEdit ? __('general.note_updated') : __('general.note_added'));
             })
-            .catch(() => toast.error(__('general.error') || 'Failed to save note.'));
+            .catch(() => toast.error(__('general.error')));
     };
 
     const handleSaveTask = () => {
@@ -892,7 +900,7 @@ export default function ProjectBoard({
                 setActiveModal(null);
                 toast.success(isEdit ? __('general.task_updated') : __('general.task_added'));
             })
-            .catch(() => toast.error(__('general.error') || 'Failed to save task.'));
+            .catch(() => toast.error(__('general.error')));
     };
 
     const handleSaveTodo = () => {
@@ -920,7 +928,7 @@ export default function ProjectBoard({
                 setActiveModal(null);
                 toast.success(isEdit ? __('general.todo_updated') : __('general.todo_added'));
             })
-            .catch(() => toast.error(__('general.error') || 'Failed to save todo.'));
+            .catch(() => toast.error(__('general.error')));
     };
 
     const handleUploadFile = () => {
@@ -941,9 +949,9 @@ export default function ProjectBoard({
                 flashCard(data.card.type, data.card.id);
             }
             setActiveModal(null);
-            toast.success(__('general.file_uploaded') || 'File uploaded successfully!');
+            toast.success(__('general.file_uploaded'));
         }).catch(() => {
-            toast.error(__('general.error') || 'Failed to upload file.');
+            toast.error(__('general.error'));
         }).finally(() => {
             setUploading(false);
         });
@@ -974,12 +982,12 @@ export default function ProjectBoard({
                 setActiveModal(null);
                 toast.success(isEdit ? __('general.report_updated') : __('general.report_added'));
             })
-            .catch(() => toast.error(__('general.error') || 'Failed to save report.'));
+            .catch(() => toast.error(__('general.error')));
     };
 
     const handleAiGenerateReport = () => {
         if (!reportForm.period_start || !reportForm.period_end) {
-            toast.error('Please specify Period Start and Period End times.');
+            toast.error(__('client.board_report_period_required'));
             return;
         }
         setGeneratingReportDraft(true);
@@ -995,11 +1003,11 @@ export default function ProjectBoard({
                     body: data.draft,
                     title: prev.title || data.suggested_title || ''
                 }));
-                toast.success('Report draft generated successfully with AI!');
+                toast.success(__('client.board_report_draft_success'));
             }
         })
         .catch((err) => {
-            const msg = err.response?.data?.error || 'Failed to generate report draft.';
+            const msg = err.response?.data?.error || __('client.board_report_draft_failed');
             toast.error(msg);
         })
         .finally(() => {
@@ -1007,9 +1015,9 @@ export default function ProjectBoard({
         });
     };
 
-    const handleDeleteCard = (card: BoardCard) => {
+    const handleDeleteCard = async (card: BoardCard) => {
         if (readOnly) return;
-        if (!confirm(__('general.delete_confirm') || 'Are you sure you want to delete this item?')) return;
+        if (!(await confirm({ title: __('client.board_delete_card'), description: __('general.delete_confirm'), variant: 'danger' }))) return;
         
         const targetProject = card.project_id || projectId;
         let url = '';
@@ -1022,9 +1030,9 @@ export default function ProjectBoard({
         axios.delete(url)
             .then(() => {
                 setCards((prev) => prev.filter((c) => !(c.type === card.type && c.id === card.id)));
-                toast.success(__('general.card_deleted') || 'Item deleted successfully.');
+                toast.success(__('general.card_deleted'));
             })
-            .catch(() => toast.error(__('general.error') || 'Deletion failed.'));
+            .catch(() => toast.error(__('general.error')));
     };
 
     const addTodoCheckItem = () => {
@@ -1067,7 +1075,7 @@ export default function ProjectBoard({
                         <input
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            placeholder={__('general.search_cards') || 'Search board cards...'}
+                            placeholder={__('general.search_cards')}
                             className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-xs text-slate-700 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-300 transition-all"
                         />
                     </div>
@@ -1114,8 +1122,8 @@ export default function ProjectBoard({
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow ring-1 ring-slate-100">
                         <AlertCircle className="h-7 w-7 text-slate-400" />
                     </div>
-                    <p className="text-sm font-semibold text-slate-600">{__('general.no_cards_match_filter') || 'No cards matches filter'}</p>
-                    <p className="text-xs text-slate-400">{__('general.try_changing_filter') || 'Try switching top status tabs'}</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.no_cards_match_filter')}</p>
+                    <p className="text-xs text-slate-400">{__('general.try_changing_filter')}</p>
                 </div>
             ) : viewMode === 'table' ? (
                 <BoardTableView
@@ -1170,7 +1178,7 @@ export default function ProjectBoard({
                                 {sortBy !== 'manual' && (
                                     <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-800">
                                         <AlertCircle className="h-3.5 w-3.5" />
-                                        <span>{__('general.board_drag_disabled_when_sorted') || 'Drag-to-reorder is only available when sort is set to Manual order.'}</span>
+                                        <span>{__('general.board_drag_disabled_when_sorted')}</span>
                                     </div>
                                 )}
                                 {filteredCards.map((card, index) => {
@@ -1211,7 +1219,7 @@ export default function ProjectBoard({
                                                 >
                                                     {isHighlighted && (
                                                         <span className="pointer-events-none absolute -top-2.5 -end-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg ring-2 ring-white">
-                                                            <CheckCircle2 className="h-3 w-3" /> Uploaded
+                                                            <CheckCircle2 className="h-3 w-3" /> {__('client.board_uploaded')}
                                                         </span>
                                                     )}
                                                     <div className="space-y-3">
@@ -1220,8 +1228,8 @@ export default function ProjectBoard({
                                                                 dragDisabled ? (
                                                                     <span
                                                                         className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-200 cursor-not-allowed"
-                                                                        title={__('general.board_drag_disabled_when_sorted') || 'Drag disabled while sorted.'}
-                                                                        aria-label={__('general.board_drag_handle') || 'Drag handle'}
+                                                                        title={__('general.board_drag_disabled_when_sorted')}
+                                                                        aria-label={__('general.board_drag_handle')}
                                                                     >
                                                                         <GripVertical className="h-3.5 w-3.5" />
                                                                     </span>
@@ -1229,8 +1237,8 @@ export default function ProjectBoard({
                                                                     <span
                                                                         {...dragProvided.dragHandleProps}
                                                                         className="inline-flex h-5 w-5 items-center justify-center rounded-md text-slate-300 group-hover:text-slate-500 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing"
-                                                                        title={__('general.board_drag_handle') || 'Drag handle'}
-                                                                        aria-label={__('general.board_drag_handle') || 'Drag handle'}
+                                                                        title={__('general.board_drag_handle')}
+                                                                        aria-label={__('general.board_drag_handle')}
                                                                         onClick={(e) => e.stopPropagation()}
                                                                     >
                                                                         <GripVertical className="h-3.5 w-3.5" />
@@ -1246,12 +1254,12 @@ export default function ProjectBoard({
                                                                 )}
                                                                 <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring)}>
                                                                     <TypeIcon className="h-2.5 w-2.5" />
-                                                                    {meta.label}
+                                                                    {__(meta.labelKey)}
                                                                 </span>
                                                                 {card.is_important && (
                                                                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-white shadow-sm ring-1 ring-amber-400 animate-pulse">
                                                                         <Sparkles className="h-2.5 w-2.5 fill-white" />
-                                                                        {__('general.key_milestone') || 'Key Milestone'}
+                                                                        {__('general.key_milestone')}
                                                                     </span>
                                                                 )}
                                                                 {card.is_ai && (
@@ -1261,7 +1269,7 @@ export default function ProjectBoard({
                                                                     </span>
                                                                 )}
                                                                 {card.board_published_at && (
-                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-200" title="Scheduled to publish">
+                                                                    <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-indigo-700 ring-1 ring-indigo-200" title={__('client.board_scheduled_to_publish')}>
                                                                         <Clock className="h-2.5 w-2.5 text-indigo-500" />
                                                                         {new Date(card.board_published_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                                     </span>
@@ -1269,13 +1277,13 @@ export default function ProjectBoard({
                                                                 {card.client_approval_status === 'approved' && (
                                                                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200">
                                                                         <Check className="h-2.5 w-2.5 text-emerald-500" />
-                                                                        Approved
+                                                                        {__('client.board_status_approved')}
                                                                     </span>
                                                                 )}
                                                                 {card.client_approval_status === 'revision_requested' && (
                                                                     <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-rose-700 ring-1 ring-rose-200">
                                                                         <AlertTriangle className="h-2.5 w-2.5 text-rose-500" />
-                                                                        Revision
+                                                                        {__('client.board_status_revision')}
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -1320,7 +1328,7 @@ export default function ProjectBoard({
                                                             {card.type === 'task' && priorityCls && (
                                                                 <div className="pt-1">
                                                                     <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ring-1 ring-inset', priorityCls)}>
-                                                                        {card.priority}
+                                                                        {__(`client.board_priority_${card.priority}`)}
                                                                     </span>
                                                                 </div>
                                                             )}
@@ -1328,7 +1336,7 @@ export default function ProjectBoard({
                                                             {card.type === 'todo' && card.checklist && card.checklist.length > 0 && (
                                                                 <div className="mt-2 space-y-1 text-[11px] text-slate-500 bg-slate-50/50 p-2 rounded-xl border border-slate-100">
                                                                     <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                                        <span>Progress</span>
+                                                                        <span>{__('client.board_progress')}</span>
                                                                         <span>
                                                                             {card.checklist.filter(c => c.is_completed).length} / {card.checklist.length}
                                                                         </span>
@@ -1352,7 +1360,8 @@ export default function ProjectBoard({
                                                                         <a
                                                                             href={card.download_url}
                                                                             className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
-                                                                            title={`Download ${card.title}`}
+                                                                            title={__('client.board_download_file', { name: card.title })}
+                                                                            aria-label={__('client.board_download_file', { name: card.title })}
                                                                         >
                                                                             <Download className="h-3.5 w-3.5" />
                                                                         </a>
@@ -1382,18 +1391,18 @@ export default function ProjectBoard({
                                                             type="button"
                                                             onClick={() => setViewingCard(card)}
                                                             className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100 hover:ring-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                                                            title={__('general.view') || 'View'}
-                                                            aria-label={__('general.view') || 'View'}
+                                                            title={__('general.view')}
+                                                            aria-label={__('general.view')}
                                                         >
                                                             <Eye className="h-3.5 w-3.5" />
-                                                            <span>{__('general.view') || 'View'}</span>
+                                                            <span>{__('general.view')}</span>
                                                         </button>
                                                     </div>
 
                                                     {!readOnly && (
                                                         <div className="mt-3 flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pt-2 border-t border-slate-100/50">
                                                             {!guestMode && (
-                                                                <div onClick={(e) => e.stopPropagation()} title={__('general.board_category') || 'Category'}>
+                                                                <div onClick={(e) => e.stopPropagation()} title={__('general.board_category')}>
                                                                     <BoardCategoryPicker
                                                                         projectId={projectId}
                                                                         categories={effectiveCategories}
@@ -1405,14 +1414,16 @@ export default function ProjectBoard({
                                                             <button
                                                                 onClick={() => openEditModal(card)}
                                                                 className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
-                                                                title="Edit Card"
+                                                                title={__('client.board_edit_card')}
+                                                                aria-label={__('client.board_edit_card')}
                                                             >
                                                                 <Edit3 className="h-3.5 w-3.5" />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteCard(card)}
                                                                 className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
-                                                                title="Delete Card"
+                                                                title={__('client.board_delete_card')}
+                                                                aria-label={__('client.board_delete_card')}
                                                             >
                                                                 <Trash2 className="h-3.5 w-3.5" />
                                                             </button>
@@ -1484,14 +1495,14 @@ export default function ProjectBoard({
                         className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                         <Edit3 className="h-3.5 w-3.5 text-slate-400" />
-                        <span>Edit</span>
+                        <span>{__('general.edit')}</span>
                     </button>
                     <button
                         onClick={() => { handleDeleteCard(contextMenu.card); setContextMenu(null); }}
                         className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-rose-600 hover:bg-rose-50 transition-colors"
                     >
                         <Trash2 className="h-3.5 w-3.5" />
-                        <span>Delete</span>
+                        <span>{__('general.delete')}</span>
                     </button>
                     {isAdmin && (
                         <button
@@ -1503,11 +1514,11 @@ export default function ProjectBoard({
                             className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                             <Clock className="h-3.5 w-3.5 text-indigo-500" />
-                            <span>Set Publish Date</span>
+                            <span>{__('client.board_set_publish_date')}</span>
                         </button>
                     )}
                     <div className="border-t border-slate-100 my-1" />
-                    <div className="px-3 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Move Status</div>
+                    <div className="px-3 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{__('client.board_move_status')}</div>
                     {Object.entries(LANE_META).map(([laneKey, meta]) => {
                         const LaneIcon = meta.icon;
                         return (
@@ -1533,21 +1544,21 @@ export default function ProjectBoard({
                             <div className="border-t border-slate-100 my-1" />
                             <div className="px-3 py-1 text-[9px] font-semibold text-slate-400 uppercase tracking-wider inline-flex items-center gap-1">
                                 <CalendarClock className="h-3 w-3" />
-                                <span>{__('general.reschedule') || 'Reschedule'}</span>
+                                <span>{__('general.reschedule')}</span>
                             </div>
                             <button
                                 onClick={() => { const c = contextMenu.card; setContextMenu(null); shiftDay(c, -1); }}
                                 className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
                             >
                                 <ArrowLeft className="h-3.5 w-3.5" />
-                                <span>{__('general.reschedule_back_day') || 'Back 1 day'}</span>
+                                <span>{__('general.reschedule_back_day')}</span>
                             </button>
                             <button
                                 onClick={() => { const c = contextMenu.card; setContextMenu(null); shiftDay(c, 1); }}
                                 className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
                             >
                                 <ArrowRight className="h-3.5 w-3.5" />
-                                <span>{__('general.reschedule_next_day') || 'Next 1 day'}</span>
+                                <span>{__('general.reschedule_next_day')}</span>
                             </button>
                             <button
                                 onClick={() => {
@@ -1561,7 +1572,7 @@ export default function ProjectBoard({
                                 className="flex w-full items-center gap-2 px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
                             >
                                 <CalendarIcon className="h-3.5 w-3.5" />
-                                <span>{__('general.reschedule_choose_date') || 'Choose date…'}</span>
+                                <span>{__('general.reschedule_choose_date')}</span>
                             </button>
                         </>
                     )}
@@ -1574,10 +1585,10 @@ export default function ProjectBoard({
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500 inline-flex items-center gap-2">
                                 <CalendarClock className="h-4 w-4 text-indigo-500" />
-                                {__('general.reschedule_dialog_title') || 'Reschedule card'}
+                                {__('general.reschedule_dialog_title')}
                             </DialogTitle>
                             <DialogDescription className="text-xs text-slate-500 mt-1">
-                                {__('general.reschedule_dialog_description') || 'Pick the new date for this card. The card will be moved out of the current day.'}
+                                {__('general.reschedule_dialog_description')}
                             </DialogDescription>
                         </DialogHeader>
                     </div>
@@ -1585,11 +1596,11 @@ export default function ProjectBoard({
                         {rescheduleDialog && (
                             <>
                                 <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2 text-[11px] text-slate-600 truncate">
-                                    <span className="font-bold uppercase tracking-wider text-slate-400 mr-2">Card</span>
+                                    <span className="font-bold uppercase tracking-wider text-slate-400 me-2">{__('client.board_card')}</span>
                                     <span className="font-semibold text-slate-700">{rescheduleDialog.card.title}</span>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-bold text-slate-600">{__('general.reschedule_choose_date') || 'Choose date'}</Label>
+                                    <Label className="text-xs font-bold text-slate-600">{__('general.reschedule_choose_date')}</Label>
                                     <Input
                                         type="date"
                                         value={rescheduleDialog.targetDate}
@@ -1607,7 +1618,7 @@ export default function ProjectBoard({
                             disabled={rescheduling}
                             className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                         >
-                            {__('general.cancel') || 'Cancel'}
+                            {__('general.cancel')}
                         </button>
                         <button
                             type="button"
@@ -1625,7 +1636,7 @@ export default function ProjectBoard({
                             className="rounded-xl bg-indigo-600 text-white px-4 py-2 text-xs font-semibold hover:bg-indigo-500 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm"
                         >
                             <CalendarClock className="h-3.5 w-3.5" />
-                            <span>{rescheduling ? '…' : __('general.reschedule_card') || 'Reschedule'}</span>
+                            <span>{rescheduling ? '…' : __('general.reschedule_card')}</span>
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -1638,14 +1649,14 @@ export default function ProjectBoard({
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">
-                                {activeModal?.action === 'edit' ? 'Edit Sticky Note' : 'New Sticky Note'}
+                                {activeModal?.action === 'edit' ? __('client.board_edit_note') : __('client.board_new_note')}
                             </DialogTitle>
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
                         {isConsolidated && activeModal?.action === 'create' && (
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_select_project')}</Label>
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -1658,28 +1669,28 @@ export default function ProjectBoard({
                             </div>
                         )}
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">{__('general.note_title') || 'Title'}</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('general.note_title')}</Label>
                             <Input
                                 value={noteForm.title}
                                 onChange={(e) => setNoteForm({ ...noteForm, title: e.target.value })}
-                                placeholder={__('general.note_title_placeholder') || 'Give your note a short title…'}
+                                placeholder={__('general.note_title_placeholder')}
                                 maxLength={255}
                                 className="rounded-xl border-slate-200 text-sm focus:ring-slate-300"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Note Content</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('client.board_note_content')}</Label>
                             <Textarea
                                 value={noteForm.content}
                                 onChange={(e) => setNoteForm({ ...noteForm, content: e.target.value })}
-                                placeholder="Write down your notes here..."
+                                placeholder={__('client.board_note_content_placeholder')}
                                 rows={6}
                                 maxLength={61440}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-bold text-slate-600">Background Color</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('client.board_background_color')}</Label>
                             <div className="flex items-center gap-2">
                                 {Object.entries(NOTE_COLORS).map(([key, c]) => (
                                     <button
@@ -1691,7 +1702,7 @@ export default function ProjectBoard({
                                             c.swatch,
                                             noteForm.color === key ? 'border-slate-900 scale-110 shadow' : 'border-white',
                                         )}
-                                        aria-label={key}
+                                        aria-label={__(`client.board_color_${key}`)}
                                     />
                                 ))}
                             </div>
@@ -1700,8 +1711,8 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date & Time
-                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                    {__('client.board_publish_datetime')}
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">{__('client.board_publish_empty_hint')}</span>
                                 </Label>
                                 <Input
                                     type="datetime-local"
@@ -1714,10 +1725,10 @@ export default function ProjectBoard({
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button onClick={handleSaveNote} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800">
-                            Save
+                            {__('general.save')}
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -1728,14 +1739,14 @@ export default function ProjectBoard({
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">
-                                {activeModal?.action === 'edit' ? 'Edit Project Task' : 'New Project Task'}
+                                {activeModal?.action === 'edit' ? __('client.board_edit_task') : __('client.board_new_task')}
                             </DialogTitle>
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
                         {isConsolidated && activeModal?.action === 'create' && (
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_select_project')}</Label>
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -1748,43 +1759,43 @@ export default function ProjectBoard({
                             </div>
                         )}
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Task Name</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('general.task_name')}</Label>
                             <Input
                                 value={taskForm.task_name}
                                 onChange={(e) => setTaskForm({ ...taskForm, task_name: e.target.value })}
-                                placeholder="Enter task title"
+                                placeholder={__('client.board_task_name_placeholder')}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Description</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('general.description')}</Label>
                             <Textarea
                                 value={taskForm.task_description}
                                 onChange={(e) => setTaskForm({ ...taskForm, task_description: e.target.value })}
-                                placeholder="Add descriptive notes..."
+                                placeholder={__('client.board_task_description_placeholder')}
                                 rows={5}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Priority</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('general.priority')}</Label>
                             <select
                                 value={taskForm.priority}
                                 onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value })}
                                 className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs ring-offset-white focus:outline-none focus:ring-1 focus:ring-slate-300"
                             >
-                                <option value="low">Low</option>
-                                <option value="normal">Normal</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
+                                <option value="low">{__('client.board_priority_low')}</option>
+                                <option value="normal">{__('client.board_priority_normal')}</option>
+                                <option value="high">{__('client.board_priority_high')}</option>
+                                <option value="urgent">{__('client.board_priority_urgent')}</option>
                             </select>
                         </div>
                         {isAdmin && (
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date & Time
-                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                    {__('client.board_publish_datetime')}
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">{__('client.board_publish_empty_hint')}</span>
                                 </Label>
                                 <Input
                                     type="datetime-local"
@@ -1797,10 +1808,10 @@ export default function ProjectBoard({
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button onClick={handleSaveTask} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800">
-                            Save
+                            {__('general.save')}
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -1811,14 +1822,14 @@ export default function ProjectBoard({
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">
-                                {activeModal?.action === 'edit' ? 'Edit Board Todo Checklist' : 'New Board Todo Checklist'}
+                                {activeModal?.action === 'edit' ? __('client.board_edit_todo') : __('client.board_new_todo')}
                             </DialogTitle>
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
                         {isConsolidated && activeModal?.action === 'create' && (
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_select_project')}</Label>
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -1831,20 +1842,20 @@ export default function ProjectBoard({
                             </div>
                         )}
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Todo Title</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('client.board_todo_title')}</Label>
                             <Input
                                 value={todoForm.title}
                                 onChange={(e) => setTodoForm({ ...todoForm, title: e.target.value })}
-                                placeholder="E.g., Design UI layout"
+                                placeholder={__('client.board_todo_title_placeholder')}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Description</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('general.description')}</Label>
                             <Textarea
                                 value={todoForm.description}
                                 onChange={(e) => setTodoForm({ ...todoForm, description: e.target.value })}
-                                placeholder="Summary notes..."
+                                placeholder={__('client.board_todo_description_placeholder')}
                                 rows={3}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
@@ -1852,7 +1863,7 @@ export default function ProjectBoard({
 
                         <div className="space-y-2 border-t border-slate-100 pt-3">
                             <Label className="text-xs font-bold text-slate-600 flex items-center justify-between">
-                                <span>Checklist Sub-items</span>
+                                <span>{__('client.board_checklist_items')}</span>
                                 <span className="text-[10px] text-slate-400 font-extrabold">
                                     {todoForm.checklist.filter(c => c.is_completed).length} / {todoForm.checklist.length}
                                 </span>
@@ -1868,7 +1879,7 @@ export default function ProjectBoard({
                                             />
                                             <span className={cn('text-xs', chk.is_completed && 'line-through text-slate-400')}>{chk.title}</span>
                                         </div>
-                                        <button onClick={() => removeTodoCheckItem(index)} className="text-slate-400 hover:text-rose-600">
+                                        <button onClick={() => removeTodoCheckItem(index)} className="text-slate-400 hover:text-rose-600" aria-label={__('client.board_remove_checklist_item')}>
                                             <X className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
@@ -1878,7 +1889,8 @@ export default function ProjectBoard({
                                 <Input
                                     value={newCheckItem}
                                     onChange={(e) => setNewCheckItem(e.target.value)}
-                                    placeholder="Add checklist sub-item..."
+                                    placeholder={__('client.board_checklist_item_placeholder')}
+                                    aria-label={__('client.board_checklist_item_placeholder')}
                                     className="h-8 rounded-xl border-slate-200 text-xs flex-1"
                                     onKeyDown={(e) => e.key === 'Enter' && addTodoCheckItem()}
                                 />
@@ -1886,7 +1898,7 @@ export default function ProjectBoard({
                                     onClick={addTodoCheckItem}
                                     className="inline-flex h-8 items-center justify-center rounded-xl bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-800 shadow-sm"
                                 >
-                                    Add
+                                    {__('general.add')}
                                 </button>
                             </div>
                         </div>
@@ -1894,8 +1906,8 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date & Time
-                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                    {__('client.board_publish_datetime')}
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">{__('client.board_publish_empty_hint')}</span>
                                 </Label>
                                 <Input
                                     type="datetime-local"
@@ -1908,10 +1920,10 @@ export default function ProjectBoard({
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button onClick={handleSaveTodo} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800">
-                            Save
+                            {__('general.save')}
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -1924,10 +1936,10 @@ export default function ProjectBoard({
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide flex items-center gap-1.5 text-violet-700">
                                 <Sparkles className="h-4 w-4" />
-                                {__('general.add_with_ai') || 'Add with AI'}
+                                {__('general.add_with_ai')}
                             </DialogTitle>
                             <DialogDescription className="text-xs text-slate-400">
-                                Explain what you want to accomplish, then configure how the AI should distribute cards across days.
+                                {__('client.board_ai_description')}
                             </DialogDescription>
                         </DialogHeader>
                     </div>
@@ -1941,18 +1953,18 @@ export default function ProjectBoard({
                                 {aiStep === 'prompt' ? (
                                     <>
                                         <div className="space-y-1">
-                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_prompt') || 'AI Instructions'}</Label>
+                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_prompt')}</Label>
                                             <Textarea
                                                 value={aiPrompt}
                                                 onChange={(e) => setAiPrompt(e.target.value)}
-                                                placeholder="E.g., Build a captcha solver bot. First, analyze the target captcha structure. Second, write python helper scripts. Third, implement and test locally."
+                                                placeholder={__('client.board_ai_prompt_placeholder')}
                                                 rows={9}
                                                 disabled={aiLoading || aiAskingQuestions}
                                                 className="rounded-xl border-slate-200 text-xs focus:ring-violet-500/30 focus:border-violet-500 resize-none"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_start_date') || 'Start Date'}</Label>
+                                            <Label className="text-xs font-bold text-slate-600">{__('general.ai_start_date')}</Label>
                                             <Input
                                                 type="date"
                                                 value={aiStartDate}
@@ -1966,10 +1978,10 @@ export default function ProjectBoard({
                                     <div className="space-y-4">
                                         <div className="bg-violet-50/50 border border-violet-100 rounded-2xl p-3.5 space-y-1">
                                             <p className="text-[11px] font-bold text-violet-700 uppercase tracking-wider flex items-center gap-1">
-                                                <Sparkles className="h-3 w-3" /> Clarification Interview
+                                                <Sparkles className="h-3 w-3" /> {__('client.board_ai_interview')}
                                             </p>
                                             <p className="text-[10px] text-slate-500">
-                                                Please answer these questions so the AI can generate realistic, highly specific cards rather than generic placeholders.
+                                                {__('client.board_ai_interview_hint')}
                                             </p>
                                         </div>
 
@@ -1987,7 +1999,7 @@ export default function ProjectBoard({
                                                                 [q]: e.target.value,
                                                             }))
                                                         }
-                                                        placeholder="Type your answer here..."
+                                                        placeholder={__('client.board_ai_answer_placeholder')}
                                                         disabled={aiLoading}
                                                         className="rounded-xl border-slate-200 text-xs focus:ring-violet-500/30 focus:border-violet-500"
                                                     />
@@ -2000,7 +2012,7 @@ export default function ProjectBoard({
 
                             {/* Right column — Plan Controls */}
                             <div className="sm:col-span-2 px-6 py-5 space-y-5 bg-slate-50/40">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Plan Controls</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{__('client.board_ai_plan_controls')}</p>
 
                                 {/* Card Types */}
                                 <div className="space-y-2">
@@ -2008,16 +2020,16 @@ export default function ProjectBoard({
                                         <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-violet-100 text-violet-600">
                                             <Sparkles className="h-2.5 w-2.5" />
                                         </span>
-                                        Card Types
+                                        {__('client.board_ai_card_types')}
                                     </Label>
-                                    <p className="text-[10px] text-slate-400">AI will only generate the selected card types.</p>
+                                    <p className="text-[10px] text-slate-400">{__('client.board_ai_card_types_hint')}</p>
                                     <div className="grid grid-cols-2 gap-1.5">
                                         {(
                                             [
-                                                { key: 'task',   label: 'Task',   icon: ListTodo,      color: 'text-sky-600 bg-sky-50 ring-sky-200' },
-                                                { key: 'todo',   label: 'Todo',   icon: ClipboardList,  color: 'text-violet-600 bg-violet-50 ring-violet-200' },
-                                                { key: 'note',   label: 'Note',   icon: StickyNote,     color: 'text-amber-600 bg-amber-50 ring-amber-200' },
-                                                { key: 'report', label: 'Report', icon: FileText,       color: 'text-emerald-600 bg-emerald-50 ring-emerald-200' },
+                                                { key: 'task',   label: __('general.task'),   icon: ListTodo,      color: 'text-sky-600 bg-sky-50 ring-sky-200' },
+                                                { key: 'todo',   label: __('client.board_type_todo'),   icon: ClipboardList,  color: 'text-violet-600 bg-violet-50 ring-violet-200' },
+                                                { key: 'note',   label: __('general.note'),   icon: StickyNote,     color: 'text-amber-600 bg-amber-50 ring-amber-200' },
+                                                { key: 'report', label: __('general.report'), icon: FileText,       color: 'text-emerald-600 bg-emerald-50 ring-emerald-200' },
                                             ] as const
                                         ).map(({ key, label, icon: Icon, color }) => {
                                             const active = aiAllowedTypes.includes(key);
@@ -2051,13 +2063,13 @@ export default function ProjectBoard({
                                         })}
                                     </div>
                                     {aiAllowedTypes.length === 0 && (
-                                        <p className="text-[10px] text-rose-500 font-semibold">Select at least one type.</p>
+                                        <p className="text-[10px] text-rose-500 font-semibold">{__('client.board_ai_select_one_type')}</p>
                                     )}
                                 </div>
 
                                 {/* Max Daily Hours */}
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold text-slate-600">Max Hours / Day</Label>
+                                    <Label className="text-xs font-bold text-slate-600">{__('client.board_ai_max_hours')}</Label>
                                     <div className="flex items-center gap-3">
                                         <input
                                             type="range"
@@ -2068,28 +2080,29 @@ export default function ProjectBoard({
                                             disabled={aiLoading || aiAskingQuestions}
                                             onChange={(e) => setAiMaxDailyHours(Number(e.target.value))}
                                             className="flex-1 accent-violet-600 disabled:opacity-50"
+                                            aria-label={__('client.board_ai_max_hours')}
                                         />
                                         <span className="shrink-0 min-w-[2.5rem] rounded-lg bg-violet-100 px-2 py-0.5 text-center text-xs font-bold text-violet-700">
-                                            {aiMaxDailyHours}h
+                                            {__('client.board_ai_hours_value', { count: aiMaxDailyHours })}
                                         </span>
                                     </div>
-                                    <p className="text-[10px] text-slate-400">Tasks will roll over to the next working day when the limit is reached.</p>
+                                    <p className="text-[10px] text-slate-400">{__('client.board_ai_max_hours_hint')}</p>
                                 </div>
 
                                 {/* Working Days */}
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold text-slate-600">Working Days</Label>
-                                    <p className="text-[10px] text-slate-400">Unchecked days will be skipped.</p>
+                                    <Label className="text-xs font-bold text-slate-600">{__('client.board_ai_working_days')}</Label>
+                                    <p className="text-[10px] text-slate-400">{__('client.board_ai_working_days_hint')}</p>
                                     <div className="flex flex-wrap gap-1">
                                         {(
                                             [
-                                                { day: 0, label: 'Sun' },
-                                                { day: 1, label: 'Mon' },
-                                                { day: 2, label: 'Tue' },
-                                                { day: 3, label: 'Wed' },
-                                                { day: 4, label: 'Thu' },
-                                                { day: 5, label: 'Fri' },
-                                                { day: 6, label: 'Sat' },
+                                                { day: 0, label: __('general.cal_sun') },
+                                                { day: 1, label: __('general.cal_mon') },
+                                                { day: 2, label: __('general.cal_tue') },
+                                                { day: 3, label: __('general.cal_wed') },
+                                                { day: 4, label: __('general.cal_thu') },
+                                                { day: 5, label: __('general.cal_fri') },
+                                                { day: 6, label: __('general.cal_sat') },
                                             ]
                                         ).map(({ day, label }) => {
                                             const isSkipped = aiSkipDays.includes(day);
@@ -2133,7 +2146,7 @@ export default function ProjectBoard({
                                     disabled={aiLoading || aiAskingQuestions}
                                     className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </button>
                                 <div className="flex items-center gap-2 sm:ms-auto">
                                     <button
@@ -2144,12 +2157,12 @@ export default function ProjectBoard({
                                         {aiAskingQuestions ? (
                                             <>
                                                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-violet-700 border-t-transparent" />
-                                                Preparing Interview...
+                                                {__('client.board_ai_preparing_interview')}
                                             </>
                                         ) : (
                                             <>
                                                 <Sparkles className="h-3.5 w-3.5" />
-                                                Clarify with AI first
+                                                {__('client.board_ai_clarify_first')}
                                             </>
                                         )}
                                     </button>
@@ -2161,11 +2174,11 @@ export default function ProjectBoard({
                                         {aiLoading ? (
                                             <>
                                                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                                Creating plan...
+                                                {__('client.board_ai_creating_plan')}
                                             </>
                                         ) : (
                                             <>
-                                                Generate directly
+                                                {__('client.board_ai_generate_directly')}
                                             </>
                                         )}
                                     </button>
@@ -2178,7 +2191,7 @@ export default function ProjectBoard({
                                     disabled={aiLoading}
                                     className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                                 >
-                                    Back
+                                    {__('general.back')}
                                 </button>
                                 <button
                                     onClick={handleSaveAiPlan}
@@ -2188,12 +2201,12 @@ export default function ProjectBoard({
                                     {aiLoading ? (
                                         <>
                                             <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                            {__('general.ai_generating_plan') || 'Creating plan...'}
+                                            {__('general.ai_generating_plan')}
                                         </>
                                     ) : (
                                         <>
                                             <Sparkles className="h-3.5 w-3.5" />
-                                            Generate detailed plan
+                                            {__('client.board_ai_generate_detailed')}
                                         </>
                                     )}
                                 </button>
@@ -2207,13 +2220,13 @@ export default function ProjectBoard({
                 <DialogContent className="w-full sm:max-w-3xl max-h-[calc(100vh-3rem)] flex flex-col gap-0 p-0 overflow-hidden">
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
                         <DialogHeader>
-                            <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">Upload Attachment Card</DialogTitle>
+                            <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">{__('client.board_upload_attachment')}</DialogTitle>
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
                         {isConsolidated && activeModal?.action === 'create' && (
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_select_project')}</Label>
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -2229,6 +2242,7 @@ export default function ProjectBoard({
                             <input
                                 type="file"
                                 onChange={(e) => setFileForm(e.target.files?.[0] || null)}
+                                aria-label={__('client.board_select_file')}
                                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                             />
                             <UploadCloud className="h-10 w-10 text-slate-400 mb-2" />
@@ -2239,8 +2253,8 @@ export default function ProjectBoard({
                                 </div>
                             ) : (
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-600">Drag & Drop or Click to Select File</p>
-                                    <p className="text-[10px] text-slate-400 mt-1">Maximum upload size 20MB</p>
+                                    <p className="text-xs font-semibold text-slate-600">{__('client.board_upload_drop_hint')}</p>
+                                    <p className="text-[10px] text-slate-400 mt-1">{__('client.board_upload_max_size')}</p>
                                 </div>
                             )}
                         </div>
@@ -2248,8 +2262,8 @@ export default function ProjectBoard({
                             <div className="space-y-1">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date & Time
-                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Leave empty to show immediately</span>
+                                    {__('client.board_publish_datetime')}
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">{__('client.board_publish_empty_hint')}</span>
                                 </Label>
                                 <Input
                                     type="datetime-local"
@@ -2262,10 +2276,10 @@ export default function ProjectBoard({
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50" disabled={uploading}>
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button onClick={handleUploadFile} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800 disabled:opacity-50" disabled={!fileForm || uploading}>
-                            {uploading ? 'Uploading...' : 'Upload'}
+                            {uploading ? __('general.uploading') : __('general.upload')}
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -2276,14 +2290,14 @@ export default function ProjectBoard({
                     <div className="px-6 pt-5 pb-3 border-b border-slate-100 shrink-0">
                         <DialogHeader>
                             <DialogTitle className="text-sm font-extrabold uppercase tracking-wide text-slate-500">
-                                {activeModal?.action === 'edit' ? 'Edit Progress Report' : 'New Progress Report'}
+                                {activeModal?.action === 'edit' ? __('client.board_edit_report') : __('client.board_new_report')}
                             </DialogTitle>
                         </DialogHeader>
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
                         {isConsolidated && activeModal?.action === 'create' && (
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Select Project</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_select_project')}</Label>
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(Number(e.target.value))}
@@ -2296,18 +2310,18 @@ export default function ProjectBoard({
                             </div>
                         )}
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Report Title</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('client.board_report_title')}</Label>
                             <Input
                                 value={reportForm.title}
                                 onChange={(e) => setReportForm({ ...reportForm, title: e.target.value })}
-                                placeholder="E.g., Weekly progress updates"
+                                placeholder={__('client.board_report_title_placeholder')}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300"
                             />
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Period Start (Date & Time)</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_period_start')}</Label>
                                 <Input
                                     type="datetime-local"
                                     value={reportForm.period_start}
@@ -2316,7 +2330,7 @@ export default function ProjectBoard({
                                 />
                             </div>
                             <div className="space-y-1">
-                                <Label className="text-xs font-bold text-slate-600">Period End (Date & Time)</Label>
+                                <Label className="text-xs font-bold text-slate-600">{__('client.board_period_end')}</Label>
                                 <Input
                                     type="datetime-local"
                                     value={reportForm.period_end}
@@ -2330,8 +2344,8 @@ export default function ProjectBoard({
                             <div className="space-y-1 border-t border-slate-100 pt-3">
                                 <Label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
                                     <Clock className="h-3 w-3 text-indigo-500" />
-                                    Publish Date & Time
-                                    <span className="ml-auto text-[10px] font-normal text-slate-400">Specify when the report should become visible to guests/clients</span>
+                                    {__('client.board_publish_datetime')}
+                                    <span className="ml-auto text-[10px] font-normal text-slate-400">{__('client.board_report_publish_hint')}</span>
                                 </Label>
                                 <Input
                                     type="datetime-local"
@@ -2344,7 +2358,7 @@ export default function ProjectBoard({
 
                         <div className="flex items-center justify-between bg-slate-50/50 border border-slate-100 rounded-xl p-3">
                             <div className="text-[11px] text-slate-500 max-w-md">
-                                Provide a custom date & time range above to automatically summarize project tasks, todos, notes, and file updates with AI.
+                                {__('client.board_report_ai_hint')}
                             </div>
                             <button
                                 type="button"
@@ -2353,16 +2367,16 @@ export default function ProjectBoard({
                                 className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                             >
                                 <Sparkles className="h-3.5 w-3.5" />
-                                {generatingReportDraft ? 'Generating...' : 'Draft with AI'}
+                                {generatingReportDraft ? __('client.board_generating') : __('client.board_draft_with_ai')}
                             </button>
                         </div>
 
                         <div className="space-y-1">
-                            <Label className="text-xs font-bold text-slate-600">Report Body (Markdown Supported)</Label>
+                            <Label className="text-xs font-bold text-slate-600">{__('client.board_report_body')}</Label>
                             <Textarea
                                 value={reportForm.body}
                                 onChange={(e) => setReportForm({ ...reportForm, body: e.target.value })}
-                                placeholder="Use markdown headings, checklists, or descriptions..."
+                                placeholder={__('client.board_report_body_placeholder')}
                                 rows={10}
                                 className="rounded-xl border-slate-200 text-xs focus:ring-slate-300 font-mono"
                             />
@@ -2370,10 +2384,10 @@ export default function ProjectBoard({
                     </div>
                     <DialogFooter className="gap-2 sm:gap-0 px-6 py-4 border-t border-slate-100 bg-slate-50/60 shrink-0">
                         <button onClick={() => setActiveModal(null)} className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button onClick={handleSaveReport} className="rounded-xl bg-slate-900 text-white px-4 py-2 text-xs font-semibold hover:bg-slate-800">
-                            Save
+                            {__('general.save')}
                         </button>
                     </DialogFooter>
                 </DialogContent>
@@ -2397,7 +2411,7 @@ export default function ProjectBoard({
                                         <div className={cn('flex items-center gap-2', headerIconColor)}>
                                             <TypeIcon className="h-4 w-4" />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">
-                                                {__(`general.${viewingCard.type === 'note' ? 'note' : viewingCard.type === 'task' ? 'task' : viewingCard.type === 'todo' ? 'todo' : viewingCard.type === 'file' ? 'file' : 'report'}`) || meta.label}
+                                                {__(meta.labelKey)}
                                             </span>
                                         </div>
                                         <DialogTitle className="text-lg font-bold text-slate-900 mt-1 break-words">
@@ -2411,13 +2425,13 @@ export default function ProjectBoard({
                                         {viewingCard.type === 'report' && (viewingCard.period_start || viewingCard.period_end) && (
                                             <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 font-semibold bg-slate-50/80 border border-slate-100 rounded-lg px-2.5 py-1 w-fit">
                                                 <CalendarDays className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                                                <span>Report Period:</span>
+                                                <span>{__('client.board_report_period')}</span>
                                                 <span className="font-mono text-slate-700">
-                                                    {viewingCard.period_start ? new Date(viewingCard.period_start).toLocaleString() : 'N/A'}
+                                                    {viewingCard.period_start ? new Date(viewingCard.period_start).toLocaleString() : __('general.n_a')}
                                                 </span>
                                                 <span className="text-slate-300">→</span>
                                                 <span className="font-mono text-slate-700">
-                                                    {viewingCard.period_end ? new Date(viewingCard.period_end).toLocaleString() : 'N/A'}
+                                                    {viewingCard.period_end ? new Date(viewingCard.period_end).toLocaleString() : __('general.n_a')}
                                                 </span>
                                             </div>
                                         )}
@@ -2439,7 +2453,7 @@ export default function ProjectBoard({
                                                     className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 transition-colors"
                                                 >
                                                     <Download className="h-3.5 w-3.5" />
-                                                    {__('general.download') || 'Download'}
+                                                    {__('general.download')}
                                                 </a>
                                             )}
                                         </div>
@@ -2472,13 +2486,13 @@ export default function ProjectBoard({
                                         <p className="text-sm text-slate-700 whitespace-pre-wrap break-words">{viewingCard.content}</p>
                                     ) : isNote ? (
                                         <p className="text-sm text-slate-400 italic text-center py-8">
-                                            {__('general.no_content') || 'No content available.'}
+                                            {__('general.no_content')}
                                         </p>
                                     ) : viewingCard.description ? (
                                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{viewingCard.description}</p>
                                     ) : (
                                         <p className="text-sm text-slate-400 italic text-center py-8">
-                                            {__('general.no_content') || 'No content available.'}
+                                            {__('general.no_content')}
                                         </p>
                                     )}
                                     {/* Client Approval Sign-off */}
@@ -2486,7 +2500,7 @@ export default function ProjectBoard({
                                         <div className="rounded-2xl border border-slate-200 p-4 bg-slate-50 space-y-3 mt-6">
                                             <div className="flex items-center justify-between">
                                                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                                    Client Approval Sign-off
+                                                    {__('client.board_approval_title')}
                                                 </h4>
                                                 <span className={cn(
                                                     "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset",
@@ -2496,13 +2510,13 @@ export default function ProjectBoard({
                                                             ? "bg-rose-100 text-rose-800 ring-rose-200"
                                                             : "bg-slate-200 text-slate-800 ring-slate-350"
                                                 )}>
-                                                    {viewingCard.client_approval_status || 'pending'}
+                                                    {__(APPROVAL_STATUS_KEYS[viewingCard.client_approval_status ?? 'pending'] ?? 'general.status_pending')}
                                                 </span>
                                             </div>
                                             
                                             {viewingCard.client_feedback && (
                                                 <p className="text-xs text-slate-500 italic bg-white p-2.5 rounded-lg border border-slate-100">
-                                                    Feedback: "{viewingCard.client_feedback}"
+                                                    {__('client.board_feedback', { text: viewingCard.client_feedback })}
                                                 </p>
                                             )}
 
@@ -2511,7 +2525,8 @@ export default function ProjectBoard({
                                                     {showApprovalRevisionForm ? (
                                                         <div className="w-full space-y-2">
                                                             <Textarea
-                                                                placeholder="Explain the required revisions..."
+                                                                placeholder={__('client.board_revision_placeholder')}
+                                                                aria-label={__('client.board_revision_placeholder')}
                                                                 className="text-xs"
                                                                 rows={3}
                                                                 value={feedbackText}
@@ -2524,7 +2539,7 @@ export default function ProjectBoard({
                                                                     className="h-8 text-xs"
                                                                     onClick={() => setShowApprovalRevisionForm(false)}
                                                                 >
-                                                                    Cancel
+                                                                    {__('general.cancel')}
                                                                 </Button>
                                                                 <Button
                                                                     size="sm"
@@ -2532,7 +2547,7 @@ export default function ProjectBoard({
                                                                     disabled={!feedbackText.trim() || boardItemUpdating}
                                                                     onClick={() => handleBoardItemApproval(viewingCard.board_item_id!, 'revision_requested', feedbackText)}
                                                                 >
-                                                                    Submit Revision Request
+                                                                    {__('client.board_submit_revision')}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -2544,7 +2559,7 @@ export default function ProjectBoard({
                                                                 className="h-8 text-xs border-rose-200 text-rose-600 hover:bg-rose-50"
                                                                 onClick={() => setShowApprovalRevisionForm(true)}
                                                             >
-                                                                Request Revision
+                                                                {__('client.board_request_revision')}
                                                             </Button>
                                                             <Button
                                                                 size="sm"
@@ -2552,7 +2567,7 @@ export default function ProjectBoard({
                                                                 disabled={boardItemUpdating}
                                                                 onClick={() => handleBoardItemApproval(viewingCard.board_item_id!, 'approved')}
                                                             >
-                                                                Approve Deliverable
+                                                                {__('client.board_approve_deliverable')}
                                                             </Button>
                                                         </div>
                                                     )}
@@ -2573,7 +2588,7 @@ export default function ProjectBoard({
                                             className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                                         >
                                             <Download className="h-3.5 w-3.5" />
-                                            {__('general.export_as_pdf') || 'Export as PDF'}
+                                            {__('general.export_as_pdf')}
                                         </a>
                                     )}
                                     <button
@@ -2581,7 +2596,7 @@ export default function ProjectBoard({
                                         onClick={() => setViewingCard(null)}
                                         className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-white"
                                     >
-                                        {__('general.close') || 'Close'}
+                                        {__('general.close')}
                                     </button>
                                 </DialogFooter>
                             </>
@@ -2589,6 +2604,7 @@ export default function ProjectBoard({
                     })()}
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </div>
     );
 }
@@ -2611,8 +2627,8 @@ const CategoryFilterDropdown: React.FC<{
     }, [open]);
 
     const selectedLabel = (() => {
-        if (value === 'all') return __('general.board_clear_category_filter') || 'All categories';
-        if (value === 'uncategorized') return __('general.board_no_category') || 'No category';
+        if (value === 'all') return __('general.board_clear_category_filter');
+        if (value === 'uncategorized') return __('general.board_no_category');
         return categories.find((c) => c.id === value)?.name ?? '—';
     })();
 
@@ -2630,7 +2646,7 @@ const CategoryFilterDropdown: React.FC<{
             {open && (
                 <div className="absolute right-0 sm:left-0 z-30 mt-1.5 w-60 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {__('general.board_filter_by_category') || 'Filter by category'}
+                        {__('general.board_filter_by_category')}
                     </div>
                     <button
                         type="button"
@@ -2643,7 +2659,7 @@ const CategoryFilterDropdown: React.FC<{
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200/60 text-slate-500">
                             <Tag className="h-3 w-3" />
                         </span>
-                        <span className="flex-1 truncate">{__('general.board_clear_category_filter') || 'All categories'}</span>
+                        <span className="flex-1 truncate">{__('general.board_clear_category_filter')}</span>
                     </button>
                     <button
                         type="button"
@@ -2654,7 +2670,7 @@ const CategoryFilterDropdown: React.FC<{
                         )}
                     >
                         <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-dashed border-slate-300 text-slate-400">—</span>
-                        <span className="flex-1 truncate">{__('general.board_no_category') || 'No category'}</span>
+                        <span className="flex-1 truncate">{__('general.board_no_category')}</span>
                     </button>
                     {categories.length > 0 && <div className="my-1 border-t border-slate-100" />}
                     <div className="max-h-56 overflow-y-auto">
@@ -2694,10 +2710,10 @@ const ViewModeToggle: React.FC<{
     onChange: (next: ViewMode) => void;
 }> = ({ value, onChange }) => {
     const items: { id: ViewMode; icon: React.ElementType; label: string }[] = [
-        { id: 'cards', icon: LayoutList, label: __('general.board_view_cards') || 'Cards' },
-        { id: 'grid', icon: LayoutGrid, label: __('general.board_view_grid') || 'Grid' },
-        { id: 'lines', icon: Rows3, label: __('general.board_view_lines') || 'Lines' },
-        { id: 'table', icon: Table2, label: __('general.board_view_table') || 'Table' },
+        { id: 'cards', icon: LayoutList, label: __('general.board_view_cards') },
+        { id: 'grid', icon: LayoutGrid, label: __('general.board_view_grid') },
+        { id: 'lines', icon: Rows3, label: __('general.board_view_lines') },
+        { id: 'table', icon: Table2, label: __('general.board_view_table') },
     ];
 
     return (
@@ -2748,12 +2764,12 @@ const SortDropdown: React.FC<{
 
     const label = (() => {
         switch (sortBy) {
-            case 'manual': return __('general.board_sort_manual') || 'Manual';
-            case 'title': return __('general.board_sort_title') || 'Title';
-            case 'type': return __('general.board_sort_type') || 'Type';
-            case 'lane': return __('general.board_sort_lane') || 'Status';
-            case 'priority': return __('general.board_sort_priority') || 'Priority';
-            case 'category': return __('general.board_sort_category') || 'Category';
+            case 'manual': return __('general.board_sort_manual');
+            case 'title': return __('general.board_sort_title');
+            case 'type': return __('general.board_sort_type');
+            case 'lane': return __('general.board_sort_lane');
+            case 'priority': return __('general.board_sort_priority');
+            case 'category': return __('general.board_sort_category');
         }
     })();
 
@@ -2768,7 +2784,7 @@ const SortDropdown: React.FC<{
                     className="inline-flex h-full items-center gap-1.5 px-3 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
                 >
                     <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
-                    <span className="text-slate-400">{__('general.board_sort_label') || 'Sort'}:</span>
+                    <span className="text-slate-400">{__('general.board_sort_label')}:</span>
                     <span>{label}</span>
                     <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                 </button>
@@ -2776,8 +2792,8 @@ const SortDropdown: React.FC<{
                     type="button"
                     onClick={() => onChangeDir(sortDir === 'asc' ? 'desc' : 'asc')}
                     className="inline-flex h-full items-center gap-1 border-l border-slate-200 px-2.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-                    title={__('general.board_sort_direction') || 'Sort direction'}
-                    aria-label={__('general.board_sort_direction') || 'Sort direction'}
+                    title={__('general.board_sort_direction')}
+                    aria-label={__('general.board_sort_direction')}
                 >
                     <DirIcon className="h-3.5 w-3.5 text-slate-400" />
                 </button>
@@ -2787,12 +2803,12 @@ const SortDropdown: React.FC<{
                     {SORT_KEYS.map((key) => {
                         const itemLabel = (() => {
                             switch (key) {
-                                case 'manual': return __('general.board_sort_manual') || 'Manual order';
-                                case 'title': return __('general.board_sort_title') || 'Title';
-                                case 'type': return __('general.board_sort_type') || 'Type';
-                                case 'lane': return __('general.board_sort_lane') || 'Status';
-                                case 'priority': return __('general.board_sort_priority') || 'Priority';
-                                case 'category': return __('general.board_sort_category') || 'Category';
+                                case 'manual': return __('general.board_sort_manual');
+                                case 'title': return __('general.board_sort_title');
+                                case 'type': return __('general.board_sort_type');
+                                case 'lane': return __('general.board_sort_lane');
+                                case 'priority': return __('general.board_sort_priority');
+                                case 'category': return __('general.board_sort_category');
                             }
                         })();
                         const isActive = sortBy === key;
@@ -2846,7 +2862,7 @@ const CardChrome: React.FC<{
             )}
             <span className={cn('inline-flex items-center gap-1 rounded-full font-extrabold uppercase tracking-wider shadow-sm ring-1 ring-inset', meta.color, meta.ring, sizeCls)}>
                 <TypeIcon className="h-2.5 w-2.5" />
-                {meta.label}
+                {__(meta.labelKey)}
             </span>
             <span className={cn('inline-flex items-center gap-1 rounded-full border font-bold', lane.bg, lane.border, sizeCls)}>
                 <LaneIcon className="h-2.5 w-2.5" />
@@ -2925,10 +2941,10 @@ const BoardGridView: React.FC<{
                             />
                             {!readOnly && (
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                    <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title={__('general.edit')} aria-label={__('general.edit')}>
                                         <Edit3 className="h-3.5 w-3.5" />
                                     </button>
-                                    <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                    <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title={__('general.delete')} aria-label={__('general.delete')}>
                                         <Trash2 className="h-3.5 w-3.5" />
                                     </button>
                                 </div>
@@ -2995,10 +3011,10 @@ const BoardLinesView: React.FC<{
                                 />
                                 {!readOnly && (
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                        <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title={__('general.edit')} aria-label={__('general.edit')}>
                                             <Edit3 className="h-3.5 w-3.5" />
                                         </button>
-                                        <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                        <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title={__('general.delete')} aria-label={__('general.delete')}>
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </button>
                                     </div>
@@ -3031,13 +3047,13 @@ const BoardTableView: React.FC<{
                 <table className="min-w-full divide-y divide-slate-200 text-xs">
                     <thead className="bg-slate-50">
                         <tr>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_type') || 'Type'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_title') || 'Title'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_lane') || 'Status'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_category') || 'Category'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_priority') || 'Priority'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.comments') || 'Comments'}</th>
-                            <th scope="col" className="px-4 py-2.5 text-end text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Actions</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_type')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_title')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_lane')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_category')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.board_sort_priority')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-start text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.comments')}</th>
+                            <th scope="col" className="px-4 py-2.5 text-end text-[10px] font-extrabold uppercase tracking-wider text-slate-500">{__('general.actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -3078,7 +3094,7 @@ const BoardTableView: React.FC<{
                                     <td className="px-4 py-2.5 whitespace-nowrap">
                                         {priorityCls ? (
                                             <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ring-1 ring-inset', priorityCls)}>
-                                                {card.priority}
+                                                {__(`client.board_priority_${card.priority}`)}
                                             </span>
                                         ) : (
                                             <span className="text-slate-300">—</span>
@@ -3097,10 +3113,10 @@ const BoardTableView: React.FC<{
                                     <td className="px-4 py-2.5 whitespace-nowrap text-end" onClick={(e) => e.stopPropagation()}>
                                         {!readOnly ? (
                                             <div className="inline-flex items-center gap-1">
-                                                <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Edit">
+                                                <button onClick={() => onEdit(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title={__('general.edit')} aria-label={__('general.edit')}>
                                                     <Edit3 className="h-3.5 w-3.5" />
                                                 </button>
-                                                <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="Delete">
+                                                <button onClick={() => onDelete(card)} className="inline-flex h-6 w-6 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title={__('general.delete')} aria-label={__('general.delete')}>
                                                     <Trash2 className="h-3.5 w-3.5" />
                                                 </button>
                                             </div>

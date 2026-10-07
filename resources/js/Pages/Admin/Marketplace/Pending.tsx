@@ -2,6 +2,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Modal from '@/Components/Modal';
+import Pagination from '@/Components/Pagination';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Search, FilterX, Check, X, Eye, FileWarning, Pencil, Inbox } from 'lucide-react';
@@ -37,11 +38,11 @@ export default function Pending({ auth, services, filters }: any) {
         router.post(route('admin.marketplace.services.approve', pendingApprove), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.approved') || 'Approved');
+                toast.success(__('general.approved'));
                 setPendingApprove(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingApprove(null);
             },
         });
@@ -61,11 +62,11 @@ export default function Pending({ auth, services, filters }: any) {
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    toast.success(__('general.rejected') || 'Rejected');
+                    toast.success(__('general.rejected'));
                     setRejectingServiceId(null);
                     setRejectionNote('');
                 },
-                onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+                onError: () => toast.error(__('general.error_occurred')),
             },
         );
     };
@@ -76,7 +77,7 @@ export default function Pending({ auth, services, filters }: any) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title={__('general.pending_services')} header="Pending Services">
+        <AdminSidebarLayout user={auth?.user} title={__('general.pending_services')} header={__('general.pending_services')}>
             <Head title={__('general.pending_services')} />
             <div className="py-8 bg-slate-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
@@ -92,7 +93,7 @@ export default function Pending({ auth, services, filters }: any) {
                                     className="ps-9 bg-white"
                                 />
                                 {search && (
-                                    <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute end-1 h-7 w-7 text-slate-400 hover:text-black">
+                                    <Button variant="ghost" size="icon" onClick={clearSearch} aria-label={__('general.clear_search')} title={__('general.clear_search')} className="absolute end-1 h-7 w-7 text-slate-400 hover:text-black">
                                         <X className="h-4 w-4" />
                                     </Button>
                                 )}
@@ -123,7 +124,7 @@ export default function Pending({ auth, services, filters }: any) {
                                             </div>
                                         )}
                                         <div className="absolute top-3 start-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
-                                            ID: {service.id}
+                                            {__('general.id')}: {service.id}
                                         </div>
                                     </div>
 
@@ -205,37 +206,19 @@ export default function Pending({ auth, services, filters }: any) {
                     ) : (
                         <EmptyState
                             icon={search ? Search : Inbox}
-                            title={search ? __('general.no_matches_found') || 'No matches found' : __('general.all_caught_up') || 'All caught up!'}
-                            description={search ? __('general.try_adjusting_search') || 'Try adjusting your search query.' : __('general.no_pending_services') || 'There are no pending services requiring review.'}
+                            title={search ? __('general.no_matches_found') : __('general.all_caught_up')}
+                            description={search ? __('general.try_adjusting_search') : __('general.no_pending_services')}
                         />
                     )}
 
-                    {services.links && services.links.length > 3 && (
-                        <div className="mt-8 flex justify-center gap-2">
-                            {services.links.map((link: any, idx: number) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => { if (link.url) router.get(link.url, {}, { preserveScroll: true }); }}
-                                    disabled={!link.url}
-                                    className={`rounded-md px-4 py-2 text-sm font-medium transition ${
-                                        link.active
-                                            ? 'bg-slate-900 text-white shadow-sm'
-                                            : !link.url
-                                                ? 'cursor-not-allowed text-slate-300'
-                                                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                                    }`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    <Pagination links={services.links} />
                 </div>
             </div>
 
             <ConfirmModal
                 isOpen={pendingApprove !== null}
-                title={__('general.approve_service') || 'Approve service?'}
-                description={__('general.approve_service_desc_detailed') || 'This service will become publicly available immediately.'}
+                title={__('general.approve_service')}
+                description={__('general.approve_service_desc_detailed')}
                 confirmLabel={__('general.approve')}
                 cancelLabel={__('general.cancel')}
                 onConfirm={handleApprove}

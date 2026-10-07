@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from '@/Components/ui/select';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import {
     ArrowDownRight,
     ArrowUpRight,
@@ -58,6 +59,7 @@ import {
     Legend
 } from 'recharts';
 import { __ } from '@/lib/i18n';
+import { ChartTooltip, PERIOD_PRESETS, SortHeader, monthLabel, presetLabel } from './Components/LedgerParts';
 import {
     Table,
     TableBody,
@@ -67,7 +69,6 @@ import {
     TableRow,
 } from '@/Components/ui/table';
 
-const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const PIE_COLORS = ['#0f172a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'];
 
 const ALL_VALUE = '__all__';
@@ -157,56 +158,24 @@ export default function Income() {
 
     const tooltipFormatter = (value: number) => formatCurrency(value, stats.business_currency_code);
 
-    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
-                    <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label}</p>
-                    {payload.map((entry: any, idx: number) => (
-                        <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
-                            <span className="text-slate-400 capitalize">{entry.name || entry.payload?.name}:</span>
-                            <span className="font-mono font-semibold">
-                                {typeof entry.value === 'number' ? tooltipFormatter(entry.value) : entry.value}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
-    const SortHeader = ({ field, children, align = 'start' }: { field: string; children: React.ReactNode; align?: 'start' | 'end' | 'center' }) => (
-        <button
-            type="button"
-            onClick={() => handleSort(field)}
-            className={`inline-flex items-center gap-1 font-semibold text-${align} w-full`}
-        >
-            {children}
-            {filters?.sort_by === field && (
-                <span className="text-slate-400">{filters.sort_dir === 'asc' ? '▲' : '▼'}</span>
-            )}
-        </button>
-    );
-
     const preset = filters?.preset || '';
     const activeFilterPills: { key: string; label: string; value: string }[] = [];
-    if (preset && preset !== '') activeFilterPills.push({ key: 'preset', label: 'Preset', value: preset });
+    if (preset && preset !== '') activeFilterPills.push({ key: 'preset', label: __('admin.ledger_filter_period'), value: presetLabel(preset) });
     if (filters?.project_id) {
         const p = options?.projects?.find((x: any) => String(x.id) === String(filters.project_id));
-        if (p) activeFilterPills.push({ key: 'project_id', label: 'Project', value: p.name });
+        if (p) activeFilterPills.push({ key: 'project_id', label: __('general.project'), value: p.name });
     }
     if (filters?.user_id) {
-        const u = options?.users?.find((x: any) => String(x.id) === String(filters.user_id));
-        if (u) activeFilterPills.push({ key: 'user_id', label: 'Client', value: u.name });
+        const u = options?.selected_user;
+        if (u) activeFilterPills.push({ key: 'user_id', label: __('general.client'), value: u.name });
     }
     if (filters?.currency_id) {
         const c = options?.currencies?.find((x: any) => String(x.id) === String(filters.currency_id));
-        if (c) activeFilterPills.push({ key: 'currency_id', label: 'Currency', value: c.code });
+        if (c) activeFilterPills.push({ key: 'currency_id', label: __('general.currency'), value: c.code });
     }
-    if (filters?.category) activeFilterPills.push({ key: 'category', label: 'Category', value: filters.category });
-    if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: 'Min', value: filters.min_amount });
-    if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: 'Max', value: filters.max_amount });
+    if (filters?.category) activeFilterPills.push({ key: 'category', label: __('general.category'), value: filters.category });
+    if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: __('general.min'), value: filters.min_amount });
+    if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: __('general.max'), value: filters.max_amount });
 
     return (
         <AdminSidebarLayout
@@ -216,7 +185,7 @@ export default function Income() {
                 <Link href={route('admin.business.reports')}>
                     <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
                         <Activity className="h-4 w-4 text-slate-800" />
-                        <span>{__('general.business_reports') || 'Business Reports'}</span>
+                        <span>{__('general.business_reports')}</span>
                     </Button>
                 </Link>
             }
@@ -227,7 +196,7 @@ export default function Income() {
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between pb-2">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_received') || 'Total Received'}</p>
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_received')}</p>
                             <div className="p-2 bg-emerald-50 rounded-lg">
                                 <ArrowUpRight className="h-4 w-4 text-emerald-600" />
                             </div>
@@ -235,14 +204,14 @@ export default function Income() {
                         <div className="text-2xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_received || 0, stats.business_currency_code)}
                         </div>
-                        <p className="text-xs text-slate-500 mt-1.5">{__('general.gross_received_income') || 'Gross received income'}</p>
+                        <p className="text-xs text-slate-500 mt-1.5">{__('general.gross_received_income')}</p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between pb-2">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_refunded') || 'Total Refunded'}</p>
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.total_refunded')}</p>
                             <div className="p-2 bg-rose-50 rounded-lg">
                                 <ArrowDownRight className="h-4 w-4 text-rose-600" />
                             </div>
@@ -250,14 +219,14 @@ export default function Income() {
                         <div className="text-2xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_refunded || 0, stats.business_currency_code)}
                         </div>
-                        <p className="text-xs text-slate-500 mt-1.5">{__('general.refunds_sent') || 'Refunds for the period'}</p>
+                        <p className="text-xs text-slate-500 mt-1.5">{__('general.refunds_sent')}</p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between pb-2">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.net_income') || 'Net Income'}</p>
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.net_income')}</p>
                             <div className="p-2 bg-emerald-50 rounded-lg">
                                 <ArrowUpRight className="h-4 w-4 text-emerald-600" />
                             </div>
@@ -265,14 +234,14 @@ export default function Income() {
                         <div className="text-2xl font-bold text-slate-900 tracking-tight">
                             {formatCurrency(stats.total_monthly_income || 0, stats.business_currency_code)}
                         </div>
-                        <p className="text-xs text-slate-500 mt-1.5">{__('general.net_income_description') || 'Gross income minus refunds/sent'}</p>
+                        <p className="text-xs text-slate-500 mt-1.5">{__('general.net_income_description')}</p>
                     </CardContent>
                 </Card>
 
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardContent className="p-5">
                         <div className="flex items-center justify-between pb-2">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.vs_last_month') || 'vs Last Month'}</p>
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{__('general.vs_last_month')}</p>
                             <div className={`p-2 rounded-lg ${(stats.income_change_percent || 0) >= 0 ? 'bg-emerald-50' : 'bg-rose-50'}`}>
                                 {(stats.income_change_percent || 0) >= 0
                                     ? <TrendingUp className="h-4 w-4 text-emerald-600" />
@@ -283,7 +252,7 @@ export default function Income() {
                             {(stats.income_change_percent || 0) >= 0 ? '+' : ''}{stats.income_change_percent || 0}%
                         </div>
                         <p className="text-xs text-slate-500 mt-1.5">
-                            {__('general.previous') || 'Previous'}: {formatCurrency(stats.previous_month_income || 0, stats.business_currency_code)}
+                            {__('general.previous')}: {formatCurrency(stats.previous_month_income || 0, stats.business_currency_code)}
                         </p>
                     </CardContent>
                 </Card>
@@ -294,7 +263,7 @@ export default function Income() {
                     <div className="flex items-center gap-3 flex-wrap">
                         <div className="flex items-center gap-2 text-slate-500">
                             <Filter className="h-4 w-4" />
-                            <span className="text-sm font-medium">Filters:</span>
+                            <span className="text-sm font-medium">{__('admin.ledger_filters_label')}</span>
                         </div>
                         <Select
                             value={preset || 'month'}
@@ -310,11 +279,9 @@ export default function Income() {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="month">This month</SelectItem>
-                                <SelectItem value="last_30">Last 30 days</SelectItem>
-                                <SelectItem value="last_90">Last 90 days</SelectItem>
-                                <SelectItem value="ytd">Year to date</SelectItem>
-                                <SelectItem value="all">All time</SelectItem>
+                                {PERIOD_PRESETS.map((item) => (
+                                    <SelectItem key={item.value} value={item.value}>{__(item.labelKey)}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                         {(!preset || preset === '') && (
@@ -324,7 +291,7 @@ export default function Income() {
                                     onValueChange={(val) => { if (val) handleFilterChange('year', val); }}
                                 >
                                     <SelectTrigger className="w-[110px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder="Year" />
+                                        <SelectValue placeholder={__('admin.ledger_year')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {(filters?.available_years || [new Date().getFullYear()]).map((y: number) => (
@@ -337,11 +304,11 @@ export default function Income() {
                                     onValueChange={(val) => { if (val) handleFilterChange('month', val); }}
                                 >
                                     <SelectTrigger className="w-[130px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder="Month" />
+                                        <SelectValue placeholder={__('admin.ledger_month')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {(filters?.available_months || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).map((m: number) => (
-                                            <SelectItem key={m} value={String(m)}>{MONTH_NAMES[m]}</SelectItem>
+                                            <SelectItem key={m} value={String(m)}>{monthLabel(m)}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -351,30 +318,29 @@ export default function Income() {
                             value={filters?.project_id ? String(filters.project_id) : ''}
                             onChange={(val) => handleFilterChange('project_id', (val as string) || '')}
                             options={(options?.projects || []).map((p: any) => ({ value: String(p.id), label: p.name }))}
-                            placeholder="Project"
+                            placeholder={__('general.project')}
                         />
-                        <PremiumCombobox
+                        <UserSearchCombobox
                             value={filters?.user_id ? String(filters.user_id) : ''}
                             onChange={(val) => handleFilterChange('user_id', (val as string) || '')}
-                            options={(options?.users || []).map((u: any) => ({ value: String(u.id), label: u.name }))}
-                            placeholder="Client"
+                            placeholder={__('general.client')}
                         />
                         <PremiumCombobox
                             value={filters?.currency_id ? String(filters.currency_id) : ''}
                             onChange={(val) => handleFilterChange('currency_id', (val as string) || '')}
                             options={(options?.currencies || []).map((c: any) => ({ value: String(c.id), label: `${c.code} (${c.symbol})` }))}
-                            placeholder="Currency"
+                            placeholder={__('general.currency')}
                         />
                         <PremiumCombobox
                             value={filters?.category ? String(filters.category) : ''}
                             onChange={(val) => handleFilterChange('category', (val as string) || '')}
                             options={(options?.categories || []).map((c: any) => ({ value: String(c.value), label: c.label }))}
-                            placeholder="Category"
+                            placeholder={__('general.category')}
                         />
                         <div className="flex items-center gap-1">
                             <Input
                                 type="number"
-                                placeholder={__('general.min') || 'Min'}
+                                placeholder={__('general.min')}
                                 className="h-9 w-24 text-sm"
                                 value={filters?.min_amount || ''}
                                 onChange={(e) => handleFilterChange('min_amount', e.target.value)}
@@ -382,7 +348,7 @@ export default function Income() {
                             <span className="text-slate-400 text-xs">—</span>
                             <Input
                                 type="number"
-                                placeholder={__('general.max') || 'Max'}
+                                placeholder={__('general.max')}
                                 className="h-9 w-24 text-sm"
                                 value={filters?.max_amount || ''}
                                 onChange={(e) => handleFilterChange('max_amount', e.target.value)}
@@ -396,7 +362,7 @@ export default function Income() {
                                 className="h-9 ms-auto text-slate-500"
                                 onClick={() => router.get(route('admin.income.index'), {}, { preserveState: false, preserveScroll: true })}
                             >
-                                <X className="h-3 w-3 me-1" /> Clear all
+                                <X className="h-3 w-3 me-1" /> {__('admin.ledger_clear_all')}
                             </Button>
                         )}
                     </div>
@@ -405,7 +371,7 @@ export default function Income() {
                             {activeFilterPills.map((p) => (
                                 <span key={p.key} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
                                     <span className="text-slate-500">{p.label}:</span> {typeof p.value === 'object' ? JSON.stringify(p.value) : String(p.value)}
-                                    <button onClick={() => clearFilter(p.key)} className="ms-1 text-slate-400 hover:text-slate-700">
+                                    <button type="button" onClick={() => clearFilter(p.key)} aria-label={__('admin.ledger_remove_filter', { name: p.label })} className="ms-1 text-slate-400 hover:text-slate-700">
                                         <X className="h-3 w-3" />
                                     </button>
                                 </span>
@@ -420,9 +386,9 @@ export default function Income() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-base font-semibold flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4 text-slate-900" />
-                            {__('general.income_trends') || 'Income Trends'}
+                            {__('general.income_trends')}
                         </CardTitle>
-                        <CardDescription>{__('general.last_12_months') || 'Last 6 Months Income vs Expenses'}</CardDescription>
+                        <CardDescription>{__('general.last_12_months')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[260px] mt-2">
@@ -437,7 +403,7 @@ export default function Income() {
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
                                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={formatYAxis} dx={-10} />
-                                    <RechartsTooltip content={<CustomTooltip />} />
+                                    <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                     <Area type="monotone" dataKey="income" name="Income" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
                                 </AreaChart>
                             </ResponsiveContainer>
@@ -449,7 +415,7 @@ export default function Income() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-base font-semibold flex items-center gap-2">
                             <PieIcon className="w-4 h-4 text-slate-900" />
-                            {__('general.by_category') || 'By Category'}
+                            {__('general.by_category')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -462,13 +428,13 @@ export default function Income() {
                                                 <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <RechartsTooltip content={<CustomTooltip />} />
+                                        <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                         <Legend wrapperStyle={{ fontSize: 11 }} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             ) : (
                                 <div className="h-full flex items-center justify-center text-sm text-slate-500">
-                                    {__('general.no_data_available') || 'No data available'}
+                                    {__('general.no_data_available')}
                                 </div>
                             )}
                         </div>
@@ -482,7 +448,7 @@ export default function Income() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base font-semibold flex items-center gap-2">
                                 <Building2 className="w-4 h-4 text-slate-400" />
-                                {__('general.by_client') || 'By Client'}
+                                {__('general.by_client')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -492,7 +458,7 @@ export default function Income() {
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
                                         <XAxis type="number" hide />
                                         <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} width={120} />
-                                        <RechartsTooltip content={<CustomTooltip />} />
+                                        <RechartsTooltip content={<ChartTooltip formatValue={tooltipFormatter} />} />
                                         <Bar dataKey="value" fill="#10b981" radius={[0, 6, 6, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -529,15 +495,15 @@ export default function Income() {
                         <TableHeader>
                             <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
                                 <TableHead className="w-[120px] font-semibold">
-                                    <SortHeader field="created_at">{__('general.date')}</SortHeader>
+                                    <SortHeader field="created_at" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort}>{__('general.date')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="font-semibold">
-                                    <SortHeader field="reason">{__('general.reason')}</SortHeader>
+                                    <SortHeader field="reason" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort}>{__('general.reason')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="font-semibold">{__('general.category')}</TableHead>
-                                <TableHead className="font-semibold">{__('general.project_client') || 'Project/Client'}</TableHead>
+                                <TableHead className="font-semibold">{__('general.project_client')}</TableHead>
                                 <TableHead className="text-end font-semibold">
-                                    <SortHeader field="amount" align="end">{__('general.amount')}</SortHeader>
+                                    <SortHeader field="amount" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort} align="end">{__('general.amount')}</SortHeader>
                                 </TableHead>
                                 <TableHead className="w-[60px]"></TableHead>
                             </TableRow>
@@ -607,7 +573,7 @@ export default function Income() {
                                                         onClick={() => setReverseId(entry.id)}
                                                         className="focus:bg-slate-50"
                                                     >
-                                                        {__('admin.reverse_transaction') || 'Reverse Transaction'}
+                                                        {__('admin.reverse_transaction')}
                                                     </DropdownMenuItem>
                                                 )}
                                                 {!entry.deleted_at && (
@@ -638,7 +604,7 @@ export default function Income() {
             <ConfirmModal
                 isOpen={deleteId !== null}
                 title={__('general.delete_income_transaction')}
-                description="Are you sure you want to delete this transaction? This will recalculate the associated user's ledger. This action cannot be undone."
+                description={__('admin.income_delete_transaction_desc')}
                 confirmLabel={__('general.delete')}
                 variant="danger"
                 onConfirm={handleDelete}
@@ -649,10 +615,10 @@ export default function Income() {
             <PromptModal
                 isOpen={reverseId !== null}
                 title={__('general.reverse_transaction')}
-                description="This will create a negative transaction to nullify this entry in the ledger."
+                description={__('admin.income_reverse_transaction_desc')}
                 label={__('general.reversal_reason')}
-                placeholder={`Reversal of transaction #${reverseId}`}
-                confirmLabel="Reverse Transaction"
+                placeholder={__('admin.income_reversal_placeholder', { id: reverseId ?? '' })}
+                confirmLabel={__('admin.reverse_transaction')}
                 onConfirm={handleReverse}
                 onCancel={() => setReverseId(null)}
                 loading={isReversing}

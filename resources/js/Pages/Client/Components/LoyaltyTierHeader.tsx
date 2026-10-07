@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { Crown, Sparkles, Shield, ArrowUpRight, Award, Zap, History, Gem } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface LoyaltyTierHeaderProps {
     clientName: string;
@@ -29,8 +30,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
     const getTierConfig = () => {
         if (cleanTier === 'obsidian' || cleanTier === 'apex' || cleanTier === 'crown') {
             return {
-                title: 'Obsidian Imperial VIP',
-                subtitle: 'Direct CTO Line • Dedicated Engineering Squad • Custom Architecture • 25% Invoice Deduction',
+                title: __('client.loyalty_hdr_obsidian_title'),
+                subtitle: __('client.loyalty_hdr_obsidian_subtitle'),
                 icon: Crown,
                 badge: '/images/tiers/obsidian.png',
                 badgeStyle: 'bg-gradient-to-r from-[#18181B] via-[#3B0764] to-[#18181B] text-[#FEF08A] font-bold shadow-xs border border-[#F59E0B]/50',
@@ -39,8 +40,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'diamond') {
             return {
-                title: 'Diamond Elite Partner',
-                subtitle: '15-Min Guaranteed Engineering SLA • Comprehensive Code Audits • 20% Invoice Deduction',
+                title: __('client.loyalty_hdr_diamond_title'),
+                subtitle: __('client.loyalty_hdr_diamond_subtitle'),
                 icon: Crown,
                 badge: '/images/tiers/diamond.png',
                 badgeStyle: 'bg-gradient-to-r from-cyan-600 via-teal-500 to-sky-600 text-white font-bold shadow-xs border border-cyan-300/60',
@@ -49,8 +50,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'ruby') {
             return {
-                title: 'Ruby Prestige Enterprise',
-                subtitle: 'Dedicated Senior Architect • 2-Hour SLA • Complimentary Security Scans • 18% Invoice Deduction',
+                title: __('client.loyalty_hdr_ruby_title'),
+                subtitle: __('client.loyalty_hdr_ruby_subtitle'),
                 icon: Gem,
                 badge: '/images/tiers/ruby.png',
                 badgeStyle: 'bg-gradient-to-r from-rose-600 via-red-600 to-pink-600 text-white font-bold shadow-xs border border-rose-300/60',
@@ -59,8 +60,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'platinum' || cleanTier === 'enterprise') {
             return {
-                title: 'Platinum VIP Tier',
-                subtitle: 'Executive Dedicated Engineering • Zero-Queue VIP SLA • 15% Invoice Deduction Privilege',
+                title: __('client.loyalty_hdr_platinum_title'),
+                subtitle: __('client.loyalty_hdr_platinum_subtitle'),
                 icon: Crown,
                 badge: '/images/tiers/platinum.png',
                 badgeStyle: 'bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 text-white font-semibold shadow-xs border border-sky-300/40',
@@ -69,8 +70,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'emerald') {
             return {
-                title: 'Emerald Growth Partner',
-                subtitle: 'Priority Dispatch Routing • Architecture Sync Calls • Extended Warranty • 12% Invoice Deduction',
+                title: __('client.loyalty_hdr_emerald_title'),
+                subtitle: __('client.loyalty_hdr_emerald_subtitle'),
                 icon: Gem,
                 badge: '/images/tiers/emerald.png',
                 badgeStyle: 'bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white font-bold shadow-xs border border-emerald-300/60',
@@ -79,8 +80,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'gold') {
             return {
-                title: 'Gold Tier Partner',
-                subtitle: 'Priority Queue Routing • 10% Invoice Deduction Privilege • Dedicated Technical Lead',
+                title: __('client.loyalty_hdr_gold_title'),
+                subtitle: __('client.loyalty_hdr_gold_subtitle'),
                 icon: Crown,
                 badge: '/images/tiers/gold.png',
                 badgeStyle: 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-slate-950 font-bold shadow-xs border border-amber-300/60',
@@ -89,8 +90,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
         }
         if (cleanTier === 'silver' || cleanTier === 'pro') {
             return {
-                title: 'Silver Tier Client',
-                subtitle: 'Accelerated Ticket Dispatch • 5% Invoice Deduction Privilege • Regular Milestone Audits',
+                title: __('client.loyalty_hdr_silver_title'),
+                subtitle: __('client.loyalty_hdr_silver_subtitle'),
                 icon: Sparkles,
                 badge: '/images/tiers/silver.png',
                 badgeStyle: 'bg-gradient-to-r from-slate-200 via-zinc-200 to-slate-300 text-slate-900 dark:from-slate-800 dark:via-zinc-700 dark:to-slate-800 dark:text-slate-100 font-semibold shadow-xs border border-slate-300 dark:border-slate-600/40',
@@ -98,8 +99,8 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
             };
         }
         return {
-            title: 'Bronze Tier Client',
-            subtitle: 'Automated Self-Service Studio • Earn Points with Every Milestone and Early Settlement',
+            title: __('client.loyalty_hdr_bronze_title'),
+            subtitle: __('client.loyalty_hdr_bronze_subtitle'),
             icon: Shield,
             badge: '/images/tiers/bronze.png',
             badgeStyle: 'bg-gradient-to-r from-[#7D320B] via-[#B25324] to-[#D9733E] text-white font-semibold shadow-xs border border-[#FFA875]/50',
@@ -131,7 +132,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                             }}
                         />
                         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans break-words min-w-0">
-                            {clientName || 'Private Client'}
+                            {clientName || __('client.loyalty_hdr_private_client')}
                         </h1>
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono tracking-wider uppercase ${config.badgeStyle}`}>
                             <img
@@ -154,14 +155,14 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 self-stretch md:self-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-black/5 dark:border-white/5 w-full md:w-auto">
                     <div className="text-left md:text-right">
                         <div className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                            Available Loyalty Capital
+                            {__('client.loyalty_hdr_available_capital')}
                         </div>
                         <div className="text-2xl font-mono font-bold text-[#1d1d1f] dark:text-white tabular-nums mt-0.5">
-                            {loyaltyPoints.toLocaleString()} <span className="text-xs font-sans font-normal text-zinc-500 dark:text-zinc-400">PTS</span>
+                            {loyaltyPoints.toLocaleString()} <span className="text-xs font-sans font-normal text-zinc-500 dark:text-zinc-400">{__('client.loyalty_hdr_pts_unit')}</span>
                         </div>
                         {loyaltyPoints > 0 && (
                             <div className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400/90 mt-0.5 font-medium">
-                                ≈ {formatMoney(pointsMonetaryValue, currency)} in service deductions
+                                {__('client.loyalty_hdr_service_deductions', { amount: formatMoney(pointsMonetaryValue, currency) })}
                             </div>
                         )}
                     </div>
@@ -172,7 +173,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900 text-[#1d1d1f] dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all shadow-xs cursor-pointer"
                         >
                             <History className="w-3.5 h-3.5 text-zinc-500" />
-                            <span>Ledger & Tiers</span>
+                            <span>{__('client.loyalty_hdr_ledger_tiers')}</span>
                         </Link>
                         <button
                             type="button"
@@ -180,7 +181,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#1d1d1f] hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all duration-200 shadow-sm active:scale-98 cursor-pointer"
                         >
                             <Award className="w-4 h-4 text-white dark:text-black" />
-                            <span>Redeem</span>
+                            <span>{__('client.loyalty_hdr_redeem')}</span>
                         </button>
                     </div>
                 </div>
@@ -191,7 +192,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                 <div className="relative z-10 mt-6 pt-4 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                     <div className="flex items-center gap-3 w-full sm:w-auto">
                         <span className="text-zinc-600 dark:text-zinc-400 text-[11px] font-mono">
-                            DATA PROFILE: <strong className="text-zinc-900 dark:text-zinc-200 font-semibold">{profileCompletion}%</strong>
+                            {__('client.loyalty_hdr_data_profile')} <strong className="text-zinc-900 dark:text-zinc-200 font-semibold">{profileCompletion}%</strong>
                         </span>
                         <div className="flex-1 sm:w-40 bg-zinc-200 dark:bg-zinc-800/80 h-1.5 rounded-full overflow-hidden">
                             <div
@@ -205,7 +206,7 @@ export const LoyaltyTierHeader: React.FC<LoyaltyTierHeaderProps> = ({
                         onClick={onCompleteProfile}
                         className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 inline-flex items-center gap-1 transition-colors cursor-pointer"
                     >
-                        <span>Finalize company credentials (+50 PTS)</span>
+                        <span>{__('client.loyalty_hdr_finalize_profile')}</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                 </div>

@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export default function Impersonate({ user, token }) {
     useEffect(() => {
@@ -15,7 +16,7 @@ export default function Impersonate({ user, token }) {
             <Head title={__('general.impersonating_user')} />
             <div className="text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                    Impersonating {user.name}
+                    {__('admin.impersonating_user_name', { name: user.name })}
                 </h1>
                 <p className="text-gray-500 mb-6">{__('general.setting_up_impersonation_session')}</p>
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>

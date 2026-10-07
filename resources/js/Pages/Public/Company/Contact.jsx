@@ -9,7 +9,7 @@ import StudioHeader from '@/Components/Studio/StudioHeader';
 export default function Contact({ canLogin, canRegister }) {
     return (
         <PublicLayout>
-            <Head title={`${__('landing_company.contact_meta_title') || 'Contact Studio'} | Musoftwares`} />
+            <Head title={`${__('landing_company.contact_meta_title')} | Musoftwares`} />
 
             <div className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
 
@@ -22,7 +22,7 @@ export default function Contact({ canLogin, canRegister }) {
                             <span className="text-[#0071e3]">The Software Architect.</span>
                         </>
                     }
-                    subtitle={__('landing_company.contact_subtitle') || 'No layers of middle management. Direct technical communication, rapid responses, and transparent scoping.'}
+                    subtitle={__('landing_company.contact_subtitle')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center text-xs mb-20">
@@ -30,7 +30,7 @@ export default function Contact({ canLogin, canRegister }) {
                         onClick={() => openWhatsAppChat("Hello Mahmoud, I'd like to discuss a project with Musoftware.")}
                         className="bg-[#0071e3] hover:bg-[#0077ed] text-white px-8 py-3 rounded-[980px] font-semibold tracking-wide transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                     >
-                        {__('general.whatsapp_direct') || 'WHATSAPP DIRECT CHAT'} ➔
+                        {__('general.whatsapp_direct')} ➔
                     </button>
                     <a
                         href="mailto:admin@musoftwares.com"

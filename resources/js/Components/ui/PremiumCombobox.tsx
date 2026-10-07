@@ -17,6 +17,7 @@ interface PremiumComboboxProps {
     options?: Option[] | string[] | any[];
     asyncEndpoint?: string;
     searchParam?: string; // default 'q'
+    selectedParam?: string; // when set, the endpoint is queried with { [selectedParam]: value } to show the label of a preselected value
     
     // UI
     placeholder?: string;
@@ -36,6 +37,7 @@ export function PremiumCombobox({
     options = [],
     asyncEndpoint,
     searchParam = 'q',
+    selectedParam,
     placeholder = 'Select an option...',
     searchPlaceholder = 'Search...',
     icon,
@@ -47,6 +49,7 @@ export function PremiumCombobox({
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [asyncOptions, setAsyncOptions] = useState<Option[]>([]);
+    const [resolvedOptions, setResolvedOptions] = useState<Option[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -106,14 +109,33 @@ export function PremiumCombobox({
         };
     }, [searchQuery, isOpen, asyncEndpoint, searchParam, debounceMs]);
 
-    const activeOptions = asyncEndpoint 
-        ? asyncOptions 
-        : staticOptions.filter(o => String(o.label || '').toLowerCase().includes(String(searchQuery || '').toLowerCase()));
-    
+    const knownOptions = [...staticOptions, ...asyncOptions, ...resolvedOptions];
+    const hasLabelForValue = knownOptions.some(o => String(o.value) === String(value));
+
+    // Resolve the label of a preselected value that is not in the loaded options
+    useEffect(() => {
+        if (!asyncEndpoint || !selectedParam || !value || hasLabelForValue) return;
+
+        let cancelled = false;
+        axios.get(asyncEndpoint, { params: { [selectedParam]: value } })
+            .then(res => {
+                const data = res.data?.data || res.data;
+                if (!cancelled) setResolvedOptions(formatOptions(Array.isArray(data) ? data : []));
+            })
+            .catch(err => console.error("PremiumCombobox selected value fetch error:", err));
+
+        return () => { cancelled = true; };
+    }, [asyncEndpoint, selectedParam, value, hasLabelForValue]);
+
+    const filteredStaticOptions = staticOptions.filter(o => String(o.label || '').toLowerCase().includes(String(searchQuery || '').toLowerCase()));
+    const activeOptions = asyncEndpoint
+        ? [...filteredStaticOptions, ...asyncOptions]
+        : filteredStaticOptions;
+
     // Current display label
     let currentLabel = String(value || '');
     if (!allowCustomValue) {
-        const found = [...staticOptions, ...asyncOptions].find(o => String(o.value) === String(value));
+        const found = knownOptions.find(o => String(o.value) === String(value));
         if (found) currentLabel = found.label;
     }
 

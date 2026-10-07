@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class ResellerDeviceService extends BaseService
 {
@@ -634,8 +635,8 @@ class ResellerDeviceService extends BaseService
                 if (method_exists($customer, 'assignRole')) {
                     $customer->assignRole('client');
                 }
-            } catch (\Throwable) {
-                // Ignore if role already assigned or table missing in test
+            } catch (\Throwable $e) {
+                Log::warning('Reseller device: client role assignment failed', ['customer_id' => $customer->id, 'error' => $e->getMessage()]);
             }
         } else {
             if (! empty($data['customer_phone'])) {

@@ -8,13 +8,11 @@
         <!-- ── Core Unit Tests ── -->
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
-            <directory>Modules/Shared/tests/Unit</directory>
         </testsuite>
 
         <!-- ── Core Feature Tests (Admin Panel + Platform) ── -->
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
-            <directory>Modules/Shared/tests/Feature</directory>
         </testsuite>
 
         <!-- ── Marketplace Module ── -->
@@ -30,11 +28,32 @@
         <!-- ── SMS Payment Gateway Module ── -->
         <testsuite name="SmsPaymentGateway">
             <directory>Modules/SmsPaymentGateway/tests/Unit</directory>
+            <directory>Modules/SmsPaymentGateway/tests/Feature</directory>
         </testsuite>
 
         <!-- ── WhatsappSender Module ── -->
         <testsuite name="WhatsappSender">
             <directory>Modules/WhatsappSender/Tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Listing Module ── -->
+        <testsuite name="Listing">
+            <directory>Modules/Listing/tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── PasswordSync Module ── -->
+        <testsuite name="PasswordSync">
+            <directory>Modules/PasswordSync/tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Series Module ── -->
+        <testsuite name="Series">
+            <directory>Modules/Series/tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Fbmb Module ── -->
+        <testsuite name="Fbmb">
+            <directory>Modules/Fbmb/Tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>
@@ -56,5 +75,6 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="APP_BUSINESS_TIMEZONE" value="UTC"/>
     </php>
 </phpunit>

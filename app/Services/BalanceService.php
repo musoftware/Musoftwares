@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\WithdrawalRejectedException;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\UserReferralRequestWithdraw;
@@ -136,6 +137,11 @@ class BalanceService extends BaseService
             return ['eligible' => false, 'reason' => "Insufficient earned balance. Available: {$availableEarned}."];
         }
 
+        $walletBalance = round((float) $user->user_balance, 2);
+        if ($amount > $walletBalance) {
+            return ['eligible' => false, 'reason' => "Insufficient wallet balance. Available: {$walletBalance}."];
+        }
+
         $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->first();
         if (! $payoutMethod) {
             return ['eligible' => false, 'reason' => 'Invalid payout method.'];
@@ -149,42 +155,73 @@ class BalanceService extends BaseService
     }
 
     /**
-     * Process a withdrawal request transaction.
+     * Process a withdrawal request.
+     *
+     * Locks the user row, re-checks eligibility on fresh data and only then
+     * debits the wallet, so parallel requests cannot withdraw the same funds.
+     *
+     * @throws WithdrawalRejectedException when the locked re-check fails
      */
-    public function processWithdrawalRequest(User $user, float $amount, int $payoutMethodId): void
+    public function processWithdrawalRequest(User $user, float $amount, int $payoutMethodId): UserReferralRequestWithdraw
     {
-        $payoutMethod = $user->payoutMethods()->where('id', $payoutMethodId)->firstOrFail();
+        return $this->executeInTransaction(function () use ($user, $amount, $payoutMethodId) {
+            $lockedUser = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
 
-        $this->executeInTransaction(function () use ($user, $amount, $payoutMethod) {
-            $user->add_balance(-1 * $amount, 'Withdrawal request via '.ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
+            $eligibility = $this->validateWithdrawalEligibility($lockedUser, $amount, $payoutMethodId);
+            if (! $eligibility['eligible']) {
+                throw new WithdrawalRejectedException($eligibility['reason']);
+            }
+
+            $payoutMethod = $lockedUser->payoutMethods()->whereKey($payoutMethodId)->firstOrFail();
+            $lockedUser->add_balance(-1 * $amount, 'Withdrawal request via '.ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
 
             $withdrawal = new UserReferralRequestWithdraw;
-            $withdrawal->user_id = $user->id;
+            $withdrawal->user_id = $lockedUser->id;
             $withdrawal->amount = $amount;
-            $withdrawal->currency = $user->currency;
+            $withdrawal->currency = $lockedUser->currency;
+            $withdrawal->payment_method = $payoutMethod->type;
+            $withdrawal->payment_info = json_encode($payoutMethod->details ?? []);
             $withdrawal->user_payment_method_id = $payoutMethod->id;
             $withdrawal->status = 'pending';
             $withdrawal->save();
+
+            return $withdrawal;
         });
     }
 
     /**
-     * Process Kashier deposit webhook.
+     * Credit a Kashier wallet deposit exactly once. Single entry point for every Kashier deposit handler.
+     * The payment_provider_events row is inserted in the same transaction as the credit, so a
+     * duplicate or concurrent delivery hits the UNIQUE(provider, external_id) key and credits nothing.
+     * The credited amount is the signed charge, converted from its currency by add_balance().
      */
-    public function processKashierDepositWebhook(User $user, float $amountPaid, string $trxId): array
+    public function processKashierDepositWebhook(User $user, \App\Helpers\KashierSignedAmount $paid, string $trxId, array $payload = []): array
     {
-        // Idempotency check
         $reason = "Deposit via Kashier online payment (Trx: $trxId)";
-        $alreadyProcessed = Transaction::where('user_id', $user->id)
-            ->where('reason', $reason)
-            ->exists();
 
-        if (! $alreadyProcessed) {
-            $user->add_balance($amountPaid, $reason, 'received');
+        $credited = $this->executeInTransaction(function () use ($user, $paid, $trxId, $payload, $reason) {
+            if (! \App\Models\PaymentProviderEvent::recordOnce(\App\Models\PaymentProviderEvent::PROVIDER_KASHIER, $trxId, $payload)) {
+                return false;
+            }
 
-            return ['status' => 'success', 'message' => 'Deposit processed successfully', 'already_processed' => false];
+            $user->add_balance($paid->amount, $reason, 'received', $paid->currencyId);
+
+            return true;
+        }, "Kashier deposit credit failed for user {$user->id}, trx {$trxId}");
+
+        if (! $credited) {
+            \Illuminate\Support\Facades\Log::info('Duplicate Kashier deposit webhook skipped.', ['user_id' => $user->id, 'trx' => $trxId]);
+
+            return ['status' => 'success', 'message' => 'Already processed', 'already_processed' => true];
         }
 
-        return ['status' => 'success', 'message' => 'Already processed', 'already_processed' => true];
+        \Illuminate\Support\Facades\Log::info('Kashier deposit credited.', [
+            'user_id' => $user->id,
+            'trx' => $trxId,
+            'amount' => $paid->amount,
+            'currency' => $paid->currencyCode,
+        ]);
+
+        return ['status' => 'success', 'message' => 'Deposit processed successfully', 'already_processed' => false];
     }
 }

@@ -5,6 +5,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { __ } from '@/lib/i18n';
 import { formatDate } from '@/lib/utils';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface FileItem {
     id: number;
@@ -23,6 +24,7 @@ interface Props {
 export default function AdminProjectFilesIndex({ project, files = [] }: Props) {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [uploading, setUploading] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -36,8 +38,13 @@ export default function AdminProjectFilesIndex({ project, files = [] }: Props) {
         });
     };
 
-    const destroy = (id: number) => {
-        if (!confirm(__('general.delete_this_file'))) return;
+    const destroy = async (id: number) => {
+        const accepted = await confirm({
+            title: __('general.delete_this_file'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
         router.delete(route('admin.projects.files.destroy', { project: project.id, file: id }), { preserveScroll: true });
     };
 
@@ -46,7 +53,7 @@ export default function AdminProjectFilesIndex({ project, files = [] }: Props) {
             <div className="space-y-6 p-6">
                 <div className="flex items-center justify-between">
                     <Link href={route('admin.projects.index')} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800">
-                        <ArrowLeft className="h-4 w-4" /> {__('general.back_to_projects')}
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {__('general.back_to_projects')}
                     </Link>
                     <div>
                         <input ref={inputRef} type="file" className="hidden" onChange={onUpload} />
@@ -70,7 +77,7 @@ export default function AdminProjectFilesIndex({ project, files = [] }: Props) {
                                         <p className="truncate font-medium text-slate-900">{file.original_name}</p>
                                         <p className="text-xs text-slate-400">{file.human_size}{file.created_at ? ` · ${formatDate(file.created_at)}` : ''}</p>
                                     </div>
-                                    <button onClick={() => destroy(file.id)} className="rounded-md p-1.5 text-rose-500 hover:bg-rose-50" title={__('general.delete')}>
+                                    <button type="button" onClick={() => destroy(file.id)} className="rounded-md p-1.5 text-rose-500 hover:bg-rose-50" title={__('general.delete')} aria-label={__('general.delete')}>
                                         <Trash2 className="h-4 w-4" />
                                     </button>
                                 </li>
@@ -79,6 +86,7 @@ export default function AdminProjectFilesIndex({ project, files = [] }: Props) {
                     )}
                 </div>
             </div>
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

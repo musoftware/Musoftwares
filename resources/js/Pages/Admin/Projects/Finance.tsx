@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { formatMoney, formatDate } from '@/lib/utils';
+import { projectStatusLabel } from './Components/ProjectFormFields';
 
 interface ProjectCurrency {
     id: number;
@@ -74,6 +75,16 @@ const STATUS_STYLES: Record<string, string> = {
     cancelled: 'bg-slate-200 text-slate-600',
 };
 
+const INVOICE_STATUS_LABEL_KEYS: Record<string, string> = {
+    paid: 'admin.project_finance_invoice_paid',
+    unpaid: 'admin.project_finance_invoice_unpaid',
+    partially_paid: 'admin.project_finance_invoice_partially_paid',
+    cancelled: 'admin.project_finance_invoice_cancelled',
+};
+
+const labelFor = (keys: Record<string, string>, value: string): string =>
+    keys[value] ? __(keys[value]) : value.replace('_', ' ');
+
 export default function ProjectFinance({ project, summary, costTransactions, invoices }: Props) {
     const cur = project.currency;
     const net = (Number(summary.paid_invoices) || 0) - (Number(summary.cost) || 0);
@@ -89,12 +100,12 @@ export default function ProjectFinance({ project, summary, costTransactions, inv
                         href={route('admin.projects.board.index', project.id)}
                         className="mb-1 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"
                     >
-                        <ArrowLeft className="h-4 w-4" /> {__('general.back_to_project')}
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" /> {__('general.back_to_project')}
                     </Link>
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900">{project.name}</h1>
                         <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${project.archived ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                            {project.archived ? __('general.archived') : (project.status ?? 'open').replace('_', ' ')}
+                            {project.archived ? __('general.archived') : projectStatusLabel(project.status ?? 'open')}
                         </span>
                     </div>
                     {(project.client_name || project.owner_name) && (
@@ -211,7 +222,7 @@ export default function ProjectFinance({ project, summary, costTransactions, inv
                                                 <td className="py-2.5 pe-4 font-mono text-slate-500">#{inv.id}</td>
                                                 <td className="py-2.5 pe-4">
                                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold capitalize ${STATUS_STYLES[inv.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                                                        {inv.status.replace('_', ' ')}
+                                                        {labelFor(INVOICE_STATUS_LABEL_KEYS, inv.status)}
                                                     </span>
                                                 </td>
                                                 <td className="py-2.5 pe-4 font-mono text-slate-700">

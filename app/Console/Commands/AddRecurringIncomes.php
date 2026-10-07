@@ -2,36 +2,22 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\AppliesRecurringItems;
 use App\Models\RecurringIncome;
 use Illuminate\Console\Command;
 
 class AddRecurringIncomes extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    use AppliesRecurringItems;
+
     protected $signature = 'add:recurring_incomes';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Add Recurring Incomes';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
-        foreach (RecurringIncome::where('is_active', true)->get() as $item) {
-            $item->apply();
-        }
+        $failed = $this->applyRecurringItems(RecurringIncome::where('is_active', true), 'AddRecurringIncomes');
 
-        return Command::SUCCESS;
+        return $failed === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 }

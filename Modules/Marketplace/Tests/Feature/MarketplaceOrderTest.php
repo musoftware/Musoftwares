@@ -18,12 +18,14 @@ use Spatie\Permission\Models\Role;
 class MarketplaceOrderTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates(); // wallet ledger and escrow convert USD amounts to the EGP business currency
 
         Role::firstOrCreate(['name' => 'seller']);
         Role::firstOrCreate(['name' => 'client']);

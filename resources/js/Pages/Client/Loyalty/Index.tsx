@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 import axios from 'axios';
 
 interface LoyaltyTier {
@@ -113,7 +114,7 @@ export default function LoyaltyIndex({
 
     const handleRedeem = async (reward: RewardItem) => {
         if (currentBalance < reward.points_cost) {
-            setRedeemErrorMsg(__('loyalty.insufficient_points') || 'Insufficient points balance.');
+            setRedeemErrorMsg(__('loyalty.insufficient_points'));
             setTimeout(() => setRedeemErrorMsg(null), 4000);
             return;
         }
@@ -124,11 +125,11 @@ export default function LoyaltyIndex({
             const res = await axios.post(`/api/portal/loyalty/rewards/${reward.id}/redeem`);
             if (res.data?.status === 'success') {
                 setCurrentBalance(res.data.data.new_points_balance);
-                setRedeemSuccessMsg(`Successfully redeemed "${reward.name}"! Your account has been credited.`);
+                setRedeemSuccessMsg(__('client.loyalty_page_redeem_success', { name: reward.name }));
                 setTimeout(() => setRedeemSuccessMsg(null), 5000);
             }
         } catch (err: any) {
-            setRedeemErrorMsg(err?.response?.data?.message || 'Failed to redeem reward.');
+            setRedeemErrorMsg(err?.response?.data?.message || __('client.loyalty_page_redeem_failed'));
             setTimeout(() => setRedeemErrorMsg(null), 4000);
         } finally {
             setRedeemingId(null);
@@ -146,25 +147,25 @@ export default function LoyaltyIndex({
 
     return (
         <AuthenticatedLayout>
-            <Head title={__('loyalty.loyalty_hub') || 'Loyalty & Points Hub'} />
+            <Head title={__('loyalty.loyalty_hub')} />
 
             <div className="w-full">
                 {/* Hero Header */}
                 <PageHeroHeader
-                    badge={__('loyalty.loyalty_hub') || 'Loyalty & Points'}
-                    title={__('loyalty.loyalty_hub') || 'Loyalty & Points Hub'}
-                    description={__('loyalty.loyalty_tagline') || 'Complete transparency. Earn rewards on every interaction and early invoice settlement.'}
+                    badge={__('loyalty.loyalty_hub')}
+                    title={__('loyalty.loyalty_hub')}
+                    description={__('loyalty.loyalty_tagline')}
                     actions={
                         <div className="flex items-center gap-3 shrink-0">
                             <Link href="/dashboard">
                                 <Button variant="outline" size="sm" className="rounded-full text-xs font-semibold">
-                                    Dashboard
+                                    {__('general.dashboard')}
                                 </Button>
                             </Link>
                             <a href="#rewards-catalog">
                                 <Button size="sm" className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full text-xs font-semibold gap-1.5 shadow-sm">
                                     <Gift className="w-3.5 h-3.5" />
-                                    <span>{__('loyalty.rewards_catalog') || 'Rewards'}</span>
+                                    <span>{__('loyalty.rewards_catalog')}</span>
                                 </Button>
                             </a>
                         </div>
@@ -189,19 +190,19 @@ export default function LoyaltyIndex({
                     {/* 1. Core Points & Tier Metrics Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         <BentoStatCard
-                            label={__('loyalty.available_points') || 'Available Points'}
-                            value={`${currentBalance.toLocaleString()} PTS`}
-                            description={`≈ ${cashValue} in direct invoice deductions`}
+                            label={__('loyalty.available_points')}
+                            value={__('client.loyalty_page_points_value', { points: currentBalance.toLocaleString() })}
+                            description={__('client.loyalty_page_cash_value', { amount: cashValue })}
                             icon={Coins}
                             accentColor="blue"
                         />
                         <BentoStatCard
-                            label={__('loyalty.current_tier') || 'Current Tier'}
+                            label={__('loyalty.current_tier')}
                             value={currentTierName}
                             description={
                                 summary?.next_tier
-                                    ? `${summary.points_to_next_tier} PTS to ${summary.next_tier.name}`
-                                    : 'Highest tier attained'
+                                    ? __('client.loyalty_page_to_next_tier', { points: summary.points_to_next_tier, tier: summary.next_tier.name })
+                                    : __('client.loyalty_page_highest_tier')
                             }
                             icon={
                                 <img
@@ -216,16 +217,16 @@ export default function LoyaltyIndex({
                             accentColor="amber"
                         />
                         <BentoStatCard
-                            label={__('loyalty.lifetime_points') || 'Lifetime Points'}
-                            value={`${(summary?.lifetime_points || 0).toLocaleString()} PTS`}
-                            description="All-time earned points counter"
+                            label={__('loyalty.lifetime_points')}
+                            value={__('client.loyalty_page_points_value', { points: (summary?.lifetime_points || 0).toLocaleString() })}
+                            description={__('client.loyalty_page_lifetime_desc')}
                             icon={Award}
                             accentColor="emerald"
                         />
                         <BentoStatCard
-                            label={__('loyalty.referral_points_earned') || 'Referral Points'}
-                            value={`${(referral?.points_earned || 0).toLocaleString()} PTS`}
-                            description={`${referral?.total_users || 0} colleagues introduced`}
+                            label={__('loyalty.referral_points_earned')}
+                            value={__('client.loyalty_page_points_value', { points: (referral?.points_earned || 0).toLocaleString() })}
+                            description={__('client.loyalty_page_colleagues_introduced', { count: referral?.total_users || 0 })}
                             icon={Users}
                             accentColor="purple"
                         />
@@ -233,11 +234,11 @@ export default function LoyaltyIndex({
 
                     {/* 2. Tier Progression Track (Visual Ladder) */}
                     <ContentCard
-                        title={__('loyalty.tier_ladder') || 'Tier Progression Ladder'}
+                        title={__('loyalty.tier_ladder')}
                         subtitle={
                             summary?.next_tier
-                                ? `You are ${summary?.progress_percentage}% toward unlocking ${summary?.next_tier?.name}.`
-                                : 'You have reached our highest partnership tier. Thank you for your leadership.'
+                                ? __('client.loyalty_page_progress', { percent: summary?.progress_percentage, tier: summary?.next_tier?.name })
+                                : __('client.loyalty_page_top_tier')
                         }
                     >
                         <div className="space-y-6 pt-2">
@@ -246,7 +247,7 @@ export default function LoyaltyIndex({
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400">
                                         <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                                            {summary?.current_tier?.name || 'Bronze'}
+                                            {summary?.current_tier?.name || __('client.loyalty_page_bronze')}
                                         </span>
                                         <span className="font-bold text-[#0071e3]">{summary?.progress_percentage}%</span>
                                         <span className="font-semibold text-zinc-700 dark:text-zinc-300">
@@ -286,7 +287,7 @@ export default function LoyaltyIndex({
                                             {isCurrent && (
                                                 <div className="absolute -top-3 end-4">
                                                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#0071e3] text-white shadow-sm">
-                                                        CURRENT TIER
+                                                        {__('loyalty.current_tier')}
                                                     </span>
                                                 </div>
                                             )}
@@ -307,19 +308,19 @@ export default function LoyaltyIndex({
                                                     </h4>
                                                     <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
                                                         {tierItem.min_lifetime_points > 0
-                                                            ? `${tierItem.min_lifetime_points.toLocaleString()} PTS Threshold`
-                                                            : 'Base Entry Level'}
+                                                            ? __('client.loyalty_page_threshold', { points: tierItem.min_lifetime_points.toLocaleString() })
+                                                            : __('client.loyalty_page_base_level')}
                                                     </span>
                                                     {Number(tierItem.discount_percentage) > 0 && (
                                                         <span className="mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
-                                                            {tierItem.discount_percentage}% Invoice Deduction
+                                                            {__('client.loyalty_page_invoice_deduction', { percent: tierItem.discount_percentage ?? 0 })}
                                                         </span>
                                                     )}
                                                 </div>
 
                                                 <div className="pt-2 border-t border-black/5 dark:border-white/5">
                                                     <div className="text-[10px] font-mono uppercase text-zinc-400 dark:text-zinc-500 mb-2 font-semibold">
-                                                        Tier Privileges
+                                                        {__('client.loyalty_page_tier_privileges')}
                                                     </div>
                                                     <ul className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
                                                         {perks.map((perk, pIdx) => (
@@ -332,11 +333,11 @@ export default function LoyaltyIndex({
                                                             <>
                                                                 <li className="flex items-start gap-2">
                                                                     <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                                                                    <span className="leading-tight">Instant Support Ticket Priority</span>
+                                                                    <span className="leading-tight">{__('client.loyalty_page_perk_priority')}</span>
                                                                 </li>
                                                                 <li className="flex items-start gap-2">
                                                                     <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                                                                    <span className="leading-tight">Transparent Audit Ledger Tracking</span>
+                                                                    <span className="leading-tight">{__('client.loyalty_page_perk_ledger')}</span>
                                                                 </li>
                                                             </>
                                                         )}
@@ -352,8 +353,8 @@ export default function LoyaltyIndex({
 
                     {/* 3. Transparent Points Ledger (The Core Trust Feature) */}
                     <ContentCard
-                        title={__('loyalty.points_ledger') || 'Points Audit Ledger'}
-                        subtitle={__('loyalty.points_ledger_subtitle') || 'Every single point transaction is recorded below with complete transparency.'}
+                        title={__('loyalty.points_ledger')}
+                        subtitle={__('loyalty.points_ledger_subtitle')}
                         action={
                             <div className="flex items-center gap-1.5 p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl text-xs font-medium">
                                 <button
@@ -365,7 +366,7 @@ export default function LoyaltyIndex({
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
                                     }`}
                                 >
-                                    {__('loyalty.filter_all') || 'All'}
+                                    {__('loyalty.filter_all')}
                                 </button>
                                 <button
                                     type="button"
@@ -376,7 +377,7 @@ export default function LoyaltyIndex({
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
                                     }`}
                                 >
-                                    {__('loyalty.filter_earned') || 'Earned (+)'}
+                                    {__('loyalty.filter_earned')}
                                 </button>
                                 <button
                                     type="button"
@@ -387,7 +388,7 @@ export default function LoyaltyIndex({
                                             : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
                                     }`}
                                 >
-                                    {__('loyalty.filter_spent') || 'Redeemed (-)'}
+                                    {__('loyalty.filter_spent')}
                                 </button>
                             </div>
                         }
@@ -396,11 +397,11 @@ export default function LoyaltyIndex({
                             <table className="w-full text-left text-xs border-collapse">
                                 <thead>
                                     <tr className="border-b border-black/5 dark:border-white/5 text-zinc-500 dark:text-zinc-400 font-mono text-[11px] uppercase tracking-wider">
-                                        <th className="py-3 px-3 font-semibold">{__('loyalty.transaction_date') || 'Date (Cairo)'}</th>
-                                        <th className="py-3 px-3 font-semibold">{__('loyalty.event_description') || 'Activity'}</th>
-                                        <th className="py-3 px-3 font-semibold">{__('loyalty.channel') || 'Channel'}</th>
-                                        <th className="py-3 px-3 font-semibold text-right">{__('loyalty.points_delta') || 'Points'}</th>
-                                        <th className="py-3 px-3 font-semibold text-right">{__('loyalty.balance_after') || 'Balance After'}</th>
+                                        <th className="py-3 px-3 font-semibold">{__('loyalty.transaction_date')}</th>
+                                        <th className="py-3 px-3 font-semibold">{__('loyalty.event_description')}</th>
+                                        <th className="py-3 px-3 font-semibold">{__('loyalty.channel')}</th>
+                                        <th className="py-3 px-3 font-semibold text-right">{__('loyalty.points_delta')}</th>
+                                        <th className="py-3 px-3 font-semibold text-right">{__('loyalty.balance_after')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-black/5 dark:divide-white/5">
@@ -418,7 +419,7 @@ export default function LoyaltyIndex({
                                                     </div>
                                                     {item.metadata?.reason && (
                                                         <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                                            Note: {item.metadata.reason}
+                                                            {__('client.loyalty_page_note', { reason: item.metadata.reason })}
                                                         </div>
                                                     )}
                                                 </td>
@@ -429,11 +430,11 @@ export default function LoyaltyIndex({
                                                 </td>
                                                 <td className="py-3.5 px-3 text-right font-mono font-bold whitespace-nowrap">
                                                     <span className={isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-700 dark:text-zinc-300'}>
-                                                        {isPositive ? `+${item.points}` : item.points} PTS
+                                                        {__('client.loyalty_page_points_value', { points: isPositive ? `+${item.points}` : item.points })}
                                                     </span>
                                                 </td>
                                                 <td className="py-3.5 px-3 text-right font-mono font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
-                                                    {item.balance_after.toLocaleString()} PTS
+                                                    {__('client.loyalty_page_points_value', { points: item.balance_after.toLocaleString() })}
                                                 </td>
                                             </tr>
                                         );
@@ -441,7 +442,7 @@ export default function LoyaltyIndex({
                                     {filteredLedger.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="py-8 text-center text-zinc-500 dark:text-zinc-400">
-                                                {__('loyalty.no_transactions') || 'No points activity recorded yet.'}
+                                                {__('loyalty.no_transactions')}
                                             </td>
                                         </tr>
                                     )}
@@ -451,25 +452,9 @@ export default function LoyaltyIndex({
 
                         {/* Pagination */}
                         {ledger?.last_page > 1 && (
-                            <div className="flex items-center justify-between pt-4 mt-4 border-t border-black/5 dark:border-white/5 text-xs text-zinc-500">
-                                <span>Page {ledger.current_page} of {ledger.last_page}</span>
-                                <div className="flex items-center gap-2">
-                                    {ledger.links?.map((link, idx) => {
-                                        if (!link.url) return null;
-                                        return (
-                                            <Link
-                                                key={idx}
-                                                href={link.url}
-                                                className={`px-3 py-1 rounded-lg border ${
-                                                    link.active
-                                                        ? 'bg-[#0071e3] text-white border-[#0071e3] font-semibold'
-                                                        : 'border-black/5 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                                                }`}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                            />
-                                        );
-                                    })}
-                                </div>
+                            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 mt-4 border-t border-black/5 dark:border-white/5 text-xs text-zinc-500">
+                                <span>{__('general.page_of', { current: ledger.current_page, last: ledger.last_page })}</span>
+                                <Pagination links={ledger.links || []} />
                             </div>
                         )}
                     </ContentCard>
@@ -477,8 +462,8 @@ export default function LoyaltyIndex({
                     {/* 4. Rewards Catalog & Instant Redemption */}
                     <div id="rewards-catalog">
                         <ContentCard
-                            title={__('loyalty.rewards_catalog') || 'Rewards & Redemptions'}
-                            subtitle={__('loyalty.rewards_catalog_subtitle') || 'Exchange your available points for real billing credits and premium SLA hours.'}
+                            title={__('loyalty.rewards_catalog')}
+                            subtitle={__('loyalty.rewards_catalog_subtitle')}
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
                                 {rewards.map((reward) => {
@@ -493,7 +478,7 @@ export default function LoyaltyIndex({
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-blue-50 dark:bg-blue-950/50 text-[#0071e3] dark:text-[#3898ec]">
-                                                        {reward.points_cost.toLocaleString()} PTS
+                                                        {__('client.loyalty_page_points_value', { points: reward.points_cost.toLocaleString() })}
                                                     </span>
                                                     <span className="text-[11px] font-mono text-zinc-400 uppercase">
                                                         {reward.reward_type.replace('_', ' ')}
@@ -509,7 +494,7 @@ export default function LoyaltyIndex({
 
                                             <div className="pt-5 mt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
                                                 <span className="text-[11px] font-mono text-zinc-500">
-                                                    {canAfford ? 'Eligible to redeem' : `${reward.points_cost - currentBalance} more PTS needed`}
+                                                    {canAfford ? __('client.loyalty_page_eligible') : __('client.loyalty_page_more_needed', { points: reward.points_cost - currentBalance })}
                                                 </span>
                                                 <Button
                                                     size="sm"
@@ -521,7 +506,7 @@ export default function LoyaltyIndex({
                                                             : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed'
                                                     }`}
                                                 >
-                                                    {isRedeeming ? 'Applying...' : 'Redeem'}
+                                                    {isRedeeming ? __('client.loyalty_page_applying') : __('client.loyalty_page_redeem')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -533,67 +518,67 @@ export default function LoyaltyIndex({
 
                     {/* 5. How to Earn Points (Transparency Matrix) */}
                     <ContentCard
-                        title={__('loyalty.how_to_earn') || 'How Points Are Earned'}
-                        subtitle={__('loyalty.how_to_earn_subtitle') || 'Our automated system rewards your proactive engagement automatically.'}
+                        title={__('loyalty.how_to_earn')}
+                        subtitle={__('loyalty.how_to_earn_subtitle')}
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
                                     <Clock className="w-4 h-4" />
-                                    <span>Early Invoice Settlement</span>
+                                    <span>{__('client.loyalty_page_early_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Pay 7+ days early for a 2x bonus (400 PTS), or 3-6 days early for 1.5x (300 PTS). On-time payments receive 200 PTS.
+                                    {__('client.loyalty_page_early_desc')}
                                 </p>
                             </div>
 
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-[#0071e3] dark:text-[#3898ec] font-semibold text-xs">
                                     <MessageSquare className="w-4 h-4" />
-                                    <span>Portal Support Tickets</span>
+                                    <span>{__('client.loyalty_page_tickets_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Opening support tickets via the client portal awards +15 PTS. Promptly resolved tickets earn an extra +25 PTS.
+                                    {__('client.loyalty_page_tickets_desc')}
                                 </p>
                             </div>
 
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs">
                                     <Zap className="w-4 h-4" />
-                                    <span>Company Profile 100%</span>
+                                    <span>{__('client.loyalty_page_profile_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Finalizing your complete corporate credentials and contact profiles awards an immediate one-time +50 PTS reward.
+                                    {__('client.loyalty_page_profile_desc')}
                                 </p>
                             </div>
 
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400 font-semibold text-xs">
                                     <Users className="w-4 h-4" />
-                                    <span>Referral Network</span>
+                                    <span>{__('client.loyalty_page_referral_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Earn +100 PTS whenever a colleague registers through your referral link, plus +250 PTS when they pay their first invoice.
+                                    {__('client.loyalty_page_referral_desc')}
                                 </p>
                             </div>
 
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 font-semibold text-xs">
                                     <Shield className="w-4 h-4" />
-                                    <span>Welcome Bonus</span>
+                                    <span>{__('client.loyalty_page_welcome_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Every verified client receives a starter balance of +50 PTS immediately upon account creation.
+                                    {__('client.loyalty_page_welcome_desc')}
                                 </p>
                             </div>
 
                             <div className="p-4 rounded-2xl bg-zinc-50/50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 space-y-2">
                                 <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-semibold text-xs">
                                     <Award className="w-4 h-4" />
-                                    <span>Human Courtesy Override</span>
+                                    <span>{__('client.loyalty_page_courtesy_title')}</span>
                                 </div>
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Admins can grant courtesy bonus points for patience or milestone achievements, always noted transparently in your ledger.
+                                    {__('client.loyalty_page_courtesy_desc')}
                                 </p>
                             </div>
                         </div>
@@ -601,18 +586,18 @@ export default function LoyaltyIndex({
 
                     {/* 6. Referral Engine Card */}
                     <ContentCard
-                        title={__('loyalty.referrals_hub') || 'Referral Rewards'}
-                        subtitle={__('loyalty.referrals_hub_subtitle') || 'Invite colleagues and partners. Earn points when they join and settle services.'}
+                        title={__('loyalty.referrals_hub')}
+                        subtitle={__('loyalty.referrals_hub_subtitle')}
                     >
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pt-2">
                             <div className="space-y-2 max-w-xl">
                                 <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Share your unique invitation link with partner businesses and software teams. Every registered partner gives you immediate points and priority status.
+                                    {__('client.loyalty_page_referral_intro')}
                                 </p>
-                                <div className="flex items-center gap-3 text-xs font-mono">
-                                    <span className="text-zinc-500">Referred: <strong className="text-zinc-900 dark:text-white font-bold">{referral?.total_users || 0}</strong></span>
+                                <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
+                                    <span className="text-zinc-500">{__('client.loyalty_page_referred')} <strong className="text-zinc-900 dark:text-white font-bold">{referral?.total_users || 0}</strong></span>
                                     <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Points Earned: +{(referral?.points_earned || 0).toLocaleString()} PTS</span>
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{__('client.loyalty_page_points_earned', { points: (referral?.points_earned || 0).toLocaleString() })}</span>
                                 </div>
                             </div>
 
@@ -620,6 +605,7 @@ export default function LoyaltyIndex({
                                 <input
                                     type="text"
                                     readOnly
+                                    aria-label={__('client.loyalty_page_referral_link')}
                                     value={referral?.url || ''}
                                     className="px-3 py-2 text-xs font-mono rounded-xl border border-black/10 dark:border-white/10 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 w-full sm:w-80 select-all"
                                 />
@@ -630,7 +616,7 @@ export default function LoyaltyIndex({
                                     className="rounded-xl text-xs font-semibold gap-1.5 shrink-0 bg-[#0071e3] hover:bg-[#0077ed] text-white"
                                 >
                                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                                    <span>{copied ? 'Copied' : 'Copy'}</span>
+                                    <span>{copied ? __('client.loyalty_page_copied') : __('general.copy')}</span>
                                 </Button>
                             </div>
                         </div>

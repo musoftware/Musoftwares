@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class FinancialOperationsController extends Controller
@@ -207,6 +208,10 @@ class FinancialOperationsController extends Controller
                                 $title = $entry->reason ?: $recTx->source_title;
                             }
                         } catch (\Throwable $e) {
+                            Log::warning('Finance index: recurring cost lookup failed', [
+                                'cost_transaction_id' => $entry->id,
+                                'error' => $e->getMessage(),
+                            ]);
                             $isRecurring = false;
                         }
                     }
@@ -330,101 +335,8 @@ class FinancialOperationsController extends Controller
 
                     return $bCurrency ? $bCurrency->symbol : 'e£';
                 })(),
-                'monthly_trends' => (function () {
-                    $trends = [];
-                    for ($i = 5; $i >= 0; $i--) {
-                        $date = now()->subMonths($i);
-                        $year = $date->year;
-                        $month = $date->month;
-                        $monthName = $date->format('M Y');
-
-                        // Income
-                        $received = Transaction::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->where('type', 'received')
-                            ->sum('business_amount') ?? 0;
-                        $refunded = Transaction::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->where('type', 'refunded')
-                            ->sum('business_amount') ?? 0;
-                        $sent = Transaction::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->where('type', 'sent')
-                            ->sum('business_amount') ?? 0;
-                        $income = max(0, abs($received) - abs($refunded) - abs($sent));
-
-                        // Expenses
-                        $expenses = CostTransaction::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->where('reason', '!=', 'salary')
-                            ->sum('business_amount') ?? 0;
-
-                        // Salaries
-                        $salaries = CostTransaction::whereYear('created_at', $year)
-                            ->whereMonth('created_at', $month)
-                            ->where('reason', 'salary')
-                            ->sum('business_amount') ?? 0;
-
-                        $net_profit = $income - abs($expenses) - abs($salaries);
-
-                        $trends[] = [
-                            'month' => $monthName,
-                            'income' => (float) $income,
-                            'expenses' => (float) abs($expenses),
-                            'payroll' => (float) abs($salaries),
-                            'net_profit' => (float) $net_profit,
-                        ];
-                    }
-
-                    return $trends;
-                })(),
-                'forecast_receivables' => (function () {
-                    $invoices = Invoice::whereIn('status', ['sent', 'partially_paid', 'unpaid', 'pending'])
-                        ->get();
-
-                    $total_outstanding = 0;
-                    $thirty_days = 0;
-                    $sixty_days = 0;
-                    $ninety_days = 0;
-
-                    foreach ($invoices as $inv) {
-                        $due = $inv->created_at ? Carbon::parse($inv->created_at)->addDays(30) : now()->addDays(30);
-                        $amount = $inv->total ?? 0; // assuming total or unpaid
-
-                        if (method_exists($inv, 'unpaidAmount')) {
-                            $amount = $inv->unpaidAmount();
-                        } elseif (isset($inv->unpaid)) {
-                            $amount = $inv->unpaid;
-                        }
-
-                        $business_amount = $amount; // in a real scenario we convert this, but simple sum for now
-                        try {
-                            $businessCurrencyId = AdminSettings::business_currency();
-                            if ($inv->currency != $businessCurrencyId) {
-                                $business_amount = CurrenciesExchange::RateByDate(now(), $amount, $inv->currency, $businessCurrencyId);
-                            }
-                        } catch (\Throwable $e) {
-                        }
-
-                        $total_outstanding += $business_amount;
-
-                        $days = now()->diffInDays($due, false);
-                        if ($days >= 0 && $days <= 30) {
-                            $thirty_days += $business_amount;
-                        } elseif ($days > 30 && $days <= 60) {
-                            $sixty_days += $business_amount;
-                        } elseif ($days > 60 && $days <= 90) {
-                            $ninety_days += $business_amount;
-                        }
-                    }
-
-                    return [
-                        'total_outstanding' => $total_outstanding,
-                        'next_30_days' => $thirty_days,
-                        'next_60_days' => $sixty_days,
-                        'next_90_days' => $ninety_days,
-                    ];
-                })(),
+                'monthly_trends' => $this->buildMonthlyTrends(6),
+                'forecast_receivables' => $this->buildReceivablesForecast(),
                 'expense_categories' => CostTransaction::whereYear('created_at', now()->year)
                     ->whereMonth('created_at', now()->month)
                     ->where('reason', '!=', 'salary')
@@ -484,7 +396,6 @@ class FinancialOperationsController extends Controller
                     }
                 })(),
             ],
-            'users' => User::select('id', 'name', 'email')->get(),
             'currentTab' => $currentTab,
             'calendarEvents' => $calendarEvents,
             'year' => $year,
@@ -818,5 +729,123 @@ class FinancialOperationsController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Income, expenses, payroll and net profit for the last N months (oldest first).
+     * Uses one grouped query per table instead of several queries per month.
+     */
+    private function buildMonthlyTrends(int $months): array
+    {
+        $start = now()->subMonths($months - 1)->startOfMonth();
+        $end = now()->endOfMonth();
+        $monthKey = $this->monthKeyExpression('created_at');
+
+        $income = Transaction::whereBetween('created_at', [$start, $end])
+            ->whereIn('type', ['received', 'refunded', 'sent'])
+            ->selectRaw("{$monthKey} as month_key, type, SUM(business_amount) as total")
+            ->groupBy('month_key', 'type')
+            ->get()
+            ->groupBy('month_key');
+
+        $costs = CostTransaction::whereBetween('created_at', [$start, $end])
+            ->selectRaw("{$monthKey} as month_key")
+            ->selectRaw("SUM(CASE WHEN reason = 'salary' THEN business_amount ELSE 0 END) as salaries")
+            ->selectRaw("SUM(CASE WHEN reason <> 'salary' THEN business_amount ELSE 0 END) as expenses")
+            ->groupBy('month_key')
+            ->get()
+            ->keyBy('month_key');
+
+        $trends = [];
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $trends[] = $this->monthTrendRow($date, $income->get($date->format('Y-m'), collect()), $costs->get($date->format('Y-m')));
+        }
+
+        return $trends;
+    }
+
+    private function monthTrendRow(Carbon $date, $incomeRows, $costRow): array
+    {
+        $byType = $incomeRows->pluck('total', 'type');
+        $income = max(0, abs((float) ($byType['received'] ?? 0)) - abs((float) ($byType['refunded'] ?? 0)) - abs((float) ($byType['sent'] ?? 0)));
+        $expenses = abs((float) ($costRow->expenses ?? 0));
+        $salaries = abs((float) ($costRow->salaries ?? 0));
+
+        return [
+            'month' => $date->format('M Y'),
+            'income' => (float) $income,
+            'expenses' => (float) $expenses,
+            'payroll' => (float) $salaries,
+            'net_profit' => (float) ($income - $expenses - $salaries),
+        ];
+    }
+
+    /**
+     * SQL expression that turns a datetime column into a "YYYY-MM" key (MySQL and SQLite).
+     */
+    private function monthKeyExpression(string $column): string
+    {
+        return DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m')";
+    }
+
+    /**
+     * Open receivables in business currency, bucketed by expected due date
+     * (created_at + 30 days). Sums per currency and bucket in SQL, then converts once per currency.
+     */
+    private function buildReceivablesForecast(): array
+    {
+        $now = now();
+        $bucketSql = "CASE WHEN created_at IS NULL THEN 'next_30_days'"
+            ." WHEN created_at >= ? AND created_at <= ? THEN 'next_30_days'"
+            ." WHEN created_at > ? AND created_at <= ? THEN 'next_60_days'"
+            ." WHEN created_at > ? AND created_at <= ? THEN 'next_90_days'"
+            ." ELSE 'later' END";
+        $bindings = [
+            $now->copy()->subDays(30), $now,
+            $now, $now->copy()->addDays(30),
+            $now->copy()->addDays(30), $now->copy()->addDays(60),
+        ];
+
+        $rows = Invoice::whereIn('status', ['sent', 'partially_paid', 'unpaid', 'pending'])
+            ->selectRaw("currency_id, {$bucketSql} as bucket, SUM(unpaid) as outstanding", array_map(fn ($d) => $d->format('Y-m-d H:i:s'), $bindings))
+            ->groupBy('currency_id', 'bucket')
+            ->toBase()
+            ->get();
+
+        $forecast = ['total_outstanding' => 0, 'next_30_days' => 0, 'next_60_days' => 0, 'next_90_days' => 0];
+        $businessCurrencyId = AdminSettings::business_currency();
+
+        foreach ($rows as $row) {
+            $amount = $this->toBusinessCurrency((float) $row->outstanding, $row->currency_id, $businessCurrencyId);
+            $forecast['total_outstanding'] += $amount;
+            if (isset($forecast[$row->bucket])) {
+                $forecast[$row->bucket] += $amount;
+            }
+        }
+
+        return $forecast;
+    }
+
+    private function toBusinessCurrency(float $amount, $currencyId, $businessCurrencyId): float
+    {
+        if ((int) $currencyId === (int) $businessCurrencyId) {
+            return $amount;
+        }
+
+        try {
+            return (float) CurrenciesExchange::RateByDate(now(), $amount, $currencyId, $businessCurrencyId);
+        } catch (\Throwable $e) {
+            Log::warning('Receivables forecast: currency conversion failed, using unconverted amount', [
+                'currency_id' => $currencyId,
+                'business_currency_id' => $businessCurrencyId,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $amount;
+        }
     }
 }

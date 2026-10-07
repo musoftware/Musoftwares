@@ -113,9 +113,9 @@ export default function BoardCategoryPicker({
             setShowAdd(false);
             // Reload just the categories page piece so the new row appears in the list.
             router.reload({ only: ['categories'] });
-            toast.success(__('general.board_category_added') || 'Category added.');
+            toast.success(__('general.board_category_added'));
         } catch (err) {
-            toast.error(__('general.board_category_assign_failed') || 'Could not add category.');
+            toast.error(__('general.board_category_assign_failed'));
         } finally {
             setCreating(false);
         }
@@ -134,8 +134,8 @@ export default function BoardCategoryPicker({
                         ? cn(categoryPalette(selected).bg, categoryPalette(selected).text, categoryPalette(selected).ring)
                         : 'bg-slate-50 text-slate-500 border-slate-200 ring-slate-200 hover:bg-slate-100',
                 )}
-                title={__('general.board_category') || 'Category'}
-                aria-label={__('general.board_category') || 'Category'}
+                title={__('general.board_category')}
+                aria-label={__('general.board_category')}
             >
                 <Tag className="h-2.5 w-2.5" />
                 <span className="truncate max-w-[8rem]">
@@ -151,7 +151,7 @@ export default function BoardCategoryPicker({
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {__('general.board_categories') || 'Categories'}
+                        {__('general.board_categories')}
                     </div>
                     <button
                         type="button"
@@ -164,7 +164,7 @@ export default function BoardCategoryPicker({
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200/60 text-slate-500">
                             <Tag className="h-3 w-3" />
                         </span>
-                        <span className="flex-1 truncate">{__('general.board_no_category') || 'No category'}</span>
+                        <span className="flex-1 truncate">{__('general.board_no_category')}</span>
                         {selectedId == null && <Check className="h-3.5 w-3.5 text-slate-700" />}
                     </button>
                     <div className="my-1 border-t border-slate-100" />
@@ -200,7 +200,7 @@ export default function BoardCategoryPicker({
                             className="flex w-full items-center gap-2 rounded-xl px-3 py-1.5 text-start text-xs text-slate-600 hover:bg-slate-50"
                         >
                             <Plus className="h-3.5 w-3.5 text-slate-400" />
-                            <span>{__('general.board_add_category') || 'Add category'}</span>
+                            <span>{__('general.board_add_category')}</span>
                         </button>
                     ) : (
                         <div className="space-y-1.5 px-1 py-1">
@@ -209,7 +209,7 @@ export default function BoardCategoryPicker({
                                 type="text"
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
-                                placeholder={__('general.board_add_category') || 'Add category'}
+                                placeholder={__('general.board_add_category')}
                                 className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs focus:border-slate-400 focus:bg-white focus:outline-none"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') { e.preventDefault(); void submitNew(); }
@@ -241,7 +241,7 @@ export default function BoardCategoryPicker({
                                     onClick={() => setShowAdd(false)}
                                     className="flex-1 rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-50"
                                 >
-                                    {__('general.cancel') || 'Cancel'}
+                                    {__('general.cancel')}
                                 </button>
                                 <button
                                     type="button"
@@ -249,7 +249,7 @@ export default function BoardCategoryPicker({
                                     disabled={!newName.trim() || creating}
                                     className="flex-1 rounded-lg bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
                                 >
-                                    {__('general.save') || 'Save'}
+                                    {__('general.save')}
                                 </button>
                             </div>
                         </div>

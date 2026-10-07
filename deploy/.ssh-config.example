@@ -1,0 +1,15 @@
+# SSH server settings for the deploy scripts.
+# Copy this file to deploy/.ssh-config (it is git-ignored) and fill in real values.
+
+SSH_USER=your-ssh-user
+SSH_HOST=your.server.example.com
+SSH_PORT=22
+REMOTE_PATH=/home/your-ssh-user/domains/example.com/public_html
+
+# Preferred: path to a private key file.
+#  - plink/pscp (PuTTY) need a .ppk key
+#  - ssh/scp (OpenSSH) need an OpenSSH key (for example ~/.ssh/id_ed25519)
+SSH_KEY=C:/Users/you/.ssh/deploy_key.ppk
+
+# Fallback only (used when SSH_KEY is empty). Password auth prints a warning.
+SSH_PASSWORD=

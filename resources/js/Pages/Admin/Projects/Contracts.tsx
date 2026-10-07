@@ -5,7 +5,8 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
 import { formatMoney } from '@/lib/utils';
-import { FileText, Plus, Sparkles, Copy, Trash2, History } from 'lucide-react';
+import { FileText, Plus, Sparkles, Copy, History, ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import ContractModal from './Contracts/ContractModal';
 
 export default function Contracts({ project, contracts, currencies }) {
@@ -24,19 +25,20 @@ export default function Contracts({ project, contracts, currencies }) {
 
     const handleCopyLink = (uuid) => {
         const link = `${window.location.origin}/c/${uuid}`;
-        navigator.clipboard.writeText(link);
-        // Toast could be added here
-        alert("Link copied to clipboard");
+        navigator.clipboard.writeText(link)
+            .then(() => toast.success(__('general.link_copied')))
+            .catch(() => toast.error(__('admin.contracts_copy_failed')));
     };
 
     return (
-        <AdminSidebarLayout 
-            title={`Contracts: ${project.project_name}`} 
-            header={`Contracts for ${project.project_name}`}
+        <AdminSidebarLayout
+            title={__('admin.contracts_page_title', { project: project.project_name })}
+            header={__('admin.contracts_page_header', { project: project.project_name })}
         >
             <div className="mb-6 flex justify-between items-center">
-                <Link href="/admin/projects?status=active" className="text-slate-900 hover:underline">
-                    &larr; Back to Projects
+                <Link href="/admin/projects?status=active" className="inline-flex items-center gap-1 text-slate-900 hover:underline">
+                    <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                    {__('general.back_to_projects')}
                 </Link>
                 <div className="flex gap-2">
                     <Button onClick={handleCreate} className="gap-2">
@@ -76,23 +78,23 @@ export default function Contracts({ project, contracts, currencies }) {
                                         ${contract.status === 'draft' ? 'bg-slate-100 text-slate-700' : ''}
                                         ${contract.status === 'sent' ? 'bg-slate-50 text-slate-900' : ''}
                                     `}>
-                                        {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
+                                        {__(`admin.contracts_status_${contract.status}`)}
                                     </span>
                                 </div>
                                 <CardDescription className="line-clamp-2 mt-2 text-xs">
-                                    {contract.description || "No description provided."}
+                                    {contract.description || __('general.no_description_provided')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4 flex-1 flex flex-col justify-between gap-4">
                                 <div>
                                     <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-slate-500">Amount:</span>
+                                        <span className="text-slate-500">{__('admin.contracts_amount_label')}</span>
                                         <span className="font-medium text-slate-900">
                                             {formatMoney(contract.total_amount, contract.currency_id)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-slate-500">Versions:</span>
+                                        <span className="text-slate-500">{__('admin.contracts_versions_label')}</span>
                                         <span className="font-medium flex items-center gap-1">
                                             <History className="w-3 h-3" />
                                             {contract.versions?.length || 1}
@@ -100,7 +102,7 @@ export default function Contracts({ project, contracts, currencies }) {
                                     </div>
                                     {contract.status === 'signed' && (
                                         <div className="flex justify-between text-sm text-slate-900 bg-green-50 p-2 rounded">
-                                            <span>Signed by:</span>
+                                            <span>{__('admin.contracts_signed_by_label')}</span>
                                             <span className="font-semibold truncate max-w-[120px]" title={contract.client_name}>
                                                 {contract.client_name}
                                             </span>
@@ -109,9 +111,9 @@ export default function Contracts({ project, contracts, currencies }) {
                                 </div>
                                 <div className="flex gap-2 mt-auto">
                                     <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEdit(contract)}>
-                                        Edit / View
+                                        {__('admin.contracts_edit_view')}
                                     </Button>
-                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-slate-900" onClick={() => handleCopyLink(contract.uuid)} title={__('general.copy_public_link')}>
+                                    <Button variant="outline" size="sm" className="px-3 text-slate-500 hover:text-slate-900" onClick={() => handleCopyLink(contract.uuid)} title={__('general.copy_public_link')} aria-label={__('general.copy_public_link')}>
                                         <Copy className="w-4 h-4" />
                                     </Button>
                                 </div>
@@ -121,10 +123,10 @@ export default function Contracts({ project, contracts, currencies }) {
                 </div>
             )}
 
-            <ContractModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                project={project} 
+            <ContractModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                project={project}
                 contract={editingContract}
                 currencies={currencies}
             />

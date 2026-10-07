@@ -108,20 +108,23 @@ interface Props {
     pagination: Pagination;
 }
 
-const REASON_LABELS: Record<string, string> = {
-    non_billable: 'Non-billable internal work',
-    duplicate: 'Duplicate task',
-    entry_error: 'Entry error / accidental submission',
-    free_promo: 'Complimentary / promotional',
-    client_cancelled: 'Client cancelled request',
-    other: 'Other reason',
+const REASON_LABEL_KEYS: Record<string, string> = {
+    non_billable: 'admin.pending_tasks_reason_non_billable',
+    duplicate: 'admin.pending_tasks_reason_duplicate',
+    entry_error: 'admin.pending_tasks_reason_entry_error',
+    free_promo: 'admin.pending_tasks_reason_free_promo',
+    client_cancelled: 'admin.pending_tasks_reason_client_cancelled',
+    other: 'admin.pending_tasks_reason_other',
 };
 
-const STAGE_LABELS: Record<string, { label: string; bg: string; text: string }> = {
-    waiting_client: { label: 'Waiting Client Action', bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-800 dark:text-amber-300' },
-    waiting_execution: { label: 'Waiting Execution', bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-800 dark:text-slate-200' },
-    waiting_review: { label: 'Waiting Final Review', bg: 'bg-indigo-50 dark:bg-indigo-950/30', text: 'text-indigo-800 dark:text-indigo-300' },
-    ready_to_invoice: { label: 'Ready to Invoice', bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-800 dark:text-emerald-300' },
+const reasonLabel = (reason: string | null): string =>
+    reason && REASON_LABEL_KEYS[reason] ? __(REASON_LABEL_KEYS[reason]) : (reason ?? '');
+
+const STAGE_LABELS: Record<string, { labelKey: string; bg: string; text: string }> = {
+    waiting_client: { labelKey: 'admin.pending_tasks_stage_waiting_client', bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-800 dark:text-amber-300' },
+    waiting_execution: { labelKey: 'admin.pending_tasks_stage_waiting_execution', bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-800 dark:text-slate-200' },
+    waiting_review: { labelKey: 'admin.pending_tasks_stage_waiting_review', bg: 'bg-indigo-50 dark:bg-indigo-950/30', text: 'text-indigo-800 dark:text-indigo-300' },
+    ready_to_invoice: { labelKey: 'admin.pending_tasks_stage_ready_to_invoice', bg: 'bg-emerald-50 dark:bg-emerald-950/30', text: 'text-emerald-800 dark:text-emerald-300' },
 };
 
 export default function PendingTasks({ tasks, stats, filters, pagination }: Props) {
@@ -135,6 +138,8 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
     const [ignoringTask, setIgnoringTask] = useState<TaskItem | null>(null);
     const [updatingTask, setUpdatingTask] = useState<TaskItem | null>(null);
     const [viewingAuditTask, setViewingAuditTask] = useState<TaskItem | null>(null);
+    const [bulkIgnoreOpen, setBulkIgnoreOpen] = useState(false);
+    const [bulkIgnoreReason, setBulkIgnoreReason] = useState('non_billable');
 
     // Forms
     const ignoreForm = useForm({
@@ -244,15 +249,8 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
         if (selectedIds.length === 0) return;
 
         if (action === 'ignore') {
-            const reason = window.prompt('Enter reason for ignoring selected tasks (e.g., non_billable, duplicate):', 'non_billable');
-            if (!reason) return;
-            router.post(route('admin.tasks.bulk-pending-action'), {
-                task_ids: selectedIds,
-                action: 'ignore',
-                ignore_reason: reason,
-            }, {
-                onSuccess: () => setSelectedIds([]),
-            });
+            setBulkIgnoreReason('non_billable');
+            setBulkIgnoreOpen(true);
             return;
         }
 
@@ -264,9 +262,22 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
         });
     };
 
+    const submitBulkIgnore = () => {
+        router.post(route('admin.tasks.bulk-pending-action'), {
+            task_ids: selectedIds,
+            action: 'ignore',
+            ignore_reason: bulkIgnoreReason,
+        }, {
+            onSuccess: () => {
+                setSelectedIds([]);
+                setBulkIgnoreOpen(false);
+            },
+        });
+    };
+
     return (
         <AdminSidebarLayout>
-            <Head title="Pending Tasks & Workflow — Musoftwares" />
+            <Head title={__('admin.pending_tasks_page_title')} />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -275,11 +286,11 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                         <div className="flex items-center gap-2">
                             <Layers className="h-6 w-6 text-slate-900 dark:text-white" />
                             <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white">
-                                Pending Tasks & Execution Pipeline
+                                {__('admin.pending_tasks_heading')}
                             </h1>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                            A centralized hub for unbilled tasks, SLA checkpoints, client actions, and permanent ignore audit logging.
+                            {__('admin.pending_tasks_subtitle')}
                         </p>
                     </div>
 
@@ -287,13 +298,13 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                         <Link href="/admin/tasks/as_list">
                             <Button variant="outline" size="sm" className="hover:text-black">
                                 <FileText className="h-4 w-4 me-1 text-slate-700" />
-                                Tasks List
+                                {__('admin.pending_tasks_tasks_list')}
                             </Button>
                         </Link>
                         <Link href="/admin/tasks/board-explorer">
                             <Button variant="outline" size="sm" className="hover:text-black">
                                 <History className="h-4 w-4 me-1 text-slate-700" />
-                                Board Explorer
+                                {__('general.board_explorer')}
                             </Button>
                         </Link>
                     </div>
@@ -311,7 +322,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                All Pending
+                                {__('admin.pending_tasks_stat_all')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-2">
                                 {stats.all}
@@ -329,7 +340,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-                                Client Action
+                                {__('admin.pending_tasks_stat_client_action')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-amber-700 dark:text-amber-400 mt-2">
                                 {stats.waiting_client}
@@ -347,7 +358,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                In Execution
+                                {__('admin.pending_tasks_stat_in_execution')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-2">
                                 {stats.waiting_execution}
@@ -365,7 +376,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
-                                Final Review
+                                {__('admin.pending_tasks_stat_final_review')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-indigo-700 dark:text-indigo-400 mt-2">
                                 {stats.waiting_review}
@@ -383,7 +394,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">
-                                Ready to Bill
+                                {__('admin.pending_tasks_stat_ready_to_bill')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-green-700 dark:text-green-400 mt-2">
                                 {stats.ready_to_invoice}
@@ -401,7 +412,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     >
                         <CardContent className="p-3.5 flex flex-col justify-between">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                Ignored Archive
+                                {__('admin.pending_tasks_stat_ignored_archive')}
                             </span>
                             <span className="text-2xl font-bold tracking-tight text-slate-600 dark:text-slate-400 mt-2">
                                 {stats.ignored}
@@ -414,24 +425,24 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 bg-muted/30 p-3 rounded-lg border border-border/40">
                     <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-1 max-w-md">
                         <div className="relative flex-1">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 type="search"
-                                placeholder="Search task name, client, or project..."
+                                placeholder={__('admin.pending_tasks_search_placeholder')}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="pl-9 h-9 text-sm bg-background"
+                                className="ps-9 h-9 text-sm bg-background"
                             />
                         </div>
                         <Button type="submit" size="sm" variant="default" className="bg-black text-white hover:bg-slate-800">
-                            Search
+                            {__('general.search')}
                         </Button>
                     </form>
 
                     <div className="flex flex-wrap items-center gap-2">
                         {/* Billing Type Selector */}
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <span>Type:</span>
+                            <span>{__('admin.pending_tasks_filter_type')}</span>
                             <select
                                 value={billingType}
                                 onChange={(e) => {
@@ -440,15 +451,15 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                 }}
                                 className="h-9 text-xs rounded border border-border bg-background px-2 py-1 text-slate-900 dark:text-white"
                             >
-                                <option value="all">All Types</option>
-                                <option value="billable">Billable Only</option>
-                                <option value="non_billable">Non-Billable</option>
+                                <option value="all">{__('admin.pending_tasks_all_types')}</option>
+                                <option value="billable">{__('admin.pending_tasks_billable_only')}</option>
+                                <option value="non_billable">{__('admin.pending_tasks_non_billable')}</option>
                             </select>
                         </div>
 
                         {/* Priority Selector */}
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <span>Priority:</span>
+                            <span>{__('admin.pending_tasks_filter_priority')}</span>
                             <select
                                 value={priority}
                                 onChange={(e) => {
@@ -457,11 +468,11 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                 }}
                                 className="h-9 text-xs rounded border border-border bg-background px-2 py-1 text-slate-900 dark:text-white"
                             >
-                                <option value="all">All Priorities</option>
-                                <option value="urgent">Urgent</option>
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
+                                <option value="all">{__('admin.pending_tasks_all_priorities')}</option>
+                                <option value="urgent">{__('general.priority_urgent')}</option>
+                                <option value="high">{__('general.priority_high')}</option>
+                                <option value="medium">{__('general.priority_medium')}</option>
+                                <option value="low">{__('general.priority_low')}</option>
                             </select>
                         </div>
                     </div>
@@ -471,7 +482,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                 {selectedIds.length > 0 && (
                     <div className="flex items-center justify-between p-3 bg-slate-900 text-white rounded-lg shadow-sm">
                         <span className="text-xs font-semibold">
-                            {selectedIds.length} tasks selected
+                            {__('admin.pending_tasks_selected_count', { count: selectedIds.length })}
                         </span>
                         <div className="flex items-center gap-2">
                             {currentTab !== 'ignored' ? (
@@ -482,7 +493,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                         onClick={() => handleBulkAction('mark_ready_to_invoice')}
                                         className="text-xs h-7"
                                     >
-                                        Mark Ready to Invoice
+                                        {__('admin.pending_tasks_bulk_mark_ready')}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -490,7 +501,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                         onClick={() => handleBulkAction('mark_billable')}
                                         className="text-xs h-7"
                                     >
-                                        Set Billable
+                                        {__('admin.pending_tasks_bulk_set_billable')}
                                     </Button>
                                     <Button
                                         size="sm"
@@ -498,7 +509,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                         onClick={() => handleBulkAction('ignore')}
                                         className="text-xs h-7"
                                     >
-                                        Ignore Selected
+                                        {__('admin.pending_tasks_bulk_ignore')}
                                     </Button>
                                 </>
                             ) : (
@@ -508,7 +519,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     onClick={() => handleBulkAction('restore')}
                                     className="text-xs h-7"
                                 >
-                                    Restore Selected
+                                    {__('admin.pending_tasks_bulk_restore')}
                                 </Button>
                             )}
                             <Button
@@ -517,7 +528,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                 onClick={() => setSelectedIds([])}
                                 className="text-xs h-7 text-white hover:bg-slate-800"
                             >
-                                Clear Selection
+                                {__('general.clear_selection')}
                             </Button>
                         </div>
                     </div>
@@ -526,7 +537,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                 {/* Tasks Table */}
                 <div className="border border-border/60 rounded-lg overflow-hidden bg-card">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
+                        <table className="w-full text-sm text-start">
                             <thead className="text-xs uppercase bg-muted/50 text-muted-foreground border-b border-border/50">
                                 <tr>
                                     <th className="p-3 w-10 text-center">
@@ -534,6 +545,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                             type="button"
                                             onClick={handleSelectAll}
                                             className="text-slate-600 hover:text-black"
+                                            aria-label={__('general.select_all')}
                                         >
                                             {selectedIds.length === tasks.length && tasks.length > 0 ? (
                                                 <CheckSquare className="h-4 w-4" />
@@ -542,18 +554,18 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                             )}
                                         </button>
                                     </th>
-                                    <th className="p-3 font-semibold">Task & Project</th>
-                                    <th className="p-3 font-semibold">Client & Loyalty Tier</th>
-                                    <th className="p-3 font-semibold">Billing & Stage</th>
-                                    <th className="p-3 font-semibold">SLA / Cairo Time</th>
-                                    <th className="p-3 font-semibold text-right">Actions</th>
+                                    <th className="p-3 font-semibold">{__('admin.pending_tasks_col_task_project')}</th>
+                                    <th className="p-3 font-semibold">{__('admin.pending_tasks_col_client_tier')}</th>
+                                    <th className="p-3 font-semibold">{__('admin.pending_tasks_col_billing_stage')}</th>
+                                    <th className="p-3 font-semibold">{__('admin.pending_tasks_col_sla')}</th>
+                                    <th className="p-3 font-semibold text-end">{__('general.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border/40">
                                 {tasks.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="p-8 text-center text-muted-foreground">
-                                            No pending tasks found for the selected criteria.
+                                            {__('admin.pending_tasks_empty')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -573,6 +585,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                         type="button"
                                                         onClick={() => toggleSelect(task.id)}
                                                         className="text-slate-600 hover:text-black"
+                                                        aria-label={__('general.select')}
                                                     >
                                                         {isSelected ? (
                                                             <CheckSquare className="h-4 w-4 text-black dark:text-white" />
@@ -589,7 +602,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                     </div>
                                                     {task.project && (
                                                         <div className="text-xs text-muted-foreground mt-0.5">
-                                                            Project:{' '}
+                                                            {__('admin.pending_tasks_project_label')}{' '}
                                                             <span className="font-medium text-slate-700 dark:text-slate-300">
                                                                 {task.project.name}
                                                             </span>
@@ -623,12 +636,12 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                                         {task.client.tier_name}
                                                                     </span>
                                                                     <span>•</span>
-                                                                    <span>{task.client.points_balance} PTS</span>
+                                                                    <span>{__('admin.pending_tasks_points', { points: task.client.points_balance })}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <span className="text-xs text-muted-foreground">Direct / Platform</span>
+                                                        <span className="text-xs text-muted-foreground">{__('admin.pending_tasks_direct_platform')}</span>
                                                     )}
                                                 </td>
 
@@ -643,20 +656,20 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                                         : 'bg-muted text-muted-foreground'
                                                                 }`}
                                                             >
-                                                                {task.billing_type === 'billable' ? 'Billable' : 'Non-Billable'}
+                                                                {task.billing_type === 'billable' ? __('admin.pending_tasks_billable') : __('admin.pending_tasks_non_billable')}
                                                             </span>
 
                                                             <span
                                                                 className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold rounded ${stageInfo.bg} ${stageInfo.text}`}
                                                             >
-                                                                {stageInfo.label}
+                                                                {__(stageInfo.labelKey)}
                                                             </span>
                                                         </div>
 
                                                         {task.billing_status === 'ignored' && (
                                                             <span className="inline-flex items-center gap-1 text-[11px] text-red-600 font-medium">
                                                                 <EyeOff className="h-3 w-3" />
-                                                                Ignored: {REASON_LABELS[task.ignore_reason || ''] || task.ignore_reason}
+                                                                {__('admin.pending_tasks_ignored_reason', { reason: reasonLabel(task.ignore_reason) })}
                                                             </span>
                                                         )}
                                                     </div>
@@ -667,22 +680,22 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                     {task.sla_due_at ? (
                                                         <div className="flex items-center gap-1 text-slate-800 dark:text-slate-200 font-medium">
                                                             <Clock className="h-3.5 w-3.5 text-slate-500" />
-                                                            <span>Due: {task.sla_due_at}</span>
+                                                            <span>{__('admin.pending_tasks_due', { date: task.sla_due_at })}</span>
                                                         </div>
                                                     ) : (
                                                         <div className="text-muted-foreground">
-                                                            Created: {task.created_at}
+                                                            {__('admin.pending_tasks_created', { date: task.created_at })}
                                                         </div>
                                                     )}
                                                     {task.ignored_at && (
                                                         <div className="text-[11px] text-muted-foreground mt-0.5">
-                                                            Ignored at: {task.ignored_at}
+                                                            {__('admin.pending_tasks_ignored_at', { date: task.ignored_at })}
                                                         </div>
                                                     )}
                                                 </td>
 
                                                 {/* Actions */}
-                                                <td className="p-3 text-right">
+                                                <td className="p-3 text-end">
                                                     <div className="inline-flex items-center gap-1.5">
                                                         {task.billing_status !== 'ignored' ? (
                                                             <>
@@ -692,7 +705,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                                     onClick={() => openUpdateModal(task)}
                                                                     className="h-7 text-xs hover:text-black"
                                                                 >
-                                                                    Stage & SLA
+                                                                    {__('admin.pending_tasks_action_stage_sla')}
                                                                 </Button>
                                                                 <Button
                                                                     size="sm"
@@ -700,7 +713,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                                     onClick={() => openIgnoreModal(task)}
                                                                     className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                                                                 >
-                                                                    Ignore
+                                                                    {__('admin.pending_tasks_action_ignore')}
                                                                 </Button>
                                                             </>
                                                         ) : (
@@ -711,7 +724,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                                 className="h-7 text-xs text-green-700 hover:text-green-800 hover:bg-green-50"
                                                             >
                                                                 <RotateCcw className="h-3 w-3 me-1" />
-                                                                Restore
+                                                                {__('admin.pending_tasks_action_restore')}
                                                             </Button>
                                                         )}
 
@@ -720,7 +733,8 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                                             variant="ghost"
                                                             onClick={() => setViewingAuditTask(task)}
                                                             className="h-7 px-2 text-slate-600 hover:text-black"
-                                                            title="View Audit Logs"
+                                                            title={__('admin.pending_tasks_view_audit')}
+                                                            aria-label={__('admin.pending_tasks_view_audit')}
                                                         >
                                                             <History className="h-3.5 w-3.5" />
                                                         </Button>
@@ -738,7 +752,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     {pagination.last_page > 1 && (
                         <div className="flex items-center justify-between p-3 border-t border-border/50 text-xs text-muted-foreground">
                             <span>
-                                Page {pagination.current_page} of {pagination.last_page} ({pagination.total} total items)
+                                {__('admin.pending_tasks_page_info', { current: pagination.current_page, last: pagination.last_page, total: pagination.total })}
                             </span>
                             <div className="flex items-center gap-2">
                                 <Button
@@ -747,8 +761,9 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     disabled={pagination.current_page <= 1}
                                     onClick={() => applyFilters({ page: pagination.current_page - 1 })}
                                     className="h-7 px-2"
+                                    aria-label={__('general.previous_page')}
                                 >
-                                    <ChevronLeft className="h-3.5 w-3.5" />
+                                    <ChevronLeft className="h-3.5 w-3.5 rtl:rotate-180" />
                                 </Button>
                                 <Button
                                     size="sm"
@@ -756,8 +771,9 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     disabled={pagination.current_page >= pagination.last_page}
                                     onClick={() => applyFilters({ page: pagination.current_page + 1 })}
                                     className="h-7 px-2"
+                                    aria-label={__('general.next_page')}
                                 >
-                                    <ChevronRight className="h-3.5 w-3.5" />
+                                    <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
                                 </Button>
                             </div>
                         </div>
@@ -770,10 +786,10 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold">
-                            Ignore Task from Billing Pipeline
+                            {__('admin.pending_tasks_ignore_title')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
-                            This task will be archived from active execution queues. It will never be deleted and remains restorable anytime.
+                            {__('admin.pending_tasks_ignore_description')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -785,14 +801,14 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                 </span>
                                 {ignoringTask.project && (
                                     <div className="text-muted-foreground mt-0.5">
-                                        Project: {ignoringTask.project.name}
+                                        {__('admin.pending_tasks_project_name', { name: ignoringTask.project.name })}
                                     </div>
                                 )}
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    Reason for Ignoring <span className="text-red-500">*</span>
+                                    {__('admin.pending_tasks_ignore_reason_label')} <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={ignoreForm.data.ignore_reason}
@@ -800,24 +816,21 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     className="w-full text-xs rounded border border-border bg-background p-2 text-slate-900 dark:text-white"
                                     required
                                 >
-                                    <option value="non_billable">Non-billable internal work</option>
-                                    <option value="duplicate">Duplicate task</option>
-                                    <option value="entry_error">Entry error / accidental submission</option>
-                                    <option value="free_promo">Complimentary / promotional</option>
-                                    <option value="client_cancelled">Client cancelled request</option>
-                                    <option value="other">Other reason</option>
+                                    {Object.entries(REASON_LABEL_KEYS).map(([value, labelKey]) => (
+                                        <option key={value} value={value}>{__(labelKey)}</option>
+                                    ))}
                                 </select>
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    Internal Notes (Audit Trail)
+                                    {__('admin.pending_tasks_internal_notes_label')}
                                 </label>
                                 <textarea
                                     rows={3}
                                     value={ignoreForm.data.ignore_notes}
                                     onChange={(e) => ignoreForm.setData('ignore_notes', e.target.value)}
-                                    placeholder="Explain why this task is being ignored..."
+                                    placeholder={__('admin.pending_tasks_internal_notes_placeholder')}
                                     className="w-full text-xs rounded border border-border bg-background p-2 text-slate-900 dark:text-white"
                                 />
                             </div>
@@ -829,14 +842,14 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     onClick={() => setIgnoringTask(null)}
                                     className="text-xs"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={ignoreForm.processing}
                                     className="bg-red-600 hover:bg-red-700 text-white text-xs"
                                 >
-                                    {ignoreForm.processing ? 'Saving...' : 'Confirm Ignore'}
+                                    {ignoreForm.processing ? __('general.saving') : __('admin.pending_tasks_confirm_ignore')}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -849,10 +862,10 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold">
-                            Update Task Status & SLA
+                            {__('admin.pending_tasks_update_title')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
-                            Update execution stage, classification, or target SLA turnaround time.
+                            {__('admin.pending_tasks_update_description')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -860,37 +873,36 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                         <form onSubmit={submitUpdate} className="space-y-4 py-2">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    Billing Type
+                                    {__('admin.pending_tasks_billing_type')}
                                 </label>
                                 <select
                                     value={updateForm.data.billing_type}
                                     onChange={(e) => updateForm.setData('billing_type', e.target.value as any)}
                                     className="w-full text-xs rounded border border-border bg-background p-2 text-slate-900 dark:text-white"
                                 >
-                                    <option value="billable">Billable</option>
-                                    <option value="non_billable">Non-Billable</option>
+                                    <option value="billable">{__('admin.pending_tasks_billable')}</option>
+                                    <option value="non_billable">{__('admin.pending_tasks_non_billable')}</option>
                                 </select>
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    Pending Stage / Reason
+                                    {__('admin.pending_tasks_pending_stage_label')}
                                 </label>
                                 <select
                                     value={updateForm.data.pending_reason}
                                     onChange={(e) => updateForm.setData('pending_reason', e.target.value)}
                                     className="w-full text-xs rounded border border-border bg-background p-2 text-slate-900 dark:text-white"
                                 >
-                                    <option value="waiting_client">Waiting Client Action</option>
-                                    <option value="waiting_execution">Waiting Execution</option>
-                                    <option value="waiting_review">Waiting Final Review</option>
-                                    <option value="ready_to_invoice">Ready to Invoice</option>
+                                    {Object.entries(STAGE_LABELS).map(([value, stage]) => (
+                                        <option key={value} value={value}>{__(stage.labelKey)}</option>
+                                    ))}
                                 </select>
                             </div>
 
                             <div className="space-y-1.5">
                                 <label className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    SLA Target Hours (Cairo Timezone)
+                                    {__('admin.pending_tasks_sla_hours_label')}
                                 </label>
                                 <Input
                                     type="number"
@@ -901,7 +913,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     className="h-9 text-xs"
                                 />
                                 <span className="text-[11px] text-muted-foreground">
-                                    Computes deadline automatically based on Cairo local time.
+                                    {__('admin.pending_tasks_sla_hours_hint')}
                                 </span>
                             </div>
 
@@ -912,14 +924,14 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                     onClick={() => setUpdatingTask(null)}
                                     className="text-xs"
                                 >
-                                    Cancel
+                                    {__('general.cancel')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={updateForm.processing}
                                     className="bg-black hover:bg-slate-800 text-white text-xs"
                                 >
-                                    {updateForm.processing ? 'Saving...' : 'Save Updates'}
+                                    {updateForm.processing ? __('general.saving') : __('admin.pending_tasks_save_updates')}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -933,10 +945,10 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                     <DialogHeader>
                         <DialogTitle className="text-lg font-bold flex items-center gap-2">
                             <History className="h-5 w-5 text-slate-800 dark:text-slate-200" />
-                            Task Audit History
+                            {__('admin.pending_tasks_audit_title')}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground">
-                            Immutable audit trail of state transitions, ignore reasons, and timestamps (Cairo Time).
+                            {__('admin.pending_tasks_audit_description')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -950,7 +962,7 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
 
                             {viewingAuditTask.audit_logs.length === 0 ? (
                                 <p className="text-xs text-center text-muted-foreground py-4">
-                                    No audit entries recorded yet for this task.
+                                    {__('admin.pending_tasks_audit_empty')}
                                 </p>
                             ) : (
                                 <div className="space-y-2.5">
@@ -969,17 +981,17 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                                             </div>
                                             {log.reason && (
                                                 <div className="mt-1 text-slate-700 dark:text-slate-300">
-                                                    <span className="text-muted-foreground">Reason:</span>{' '}
-                                                    {REASON_LABELS[log.reason] || log.reason}
+                                                    <span className="text-muted-foreground">{__('admin.pending_tasks_reason_label')}</span>{' '}
+                                                    {reasonLabel(log.reason)}
                                                 </div>
                                             )}
                                             {log.notes && (
                                                 <div className="mt-0.5 text-muted-foreground text-[11px]">
-                                                    Note: {log.notes}
+                                                    {__('admin.pending_tasks_note', { note: log.notes })}
                                                 </div>
                                             )}
                                             <div className="mt-1 text-[10px] text-muted-foreground">
-                                                By: {log.user_name}
+                                                {__('admin.pending_tasks_by', { name: log.user_name })}
                                             </div>
                                         </div>
                                     ))}
@@ -995,7 +1007,44 @@ export default function PendingTasks({ tasks, stats, filters, pagination }: Prop
                             onClick={() => setViewingAuditTask(null)}
                             className="text-xs"
                         >
-                            Close
+                            {__('general.close')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Modal: Bulk Ignore */}
+            <Dialog open={bulkIgnoreOpen} onOpenChange={setBulkIgnoreOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-bold">
+                            {__('admin.pending_tasks_bulk_ignore_title', { count: selectedIds.length })}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-muted-foreground">
+                            {__('admin.pending_tasks_ignore_description')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-1.5 py-2">
+                        <label htmlFor="bulk-ignore-reason" className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            {__('admin.pending_tasks_ignore_reason_label')}
+                        </label>
+                        <select
+                            id="bulk-ignore-reason"
+                            value={bulkIgnoreReason}
+                            onChange={(e) => setBulkIgnoreReason(e.target.value)}
+                            className="w-full text-xs rounded border border-border bg-background p-2 text-slate-900 dark:text-white"
+                        >
+                            {Object.entries(REASON_LABEL_KEYS).map(([value, labelKey]) => (
+                                <option key={value} value={value}>{__(labelKey)}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button type="button" variant="outline" onClick={() => setBulkIgnoreOpen(false)} className="text-xs">
+                            {__('general.cancel')}
+                        </Button>
+                        <Button type="button" onClick={submitBulkIgnore} className="bg-red-600 hover:bg-red-700 text-white text-xs">
+                            {__('admin.pending_tasks_confirm_ignore')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

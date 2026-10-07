@@ -12,13 +12,63 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { __ } from '@/lib/i18n';
-import { Sparkles, Loader2, FileText, Plus, Trash2, Send } from 'lucide-react';
+import { Sparkles, Loader2, Plus, Trash2, Send } from 'lucide-react';
 import axios from 'axios';
+import { toast } from 'sonner';
+
+interface MilestoneInvoiceDialogProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (title: string, amount: string) => void;
+}
+
+function MilestoneInvoiceDialog({ isOpen, onClose, onSubmit }: MilestoneInvoiceDialogProps) {
+    const [title, setTitle] = useState('');
+    const [amount, setAmount] = useState('');
+    const isValid = title.trim() !== '' && amount !== '' && !isNaN(Number(amount)) && Number(amount) > 0;
+
+    const close = () => {
+        setTitle('');
+        setAmount('');
+        onClose();
+    };
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!isValid) return;
+        onSubmit(title.trim(), amount);
+        close();
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+            <DialogContent className="sm:max-w-[420px]">
+                <DialogHeader>
+                    <DialogTitle>{__('admin.contract_milestone_invoice_title')}</DialogTitle>
+                </DialogHeader>
+                <form id="milestone-invoice-form" onSubmit={submit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="milestone-title">{__('admin.contract_milestone_title_label')}</Label>
+                        <Input id="milestone-title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="milestone-amount">{__('general.amount')}</Label>
+                        <Input id="milestone-amount" type="number" step="0.01" min="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                    </div>
+                </form>
+                <DialogFooter className="gap-2">
+                    <Button type="button" variant="outline" onClick={close}>{__('general.cancel')}</Button>
+                    <Button type="submit" form="milestone-invoice-form" disabled={!isValid}>{__('general.generate_invoice')}</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 export default function ContractModal({ isOpen, onClose, project, contract, currencies }) {
     const [isLoading, setIsLoading] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    
+
     const [formData, setFormData] = useState({
         description: '',
         payment_terms: '',
@@ -35,6 +85,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
 
     const [aiPrompt, setAiPrompt] = useState('');
     const [activeTab, setActiveTab] = useState('details'); // details, scope, pricing
+    const [milestoneDialogOpen, setMilestoneDialogOpen] = useState(false);
 
     useEffect(() => {
         if (contract) {
@@ -71,14 +122,17 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
     }, [contract, isOpen, project.client?.currency_id]);
 
     const handleGenerateAi = async () => {
-        if (!aiPrompt) return alert('Please enter requirements for the AI to generate the contract.');
+        if (!aiPrompt) {
+            toast.error(__('admin.contract_ai_prompt_required'));
+            return;
+        }
         setIsGenerating(true);
         try {
             const res = await axios.post('/contracts/ai/generate', {
                 project_id: project.id,
                 prompt: aiPrompt,
             });
-            
+
             const data = res.data;
             // The AI should return structured data. Merge it into form data.
             setFormData(prev => ({
@@ -92,29 +146,24 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 pricing_items: data.pricing_items || prev.pricing_items,
                 total_amount: data.total_amount || prev.total_amount,
             }));
-            
+
             setActiveTab('scope');
         } catch (error) {
             console.error('AI Generation Failed:', error);
-            alert('Failed to generate contract from AI. Check the console for errors.');
+            toast.error(__('admin.contract_ai_generate_failed'));
         } finally {
             setIsGenerating(false);
         }
     };
 
-    const handleGenerateInvoice = () => {
-        const title = prompt("Enter milestone title:");
-        if (!title) return;
-        const amount = prompt("Enter amount for this milestone:");
-        if (!amount || isNaN(Number(amount))) return alert("Invalid amount");
-        
+    const handleGenerateInvoice = (title: string, amount: string) => {
         router.post(route('projects.contracts.invoice', { project: project.id, contract: contract.id }), {
             title,
             amount,
-            description: `Milestone for ${project.project_name}`
+            description: __('admin.contract_milestone_description', { project: project.project_name }),
         }, {
             onSuccess: () => {
-                alert("Invoice generated successfully");
+                toast.success(__('admin.contract_invoice_generated'));
             }
         });
     };
@@ -122,12 +171,12 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
     const onSubmit = (e) => {
         e.preventDefault();
         setIsLoading(true);
-        
-        const routeName = contract 
-            ? 'projects.contracts.update' 
+
+        const routeName = contract
+            ? 'projects.contracts.update'
             : 'projects.contracts.store';
-        
-        const params = contract 
+
+        const params = contract
             ? { project: project.id, contract: contract.id }
             : { project: project.id };
 
@@ -154,9 +203,9 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
         ...p, key_features: p.key_features.filter((_, idx) => idx !== i)
     }));
 
-    const addPricing = () => setFormData(p => ({ 
-        ...p, 
-        pricing_items: [...p.pricing_items, { item: '', description: '', hours: 0, hourly_rate: 0, total: 0 }] 
+    const addPricing = () => setFormData(p => ({
+        ...p,
+        pricing_items: [...p.pricing_items, { item: '', description: '', hours: 0, hourly_rate: 0, total: 0 }]
     }));
     const updatePricing = (i, field, val) => setFormData(p => {
         const np = [...p.pricing_items];
@@ -174,27 +223,30 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{contract ? 'Edit Contract / Proposal' : 'Create New Contract / Proposal'}</DialogTitle>
+                    <DialogTitle>{contract ? __('admin.contract_edit_title') : __('admin.contract_create_title')}</DialogTitle>
                 </DialogHeader>
-                
+
                 <div className="flex border-b mb-4">
-                    <button 
+                    <button
+                        type="button"
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'details' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('details')}
                     >
                         {__('general.general_details')}</button>
-                    <button 
+                    <button
+                        type="button"
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'scope' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('scope')}
                     >
                         {__('general.scope_features')}</button>
-                    <button 
+                    <button
+                        type="button"
                         className={`px-4 py-2 font-medium text-sm ${activeTab === 'pricing' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'}`}
                         onClick={() => setActiveTab('pricing')}
                     >
                         {__('general.pricing_milestones')}</button>
                     {contract && (
-                        <button 
+                        <button
                             className={`px-4 py-2 font-medium text-sm ${activeTab === 'ai' ? 'border-b-2 border-slate-900 text-slate-900' : 'text-slate-500'} ms-auto flex items-center gap-1`}
                             onClick={() => setActiveTab('ai')}
                         >
@@ -205,21 +257,21 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                 {!contract && activeTab === 'details' && (
                     <div className="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-50 flex flex-col gap-3">
                         <div className="flex items-center gap-2 text-slate-900 font-semibold">
-                            <Sparkles className="w-5 h-5" /> Generate with AI (Recommended)
+                            <Sparkles className="w-5 h-5" /> {__('admin.contract_generate_with_ai')}
                         </div>
-                        <Textarea 
-                            placeholder={__('general.describe_the_project_requirements_featur')} 
+                        <Textarea
+                            placeholder={__('general.describe_the_project_requirements_featur')}
                             value={aiPrompt}
                             onChange={(e) => setAiPrompt(e.target.value)}
                             className="bg-white border-slate-200"
                             rows={3}
                         />
-                        <Button 
-                            onClick={handleGenerateAi} 
-                            disabled={isGenerating} 
+                        <Button
+                            onClick={handleGenerateAi}
+                            disabled={isGenerating}
                             className="self-end bg-slate-900 hover:bg-slate-900 text-white"
                         >
-                            {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.generating')}</> : 'Generate Contract'}
+                            {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.generating')}</> : __('admin.contract_generate_contract')}
                         </Button>
                     </div>
                 )}
@@ -228,9 +280,9 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     {activeTab === 'details' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="md:col-span-2">
-                                <Label>Project Description / Objective</Label>
-                                <Textarea 
-                                    value={formData.description} 
+                                <Label>{__('admin.contract_description_label')}</Label>
+                                <Textarea
+                                    value={formData.description}
                                     onChange={e => setFormData({...formData, description: e.target.value})}
                                     rows={4}
                                     placeholder={__('general.executive_summary_of_the_project')}
@@ -238,7 +290,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             </div>
                             <div>
                                 <Label>{__('general.currency')}</Label>
-                                <select 
+                                <select
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     value={formData.currency_id}
                                     onChange={e => setFormData({...formData, currency_id: e.target.value})}
@@ -252,33 +304,33 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                             </div>
                             <div>
                                 <Label>{__('general.total_amount')}</Label>
-                                <Input 
-                                    type="number" 
-                                    step="0.01" 
-                                    value={formData.total_amount} 
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={formData.total_amount}
                                     onChange={e => setFormData({...formData, total_amount: e.target.value})}
                                     required
                                 />
                             </div>
                             <div>
-                                <Label>Duration (e.g., 3 Months)</Label>
-                                <Input 
-                                    value={formData.duration} 
+                                <Label>{__('admin.contract_duration_label')}</Label>
+                                <Input
+                                    value={formData.duration}
                                     onChange={e => setFormData({...formData, duration: e.target.value})}
                                 />
                             </div>
                             <div>
                                 <Label>{__('general.valid_until')}</Label>
-                                <Input 
-                                    type="date" 
-                                    value={formData.valid_until} 
+                                <Input
+                                    type="date"
+                                    value={formData.valid_until}
                                     onChange={e => setFormData({...formData, valid_until: e.target.value})}
                                 />
                             </div>
                             {contract && (
                                 <div>
                                     <Label>{__('general.contract_status')}</Label>
-                                    <select 
+                                    <select
                                         className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                                         value={formData.status}
                                         onChange={e => setFormData({...formData, status: e.target.value})}
@@ -297,35 +349,35 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                         <div className="space-y-4">
                             <div>
                                 <div className="flex justify-end gap-4 items-center mb-2">
-                                    <Label className="text-base font-semibold">Key Features / Scope of Work</Label>
+                                    <Label className="text-base font-semibold">{__('admin.contract_key_features_label')}</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addFeature}>
                                         <Plus className="w-4 h-4 me-1" /> {__('general.add_feature')}</Button>
                                 </div>
                                 <div className="space-y-2">
                                     {formData.key_features.map((feature, idx) => (
                                         <div key={idx} className="flex items-center gap-2">
-                                            <Input 
-                                                value={feature} 
-                                                onChange={e => updateFeature(idx, e.target.value)} 
-                                                placeholder={`Feature ${idx + 1}`}
+                                            <Input
+                                                value={feature}
+                                                onChange={e => updateFeature(idx, e.target.value)}
+                                                placeholder={__('admin.contract_feature_placeholder', { number: idx + 1 })}
                                             />
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(idx)} className="text-red-500 hover:bg-red-50 hover:text-red-700">
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(idx)} className="text-red-500 hover:bg-red-50 hover:text-red-700" aria-label={__('admin.contract_remove_feature')}>
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
                                     ))}
                                     {formData.key_features.length === 0 && (
                                         <div className="text-center p-4 border border-dashed rounded text-slate-500 text-sm">
-                                            No features added. Click "Add Feature" or use AI to generate.
+                                            {__('admin.contract_no_features')}
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="pt-4 border-t">
                                 <Label className="text-base font-semibold block mb-2">{__('general.general_terms_conditions')}</Label>
-                                <Textarea 
-                                    value={formData.terms} 
+                                <Textarea
+                                    value={formData.terms}
                                     onChange={e => setFormData({...formData, terms: e.target.value})}
                                     rows={6}
                                     placeholder={__('general.legal_terms_responsibilities_etc')}
@@ -338,7 +390,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                         <div className="space-y-4">
                             <div>
                                 <div className="flex justify-end gap-4 items-center mb-2">
-                                    <Label className="text-base font-semibold">Pricing Items (Quotation)</Label>
+                                    <Label className="text-base font-semibold">{__('admin.contract_pricing_items_label')}</Label>
                                     <Button type="button" variant="outline" size="sm" onClick={addPricing}>
                                         <Plus className="w-4 h-4 me-1" /> {__('general.add_item')}</Button>
                                 </div>
@@ -353,7 +405,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                                     <Input placeholder={__('general.description')} value={item.description} onChange={e => updatePricing(idx, 'description', e.target.value)} />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-xs">Hours/Qty</Label>
+                                                    <Label className="text-xs">{__('admin.contract_hours_qty')}</Label>
                                                     <Input type="number" placeholder={__('general.hours')} value={item.hours} onChange={e => updatePricing(idx, 'hours', e.target.value)} />
                                                 </div>
                                                 <div>
@@ -365,7 +417,7 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                                     <Input type="number" disabled value={item.total} className="bg-slate-100" />
                                                 </div>
                                             </div>
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => removePricing(idx)} className="text-red-500 mt-6">
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => removePricing(idx)} className="text-red-500 mt-6" aria-label={__('admin.contract_remove_pricing_item')}>
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
@@ -376,14 +428,14 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="pt-4 border-t">
-                                <Label className="text-base font-semibold block mb-2">Payment Terms (Milestones)</Label>
-                                <Textarea 
-                                    value={formData.payment_terms} 
+                                <Label className="text-base font-semibold block mb-2">{__('admin.contract_payment_terms_label')}</Label>
+                                <Textarea
+                                    value={formData.payment_terms}
                                     onChange={e => setFormData({...formData, payment_terms: e.target.value})}
                                     rows={4}
-                                    placeholder="e.g. 50% upfront, 25% after UI, 25% upon delivery..."
+                                    placeholder={__('admin.contract_payment_terms_placeholder')}
                                 />
                             </div>
 
@@ -391,33 +443,33 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                                 <div className="pt-4 border-t flex items-center justify-end gap-4">
                                     <div className="text-sm text-slate-600">
                                         {__('general.you_can_generate_invoices_dynamically_fr')}</div>
-                                    <Button type="button" variant="outline" onClick={handleGenerateInvoice}>
+                                    <Button type="button" variant="outline" onClick={() => setMilestoneDialogOpen(true)}>
                                         <Send className="w-4 h-4 me-2" /> {__('general.generate_invoice')}</Button>
                                 </div>
                             )}
                         </div>
                     )}
-                    
+
                     {activeTab === 'ai' && contract && (
                         <div className="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-50 flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-slate-900 font-semibold">
                                 <Sparkles className="w-5 h-5" /> {__('general.refine_with_ai')}</div>
                             <p className="text-sm text-slate-900 mb-2">
-                                Describe the changes you want to make to this contract (e.g., "Add a milestone for testing", "Change the duration to 6 months and adjust pricing accordingly"). The AI will create a new version.
+                                {__('admin.contract_refine_help')}
                             </p>
-                            <Textarea 
-                                placeholder={__('general.instructions_for_ai')} 
+                            <Textarea
+                                placeholder={__('general.instructions_for_ai')}
                                 value={aiPrompt}
                                 onChange={(e) => setAiPrompt(e.target.value)}
                                 className="bg-white border-slate-200"
                                 rows={3}
                             />
-                            <Button 
-                                onClick={handleGenerateAi} 
-                                disabled={isGenerating} 
+                            <Button
+                                onClick={handleGenerateAi}
+                                disabled={isGenerating}
                                 className="self-end bg-slate-900 hover:bg-slate-900 text-white"
                             >
-                                {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.processing')}</> : 'Refine Contract'}
+                                {isGenerating ? <><Loader2 className="w-4 h-4 me-2 animate-spin" /> {__('general.processing')}</> : __('admin.contract_refine_contract')}
                             </Button>
                         </div>
                     )}
@@ -428,9 +480,16 @@ export default function ContractModal({ isOpen, onClose, project, contract, curr
                     <Button variant="outline" onClick={onClose} type="button">{__('general.cancel')}</Button>
                     <Button type="submit" form="contract-form" disabled={isLoading || isGenerating}>
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : null}
-                        {contract ? 'Update Contract (Creates new version)' : 'Create Contract'}
+                        {contract ? __('admin.contract_update_contract') : __('admin.contract_create_contract')}
                     </Button>
                 </DialogFooter>
+            {contract && (
+                <MilestoneInvoiceDialog
+                    isOpen={milestoneDialogOpen}
+                    onClose={() => setMilestoneDialogOpen(false)}
+                    onSubmit={handleGenerateInvoice}
+                />
+            )}
             </DialogContent>
         </Dialog>
     );

@@ -70,6 +70,11 @@ class AdminTransactionController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate([
+            'from_date' => ['nullable', 'date'],
+            'to_date' => ['nullable', 'date'],
+        ]);
+
         $filters = $request->only([
             'user',
             'project',
@@ -89,6 +94,10 @@ class AdminTransactionController extends Controller
         ]);
         $type = $filters['type'] ?? 'income'; // income, cost, revenue
 
+        if (! in_array($type, ['income', 'cost', 'revenue'], true)) {
+            return redirect()->route('admin.transactions.index', array_merge($filters, ['type' => 'income']));
+        }
+
         $filteredUser = null;
         if (! empty($filters['user'])) {
             $u = User::find($filters['user']);
@@ -105,7 +114,6 @@ class AdminTransactionController extends Controller
         }
 
         $filterOptions = [
-            'users' => User::select('id', 'name', 'email')->orderBy('name')->get(),
             'projects' => Project::select('id', 'project_name', 'user_id')->orderBy('project_name')->get(),
             'currencies' => Currency::select('id', 'currency', 'symbol')->get(),
             'types' => ['received', 'earned', 'used', 'refunded', 'sent'],
@@ -140,7 +148,7 @@ class AdminTransactionController extends Controller
                 'summary' => $summary,
                 'businessCurrency' => $businessCurrency,
             ]);
-        } elseif ($type === 'revenue') {
+        } else {
             $income = $this->transactionService->getIncomeTransactions($filters);
             $cost = $this->transactionService->getCostTransactions($filters);
 
@@ -162,14 +170,6 @@ class AdminTransactionController extends Controller
                 ],
             ]);
         }
-
-        return Inertia::render('Admin/Transactions/Index', [
-            'filters' => $filters,
-            'filteredUser' => $filteredUser,
-            'filterOptions' => $filterOptions,
-            'summary' => $summary,
-            'businessCurrency' => $businessCurrency,
-        ]);
     }
 
     public function store(Request $request)

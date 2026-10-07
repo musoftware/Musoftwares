@@ -8,6 +8,17 @@ import type { ProjectStatus } from '@/types/project';
 
 export const PROJECT_STATUS_OPTIONS: ProjectStatus[] = ['open', 'hold_on', 'closed'];
 
+const PROJECT_STATUS_LABEL_KEYS: Record<string, string> = {
+    open: 'admin.projects_status_open',
+    hold_on: 'admin.projects_status_hold_on',
+    closed: 'admin.projects_status_closed',
+};
+
+/** Translated label for a project status value; falls back to the raw value for unknown statuses. */
+export function projectStatusLabel(status: string): string {
+    return PROJECT_STATUS_LABEL_KEYS[status] ? __(PROJECT_STATUS_LABEL_KEYS[status]) : status.replace('_', ' ');
+}
+
 export type ProjectFormState = {
     user_id: string;
     project_name: string;
@@ -19,7 +30,7 @@ export type ProjectFormState = {
     date_start: string;
     date_end: string;
     hide_future_tasks: boolean;
-    
+
     // Portfolio fields
     show_on_landing_portfolio: boolean;
     portfolio_category: string;
@@ -44,7 +55,7 @@ export const EMPTY_PROJECT_FORM: ProjectFormState = {
     date_start: '',
     date_end: '',
     hide_future_tasks: true,
-    
+
     // Portfolio fields
     show_on_landing_portfolio: false,
     portfolio_category: 'Platform',
@@ -71,7 +82,7 @@ export function projectToForm(project: any): ProjectFormState {
         date_start: project.date_start ?? '',
         date_end: project.date_end ?? '',
         hide_future_tasks: Boolean(project.hide_future_tasks),
-        
+
         // Portfolio fields
         show_on_landing_portfolio: Boolean(project.show_on_landing_portfolio),
         portfolio_category: project.portfolio_category ?? 'Platform',
@@ -98,7 +109,7 @@ export function formToPayload(form: ProjectFormState): Record<string, any> {
         date_start: form.date_start || null,
         date_end: form.date_end || null,
         hide_future_tasks: form.hide_future_tasks,
-        
+
         // Portfolio fields
         show_on_landing_portfolio: form.show_on_landing_portfolio ? 1 : 0,
         portfolio_category: form.portfolio_category || null,
@@ -109,11 +120,11 @@ export function formToPayload(form: ProjectFormState): Record<string, any> {
         portfolio_github_url: form.portfolio_github_url || null,
         portfolio_sort_order: form.portfolio_sort_order ? Number(form.portfolio_sort_order) : 0,
     };
-    
+
     if (form.portfolio_image_file) {
         payload.portfolio_image_file = form.portfolio_image_file;
     }
-    
+
     Object.keys(payload).forEach((k) => {
         if (payload[k] === '' || payload[k] === null) delete payload[k];
     });
@@ -175,7 +186,7 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                 >
                     {PROJECT_STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s}>
-                            {s.replace('_', ' ')}
+                            {projectStatusLabel(s)}
                         </option>
                     ))}
                 </select>
@@ -257,17 +268,17 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                     disabled={disabled}
                 />
                 <Label htmlFor="show_on_landing_portfolio" className="cursor-pointer font-semibold text-indigo-600">
-                    {__('general.show_on_landing_portfolio') || 'Show on Landing Portfolio'}
+                    {__('general.show_on_landing_portfolio')}
                 </Label>
             </div>
 
             {form.show_on_landing_portfolio && (
                 <div className="sm:col-span-2 border-t border-slate-100 pt-4 mt-2 space-y-4">
-                    <h3 className="text-sm font-bold text-slate-700">{__('general.portfolio_details') || 'Portfolio Details'}</h3>
-                    
+                    <h3 className="text-sm font-bold text-slate-700">{__('general.portfolio_details')}</h3>
+
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <Label htmlFor="portfolio_title">{__('general.portfolio_title') || 'Portfolio Title'}</Label>
+                            <Label htmlFor="portfolio_title">{__('general.portfolio_title')}</Label>
                             <Input
                                 id="portfolio_title"
                                 value={form.portfolio_title}
@@ -277,28 +288,28 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                             />
                         </div>
                         <div>
-                            <Label htmlFor="portfolio_category">{__('general.portfolio_category') || 'Category'}</Label>
+                            <Label htmlFor="portfolio_category">{__('general.portfolio_category')}</Label>
                             <Input
                                 id="portfolio_category"
                                 value={form.portfolio_category}
                                 onChange={(e) => setForm((prev) => ({ ...prev, portfolio_category: e.target.value }))}
-                                placeholder="Platform, SaaS, E-Commerce..."
+                                placeholder={__('admin.project_form_portfolio_category_placeholder')}
                                 disabled={disabled}
                             />
                         </div>
                         <div className="sm:col-span-2">
-                            <Label htmlFor="portfolio_description">{__('general.portfolio_description') || 'Portfolio Description'}</Label>
+                            <Label htmlFor="portfolio_description">{__('general.portfolio_description')}</Label>
                             <Textarea
                                 id="portfolio_description"
                                 rows={3}
                                 value={form.portfolio_description}
                                 onChange={(e) => setForm((prev) => ({ ...prev, portfolio_description: e.target.value }))}
-                                placeholder={form.description || 'Describe the project outcomes and features...'}
+                                placeholder={form.description || __('admin.project_form_portfolio_description_placeholder')}
                                 disabled={disabled}
                             />
                         </div>
                         <div>
-                            <Label htmlFor="portfolio_live_url">{__('general.portfolio_live_url') || 'Website Link (Live URL)'}</Label>
+                            <Label htmlFor="portfolio_live_url">{__('general.portfolio_live_url')}</Label>
                             <Input
                                 id="portfolio_live_url"
                                 type="url"
@@ -309,7 +320,7 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                             />
                         </div>
                         <div>
-                            <Label htmlFor="portfolio_github_url">{__('general.portfolio_github_url') || 'GitHub Link (Optional)'}</Label>
+                            <Label htmlFor="portfolio_github_url">{__('general.portfolio_github_url')}</Label>
                             <Input
                                 id="portfolio_github_url"
                                 type="url"
@@ -320,7 +331,7 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                             />
                         </div>
                         <div>
-                            <Label htmlFor="portfolio_tech">{__('general.portfolio_tech') || 'Technologies (comma separated)'}</Label>
+                            <Label htmlFor="portfolio_tech">{__('general.portfolio_tech')}</Label>
                             <Input
                                 id="portfolio_tech"
                                 value={form.portfolio_tech}
@@ -330,7 +341,7 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                             />
                         </div>
                         <div>
-                            <Label htmlFor="portfolio_sort_order">{__('general.portfolio_sort_order') || 'Sort Order'}</Label>
+                            <Label htmlFor="portfolio_sort_order">{__('general.portfolio_sort_order')}</Label>
                             <Input
                                 id="portfolio_sort_order"
                                 type="number"
@@ -339,9 +350,9 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                                 disabled={disabled}
                             />
                         </div>
-                        
+
                         <div className="sm:col-span-2">
-                            <Label htmlFor="portfolio_image_file">{__('general.portfolio_image') || 'Website Screenshot (Large Image)'}</Label>
+                            <Label htmlFor="portfolio_image_file">{__('general.portfolio_image')}</Label>
                             <Input
                                 id="portfolio_image_file"
                                 type="file"
@@ -354,17 +365,17 @@ export function ProjectFormFields({ form, setForm, includeClient, disabled, init
                                 className="mt-1"
                             />
                             <p className="text-xs text-slate-400 mt-1">
-                                {__('general.portfolio_image_help') || 'Upload a full website screenshot. The system will automatically crop the top portion for previews and keep the full version for details.'}
+                                {__('general.portfolio_image_help')}
                             </p>
                             {form.portfolio_image_preview && (
                                 <div className="mt-2 relative w-48 h-32 border rounded overflow-hidden bg-slate-50">
-                                    <img 
-                                        src={form.portfolio_image_preview} 
-                                        alt="Current preview" 
-                                        className="w-full h-full object-cover" 
+                                    <img
+                                        src={form.portfolio_image_preview}
+                                        alt={__('admin.project_form_current_preview')}
+                                        className="w-full h-full object-cover"
                                     />
-                                    <span className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
-                                        Current Image
+                                    <span className="absolute bottom-1 end-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                        {__('admin.project_form_current_image')}
                                     </span>
                                 </div>
                             )}

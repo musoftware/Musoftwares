@@ -43,19 +43,19 @@ export default function Documentation() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
-                                        <h3 className="text-lg font-bold text-slate-800">1. Include the Script</h3>
+                                        <h3 className="text-lg font-bold text-slate-800">{__('sms_gateway.docs_step_include_script')}</h3>
                                         <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
                                             <pre className="text-emerald-400 text-sm">
                                                 <code>{`<script src="${window.location.origin}/js/smspay.js"></script>`}</code>
                                             </pre>
                                         </div>
 
-                                        <h3 className="text-lg font-bold text-slate-800 mt-6">2. Trigger Checkout</h3>
+                                        <h3 className="text-lg font-bold text-slate-800 mt-6">{__('sms_gateway.docs_step_trigger_checkout')}</h3>
                                         <p className="text-slate-600 text-sm">{__('general.use_the_session_id_you_created_on_your_backend_and_your')}<strong>{__('general.publishable_key')}</strong>.</p>
                                         
                                         <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
                                             <pre className="text-slate-300 text-sm">
-<code>{`<button id="pay-button">{__('general.pay_now')}</button>
+<code>{`<button id="pay-button">Pay Now</button>
 
 <script>
   // Initialize with your PUBLISHABLE KEY
@@ -66,11 +66,11 @@ export default function Documentation() {
     smspay.checkout({
       sessionId: 'cs_xyz123', // ID generated on your backend
       onSuccess: function(result) {
-        console.log('Payment successful!', result);
+        // Show a thank-you page. Fulfill the order only from your verified webhook.
         window.location.href = '/success';
       },
       onCancel: function() {
-        console.log('User closed the modal');
+        // The user closed the modal without paying.
       },
       onError: function(error) {
         console.error('Payment error', error);
@@ -90,12 +90,12 @@ export default function Documentation() {
                             <div className="space-y-6">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>SDK Integration (Backend)</CardTitle>
+                                        <CardTitle>{__('sms_gateway.docs_sdk_backend')}</CardTitle>
                                         <CardDescription>{__('general.integrate_the_sms_payment_gateway_directly_into_your_backend_to_create_sessions')}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-slate-800">1. Download the SDK</h3>
+                                            <h3 className="text-lg font-bold text-slate-800">{__('sms_gateway.docs_step_download_sdk')}</h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
                                                     <div>
@@ -121,7 +121,7 @@ export default function Documentation() {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-slate-800">2. Create a Checkout Session</h3>
+                                            <h3 className="text-lg font-bold text-slate-800">{__('sms_gateway.docs_step_create_session')}</h3>
                                             <p className="text-slate-600 text-sm">{__('general.when_your_customer_wants_to_pay_create_a_checkout_session_on_your_server_using_your')}<strong>{__('general.secret_key')}</strong>.</p>
                                             
                                             <Tabs defaultValue="php" className="w-full mt-2">
@@ -261,7 +261,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-bold text-slate-800">1. Download the Plugin</h3>
+                                            <h3 className="text-lg font-bold text-slate-800">{__('sms_gateway.docs_step_download_plugin')}</h3>
                                             <div className="bg-slate-900 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                 <div>
                                                     <div className="text-xs text-slate-400 font-bold mb-2">{__('sms_gateway.wordpress_plugin')}</div>
@@ -287,23 +287,15 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                     <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-900 mt-8">
                         <CardHeader>
                             <CardTitle className="text-amber-800 dark:text-amber-500 flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5" /> 
-                                Security Best Practices / ممارسات الأمان
+                                <AlertTriangle className="w-5 h-5" />
+                                {__('sms_gateway.docs_security_title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6 text-sm text-amber-900/80 dark:text-amber-200/80">
-                            <div>
-                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">{__('general.english')}</h4>
-                                <p>
-                                    <strong>{__('general.never_rely_on_the_frontend')}<code>onSuccess</code>{__('general.callback_to_fulfill_orders')}</strong><br/>{__('general.client_side_code_can_be_easily_manipulated_or_bypassed_by_users_hijacking_the')}<code>onSuccess</code>{__('general.event_is_strictly_for_ui_purposes_such_as_redirecting_the_user_to_a_thank_you_page_to_securely_verify_that_a_payment_was_successful_you_must_use')}<strong>{__('general.webhooks')}</strong>{__('general.or_server_side_api_verification_exactly_as_implemented_by_major_gateways_like_stripe')}</p>
-                            </div>
-                            <div  className="text-end font-sans">
-                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">عربي</h4>
-                                <p>
-                                    <strong>لا تعتمد أبداً على دالة <code>onSuccess</code> في واجهة المستخدم لتأكيد الطلبات.</strong><br/>
-                                    يمكن للمستخدمين التلاعب بسهولة بالكود من جهة المتصفح وتخطي عملية الدفع. حدث <code>onSuccess</code> مصمم فقط لتحسين تجربة المستخدم (مثل توجيهه لصفحة شكر). لكي تتأكد بأمان تام من نجاح الدفع، يجب عليك استخدام <strong>{__('general.webhooks')}</strong> أو التحقق من جانب السيرفر (Server-Side Verification)، تماماً كما تفعل بوابات الدفع العالمية مثل Stripe.
-                                </p>
-                            </div>
+                            <p>
+                                <strong>{__('sms_gateway.docs_security_never_rely')}</strong><br/>
+                                {__('sms_gateway.docs_security_body')}
+                            </p>
                         </CardContent>
                     </Card>
                 </div>

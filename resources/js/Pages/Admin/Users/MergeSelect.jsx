@@ -77,27 +77,26 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
 
     return (
         <AdminSidebarLayout auth={{ user: survivor }}>
-            <Head title={`Merge into #${survivor.id}`} />
+            <Head title={`${__('general.merge_accounts_into')} #${survivor.id}`} />
 
             <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <p className="text-xs font-semibold tracking-wider uppercase text-slate-500">
-                            {__('general.users') || 'Users'} · {__('general.merge') || 'Merge'}
+                            {__('general.users')} · {__('general.merge')}
                         </p>
                         <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 flex items-center gap-3">
                             <GitMerge className="h-7 w-7 text-indigo-600" />
-                            {__('general.merge_accounts_into') || 'Merge accounts into'} #{survivor.id}
+                            {__('general.merge_accounts_into')} #{survivor.id}
                         </h1>
                         <p className="mt-1 text-sm text-slate-500">
-                            {__('general.merge_select_intro') ||
-                                'Search for the duplicate accounts you want to absorb into this survivor. You can pick one or many. The merge review screen will show every conflict before anything is committed.'}
+                            {__('general.merge_select_intro')}
                         </p>
                     </div>
                     <Button asChild variant="outline">
                         <Link href={route('admin.users.show', survivor.id)}>
-                            <ArrowLeft className="me-2 h-4 w-4" />
-                            {__('general.back_to_user') || 'Back to user'}
+                            <ArrowLeft className="me-2 h-4 w-4 rtl:rotate-180" />
+                            {__('general.back_to_user')}
                         </Link>
                     </Button>
                 </div>
@@ -110,7 +109,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                         <div className="min-w-0 flex-1">
                             <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-2">
                                 <ShieldCheck className="h-3.5 w-3.5" />
-                                {__('general.survivor_primary_account') || 'Survivor (primary account)'}
+                                {__('general.survivor_primary_account')}
                             </div>
                             <div className="mt-1 text-lg font-semibold text-slate-900 truncate">
                                 {survivor.name || '—'}
@@ -128,7 +127,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                 {survivor.email_verified_at && (
                                     <span className="inline-flex items-center gap-1 text-emerald-700 text-xs font-semibold">
                                         <CheckCircle2 className="h-3.5 w-3.5" />
-                                        {__('general.email_verified') || 'Email verified'}
+                                        {__('general.email_verified')}
                                     </span>
                                 )}
                             </div>
@@ -140,11 +139,10 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                     <div className="p-5 sm:p-6 border-b border-slate-100">
                         <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                             <Search className="h-4 w-4 text-slate-500" />
-                            {__('general.find_duplicate_accounts') || 'Find duplicate accounts'}
+                            {__('general.find_duplicate_accounts')}
                         </h2>
                         <p className="mt-1 text-sm text-slate-500">
-                            {__('general.merge_search_help') ||
-                                'Search by user ID, name, or email. Each result can be reviewed before merging. The survivor is always excluded automatically.'}
+                            {__('general.merge_search_help')}
                         </p>
                         <form
                             onSubmit={(e) => {
@@ -166,13 +164,14 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                     type="search"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder={__('general.merge_search_placeholder') || 'Search by ID, name, or email…'}
+                                    placeholder={__('general.merge_search_placeholder')}
+                                    aria-label={__('general.merge_search_placeholder')}
                                     className="ps-9 h-11"
                                     autoFocus
                                 />
                             </div>
                             <Button type="submit" variant="outline" className="h-11">
-                                {__('general.search') || 'Search'}
+                                {__('general.search')}
                             </Button>
                             {search && (
                                 <Button
@@ -189,7 +188,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                         );
                                     }}
                                 >
-                                    {__('general.clear') || 'Clear'}
+                                    {__('general.clear')}
                                 </Button>
                             )}
                         </form>
@@ -205,9 +204,8 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                 <div className="flex items-center justify-between mb-3">
                                 <div className="text-xs uppercase tracking-wider font-bold text-slate-500">
                                     {suggestions.length === 1
-                                        ? __('general.one_result') || '1 result'
-                                        : __('general.n_results', { count: suggestions.length }) ||
-                                          `${suggestions.length} results`}
+                                        ? __('general.one_result')
+                                        : __('general.n_results', { count: suggestions.length })}
                                 </div>
                                     <div className="flex items-center gap-2">
                                         {selected.length > 0 && (
@@ -216,7 +214,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                                 onClick={clearSelection}
                                                 className="text-xs font-semibold text-slate-500 hover:text-slate-900 underline-offset-2 hover:underline"
                                             >
-                                                {__('general.clear_selection') || 'Clear selection'}
+                                                {__('general.clear_selection')}
                                             </button>
                                         )}
                                         <button
@@ -224,7 +222,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                             onClick={selectAll}
                                             className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline-offset-2 hover:underline"
                                         >
-                                            {__('general.select_all_results') || 'Select all'}
+                                            {__('general.select_all_results')}
                                         </button>
                                     </div>
                                 </div>
@@ -243,6 +241,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                                     className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                                     checked={checked}
                                                     onChange={() => toggle(s.id)}
+                                                    aria-label={s.email || `#${s.id}`}
                                                 />
                                                 <div className="h-9 w-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-sm shrink-0">
                                                     {(s.name || s.email || '?').charAt(0).toUpperCase()}
@@ -261,12 +260,12 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                                         {s.email_verified ? (
                                                             <span className="inline-flex items-center gap-1 text-emerald-700 text-[10px] font-semibold">
                                                                 <CheckCircle2 className="h-3 w-3" />
-                                                                {__('general.verified') || 'Verified'}
+                                                                {__('general.verified')}
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex items-center gap-1 text-amber-700 text-[10px] font-semibold">
                                                                 <AlertTriangle className="h-3 w-3" />
-                                                                {__('general.unverified') || 'Unverified'}
+                                                                {__('general.unverified')}
                                                             </span>
                                                         )}
                                                     </div>
@@ -285,7 +284,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                     <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
                         <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
                             <Info className="h-4 w-4 text-slate-500" />
-                            {__('general.recently_merged_into_this_account') || 'Recently merged into this account'}
+                            {__('general.recently_merged_into_this_account')}
                         </h2>
                         <ul className="mt-3 divide-y divide-slate-200/70 rounded-lg border border-slate-200 bg-white">
                             {recently_merged.map((m) => (
@@ -308,20 +307,19 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                     <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div className="text-sm text-slate-600">
                             {selected.length === 0 ? (
-                                <span>{__('general.no_duplicates_selected') || 'No duplicates selected yet.'}</span>
+                                <span>{__('general.no_duplicates_selected')}</span>
                             ) : (
                                 <span className="font-semibold text-slate-900">
                                     {selected.length === 1
-                                        ? __('general.one_duplicate_selected') || '1 duplicate selected'
-                                        : __('general.n_duplicates_selected_plain', { count: selected.length }) ||
-                                          `${selected.length} duplicates selected`}
+                                        ? __('general.one_duplicate_selected')
+                                        : __('general.n_duplicates_selected_plain', { count: selected.length })}
                                 </span>
                             )}
                         </div>
                         <div className="flex items-center gap-2">
                             <Button asChild variant="outline">
                                 <Link href={route('admin.users.show', survivor.id)}>
-                                    {__('general.cancel') || 'Cancel'}
+                                    {__('general.cancel')}
                                 </Link>
                             </Button>
                             <Button
@@ -330,7 +328,7 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                                 className="bg-indigo-600 hover:bg-indigo-700"
                             >
                                 <GitMerge className="me-2 h-4 w-4" />
-                                {__('general.continue_to_review') || 'Continue to merge review'}
+                                {__('general.continue_to_review')}
                             </Button>
                         </div>
                     </div>
@@ -347,11 +345,10 @@ function EmptySearchState() {
                 <Search className="h-5 w-5 text-slate-400" />
             </div>
             <p className="text-sm font-semibold text-slate-800">
-                {__('general.start_typing_to_search') || 'Start typing to search'}
+                {__('general.start_typing_to_search')}
             </p>
             <p className="mt-1 text-xs text-slate-500 max-w-sm">
-                {__('general.merge_empty_state_help') ||
-                    'Enter a user ID (e.g. 1234), part of a name, or an email address. Matching accounts will appear here for you to select.'}
+                {__('general.merge_empty_state_help')}
             </p>
         </div>
     );
@@ -364,11 +361,10 @@ function NoResultsState({ query }) {
                 <AlertTriangle className="h-5 w-5 text-amber-500" />
             </div>
             <p className="text-sm font-semibold text-amber-900">
-                {__('general.no_matching_users') || 'No matching accounts'}
+                {__('general.no_matching_users')}
             </p>
             <p className="mt-1 text-xs text-amber-700 max-w-sm">
-                {__('general.no_matches_for_query', { query }) ||
-                    `We couldn't find any active accounts for "${query}". Try a different name, email, or numeric ID.`}
+                {__('general.no_matches_for_query', { query })}
             </p>
         </div>
     );

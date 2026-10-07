@@ -6,14 +6,20 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { ExternalLink, RefreshCw } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function TransactionUserCard({ user }) {
     const [recalcLoading, setRecalcLoading] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
 
     if (!user) return null;
 
-    const handleRecalc = () => {
-        if (!confirm(__('general.confirm_recalc_balance') || 'Recalculate this user\'s balance from their transaction history?')) return;
+    const handleRecalc = async () => {
+        const accepted = await confirm({
+            title: __('general.confirm_recalc_balance'),
+            confirmLabel: __('general.recalc_balance'),
+        });
+        if (!accepted) return;
         setRecalcLoading(true);
         router.post(`/admin/transactions/recalc-balance/${user.id}`, {}, {
             preserveScroll: true,
@@ -55,7 +61,7 @@ export default function TransactionUserCard({ user }) {
                             className="gap-2 text-yellow-700 border-yellow-200 hover:bg-yellow-50"
                         >
                             <RefreshCw className={`w-4 h-4 ${recalcLoading ? 'animate-spin' : ''}`} />
-                            {recalcLoading ? __('general.recalculating') || 'Recalculating…' : __('general.recalc_balance') || 'Recalc Balance'}
+                            {recalcLoading ? __('general.recalculating') : __('general.recalc_balance')}
                         </Button>
                         <Button variant="outline" size="sm" asChild className="gap-2">
                             <Link href={`/admin/users/${user.id}`}>
@@ -66,6 +72,7 @@ export default function TransactionUserCard({ user }) {
                     </div>
                 </div>
             </CardContent>
+            {confirmDialog}
         </Card>
     );
 }

@@ -5,9 +5,10 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { BookOpen, Plus, Search, Eye, Edit3, Trash2, FileText } from 'lucide-react';
+import { BookOpen, Plus, Search, Eye, Edit3, Trash2, FileText, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 interface Playbook {
     id: number;
@@ -43,23 +44,30 @@ interface IndexProps {
 
 export default function Index({ playbooks, filters }: IndexProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const { confirm, confirmDialog } = useConfirm();
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get('/admin/marketplace/service-playbooks', { search }, { preserveState: true });
     };
 
-    const handleDelete = (id: number, title: string) => {
-        if (confirm(__('service_playbooks.delete_confirm', { title }))) {
-            router.delete(`/admin/marketplace/service-playbooks/${id}`, {
-                onSuccess: () => toast.success(__('service_playbooks.deleted_success')),
-            });
-        }
+    const handleDelete = async (id: number, title: string) => {
+        const accepted = await confirm({
+            title: __('service_playbooks.delete'),
+            description: __('service_playbooks.delete_confirm', { title }),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/marketplace/service-playbooks/${id}`, {
+            onSuccess: () => toast.success(__('service_playbooks.deleted_success')),
+        });
     };
 
     return (
         <AdminSidebarLayout header={__('service_playbooks.title')}>
             <Head title={__('service_playbooks.admin_title')} />
+            {confirmDialog}
 
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header Card */}
@@ -130,8 +138,9 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                                 {playbook.title}
                                             </CardTitle>
                                             {playbook.service ? (
-                                                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200 text-xs font-normal">
-                                                    🔗 {playbook.service.title}
+                                                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200 text-xs font-normal gap-1">
+                                                    <LinkIcon className="w-3 h-3" aria-hidden="true" />
+                                                    {playbook.service.title}
                                                 </Badge>
                                             ) : (
                                                 <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 text-xs font-normal">
@@ -178,7 +187,7 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                     </Link>
                                     <div className="flex items-center gap-1">
                                         <Link href={`/admin/marketplace/service-playbooks/${playbook.id}/edit`}>
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('service_playbooks.edit_this')}>
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-600 hover:text-slate-900" title={__('service_playbooks.edit_this')} aria-label={__('service_playbooks.edit_this')}>
                                                 <Edit3 className="w-3.5 h-3.5" />
                                             </Button>
                                         </Link>
@@ -188,6 +197,7 @@ export default function Index({ playbooks, filters }: IndexProps) {
                                             onClick={() => handleDelete(playbook.id, playbook.title)}
                                             className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
                                             title={__('service_playbooks.delete')}
+                                            aria-label={__('service_playbooks.delete')}
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
                                         </Button>

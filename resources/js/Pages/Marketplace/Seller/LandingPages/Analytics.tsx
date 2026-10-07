@@ -9,7 +9,8 @@ import {
     FileText,
     ArrowLeft,
     Sparkles,
-    CheckCircle2
+    CheckCircle2,
+    Trophy
 } from 'lucide-react';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
@@ -46,7 +47,7 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
 
     return (
         <MarketplaceLayout>
-            <Head title={__('general.landing_page_analytics') || 'Landing Page Analytics'} />
+            <Head title={__('general.landing_page_analytics')} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <div className="flex items-center justify-between">
@@ -55,35 +56,35 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
                         className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        {__('general.back_to_landing_pages') || 'Back to Landing Pages'}
+                        {__('general.back_to_landing_pages')}
                     </Link>
                 </div>
 
                 <ModulePageHeader
-                    title={`${service?.title || 'Service'} — ${__('general.analytics') || 'Performance Analytics'}`}
-                    description={`Conversion tracking & A/B testing insights for /s/${landingPage?.slug || ''}`}
+                    title={`${service?.title || __('general.service')} - ${__('general.analytics')}`}
+                    description={__('marketplace.lp_analytics_desc', { path: `/s/${landingPage?.slug || ''}` })}
                 />
 
                 <SellerNav />
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <MetricCard
-                        label={__('general.total_page_views') || 'Total Page Visits'}
+                        label={__('general.total_page_views')}
                         value={totalVisits}
                         icon={Users}
                     />
                     <MetricCard
-                        label={__('general.cta_clicks') || 'CTA Button Clicks'}
+                        label={__('general.cta_clicks')}
                         value={ctaClicks}
                         icon={MousePointer}
                     />
                     <MetricCard
-                        label={__('general.form_leads') || 'Form Submissions'}
+                        label={__('general.form_leads')}
                         value={formSubmissions}
                         icon={FileText}
                     />
                     <MetricCard
-                        label={__('general.conversion_rate') || 'Conversion Rate'}
+                        label={__('general.conversion_rate')}
                         value={`${conversionRate}%`}
                         icon={TrendingUp}
                     />
@@ -91,8 +92,8 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
 
                 {landingPage?.ab_testing_enabled && analytics?.variants_performance && (
                     <OperationalCard
-                        title={__('general.ab_test_variants') || 'A/B Test Variant Performance'}
-                        description={__('general.ab_test_sub') || 'Comparing conversion efficiency across test variants.'}
+                        title={__('general.ab_test_variants')}
+                        description={__('general.ab_test_sub')}
                     >
                         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {analytics.variants_performance.map((variant: any, idx: number) => (
@@ -100,26 +101,27 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
                                     <div className="flex items-center justify-between">
                                         <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
                                             <Sparkles className="w-4 h-4 text-indigo-600" />
-                                            Variant {variant.name || (idx === 0 ? 'A (Original)' : 'B')}
+                                            {__('marketplace.lp_variant_name', { name: variant.name || (idx === 0 ? __('marketplace.lp_variant_original') : 'B') })}
                                         </span>
                                         {variant.is_winner && (
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800">
-                                                🏆 Winner
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-100 text-emerald-800">
+                                                <Trophy className="w-3.5 h-3.5" />
+                                                {__('marketplace.lp_variant_winner')}
                                             </span>
                                         )}
                                     </div>
 
                                     <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-slate-100">
                                         <div>
-                                            <div className="text-xs text-slate-400">Visits</div>
+                                            <div className="text-xs text-slate-400">{__('marketplace.lp_visits')}</div>
                                             <div className="font-bold text-slate-900 text-base">{variant.visits || 0}</div>
                                         </div>
                                         <div>
-                                            <div className="text-xs text-slate-400">Leads</div>
+                                            <div className="text-xs text-slate-400">{__('general.leads')}</div>
                                             <div className="font-bold text-slate-900 text-base">{variant.submissions || 0}</div>
                                         </div>
                                         <div>
-                                            <div className="text-xs text-slate-400">Rate</div>
+                                            <div className="text-xs text-slate-400">{__('marketplace.lp_rate')}</div>
                                             <div className="font-bold text-indigo-600 text-base">{variant.conversion_rate || 0}%</div>
                                         </div>
                                     </div>
@@ -130,24 +132,24 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
                 )}
 
                 <OperationalCard
-                    title={__('general.recent_activity_logs') || 'Recent Visitor Activity Events'}
-                    description={__('general.activity_logs_sub') || 'Real-time tracking of visitor interactions on your landing page.'}
+                    title={__('general.recent_activity_logs')}
+                    description={__('general.activity_logs_sub')}
                 >
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
                             <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 uppercase tracking-wider text-xs font-semibold">
                                 <tr>
-                                    <th className="px-6 py-3">Event Type</th>
-                                    <th className="px-6 py-3">Visitor IP</th>
-                                    <th className="px-6 py-3">Scroll Depth</th>
-                                    <th className="px-6 py-3 text-right">Timestamp</th>
+                                    <th className="px-6 py-3">{__('general.event_type_filter')}</th>
+                                    <th className="px-6 py-3">{__('marketplace.lp_visitor_ip')}</th>
+                                    <th className="px-6 py-3">{__('marketplace.lp_scroll_depth')}</th>
+                                    <th className="px-6 py-3 text-right">{__('general.timestamp')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {(!analytics?.events || analytics.events.length === 0) ? (
                                     <tr>
                                         <td colSpan={4} className="px-6 py-8 text-center text-slate-400 text-xs">
-                                            No conversion activity recorded yet.
+                                            {__('marketplace.lp_no_activity')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -157,13 +159,13 @@ export default function Analytics({ service, landingPage, analytics }: Analytics
                                                 {evt.event_type || 'page_view'}
                                             </td>
                                             <td className="px-6 py-3.5 font-mono text-xs text-slate-500">
-                                                {evt.visitor_ip || 'Anonymous'}
+                                                {evt.visitor_ip || __('general.anonymous')}
                                             </td>
                                             <td className="px-6 py-3.5 text-slate-700">
-                                                {evt.scroll_depth ? `${evt.scroll_depth}%` : '—'}
+                                                {evt.scroll_depth ? `${evt.scroll_depth}%` : '-'}
                                             </td>
                                             <td className="px-6 py-3.5 text-right text-xs text-slate-400">
-                                                {evt.created_at || 'Just now'}
+                                                {evt.created_at || __('general.just_now')}
                                             </td>
                                         </tr>
                                     ))

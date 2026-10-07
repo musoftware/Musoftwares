@@ -6,6 +6,9 @@ import { Switch } from '@/Components/ui/switch';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye, Power } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
+import { formatRecurringSchedule } from '../Components/recurringSchedule';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
@@ -14,13 +17,19 @@ export default function Index({ costs, currencies, categories, stats }) {
     const { errors } = usePage().props;
     const currenciesList = Array.isArray(currencies) ? currencies : (currencies ? Object.values(currencies) : []);
     const categoriesList = Array.isArray(categories) ? categories : (categories ? Object.values(categories) : []);
+    const { confirm, confirmDialog } = useConfirm();
 
 
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this recurring cost?')) {
-            router.delete(route('admin.recurring_costs.delete', id));
-        }
+    const handleDelete = async (id) => {
+        const accepted = await confirm({
+            title: __('admin.recurring_cost_delete_title'),
+            description: __('admin.recurring_cost_delete_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.recurring_costs.delete', id));
     };
 
     const handleToggleActive = (id) => {
@@ -29,28 +38,22 @@ export default function Index({ costs, currencies, categories, stats }) {
         });
     };
 
-    const handleDeleteWithTransactions = (id) => {
-        if (confirm('Are you sure you want to delete this recurring cost AND all its generated transactions? This cannot be undone.')) {
-            router.delete(route('admin.recurring_costs.delete_with_transaction', id));
-        }
+    const handleDeleteWithTransactions = async (id) => {
+        const accepted = await confirm({
+            title: __('admin.recurring_cost_delete_all_title'),
+            description: __('admin.recurring_cost_delete_all_desc'),
+            variant: 'danger',
+            confirmLabel: __('general.delete_everything'),
+        });
+        if (!accepted) return;
+        router.delete(route('admin.recurring_costs.delete_with_transaction', id));
     };
 
-    const formatSchedule = (cost) => {
-        let scheduleStr = `Every ${cost.recurring_times} ${cost.recurring}(s)`;
-        if (cost.recurring === 'week' && cost.recurring_times_week) {
-            scheduleStr += ` on [${cost.recurring_times_week}]`;
-        } else if (cost.recurring === 'month' && cost.recurring_times_month) {
-            scheduleStr += ` on day [${cost.recurring_times_month}]`;
-        } else if (cost.recurring === 'year' && cost.recurring_times_year) {
-            scheduleStr += ` on [${cost.recurring_times_year}]`;
-        }
-        return scheduleStr;
-    };
 
 
 
     return (
-        <AdminSidebarLayout title={__('general.recurring_costs')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.recurring_costs')} header={__('admin.business_operations')}>
             <Head title={__('general.admin_recurring_costs')} />
 
             <div className="mb-4">
@@ -179,12 +182,12 @@ export default function Index({ costs, currencies, categories, stats }) {
                             <tr key={cost.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4">
                                     <div className="text-sm font-semibold text-gray-900">{cost.title}</div>
-                                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Clock className="w-3 h-3"/> {formatSchedule(cost)}</div>
+                                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Clock className="w-3 h-3"/> {formatRecurringSchedule(cost)}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">{new Date(cost.start_date).toLocaleDateString()}</div>
                                     {(cost.next_date || cost.current_date) && (
-                                        <div className="text-xs text-gray-500 mt-0.5">Next: {new Date(cost.next_date || cost.current_date).toLocaleDateString()}</div>
+                                        <div className="text-xs text-gray-500 mt-0.5">{__('admin.recurring_next_run', { date: new Date(cost.next_date || cost.current_date).toLocaleDateString() })}</div>
                                     )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -210,19 +213,19 @@ export default function Index({ costs, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                     <Link href={route('admin.recurring_costs.view', cost.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.view_details')}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.view_details')} aria-label={__('general.view_details')}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                     </Link>
                                     <Link href={route('admin.recurring_costs.edit', cost.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')}>
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black me-1" title={__('general.edit')} aria-label={__('general.edit')}>
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(cost.id)} title={__('general.delete_schedule_only')}>
+                                    <Button variant="ghost" size="sm" className="text-yellow-600 hover:text-yellow-900 me-1" onClick={() => handleDelete(cost.id)} title={__('general.delete_schedule_only')} aria-label={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(cost.id)} title={__('general.delete_everything')}>
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(cost.id)} title={__('general.delete_everything')} aria-label={__('general.delete_everything')}>
                                         <Trash2 className="w-4 h-4 border border-red-200 rounded p-0.5" />
                                     </Button>
                                 </td>
@@ -245,20 +248,12 @@ export default function Index({ costs, currencies, categories, stats }) {
             {costs.links && costs.links.length > 3 && (
                 <div className="flex justify-between items-center mt-6">
                     <div className="text-sm text-gray-500">
-                        Showing {costs.from} to {costs.to} of {costs.total} entries
+                        {__('admin.pagination_showing_entries', { from: costs.from, to: costs.to, total: costs.total })}
                     </div>
-                    <div className="flex space-x-1">
-                        {costs.links.map((link, idx) => (
-                            <Link
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-2 border rounded text-sm ${link.active ? 'bg-black text-white border-black font-semibold' : 'bg-white text-gray-700 hover:bg-gray-50'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
+                    <Pagination links={costs.links} />
                 </div>
             )}
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

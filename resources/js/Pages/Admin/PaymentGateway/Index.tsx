@@ -25,6 +25,8 @@ import {
 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import Pagination from '@/Components/Pagination';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -91,6 +93,7 @@ export default function Index({ clients, totals }: Props) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [formData, setFormData] = useState({ ...emptyForm });
   const [processing, setProcessing] = useState(false);
+  const { confirm, confirmDialog } = useConfirm();
 
   const set = (key: string, value: string) =>
   setFormData((prev) => ({ ...prev, [key]: value }));
@@ -119,31 +122,37 @@ export default function Index({ clients, totals }: Props) {
     });
   };
 
-  const handleDelete = (client: GatewayClient) => {
-    if (!confirm(`Delete "${client.name}"? This cannot be undone.`)) return;
+  const handleDelete = async (client: GatewayClient) => {
+    const accepted = await confirm({
+      title: __('admin.payment_gateway_delete_confirm_title'),
+      description: __('admin.payment_gateway_delete_confirm_body', { name: client.name }),
+      variant: 'danger',
+      confirmLabel: __('general.delete'),
+    });
+    if (!accepted) return;
     router.delete(route('admin.musoftware-clients.destroy', client.id));
   };
 
   const items = clients?.data ?? [];
 
   return (
-    <AdminSidebarLayout title={__('general.payment_gateway')} header="Payment Gateway Clients">
+    <AdminSidebarLayout title={__('general.payment_gateway')} header={__('admin.payment_gateway_header')}>
             <Head title={__('general.admin_payment_gateway')} />
 
             {/* ── Stats Row ─────────────────────────────────────────────── */}
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
-                <StatCard icon={Users} label={__('general.total_clients')} value={String(totals.total_clients)} sub={`${totals.active_clients} active`} />
+                <StatCard icon={Users} label={__('general.total_clients')} value={String(totals.total_clients)} sub={__('admin.payment_gateway_active_count', { count: totals.active_clients })} />
                 <StatCard icon={CheckCircle} label={__('general.payments_done')} value={String(totals.total_payments)} />
                 <StatCard icon={DollarSign} label={__('general.total_volume')} value={formatCurrency(totals.total_volume, 'USD')} />
                 <StatCard icon={TrendingUp} label={__('general.our_commission')} value={formatCurrency(totals.total_commission, 'USD')} />
-                <StatCard icon={Percent} label={__('general.default_rate')} value="40%" sub="Per payment" />
+                <StatCard icon={Percent} label={__('general.default_rate')} value="40%" sub={__('admin.payment_gateway_per_payment')} />
             </div>
 
             {/* ── Header bar ────────────────────────────────────────────── */}
             <div className="mb-4 flex items-center justify-end gap-4">
                 <div className="me-auto flex items-center gap-2 text-sm text-gray-500">
                     <CreditCard className="h-4 w-4" />
-                    <span>{items.length} client{items.length !== 1 ? 's' : ''}</span>
+                    <span>{__('admin.payment_gateway_clients_count', { count: items.length })}</span>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)}>
                     <Plus className="me-2 h-4 w-4" />{__('general.new_client')}</Button>
@@ -216,6 +225,8 @@ export default function Index({ clients, totals }: Props) {
                                     <Button
                   variant="destructive"
                   size="sm"
+                  aria-label={__('admin.payment_gateway_delete_client')}
+                  title={__('admin.payment_gateway_delete_client')}
                   onClick={() => handleDelete(client)}>
                   
                                         <Trash2 className="h-3.5 w-3.5" />
@@ -237,23 +248,7 @@ export default function Index({ clients, totals }: Props) {
             </div>
 
             {/* ── Pagination ────────────────────────────────────────────── */}
-            {clients?.links &&
-      <div className="mt-4 flex justify-center gap-1">
-                    {clients.links.map((link, i) =>
-        <button
-          key={i}
-          disabled={!link.url}
-          onClick={() => link.url && router.visit(link.url)}
-          className={`px-3 py-1 rounded text-sm border ${
-          link.active ?
-          'bg-black text-white border-black' :
-          'bg-white text-gray-600 border-gray-300 hover:bg-gray-50 disabled:opacity-40'}`
-          }
-          dangerouslySetInnerHTML={{ __html: link.label }} />
-
-        )}
-                </div>
-      }
+            <Pagination links={clients?.links ?? []} />
 
             {/* ── Create Modal ──────────────────────────────────────────── */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -264,7 +259,7 @@ export default function Index({ clients, totals }: Props) {
                     <form onSubmit={handleCreate}>
                         <div className="space-y-4 py-2">
                             <div>
-                                <Label htmlFor="name">Business / App Name *</Label>
+                                <Label htmlFor="name">{__('admin.payment_gateway_business_app_name')}</Label>
                                 <Input
                   id="name"
                   value={formData.name}
@@ -285,7 +280,7 @@ export default function Index({ clients, totals }: Props) {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="commission_rate">Commission Rate (%)</Label>
+                                    <Label htmlFor="commission_rate">{__('admin.payment_gateway_commission_rate')}</Label>
                                     <Input
                     id="commission_rate"
                     type="number"
@@ -297,7 +292,7 @@ export default function Index({ clients, totals }: Props) {
                     required />
                   
                                     <p className="mt-1 text-xs text-gray-400">
-                                        Default: 40% → Musoftware earns {formData.commission_rate}% per payment
+                                        {__('admin.payment_gateway_commission_hint', { rate: formData.commission_rate })}
                                     </p>
                                 </div>
                                 <div>
@@ -314,7 +309,7 @@ export default function Index({ clients, totals }: Props) {
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="allowed_ips">Allowed IPs (optional)</Label>
+                                <Label htmlFor="allowed_ips">{__('admin.payment_gateway_allowed_ips_optional')}</Label>
                                 <Input
                   id="allowed_ips"
                   value={formData.allowed_ips}
@@ -328,12 +323,13 @@ export default function Index({ clients, totals }: Props) {
                             <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                                 {__('general.cancel')}</Button>
                             <Button type="submit" disabled={processing}>
-                                {processing ? 'Creating…' : 'Create Client'}
+                                {processing ? __('general.creating') : __('admin.payment_gateway_create_client')}
                             </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AdminSidebarLayout>);
 
 }

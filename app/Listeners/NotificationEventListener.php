@@ -119,7 +119,12 @@ class NotificationEventListener
         $user = $this->resolveInvoiceRecipient($invoice);
         $email = $invoice->client->email ?? null;
 
-        $this->notifyRecipient($user, $email, new InvoiceCreatedNotification($invoice));
+        $notification = new InvoiceCreatedNotification($invoice);
+        if ($invoice->hasSimpleItem()) {
+            $notification->delay(now()->addHour());
+        }
+
+        $this->notifyRecipient($user, $email, $notification);
     }
 
     private function handleInvoiceItemAdded(InvoiceItemAdded $event): void
@@ -132,7 +137,12 @@ class NotificationEventListener
         $user = $this->resolveInvoiceRecipient($invoice);
         $email = $invoice->client->email ?? null;
 
-        $this->notifyRecipient($user, $email, new InvoiceItemAddedNotification($invoice, $event->item));
+        $notification = new InvoiceItemAddedNotification($invoice, $event->item);
+        if (($event->item->item_type ?? null) === 'simple' || $invoice->hasSimpleItem()) {
+            $notification->delay(now()->addHour());
+        }
+
+        $this->notifyRecipient($user, $email, $notification);
     }
 
     private function handleInvoiceCancelled(InvoiceCancelled $event): void

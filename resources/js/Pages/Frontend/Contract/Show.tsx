@@ -34,7 +34,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
 
     return (
         <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-200">
-            <Head title={`Contract: ${contract.project_name}`} />
+            <Head title={__('frontend.contract_show_page_title', { project: contract.project_name })} />
             
             <div className="max-w-7xl mx-auto">
                 {/* Header branding */}
@@ -74,7 +74,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                         dangerouslySetInnerHTML={createMarkup(contract.description)} 
                                     />
                                 ) : (
-                                    <p className="text-muted-foreground italic">No general description provided.</p>
+                                    <p className="text-muted-foreground italic">{__('frontend.contract_show_no_description')}</p>
                                 )}
 
                                 {contract.content?.key_features?.length > 0 && (
@@ -107,7 +107,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                         </p>
                                     </div>
                                     <div className="text-end">
-                                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">الدفعة الأولى (50% Deposit)</p>
+                                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">{__('frontend.contract_show_first_deposit')}</p>
                                         <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                                             {formatMoney(contract.deposit_amount || (contract.total_amount * 0.5), contract.currency)}
                                         </p>
@@ -144,7 +144,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                 <div>
                                     <h4 className="font-semibold text-foreground mb-2">{__('general.payment_terms')}</h4>
                                     <p className="whitespace-pre-line text-muted-foreground text-sm bg-muted/20 p-4 border border-border rounded-xl">
-                                        {contract.payment_terms || 'Standard payment terms apply.'}
+                                        {contract.payment_terms || __('frontend.contract_show_default_payment_terms')}
                                     </p>
                                 </div>
                             </CardContent>
@@ -176,7 +176,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                     <div className="space-y-4">
                                         <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 p-4 rounded-xl border border-emerald-500/20">
                                             <p className="font-bold text-foreground mb-1">{__('general.contract_executed')}</p>
-                                            <p className="text-sm text-muted-foreground">Signed on {new Date(contract.signed_at).toLocaleDateString()}</p>
+                                            <p className="text-sm text-muted-foreground">{__('frontend.contract_show_signed_on', { date: new Date(contract.signed_at).toLocaleDateString() })}</p>
                                         </div>
                                         
                                         <div>
@@ -194,60 +194,60 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                 ) : !wallet_check?.is_logged_in ? (
                                     <div className="space-y-4 text-center p-4 bg-amber-500/10 rounded-xl border border-amber-500/20">
                                         <Building2 className="w-10 h-10 text-amber-500 mx-auto" />
-                                        <p className="font-bold text-foreground text-sm">تطلب توقيع العقد تسجيل الدخول</p>
-                                        <p className="text-xs text-muted-foreground">يرجى تسجيل الدخول بحسابك لموافاة توقيع العقد وسداد الدفعة الأولى تلقائياً من المحفظة.</p>
+                                        <p className="font-bold text-foreground text-sm">{__('frontend.contract_show_login_required')}</p>
+                                        <p className="text-xs text-muted-foreground">{__('frontend.contract_show_login_required_desc')}</p>
                                         <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full">
-                                            <a href="/login">تسجيل الدخول / إنشاء حساب</a>
+                                            <a href="/login">{__('frontend.contract_show_login_or_register')}</a>
                                         </Button>
                                     </div>
                                 ) : !wallet_check?.has_sufficient_balance ? (
                                     <div className="space-y-4 p-4 bg-rose-500/10 rounded-xl border border-rose-500/20">
                                         <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-sm">
                                             <AlertTriangle className="w-4 h-4" />
-                                            <span>رصيد المحفظة غير كافٍ</span>
+                                            <span>{__('frontend.contract_show_insufficient_balance')}</span>
                                         </div>
                                         <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                                            رصيدك الحالي هو <strong className="text-foreground">{wallet_check.user_balance} {wallet_check.currency_symbol}</strong>.
-                                            المبلغ المطلوب لسداد الدفعة الأولى (50%) هو <strong className="text-foreground">{wallet_check.deposit_amount} {wallet_check.currency_symbol}</strong>.
-                                            الخصم المتبقي للشحن: <strong className="text-rose-600 dark:text-rose-400">{wallet_check.missing_amount} {wallet_check.currency_symbol}</strong>.
+                                            {__('frontend.contract_show_current_balance')} <strong className="text-foreground">{wallet_check.user_balance} {wallet_check.currency_symbol}</strong>.
+                                            {__('frontend.contract_show_required_amount')} <strong className="text-foreground">{wallet_check.deposit_amount} {wallet_check.currency_symbol}</strong>.
+                                            {__('frontend.contract_show_missing_amount')} <strong className="text-rose-600 dark:text-rose-400">{wallet_check.missing_amount} {wallet_check.currency_symbol}</strong>.
                                         </p>
                                         <Button asChild className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs py-5">
                                             <a href="/wallet" className="inline-flex items-center justify-center gap-1.5">
                                                 <CreditCard className="w-4 h-4" />
-                                                <span>شحن المحفظة الآن</span>
+                                                <span>{__('frontend.contract_show_top_up')}</span>
                                             </a>
                                         </Button>
                                     </div>
                                 ) : (
                                     <form onSubmit={handleSign} className="space-y-4">
                                         <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 p-4 rounded-xl border border-emerald-500/20 mb-4 text-xs font-medium">
-                                            رصيد محفظتك يكفي لسداد الدفعة الأولى (50%). سيتم الخصم تلقائياً وبدء عمل محرك الـ AI فور التوقيع.
+                                            {__('frontend.contract_show_balance_ok')}
                                         </div>
                                         
                                         <div>
-                                            <Label htmlFor="client_name" className="text-foreground text-xs font-semibold">الاسم الكامل / ممثل الشركة</Label>
+                                            <Label htmlFor="client_name" className="text-foreground text-xs font-semibold">{__('frontend.contract_show_full_name')}</Label>
                                             <Input 
                                                 id="client_name" 
                                                 value={clientName}
                                                 onChange={e => setClientName(e.target.value)}
                                                 required 
-                                                placeholder="مثال: محمود أحمد"
+                                                placeholder={__('frontend.contract_show_name_placeholder')}
                                                 className="mt-1 text-sm bg-background text-foreground border-input"
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="signature" className="text-foreground text-xs font-semibold">التوقيع الرقمي (اكتب اسمك)</Label>
+                                            <Label htmlFor="signature" className="text-foreground text-xs font-semibold">{__('frontend.contract_show_signature')}</Label>
                                             <Input 
                                                 id="signature" 
                                                 value={signature}
                                                 onChange={e => setSignature(e.target.value)}
                                                 required 
-                                                placeholder="اكتب اسمك لتأكيد التوقيع"
+                                                placeholder={__('frontend.contract_show_signature_placeholder')}
                                                 className="mt-1 font-signature text-lg bg-background text-foreground border-input"
                                             />
                                         </div>
                                         <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-6 rounded-xl text-xs uppercase tracking-wider shadow-lg" disabled={isSigning || !clientName || !signature}>
-                                            {isSigning ? 'جاري التوقيع والسداد...' : 'قبول العقد وسداد الدفعة الأولى (50%)'}
+                                            {isSigning ? __('frontend.contract_show_signing') : __('frontend.contract_show_accept_and_pay')}
                                         </Button>
                                     </form>
                                 )}
@@ -265,7 +265,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                         <div key={invoice.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
                                             <div>
                                                 <p className="font-medium text-sm text-foreground">
-                                                    {invoice.items?.[0]?.item || `Invoice #${invoice.id}`}
+                                                    {invoice.items?.[0]?.item || __('frontend.guest_invoice_title', { id: invoice.id })}
                                                 </p>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
@@ -273,7 +273,7 @@ export default function Show({ contract, invoices, project, wallet_check }: any)
                                                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
                                                             : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
                                                     }`}>
-                                                        {invoice.status?.toUpperCase()}
+                                                        {__('general.status_' + invoice.status)}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground font-medium">
                                                         {invoice.total_str}

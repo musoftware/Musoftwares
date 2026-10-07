@@ -44,14 +44,14 @@ export default function Show({ ticket, messages, statuses }: Props) {
 
     return (
         <AdminSidebarLayout
-            header={`Ticket #${ticket.id}`}
+            header={__('admin.ticket_show_ticket_number', { id: ticket.id })}
             actions={
                 <Link href={route('admin.guest-tickets.index')}>
-                    <Button variant="outline"><ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}</Button>
+                    <Button variant="outline"><ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" /> {__('general.back')}</Button>
                 </Link>
             }
         >
-            <Head title={`Ticket #${ticket.id}`} />
+            <Head title={__('admin.ticket_show_ticket_number', { id: ticket.id })} />
             <div className="max-w-5xl mx-auto space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-slate-100 pb-6">

@@ -22,6 +22,31 @@ import {
     Loader2,
 } from 'lucide-react';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
+
+const PRICING_TYPE_KEYS: Record<string, string> = {
+    free: 'general.free',
+    single: 'admin.serial_pricing_single',
+    packages: 'general.packages',
+};
+
+const BILLING_CYCLE_KEYS: Record<string, string> = {
+    lifetime: 'general.lifetime',
+    monthly: 'general.monthly',
+    annual: 'general.annual',
+    custom: 'general.custom_days',
+};
+
+const DEVICE_STATUS_KEYS: Record<string, string> = {
+    active: 'general.active',
+    inactive: 'general.inactive',
+    blocked: 'general.blocked',
+};
+
+function translateValue(keys: Record<string, string>, value: string): string {
+    const key = keys[value];
+    return key ? __(key) : value;
+}
 
 /* ─── Types ─────────────────────────────────────────────────────── */
 
@@ -155,18 +180,18 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
 
     function durationOptions(sw: Software | null): { value: DurationType; label: string }[] {
         const base: { value: DurationType; label: string }[] = [
-            { value: 'lifetime',         label: 'Lifetime (no expiry)' },
-            { value: 'software_default', label: sw ? `Software default (${sw.billing_cycle})` : 'Software default' },
-            { value: 'days',             label: 'Custom days' },
-            { value: 'date',             label: 'Specific date' },
+            { value: 'lifetime',         label: __('admin.serial_quick_activate_lifetime_option') },
+            { value: 'software_default', label: sw ? __('admin.serial_quick_activate_software_default_with_cycle', { cycle: translateValue(BILLING_CYCLE_KEYS, sw.billing_cycle) }) : __('admin.serial_quick_activate_software_default') },
+            { value: 'days',             label: __('general.custom_days') },
+            { value: 'date',             label: __('admin.serial_quick_activate_specific_date') },
         ];
-        if (hasPackages && packageId) base.splice(1, 0, { value: 'package_default', label: 'Package default' });
+        if (hasPackages && packageId) base.splice(1, 0, { value: 'package_default', label: __('admin.serial_quick_activate_package_default') });
         return base;
     }
 
     return (
         <AdminSidebarLayout>
-            <Head title="Quick Activate" />
+            <Head title={__('admin.serial_quick_activate_title')} />
 
             <div className="p-6 max-w-5xl mx-auto space-y-6">
 
@@ -175,8 +200,8 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                         <Zap className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-semibold">Quick Activate</h1>
-                        <p className="text-sm text-muted-foreground">Activate a device immediately without going through the device list.</p>
+                        <h1 className="text-xl font-semibold">{__('admin.serial_quick_activate_title')}</h1>
+                        <p className="text-sm text-muted-foreground">{__('admin.serial_quick_activate_subtitle')}</p>
                     </div>
                 </div>
 
@@ -202,25 +227,25 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
 
                     <Card className="lg:col-span-2">
                         <CardHeader className="pb-4">
-                            <CardTitle className="text-base font-medium">Device Activation</CardTitle>
+                            <CardTitle className="text-base font-medium">{__('admin.serial_quick_activate_device_activation')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-5">
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="device_id">Device ID</Label>
+                                    <Label htmlFor="device_id">{__('general.device_id')}</Label>
                                     <div className="relative">
-                                        <Monitor className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <Monitor className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                         <Input
                                             id="device_id"
-                                            className="pl-9 font-mono text-sm"
-                                            placeholder="Paste device ID here…"
+                                            className="ps-9 font-mono text-sm"
+                                            placeholder={__('admin.serial_quick_activate_device_id_placeholder')}
                                             value={deviceId}
                                             onChange={e => setDeviceId(e.target.value)}
                                             required
                                         />
                                         {lookupLoading && (
-                                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                                            <Loader2 className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
                                         )}
                                     </div>
 
@@ -233,18 +258,18 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                             {lookupResult.found ? (
                                                 <>
                                                     <p className="font-medium flex items-center gap-1">
-                                                        <Search className="w-3 h-3" /> Device found in system
+                                                        <Search className="w-3 h-3" /> {__('admin.serial_quick_activate_device_found')}
                                                     </p>
-                                                    {lookupResult.machine_name && <p>Machine: <span className="font-mono">{lookupResult.machine_name}</span></p>}
-                                                    {lookupResult.user_name && <p>Windows user: <span className="font-mono">{lookupResult.user_name}</span></p>}
-                                                    {lookupResult.current_software && <p>Registered software: {lookupResult.current_software}</p>}
+                                                    {lookupResult.machine_name && <p>{__('admin.serial_quick_activate_machine_label')} <span className="font-mono">{lookupResult.machine_name}</span></p>}
+                                                    {lookupResult.user_name && <p>{__('admin.serial_quick_activate_windows_user_label')} <span className="font-mono">{lookupResult.user_name}</span></p>}
+                                                    {lookupResult.current_software && <p>{__('admin.serial_quick_activate_registered_software', { name: lookupResult.current_software })}</p>}
                                                     {lookupResult.status && (
-                                                        <p>Current status: <Badge variant={lookupResult.status === 'active' ? 'default' : 'secondary'} className="text-[10px] py-0">{lookupResult.status}</Badge></p>
+                                                        <p>{__('admin.serial_quick_activate_current_status_label')} <Badge variant={lookupResult.status === 'active' ? 'default' : 'secondary'} className="text-[10px] py-0">{translateValue(DEVICE_STATUS_KEYS, lookupResult.status)}</Badge></p>
                                                     )}
                                                 </>
                                             ) : (
                                                 <p className="flex items-center gap-1">
-                                                    <Search className="w-3 h-3" /> Device not found — will be created on activation.
+                                                    <Search className="w-3 h-3" /> {__('admin.serial_quick_activate_device_not_found')}
                                                 </p>
                                             )}
                                         </div>
@@ -252,17 +277,17 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="software_id">Software</Label>
+                                    <Label htmlFor="software_id">{__('general.software')}</Label>
                                     <Select value={softwareId} onValueChange={v => setSoftwareId(v ?? "")} required>
                                         <SelectTrigger id="software_id">
-                                            <SelectValue placeholder="Select a software…" />
+                                            <SelectValue placeholder={__('admin.serial_quick_activate_select_software')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {softwares.map(sw => (
                                                 <SelectItem key={sw.id} value={String(sw.id)}>
                                                     {sw.name}
                                                     {sw.pricing_type !== 'free' && (
-                                                        <span className="text-xs text-muted-foreground ml-1">({sw.pricing_type})</span>
+                                                        <span className="text-xs text-muted-foreground ms-1">({translateValue(PRICING_TYPE_KEYS, sw.pricing_type)})</span>
                                                     )}
                                                 </SelectItem>
                                             ))}
@@ -273,17 +298,17 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                 {isPackagesPricing && hasPackages && (
                                     <div className="space-y-1.5">
                                         <Label htmlFor="package_id">
-                                            Package <span className="text-muted-foreground text-xs">(optional)</span>
+                                            {__('admin.serial_quick_activate_package')} <span className="text-muted-foreground text-xs">({__('general.optional')})</span>
                                         </Label>
                                         <Select value={packageId} onValueChange={v => setPackageId(v ?? "")}>
                                             <SelectTrigger id="package_id">
-                                                <SelectValue placeholder="No specific package" />
+                                                <SelectValue placeholder={__('admin.serial_quick_activate_no_specific_package')} />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="">No specific package</SelectItem>
+                                                <SelectItem value="">{__('admin.serial_quick_activate_no_specific_package')}</SelectItem>
                                                 {selectedSoftware?.packages.map(pkg => (
                                                     <SelectItem key={pkg.id} value={String(pkg.id)}>
-                                                        {pkg.name} — {pkg.price} {pkg.currency} / {pkg.billing_cycle}
+                                                        {pkg.name} - {pkg.price} {pkg.currency} / {translateValue(BILLING_CYCLE_KEYS, pkg.billing_cycle)}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -294,7 +319,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                 <Separator />
 
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="duration_type">Duration</Label>
+                                    <Label htmlFor="duration_type">{__('general.duration')}</Label>
                                     <Select value={durationType} onValueChange={v => setDurationType(v as DurationType)}>
                                         <SelectTrigger id="duration_type">
                                             <SelectValue />
@@ -312,7 +337,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                             max={3650}
                                             value={durationDays}
                                             onChange={e => setDurationDays(e.target.value)}
-                                            placeholder="Number of days"
+                                            placeholder={__('general.days_count')}
                                             className="mt-1.5"
                                         />
                                     )}
@@ -330,32 +355,32 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
 
                                 <div className="space-y-1.5">
                                     <Label htmlFor="user_id">
-                                        Assign to user <span className="text-muted-foreground text-xs">(optional)</span>
+                                        {__('admin.serial_quick_activate_assign_to_user')} <span className="text-muted-foreground text-xs">({__('general.optional')})</span>
                                     </Label>
                                     <PremiumCombobox
                                         value={userId ? String(userId) : ''}
                                         onChange={(val) => setUserId(val ? String(val) : '')}
                                         options={[
-                                            { value: '', label: 'No assignment' },
+                                            { value: '', label: __('admin.serial_quick_activate_no_assignment') },
                                             ...users.map(u => ({
                                                 value: String(u.id),
                                                 label: `${u.name} (${u.email})`
                                             }))
                                         ]}
-                                        placeholder="No user assignment"
-                                        searchPlaceholder="Search users..."
+                                        placeholder={__('admin.serial_quick_activate_no_assignment')}
+                                        searchPlaceholder={__('general.search_users')}
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label htmlFor="notes">
-                                        Notes <span className="text-muted-foreground text-xs">(optional)</span>
+                                        {__('general.notes')} <span className="text-muted-foreground text-xs">({__('general.optional')})</span>
                                     </Label>
                                     <Textarea
                                         id="notes"
                                         value={notes}
                                         onChange={e => setNotes(e.target.value)}
-                                        placeholder="Customer name, order reference…"
+                                        placeholder={__('admin.serial_quick_activate_notes_placeholder')}
                                         rows={2}
                                         className="resize-none text-sm"
                                     />
@@ -367,7 +392,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                     disabled={submitting || !deviceId.trim() || !softwareId}
                                 >
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                                    {submitting ? 'Activating…' : 'Activate Device'}
+                                    {submitting ? __('admin.serial_quick_activate_activating') : __('admin.serial_quick_activate_activate_device')}
                                 </Button>
                             </form>
                         </CardContent>
@@ -378,28 +403,28 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                             <Card>
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                        <Package className="w-4 h-4" /> Software Info
+                                        <Package className="w-4 h-4" /> {__('admin.serial_quick_activate_software_info')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="text-sm space-y-2 text-muted-foreground">
                                     <div className="flex justify-between">
-                                        <span>Pricing</span>
-                                        <Badge variant="outline" className="text-xs">{selectedSoftware.pricing_type}</Badge>
+                                        <span>{__('general.pricing')}</span>
+                                        <Badge variant="outline" className="text-xs">{translateValue(PRICING_TYPE_KEYS, selectedSoftware.pricing_type)}</Badge>
                                     </div>
                                     {selectedSoftware.price !== null && (
                                         <div className="flex justify-between">
-                                            <span>Price</span>
+                                            <span>{__('general.price')}</span>
                                             <span className="font-mono">{selectedSoftware.price} {selectedSoftware.currency}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between">
-                                        <span>Billing</span>
-                                        <span>{selectedSoftware.billing_cycle}</span>
+                                        <span>{__('general.billing')}</span>
+                                        <span>{translateValue(BILLING_CYCLE_KEYS, selectedSoftware.billing_cycle)}</span>
                                     </div>
                                     {selectedSoftware.packages.length > 0 && (
                                         <div className="flex justify-between">
-                                            <span>Packages</span>
-                                            <span>{selectedSoftware.packages.length} available</span>
+                                            <span>{__('general.packages')}</span>
+                                            <span>{__('admin.serial_quick_activate_packages_available', { count: selectedSoftware.packages.length })}</span>
                                         </div>
                                     )}
                                 </CardContent>
@@ -409,12 +434,12 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                    <Clock className="w-4 h-4" /> Recent Activations
+                                    <Clock className="w-4 h-4" /> {__('admin.serial_quick_activate_recent_activations')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 {recentActivations.length === 0 ? (
-                                    <p className="text-xs text-muted-foreground p-4">No recent activations.</p>
+                                    <p className="text-xs text-muted-foreground p-4">{__('admin.serial_quick_activate_no_recent_activations')}</p>
                                 ) : (
                                     <ul className="divide-y divide-border">
                                         {recentActivations.map(act => (
@@ -424,7 +449,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                                         {act.device_id.length > 12 ? `${act.device_id.slice(0, 8)}…` : act.device_id}
                                                     </span>
                                                     <Badge variant={act.status === 'active' ? 'default' : 'secondary'} className="text-[10px] py-0 shrink-0">
-                                                        {act.status}
+                                                        {translateValue(DEVICE_STATUS_KEYS, act.status)}
                                                     </Badge>
                                                 </div>
                                                 <p className="text-xs text-muted-foreground">
@@ -432,7 +457,7 @@ export default function QuickActivate({ softwares, recentActivations, users, ini
                                                 </p>
                                                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                                                     {act.user_name && <><User className="w-3 h-3" />{act.user_name} · </>}
-                                                    {act.is_lifetime ? 'Lifetime' : (act.expires_at ?? '—')}
+                                                    {act.is_lifetime ? __('general.lifetime') : (act.expires_at ?? '—')}
                                                 </p>
                                                 <p className="text-[10px] text-muted-foreground/60">{act.updated_at}</p>
                                             </li>

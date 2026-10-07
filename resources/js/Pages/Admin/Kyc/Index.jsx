@@ -11,26 +11,32 @@ import { useToast } from '@/Components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function AdminKycIndex({ auth, users }) {
     const { toast } = useToast();
     const [selectedUser, setSelectedUser] = useState(null);
     const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+    const { confirm, confirmDialog } = useConfirm();
     
     const { data, setData, post, processing, reset, errors } = useForm({
         reason: ''
     });
 
-    const handleApprove = (userId) => {
-        if (confirm("Are you sure you want to approve this KYC application? This will grant the user full financial capabilities.")) {
-            router.post(route('admin.kyc.approve', userId), {}, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast({ title: "Approved", description: "User KYC verified successfully." });
-                    setSelectedUser(null);
-                }
-            });
-        }
+    const handleApprove = async (userId) => {
+        const accepted = await confirm({
+            title: __('admin.kyc_approve_confirm_title'),
+            description: __('admin.kyc_approve_confirm_body'),
+            confirmLabel: __('general.approve_verification'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.kyc.approve', userId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({ title: __('admin.kyc_approved_title'), description: __('admin.kyc_approved_body') });
+                setSelectedUser(null);
+            }
+        });
     };
 
     const handleReject = (e) => {
@@ -38,7 +44,7 @@ export default function AdminKycIndex({ auth, users }) {
         post(route('admin.kyc.reject', selectedUser.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast({ title: "Rejected", description: "Application rejected.", variant: "destructive" });
+                toast({ title: __('admin.kyc_rejected_title'), description: __('admin.kyc_rejected_body'), variant: "destructive" });
                 setIsRejectDialogOpen(false);
                 setSelectedUser(null);
                 reset();
@@ -47,7 +53,7 @@ export default function AdminKycIndex({ auth, users }) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title={__('general.kyc_applications')} header="KYC Applications">
+        <AdminSidebarLayout user={auth?.user} title={__('general.kyc_applications')} header={__('admin.kyc_applications_header')}>
             <div className="space-y-6 pb-20 p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div>
@@ -133,7 +139,7 @@ export default function AdminKycIndex({ auth, users }) {
                         <DialogContent className="max-w-3xl">
                             <DialogHeader>
                                 <DialogTitle className="flex items-center gap-2">
-                                    <User className="w-5 h-5 text-slate-900" /> Review Application: {selectedUser.name}
+                                    <User className="w-5 h-5 text-slate-900" /> {__('admin.kyc_review_application', { name: selectedUser.name })}
                                 </DialogTitle>
                                 <DialogDescription>{__('general.review_the_documents_below_to_verify_this_user_s_identity')}</DialogDescription>
                             </DialogHeader>
@@ -198,6 +204,7 @@ export default function AdminKycIndex({ auth, users }) {
                         </form>
                     </DialogContent>
                 </Dialog>
+                {confirmDialog}
             </div>
         </AdminSidebarLayout>
     );

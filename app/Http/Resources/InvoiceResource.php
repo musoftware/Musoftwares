@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\FinanceHelper;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
@@ -39,14 +40,7 @@ class InvoiceResource extends JsonResource
             'project_id' => $this->project_id,
             'invoice_number' => $this->enc_id(),
             'public_url' => url('/invoices/'.$this->enc_id()),
-            'user' => $this->whenLoaded('user', fn () => array_merge(
-                $this->user->only('id', 'name', 'email', 'address', 'phone_number', 'phone'),
-                [
-                    'projects' => $this->user->relationLoaded('projects') ? $this->user->projects->map(fn ($p) => ['id' => $p->id, 'project_name' => $p->project_name])->values()->all() : [],
-                    'balance' => (float) ($this->user->balance($currencyId) ?? 0),
-                    'balance_str' => FinanceHelper::instance()->format_money((float) ($this->user->balance($currencyId) ?? 0), $currencyId),
-                ]
-            )),
+            'user' => $this->whenLoaded('user', fn () => $this->userSummary($currencyId)),
             'project' => $this->whenLoaded('project', fn () => ['id' => $this->project->id, 'project_name' => $this->project->project_name]),
             'items' => InvoiceItemResource::collection($this->whenLoaded('items')),
             'amount' => $this->total(),
@@ -71,9 +65,9 @@ class InvoiceResource extends JsonResource
             'is_published' => $this->is_published ?? 0,
             'archive' => $this->archive ?? 0,
             'scheduled_start_date' => $this->scheduled_start_date,
-            'total_timer_str' => method_exists($this->resource, 'total_timer_str') ? $this->total_timer_str() : '00:00:00',
+            'total_timer_str' => $this->total_timer_str(),
             'timer_metrics' => $this->calculateTimerMetrics(),
-            'revenue' => method_exists($this->resource, 'revenue') ? $this->revenue() : ($this->total() - $this->cost),
+            'revenue' => $this->revenue(),
             'cost' => $this->cost ?? 0,
  
             // Reference Data
@@ -107,7 +101,7 @@ class InvoiceResource extends JsonResource
                     ? $affiliate->getAffiliateCommissionPercentageForReferredUser($this->user)
                     : 1.10;
                 $commissionPercent = round(($commissionMultiplier - 1) * 100, 2);
-                $addsToTotal = method_exists($affiliate, 'shouldAddCommissionToTotal') && $affiliate->shouldAddCommissionToTotal();
+                $addsToTotal = (bool) $affiliate->shouldAddCommissionToTotal();
 
                 $isPaid = in_array($this->status, ['paid', 'partially_paid']);
                 $actualAmount = 0;
@@ -122,7 +116,7 @@ class InvoiceResource extends JsonResource
                     $actualAmountStr = FinanceHelper::instance()->format_money($actualAmount, $earningCurrency);
                 }
 
-                $estimatedBase = method_exists($this->resource, 'total_min_cost') ? $this->total_min_cost() : $this->sub_total();
+                $estimatedBase = $this->total_min_cost();
                 $estimatedFull = round($estimatedBase - $estimatedBase / $commissionMultiplier, 2);
 
                 $upperRef = $affiliate->relationLoaded('ref_user') ? $affiliate->ref_user : null;
@@ -138,8 +132,10 @@ class InvoiceResource extends JsonResource
                 }
 
                 $invoiceCurrencyId = $this->getCurrencyId();
-                $estimatedInAffiliateCurrency = CurrenciesExchange::RateToday($estimatedDirect, $invoiceCurrencyId, $affiliate->currency);
-                $estimatedStr = FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
+                $estimatedInAffiliateCurrency = $this->convertForDisplay($estimatedDirect, $invoiceCurrencyId, $affiliate->currency);
+                $estimatedStr = $estimatedInAffiliateCurrency === null
+                    ? '-'
+                    : FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
 
                 return [
                     'affiliate_id' => $affiliate->id,
@@ -153,6 +149,23 @@ class InvoiceResource extends JsonResource
                 ];
             }),
         ];
+    }
+
+    /**
+     * Client summary with projects (when eager loaded) and balance in the invoice currency.
+     */
+    protected function userSummary(int $currencyId): array
+    {
+        $balance = (float) ($this->user->balance($currencyId) ?? 0);
+
+        return array_merge(
+            $this->user->only('id', 'name', 'email', 'address', 'phone_number', 'phone'),
+            [
+                'projects' => $this->user->relationLoaded('projects') ? $this->user->projects->map(fn ($p) => ['id' => $p->id, 'project_name' => $p->project_name])->values()->all() : [],
+                'balance' => $balance,
+                'balance_str' => FinanceHelper::instance()->format_money($balance, $currencyId),
+            ]
+        );
     }
 
     protected function getCurrencyId(): int
@@ -173,7 +186,7 @@ class InvoiceResource extends JsonResource
             }
         }
 
-        $total_hours = method_exists($this->resource, 'total_timer') ? ($this->total_timer() / 3600) : 0;
+        $total_hours = $this->total_timer() / 3600;
 
         return round(($total_hours * $recommended_rate) + $non_timer_total, 2);
     }
@@ -192,6 +205,19 @@ class InvoiceResource extends JsonResource
         return $current_total > 0 ? round((($current_total - ($this->cost ?? 0)) / $current_total) * 100, 2) : 0;
     }
 
+    /**
+     * Currency conversion for display-only fields. A missing rate (already logged by
+     * CurrenciesExchange) returns null so the invoice page still renders.
+     */
+    protected function convertForDisplay(float $amount, $fromCurrencyId, $toCurrencyId): ?float
+    {
+        try {
+            return (float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $toCurrencyId);
+        } catch (MissingExchangeRateException) {
+            return null;
+        }
+    }
+
     protected function calculateTimerMetrics(): array
     {
         $invoice = $this->resource;
@@ -199,22 +225,19 @@ class InvoiceResource extends JsonResource
         $user = $invoice->user;
 
         $baseRate = FinanceHelper::calculateOverheadHourlyRate();
-        $systemBaseRate = CurrenciesExchange::RateToday(
-            $baseRate,
-            AdminSettings::GetValue('business_currency', 2),
-            $currencyId
-        );
+        // Display-only insight: a missing rate makes the metric 0 ("no data") rather than failing the page.
+        $systemBaseRate = $this->convertForDisplay($baseRate, AdminSettings::GetValue('business_currency', 2), $currencyId) ?? 0.0;
 
         $clientRate = 0;
         $isCustomRateEnabled = false;
         if ($user) {
             $isCustomRateEnabled = (bool) ($user->enable_custom_hour_rate ?? false);
             if ((float) ($user->hour_rate ?? 0) > 0) {
-                $clientRate = CurrenciesExchange::RateToday(
-                    $user->hour_rate,
+                $clientRate = $this->convertForDisplay(
+                    (float) $user->hour_rate,
                     $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
                     $currencyId
-                );
+                ) ?? 0.0;
             }
         }
 
@@ -248,11 +271,7 @@ class InvoiceResource extends JsonResource
         $rawMarketRate = (float) AdminSettings::GetValue('market_hourly_rate', 0);
         $marketHourlyRateInInvoiceCurrency = 0.0;
         if ($rawMarketRate > 0) {
-            $marketHourlyRateInInvoiceCurrency = CurrenciesExchange::RateToday(
-                $rawMarketRate,
-                AdminSettings::GetValue('business_currency', 2),
-                $currencyId
-            );
+            $marketHourlyRateInInvoiceCurrency = $this->convertForDisplay($rawMarketRate, AdminSettings::GetValue('business_currency', 2), $currencyId) ?? 0.0;
         }
         $marketValue = $totalHours * $marketHourlyRateInInvoiceCurrency;
         $marketDiscountSavings = max(0, $marketValue - $billedAmount);

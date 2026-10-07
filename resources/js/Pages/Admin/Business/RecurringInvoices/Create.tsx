@@ -8,12 +8,11 @@ import RecurringScheduleForm, {
 } from '@/Components/RecurringScheduleForm';
 import { __ } from '@/lib/i18n';
 
-export default function Create({ currencies, users, preselectedUserId }) {
+export default function Create({ currencies, preselectedUserId }) {
     const { errors } = (typeof window !== 'undefined' && (window as any)) || {};
     const pageErrors = (router as any)?.page?.props?.errors ?? {};
 
     const currenciesList = Array.isArray(currencies) ? currencies : (currencies ? Object.values(currencies) : []);
-    const usersList = Array.isArray(users) ? users : (users ? Object.values(users) : []);
 
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const queryUserId = urlParams ? urlParams.get('user') : null;
@@ -22,7 +21,6 @@ export default function Create({ currencies, users, preselectedUserId }) {
     const defaultUserId =
         preselectedUserId ??
         (queryUserId ? Number(queryUserId) : null) ??
-        usersList[0]?.id ??
         '';
 
     const [form] = useState<RecurringScheduleValues>({
@@ -41,7 +39,7 @@ export default function Create({ currencies, users, preselectedUserId }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.add_recurring_invoice')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.add_recurring_invoice')} header={__('admin.business_operations')}>
             <Head title={__('general.add_recurring_invoice')} />
 
             <div className="mb-4">
@@ -64,8 +62,6 @@ export default function Create({ currencies, users, preselectedUserId }) {
                     mode="create"
                     initialValues={form}
                     currencies={currenciesList}
-                    users={usersList}
-                    searchUsersEndpoint={route('admin.projects.search-clients')}
                     errors={pageErrors}
                     submitting={submitting}
                     onSubmit={handleSubmit}

@@ -16,12 +16,14 @@ use Tests\TestCase;
 class InvoiceRaceConditionTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected Currency $currency;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates();
 
         // Ensure default currency exists for testing
         $this->currency = Currency::firstOrCreate(

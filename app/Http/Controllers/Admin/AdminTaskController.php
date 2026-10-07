@@ -276,6 +276,7 @@ class AdminTaskController extends Controller
                 SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
             }
         } catch (\Throwable $e) {
+            Log::warning('Google Calendar delete sync dispatch failed', ['todo_id' => $todo->id, 'error' => $e->getMessage()]);
         }
 
         $todo->delete();
@@ -866,6 +867,7 @@ class AdminTaskController extends Controller
                     SyncTodoToGoogleCalendar::dispatch($todo, $adminUser, 'delete');
                 }
             } catch (\Throwable $e) {
+                Log::warning('Google Calendar delete sync dispatch failed', ['todo_id' => $todo->id, 'error' => $e->getMessage()]);
             }
 
             $todo->delete();

@@ -62,8 +62,8 @@ export default function Portfolio({ dbProjects = [] }) {
 
     return (
         <PublicLayout>
-            <Head title={`${__('general.landing_portfolio_title') || 'Work'} | ${__('general.musoftware_unified_workspace') || 'Musoftwares Studio'}`}>
-                <meta name="description" content={__('general.landing_portfolio_desc') || "Explore our engineered platforms, enterprise SaaS, and desktop utilities."} />
+            <Head title={`${__('general.landing_portfolio_title')} | ${__('general.musoftware_unified_workspace')}`}>
+                <meta name="description" content={__('general.landing_portfolio_desc')} />
             </Head>
 
             <div ref={mainRef} className="w-full bg-[#ffffff] text-[#1d1d1f] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3] pt-12 sm:pt-20 pb-24 sm:pb-36">
@@ -71,14 +71,14 @@ export default function Portfolio({ dbProjects = [] }) {
                 {/* Reusable Studio Hero Section */}
                 <div className="reveal-section">
                     <StudioHeader
-                        badge={__('general.landing_portfolio_badge') || 'Proven in Production'}
+                        badge={__('general.landing_portfolio_badge')}
                         title={
                             <>
                                 Engineered for Scale. <br className="hidden sm:inline" />
                                 <span className="text-[#0071e3]">Shipped to the World.</span>
                             </>
                         }
-                        subtitle={__('general.landing_portfolio_desc') || 'A curated archive of bespoke ERP architectures, high-throughput Meta Graph pipelines, and custom enterprise platforms.'}
+                        subtitle={__('general.landing_portfolio_desc')}
                     />
                 </div>
 

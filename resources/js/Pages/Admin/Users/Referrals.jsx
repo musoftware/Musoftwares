@@ -10,8 +10,10 @@ import Pagination from '@/Components/Pagination';
 import { formatMoney } from '@/lib/utils';
 import { format } from 'date-fns';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function Referrals({ client, referrals }) {
+    const { confirm, confirmDialog } = useConfirm();
     const currency = client.currency;
 
     const getInitials = (name) => {
@@ -19,32 +21,40 @@ export default function Referrals({ client, referrals }) {
         return name.substring(0, 2).toUpperCase();
     };
 
-    const handleUnlink = (referralId) => {
-        if (confirm(__('general.confirm_unlink_referral'))) {
-            router.delete(`/admin/users/${client.id}/referrals/${referralId}/unlink`);
-        }
+    const handleUnlink = async (referralId) => {
+        const accepted = await confirm({
+            title: __('general.confirm_unlink_referral'),
+            confirmLabel: __('general.remove_referral'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/users/${client.id}/referrals/${referralId}/unlink`);
     };
 
-    const handleDelete = (referralId) => {
-        if (confirm(__('general.confirm_delete_user_permanently'))) {
-            router.delete(`/admin/users/${referralId}`);
-        }
+    const handleDelete = async (referralId) => {
+        const accepted = await confirm({
+            title: __('general.confirm_delete_user_permanently'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/users/${referralId}`);
     };
 
     return (
-        <AdminSidebarLayout title={__('general.user_referrals')} header="User Referrals">
-            <Head title={`Referrals - ${client.name}`} />
+        <AdminSidebarLayout title={__('general.user_referrals')} header={__('general.user_referrals')}>
+            <Head title={__('admin.user_referrals_title', { name: client.name })} />
+            {confirmDialog}
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <Link href={`/admin/users/${client.id}`} className="text-gray-500 hover:text-gray-700">
-                            <ArrowLeft className="h-6 w-6" />
+                        <Link href={`/admin/users/${client.id}`} className="text-gray-500 hover:text-gray-700" aria-label={__('general.back_to_user')} title={__('general.back_to_user')}>
+                            <ArrowLeft className="h-6 w-6 rtl:rotate-180" />
                         </Link>
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">{__('general.manage_referrals')}</h2>
-                            <p className="text-sm text-gray-500">View and manage users referred by {client.name}</p>
+                            <p className="text-sm text-gray-500">{__('admin.user_referrals_description', { name: client.name })}</p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +69,7 @@ export default function Referrals({ client, referrals }) {
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-gray-50">
-                                            <TableHead className="w-16">ID</TableHead>
+                                            <TableHead className="w-16">{__('general.id')}</TableHead>
                                             <TableHead>{__('general.user')}</TableHead>
                                             <TableHead>{__('general.joined_date')}</TableHead>
                                             <TableHead>{__('general.email')}</TableHead>

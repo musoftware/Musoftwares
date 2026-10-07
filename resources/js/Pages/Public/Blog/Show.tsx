@@ -9,6 +9,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { __ } from '@/lib/i18n';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ServicePackage {
     id: number;
@@ -85,7 +86,7 @@ export default function Show({ article }: ShowProps) {
         } else {
             // Fallback: Copy to clipboard
             navigator.clipboard.writeText(window.location.href);
-            alert('Article link copied to clipboard!');
+            toast.success(__('general.share_link_copied'));
         }
     };
 
@@ -231,7 +232,7 @@ export default function Show({ article }: ShowProps) {
                                     {/* Service Info */}
                                     <div className="flex-grow text-center md:text-start space-y-3">
                                         <Badge className="bg-indigo-500/20 text-indigo-300 border-none shadow-sm uppercase font-bold tracking-widest text-xs px-2.5 py-1">
-                                            {__('general.related_service') || 'Related Service'}
+                                            {__('general.related_service')}
                                         </Badge>
                                         <h3 className="text-xl sm:text-2xl font-extrabold text-white leading-snug tracking-tight">
                                             {article.service.title}
@@ -245,12 +246,12 @@ export default function Show({ article }: ShowProps) {
                                     <div className="w-full md:w-auto shrink-0 flex flex-col items-center md:items-end gap-3.5 pt-4 md:pt-0 md:ps-6 border-t md:border-t-0 md:border-s border-white/10">
                                         <div className="text-center md:text-end">
                                             <span className="block text-xs uppercase tracking-widest text-slate-400 font-medium mb-1">
-                                                {__('general.starting_from') || 'Starting Price'}
+                                                {__('general.starting_from')}
                                             </span>
                                             <span className="text-2xl sm:text-3xl font-black text-indigo-300">
                                                 {(() => {
                                                     const pkgs = article.service.packages;
-                                                    if (article.service.is_free) return __('general.free') || 'Free';
+                                                    if (article.service.is_free) return __('general.free');
                                                     if (!pkgs || pkgs.length === 0) return '$5';
                                                     const cheapest = pkgs.reduce((min, p) => Number(p.price) < Number(min.price) ? p : min, pkgs[0]);
                                                     return formatCurrency(cheapest.price, cheapest.currency);
@@ -262,7 +263,7 @@ export default function Show({ article }: ShowProps) {
                                             className="w-full md:w-auto"
                                         >
                                             <Button className="w-full md:w-auto px-6 py-5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group border-none">
-                                                <span>{__('general.order_now') || 'Order Now'}</span>
+                                                <span>{__('general.order_now')}</span>
                                                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </a>

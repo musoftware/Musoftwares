@@ -15,6 +15,13 @@ use Modules\Marketplace\Services\ReferralService;
 class ReferralNetworkTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seedUsdEgpRates(); // USD wallets post to the EGP business currency ledger
+    }
 
     public function test_referral_commission_calculation_and_crediting()
     {

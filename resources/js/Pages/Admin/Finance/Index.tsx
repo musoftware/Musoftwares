@@ -22,8 +22,9 @@ import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { toast } from 'sonner';
-import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 declare const route: any;
 
@@ -56,7 +57,7 @@ function getStatusFromDate(due: string | null | undefined, status: string): stri
 }
 
 export default function Index({
-    entries, categories, users, currentTab, stats, all_currencies, filters,
+    entries, categories, currentTab, stats, all_currencies, filters,
     calendarEvents = {}, year = new Date().getFullYear(), month = new Date().getMonth() + 1,
 }: any) {
     const { errors } = usePage().props as any;
@@ -169,9 +170,9 @@ export default function Index({
                     type: currentTab === 'salaries' ? 'salary' : currentTab === 'income' ? 'income' : 'expense',
                 });
                 setCreateCategoryOption(categoriesList[0]?.id || 'custom');
-                toast.success(__('general.created') || 'Created');
+                toast.success(__('general.created'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -197,9 +198,9 @@ export default function Index({
         router.put(route('admin.finance.update', editingEntry.id), editingEntry, {
             onSuccess: () => {
                 setIsEditOpen(false);
-                toast.success(__('general.updated') || 'Updated');
+                toast.success(__('general.updated'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -209,11 +210,11 @@ export default function Index({
         router.delete(route('admin.finance.destroy', { entry: pendingDelete, type: entryType }), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.deleted') || 'Deleted');
+                toast.success(__('general.deleted'));
                 setPendingDelete(null);
             },
             onError: () => {
-                toast.error(__('general.error_occurred') || 'Something went wrong');
+                toast.error(__('general.error_occurred'));
                 setPendingDelete(null);
             },
         });
@@ -226,9 +227,9 @@ export default function Index({
                 if (fromDetails && selectedDetailEntry) {
                     setSelectedDetailEntry((prev: any) => prev ? { ...prev, status: 'completed' } : null);
                 }
-                toast.success(__('general.marked_paid') || 'Marked as paid');
+                toast.success(__('general.marked_paid'));
             },
-            onError: () => toast.error(__('general.error_occurred') || 'Something went wrong'),
+            onError: () => toast.error(__('general.error_occurred')),
         });
     };
 
@@ -338,10 +339,10 @@ export default function Index({
                     <div className="lg:col-span-2 bg-white p-6 rounded-xl border shadow-sm">
                         <div className="mb-4">
                             <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-1">
-                                {__('general.financial_trends') || 'Financial Trends (Last 6 Months)'}
+                                {__('general.financial_trends')}
                             </h3>
                             <p className="text-xs text-gray-500 font-normal">
-                                {__('general.historical_comparison') || 'Historical comparison in'} {stats.business_currency_code}
+                                {__('general.historical_comparison')} {stats.business_currency_code}
                             </p>
                         </div>
                         <div className="h-[260px] w-full">
@@ -387,9 +388,9 @@ export default function Index({
                         ) : (
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-1">
-                                    {currentTab === 'income' ? __('general.income_stream_breakdown') || 'Income Stream Breakdown' : __('general.cost_expense_allocation') || 'Cost & Expense Allocation'}
+                                    {currentTab === 'income' ? __('general.income_stream_breakdown') : __('general.cost_expense_allocation')}
                                 </h3>
-                                <p className="text-xs text-gray-500 mb-4 font-normal">{__('general.highest_spending') || 'Highest categories in'} {stats.business_currency_code}</p>
+                                <p className="text-xs text-gray-500 mb-4 font-normal">{__('general.highest_spending')} {stats.business_currency_code}</p>
 
                                 <div className="h-[120px] w-full flex items-center justify-center relative">
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -504,11 +505,11 @@ export default function Index({
                                 <option value="pending">{__('general.pending')}</option>
                                 <option value="overdue">{__('general.overdue')}</option>
                             </select>
-                            <PremiumCombobox
+                            <UserSearchCombobox
                                 className="w-[180px]"
                                 value={selectedUserFilter || ''}
                                 onChange={(val) => setSelectedUserFilter(val ? String(val) : '')}
-                                options={[{ value: '', label: __('general.all_users') }, ...users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))]}
+                                emptyOptionLabel={__('general.all_users')}
                                 placeholder={__('general.all_users')}
                                 searchPlaceholder={__('general.search_users')}
                             />
@@ -541,7 +542,7 @@ export default function Index({
                                 <DialogHeader>
                                     <DialogTitle>{__('general.add_new_ledger_record')}</DialogTitle>
                                     <DialogDescription>
-                                        {currentTab === 'income' ? __('general.create_income_stream_desc') || 'Create a new income stream.' : __('general.create_expense_desc') || 'Create a new expense entry.'}
+                                        {currentTab === 'income' ? __('general.create_income_stream_desc') : __('general.create_expense_desc')}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
@@ -588,7 +589,7 @@ export default function Index({
                                                     setNewEntry({ ...newEntry, category_id: e.target.value !== 'custom' ? e.target.value : '' });
                                                 }}>
                                                     {categoriesList.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                                    <option value="custom">-- Custom Category --</option>
+                                                    <option value="custom">{__('admin.finance_custom_category_option')}</option>
                                                 </select>
                                                 {createCategoryOption === 'custom' && (
                                                     <Input required placeholder={__('general.enter_category')} value={newEntry.category_id} onChange={(e) => setNewEntry({ ...newEntry, category_id: e.target.value })} />
@@ -600,14 +601,13 @@ export default function Index({
 
                                     <div className="space-y-2">
                                         <Label htmlFor="create-user">
-                                            {currentTab === 'salaries' || newEntry.type === 'salary' ? __('general.employee_required') || 'Employee (Required)'
-                                                : currentTab === 'income' || newEntry.type === 'income' ? __('general.client_user_optional') || 'Client/User (Optional)'
-                                                : __('general.user_vendor_optional') || 'User/Vendor (Optional)'}
+                                            {currentTab === 'salaries' || newEntry.type === 'salary' ? __('general.employee_required')
+                                                : currentTab === 'income' || newEntry.type === 'income' ? __('general.client_user_optional')
+                                                : __('general.user_vendor_optional')}
                                         </Label>
-                                        <PremiumCombobox
+                                        <UserSearchCombobox
                                             value={newEntry.user_id ? String(newEntry.user_id) : ''}
                                             onChange={(val) => setNewEntry({ ...newEntry, user_id: val ? String(val) : '' })}
-                                            options={users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))}
                                             placeholder={__('general.select_user')}
                                             searchPlaceholder={__('general.search_users')}
                                         />
@@ -674,7 +674,7 @@ export default function Index({
             {currentTab !== 'calendar' && !hasEntries ? (
                 <EmptyState
                     icon={DollarSign}
-                    title={__('general.no_records_found') || 'No records found'}
+                    title={__('general.no_records_found')}
                     description={__('general.create_a_new_entry_to_start_tracking_your_finances')}
                 />
             ) : currentTab !== 'calendar' && (
@@ -830,25 +830,11 @@ export default function Index({
             )}
 
             {currentTab !== 'calendar' && entries.links && entries.links.length > 3 && (
-                <div className="flex justify-end gap-4 items-center mt-6">
-                    <div className="me-auto text-sm text-gray-500">
+                <div className="flex flex-wrap justify-between gap-4 items-center mt-6">
+                    <div className="text-sm text-gray-500">
                         {__('general.showing')} {entries.from} {__('general.to')} {entries.to} {__('general.of')} {entries.total} {__('general.entries')}
                     </div>
-                    <div className="flex space-x-1">
-                        {entries.links.map((link: any, idx: number) => {
-                            if (link.url === null) {
-                                return <span key={idx} className="px-3 py-2 border rounded text-gray-400 bg-gray-50 text-sm cursor-not-allowed" dangerouslySetInnerHTML={{ __html: link.label }} />;
-                            }
-                            return (
-                                <Link
-                                    key={idx}
-                                    href={link.url}
-                                    className={`px-3 py-2 border rounded text-sm ${link.active ? 'bg-black text-white border-black font-semibold' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            );
-                        })}
-                    </div>
+                    <Pagination links={entries.links} />
                 </div>
             )}
 
@@ -985,7 +971,7 @@ export default function Index({
                                             setEditingEntry({ ...editingEntry, category_id: e.target.value !== 'custom' ? e.target.value : '' });
                                         }}>
                                             {categoriesList.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                            <option value="custom">-- Custom Category --</option>
+                                            <option value="custom">{__('admin.finance_custom_category_option')}</option>
                                         </select>
                                         {editCategoryOption === 'custom' && (
                                             <Input required placeholder={__('general.enter_category')} value={editingEntry.category_id} onChange={(e) => setEditingEntry({ ...editingEntry, category_id: e.target.value })} />
@@ -997,14 +983,13 @@ export default function Index({
 
                             <div className="space-y-2">
                                 <Label htmlFor="edit-user">
-                                    {currentTab === 'salaries' || editingEntry.type === 'salary' ? __('general.employee_required') || 'Employee (Required)'
-                                        : currentTab === 'income' || editingEntry.type === 'income' ? __('general.client_user_optional') || 'Client/User (Optional)'
-                                        : __('general.user_vendor_optional') || 'User/Vendor (Optional)'}
+                                    {currentTab === 'salaries' || editingEntry.type === 'salary' ? __('general.employee_required')
+                                        : currentTab === 'income' || editingEntry.type === 'income' ? __('general.client_user_optional')
+                                        : __('general.user_vendor_optional')}
                                 </Label>
-                                <PremiumCombobox
+                                <UserSearchCombobox
                                     value={editingEntry.user_id ? String(editingEntry.user_id) : ''}
                                     onChange={(val) => setEditingEntry({ ...editingEntry, user_id: val ? String(val) : '' })}
-                                    options={users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email || ''})` }))}
                                     placeholder={__('general.select_user')}
                                     searchPlaceholder={__('general.search_users')}
                                 />
@@ -1193,8 +1178,8 @@ export default function Index({
 
             <ConfirmModal
                 isOpen={pendingDelete !== null}
-                title={__('general.delete') || 'Delete record?'}
-                description={__('general.confirm_delete_record_desc') || 'This record will be permanently deleted.'}
+                title={__('general.delete')}
+                description={__('general.confirm_delete_record_desc')}
                 confirmLabel={__('general.delete')}
                 cancelLabel={__('general.cancel')}
                 variant="danger"

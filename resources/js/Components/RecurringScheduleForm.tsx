@@ -6,7 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import InputError from '@/Components/InputError';
-import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { UserSearchCombobox } from '@/Components/Admin/UserSearchCombobox';
 import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { __ } from '@/lib/i18n';
@@ -74,9 +74,6 @@ export interface RecurringScheduleFormProps {
     mode: 'create' | 'edit';
     initialValues: RecurringScheduleValues;
     currencies: any[];
-    users: any[];
-    userOptions?: { value: string | number; label: string }[];
-    searchUsersEndpoint?: string;
     errors?: Record<string, string>;
     submitting?: boolean;
     onSubmit: (values: RecurringScheduleValues) => void;
@@ -89,9 +86,6 @@ export function RecurringScheduleForm({
     mode,
     initialValues,
     currencies,
-    users,
-    userOptions,
-    searchUsersEndpoint,
     errors = {},
     submitting = false,
     onSubmit,
@@ -110,14 +104,6 @@ export function RecurringScheduleForm({
 
     const userLabel = kind === 'salary' ? __('general.employee_user') : __('general.user_user');
     const selectUserPlaceholder = kind === 'salary' ? __('general.select_employee') : __('general.select_user');
-
-    const builtUserOptions = useMemo(() => {
-        if (userOptions?.length) return userOptions;
-        return users.map((u: any) => ({
-            value: u.id,
-            label: u.name ? `${u.name} (${u.email})` : u.email,
-        }));
-    }, [userOptions, users]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,15 +139,12 @@ export function RecurringScheduleForm({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="space-y-2">
                 <Label htmlFor="user_id">{userLabel}</Label>
-                <PremiumCombobox
+                <UserSearchCombobox
                     value={form.user_id ? String(form.user_id) : null}
                     onChange={(val) => updateField('user_id', val as any)}
-                    options={builtUserOptions && builtUserOptions.length > 0 ? (builtUserOptions as any) : users.map((u: any) => ({ value: String(u.id), label: `${u.name} (${u.email})` }))}
-                    asyncEndpoint={searchUsersEndpoint || undefined}
-                    searchParam="q"
                     placeholder={selectUserPlaceholder}
-                    searchPlaceholder={`${__('general.search') || 'Search'} ${userLabel.toLowerCase()}...`}
-                    emptyText={__('general.no_results') || 'No clients found.'}
+                    searchPlaceholder={`${__('general.search')} ${userLabel.toLowerCase()}...`}
+                    emptyText={__('general.no_results')}
                 />
                 <InputError message={errors.user_id} />
             </div>
@@ -201,7 +184,7 @@ export function RecurringScheduleForm({
                         value={form.currency}
                         onChange={(e) => updateField('currency', e.target.value)}
                     >
-                        <option value="">{__('general.select_currency') || 'Select currency'}</option>
+                        <option value="">{__('general.select_currency')}</option>
                         {currencies.map((c: any) => (
                             <option key={c.id} value={c.id}>{c.currency} ({c.symbol})</option>
                         ))}
@@ -213,7 +196,7 @@ export function RecurringScheduleForm({
             {kind === 'invoice' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 border rounded-lg">
                     <div className="space-y-2">
-                        <Label htmlFor="cost">{__('general.cost') || 'Cost'} ({__('general.optional') || 'Optional'})</Label>
+                        <Label htmlFor="cost">{__('general.cost')} ({__('general.optional')})</Label>
                         <Input
                             id="cost"
                             type="number"
@@ -223,11 +206,11 @@ export function RecurringScheduleForm({
                             onChange={(e) => updateField('cost', e.target.value)}
                             placeholder="0.00"
                         />
-                        <p className="text-xs text-muted-foreground">{__('general.recurring_invoice_cost_help') || 'Cost amount that will attach to the generated invoice.'}</p>
+                        <p className="text-xs text-muted-foreground">{__('general.recurring_invoice_cost_help')}</p>
                         <InputError message={errors.cost} />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="days_before">{__('general.fire_in_advance_days') || 'Issue in advance (days before)'}</Label>
+                        <Label htmlFor="days_before">{__('general.fire_in_advance_days')}</Label>
                         <Input
                             id="days_before"
                             type="number"
@@ -237,14 +220,14 @@ export function RecurringScheduleForm({
                             onChange={(e) => updateField('days_before', e.target.value ? parseInt(e.target.value, 10) : 0)}
                             placeholder="3"
                         />
-                        <p className="text-xs text-muted-foreground">{__('general.fire_in_advance_help') || 'Generate and fire this invoice up to X days before its scheduled date (default 3).'}</p>
+                        <p className="text-xs text-muted-foreground">{__('general.fire_in_advance_help')}</p>
                         <InputError message={errors.days_before} />
                     </div>
                 </div>
             )}
 
             <div className="space-y-2">
-                <Label htmlFor="reason">Note / Custom Reason (Optional)</Label>
+                <Label htmlFor="reason">{__('general.recurring_note_optional')}</Label>
                 <Textarea
                     id="reason"
                     rows={2}
@@ -283,7 +266,7 @@ export function RecurringScheduleForm({
                     </select>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="interval">Interval (Every N)</Label>
+                    <Label htmlFor="interval">{__('general.recurring_interval_every_n')}</Label>
                     <select
                         id="interval"
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10"

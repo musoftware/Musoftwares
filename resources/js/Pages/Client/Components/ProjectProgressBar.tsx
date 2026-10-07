@@ -10,6 +10,8 @@ import {
     DialogFooter
 } from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
+import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 export interface Milestone {
     id: number;
@@ -39,10 +41,10 @@ interface ProjectProgressBarProps {
 }
 
 const STAGES = [
-    { key: 'planning', title: 'Planning', desc: 'Architecture & Specifications', num: '01' },
-    { key: 'development', title: 'Engineering', desc: 'Core Implementation', num: '02' },
-    { key: 'testing', title: 'Audit & QA', desc: 'Security & Verification', num: '03' },
-    { key: 'delivered', title: 'Handover', desc: 'Production Deployment', num: '04' },
+    { key: 'planning', title: 'client.progress_stage_planning', desc: 'client.progress_stage_planning_desc', num: '01' },
+    { key: 'development', title: 'client.progress_stage_engineering', desc: 'client.progress_stage_engineering_desc', num: '02' },
+    { key: 'testing', title: 'client.progress_stage_qa', desc: 'client.progress_stage_qa_desc', num: '03' },
+    { key: 'delivered', title: 'client.progress_stage_handover', desc: 'client.progress_stage_handover_desc', num: '04' },
 ];
 
 export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
@@ -82,6 +84,8 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
 
     const currentStageIndex = isDelivered ? 3 : STAGES.findIndex((s) => s.key === currentStage);
     const milestones = project.milestones || [];
+    const phaseStage = STAGES.find((s) => s.key === (isDelivered ? 'delivered' : currentStage));
+    const phaseLabel = phaseStage ? __(phaseStage.title) : currentStage;
 
     const handleBriefSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -92,11 +96,11 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
             const res = await axios.post(`/api/portal/projects/${project.id}/brief`, {
                 brief_details: briefText,
             });
-            setBriefSuccessMsg(res.data?.message || 'Brief locked in. +100 Loyalty Points awarded.');
+            setBriefSuccessMsg(res.data?.message || __('client.progress_brief_success'));
             setShowBriefForm(false);
             if (onBriefSubmitted) onBriefSubmitted();
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to submit brief. Please try again.');
+            toast.error(err.response?.data?.message || __('client.progress_brief_failed'));
         } finally {
             setIsSubmittingBrief(false);
         }
@@ -112,7 +116,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
             });
 
             const points = res.data?.data?.points_awarded ?? 150;
-            setCompleteSuccessMsg(res.data?.message || `Project confirmed and delivered! +${points} Loyalty Points awarded.`);
+            setCompleteSuccessMsg(res.data?.message || __('client.progress_complete_success', { points }));
             setIsDelivered(true);
             setCurrentStage('delivered');
             setPercentage(100);
@@ -122,7 +126,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                 onProjectCompleted();
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to sign off project. Please try again.');
+            toast.error(err.response?.data?.message || __('client.progress_complete_failed'));
         } finally {
             setIsSubmittingComplete(false);
         }
@@ -150,14 +154,14 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                         {isDelivered && (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20">
                                 <CheckCircle2 className="w-3 h-3" />
-                                Handover Complete
+                                {__('client.progress_handover_complete')}
                             </span>
                         )}
                     </div>
                     <p className="text-xs text-zinc-600 dark:text-zinc-400 max-w-xl font-normal leading-relaxed">
                         {isDelivered
-                            ? 'All development, testing, and production handover deliverables have been verified and signed off.'
-                            : 'Live sprint trajectory with continuous delivery verification. No status check-in calls required.'}
+                            ? __('client.progress_delivered_desc')
+                            : __('client.progress_live_desc')}
                     </p>
                 </div>
 
@@ -169,18 +173,18 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400 text-white dark:text-black transition-all shadow-sm active:scale-[0.98] cursor-pointer"
                         >
                             <ShieldCheck className="w-4 h-4" />
-                            <span>Confirm Completion (+150 PTS)</span>
+                            <span>{__('client.progress_confirm_completion')}</span>
                         </button>
                     ) : (
                         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 text-xs text-zinc-600 dark:text-zinc-400">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                            <span>Verified Delivery</span>
+                            <span>{__('client.progress_verified_delivery')}</span>
                         </div>
                     )}
 
                     <div className="text-left sm:text-right border-l sm:border-l-0 pl-3 sm:pl-0 border-black/5 dark:border-white/5">
                         <div className="text-[11px] font-mono tracking-wider uppercase text-zinc-500 dark:text-zinc-400">
-                            Sprint Velocity
+                            {__('client.progress_sprint_velocity')}
                         </div>
                         <div className="text-3xl font-mono font-bold text-[#1d1d1f] dark:text-white tracking-tight tabular-nums mt-0.5">
                             {percentage}<span className="text-sm font-sans font-normal text-zinc-500 dark:text-zinc-400">%</span>
@@ -223,12 +227,12 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                         {isCurrent && <Clock className="w-3.5 h-3.5 text-[#0071e3] dark:text-sky-400 animate-pulse" />}
                                         {!isDone && !isCurrent && <Circle className="w-3 h-3 text-zinc-300 dark:text-zinc-700" />}
                                         <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-500 dark:text-zinc-400">
-                                            {isDone ? 'Delivered' : isCurrent ? 'Active' : 'Queued'}
+                                            {isDone ? __('client.progress_status_delivered') : isCurrent ? __('client.progress_status_active') : __('client.progress_status_queued')}
                                         </span>
                                     </span>
                                 </div>
-                                <div className="text-xs font-semibold text-[#1d1d1f] dark:text-white tracking-tight">{stg.title}</div>
-                                <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">{stg.desc}</div>
+                                <div className="text-xs font-semibold text-[#1d1d1f] dark:text-white tracking-tight">{__(stg.title)}</div>
+                                <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">{__(stg.desc)}</div>
 
                                 {/* Handover Action on Stage 4 */}
                                 {stg.key === 'delivered' && !isDelivered && (
@@ -238,7 +242,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                         className="mt-2.5 w-full py-1 px-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-500 dark:hover:text-black text-[11px] font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
                                     >
                                         <Check className="w-3 h-3" />
-                                        <span>Sign Off Handover</span>
+                                        <span>{__('client.progress_sign_off_handover')}</span>
                                     </button>
                                 )}
                             </div>
@@ -256,10 +260,10 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                         </div>
                         <div>
                             <div className="text-xs font-semibold text-emerald-950 dark:text-white">
-                                Project Finalized & Signed Off
+                                {__('client.progress_finalized_title')}
                             </div>
                             <p className="text-[11px] text-emerald-900/80 dark:text-zinc-400 mt-0.5">
-                                Client confirmation complete. Deliverables are approved for production and +150 Loyalty Points have been credited.
+                                {__('client.progress_finalized_desc')}
                             </p>
                         </div>
                     </div>
@@ -269,8 +273,8 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                 {project.delivered_at}
                             </span>
                         )}
-                        <span className="px-3 py-1 rounded-md text-xs font-mono font-semibold bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shrink-0">
-                            CLOSED
+                        <span className="px-3 py-1 rounded-md text-xs font-mono font-semibold bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shrink-0 uppercase">
+                            {__('client.progress_closed')}
                         </span>
                     </div>
                 </div>
@@ -284,10 +288,10 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                             </div>
                             <div>
                                 <div className="text-xs font-semibold text-amber-950 dark:text-white">
-                                    Lock-In Project Scope & Requirements
+                                    {__('client.progress_lock_scope_title')}
                                 </div>
                                 <p className="text-[11px] text-amber-900/80 dark:text-zinc-400 mt-0.5">
-                                    Define architecture parameters early to bypass manual scope discussions and earn 100 PTS.
+                                    {__('client.progress_lock_scope_desc')}
                                 </p>
                             </div>
                         </div>
@@ -296,7 +300,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                             onClick={() => setShowBriefForm(!showBriefForm)}
                             className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#1d1d1f] hover:bg-black text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors shrink-0 shadow-sm cursor-pointer"
                         >
-                            {showBriefForm ? 'Dismiss' : 'Lock In Brief (+100 PTS)'}
+                            {showBriefForm ? __('client.progress_dismiss') : __('client.progress_lock_brief')}
                         </button>
                     </div>
                 )
@@ -305,15 +309,16 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
             {showBriefForm && (
                 <form onSubmit={handleBriefSubmit} className="mt-4 p-4 rounded-xl bg-[#fbfbfd] dark:bg-zinc-950 border border-black/10 dark:border-white/10 space-y-3 animate-in fade-in duration-200">
                     <div className="flex items-center justify-between text-xs font-mono text-zinc-500 dark:text-zinc-400">
-                        <span>ENGINEERING SPECIFICATION INPUT</span>
-                        <span>MIN 20 CHARACTERS</span>
+                        <span className="uppercase">{__('client.progress_spec_input')}</span>
+                        <span className="uppercase">{__('client.progress_min_chars')}</span>
                     </div>
                     <textarea
                         rows={4}
                         required
                         value={briefText}
                         onChange={(e) => setBriefText(e.target.value)}
-                        placeholder="Detail functional goals, target APIs, database constraints, user roles, or benchmark milestones..."
+                        placeholder={__('client.progress_brief_placeholder')}
+                        aria-label={__('client.progress_spec_input')}
                         className="w-full text-xs p-3.5 rounded-lg bg-white dark:bg-zinc-900/90 border border-black/15 dark:border-zinc-700 text-[#1d1d1f] dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#0071e3]/30 dark:focus:ring-white/30 font-mono leading-relaxed"
                     />
                     <div className="flex justify-end gap-2.5 pt-1">
@@ -322,7 +327,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                             onClick={() => setShowBriefForm(false)}
                             className="px-3 py-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white cursor-pointer"
                         >
-                            Cancel
+                            {__('general.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -330,7 +335,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 dark:bg-emerald-500 text-white dark:text-black hover:bg-emerald-700 dark:hover:bg-emerald-400 disabled:opacity-40 transition-colors cursor-pointer"
                         >
                             <Send className="w-3.5 h-3.5" />
-                            <span>{isSubmittingBrief ? 'Locking In...' : 'Confirm Scope & Claim Points'}</span>
+                            <span>{isSubmittingBrief ? __('client.progress_locking_in') : __('client.progress_confirm_scope')}</span>
                         </button>
                     </div>
                 </form>
@@ -353,9 +358,12 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
             {milestones.length > 0 && (
                 <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5">
                     <div className="flex items-center justify-between mb-3 text-[11px] font-mono uppercase text-zinc-500 dark:text-zinc-400">
-                        <span>Phase Milestones ({isDelivered ? 'Handover' : currentStage})</span>
+                        <span>{__('client.progress_phase_milestones', { phase: phaseLabel })}</span>
                         <span className="tabular-nums font-mono">
-                            {isDelivered ? milestones.length : milestones.filter(m => m.is_completed).length}/{milestones.length} Completed
+                            {__('client.progress_completed_count', {
+                                done: isDelivered ? milestones.length : milestones.filter(m => m.is_completed).length,
+                                total: milestones.length,
+                            })}
                         </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -368,7 +376,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                     {m.title}
                                 </span>
                                 <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500 uppercase">
-                                    {(isDelivered || m.is_completed) ? 'PASS' : 'ACTIVE'}
+                                    {(isDelivered || m.is_completed) ? __('client.progress_pass') : __('client.progress_status_active')}
                                 </span>
                             </div>
                         ))}
@@ -383,17 +391,17 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                         <DialogHeader>
                             <DialogTitle className="text-lg font-semibold text-[#1d1d1f] dark:text-white flex items-center gap-2">
                                 <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                <span>Confirm Project Handover</span>
+                                <span>{__('client.progress_confirm_handover_title')}</span>
                             </DialogTitle>
                             <DialogDescription className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mt-1">
-                                Are you satisfied with the project deliverables? Confirming completion marks the project as delivered, verifies sprint velocity at 100%, and awards you <strong className="text-emerald-600 dark:text-emerald-400">+150 Loyalty Points</strong>.
+                                {__('client.progress_confirm_handover_desc')}
                             </DialogDescription>
                         </DialogHeader>
 
                         {/* Star Rating Selection */}
                         <div className="my-5 space-y-2">
                             <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                                How would you rate your delivery experience?
+                                {__('client.progress_rate_experience')}
                             </label>
                             <div className="flex items-center gap-1.5 pt-1">
                                 {[1, 2, 3, 4, 5].map((starVal) => {
@@ -405,6 +413,7 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                             onClick={() => setRating(starVal)}
                                             onMouseEnter={() => setHoveredRating(starVal)}
                                             onMouseLeave={() => setHoveredRating(null)}
+                                            aria-label={__('client.progress_rate_star', { count: starVal })}
                                             className="p-1 rounded-md text-amber-400 hover:scale-110 transition-transform cursor-pointer"
                                         >
                                             <Star
@@ -426,13 +435,14 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                         {/* Optional Feedback */}
                         <div className="space-y-1.5 mb-5">
                             <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                                Final Handover Notes / Feedback <span className="text-zinc-400 font-normal">(Optional)</span>
+                                {__('client.progress_feedback_label')} <span className="text-zinc-400 font-normal">{__('client.progress_optional')}</span>
                             </label>
                             <textarea
                                 rows={3}
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
-                                placeholder="Any feedback, testimonial, or notes for our engineering team..."
+                                placeholder={__('client.progress_feedback_placeholder')}
+                                aria-label={__('client.progress_feedback_label')}
                                 className="w-full text-xs p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                             />
                         </div>
@@ -445,14 +455,14 @@ export const ProjectProgressBar: React.FC<ProjectProgressBarProps> = ({
                                 disabled={isSubmittingComplete}
                                 className="text-xs rounded-xl"
                             >
-                                Cancel
+                                {__('general.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isSubmittingComplete}
                                 className="text-xs font-semibold bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400 text-white dark:text-black rounded-xl"
                             >
-                                {isSubmittingComplete ? 'Verifying...' : 'Sign Off & Earn 150 PTS'}
+                                {isSubmittingComplete ? __('client.progress_verifying') : __('client.progress_sign_off_earn')}
                             </Button>
                         </DialogFooter>
                     </form>

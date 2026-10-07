@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
@@ -10,7 +10,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import MDEditor from '@uiw/react-md-editor';
 import { 
-    ArrowRight, Save, Plus, Trash2, Code, Server, 
+    ArrowLeft, Save, Plus, Trash2, Code, Server, 
     Sparkles, DollarSign, CheckCircle2, 
     FileText
 } from 'lucide-react';
@@ -31,6 +31,18 @@ interface ItemRow {
     quantity: number | string;
     external_link?: string;
     link_label?: string;
+}
+
+type ScopeTemplate = 'saas' | 'ecommerce' | 'payment';
+
+const SCOPE_SNIPPET_BUILDERS: Record<ScopeTemplate, (depositPct: number) => string> = {
+    saas: () => `\n\n### SaaS Features\n- Subscription billing and gateway integration.\n- Admin dashboard for user management.\n- Continuous support and security updates.`,
+    ecommerce: () => `\n\n### Store Specifications\n- Products, inventory, and order management.\n- Seamless 1-step checkout.\n- Multiple payment gateways integration.`,
+    payment: (depositPct) => `\n\n### Payment Milestones\n- **1st Milestone:** ${depositPct}% upfront upon contract.\n- **2nd Milestone:** ${100 - depositPct}% upon final delivery.`,
+};
+
+function buildScopeSnippet(templateType: ScopeTemplate, depositPct: number): string {
+    return SCOPE_SNIPPET_BUILDERS[templateType](depositPct);
 }
 
 interface CreateProps {
@@ -126,7 +138,7 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
 
     const handleRemoveItem = (index: number) => {
         if (data.items.length <= 1) {
-            toast.error(__('validation.required'));
+            toast.error(__('admin.quotations_min_one_item'));
             return;
         }
         const updated = data.items.filter((_, i) => i !== index);
@@ -151,15 +163,8 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
         }));
     };
 
-    const insertTemplate = (templateType: string) => {
-        let snippet = '';
-        if (templateType === 'saas') {
-            snippet = `\n\n### 🚀 SaaS Features\n- Subscription billing and gateway integration.\n- Admin dashboard for user management.\n- Continuous support and security updates.`;
-        } else if (templateType === 'ecommerce') {
-            snippet = `\n\n### 🛍️ Store Specifications\n- Products, inventory, and order management.\n- Seamless 1-step checkout.\n- Multiple payment gateways integration.`;
-        } else if (templateType === 'payment') {
-            snippet = `\n\n### 💳 Payment Milestones\n- **1st Milestone:** ${data.deposit_percentage}% upfront upon contract.\n- **2nd Milestone:** ${100 - (Number(data.deposit_percentage) || 50)}% upon final delivery.`;
-        }
+    const insertTemplate = (templateType: ScopeTemplate) => {
+        const snippet = buildScopeSnippet(templateType, Number(data.deposit_percentage) || 50);
         setData('scope_markdown', (data.scope_markdown || '') + snippet);
         toast.success(__('common.success'));
     };
@@ -168,20 +173,17 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
         e.preventDefault();
 
         if (!data.title.trim()) {
-            toast.error(__('validation.required'));
+            toast.error(__('admin.quotations_title_required'));
             return;
         }
 
         if (data.items.length === 0) {
-            toast.error(__('validation.required'));
+            toast.error(__('admin.quotations_min_one_item'));
             return;
         }
 
         post('/admin/marketplace/quotations', {
-            onError: (errs) => {
-                console.error(errs);
-                toast.error(__('validation.required'));
-            },
+            onError: () => toast.error(__('admin.quotations_save_failed')),
         });
     };
 
@@ -199,8 +201,10 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
                         <Link
                             href="/admin/marketplace/quotations"
                             className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                            aria-label={__('general.back')}
+                            title={__('general.back')}
                         >
-                            <ArrowRight className="w-5 h-5" />
+                            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
                         </Link>
                         <div>
                             <h1 className="text-xl font-bold text-slate-900">{__('quotations.create_new')}</h1>
@@ -441,6 +445,8 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
                                                 variant="ghost"
                                                 onClick={() => handleRemoveItem(item.originalIndex)}
                                                 className="text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0 h-9 px-2"
+                                                aria-label={__('admin.quotations_remove_item')}
+                                                title={__('admin.quotations_remove_item')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
@@ -540,6 +546,8 @@ export default function Create({ currencies, defaultCurrencyId, defaultCurrencyC
                                                     variant="ghost"
                                                     onClick={() => handleRemoveItem(item.originalIndex)}
                                                     className="text-slate-400 hover:text-red-600 hover:bg-red-50 shrink-0 h-9 px-2"
+                                                    aria-label={__('admin.quotations_remove_item')}
+                                                    title={__('admin.quotations_remove_item')}
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>

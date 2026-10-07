@@ -68,6 +68,14 @@ return [
     'timezone' => 'UTC',
 
     /*
+    | Business calendar timezone. Recurring schedules (invoices, costs,
+    | incomes, salaries) decide "which day is today" using this zone, so a
+    | run fires on the business date and not the UTC date.
+    */
+
+    'business_timezone' => env('APP_BUSINESS_TIMEZONE', 'Africa/Cairo'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------

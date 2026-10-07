@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React, { useState } from 'react';
 import { 
     FileText, 
@@ -149,7 +150,7 @@ export default function Message({ message, isOwnMessage }) {
                                                         type="button"
                                                         onClick={() => openLightbox(src)}
                                                         className="absolute bottom-2 end-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover/img:opacity-100 transition-opacity backdrop-blur-xs cursor-pointer"
-                                                        title="Expand Image"
+                                                        title={__('general.chat_expand_image')}
                                                     >
                                                         <Maximize2 className="w-3.5 h-3.5" />
                                                     </button>
@@ -197,7 +198,7 @@ export default function Message({ message, isOwnMessage }) {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="truncate font-semibold text-xs">{displayName}</p>
-                                                    <p className="text-[10px] opacity-75">Click to download</p>
+                                                    <p className="text-[10px] opacity-75">{__('general.chat_click_to_download')}</p>
                                                 </div>
                                                 <Download className="w-4 h-4 shrink-0 opacity-70" />
                                             </a>
@@ -245,7 +246,7 @@ export default function Message({ message, isOwnMessage }) {
                     >
                         <img 
                             src={activeLightboxSrc} 
-                            alt="Preview" 
+                            alt={__('general.chat_image_preview')} 
                             className="max-h-[80vh] max-w-full rounded-xl object-contain shadow-2xl" 
                         />
                         <div className="flex items-center gap-3 mt-4">
@@ -257,7 +258,7 @@ export default function Message({ message, isOwnMessage }) {
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-semibold backdrop-blur-md transition-colors"
                             >
                                 <Download className="w-3.5 h-3.5" />
-                                Download Full Image
+                                {__('general.chat_download_full_image')}
                             </a>
                             <button
                                 type="button"

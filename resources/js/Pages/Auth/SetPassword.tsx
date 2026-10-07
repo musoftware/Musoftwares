@@ -34,10 +34,10 @@ export default function SetPassword({
 
         let label = '';
         if (score === 0) label = '';
-        else if (score === 1) label = __('general.weak') || 'Weak';
-        else if (score === 2) label = __('general.fair') || 'Fair';
-        else if (score === 3) label = __('general.good') || 'Good';
-        else if (score === 4) label = __('general.strong') || 'Strong';
+        else if (score === 1) label = __('general.weak');
+        else if (score === 2) label = __('general.fair');
+        else if (score === 3) label = __('general.good');
+        else if (score === 4) label = __('general.strong');
 
         setPasswordStrength({ score, label });
     };
@@ -56,19 +56,18 @@ export default function SetPassword({
 
     return (
         <GuestLayout>
-            <Head title={__('general.set_password') || 'Set your password'} />
+            <Head title={__('general.set_password')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
                     <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                        {__('general.set_your_password') || 'Set your password'}
+                        {__('general.set_your_password')}
                     </h1>
                     <p className="text-xs text-[#1d1d1f]/60 font-sans">
                         {name} · {email}
                     </p>
                     <p className="text-xs text-[#1d1d1f]/60 font-sans">
-                        {__('general.choose_a_secure_key_to_protect_your_workspace') ||
-                            'Choose a secure password to protect your account. This link is single-use.'}
+                        {__('general.choose_a_secure_key_to_protect_your_workspace')}
                     </p>
                 </div>
 
@@ -77,7 +76,7 @@ export default function SetPassword({
 
                     <div className="space-y-1.5">
                         <Label htmlFor="password" className="text-xs font-semibold text-[#1d1d1f]/80">
-                            {__('general.new_password') || 'New password'}
+                            {__('general.new_password')}
                         </Label>
                         <div className="relative">
                             <Input
@@ -140,7 +139,7 @@ export default function SetPassword({
 
                     <div className="space-y-1.5">
                         <Label htmlFor="password_confirmation" className="text-xs font-semibold text-[#1d1d1f]/80">
-                            {__('general.confirm_password') || 'Confirm password'}
+                            {__('general.confirm_password')}
                         </Label>
                         <div className="relative">
                             <Input
@@ -157,12 +156,12 @@ export default function SetPassword({
                         </div>
                         {data.password_confirmation.length > 0 && data.password !== data.password_confirmation && (
                             <p className="text-xs text-[#ff3b30] font-medium mt-1">
-                                {__('general.passwords_do_not_match') || 'Passwords do not match'}
+                                {__('general.passwords_do_not_match')}
                             </p>
                         )}
                         {data.password_confirmation.length > 0 && data.password === data.password_confirmation && (
                             <p className="text-xs text-[#34c759] font-medium mt-1">
-                                {__('general.passwords_match') || 'Passwords match'}
+                                {__('general.passwords_match')}
                             </p>
                         )}
                         {errors.password_confirmation && (
@@ -183,10 +182,10 @@ export default function SetPassword({
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-white" />
-                                    <span>{__('general.setting_password') || 'Setting password...'}</span>
+                                    <span>{__('general.setting_password')}</span>
                                 </>
                             ) : (
-                                <span>{__('general.save_password') || 'Save password & sign in'}</span>
+                                <span>{__('general.save_password')}</span>
                             )}
                         </Button>
                     </div>

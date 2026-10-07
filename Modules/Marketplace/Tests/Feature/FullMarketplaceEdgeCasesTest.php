@@ -22,6 +22,7 @@ use Spatie\Permission\Models\Role;
 class FullMarketplaceEdgeCasesTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Feature\Concerns\SeedsUsdEgpRates;
 
     protected User $seller;
     protected User $buyer;
@@ -33,6 +34,7 @@ class FullMarketplaceEdgeCasesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seedUsdEgpRates(); // wallet ledger and escrow convert USD amounts to the EGP business currency
 
         Role::firstOrCreate(['name' => 'seller']);
         Role::firstOrCreate(['name' => 'client']);

@@ -2,36 +2,22 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Concerns\AppliesRecurringItems;
 use App\Models\RecurringCost;
 use Illuminate\Console\Command;
 
 class AddRecurringCosts extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    use AppliesRecurringItems;
+
     protected $signature = 'add:recurring_costs';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Add Recurring Costs';
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
-        foreach (RecurringCost::where('is_active', true)->get() as $item) {
-            $item->apply();
-        }
+        $failed = $this->applyRecurringItems(RecurringCost::where('is_active', true), 'AddRecurringCosts');
 
-        return Command::SUCCESS;
+        return $failed === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 }

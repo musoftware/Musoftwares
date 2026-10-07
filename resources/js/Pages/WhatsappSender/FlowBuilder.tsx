@@ -1,5 +1,7 @@
+import { __ } from '@/lib/i18n';
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
+import { MessageSquare, Hourglass, GitBranch, Settings, PlayCircle, CircleDot, MousePointerClick, X } from 'lucide-react';
 
 interface Node {
     id: string;
@@ -68,7 +70,7 @@ export default function FlowBuilder({
         whatsapp_business_id: whatsappBusinessId,
         channel: channel,
         telegram_bot_id: telegramBotId || (flow?.telegram_bot_id ?? null),
-        name: flow?.name ?? 'New Chatbot Flow',
+        name: flow?.name ?? __('whatsapp.flow_default_name'),
         is_active: flow?.is_active ?? false,
         trigger_type: flow?.trigger_type ?? 'keyword',
         trigger_keywords: flow?.trigger_keywords ?? [],
@@ -138,7 +140,7 @@ export default function FlowBuilder({
     const addNode = (type: 'message' | 'delay' | 'condition' | 'action') => {
         const id = `node_${type}_${uuid()}`;
         const defaultData = type === 'message'
-            ? { message_text: 'Hello! How can we help you today?', buttons: [] }
+            ? { message_text: __('whatsapp.flow_default_message'), buttons: [] }
             : type === 'delay'
             ? { seconds: 2 }
             : type === 'condition'
@@ -277,17 +279,18 @@ export default function FlowBuilder({
                         onClick={onClose}
                         className="px-3 py-1.5 text-sm font-medium border border-slate-700 rounded-lg hover:bg-slate-800 transition"
                     >
-                        ← Back
+                        {__('whatsapp.flow_back')}
                     </button>
                     <div>
                         <input
                             type="text"
                             value={data.name}
                             onChange={e => setData('name', e.target.value)}
+                            aria-label={__('whatsapp.flow_name_label')}
                             className="bg-transparent border-b border-transparent hover:border-slate-600 focus:border-blue-500 focus:outline-none text-lg font-bold px-1"
                         />
                         <div className="text-xs text-slate-400 mt-0.5">
-                            Channel: <span className="capitalize text-slate-200">{data.channel}</span>
+                            {__('whatsapp.flow_channel_label')} <span className="capitalize text-slate-200">{data.channel}</span>
                         </div>
                     </div>
                 </div>
@@ -295,9 +298,12 @@ export default function FlowBuilder({
                 <div className="flex items-center space-x-4">
                     {/* Active Toggle */}
                     <div className="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
-                        <span className="text-xs font-semibold text-slate-400">Flow Status:</span>
+                        <span className="text-xs font-semibold text-slate-400">{__('whatsapp.flow_status_label')}</span>
                         <button
                             onClick={() => setData('is_active', !data.is_active)}
+                            role="switch"
+                            aria-checked={data.is_active}
+                            aria-label={__('whatsapp.flow_status_label')}
                             className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                                 data.is_active ? 'bg-emerald-500' : 'bg-slate-700'
                             }`}
@@ -309,7 +315,7 @@ export default function FlowBuilder({
                             />
                         </button>
                         <span className={`text-xs font-bold ${data.is_active ? 'text-emerald-400' : 'text-slate-400'}`}>
-                            {data.is_active ? 'Active' : 'Inactive'}
+                            {data.is_active ? __('general.active') : __('general.inactive')}
                         </span>
                     </div>
 
@@ -318,7 +324,7 @@ export default function FlowBuilder({
                         disabled={processing}
                         className="px-5 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition shadow-lg shadow-blue-500/10 disabled:opacity-50"
                     >
-                        {processing ? 'Saving...' : 'Save Flow'}
+                        {processing ? __('general.saving') : __('whatsapp.flow_save')}
                     </button>
                 </div>
             </header>
@@ -327,16 +333,16 @@ export default function FlowBuilder({
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Node Palette Sidebar */}
                 <div className="w-64 bg-slate-900 border-r border-slate-800 p-5 flex flex-col space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Node Palette</h3>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">{__('whatsapp.flow_node_palette')}</h3>
                     
                     <button
                         onClick={() => addNode('message')}
                         className="flex items-center space-x-3 w-full p-3 rounded-xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800 hover:border-slate-700 transition text-left group"
                     >
-                        <span className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">💬</span>
+                        <span className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition"><MessageSquare className="w-4 h-4" aria-hidden="true" /></span>
                         <div>
-                            <div className="text-sm font-bold">Send Message</div>
-                            <div className="text-xs text-slate-400">Send text/buttons</div>
+                            <div className="text-sm font-bold">{__('whatsapp.flow_node_message')}</div>
+                            <div className="text-xs text-slate-400">{__('whatsapp.flow_node_message_desc')}</div>
                         </div>
                     </button>
 
@@ -344,10 +350,10 @@ export default function FlowBuilder({
                         onClick={() => addNode('delay')}
                         className="flex items-center space-x-3 w-full p-3 rounded-xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800 hover:border-slate-700 transition text-left group"
                     >
-                        <span className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">⏳</span>
+                        <span className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition"><Hourglass className="w-4 h-4" aria-hidden="true" /></span>
                         <div>
-                            <div className="text-sm font-bold">Delay Timer</div>
-                            <div className="text-xs text-slate-400">Wait X seconds</div>
+                            <div className="text-sm font-bold">{__('whatsapp.flow_node_delay')}</div>
+                            <div className="text-xs text-slate-400">{__('whatsapp.flow_node_delay_desc')}</div>
                         </div>
                     </button>
 
@@ -355,10 +361,10 @@ export default function FlowBuilder({
                         onClick={() => addNode('condition')}
                         className="flex items-center space-x-3 w-full p-3 rounded-xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800 hover:border-slate-700 transition text-left group"
                     >
-                        <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">🔀</span>
+                        <span className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition"><GitBranch className="w-4 h-4" aria-hidden="true" /></span>
                         <div>
-                            <div className="text-sm font-bold">Condition Branch</div>
-                            <div className="text-xs text-slate-400">If / Else routing</div>
+                            <div className="text-sm font-bold">{__('whatsapp.flow_node_condition_branch')}</div>
+                            <div className="text-xs text-slate-400">{__('whatsapp.flow_node_condition_desc')}</div>
                         </div>
                     </button>
 
@@ -366,18 +372,18 @@ export default function FlowBuilder({
                         onClick={() => addNode('action')}
                         className="flex items-center space-x-3 w-full p-3 rounded-xl border border-slate-800 bg-slate-800/30 hover:bg-slate-800 hover:border-slate-700 transition text-left group"
                     >
-                        <span className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">⚙️</span>
+                        <span className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition"><Settings className="w-4 h-4" aria-hidden="true" /></span>
                         <div>
-                            <div className="text-sm font-bold">Action Event</div>
-                            <div className="text-xs text-slate-400">Set tag, trigger webhook</div>
+                            <div className="text-sm font-bold">{__('whatsapp.flow_node_action_event')}</div>
+                            <div className="text-xs text-slate-400">{__('whatsapp.flow_node_action_desc')}</div>
                         </div>
                     </button>
 
                     <div className="mt-8 border-t border-slate-800 pt-6 text-xs text-slate-500 leading-relaxed">
-                        <span className="font-bold text-slate-400">Tips:</span><br />
-                        - Drag nodes by their title bars.<br />
-                        - Click a node's output dot, then click another node to connect.<br />
-                        - Selected node properties open on the right panel.
+                        <span className="font-bold text-slate-400">{__('whatsapp.flow_tips_title')}</span><br />
+                        - {__('whatsapp.flow_tip_drag')}<br />
+                        - {__('whatsapp.flow_tip_connect')}<br />
+                        - {__('whatsapp.flow_tip_panel')}
                     </div>
                 </div>
 
@@ -438,7 +444,7 @@ export default function FlowBuilder({
                                 <div
                                     onMouseUp={(e) => { e.stopPropagation(); handleEndConnection(node.id); }}
                                     className="absolute -left-2 top-[46px] w-4 h-4 rounded-full border-2 border-slate-700 bg-slate-900 hover:bg-indigo-400 cursor-pointer flex items-center justify-center transition"
-                                    title="Connect Input"
+                                    title={__('whatsapp.flow_connect_input')}
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                                 </div>
@@ -453,25 +459,26 @@ export default function FlowBuilder({
                                 'bg-purple-500/10 text-purple-400 border-purple-500/20'
                             }`}>
                                 <div className="flex items-center space-x-2">
-                                    <span>
-                                        {node.type === 'trigger' ? '🟢' :
-                                         node.type === 'message' ? '💬' :
-                                         node.type === 'delay' ? '⏳' :
-                                         node.type === 'condition' ? '🔀' : '⚙️'}
+                                    <span aria-hidden="true">
+                                        {node.type === 'trigger' ? <PlayCircle className="w-3.5 h-3.5" /> :
+                                         node.type === 'message' ? <MessageSquare className="w-3.5 h-3.5" /> :
+                                         node.type === 'delay' ? <Hourglass className="w-3.5 h-3.5" /> :
+                                         node.type === 'condition' ? <GitBranch className="w-3.5 h-3.5" /> : <Settings className="w-3.5 h-3.5" />}
                                     </span>
                                     <span className="uppercase tracking-wider">
-                                        {node.type === 'trigger' ? 'Flow Trigger' :
-                                         node.type === 'message' ? 'Send Message' :
-                                         node.type === 'delay' ? 'Delay Timer' :
-                                         node.type === 'condition' ? 'Condition' : 'Action'}
+                                        {node.type === 'trigger' ? __('whatsapp.flow_node_trigger') :
+                                         node.type === 'message' ? __('whatsapp.flow_node_message') :
+                                         node.type === 'delay' ? __('whatsapp.flow_node_delay') :
+                                         node.type === 'condition' ? __('whatsapp.flow_node_condition') : __('general.action')}
                                     </span>
                                 </div>
                                 {node.type !== 'trigger' && (
                                     <button 
                                         onClick={(e) => { e.stopPropagation(); deleteNode(node.id); }}
                                         className="text-slate-500 hover:text-red-400 transition"
+                                        aria-label={__('whatsapp.flow_delete_node')}
                                     >
-                                        ✕
+                                        <X className="w-3.5 h-3.5" aria-hidden="true" />
                                     </button>
                                 )}
                             </div>
@@ -480,11 +487,11 @@ export default function FlowBuilder({
                             <div className="p-4 text-xs text-slate-300">
                                 {node.type === 'trigger' && (
                                     <div>
-                                        <div className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Type</div>
+                                        <div className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">{__('general.type')}</div>
                                         <div className="text-sm font-bold text-emerald-400 mt-1 capitalize">{data.trigger_type}</div>
                                         {data.trigger_type === 'keyword' && (
                                             <div className="mt-2 text-slate-400 truncate">
-                                                Keywords: {data.trigger_keywords.join(', ') || 'none'}
+                                                {__('whatsapp.flow_keywords_label')} {data.trigger_keywords.join(', ') || __('general.none')}
                                             </div>
                                         )}
                                     </div>
@@ -497,7 +504,7 @@ export default function FlowBuilder({
                                             <div className="flex flex-wrap gap-1 mt-1">
                                                 {node.data.buttons.map((btn, idx) => (
                                                     <span key={idx} className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px]">
-                                                        🔘 {btn.label}
+                                                        <CircleDot className="inline w-2.5 h-2.5 me-1" aria-hidden="true" />{btn.label}
                                                     </span>
                                                 ))}
                                             </div>
@@ -507,14 +514,14 @@ export default function FlowBuilder({
 
                                 {node.type === 'delay' && (
                                     <div className="text-slate-400">
-                                        Wait for <span className="font-bold text-amber-400 text-sm">{node.data.seconds ?? 2}</span> seconds
+                                        {__('whatsapp.flow_wait_seconds', { seconds: node.data.seconds ?? 2 })}
                                     </div>
                                 )}
 
                                 {node.type === 'condition' && (
                                     <div>
                                         <div className="text-slate-400">
-                                            If <span className="font-bold text-indigo-400">{node.data.condition_type === 'wallet_balance' ? 'Wallet Balance' : node.data.field_name}</span>
+                                            {__('whatsapp.flow_if')} <span className="font-bold text-indigo-400">{node.data.condition_type === 'wallet_balance' ? __('whatsapp.flow_wallet_balance') : node.data.field_name}</span>
                                         </div>
                                         <div className="text-slate-200 mt-1 font-mono">
                                             {node.data.operator} {node.data.value}
@@ -524,9 +531,9 @@ export default function FlowBuilder({
 
                                 {node.type === 'action' && (
                                     <div>
-                                        <div className="text-slate-400 uppercase tracking-wider text-[10px] font-semibold">Action</div>
+                                        <div className="text-slate-400 uppercase tracking-wider text-[10px] font-semibold">{__('general.action')}</div>
                                         <div className="font-bold mt-1 text-purple-400">
-                                            {node.data.action_type === 'set_field' ? 'Set Custom Field' : 'Trigger Webhook'}
+                                            {node.data.action_type === 'set_field' ? __('whatsapp.flow_set_custom_field') : __('whatsapp.flow_trigger_webhook')}
                                         </div>
                                     </div>
                                 )}
@@ -536,21 +543,21 @@ export default function FlowBuilder({
                             {node.type === 'condition' ? (
                                 <div className="flex flex-col space-y-2 pb-3 pr-3 text-right">
                                     <div className="relative">
-                                        <span className="text-[10px] text-emerald-400 font-bold mr-1">TRUE</span>
+                                        <span className="text-[10px] text-emerald-400 font-bold mr-1">{__('whatsapp.flow_true')}</span>
                                         <div
                                             onMouseDown={(e) => handleStartConnection(node.id, 'true', e)}
                                             className="absolute -right-5 top-0.5 w-4 h-4 rounded-full border-2 border-emerald-500 bg-slate-900 hover:bg-emerald-400 cursor-pointer flex items-center justify-center transition"
-                                            title="True output path"
+                                            title={__('whatsapp.flow_true_path')}
                                         >
                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                                         </div>
                                     </div>
                                     <div className="relative">
-                                        <span className="text-[10px] text-red-400 font-bold mr-1">FALSE</span>
+                                        <span className="text-[10px] text-red-400 font-bold mr-1">{__('whatsapp.flow_false')}</span>
                                         <div
                                             onMouseDown={(e) => handleStartConnection(node.id, 'false', e)}
                                             className="absolute -right-5 top-0.5 w-4 h-4 rounded-full border-2 border-red-500 bg-slate-900 hover:bg-red-400 cursor-pointer flex items-center justify-center transition"
-                                            title="False output path"
+                                            title={__('whatsapp.flow_false_path')}
                                         >
                                             <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
                                         </div>
@@ -560,7 +567,7 @@ export default function FlowBuilder({
                                 <div
                                     onMouseDown={(e) => handleStartConnection(node.id, 'out', e)}
                                     className="absolute -right-2 top-[46px] w-4 h-4 rounded-full border-2 border-slate-700 bg-slate-900 hover:bg-blue-400 cursor-pointer flex items-center justify-center transition z-20"
-                                    title="Connect Output"
+                                    title={__('whatsapp.flow_connect_output')}
                                 >
                                     <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                                 </div>
@@ -575,7 +582,7 @@ export default function FlowBuilder({
                         <div className="flex flex-col space-y-6">
                             <div className="flex justify-between items-center border-b border-slate-800 pb-4">
                                 <h3 className="font-bold text-sm uppercase tracking-wider text-slate-300">
-                                    Node Configuration
+                                    {__('whatsapp.flow_node_config')}
                                 </h3>
                                 <span className="text-[10px] bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-400 font-mono">
                                     {selectedNode.id}
@@ -586,34 +593,36 @@ export default function FlowBuilder({
                             {selectedNode.type === 'trigger' && (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Trigger Event</label>
+                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_trigger_event')}</label>
                                         <select
                                             value={data.trigger_type}
                                             onChange={e => setData('trigger_type', e.target.value as any)}
+                                            aria-label={__('whatsapp.flow_trigger_event')}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                         >
-                                            <option value="keyword">On Keyword Match</option>
-                                            {data.channel === 'telegram' && <option value="start_bot">On Bot Start (/start)</option>}
-                                            <option value="default">Fallback Default Reply</option>
+                                            <option value="keyword">{__('whatsapp.flow_on_keyword')}</option>
+                                            {data.channel === 'telegram' && <option value="start_bot">{__('whatsapp.flow_on_bot_start')}</option>}
+                                            <option value="default">{__('whatsapp.flow_fallback_reply')}</option>
                                         </select>
                                     </div>
 
                                     {data.trigger_type === 'keyword' && (
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Trigger Keywords</label>
+                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_trigger_keywords')}</label>
                                             <form onSubmit={handleAddKeyword} className="flex space-x-2">
                                                 <input
                                                     type="text"
                                                     value={newKeyword}
                                                     onChange={e => setNewKeyword(e.target.value)}
-                                                    placeholder="e.g. price, support"
+                                                    placeholder={__('whatsapp.flow_keywords_placeholder')}
+                                                    aria-label={__('whatsapp.flow_trigger_keywords')}
                                                     className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                                 />
                                                 <button
                                                     type="submit"
                                                     className="bg-blue-600 text-white hover:bg-blue-500 transition px-4 rounded-lg text-sm font-bold"
                                                 >
-                                                    + Add
+                                                    {__('whatsapp.flow_add_keyword')}
                                                 </button>
                                             </form>
                                             
@@ -626,9 +635,10 @@ export default function FlowBuilder({
                                                         <span>{kw}</span>
                                                         <button 
                                                             onClick={() => handleRemoveKeyword(kw)}
-                                                            className="text-slate-500 hover:text-red-400 font-bold ml-1"
+                                                            className="text-slate-500 hover:text-red-400 font-bold ms-1"
+                                                            aria-label={__('whatsapp.flow_remove_keyword', { keyword: kw })}
                                                         >
-                                                            ✕
+                                                            <X className="w-3 h-3" aria-hidden="true" />
                                                         </button>
                                                     </span>
                                                 ))}
@@ -642,20 +652,21 @@ export default function FlowBuilder({
                             {selectedNode.type === 'message' && (
                                 <div className="space-y-5">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Message Body</label>
+                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_message_body')}</label>
                                         <textarea
                                             value={selectedNode.data.message_text || ''}
                                             onChange={e => updateNodeData(selectedNode.id, { message_text: e.target.value })}
                                             rows={4}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 font-sans"
-                                            placeholder="Write message content..."
+                                            placeholder={__('whatsapp.flow_message_placeholder')}
+                                            aria-label={__('whatsapp.flow_message_body')}
                                         />
                                     </div>
 
                                     {/* Buttons */}
                                     <div>
                                         <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">
-                                            Quick Reply Buttons {data.channel === 'whatsapp' ? '(Max 3)' : ''}
+                                            {__('whatsapp.flow_quick_reply_buttons')} {data.channel === 'whatsapp' ? __('whatsapp.flow_max_three') : ''}
                                         </label>
                                         
                                         <div className="space-y-2 mt-2">
@@ -670,7 +681,8 @@ export default function FlowBuilder({
                                                             newBtns[idx].label = e.target.value;
                                                             updateNodeData(selectedNode.id, { buttons: newBtns });
                                                         }}
-                                                        placeholder="Button Label"
+                                                        placeholder={__('whatsapp.flow_button_label')}
+                                                        aria-label={__('whatsapp.flow_button_label')}
                                                         className="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none"
                                                     />
                                                     <button
@@ -680,7 +692,7 @@ export default function FlowBuilder({
                                                         }}
                                                         className="text-red-400 hover:text-red-300 text-xs px-1"
                                                     >
-                                                        Delete
+                                                        {__('general.delete')}
                                                     </button>
                                                 </div>
                                             ))}
@@ -690,7 +702,7 @@ export default function FlowBuilder({
                                             <button
                                                 onClick={() => {
                                                     const targetId = `node_btn_target_${uuid()}`;
-                                                    const newBtn = { label: 'New Button', target_node_id: targetId, value: targetId };
+                                                    const newBtn = { label: __('whatsapp.flow_new_button'), target_node_id: targetId, value: targetId };
                                                     updateNodeData(selectedNode.id, { buttons: [...(selectedNode.data.buttons || []), newBtn] });
                                                     // Spawn a placeholder message node that is connected automatically
                                                     const newPlaceholderNode: Node = {
@@ -698,13 +710,13 @@ export default function FlowBuilder({
                                                         type: 'message',
                                                         x: selectedNode.x + 350,
                                                         y: selectedNode.y + ((selectedNode.data.buttons || []).length * 80) - 20,
-                                                        data: { message_text: 'Thank you for selecting this button!', buttons: [] }
+                                                        data: { message_text: __('whatsapp.flow_button_thanks'), buttons: [] }
                                                     };
                                                     setData('nodes', [...data.nodes, newPlaceholderNode]);
                                                 }}
                                                 className="w-full mt-3 py-2 text-xs font-bold border border-dashed border-slate-700 hover:border-slate-500 rounded-lg text-slate-400 hover:text-slate-300 transition"
                                             >
-                                                + Add Response Button
+                                                {__('whatsapp.flow_add_response_button')}
                                             </button>
                                         )}
                                     </div>
@@ -714,17 +726,18 @@ export default function FlowBuilder({
                             {/* Delay Node config */}
                             {selectedNode.type === 'delay' && (
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Delay Duration (Seconds)</label>
+                                    <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_delay_duration')}</label>
                                     <input
                                         type="number"
                                         min={1}
                                         max={5}
                                         value={selectedNode.data.seconds ?? 2}
                                         onChange={e => updateNodeData(selectedNode.id, { seconds: parseInt(e.target.value) || 2 })}
+                                        aria-label={__('whatsapp.flow_delay_duration')}
                                         className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                     />
                                     <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-                                        For webhook execution safety, delay is limited between 1 and 5 seconds.
+                                        {__('whatsapp.flow_delay_hint')}
                                     </p>
                                 </div>
                             )}
@@ -733,25 +746,26 @@ export default function FlowBuilder({
                             {selectedNode.type === 'condition' && (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Condition Source</label>
+                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_condition_source')}</label>
                                         <select
                                             value={selectedNode.data.condition_type}
                                             onChange={e => updateNodeData(selectedNode.id, { condition_type: e.target.value })}
+                                            aria-label={__('whatsapp.flow_condition_source')}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                         >
-                                            <option value="wallet_balance">Wallet Balance</option>
-                                            <option value="custom_field">Subscriber Custom Field</option>
+                                            <option value="wallet_balance">{__('whatsapp.flow_wallet_balance')}</option>
+                                            <option value="custom_field">{__('whatsapp.flow_subscriber_custom_field')}</option>
                                         </select>
                                     </div>
 
                                     {selectedNode.data.condition_type === 'custom_field' && (
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Custom Field Name</label>
+                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_custom_field_name')}</label>
                                             <input
                                                 type="text"
                                                 value={selectedNode.data.field_name || ''}
                                                 onChange={e => updateNodeData(selectedNode.id, { field_name: e.target.value })}
-                                                placeholder="e.g. tag, country"
+                                                placeholder={__('whatsapp.flow_custom_field_placeholder')}
                                                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                             />
                                         </div>
@@ -759,25 +773,27 @@ export default function FlowBuilder({
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Operator</label>
+                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_operator')}</label>
                                             <select
                                                 value={selectedNode.data.operator}
                                                 onChange={e => updateNodeData(selectedNode.id, { operator: e.target.value })}
+                                                aria-label={__('whatsapp.flow_operator')}
                                                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                             >
-                                                <option value="=">Equals (=)</option>
-                                                <option value=">">Greater Than (&gt;)</option>
-                                                <option value="<">Less Than (&lt;)</option>
-                                                <option value="contains">Contains</option>
+                                                <option value="=">{__('whatsapp.flow_op_equals')}</option>
+                                                <option value=">">{__('whatsapp.flow_op_greater')}</option>
+                                                <option value="<">{__('whatsapp.flow_op_less')}</option>
+                                                <option value="contains">{__('whatsapp.flow_op_contains')}</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Value</label>
+                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('general.value')}</label>
                                             <input
                                                 type="text"
                                                 value={selectedNode.data.value || ''}
                                                 onChange={e => updateNodeData(selectedNode.id, { value: e.target.value })}
-                                                placeholder="Value to check"
+                                                placeholder={__('whatsapp.flow_value_placeholder')}
+                                                aria-label={__('general.value')}
                                                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                             />
                                         </div>
@@ -789,43 +805,44 @@ export default function FlowBuilder({
                             {selectedNode.type === 'action' && (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Action Event Type</label>
+                                        <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_action_event_type')}</label>
                                         <select
                                             value={selectedNode.data.action_type}
                                             onChange={e => updateNodeData(selectedNode.id, { action_type: e.target.value })}
+                                            aria-label={__('whatsapp.flow_action_event_type')}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                         >
-                                            <option value="set_field">Set Custom Field / Tag</option>
-                                            <option value="webhook">Trigger External Webhook</option>
+                                            <option value="set_field">{__('whatsapp.flow_set_field_tag')}</option>
+                                            <option value="webhook">{__('whatsapp.flow_trigger_external_webhook')}</option>
                                         </select>
                                     </div>
 
                                     {selectedNode.data.action_type === 'set_field' ? (
                                         <div className="space-y-3">
                                             <div>
-                                                <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Field Key Name</label>
+                                                <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_field_key_name')}</label>
                                                 <input
                                                     type="text"
                                                     value={selectedNode.data.field_name || ''}
                                                     onChange={e => updateNodeData(selectedNode.id, { field_name: e.target.value })}
-                                                    placeholder="e.g. current_status, preference"
+                                                    placeholder={__('whatsapp.flow_field_key_placeholder')}
                                                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Field Value</label>
+                                                <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_field_value')}</label>
                                                 <input
                                                     type="text"
                                                     value={selectedNode.data.field_value || ''}
                                                     onChange={e => updateNodeData(selectedNode.id, { field_value: e.target.value })}
-                                                    placeholder="e.g. subscribed, premium"
+                                                    placeholder={__('whatsapp.flow_field_value_placeholder')}
                                                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
                                                 />
                                             </div>
                                         </div>
                                     ) : (
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Webhook HTTP POST URL</label>
+                                            <label className="block text-xs font-bold text-slate-400 mb-1.5 uppercase">{__('whatsapp.flow_webhook_url')}</label>
                                             <input
                                                 type="url"
                                                 value={selectedNode.data.webhook_url || ''}
@@ -841,9 +858,9 @@ export default function FlowBuilder({
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-64 text-slate-500 text-center">
-                            <span className="text-3xl mb-2">👈</span>
+                            <MousePointerClick className="w-8 h-8 mb-2" aria-hidden="true" />
                             <p className="text-xs">
-                                Click any node on the canvas to configure its settings.
+                                {__('whatsapp.flow_select_node_hint')}
                             </p>
                         </div>
                     )}

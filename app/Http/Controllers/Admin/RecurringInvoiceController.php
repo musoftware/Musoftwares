@@ -13,6 +13,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Notifications\InvoicePaidNotification;
+use App\Notifications\RecurringInvoiceInsufficientBalanceNotification;
 use Inertia\Inertia;
 
 class RecurringInvoiceController extends Controller
@@ -29,12 +32,10 @@ class RecurringInvoiceController extends Controller
         });
 
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->get();
 
         return Inertia::render('Admin/Business/RecurringInvoices/Index', [
             'invoices' => $invoices,
             'currencies' => $currencies,
-            'users' => $users,
         ]);
     }
 
@@ -86,11 +87,9 @@ class RecurringInvoiceController extends Controller
     public function create()
     {
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
 
         return Inertia::render('Admin/Business/RecurringInvoices/Create', [
             'currencies' => $currencies,
-            'users' => $users,
         ]);
     }
 
@@ -98,7 +97,6 @@ class RecurringInvoiceController extends Controller
     {
         $invoice = RecurringInvoice::findOrFail($id);
         $currencies = Currency::all();
-        $users = User::select('id', 'name', 'email')->get();
 
         return Inertia::render('Admin/Business/RecurringInvoices/Edit', [
             'invoice' => [
@@ -117,7 +115,6 @@ class RecurringInvoiceController extends Controller
                 'recurring_times_year' => $invoice->recurring_times_year ? explode(',', $invoice->recurring_times_year) : [],
             ],
             'currencies' => $currencies,
-            'users' => $users,
         ]);
     }
 
@@ -327,5 +324,36 @@ class RecurringInvoiceController extends Controller
 
         return redirect()->route('admin.recurring_invoices.view', $invoice->id)
             ->with('success', __('general.transaction_removed_successfully'));
+    }
+
+    public function notifyClient(Request $request, $id)
+    {
+        $recurringInvoice = RecurringInvoice::with(['user', 'records.invoice'])->findOrFail($id);
+        $user = $recurringInvoice->user;
+
+        if (! $user) {
+            return redirect()->back()->with('error', __('admin.client_not_found'));
+        }
+
+        $latestRecord = $recurringInvoice->records()->latest()->first();
+        $latestInvoice = $latestRecord?->invoice;
+
+        if (! $latestInvoice) {
+            return redirect()->back()->with('error', __('general.no_generated_invoices_found'));
+        }
+
+        try {
+            if ($latestInvoice->status === 'paid') {
+                $user->notify(new InvoicePaidNotification($latestInvoice));
+            } else {
+                $user->notify(new RecurringInvoiceInsufficientBalanceNotification($latestInvoice));
+            }
+
+            return redirect()->back()->with('success', __('admin.notification_sent'));
+        } catch (\Throwable $e) {
+            Log::error('Failed sending email to customer for recurring invoice #'.$id.': '.$e->getMessage());
+
+            return redirect()->back()->with('error', __('admin.notification_failed'));
+        }
     }
 }

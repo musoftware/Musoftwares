@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -15,9 +15,7 @@ import {
     ExternalLink,
     FileText,
     Gift,
-    HardDrive,
     ImageIcon,
-    Layers,
     Loader2,
     Save,
     Sparkles,
@@ -107,7 +105,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
         // Dual Edition Playbook
         has_free_edition: Boolean(product.has_free_edition),
-        free_edition_title: product.free_edition_title || 'Playbook Edition (الملخص التطبيقي)',
+        free_edition_title: product.free_edition_title || __('admin.digital_products_default_playbook_title'),
         free_edition_pdf_file: null as File | null,
         free_edition_cover_image: null as File | null,
         free_edition_page_count: product.free_edition_page_count ? String(product.free_edition_page_count) : '',
@@ -177,7 +175,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(__('general.book_updated_successfully') || 'Book updated successfully!');
+                toast.success(__('general.book_updated_successfully'));
                 setSubmitting(false);
             },
             onError: (errs) => {
@@ -189,7 +187,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
     };
 
     const categoryOptions = [
-        { value: '', label: __('general.select_category') || 'Select Category' },
+        { value: '', label: __('general.select_category') },
         ...categories.map((c) => ({
             value: String(c.id),
             label: c.name,
@@ -198,11 +196,11 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
     return (
         <AdminSidebarLayout
-            title={__('general.edit_book') || `Edit Book: ${product.title}`}
+            title={__('admin.digital_products_edit_book_title', { title: product.title })}
             header={
                 <div className="flex items-center gap-2">
-                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
+                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors" aria-label={__('general.back')}>
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
                     </Link>
                     <BookOpen className="h-5 w-5 text-slate-700" />
                     <span className="truncate max-w-lg">{product.title}</span>
@@ -216,11 +214,11 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-xs"
                 >
                     <ExternalLink className="h-3.5 w-3.5" />
-                    <span>{__('general.view_in_store') || 'View in Store'}</span>
+                    <span>{__('general.view_in_store')}</span>
                 </a>
             }
         >
-            <Head title={`Edit: ${product.title}`} />
+            <Head title={__('admin.digital_products_edit_book_title', { title: product.title })} />
 
             <div className="max-w-6xl mx-auto">
                 <form onSubmit={submit} className="space-y-6">
@@ -232,7 +230,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                             <Card className="border border-slate-200 shadow-sm bg-white text-center">
                                 <CardContent className="p-5 space-y-4">
                                     <Label className="text-xs font-bold text-slate-700 block uppercase">
-                                        {__('general.main_book_cover') || 'Main Book Cover'}
+                                        {__('general.main_book_cover')}
                                     </Label>
 
                                     <div className="w-40 aspect-[3/4] mx-auto rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-md relative flex items-center justify-center">
@@ -259,7 +257,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         onClick={() => mainCoverInputRef.current?.click()}
                                     >
                                         <ImageIcon className="h-3.5 w-3.5 text-slate-600" />
-                                        <span>{coverPreview ? __('general.change_new_cover') || 'Change Selected Cover' : __('general.replace_cover_image') || 'Replace Cover Image'}</span>
+                                        <span>{coverPreview ? __('general.change_new_cover') : __('general.replace_cover_image')}</span>
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -268,16 +266,16 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                             <Card className="border border-slate-200 shadow-sm bg-white">
                                 <CardContent className="p-5 space-y-3">
                                     <Label className="text-xs font-bold text-slate-700 block uppercase">
-                                        {__('general.main_pdf_file') || 'Main Book PDF'}
+                                        {__('general.main_pdf_file')}
                                     </Label>
 
                                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
                                         <div className="flex items-center justify-between text-slate-600">
-                                            <span>Current Size:</span>
+                                            <span>{__('admin.digital_products_current_size')}</span>
                                             <strong className="text-slate-900 font-mono">{product.formatted_file_size}</strong>
                                         </div>
                                         <div className="flex items-center justify-between text-slate-600">
-                                            <span>Pages:</span>
+                                            <span>{__('admin.digital_products_pages_label')}</span>
                                             <strong className="text-slate-900">{product.page_count ?? '—'}</strong>
                                         </div>
                                     </div>
@@ -301,7 +299,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         onClick={() => mainPdfInputRef.current?.click()}
                                     >
                                         <FileText className="h-3.5 w-3.5 text-slate-600" />
-                                        <span>{form.pdf_file ? `Selected: ${form.pdf_file.name}` : __('general.replace_pdf_file') || 'Replace PDF File'}</span>
+                                        <span>{form.pdf_file ? __('admin.digital_products_selected_file', { name: form.pdf_file.name }) : __('general.replace_pdf_file')}</span>
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -317,10 +315,10 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         <div>
                                             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                                 <Gift className="h-4 w-4 text-emerald-600" />
-                                                <span>{__('general.dual_edition_playbook') || 'Dual Edition (Free Playbook Summary)'}</span>
+                                                <span>{__('general.dual_edition_playbook')}</span>
                                             </h3>
                                             <p className="text-xs text-slate-500 mt-0.5">
-                                                {__('general.dual_edition_desc') || 'Optional free summary edition alongside the full book.'}
+                                                {__('general.dual_edition_desc')}
                                             </p>
                                         </div>
                                         <Switch
@@ -334,7 +332,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-1.5">
                                                     <Label className="text-xs font-semibold text-slate-700">
-                                                        {__('general.playbook_title') || 'Playbook Title'}
+                                                        {__('general.playbook_title')}
                                                     </Label>
                                                     <Input
                                                         value={form.free_edition_title}
@@ -345,7 +343,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                                 <div className="space-y-1.5">
                                                     <Label className="text-xs font-semibold text-slate-700">
-                                                        {__('general.playbook_page_count') || 'Playbook Pages'}
+                                                        {__('general.playbook_page_count')}
                                                     </Label>
                                                     <Input
                                                         type="number"
@@ -360,7 +358,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                 <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center gap-2">
                                                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                                                     <span>
-                                                        Playbook active ({product.formatted_free_edition_file_size} • {product.free_edition_download_count} downloads)
+                                                        {__('admin.digital_products_playbook_active', { size: product.formatted_free_edition_file_size, count: product.free_edition_download_count })}
                                                     </span>
                                                 </div>
                                             )}
@@ -384,7 +382,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                     onClick={() => playbookPdfInputRef.current?.click()}
                                                 >
                                                     <UploadCloud className="h-3.5 w-3.5 text-emerald-600" />
-                                                    <span>{form.free_edition_pdf_file ? `Selected: ${form.free_edition_pdf_file.name}` : 'Replace Playbook PDF'}</span>
+                                                    <span>{form.free_edition_pdf_file ? __('admin.digital_products_selected_file', { name: form.free_edition_pdf_file.name }) : __('admin.digital_products_replace_playbook_pdf')}</span>
                                                 </Button>
 
                                                 <input
@@ -402,7 +400,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                     onClick={() => playbookCoverInputRef.current?.click()}
                                                 >
                                                     <ImageIcon className="h-3.5 w-3.5 text-emerald-600" />
-                                                    <span>{playbookCoverPreview ? 'Cover Selected' : 'Replace Playbook Cover'}</span>
+                                                    <span>{playbookCoverPreview ? __('admin.digital_products_cover_selected') : __('admin.digital_products_replace_playbook_cover')}</span>
                                                 </Button>
                                             </div>
                                         </div>
@@ -415,13 +413,13 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                 <CardContent className="p-6 space-y-5">
                                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
                                         <BookOpen className="h-4 w-4 text-slate-700" />
-                                        <span>{__('general.book_details') || 'Book Details'}</span>
+                                        <span>{__('general.book_details')}</span>
                                     </h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5 md:col-span-2">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.book_title') || 'Book Title'} <span className="text-red-500">*</span>
+                                                {__('general.book_title')} <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 value={form.title}
@@ -433,19 +431,19 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.category') || 'Category'}
+                                                {__('general.category')}
                                             </Label>
                                             <PremiumCombobox
                                                 value={form.category_id}
                                                 onChange={(val) => setForm((prev) => ({ ...prev, category_id: String(val || '') }))}
                                                 options={categoryOptions}
-                                                placeholder={__('general.select_category') || 'Select Category'}
+                                                placeholder={__('general.select_category')}
                                             />
                                         </div>
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.slug') || 'URL Slug'} <span className="text-red-500">*</span>
+                                                {__('general.slug')} <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 value={form.slug}
@@ -458,7 +456,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         {/* Pricing */}
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.pricing') || 'Pricing'}
+                                                {__('general.pricing')}
                                             </Label>
                                             <div className="flex items-center gap-3">
                                                 <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
@@ -475,7 +473,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                         }}
                                                         className="rounded border-slate-300 text-blue-600"
                                                     />
-                                                    <span>{__('general.free_book') || 'Free Book'}</span>
+                                                    <span>{__('general.free_book')}</span>
                                                 </label>
 
                                                 {!form.is_free && (
@@ -487,7 +485,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                             value={form.price}
                                                             onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
                                                             className="h-10 text-xs font-bold flex-1"
-                                                            placeholder="Price"
+                                                            placeholder={__('general.price')}
                                                         />
                                                         {currencies.length > 0 ? (
                                                             <select
@@ -511,7 +509,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.author_name') || 'Author Name'}
+                                                {__('general.author_name')}
                                             </Label>
                                             <Input
                                                 value={form.author_name}
@@ -522,7 +520,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.publisher') || 'Publisher'}
+                                                {__('general.publisher')}
                                             </Label>
                                             <Input
                                                 value={form.publisher}
@@ -533,7 +531,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.publication_year') || 'Year & Language'}
+                                                {__('general.publication_year')}
                                             </Label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <Input
@@ -551,7 +549,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.page_count') || 'Page Count'}
+                                                {__('general.page_count')}
                                             </Label>
                                             <Input
                                                 type="number"
@@ -563,7 +561,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5 md:col-span-2">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.short_description') || 'Short Summary / Teaser'}
+                                                {__('general.short_description')}
                                             </Label>
                                             <Textarea
                                                 value={form.short_description}
@@ -575,7 +573,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5 md:col-span-2">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.full_description') || 'Full Book Description'}
+                                                {__('general.full_description')}
                                             </Label>
                                             <Textarea
                                                 value={form.description}
@@ -593,14 +591,14 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                 <CardContent className="p-6 space-y-4">
                                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
                                         <Sparkles className="h-4 w-4 text-slate-700" />
-                                        <span>{__('general.publishing_and_seo') || 'Publishing & SEO'}</span>
+                                        <span>{__('general.publishing_and_seo')}</span>
                                     </h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                                             <div>
-                                                <h4 className="text-xs font-bold text-slate-900">{__('general.publish_in_gallery') || 'Published in Store'}</h4>
-                                                <p className="text-[11px] text-slate-500">Visible to all visitors</p>
+                                                <h4 className="text-xs font-bold text-slate-900">{__('general.publish_in_gallery')}</h4>
+                                                <p className="text-[11px] text-slate-500">{__('admin.digital_products_publish_hint')}</p>
                                             </div>
                                             <Switch
                                                 checked={form.is_published}
@@ -610,8 +608,8 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                                             <div>
-                                                <h4 className="text-xs font-bold text-slate-900">{__('general.featured_book') || 'Featured Book'}</h4>
-                                                <p className="text-[11px] text-slate-500">Featured badge</p>
+                                                <h4 className="text-xs font-bold text-slate-900">{__('general.featured_book')}</h4>
+                                                <p className="text-[11px] text-slate-500">{__('admin.digital_products_featured_hint')}</p>
                                             </div>
                                             <Switch
                                                 checked={form.is_featured}
@@ -621,7 +619,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5 md:col-span-2">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.meta_title') || 'Meta SEO Title'}
+                                                {__('general.meta_title')}
                                             </Label>
                                             <Input
                                                 value={form.meta_title}
@@ -632,7 +630,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
                                         <div className="space-y-1.5 md:col-span-2">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.meta_description') || 'Meta SEO Description'}
+                                                {__('general.meta_description')}
                                             </Label>
                                             <Textarea
                                                 value={form.meta_description}
@@ -649,7 +647,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                             <div className="flex items-center justify-end gap-3 pt-2">
                                 <Link href={route('admin.digitalproducts.index')}>
                                     <Button type="button" variant="outline" className="h-10 px-5 text-xs">
-                                        {__('general.cancel') || 'Cancel'}
+                                        {__('general.cancel')}
                                     </Button>
                                 </Link>
 
@@ -661,12 +659,12 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                     {submitting ? (
                                         <>
                                             <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span>{__('general.saving') || 'Saving...'}</span>
+                                            <span>{__('general.saving')}</span>
                                         </>
                                     ) : (
                                         <>
                                             <Save className="h-4 w-4" />
-                                            <span>{__('general.save_changes') || 'Save Changes'}</span>
+                                            <span>{__('general.save_changes')}</span>
                                         </>
                                     )}
                                 </Button>

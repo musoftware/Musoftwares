@@ -19,7 +19,7 @@ export interface DashboardStats {
     unpaidAmount: number;
     outstandingBalance: number;
     activeSubscriptions: number;
-    totalMonthlySubscription: number;
+    totalMonthlySubscription: number | null;
     openTickets: number;
     pendingWithdrawals: number;
     currency: Currency;

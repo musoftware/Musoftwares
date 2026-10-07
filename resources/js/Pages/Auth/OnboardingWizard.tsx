@@ -167,7 +167,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                 </div>
 
                 <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <span className="hidden sm:inline-block">{__('general.logged_in_as')}<strong className="text-foreground">{user.email}</strong></span>
+                    <span className="hidden sm:inline-block">{__('general.logged_in_as')} <strong className="text-foreground">{user.email}</strong></span>
                     <Link
                         href={route('logout')}
                         method="post"
@@ -196,7 +196,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                 </div>
                                 <span className={`hidden sm:inline-block text-xs font-medium ${s === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
                                     {s === 1 && __('general.location')}
-                                    {s === 2 && __('general.contact')}
+                                    {s === 2 && __('frontend.onboarding_contact_step')}
                                 </span>
                                 {s < 2 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
@@ -233,7 +233,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                 <CardContent className="space-y-6 px-8 py-6">
                                     {/* Country Combobox Selector */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.country')}</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('frontend.onboarding_country')}</label>
                                         <PremiumCombobox
                                             value={formData.country}
                                             onChange={(val) => setFormData(prev => ({ ...prev, country: String(val), city: '' }))}
@@ -288,6 +288,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.primary_mobile')}<span className="text-destructive">*</span></label>
                                             <Input
                                                 placeholder="+1 (555) 000-0000"
+                                                aria-label={__('general.primary_mobile')}
                                                 value={formData.mobile_1}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile_1: e.target.value }))}
                                                 className="h-10 text-sm font-medium"
@@ -297,9 +298,10 @@ export default function OnboardingWizard({ user, countries }: Props) {
 
                                         {/* Mobile 2 */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.secondary_mobile')}<span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.secondary_mobile')} <span className="text-muted-foreground/70 font-normal lowercase">{__('frontend.onboarding_optional')}</span></label>
                                             <Input
                                                 placeholder="+1 (555) 999-9999"
+                                                aria-label={__('general.secondary_mobile')}
                                                 value={formData.mobile_2}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile_2: e.target.value }))}
                                                 className="h-10 text-sm font-medium"
@@ -317,7 +319,8 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                             <div className="relative flex items-center">
                                                 <span className="absolute start-3 text-sm font-medium text-muted-foreground">@</span>
                                                 <Input
-                                                    placeholder="username"
+                                                    placeholder={__('frontend.onboarding_telegram_placeholder')}
+                                                    aria-label={__('general.telegram_username')}
                                                     value={formData.telegram_username}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, telegram_username: e.target.value }))}
                                                     className="h-10 text-sm font-medium ps-8"

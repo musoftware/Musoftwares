@@ -20,6 +20,8 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import Pagination from '@/Components/Pagination';
 import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
+import { toast } from 'sonner';
 import {
     Search,
     ArrowUpDown,
@@ -132,6 +134,29 @@ function SortIcon({ column, currentSort, direction }: { column: string; currentS
         : <ChevronDown className="w-3 h-3 ms-1" />;
 }
 
+interface SortThProps {
+    column: string;
+    sortBy: string;
+    direction: string;
+    onSort: (column: string) => void;
+    children: React.ReactNode;
+    className?: string;
+}
+
+function SortTh({ column, sortBy, direction, onSort, children, className }: SortThProps) {
+    return (
+        <TableHead
+            className={`cursor-pointer select-none hover:bg-muted/50 transition-colors ${className ?? ''}`}
+            onClick={() => onSort(column)}
+        >
+            <span className="flex items-center">
+                {children}
+                <SortIcon column={column} currentSort={sortBy} direction={direction} />
+            </span>
+        </TableHead>
+    );
+}
+
 function truncateId(id: string, max = 20) {
     if (id.length <= max) return id;
     return `${id.substring(0, 8)}…${id.slice(-8)}`;
@@ -140,6 +165,7 @@ function truncateId(id: string, max = 20) {
 /* ─── Main Component ────────────────────────────────────────────── */
 
 export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions, osVersions, users = [] }: Props) {
+    const { confirm, confirmDialog } = useConfirm();
     const [search, setSearch]                     = useState(filters.search ?? '');
     const [user, setUser]                         = useState(filters.user ?? '');
 
@@ -226,9 +252,15 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
         );
     };
 
-    const handleRemoveOverride = (deviceKeyId: number) => {
+    const handleRemoveOverride = async (deviceKeyId: number) => {
         if (!keysDevice) return;
-        if (!confirm(__('general.confirm_remove_override'))) return;
+        const accepted = await confirm({
+            title: __('general.are_you_sure'),
+            description: __('general.confirm_remove_override'),
+            variant: 'danger',
+            confirmLabel: __('admin.serial_devices_remove_override'),
+        });
+        if (!accepted) return;
         router.delete(
             route('admin.serial-devices.keys.remove', [keysDevice.id, deviceKeyId]),
             {
@@ -288,18 +320,6 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
         );
     };
 
-    const SortTh = ({ column, children, className }: { column: string; children: React.ReactNode; className?: string }) => (
-        <TableHead
-            className={`cursor-pointer select-none hover:bg-muted/50 transition-colors ${className ?? ''}`}
-            onClick={() => applySort(column)}
-        >
-            <span className="flex items-center">
-                {children}
-                <SortIcon column={column} currentSort={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} />
-            </span>
-        </TableHead>
-    );
-
     /* ── Row actions ─────────────────────────────────────────────── */
 
     const updateStatus = (device: Device, status: string) => {
@@ -330,7 +350,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     const applyBulkAction = () => {
         if (selectedIds.length === 0) return;
         if (!bulkAction) {
-            alert(__('general.please_select_a_bulk_action_first'));
+            toast.error(__('general.please_select_a_bulk_action_first'));
             return;
         }
 
@@ -455,7 +475,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         <SelectContent>
                             <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
                             {statuses.map(s => (
-                                <SelectItem key={s} value={s} className="capitalize">{__(s.charAt(0).toUpperCase() + s.slice(1))}</SelectItem>
+                                <SelectItem key={s} value={s}>{__(`general.${s}`)}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -602,12 +622,12 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                 className="rounded border-muted-foreground/30"
                                             />
                                         </TableHead>
-                                        <SortTh column="device_id">{__('general.device_id')}</SortTh>
-                                        <SortTh column="machine_name">{__('general.machine')}</SortTh>
-                                        <SortTh column="user_name">{__('general.user')}</SortTh>
-                                        <SortTh column="serial_software_id">{__('general.software')}</SortTh>
-                                        <SortTh column="last_check_date">{__('general.last_check')}</SortTh>
-                                        <SortTh column="status">{__('general.status')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="device_id">{__('general.device_id')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="machine_name">{__('general.machine')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="user_name">{__('general.user')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="serial_software_id">{__('general.software')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="last_check_date">{__('general.last_check')}</SortTh>
+                                        <SortTh sortBy={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} onSort={applySort} column="status">{__('general.status')}</SortTh>
                                         <TableHead className="text-end w-12">{__('general.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -642,7 +662,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             </TableCell>
                                             <TableCell onClick={e => e.stopPropagation()}>
                                                 <div className="flex flex-col gap-1">
-                                                    <p className="text-xs text-muted-foreground font-semibold uppercase">{__('general.machine_user') ?? 'OS User'}: {device.user_name}</p>
+                                                    <p className="text-xs text-muted-foreground font-semibold uppercase">{__('general.machine_user')}: {device.user_name}</p>
                                                     {device.userDeviceAssignment?.user ? (
                                                         <div className="flex items-center gap-1.5 mt-0.5">
                                                             <Link
@@ -655,17 +675,17 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                                 onClick={() => setAssignUserDevice(device)}
                                                                 className="text-[10px] text-muted-foreground hover:text-foreground font-mono bg-slate-100 hover:bg-slate-200 px-1.5 py-0.5 rounded transition-colors"
                                                             >
-                                                                {__('general.change') ?? 'Change'}
+                                                                {__('general.change')}
                                                             </button>
                                                         </div>
                                                     ) : (
                                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                                            <span className="text-xs text-muted-foreground italic">{__('general.unassigned') ?? 'Unassigned'}</span>
+                                                            <span className="text-xs text-muted-foreground italic">{__('general.unassigned')}</span>
                                                             <button
                                                                 onClick={() => setAssignUserDevice(device)}
                                                                 className="text-[10px] text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition-colors"
                                                             >
-                                                                {__('general.assign') ?? 'Assign'}
+                                                                {__('general.assign')}
                                                             </button>
                                                         </div>
                                                     )}
@@ -680,7 +700,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             <TableCell onClick={e => e.stopPropagation()}>
                                                 <div className="flex flex-col gap-1">
                                                     <Badge variant={statusVariant[device.status] ?? 'outline'} className="capitalize text-xs w-fit">
-                                                        {__(device.status.charAt(0).toUpperCase() + device.status.slice(1))}
+                                                        {__(`general.${device.status}`)}
                                                     </Badge>
                                                     {device.status === 'active' && (
                                                         device.userDeviceAssignment?.expires_at ? (
@@ -695,18 +715,18 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                                     onClick={() => openActivateWithDuration(device)}
                                                                     className="text-[10px] text-blue-600 hover:text-blue-700 hover:underline ms-0.5"
                                                                 >
-                                                                    ({__('general.edit') ?? 'edit'})
+                                                                    ({__('general.edit')})
                                                                 </button>
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                                                                <span>{__('general.lifetime', {}, 'Lifetime')}</span>
+                                                                <span>{__('general.lifetime')}</span>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => openActivateWithDuration(device)}
                                                                     className="text-[10px] text-muted-foreground hover:text-foreground ms-0.5"
                                                                 >
-                                                                    ({__('general.edit') ?? 'edit'})
+                                                                    ({__('general.edit')})
                                                                 </button>
                                                             </div>
                                                         )
@@ -726,11 +746,11 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => setAssignUserDevice(device)}>
                                                             <User className="w-4 h-4 me-2" />
-                                                            {device.userDeviceAssignment?.user ? __('general.change_client') ?? 'Change Client' : __('general.assign_client') ?? 'Assign Client'}
+                                                            {device.userDeviceAssignment?.user ? __('general.change_client') : __('general.assign_client')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => setKeysDevice(device)}>
                                                             <Key className="w-4 h-4 me-2" />
-                                                            {__('general.manage_keys', {}, 'Manage Keys / Overrides')}
+                                                            {__('general.manage_keys')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {device.status !== 'active' && (
@@ -742,7 +762,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                         {device.status === 'active' && (
                                                             <DropdownMenuItem onClick={() => openActivateWithDuration(device)}>
                                                                 <Calendar className="w-4 h-4 me-2 text-blue-600" />
-                                                                {__('general.edit_duration', {}, 'Edit Duration / Expiration')}
+                                                                {__('general.edit_duration')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         {device.status !== 'inactive' && (
@@ -781,7 +801,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         {selectedIds.length > 0 && (
                             <div className="flex flex-wrap items-center gap-2 p-3 border rounded-lg bg-white shadow-sm">
                                 <span className="text-sm font-medium">
-                                    {__(':count selected', { count: String(selectedIds.length) })}
+                                    {__('general.items_selected', { count: selectedIds.length })}
                                 </span>
                                 <Separator orientation="vertical" className="h-5" />
                                 <div className="w-48">
@@ -856,37 +876,37 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                         <DialogTitle className="flex items-center gap-2">
                             <Calendar className="w-5 h-5 text-blue-600" />
                             {durationDevice?.status === 'active'
-                                ? (__('general.edit_license_duration') ?? 'تعديل مدة الصلاحية')
-                                : (__('general.activate_device_with_duration') ?? 'تفعيل الجهاز وتحديد المدة')}
+                                ? (__('general.edit_license_duration'))
+                                : (__('general.activate_device_with_duration'))}
                         </DialogTitle>
                     </DialogHeader>
                     {durationDevice && (
                         <div className="space-y-4 pt-2 text-sm">
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border text-xs space-y-1">
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.device_id') ?? 'Device ID'}:</span>
+                                    <span className="text-muted-foreground">{__('general.device_id')}:</span>
                                     <span className="font-mono">{truncateId(durationDevice.device_id)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.machine') ?? 'Machine'}:</span>
+                                    <span className="text-muted-foreground">{__('general.machine')}:</span>
                                     <span className="font-medium">{durationDevice.machine_name}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-muted-foreground">{__('general.software') ?? 'Software'}:</span>
+                                    <span className="text-muted-foreground">{__('general.software')}:</span>
                                     <span className="font-medium">{durationDevice.software?.name ?? '—'}</span>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-semibold">{__('general.choose_duration') ?? 'اختر مدة الترخيص'}</Label>
+                                <Label className="text-xs font-semibold">{__('general.choose_duration')}</Label>
                                 <div className="grid grid-cols-3 gap-2">
                                     {[
-                                        { key: '1m', label: __('general.one_month') ?? '1 Month (30d)' },
-                                        { key: '3m', label: __('general.three_months') ?? '3 Months (90d)' },
-                                        { key: '6m', label: __('general.six_months') ?? '6 Months (180d)' },
-                                        { key: '1y', label: __('general.one_year') ?? '1 Year (365d)' },
-                                        { key: 'lifetime', label: __('general.lifetime') ?? 'Lifetime (دائم)' },
-                                        { key: 'custom', label: __('general.custom_date') ?? 'Custom Date' },
+                                        { key: '1m', label: __('general.one_month') },
+                                        { key: '3m', label: __('general.three_months') },
+                                        { key: '6m', label: __('general.six_months') },
+                                        { key: '1y', label: __('general.one_year') },
+                                        { key: 'lifetime', label: __('general.lifetime') },
+                                        { key: 'custom', label: __('general.custom_date') },
                                     ].map(item => (
                                         <button
                                             key={item.key}
@@ -906,7 +926,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
 
                             {durationPreset === 'custom' && (
                                 <div className="space-y-1.5 pt-1">
-                                    <Label className="text-xs">{__('general.select_expiration_date') ?? 'حدد تاريخ الانتهاء'}</Label>
+                                    <Label className="text-xs">{__('general.select_expiration_date')}</Label>
                                     <Input
                                         type="date"
                                         value={customDate}
@@ -921,16 +941,16 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             <div className="rounded-lg p-3 border bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900 text-xs">
                                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-medium">
                                     <Clock className="w-4 h-4" />
-                                    <span>{__('general.result_preview') ?? 'معاينة الصلاحية'}:</span>
+                                    <span>{__('general.result_preview')}:</span>
                                 </div>
                                 <p className="mt-1 text-slate-700 dark:text-slate-300">
                                     {durationPreset === 'lifetime' ? (
                                         <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                            {__('general.permanent_lifetime_no_expiry') ?? 'ترخيص دائم مدى الحياة (بدون تاريخ انتهاء)'}
+                                            {__('general.permanent_lifetime_no_expiry')}
                                         </span>
                                     ) : (
                                         <span>
-                                            {__('general.expires_at') ?? 'ينتهي في'}:{' '}
+                                            {__('general.expires_at')}:{' '}
                                             <strong className="text-slate-900 dark:text-white font-mono">
                                                 {computeExpirationDate(durationPreset, customDate) || '—'}
                                             </strong>
@@ -951,8 +971,8 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                 >
                                     <CheckCircle2 className="w-4 h-4 me-1.5" />
                                     {durationDevice.status === 'active'
-                                        ? (__('general.save_duration') ?? 'حفظ المدة')
-                                        : (__('general.activate_now') ?? 'تفعيل الجهاز الآن')}
+                                        ? (__('general.save_duration'))
+                                        : (__('general.activate_now'))}
                                 </Button>
                             </div>
                         </div>
@@ -966,7 +986,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <User className="w-5 h-5 text-muted-foreground" />
-                            {assignUserDevice?.userDeviceAssignment?.user ? __('general.change_client') ?? 'Change Client' : __('general.assign_client') ?? 'Assign Client'}
+                            {assignUserDevice?.userDeviceAssignment?.user ? __('general.change_client') : __('general.assign_client')}
                         </DialogTitle>
                     </DialogHeader>
                     {assignUserDevice && (
@@ -988,7 +1008,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             
                             <div className="space-y-2">
                                 <label className="text-xs font-semibold text-muted-foreground uppercase">
-                                    {__('general.select_client') ?? 'Select Client'}
+                                    {__('general.select_client')}
                                 </label>
                                 <PremiumCombobox
                                     value={assignUserDevice.userDeviceAssignment?.user?.id ? String(assignUserDevice.userDeviceAssignment.user.id) : ''}
@@ -1005,15 +1025,15 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             }
                                         });
                                     }}
-                                    options={[{ value: '', label: __('general.unassigned') ?? 'Unassigned' }, ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))]}
-                                    placeholder={__('general.unassigned') ?? 'Unassigned'}
+                                    options={[{ value: '', label: __('general.unassigned') }, ...users.map(u => ({ value: String(u.id), label: `${u.name} (${u.email})` }))]}
+                                    placeholder={__('general.unassigned')}
                                     searchPlaceholder={__('general.search_users')}
                                 />
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2">
                                 <Button variant="outline" size="sm" onClick={() => setAssignUserDevice(null)}>
-                                    {__('general.close') ?? 'Close'}
+                                    {__('general.close')}
                                 </Button>
                             </div>
                         </div>
@@ -1027,7 +1047,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Key className="w-5 h-5 text-muted-foreground" />
-                            <span>{__('general.device_key_overrides', {}, 'Device Key Overrides')}</span>
+                            <span>{__('general.device_key_overrides')}</span>
                         </DialogTitle>
                     </DialogHeader>
 
@@ -1051,21 +1071,21 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             {/* Available Software Keys & Overrides */}
                             <div className="space-y-3">
                                 <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                    {__('general.available_keys', {}, 'Available Software Keys & Effective Values')}
+                                    {__('general.available_keys')}
                                 </Label>
 
                                 {(!keysDevice.software?.custom_keys || keysDevice.software.custom_keys.length === 0) ? (
                                     <div className="p-4 border rounded-lg text-center text-xs text-muted-foreground bg-muted/20">
-                                        {__('general.no_keys_in_software_yet', {}, 'No keys are defined for this software yet. Add keys in Software Registry first.')}
+                                        {__('general.no_keys_in_software_yet')}
                                     </div>
                                 ) : (
                                     <div className="border rounded-lg overflow-hidden">
                                         <Table>
                                             <TableHeader>
                                                 <TableRow className="bg-muted/40">
-                                                    <TableHead className="text-xs font-semibold">{__('general.key_name', {}, 'Key')}</TableHead>
-                                                    <TableHead className="text-xs font-semibold">{__('general.default_value', {}, 'Default')}</TableHead>
-                                                    <TableHead className="text-xs font-semibold">{__('general.effective_value', {}, 'Device Value')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.key_name')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.default_value')}</TableHead>
+                                                    <TableHead className="text-xs font-semibold">{__('general.effective_value')}</TableHead>
                                                     <TableHead className="w-16 text-end"></TableHead>
                                                 </TableRow>
                                             </TableHeader>
@@ -1094,11 +1114,11 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                                     </span>
                                                                     {override ? (
                                                                         <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-blue-100 text-blue-800">
-                                                                            {__('general.override', {}, 'Override')}
+                                                                            {__('general.override')}
                                                                         </Badge>
                                                                     ) : (
                                                                         <Badge variant="outline" className="text-[10px] px-1 py-0 text-muted-foreground">
-                                                                            {__('general.default', {}, 'Default')}
+                                                                            {__('general.default')}
                                                                         </Badge>
                                                                     )}
                                                                 </div>
@@ -1110,10 +1130,11 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                                         size="sm"
                                                                         className="h-7 text-xs text-destructive hover:bg-destructive/10"
                                                                         onClick={() => handleRemoveOverride(override.id)}
-                                                                        title={__('general.revert_to_default', {}, 'Revert to Default')}
+                                                                        title={__('general.revert_to_default')}
+                                                                        aria-label={__('general.revert_to_default')}
                                                                     >
                                                                         <Trash2 className="w-3.5 h-3.5 me-1" />
-                                                                        <span className="text-[10px]">{__('general.revert', {}, 'Revert')}</span>
+                                                                        <span className="text-[10px]">{__('general.revert')}</span>
                                                                     </Button>
                                                                 ) : (
                                                                     <Button
@@ -1122,7 +1143,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                                         className="h-7 text-xs text-muted-foreground"
                                                                         onClick={() => setOverrideForm({ serial_software_key_id: sk.id, value: sk.default_value ?? '' })}
                                                                     >
-                                                                        {__('general.override', {}, 'Override')}
+                                                                        {__('general.override')}
                                                                     </Button>
                                                                 )}
                                                             </TableCell>
@@ -1139,12 +1160,12 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             {keysDevice.software?.custom_keys && keysDevice.software.custom_keys.length > 0 && (
                                 <form onSubmit={handleSetOverride} className="p-3 border rounded-lg bg-muted/20 space-y-3">
                                     <Label className="text-xs font-semibold uppercase text-muted-foreground">
-                                        {__('general.set_key_override', {}, 'Set Custom Value Override for this Device')}
+                                        {__('general.set_key_override')}
                                     </Label>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div className="space-y-1">
-                                            <Label className="text-xs">{__('general.select_key', {}, 'Select Key')}</Label>
+                                            <Label className="text-xs">{__('general.select_key')}</Label>
                                             <Select
                                                 value={overrideForm.serial_software_key_id ? String(overrideForm.serial_software_key_id) : ''}
                                                 onValueChange={(v) => {
@@ -1158,7 +1179,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                                 }}
                                             >
                                                 <SelectTrigger className="h-8 text-xs">
-                                                    <SelectValue placeholder={__('general.select_key', {}, 'Select Key')} />
+                                                    <SelectValue placeholder={__('general.select_key')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {keysDevice.software.custom_keys.map(sk => (
@@ -1171,9 +1192,9 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                         </div>
 
                                         <div className="space-y-1">
-                                            <Label className="text-xs">{__('general.override_value', {}, 'Override Value')}</Label>
+                                            <Label className="text-xs">{__('general.override_value')}</Label>
                                             <Input
-                                                placeholder={__('general.custom_value', {}, 'e.g. 5')}
+                                                placeholder={__('general.custom_value')}
                                                 value={overrideForm.value}
                                                 onChange={e => setOverrideForm({ ...overrideForm, value: e.target.value })}
                                                 className="h-8 font-mono text-xs"
@@ -1190,7 +1211,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                             className="h-8 text-xs gap-1.5"
                                         >
                                             <Key className="w-3.5 h-3.5" />
-                                            <span>{keySaving ? __('general.saving', {}, 'Saving...') : __('general.save_override', {}, 'Save Override')}</span>
+                                            <span>{keySaving ? __('general.saving') : __('general.save_override')}</span>
                                         </Button>
                                     </div>
                                 </form>
@@ -1198,7 +1219,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
 
                             <div className="flex justify-end gap-2 pt-1">
                                 <Button variant="outline" size="sm" onClick={() => setKeysDevice(null)}>
-                                    {__('general.close', {}, 'Close')}
+                                    {__('general.close')}
                                 </Button>
                             </div>
                         </div>
@@ -1253,6 +1274,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                 </DialogContent>
             </Dialog>
 
+            {confirmDialog}
         </AdminSidebarLayout>
     );
 }

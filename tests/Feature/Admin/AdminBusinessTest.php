@@ -130,7 +130,7 @@ class AdminBusinessTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Admin/Business/Reports')
-            ->has('clients')
+            ->missing('clients')
             ->has('filters')
             ->where('filters.client_id', null)
             ->where('stats.lifetime_income', 30000)

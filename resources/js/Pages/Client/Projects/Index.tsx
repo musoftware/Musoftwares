@@ -8,6 +8,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { ProjectBudgetRow } from '@/Components/ProjectBudgetRow';
 import { __ } from '@/lib/i18n';
 import { formatDate } from '@/lib/utils';
+import Pagination from '@/Components/Pagination';
 
 interface ProjectItem {
     id: number;
@@ -46,10 +47,10 @@ export default function ProjectsIndex({ projects }: Props) {
                             <div className="flex items-center gap-3">
                                 <span className="px-3 py-1 bg-[#0071e3]/10 dark:bg-[#2997ff]/20 text-[#0071e3] dark:text-[#2997ff] text-xs font-semibold rounded-full border border-[#0071e3]/20 flex items-center gap-1.5">
                                     <FolderKanban className="w-3.5 h-3.5" />
-                                    Active Workspaces
+                                    {__('client.projects_active_workspaces')}
                                 </span>
                                 <span className="text-xs font-sans text-[#1d1d1f]/60 dark:text-white/60 font-medium">
-                                    {list.length} Project Deliveries
+                                    {__('client.projects_deliveries_count', { count: list.length })}
                                 </span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
@@ -66,7 +67,7 @@ export default function ProjectsIndex({ projects }: Props) {
                                 className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] dark:bg-[#0071e3] dark:hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>{__('general.new_project') || 'New Project'}</span>
+                                <span>{__('general.new_project')}</span>
                             </Link>
                         </div>
                     </div>
@@ -81,14 +82,14 @@ export default function ProjectsIndex({ projects }: Props) {
                             href={route('client.projects.index')}
                             className="px-4 py-2 rounded-full text-xs font-semibold bg-[#1d1d1f] dark:bg-white text-white dark:text-[#090d16] shadow-xs"
                         >
-                            {__('general.projects_list') || 'Projects List'}
+                            {__('general.projects_list')}
                         </Link>
                         <Link
                             href={route('client.projects.all-projects-board.index')}
                             className="px-4 py-2 rounded-full text-xs font-semibold bg-white dark:bg-white/5 text-[#1d1d1f]/70 dark:text-white/70 border border-black/5 dark:border-white/10 hover:bg-[#f5f5f7] dark:hover:bg-white/10 hover:text-[#1d1d1f] dark:hover:text-white transition-colors flex items-center gap-1.5"
                         >
                             <CalendarDays className="w-3.5 h-3.5" />
-                            <span>{__('general.all_projects_board') || 'All Projects Board'}</span>
+                            <span>{__('general.all_projects_board')}</span>
                         </Link>
                     </div>
 
@@ -156,7 +157,7 @@ export default function ProjectsIndex({ projects }: Props) {
                                 className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all inline-flex items-center gap-2"
                             >
                                 <Plus className="w-4 h-4" />
-                                <span>{__('general.new_project') || 'New Project'}</span>
+                                <span>{__('general.new_project')}</span>
                             </Link>
                         </div>
                     ) : (
@@ -184,7 +185,7 @@ export default function ProjectsIndex({ projects }: Props) {
                                                             ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
                                                             : 'bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f]/70 dark:text-white/70 border-black/5 dark:border-white/10'
                                                 }`}>
-                                                    {project.status?.replace('_', ' ')}
+                                                    {__(`general.status_${project.status}`)}
                                                 </span>
                                             </div>
 
@@ -212,7 +213,7 @@ export default function ProjectsIndex({ projects }: Props) {
 
                                             {project.date_start && (
                                                 <p className="mb-4 text-[11px] text-[#1d1d1f]/50 dark:text-white/50 font-sans">
-                                                    {formatDate(project.date_start)} → {project.date_end ? formatDate(project.date_end) : 'Ongoing'}
+                                                    {formatDate(project.date_start)} → {project.date_end ? formatDate(project.date_end) : __('client.projects_ongoing')}
                                                 </p>
                                             )}
                                         </div>
@@ -244,26 +245,7 @@ export default function ProjectsIndex({ projects }: Props) {
                         </div>
                     )}
 
-                    {/* Pagination */}
-                    {projects?.links && projects.links.length > 3 && (
-                        <div className="flex justify-center gap-1 pt-4">
-                            {projects.links.map((link, i) => (
-                                <Link
-                                    key={i}
-                                    href={link.url ?? '#'}
-                                    preserveScroll
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                        link.active
-                                            ? 'bg-[#1d1d1f] dark:bg-white text-white dark:text-[#090d16] shadow-xs'
-                                            : link.url
-                                                ? 'bg-white dark:bg-[#0f172a] border border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-white hover:bg-[#f5f5f7] dark:hover:bg-white/5'
-                                                : 'opacity-40 pointer-events-none bg-white dark:bg-[#0f172a] text-[#1d1d1f]/40 dark:text-white/40'
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    <Pagination links={projects?.links ?? []} />
 
                 </div>
 

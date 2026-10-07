@@ -18,18 +18,18 @@ import RecurringScheduleForm, {
     type RecurringScheduleValues,
 } from '@/Components/RecurringScheduleForm';
 import { __ } from '@/lib/i18n';
+import { formatRecurringSchedule } from '../Components/recurringSchedule';
 
-export default function Index({ salaries, currencies, users }) {
+export default function Index({ salaries, currencies }) {
     const { errors } = usePage().props as any;
     const currenciesList = Array.isArray(currencies) ? currencies : currencies ? Object.values(currencies) : [];
-    const usersList = Array.isArray(users) ? users : users ? Object.values(users) : [];
 
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const queryAction = urlParams ? urlParams.get('action') : null;
     const queryUserId = urlParams ? urlParams.get('user') : null;
 
     const defaultCurrencyId = currenciesList[0]?.id || '';
-    const defaultUserId = queryUserId ? String(queryUserId) : (usersList[0]?.id || '');
+    const defaultUserId = queryUserId ? String(queryUserId) : '';
 
     const [isCreateOpen, setIsCreateOpen] = useState(queryAction === 'create');
     const [submitting, setSubmitting] = useState(false);
@@ -37,7 +37,7 @@ export default function Index({ salaries, currencies, users }) {
     const [form, setForm] = useState<RecurringScheduleValues>({
         ...EMPTY_RECURRING_FORM,
         user_id: defaultUserId,
-        title: 'Monthly Salary',
+        title: __('admin.recurring_salary_default_title'),
         currency: defaultCurrencyId,
     });
 
@@ -49,7 +49,7 @@ export default function Index({ salaries, currencies, users }) {
                 setForm({
                     ...EMPTY_RECURRING_FORM,
                     user_id: defaultUserId,
-                    title: 'Monthly Salary',
+                    title: __('admin.recurring_salary_default_title'),
                     currency: defaultCurrencyId,
                 });
             },
@@ -58,7 +58,7 @@ export default function Index({ salaries, currencies, users }) {
     };
 
     return (
-        <AdminSidebarLayout title={__('general.recurring_salaries')} header="Business Operations">
+        <AdminSidebarLayout title={__('general.recurring_salaries')} header={__('admin.business_operations')}>
             <Head title={__('general.admin_recurring_salaries')} />
 
             <div className="mb-4">
@@ -87,7 +87,6 @@ export default function Index({ salaries, currencies, users }) {
                             mode="create"
                             initialValues={form}
                             currencies={currenciesList}
-                            users={usersList}
                             errors={errors ?? {}}
                             submitting={submitting}
                             onSubmit={handleCreate}
@@ -116,13 +115,13 @@ export default function Index({ salaries, currencies, users }) {
                             {(salaries.data as any).map((salary: any) => (
                                 <tr key={salary.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4">
-                                        <div className="text-sm font-semibold text-gray-900">{salary.user?.name || 'Unknown Employee'}</div>
-                                        <div className="text-xs text-gray-500">{salary.user?.email || 'N/A'}</div>
+                                        <div className="text-sm font-semibold text-gray-900">{salary.user?.name || __('admin.unknown_employee')}</div>
+                                        <div className="text-xs text-gray-500">{salary.user?.email || __('general.n_a')}</div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="text-sm font-semibold text-gray-900">{salary.title}</div>
                                         <div className="text-xs text-gray-500 mt-1">
-                                            Every {salary.recurring_times} {salary.recurring}(s)
+                                            {formatRecurringSchedule({ recurring: salary.recurring, recurring_times: salary.recurring_times })}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

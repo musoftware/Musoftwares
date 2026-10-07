@@ -54,6 +54,10 @@ interface LookupResult {
   status?: 'pending' | 'completed' | 'failed' | 'processing';
 }
 
+const HISTORY_FAST_POLLS = 3;
+const HISTORY_FAST_POLL_MS = 4000;
+const HISTORY_SLOW_POLL_MS = 10000;
+
 export default function ISaasIndex() {
   const { toast } = useToast();
   const { pointsBalance = 0, currency = 'USD', history = [], pricingTiers = [] } = usePage<any>().props;
@@ -107,16 +111,16 @@ export default function ISaasIndex() {
     const ext = f.name.split('.').pop()?.toLowerCase();
     if (ext !== 'txt' && ext !== 'csv') {
       toast({
-        title: "Invalid file type",
-        description: "Only .txt and .csv files are accepted.",
+        title: __('general.fbmb_invalid_file_type'),
+        description: __('general.fbmb_invalid_file_type_desc'),
         variant: "destructive"
       });
       return;
     }
     if (f.size > 10 * 1024 * 1024) {
       toast({
-        title: "File too large",
-        description: "Maximum file size is 10 MB.",
+        title: __('general.fbmb_file_too_large'),
+        description: __('general.fbmb_file_too_large_desc'),
         variant: "destructive"
       });
       return;
@@ -165,11 +169,11 @@ export default function ISaasIndex() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      toast({ title: "File required", description: "Please select a file to upload first.", variant: "destructive" });
+      toast({ title: __('general.fbmb_file_required'), description: __('general.fbmb_file_required_desc'), variant: "destructive" });
       return;
     }
     if (!hasBalance) {
-      toast({ title: "Insufficient points", description: "You have 0 points. Please get points first.", variant: "destructive" });
+      toast({ title: __('general.fbmb_insufficient_points'), description: __('general.insufficient_points_balance_please_get_points_first'), variant: "destructive" });
       return;
     }
     setPhase('processing');setProcessing(true);setErrorMessage(null);
@@ -186,16 +190,16 @@ export default function ISaasIndex() {
         });
       } else {
         toast({
-          title: "Lookup complete",
-          description: `Found ${response.data.found_count} matches from ${response.data.total_ids} IDs.`
+          title: __('general.lookup_complete'),
+          description: __('general.fbmb_found_matches', { found: response.data.found_count, total: response.data.total_ids })
         });
       }
     } catch (error: any) {
       setPhase('upload');
-      let message = "An error occurred while processing your file.";
+      let message = __('general.fbmb_process_error');
       if ((error as any).response?.data?.message) message = (error as any).response.data.message;
       setErrorMessage(message);
-      toast({ title: "Processing failed", description: message, variant: "destructive" });
+      toast({ title: __('general.processing_failed'), description: message, variant: "destructive" });
     } finally {
       setProcessing(false);
     }
@@ -237,13 +241,13 @@ export default function ISaasIndex() {
                 toast({
                   title: __('general.lookup_complete'),
                   description: response.data.found_count > 0 ?
-                  `Found ${response.data.found_count} matches from ${response.data.total_ids} IDs.` :
+                  __('general.fbmb_found_matches', { found: response.data.found_count, total: response.data.total_ids }) :
                   __('general.no_matches_were_found_no_points_were_deducted')
                 });
               } else {
                 toast({
                   title: __('general.failed_to_process'),
-                  description: response.data.error_message || 'An error occurred.',
+                  description: response.data.error_message || __('general.error_occurred'),
                   variant: "destructive"
                 });
               }
@@ -259,21 +263,35 @@ export default function ISaasIndex() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, result?.download_token, result?.status, toast]);
 
-  // Polling background scan items in history tab
+  // Polling background scan items in history tab: one stable timer chain, backing off from 4s to 10s
+  const hasPendingHistory = history.some((h: HistoryRecord) => h.status === 'pending' || h.status === 'processing');
+  const historyPollCountRef = useRef(0);
+
   useEffect(() => {
-    const hasPendingHistory = history.some((h: HistoryRecord) => h.status === 'pending' || h.status === 'processing');
     if (!hasPendingHistory) {
+      historyPollCountRef.current = 0;
       return;
     }
 
-    const intervalId = setInterval(() => {
-      router.reload({
-        only: ['pointsBalance', 'history']
-      });
-    }, 4000);
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    return () => clearInterval(intervalId);
-  }, [history]);
+    const scheduleNextPoll = () => {
+      if (cancelled) return;
+      const delay = historyPollCountRef.current < HISTORY_FAST_POLLS ? HISTORY_FAST_POLL_MS : HISTORY_SLOW_POLL_MS;
+      timeoutId = setTimeout(() => {
+        historyPollCountRef.current += 1;
+        router.reload({ only: ['pointsBalance', 'history'], onFinish: scheduleNextPoll });
+      }, delay);
+    };
+
+    scheduleNextPoll();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [hasPendingHistory]);
 
   // -- Format helpers -----------------------------------------------------
   const formatFileSize = (bytes: number) => {
@@ -334,7 +352,7 @@ export default function ISaasIndex() {
                                 <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{__('general.points')}</span>
                             </div>
                             <p className={cn("text-2xl font-bold font-mono tracking-tight", hasBalance ? "text-emerald-700" : "text-amber-700")}>
-                                {Number(pointsBalance || 0).toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
+                                {Number(pointsBalance || 0).toLocaleString()} <span className="text-sm font-normal text-slate-400">{__('general.fbmb_pts')}</span>
                             </p>
                             {!hasBalance &&
               <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
@@ -352,9 +370,9 @@ export default function ISaasIndex() {
                                 {pricingTiers?.map((tier: PricingTier, i: number) =>
                 <div key={i} className="flex justify-end gap-4 items-center text-xs">
                                         <span className="me-auto text-slate-600 font-medium">
-                                            {tier.max ? `${tier.min.toLocaleString()} - ${tier.max.toLocaleString()}` : `${tier.min.toLocaleString()}+`} IDs
+                                            {__('general.fbmb_ids_count', { count: tier.max ? `${tier.min.toLocaleString()} - ${tier.max.toLocaleString()}` : `${tier.min.toLocaleString()}+` })}
                                         </span>
-                                        <span className="text-indigo-700 font-bold">{tier.cost} Pts/ID</span>
+                                        <span className="text-indigo-700 font-bold">{__('general.fbmb_pts_per_id', { cost: tier.cost })}</span>
                                     </div>
                 )}
                             </div>
@@ -407,9 +425,9 @@ export default function ISaasIndex() {
                             {/* -- Step Indicator -- */}
                             <div className="flex items-center gap-2 mb-6 px-1">
                                 {[
-              { label: 'Upload', icon: UploadCloud, step: 'upload' },
-              { label: 'Processing', icon: Loader2, step: 'processing' },
-              { label: 'Results', icon: CheckCircle2, step: 'results' }].
+              { label: __('general.upload'), icon: UploadCloud, step: 'upload' },
+              { label: __('general.status_processing'), icon: Loader2, step: 'processing' },
+              { label: __('general.results'), icon: CheckCircle2, step: 'results' }].
               map((s, i) => {
                 const isActive = s.step === phase;
                 const isPast = phase === 'processing' && s.step === 'upload' ||
@@ -477,7 +495,7 @@ export default function ISaasIndex() {
                         "border-slate-300 bg-slate-50/50 hover:border-indigo-300 hover:bg-indigo-50/30"
                       )}>
                       
-                                                    <input ref={fileInputRef} type="file" accept=".txt,.csv" className="sr-only" onChange={handleInputChange} />
+                                                    <input ref={fileInputRef} aria-label={__('general.fbmb_select_file')} type="file" accept=".txt,.csv" className="sr-only" onChange={handleInputChange} />
 
                                                     {!file ?
                       <>
@@ -488,10 +506,10 @@ export default function ISaasIndex() {
                                                                 <UploadCloud className={cn("w-8 h-8 transition-colors duration-300", isDragging ? "text-indigo-500" : "text-slate-400 group-hover:text-indigo-500")} />
                                                             </div>
                                                             <p className="text-sm font-medium text-slate-700 mb-1">
-                                                                {isDragging ? 'Drop your file here' : 'Click to upload or drag and drop'}
+                                                                {isDragging ? __('general.fbmb_drop_file_here') : __('general.fbmb_click_or_drag')}
                                                             </p>
                                                             <p className="text-xs text-slate-500">
-                                                                {__('general.supports')}<span className="font-medium">.txt</span> and <span className="font-medium">.csv</span>{__('general.files_up_to_10_mb')}</p>
+                                                                {__('general.fbmb_supported_files')}</p>
                                                         </> :
 
                       <div className="flex items-center gap-4 w-full" onClick={(e) => e.stopPropagation()}>
@@ -505,12 +523,12 @@ export default function ISaasIndex() {
                                                                     {estimatedIds > 0 &&
                             <span className="text-xs text-indigo-600 font-medium flex items-center gap-1">
                                                                             <FileSearch className="w-3 h-3" />
-                                                                            ~{estimatedIds.toLocaleString()} IDs detected
+                                                                            {__('general.fbmb_ids_detected', { count: estimatedIds.toLocaleString() })}
                                                                         </span>
                             }
                                                                 </div>
                                                             </div>
-                                                            <button type="button" onClick={removeFile}
+                                                            <button type="button" onClick={removeFile} aria-label={__('general.fbmb_remove_file')}
                         className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0">
                                                                 <X className="w-4 h-4" />
                                                             </button>
@@ -523,11 +541,11 @@ export default function ISaasIndex() {
                                                         <div className="flex items-start gap-2.5">
                                                             <Info className="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" />
                                                             <div className="text-xs text-slate-600 space-y-1">
-                                                                <p><span className="font-medium text-slate-700">Estimated IDs:</span> {estimatedIds.toLocaleString()}</p>
+                                                                <p><span className="font-medium text-slate-700">{__('general.fbmb_estimated_ids')}</span> {estimatedIds.toLocaleString()}</p>
                                                                 <p>
-                                                                    <span className="font-medium text-slate-700">Max cost:</span>{' '}
-                                                                    <span className="font-mono">{estimatedCost.toLocaleString()}</span> points
-                                                                    <span className="text-slate-400 ms-1">(only matched IDs are charged)</span>
+                                                                    <span className="font-medium text-slate-700">{__('general.fbmb_max_cost')}</span>{' '}
+                                                                    <span className="font-mono">{estimatedCost.toLocaleString()}</span> {__('general.fbmb_points_word')}
+                                                                    <span className="text-slate-400 ms-1">{__('general.fbmb_only_matched_charged')}</span>
                                                                 </p>
                                                                 {estimatedCost > pointsBalance &&
                           <p className="text-amber-600 flex items-center gap-1 font-medium">
@@ -569,7 +587,7 @@ export default function ISaasIndex() {
                                                 </div>
                                                 <h3 className="mt-6 text-lg font-semibold text-slate-800">{__('general.processing_your_file')}</h3>
                                                 <p className="mt-1 text-sm text-slate-500 text-center max-w-xs">
-                                                    Searching {estimatedIds > 0 ? `${estimatedIds.toLocaleString()} IDs` : 'your IDs'} across the intelligence database. This may take a moment.
+                                                    {__('general.fbmb_searching_ids', { ids: estimatedIds > 0 ? __('general.fbmb_ids_count', { count: estimatedIds.toLocaleString() }) : __('general.fbmb_your_ids') })}
                                                 </p>
                                                 <div className="mt-6 flex items-center gap-2">
                                                     <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -662,7 +680,7 @@ export default function ISaasIndex() {
                                                     <div className="flex items-center justify-end gap-4 text-sm">
                                                         <span className="text-slate-500 flex items-center gap-1.5">
                                                             <Wallet className="w-3.5 h-3.5" />{__('general.remaining_points')}</span>
-                                                        <span className="font-mono font-semibold text-slate-800">{(result.remaining_balance || 0).toLocaleString()} Pts</span>
+                                                        <span className="font-mono font-semibold text-slate-800">{__('general.fbmb_pts_count', { count: (result.remaining_balance || 0).toLocaleString() })}</span>
                                                     </div>
                                                 </div>
 
@@ -673,7 +691,7 @@ export default function ISaasIndex() {
                         className="flex-1 h-11 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-px transition-all font-semibold">
                         
                                                             <Download className="w-4 h-4 me-2" />
-                                                            Download Results ({result.found_count} records)
+                                                            {__('general.fbmb_download_results', { count: result.found_count ?? 0 })}
                                                         </Button>
                       }
                                                     <Button onClick={startNewLookup} variant="outline" className="h-11 rounded-xl">
@@ -745,14 +763,14 @@ export default function ISaasIndex() {
                           <span className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                                                     <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-500" />
                                                                     {record.status === 'processing' ? __('general.processing') : __('general.pending')}
-                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                    <span className="font-normal text-slate-400"> / {__('general.fbmb_ids_count', { count: record.total_ids.toLocaleString() })}</span>
                                                                 </span>
                           }
                                                             {isFailed &&
                           <span className="text-sm font-semibold text-red-600 flex items-center gap-1.5">
                                                                     <AlertCircle className="w-3.5 h-3.5 text-red-500" />
                                                                     {__('general.failed')}
-                                                                    <span className="font-normal text-slate-400"> / {record.total_ids.toLocaleString()} IDs</span>
+                                                                    <span className="font-normal text-slate-400"> / {__('general.fbmb_ids_count', { count: record.total_ids.toLocaleString() })}</span>
                                                                 </span>
                           }                                                            {isCompleted &&
                           <span className="text-sm font-semibold text-slate-800">
@@ -797,7 +815,7 @@ export default function ISaasIndex() {
                                                         
                                                         {isFailed &&
                         <p className="text-xs text-red-500 mt-1 font-medium italic">
-                                                                {record.error_message || 'Unknown error'}
+                                                                {record.error_message || __('general.fbmb_unknown_error')}
                                                             </p>
                         }
                                                     </div>

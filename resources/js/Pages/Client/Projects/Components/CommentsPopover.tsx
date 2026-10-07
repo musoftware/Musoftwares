@@ -184,7 +184,7 @@ export default function CommentsPopover({
             const name = guestName.trim();
             const email = guestEmail.trim();
             if (!name || !email) {
-                toast.error(__('general.guest_name') + ' / ' + __('general.guest_email') + ' ' + __('general.required'));
+                toast.error(__('client.board_comment_guest_required'));
                 setSending(false);
                 return;
             }
@@ -215,9 +215,9 @@ export default function CommentsPopover({
                         /* ignore storage failures */
                     }
                 }
-                toast.success(__('general.comment_posted') || 'Comment posted.');
+                toast.success(__('general.comment_posted'));
                 if (data.ai_adjusted) {
-                    toast.success(__('general.plan_adjusted_by_ai') || 'Future plan adjusted by AI based on your comment.');
+                    toast.success(__('general.plan_adjusted_by_ai'));
                     router.reload({ preserveScroll: true } as any);
                 }
             }
@@ -245,11 +245,11 @@ export default function CommentsPopover({
                         : 'bg-sky-50 px-2.5 text-sky-700 ring-sky-200 hover:bg-sky-100 hover:ring-sky-300 focus:ring-sky-400/60',
                     className,
                 )}
-                title={__('general.open_comments') || 'Open comments'}
-                aria-label={__('general.open_comments') || 'Open comments'}
+                title={__('general.open_comments')}
+                aria-label={__('general.open_comments')}
             >
                 <MessageSquareMore className="h-3.5 w-3.5" />
-                {!iconOnly && <span>{__('general.comments') || 'Comments'}</span>}
+                {!iconOnly && <span>{__('general.comments')}</span>}
                 {displayCount > 0 && (
                     <span className="absolute -top-1.5 -end-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white">
                         {displayCount}
@@ -267,7 +267,7 @@ export default function CommentsPopover({
                         <MessageSquareMore className="h-4 w-4" />
                         <div className="flex flex-col leading-tight">
                             <span className="text-[10px] font-bold uppercase tracking-wider">
-                                {__('general.comments') || 'Comments'}
+                                {__('general.comments')}
                             </span>
                             <span className="line-clamp-1 text-xs font-bold text-slate-900">
                                 {card.title}
@@ -278,7 +278,8 @@ export default function CommentsPopover({
                         type="button"
                         onClick={fetchComments}
                         className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                        title="Refresh"
+                        title={__('client.board_comments_refresh')}
+                        aria-label={__('client.board_comments_refresh')}
                     >
                         <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
                     </button>
@@ -290,17 +291,17 @@ export default function CommentsPopover({
                 >
                     {loading && comments.length === 0 ? (
                         <div className="flex items-center justify-center py-6 text-xs text-slate-400">
-                            <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" />
-                            {__('general.loading') || 'Loading…'}
+                            <RefreshCw className="me-2 h-3.5 w-3.5 animate-spin" />
+                            {__('general.loading')}
                         </div>
                     ) : comments.length === 0 ? (
                         <p className="py-4 text-center text-xs italic text-slate-400">
-                            {__('general.no_comments_yet') || 'No comments yet.'}
+                            {__('general.no_comments_yet')}
                         </p>
                     ) : (
                         <ul className="space-y-3">
                             {comments.map((c) => {
-                                const name = c.author_name || c.guest_name || __('general.guest') || 'Guest';
+                                const name = c.author_name || c.guest_name || __('general.guest');
                                 const initials = name
                                     .split(/\s+/)
                                     .map((part) => part.charAt(0))
@@ -322,7 +323,7 @@ export default function CommentsPopover({
                                                 </span>
                                                 {c.is_guest && (
                                                     <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
-                                                        {__('general.guest') || 'Guest'}
+                                                        {__('general.guest')}
                                                     </span>
                                                 )}
                                                 <span className="ms-auto text-[10px] text-slate-400">
@@ -356,7 +357,7 @@ export default function CommentsPopover({
                                         id={`guest-name-${card.type}-${card.id}`}
                                         value={guestName}
                                         onChange={(e) => setGuestName(e.target.value)}
-                                        placeholder={__('general.your_name') || 'Your name'}
+                                        placeholder={__('general.your_name')}
                                         maxLength={120}
                                         required
                                         className="h-8 ps-8 text-xs"
@@ -374,7 +375,7 @@ export default function CommentsPopover({
                                         type="email"
                                         value={guestEmail}
                                         onChange={(e) => setGuestEmail(e.target.value)}
-                                        placeholder={__('general.your_email') || 'Your email'}
+                                        placeholder={__('general.your_email')}
                                         maxLength={190}
                                         required
                                         className="h-8 ps-8 text-xs"
@@ -397,7 +398,7 @@ export default function CommentsPopover({
                                 className="text-[10px] font-bold text-slate-600 cursor-pointer flex items-center gap-1"
                             >
                                 <Sparkles className="h-3 w-3 text-violet-500" />
-                                {__('general.adjust_future_ai') || 'Update future timeline with AI'}
+                                {__('general.adjust_future_ai')}
                             </Label>
                         </div>
                     )}
@@ -411,7 +412,8 @@ export default function CommentsPopover({
                                     (e.currentTarget.form as HTMLFormElement | null)?.requestSubmit();
                                 }
                             }}
-                            placeholder={__('general.write_a_comment') || 'Write a comment…'}
+                            placeholder={__('general.write_a_comment')}
+                            aria-label={__('general.write_a_comment')}
                             rows={2}
                             maxLength={5000}
                             className="min-h-[64px] flex-1 resize-none text-xs"
@@ -422,7 +424,7 @@ export default function CommentsPopover({
                             className="h-9 gap-1 bg-sky-600 px-3 text-xs font-semibold text-white hover:bg-sky-700"
                         >
                             <Send className="h-3.5 w-3.5" />
-                            <span className="sr-only">{__('general.send') || 'Send'}</span>
+                            <span className="sr-only">{__('general.send')}</span>
                         </Button>
                     </div>
                 </form>

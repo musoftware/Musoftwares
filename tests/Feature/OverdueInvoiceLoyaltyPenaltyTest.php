@@ -74,12 +74,12 @@ class OverdueInvoiceLoyaltyPenaltyTest extends TestCase
         ]);
 
         LoyaltyPointTransaction::where('user_id', $this->client->id)->delete();
-        $this->client->update([
+        $this->client->forceFill([
             'loyalty_points_balance'  => 1000,
             'loyalty_lifetime_points' => 1000,
             'loyalty_tier_id'         => $goldTier->id,
             'tier'                    => 'gold',
-        ]);
+        ])->save();
 
         $this->loyaltyService = app(LoyaltyService::class);
     }
@@ -133,16 +133,26 @@ class OverdueInvoiceLoyaltyPenaltyTest extends TestCase
         ]);
     }
 
+    public function test_penalty_records_actual_days_overdue(): void
+    {
+        $this->createInvoiceWithItem(amount: 1500, daysOffset: -5);
+
+        $this->loyaltyService->deductOverdueInvoicePenalties();
+
+        $txn = LoyaltyPointTransaction::where('event_type', 'invoice_overdue_penalty')->firstOrFail();
+        $this->assertSame(5, $txn->metadata['days_overdue']);
+    }
+
     public function test_penalty_deducts_from_both_balance_and_lifetime_points_and_can_demote_tier(): void
     {
         // Client starts with 1,000 points (Emerald tier requires 1,000 pts, Gold is 600 pts)
         $emeraldTier = LoyaltyTier::where('slug', 'emerald')->first();
-        $this->client->update([
+        $this->client->forceFill([
             'loyalty_points_balance'  => 1000,
             'loyalty_lifetime_points' => 1000,
             'loyalty_tier_id'         => $emeraldTier?->id,
             'tier'                    => 'emerald',
-        ]);
+        ])->save();
 
         // 5,000 EGP invoice => 50 points penalty => drops to 950 points => Demoted to Gold!
         $this->createInvoiceWithItem(amount: 5000, jobStatus: 'done', status: 'unpaid', daysOffset: -5);
@@ -160,12 +170,12 @@ class OverdueInvoiceLoyaltyPenaltyTest extends TestCase
         Mail::fake();
 
         $emeraldTier = LoyaltyTier::where('slug', 'emerald')->first();
-        $this->client->update([
+        $this->client->forceFill([
             'loyalty_points_balance'  => 1000,
             'loyalty_lifetime_points' => 1000,
             'loyalty_tier_id'         => $emeraldTier?->id,
             'tier'                    => 'emerald',
-        ]);
+        ])->save();
 
         $this->createInvoiceWithItem(amount: 5000, jobStatus: 'done', status: 'unpaid', daysOffset: -5);
 
@@ -283,6 +293,25 @@ class OverdueInvoiceLoyaltyPenaltyTest extends TestCase
         $this->assertEquals(1000, $this->client->loyalty_points_balance);
         $this->assertDatabaseMissing('loyalty_point_transactions', [
             'event_type' => 'invoice_overdue_penalty',
+        ]);
+    }
+
+    public function test_invoice_without_exchange_rate_is_skipped_and_run_continues(): void
+    {
+        // EUR invoice with no EUR->EGP rate seeded: must be skipped, not abort the whole run.
+        $eur = Currency::where('currency', 'EUR')->firstOrFail();
+        $eurInvoice = $this->createInvoiceWithItem(amount: 1000, jobStatus: 'done', status: 'unpaid', daysOffset: -2);
+        $eurInvoice->forceFill(['currency_id' => $eur->id, 'currency' => $eur->id])->saveQuietly();
+
+        $this->createInvoiceWithItem(amount: 1500, jobStatus: 'done', status: 'unpaid', daysOffset: -2);
+
+        $result = $this->loyaltyService->deductOverdueInvoicePenalties();
+
+        $this->assertEquals(1, $result['penalized_invoices']);
+        $this->assertEquals(15, $result['total_points_deducted']);
+        $this->assertDatabaseMissing('loyalty_point_transactions', [
+            'event_type'   => 'invoice_overdue_penalty',
+            'reference_id' => $eurInvoice->id,
         ]);
     }
 }

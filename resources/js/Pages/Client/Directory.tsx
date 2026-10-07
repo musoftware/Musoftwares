@@ -13,192 +13,66 @@ import {
 import { __ } from '@/lib/i18n';
 
 interface DirectoryItem {
-    name: string;
+    id: string;
     category: string;
-    desc: string;
     icon: React.ComponentType<{ className?: string }>;
     href: string;
-    btnText: string;
     badge?: string;
 }
 
+const DIRECTORY_ITEMS: DirectoryItem[] = [
+    { id: 'erp', category: 'core_saas', icon: Building2, href: '/sso/erp', badge: 'enterprise' },
+    { id: 'crm', category: 'core_saas', icon: Users, href: '/sso/crm', badge: 'active' },
+    { id: 'whatsapp', category: 'marketing', icon: MessageSquare, href: '/whatsapp-sender', badge: 'cloud_api' },
+    { id: 'fb_marketing', category: 'marketing', icon: Megaphone, href: '/fbmb' },
+    { id: 'sms', category: 'messaging', icon: Smartphone, href: '/sms-payment-gateway' },
+    { id: 'booking', category: 'core_saas', icon: Calendar, href: '/sso/bookingsys' },
+    { id: 'gold_pos', category: 'pos_engine', icon: Coins, href: '/sso/goldsaversys' },
+    { id: 'affiliate_pos', category: 'pos_engine', icon: Share2, href: '/sso/affsys' },
+    { id: 'contracts', category: 'legal', icon: FileCheck2, href: '/isaas/contracts' },
+    { id: 'marketplace', category: 'app_store', icon: ShoppingBag, href: '/marketplace/services', badge: 'store' },
+    { id: 'seller', category: 'app_store', icon: Store, href: '/marketplace/dashboard' },
+    { id: 'recharge', category: 'finance', icon: Wallet, href: '/financial/add-balance' },
+    { id: 'invoices', category: 'finance', icon: FileText, href: '/billing/invoices' },
+    { id: 'transactions', category: 'finance', icon: ArrowRightLeft, href: '/financial/transactions' },
+    { id: 'vouchers', category: 'rewards', icon: Ticket, href: '/vouchers' },
+    { id: 'withdrawals', category: 'finance', icon: ArrowUpRight, href: '/financial/withdrawals' },
+    { id: 'points', category: 'rewards', icon: Award, href: '/points' },
+    { id: 'kyc', category: 'security', icon: ShieldCheck, href: '/kyc' },
+];
+
+const CATEGORY_IDS = ['all', 'core_saas', 'marketing', 'messaging', 'pos_engine', 'app_store', 'finance', 'rewards', 'security', 'legal'];
+
+const itemText = (item: DirectoryItem, field: 'name' | 'desc' | 'btn') => __(`client.directory_${item.id}_${field}`);
+const categoryLabel = (categoryId: string) => __(`client.directory_cat_${categoryId}`);
+
 export default function Directory() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeCategory, setActiveCategory] = useState('ALL');
+    const [activeCategory, setActiveCategory] = useState('all');
 
-    const directoryItems: DirectoryItem[] = [
-        {
-            name: 'ERP System',
-            category: 'Core SaaS',
-            desc: 'نظام إدارة المؤسسات والحسابات المالية والفواتير وشجرة الحسابات المتكاملة.',
-            icon: Building2,
-            href: '/sso/erp',
-            btnText: 'Launch ERP',
-            badge: 'Enterprise'
-        },
-        {
-            name: 'CRM System',
-            category: 'Core SaaS',
-            desc: 'إدارة العملاء والقيادة، متابعة العروض وسجل التفاعلات والاتصالات والمراحل البيعية.',
-            icon: Users,
-            href: '/sso/crm',
-            btnText: 'Launch CRM',
-            badge: 'Active'
-        },
-        {
-            name: 'WhatsApp Sender',
-            category: 'Marketing',
-            desc: 'منصة إرسال وتأتمة الحملات الترويجية ورسائل الواتساب الجماعية للعملاء.',
-            icon: MessageSquare,
-            href: '/whatsapp-sender',
-            btnText: 'Open WhatsApp',
-            badge: 'Cloud API'
-        },
-        {
-            name: 'FB Marketing System',
-            category: 'Marketing',
-            desc: 'أدوات التسويق واستخراج البيانات وإدارة الحملات الإعلانية على فيسبوك.',
-            icon: Megaphone,
-            href: '/fbmb',
-            btnText: 'Open FB Marketing'
-        },
-        {
-            name: 'SMS Gateway',
-            category: 'Messaging',
-            desc: 'بوابة إرسال الرسائل النصية القصيرة OTP وإشعارات الفواتير والتحقق.',
-            icon: Smartphone,
-            href: '/sms-payment-gateway',
-            btnText: 'Open SMS Gateway'
-        },
-        {
-            name: 'Booking System',
-            category: 'Core SaaS',
-            desc: 'منصة حجز المواعيد والاستشارات والجداول الزمانية والمواعيد التلقائية.',
-            icon: Calendar,
-            href: '/sso/bookingsys',
-            btnText: 'Open Bookings'
-        },
-        {
-            name: 'Gold POS System',
-            category: 'POS Engine',
-            desc: 'نظام كاشير ونقاط بيع وتداول الذهب والمجوهرات ومتابعة أسعار البورصة الحية.',
-            icon: Coins,
-            href: '/sso/goldsaversys',
-            btnText: 'Open Gold POS'
-        },
-        {
-            name: 'Affiliate POS System',
-            category: 'POS Engine',
-            desc: 'نظام إدارة المسوقين ونقاط البيع بالعمولة وتوزيع الأرباح التلقائي.',
-            icon: Share2,
-            href: '/sso/affsys',
-            btnText: 'Open Affiliate POS'
-        },
-        {
-            name: 'Contracts & Proposals',
-            category: 'Legal',
-            desc: 'إدارة العقود الإلكترونية وشروط الاتفاقيات والمقترحات الفنية الموثقة.',
-            icon: FileCheck2,
-            href: '/isaas/contracts',
-            btnText: 'Open Contracts'
-        },
-        {
-            name: 'Marketplace Services',
-            category: 'App Store',
-            desc: 'كتالوج المتجر لشراء الإضافات والخدمات والملحقات والتكاملات البرمجية.',
-            icon: ShoppingBag,
-            href: '/marketplace/services',
-            btnText: 'Browse Marketplace',
-            badge: 'Store'
-        },
-        {
-            name: 'Seller Portal',
-            category: 'App Store',
-            desc: 'بوابة البائعين لرفع ونشر أدواتك ومنتجاتك الرقمية في المتجر.',
-            icon: Store,
-            href: '/marketplace/dashboard',
-            btnText: 'Seller Portal'
-        },
-        {
-            name: 'Recharge Wallet',
-            category: 'Finance',
-            desc: 'شحن رصيد المحفظة عبر وسائل الدفع الإلكترونية واستخدام الرصيد في الاشتراكات.',
-            icon: Wallet,
-            href: '/financial/add-balance',
-            btnText: 'Add Balance'
-        },
-        {
-            name: 'Invoices & Settlements',
-            category: 'Finance',
-            desc: 'سجل الفواتير الصادرة والمستحقة وسداد المبالغ وتنزيل كشوفات الحساب.',
-            icon: FileText,
-            href: '/billing/invoices',
-            btnText: 'View Invoices'
-        },
-        {
-            name: 'Transactions Audit Log',
-            category: 'Finance',
-            desc: 'سجل حركة الحساب المالي والتسويات والإيداعات والسحوبات التفصيلية.',
-            icon: ArrowRightLeft,
-            href: '/financial/transactions',
-            btnText: 'View Log'
-        },
-        {
-            name: 'Vouchers & Promo Codes',
-            category: 'Rewards',
-            desc: 'شحن أكواد الخصم والقسائم الشرائية الترويجية وإيداع رصيد مجاني.',
-            icon: Ticket,
-            href: '/vouchers',
-            btnText: 'Redeem Vouchers'
-        },
-        {
-            name: 'Earnings Withdrawals',
-            category: 'Finance',
-            desc: 'طلب سحب أرباحك وعمولات التسويق المكتسبة إلى حسابك البنكي أو المحفظة.',
-            icon: ArrowUpRight,
-            href: '/financial/withdrawals',
-            btnText: 'Withdraw Funds'
-        },
-        {
-            name: 'Points & Rewards',
-            category: 'Rewards',
-            desc: 'استبدال نقاط النشاط والمكافآت برصيد مجاني أو اشتراكات أدوات إضافية.',
-            icon: Award,
-            href: '/points',
-            btnText: 'Points Store'
-        },
-        {
-            name: 'KYC Account Verification',
-            category: 'Security',
-            desc: 'رفع مستندات إثبات الشخصية لتوثيق الحساب ورفع حدود السحب والعمليات.',
-            icon: ShieldCheck,
-            href: '/kyc',
-            btnText: 'Verify Account'
-        }
-    ];
+    const categories = CATEGORY_IDS.map((id) => ({ id, label: categoryLabel(id) }));
+    const query = searchQuery.toLowerCase();
 
-    const categories = ['ALL', 'CORE SAAS', 'MARKETING', 'MESSAGING', 'POS ENGINE', 'APP STORE', 'FINANCE', 'REWARDS', 'SECURITY', 'LEGAL'];
-
-    const filteredItems = directoryItems.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.desc.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesCategory = activeCategory === 'ALL' || item.category.toUpperCase() === activeCategory.toUpperCase();
+    const filteredItems = DIRECTORY_ITEMS.filter(item => {
+        const matchesSearch = itemText(item, 'name').toLowerCase().includes(query) ||
+            itemText(item, 'desc').toLowerCase().includes(query);
+        const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
         return matchesSearch && matchesCategory;
     });
 
     return (
         <AuthenticatedLayout>
-            <Head title="Systems & Tools Directory — Musoftwares Studio" />
+            <Head title={`${__('client.directory_page_title')} — Musoftwares Studio`} />
 
             <div className="w-full">
                 {/* Hero Header */}
                 <PageHeroHeader
-                    badge="Studio Ecosystem Directory"
-                    title="Applications & Features Directory"
-                    description="Explore and launch all core SaaS applications, automation tools, financial portals, and platform extensions from one centralized index."
+                    badge={__('client.directory_hero_badge')}
+                    title={__('client.directory_hero_title')}
+                    description={__('client.directory_hero_description')}
                     searchValue={searchQuery}
                     onSearchChange={setSearchQuery}
-                    searchPlaceholder="Search applications & tools..."
+                    searchPlaceholder={__('client.directory_search_placeholder')}
                 />
 
                 {/* Main Content Area */}
@@ -216,16 +90,16 @@ export default function Directory() {
                             <div className="w-12 h-12 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 flex items-center justify-center mx-auto text-[#1d1d1f]/40 dark:text-zinc-500 mb-3">
                                 <Search className="w-6 h-6" />
                             </div>
-                            <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-[#f8fafc]">No applications match your search</h3>
-                            <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1">Try searching with a different keyword or select another category.</p>
+                            <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-[#f8fafc]">{__('client.directory_empty_title')}</h3>
+                            <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 mt-1">{__('client.directory_empty_hint')}</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredItems.map((item, idx) => {
+                            {filteredItems.map((item) => {
                                 const IconComponent = item.icon;
                                 return (
                                     <div
-                                        key={idx}
+                                        key={item.id}
                                         className="bg-white dark:bg-zinc-900/80 border border-black/5 dark:border-white/10 rounded-[24px] p-6 sm:p-7 flex flex-col justify-between group hover:border-[#0071e3]/30 dark:hover:border-[#2997ff]/40 hover:shadow-md transition-all shadow-sm relative overflow-hidden"
                                     >
                                         <div>
@@ -234,23 +108,23 @@ export default function Directory() {
                                                     <IconComponent className="w-5 h-5" />
                                                 </div>
                                                 <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 border border-black/5 dark:border-white/10 text-[#1d1d1f]/60 dark:text-zinc-300 font-mono">
-                                                    {item.category}
+                                                    {categoryLabel(item.category)}
                                                 </span>
                                             </div>
 
                                             <div className="space-y-1.5 mb-6">
                                                 <div className="flex items-center gap-2">
                                                     <h3 className="text-base font-bold text-[#1d1d1f] dark:text-[#f8fafc] font-sans group-hover:text-[#0071e3] dark:group-hover:text-[#2997ff] transition-colors">
-                                                        {item.name}
+                                                        {itemText(item, 'name')}
                                                     </h3>
                                                     {item.badge && (
                                                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
-                                                            {item.badge}
+                                                            {__(`client.directory_badge_${item.badge}`)}
                                                         </span>
                                                     )}
                                                 </div>
                                                 <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f8fafc]/60 font-sans leading-relaxed">
-                                                    {item.desc}
+                                                    {itemText(item, 'desc')}
                                                 </p>
                                             </div>
                                         </div>
@@ -260,7 +134,7 @@ export default function Directory() {
                                                 href={item.href}
                                                 className="w-full flex items-center justify-between text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] group-hover:text-[#0077ed] dark:group-hover:text-[#52a9ff] py-1"
                                             >
-                                                <span>{item.btnText}</span>
+                                                <span>{itemText(item, 'btn')}</span>
                                                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
                                             </Link>
                                         </div>

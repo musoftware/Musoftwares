@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class RegisteredUserController extends Controller
 {
@@ -79,7 +80,7 @@ class RegisteredUserController extends Controller
                     }
                 }
             } catch (\Throwable $e) {
-                // Non-blocking
+                Log::warning('Registration: referral loyalty award failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
             }
         }
 

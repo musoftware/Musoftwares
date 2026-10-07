@@ -1,3 +1,4 @@
+import { useConfirm } from '@/hooks/useConfirm';
 import React, { useState } from 'react';
 import { __ } from '@/lib/i18n';
 import { Head, router } from '@inertiajs/react';
@@ -16,14 +17,19 @@ interface DevicesProps {
 
 export default function Devices({ devices, androidAppUrl }: DevicesProps) {
     const { toast } = useToast();
+    const { confirm, confirmDialog } = useConfirm();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [qrData, setQrData] = useState<{ qr_code: string; connection_code: string; expires_at: string } | null>(null);
 
-    const handleDelete = (id: number) => {
-        if (confirm(__('general.are_you_sure_you_want_4'))) {
-            router.delete(route('sms-payment-gateway.delete-device', id));
-        }
+    const handleDelete = async (id: number) => {
+        const accepted = await confirm({
+            title: __('sms_gateway.devices_remove_title'),
+            description: __('general.are_you_sure_you_want_4'),
+            variant: 'danger',
+        });
+        if (!accepted) return;
+        router.delete(route('sms-payment-gateway.delete-device', id));
     };
 
     const handleAddDevice = async () => {
@@ -212,6 +218,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                     </div>
                 </DialogContent>
             </Dialog>
+            {confirmDialog}
         </AuthenticatedLayout>
     );
 }

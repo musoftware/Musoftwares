@@ -7,7 +7,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import MDEditor from '@uiw/react-md-editor';
-import { ArrowRight, Save, Copy, Check, Info, Megaphone, DollarSign, ListChecks, Wrench, HeartHandshake } from 'lucide-react';
+import { ArrowLeft, Save, Copy, Check, Info, Megaphone, DollarSign, ListChecks, Wrench, HeartHandshake } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { __ } from '@/lib/i18n';
@@ -63,6 +63,7 @@ export default function Edit({ playbook, services }: EditProps) {
             }
         } catch (e) {
             console.error(e);
+            toast.error(__('admin.service_playbooks_pricing_fetch_failed'));
         } finally {
             setIsLoadingPricing(false);
         }
@@ -97,7 +98,7 @@ export default function Edit({ playbook, services }: EditProps) {
                         href="/admin/marketplace/service-playbooks"
                         className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 font-medium gap-1.5"
                     >
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
                         {__('service_playbooks.back_to_list')}
                     </Link>
                     <Link href={`/admin/marketplace/service-playbooks/${playbook.id}`}>

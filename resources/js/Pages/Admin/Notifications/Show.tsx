@@ -8,6 +8,7 @@ import { ArrowLeft, BarChart3, Eye, MousePointerClick, Calendar, Send, Link as L
 import { formatDate } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { campaignStatusLabel, campaignAudienceLabel } from './campaignStatus';
 
 export default function Show({ campaign }: { campaign: any }) {
     // Calculate CTR
@@ -26,9 +27,9 @@ export default function Show({ campaign }: { campaign: any }) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href={route('admin.notifications.broadcast')}>
-                            <Button variant="outline" size="icon" className="h-8 w-8">
-                                <ArrowLeft className="w-4 h-4" />
+                        <Link href={route('admin.notifications.broadcast')} aria-label={__('general.back')} title={__('general.back')}>
+                            <Button variant="outline" size="icon" className="h-8 w-8" tabIndex={-1}>
+                                <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
                             </Button>
                         </Link>
                         <div>
@@ -36,7 +37,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                 {campaign.title}
                                 {campaign.audience_type === 'personal' && (
                                     <Badge variant="outline" className="ms-2 bg-slate-50 text-slate-900 border-slate-200">
-                                        {__('general.personal')}</Badge>
+                                        {campaignAudienceLabel(campaign.audience_type)}</Badge>
                                 )}
                             </h1>
                             <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
@@ -47,7 +48,7 @@ export default function Show({ campaign }: { campaign: any }) {
                     </div>
                     <div>
                         <Badge className={campaign.status === 'completed' ? 'bg-green-500 hover:bg-green-600' : ''} variant={campaign.status === 'completed' ? 'default' : 'secondary'}>
-                            {__(campaign.status)}
+                            {campaignStatusLabel(campaign.status)}
                         </Badge>
                     </div>
                 </div>
@@ -127,7 +128,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                             <TableBody>
                                                 {views.map((view: any) => (
                                                     <TableRow key={view.id}>
-                                                        <TableCell className="font-medium">{view.user?.name || 'Unknown'}</TableCell>
+                                                        <TableCell className="font-medium">{view.user?.name || __('general.unknown')}</TableCell>
                                                         <TableCell className="text-end text-xs text-slate-500">{formatDate(view.created_at)}</TableCell>
                                                     </TableRow>
                                                 ))}
@@ -161,7 +162,7 @@ export default function Show({ campaign }: { campaign: any }) {
                                             <TableBody>
                                                 {clicks.map((click: any) => (
                                                     <TableRow key={click.id}>
-                                                        <TableCell className="font-medium">{click.user?.name || 'Unknown'}</TableCell>
+                                                        <TableCell className="font-medium">{click.user?.name || __('general.unknown')}</TableCell>
                                                         <TableCell className="text-end text-xs text-slate-500">{formatDate(click.created_at)}</TableCell>
                                                     </TableRow>
                                                 ))}

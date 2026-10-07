@@ -38,12 +38,12 @@ $apiRoutes = function () {
     // Receive SMS via MacroDroid (public, uses unique macrodroid_token)
     Route::post('/macrodroid/{token}', [SmsPaymentGatewayPaymentHubController::class, 'receiveMacrodroidSms']);
 
-    // Debug endpoint (public, for testing parser)
-    Route::get('/debug/empty-phone-numbers', [SmsPaymentGatewayPaymentHubController::class, 'debugEmptyPhoneNumbers']);
 
-    // Public wallet endpoints (no auth required)
-    Route::get('/get-random-wallet', [SmsPaymentGatewayPaymentHubController::class, 'getRandomWallet']);
-    Route::post('/verify-payment', [SmsPaymentGatewayPaymentHubController::class, 'verifyPayment']);
+    // Merchant wallet endpoints: scoped to the owner of the API key (pk_* or sk_*)
+    Route::middleware(['sms-gateway.api-key', 'throttle:30,1'])->group(function () {
+        Route::get('/get-random-wallet', [SmsPaymentGatewayPaymentHubController::class, 'getRandomWallet']);
+        Route::post('/verify-payment', [SmsPaymentGatewayPaymentHubController::class, 'verifyPayment']);
+    });
 
     // AutoSMS Public API (Bearer token authentication, no Sanctum)
     Route::prefix('public')->group(function () {

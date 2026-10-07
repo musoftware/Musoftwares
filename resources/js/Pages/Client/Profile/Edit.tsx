@@ -44,10 +44,10 @@ export default function Edit({
                             {__('general.back_to_dashboard')}
                         </Link>
                         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                            {__('general.profile')} &amp; Account Settings
+                            {__('client.profile_title')}
                         </h1>
                         <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                            Manage your personal details, language preferences, connected emails, and security credentials.
+                            {__('client.profile_subtitle')}
                         </p>
                     </div>
                 </div>

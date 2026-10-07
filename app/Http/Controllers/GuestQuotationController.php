@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Builders\KashierCheckoutBuilder;
+use App\Helpers\KashierHelper;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -91,7 +92,7 @@ class GuestQuotationController extends Controller
                     try {
                         $user->assignRole('client');
                     } catch (\Throwable $e) {
-                        // Role might already be synced or assigned
+                        Log::warning('Guest quotation: client role assignment failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
                     }
                 }
             } else {
@@ -181,30 +182,17 @@ class GuestQuotationController extends Controller
      */
     public function paymentSuccess(Request $request, string $orderUuid)
     {
+        // Read-only: the browser redirect is not signed, so only the verified webhook marks the order as paid.
         $order = QuotationOrder::with(['quotation', 'user', 'invoice'])->where('uuid', $orderUuid)->firstOrFail();
 
-        if ($order->status !== 'paid') {
-            DB::transaction(function () use ($order, $request) {
-                $order->update([
-                    'status' => 'paid',
-                    'paid_at' => now(),
-                    'payment_gateway' => 'kashier',
-                    'payment_reference' => $request->input('paymentId') ?? $request->input('transactionId') ?? $request->input('signature'),
-                ]);
-
-                if ($order->invoice && $order->invoice->status !== 'paid') {
-                    $order->invoice->update([
-                        'status' => 'paid',
-                        'paid_at' => now(),
-                    ]);
-                }
-            });
-        }
+        $message = $order->status === 'paid'
+            ? 'تم استلام الدفعة المقدمة بنجاح! تم إنشاء حسابك وتأكيد بدء العمل على المشروع.'
+            : 'تم استلام عملية الدفع وجاري تأكيدها من بوابة الدفع. سيصلك بريد إلكتروني فور التأكيد.';
 
         return Inertia::render('Guest/QuotationPaymentResult', [
             'status' => 'success',
             'order' => $order,
-            'message' => 'تم استلام الدفعة المقدمة بنجاح! تم إنشاء حسابك وتأكيد بدء العمل على المشروع.',
+            'message' => $message,
         ]);
     }
 
@@ -228,22 +216,44 @@ class GuestQuotationController extends Controller
      */
     public function webhook(Request $request)
     {
-        $orderId = $request->input('order_id') ?? $request->input('merchantOrderId');
-        if (!$orderId) {
+        if (! KashierHelper::validatePayload()) {
+            Log::warning('Quotation Kashier webhook: invalid signature.');
+
+            return response()->json(['status' => 'error', 'message' => 'Invalid signature'], 400);
+        }
+
+        $data = $request->json('data', []);
+        if (($data['status'] ?? '') !== 'SUCCESS') {
             return response()->json(['status' => 'ignored'], 200);
         }
 
-        // Clean prefix if present
-        $cleanId = str_replace('qto_', '', $orderId);
-        $order = QuotationOrder::find($cleanId);
+        // KashierCheckoutBuilder formats the signed merchantOrderId as "qto_{invoice_id}_{unique}-{user_id}".
+        if (! preg_match('/^qto_(\d+)_/', (string) ($data['merchantOrderId'] ?? ''), $matches)) {
+            return response()->json(['status' => 'ignored'], 200);
+        }
 
-        if ($order && $order->status !== 'paid') {
-            DB::transaction(function () use ($order, $request) {
+        $order = QuotationOrder::with('invoice')->where('invoice_id', (int) $matches[1])->first();
+        if (! $order) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        if ((float) ($data['amount'] ?? 0) + 0.01 < (float) $order->deposit_amount) {
+            Log::warning('Quotation Kashier webhook: paid amount is below the deposit.', [
+                'order_id' => $order->id,
+                'paid' => $data['amount'] ?? null,
+                'expected' => $order->deposit_amount,
+            ]);
+
+            return response()->json(['status' => 'error', 'message' => 'Amount mismatch'], 400);
+        }
+
+        if ($order->status !== 'paid') {
+            DB::transaction(function () use ($order, $data) {
                 $order->update([
                     'status' => 'paid',
                     'paid_at' => now(),
                     'payment_gateway' => 'kashier',
-                    'payment_reference' => $request->input('paymentId'),
+                    'payment_reference' => $data['transactionId'] ?? null,
                 ]);
 
                 if ($order->invoice && $order->invoice->status !== 'paid') {

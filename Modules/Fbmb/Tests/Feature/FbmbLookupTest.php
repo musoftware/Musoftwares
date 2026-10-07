@@ -9,33 +9,24 @@ use Modules\Fbmb\Models\FbmbLookupResult;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
-use PDO;
+use Illuminate\Support\Facades\Http;
 
 class FbmbLookupTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected string $dbPath;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create the storage app/db directory if not exists
-        $dbDir = storage_path('app/db');
-        if (!is_dir($dbDir)) {
-            mkdir($dbDir, 0755, true);
-        }
-
-        $this->dbPath = $dbDir . '/All Arab.db';
-        
-        // Setup SQLite mock db
-        $pdo = new PDO("sqlite:{$this->dbPath}");
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->exec("CREATE TABLE IF NOT EXISTS data (FBID TEXT, Phone TEXT)");
-        $pdo->exec("DELETE FROM data");
-        $pdo->exec("INSERT INTO data (FBID, Phone) VALUES ('12345', '123456789')");
-        $pdo->exec("INSERT INTO data (FBID, Phone) VALUES ('67890', '987654321')");
+        // Lookups now go through the AmcAcademy API. Never touch a real local database here.
+        Http::preventStrayRequests();
+        Http::fake([
+            '*/search_fbids_bulk' => Http::response([
+                'status' => 'success',
+                'data' => ['12345' => '123456789', '67890' => '987654321'],
+            ]),
+        ]);
     }
 
     public function test_user_can_upload_file_to_create_pending_lookup()
@@ -64,6 +55,11 @@ class FbmbLookupTest extends TestCase
             'status' => 'pending',
             'total_ids' => 2,
         ]);
+
+        // Points are reserved on the points ledger, never on the money wallet ledger.
+        $this->assertEquals(8, $user->fresh()->points_balance);
+        $this->assertDatabaseHas('point_transactions', ['user_id' => $user->id, 'type' => 'used', 'points' => -2]);
+        $this->assertDatabaseCount('transactions', 0);
 
         $record = FbmbLookupResult::where('user_id', $user->id)->first();
         $this->assertNotNull($record->input_path);
@@ -120,6 +116,12 @@ class FbmbLookupTest extends TestCase
         $this->assertNotNull($record->result_path);
         $this->assertTrue(file_exists($record->result_path));
         $this->assertFalse(file_exists($inputPath)); // Input file deleted
+        $this->assertSame("Phone\n123456789\n987654321\n", str_replace("\r\n", "\n", file_get_contents($record->result_path)));
+
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/search_fbids_bulk')
+            && json_decode($request['fbids'], true) === ['12345', '67890', '99999']);
+        $this->assertDatabaseHas('point_transactions', ['user_id' => $user->id, 'type' => 'earned', 'points' => 1]);
+        $this->assertDatabaseCount('transactions', 0);
 
         // Clean up output file
         if (file_exists($record->result_path)) {

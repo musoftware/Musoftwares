@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import MDEditor from '@uiw/react-md-editor';
-import { ArrowRight, Edit3, Copy, Check, Megaphone, DollarSign, ListChecks, Wrench, HeartHandshake, Info } from 'lucide-react';
+import { ArrowLeft, Edit3, Link as LinkIcon, Copy, Check, Megaphone, DollarSign, ListChecks, Wrench, HeartHandshake, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 
@@ -59,7 +59,7 @@ export default function Show({ playbook }: ShowProps) {
                         href="/admin/marketplace/service-playbooks"
                         className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900 font-medium gap-1.5"
                     >
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
                         {__('service_playbooks.back_to_list')}
                     </Link>
                     <Link href={`/admin/marketplace/service-playbooks/${playbook.id}/edit`}>
@@ -78,8 +78,9 @@ export default function Show({ playbook }: ShowProps) {
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <h1 className="text-xl font-bold text-white">{playbook.title}</h1>
                                     {playbook.service ? (
-                                        <Badge className="bg-sky-500/20 text-sky-300 border-sky-400/30">
-                                            🔗 {playbook.service.title}
+                                        <Badge className="bg-sky-500/20 text-sky-300 border-sky-400/30 gap-1">
+                                            <LinkIcon className="w-3 h-3" aria-hidden="true" />
+                                            {playbook.service.title}
                                         </Badge>
                                     ) : (
                                         <Badge className="bg-slate-800 text-slate-300 border-slate-700">

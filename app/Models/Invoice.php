@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Events\InvoiceCancelled;
 use App\Events\InvoiceCreated;
 use App\Events\InvoicePaid;
+use App\Exceptions\MissingExchangeRateException;
 use App\Helpers\ActionHelper;
 use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class Invoice extends Model
@@ -48,6 +50,22 @@ class Invoice extends Model
     public function getDateAttribute(): ?string
     {
         return $this->created_at?->format('Y-m-d');
+    }
+
+    /**
+     * Accessor for invoice due date.
+     */
+    public function getDueDateAttribute(): ?string
+    {
+        if (isset($this->attributes['due_date']) && ! empty($this->attributes['due_date'])) {
+            return $this->attributes['due_date'];
+        }
+
+        if (! empty($this->schedule['start_date'])) {
+            return $this->schedule['start_date'];
+        }
+
+        return null;
     }
 
     /**
@@ -126,6 +144,14 @@ class Invoice extends Model
     public function transactions()
     {
         return $this->belongsToMany(Transaction::class);
+    }
+
+    /**
+     * Determine if the invoice contains any simple invoice item.
+     */
+    public function hasSimpleItem(): bool
+    {
+        return $this->items()->where('item_type', 'simple')->exists();
     }
 
     public function cost_transactions()
@@ -747,7 +773,9 @@ class Invoice extends Model
 
     public function business_total_str()
     {
-        return FinanceHelper::instance()->format_money($this->business_total(), AdminSettings::GetValue('business_currency', 2));
+        $businessTotal = $this->business_total();
+
+        return $businessTotal === null ? '-' : FinanceHelper::instance()->format_money($businessTotal, AdminSettings::GetValue('business_currency', 2));
     }
 
     public function enc_id()
@@ -765,9 +793,20 @@ class Invoice extends Model
         return optional($this->user)->name;
     }
 
-    public function business_total()
+    /**
+     * Invoice total in the business currency, for display only (invoice lists, PDFs, guest page).
+     * Returns null when no exchange rate exists, so those pages render a dash instead of a 500.
+     * CurrenciesExchange already logged the missing rate; this adds the invoice context.
+     */
+    public function business_total(): ?float
     {
-        return CurrenciesExchange::RateToday($this->total(), $this->currency_id, AdminSettings::GetValue('business_currency', 2));
+        try {
+            return (float) CurrenciesExchange::RateToday($this->total(), $this->currency_id, AdminSettings::GetValue('business_currency', 2));
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Invoice business total unavailable: missing exchange rate.', ['invoice_id' => $this->id, 'error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     public function discount_str()
@@ -802,18 +841,29 @@ class Invoice extends Model
         return FinanceHelper::instance()->format_money($total, AdminSettings::GetValue('business_currency', 2));
     }
 
-    public function bill_invoice(bool $autoPaid = false)
+    /**
+     * Pay the invoice from the client's wallet.
+     *
+     * @param  bool|null  $requireSufficientBalance  Re-check the wallet under a row lock and refuse
+     *                                               to bill when it cannot cover the unpaid total.
+     *                                               Defaults to true for auto-payments.
+     */
+    public function bill_invoice(bool $autoPaid = false, ?bool $requireSufficientBalance = null)
     {
         if ($older = $this->getOlderUnpaidInvoice()) {
             throw new \Exception("Cannot bill invoice #{$this->id} because older invoice #{$older->id} is still unpaid for this client. Please pay older invoices first.");
         }
 
-        DB::transaction(function () use ($autoPaid) {
+        $requireSufficientBalance ??= $autoPaid;
+
+        DB::transaction(function () use ($autoPaid, $requireSufficientBalance) {
             $locked = static::where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {
                 return;
             }
+
+            $this->lockClientWallet($requireSufficientBalance);
 
             $transaction_id = null;
             $reason = 'Invoice #'.$this->id . ($autoPaid ? ' (Auto-Paid)' : '');
@@ -883,6 +933,28 @@ class Invoice extends Model
                 }
             }
         });
+    }
+
+    /**
+     * Lock the client's wallet row for the rest of the billing transaction so parallel
+     * debits run one after another. When asked, re-check the balance on the locked row.
+     *
+     * @throws \RuntimeException when the locked balance cannot cover the unpaid total
+     */
+    private function lockClientWallet(bool $requireSufficientBalance): void
+    {
+        $client = User::whereKey($this->user_id)->lockForUpdate()->first();
+        if (! $client || ! $requireSufficientBalance) {
+            return;
+        }
+
+        $unpaidInWalletCurrency = (float) CurrenciesExchange::RateToday($this->unpaid_total(), $this->currency_id, $client->currency_id);
+        $walletBalance = round((float) $client->user_balance, 2);
+        if ($walletBalance >= $unpaidInWalletCurrency) {
+            return;
+        }
+
+        throw new \RuntimeException("Insufficient wallet balance to bill invoice #{$this->id}: balance {$walletBalance}, needed {$unpaidInWalletCurrency}.");
     }
 
     public function max_partially_bill_amount()

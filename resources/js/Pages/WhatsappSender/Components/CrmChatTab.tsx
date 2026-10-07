@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
@@ -14,7 +15,9 @@ import {
     Sparkles,
     X,
     FileText,
-    Smartphone
+    Smartphone,
+    Flame,
+    Zap
 } from 'lucide-react';
 
 interface Conversation {
@@ -162,7 +165,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                     setActiveContact(res.data.contact);
                 } else {
                     setActiveContact({
-                        name: `Customer ${phone}`,
+                        name: __('whatsapp.livechat_customer_name', { phone }),
                         phone: phone,
                     });
                 }
@@ -207,12 +210,12 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
 
         const currentAccount = accounts.find(a => a.id === selectedAccountId);
         if (!currentAccount) {
-            setErrorMsg('Please connect or select a valid WhatsApp Account first.');
+            setErrorMsg(__('whatsapp.livechat_err_no_account'));
             return;
         }
 
         if (currentAccount.status !== 'active') {
-            setErrorMsg(`Selected account "${currentAccount.name}" is not registered (${currentAccount.status}). Please switch to an Active account.`);
+            setErrorMsg(__('whatsapp.livechat_err_account_inactive', { name: currentAccount.name, status: currentAccount.status }));
             return;
         }
 
@@ -254,11 +257,11 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                 }
                 fetchConversations();
             } else {
-                setErrorMsg(res.data.error || 'Failed to send message.');
+                setErrorMsg(res.data.error || __('whatsapp.livechat_err_send_failed'));
             }
         } catch (err: any) {
             console.error('Send message error:', err);
-            setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'Error occurred while sending message.');
+            setErrorMsg(err.response?.data?.error || err.response?.data?.message || __('whatsapp.livechat_err_send_error'));
         } finally {
             setSending(false);
         }
@@ -290,10 +293,10 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
         const now = new Date().getTime();
         const expires = new Date(expiresAtStr).getTime();
         const diffMs = expires - now;
-        if (diffMs <= 0) return 'Expired';
+        if (diffMs <= 0) return __('whatsapp.livechat_expired');
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        return `${hours}h ${mins}m left`;
+        return __('whatsapp.livechat_time_left', { hours, mins });
     };
 
     const activeReferral = messages.find(m => m.referral)?.referral;
@@ -309,13 +312,13 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                     </div>
                     <div>
                         <h2 className="text-base font-bold text-zinc-950 dark:text-zinc-50 tracking-wide flex items-center gap-2">
-                            WhatsApp CRM Live Inbox
+                            {__('whatsapp.crm_chat_title')}
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-mono">
-                                Live Webhook Active
+                                {__('whatsapp.crm_chat_webhook_active')}
                             </span>
                         </h2>
                         <p className="text-xs text-zinc-500">
-                            Receive & send messages in real-time for business <strong className="text-zinc-700 dark:text-zinc-300">{business.name}</strong>
+                            {__('whatsapp.crm_chat_subtitle', { name: business.name })}
                         </p>
                     </div>
                 </div>
@@ -323,7 +326,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                 <div className="flex items-center gap-3">
                     {/* Balance Badge */}
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs">
-                        <span className="text-zinc-500">Balance:</span>
+                        <span className="text-zinc-500">{__('whatsapp.crm_chat_balance')}</span>
                         <span className={`font-semibold font-mono ${parseFloat(business.wallet_balance) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             ${parseFloat(business.wallet_balance).toFixed(4)}
                         </span>
@@ -332,7 +335,8 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                     <button
                         onClick={() => { fetchConversations(); if (selectedPhone) fetchChatMessages(selectedPhone); }}
                         className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition border border-zinc-200 dark:border-zinc-700"
-                        title="Refresh Conversations"
+                        title={__('whatsapp.livechat_refresh')}
+                        aria-label={__('whatsapp.livechat_refresh')}
                     >
                         <RefreshCw className={`w-4 h-4 ${loadingConversations || loadingMessages ? 'animate-spin text-emerald-500' : ''}`} />
                     </button>
@@ -351,7 +355,8 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search customer or phone..."
+                                placeholder={__('whatsapp.crm_chat_search_placeholder')}
+                                aria-label={__('whatsapp.crm_chat_search_placeholder')}
                                 className="w-full pl-9 pr-3 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 transition-all"
                             />
                         </div>
@@ -361,13 +366,13 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                 onClick={() => setChannelFilter('all')}
                                 className={`flex-1 py-1 text-[10px] font-medium rounded-md transition-all ${channelFilter === 'all' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-xs' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
                             >
-                                All
+                                {__('general.all')}
                             </button>
                             <button
                                 onClick={() => setChannelFilter('ctwa')}
                                 className={`flex-1 py-1 text-[10px] font-bold rounded-md transition-all ${channelFilter === 'ctwa' ? 'bg-amber-500 text-black shadow-xs' : 'text-amber-600 dark:text-amber-400 hover:text-amber-700'}`}
                             >
-                                🔥 CTWA Ads
+                                <Flame className="inline w-3 h-3 me-0.5" aria-hidden="true" />{__('whatsapp.livechat_ctwa_ads')}
                             </button>
                             <button
                                 onClick={() => setChannelFilter('whatsapp')}
@@ -383,11 +388,11 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                         {loadingConversations && conversations.length === 0 ? (
                             <div className="p-8 text-center text-zinc-400 text-xs flex flex-col items-center gap-2">
                                 <RefreshCw className="w-5 h-5 animate-spin text-emerald-500" />
-                                Loading conversations...
+                                {__('whatsapp.crm_chat_loading')}
                             </div>
                         ) : filteredConversations.length === 0 ? (
                             <div className="p-8 text-center text-zinc-400 text-xs">
-                                No customer conversations found. Incoming webhook messages will appear here automatically.
+                                {__('whatsapp.crm_chat_empty')}
                             </div>
                         ) : (
                             filteredConversations.map((conv) => {
@@ -413,7 +418,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                                     {conv.contact_name || `+${conv.recipient_phone}`}
                                                     {isAd && (
                                                         <span className="px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40 font-bold text-[9px]">
-                                                            🔥 CTWA
+                                                            <Flame className="inline w-2.5 h-2.5 me-0.5" aria-hidden="true" />CTWA
                                                         </span>
                                                     )}
                                                 </h4>
@@ -424,9 +429,9 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
 
                                             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate flex items-center gap-1">
                                                 {conv.last_message_direction === 'outbound' && (
-                                                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">You:</span>
+                                                    <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">{__('whatsapp.livechat_you')}</span>
                                                 )}
-                                                <span>{conv.last_message || `[${conv.last_message_type} message]`}</span>
+                                                <span>{conv.last_message || __('whatsapp.livechat_type_message', { type: conv.last_message_type })}</span>
                                             </p>
                                         </div>
                                     </div>
@@ -454,7 +459,8 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="text-emerald-600 dark:text-emerald-400 hover:underline text-[10px] flex items-center gap-0.5"
-                                                title="Open in WhatsApp Web"
+                                                title={__('whatsapp.livechat_open_wa_web')}
+                                                aria-label={__('whatsapp.livechat_open_wa_web')}
                                             >
                                                 <ExternalLink className="w-3 h-3" />
                                             </a>
@@ -470,12 +476,13 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                     {activeReferral ? (
                                         <div className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/40 text-amber-800 dark:text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-xs animate-pulse">
                                             <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                            <span>⚡ 72h Free Ad Window: {calculateRemainingTime(messages.find(m => m.referral)?.created_at ? new Date(new Date(messages.find(m => m.referral)!.created_at).getTime() + 72*3600*1000).toISOString() : undefined) || '71h left'}</span>
+                                            <Zap className="w-3.5 h-3.5" aria-hidden="true" />
+                                            <span>{__('whatsapp.crm_chat_free_ad_window')} {calculateRemainingTime(messages.find(m => m.referral)?.created_at ? new Date(new Date(messages.find(m => m.referral)!.created_at).getTime() + 72*3600*1000).toISOString() : undefined) || __('whatsapp.livechat_time_left', { hours: 71, mins: 0 })}</span>
                                         </div>
                                     ) : (
                                         <div className="px-3 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 text-[11px] flex items-center gap-1.5">
                                             <Clock className="w-3.5 h-3.5 text-emerald-500" />
-                                            <span>24h Customer Window</span>
+                                            <span>{__('whatsapp.crm_chat_customer_window')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -489,7 +496,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                         <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                                         <div className="flex-1 space-y-1">
                                             <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center justify-between">
-                                                <span>🔥 Came from Meta Ad: {activeReferral.headline || 'Click to WhatsApp Campaign'}</span>
+                                                <span className="flex items-center gap-1"><Flame className="w-3.5 h-3.5" aria-hidden="true" />{__('whatsapp.livechat_came_from_ad', { headline: activeReferral.headline || __('whatsapp.livechat_ctwa_campaign') })}</span>
                                                 {activeReferral.ctwa_clid && (
                                                     <span className="font-mono text-[10px] bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 rounded text-amber-800 dark:text-amber-400">
                                                         CLID: {activeReferral.ctwa_clid}
@@ -498,7 +505,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                             </div>
                                             {activeReferral.body && <p className="text-[11px] text-amber-800 dark:text-amber-200/80">{activeReferral.body}</p>}
                                             <div className="text-[10px] text-amber-700 dark:text-amber-400/70 font-mono">
-                                                Ad ID: {activeReferral.source_id || 'N/A'} {activeReferral.source_url && `| ${activeReferral.source_url}`}
+                                                {__('whatsapp.livechat_ad_id')} {activeReferral.source_id || __('general.n_a')} {activeReferral.source_url && `| ${activeReferral.source_url}`}
                                             </div>
                                         </div>
                                     </div>
@@ -507,12 +514,12 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                 {loadingMessages && messages.length === 0 ? (
                                     <div className="h-full flex items-center justify-center text-zinc-400 text-xs gap-2">
                                         <RefreshCw className="w-4 h-4 animate-spin text-emerald-500" />
-                                        Loading messages...
+                                        {__('whatsapp.livechat_loading_messages')}
                                     </div>
                                 ) : messages.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-zinc-400 text-xs gap-2">
                                         <MessageSquare className="w-8 h-8 text-zinc-300 dark:text-zinc-700" />
-                                        No messages in this chat thread yet. Send a message below to start conversation!
+                                        {__('whatsapp.livechat_no_messages')}
                                     </div>
                                 ) : (
                                     messages.map((msg) => {
@@ -556,7 +563,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                 <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/80 border-t border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs flex items-center justify-between">
                                     <span className="flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                                        Selected account "{selectedAccount.name}" ({selectedAccount.phone_number_id}) is not registered ({selectedAccount.status}).
+                                        {__('whatsapp.crm_chat_account_not_registered', { name: selectedAccount.name, id: selectedAccount.phone_number_id, status: selectedAccount.status })}
                                     </span>
                                     {accounts.some(a => a.status === 'active') && (
                                         <button
@@ -566,7 +573,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                             }}
                                             className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-bold"
                                         >
-                                            Switch to Active Account
+                                            {__('whatsapp.crm_chat_switch_active')}
                                         </button>
                                     )}
                                 </div>
@@ -579,7 +586,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                         <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
                                         {errorMsg}
                                     </span>
-                                    <button onClick={() => setErrorMsg(null)} className="text-rose-500 hover:text-rose-700">
+                                    <button onClick={() => setErrorMsg(null)} className="text-rose-500 hover:text-rose-700" aria-label={__('general.close')}>
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -595,10 +602,10 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                             className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-medium"
                                         >
                                             <FileText className="w-3.5 h-3.5" />
-                                            {messageType === 'text' ? 'Switch to WABA Template' : 'Switch to Direct Text Reply'}
+                                            {messageType === 'text' ? __('whatsapp.livechat_switch_template') : __('whatsapp.livechat_switch_text')}
                                         </button>
                                     </div>
-                                    <span className="text-zinc-400">Press Enter to send</span>
+                                    <span className="text-zinc-400">{__('whatsapp.crm_chat_press_enter')}</span>
                                 </div>
 
                                 {messageType === 'template' ? (
@@ -606,9 +613,10 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                         <select
                                             value={selectedTemplate}
                                             onChange={(e) => setSelectedTemplate(e.target.value)}
+                                            aria-label={__('whatsapp.livechat_select_template_placeholder')}
                                             className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-emerald-500"
                                         >
-                                            <option value="">Select Approved WABA Template...</option>
+                                            <option value="">{__('whatsapp.livechat_select_template_placeholder')}</option>
                                             {templates.map(t => (
                                                 <option key={t.id} value={String(t.id)}>
                                                     {t.name} ({t.language}) - [{t.status}]
@@ -621,7 +629,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                             className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-sm"
                                         >
                                             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                            Send Template
+                                            {__('whatsapp.livechat_send_template')}
                                         </button>
                                     </div>
                                 ) : (
@@ -635,7 +643,8 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                                     handleSendMessage();
                                                 }
                                             }}
-                                            placeholder="Type your WhatsApp message..."
+                                            placeholder={__('whatsapp.crm_chat_message_placeholder')}
+                                            aria-label={__('whatsapp.crm_chat_message_placeholder')}
                                             rows={2}
                                             className="flex-1 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-emerald-500 resize-none"
                                         />
@@ -645,7 +654,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                             className="h-10 px-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs flex items-center gap-2 disabled:opacity-50 transition-all shadow-sm shrink-0"
                                         >
                                             {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                            Send
+                                            {__('general.send')}
                                         </button>
                                     </div>
                                 )}
@@ -656,9 +665,9 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                             <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-emerald-500 shadow-sm">
                                 <MessageSquare className="w-8 h-8" />
                             </div>
-                            <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Select a Conversation</h3>
+                            <h3 className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{__('whatsapp.crm_chat_select_conversation')}</h3>
                             <p className="text-xs max-w-sm text-zinc-400">
-                                Pick an active customer thread from the left sidebar to view live chat history and send direct replies.
+                                {__('whatsapp.crm_chat_select_hint')}
                             </p>
                         </div>
                     )}
@@ -668,7 +677,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                 <div className="hidden lg:flex col-span-3 bg-zinc-50/60 dark:bg-zinc-950/40 p-4 flex-col gap-4 overflow-y-auto">
                     <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-2">
                         <User className="w-4 h-4 text-emerald-500" />
-                        CRM Contact Details
+                        {__('whatsapp.crm_chat_contact_details')}
                     </h3>
 
                     {selectedPhone ? (
@@ -686,11 +695,11 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
 
                                 <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2 text-xs">
                                     <div className="flex items-center justify-between text-zinc-500">
-                                        <span>Segment Group:</span>
-                                        <span className="text-zinc-800 dark:text-zinc-200 font-medium">{activeContact?.group_name || 'Inbound Customers'}</span>
+                                        <span>{__('whatsapp.crm_chat_segment_group')}</span>
+                                        <span className="text-zinc-800 dark:text-zinc-200 font-medium">{activeContact?.group_name || __('whatsapp.crm_chat_inbound_customers')}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-zinc-500">
-                                        <span>Total Messages:</span>
+                                        <span>{__('whatsapp.crm_chat_total_messages')}</span>
                                         <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">{messages.length}</span>
                                     </div>
                                 </div>
@@ -701,11 +710,11 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                                 <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-700/50 text-xs space-y-2 shadow-sm">
                                     <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold">
                                         <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                        Meta CTWA Ad Attributes
+                                        {__('whatsapp.crm_chat_ad_attributes')}
                                     </div>
                                     <div className="space-y-1 text-[11px]">
                                         <div className="text-amber-900 dark:text-amber-200 font-semibold">{activeReferral.headline}</div>
-                                        <div className="text-zinc-500 font-mono text-[10px]">Ad ID: {activeReferral.source_id}</div>
+                                        <div className="text-zinc-500 font-mono text-[10px]">{__('whatsapp.livechat_ad_id')} {activeReferral.source_id}</div>
                                         {activeReferral.ctwa_clid && (
                                             <div className="text-amber-700 dark:text-amber-400 font-mono text-[10px] break-all">CLID: {activeReferral.ctwa_clid}</div>
                                         )}
@@ -717,17 +726,17 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                             <div className="p-3.5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs space-y-1.5 shadow-sm">
                                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
                                     <Sparkles className="w-4 h-4" />
-                                    Platform Message Fee
+                                    {__('whatsapp.crm_chat_platform_fee')}
                                 </div>
                                 <p className="text-[11px] text-zinc-500 leading-relaxed">
-                                    Each outbound message deducts <strong>${business.per_message_fee || '0.0010'} USD</strong> directly from your business balance.
+                                    {__('whatsapp.crm_chat_fee_notice', { fee: business.per_message_fee || '0.0010' })}
                                 </p>
                             </div>
 
                             {/* Quick Templates Shortcuts */}
                             {templates.length > 0 && (
                                 <div className="space-y-2">
-                                    <h4 className="text-xs font-semibold text-zinc-500">Quick Template Shortcuts</h4>
+                                    <h4 className="text-xs font-semibold text-zinc-500">{__('whatsapp.crm_chat_template_shortcuts')}</h4>
                                     <div className="space-y-1.5">
                                         {templates.slice(0, 4).map(t => (
                                             <button
@@ -748,7 +757,7 @@ export default function CrmChatTab({ business, accounts, templates, selectedAcco
                         </>
                     ) : (
                         <div className="p-6 text-center text-zinc-400 text-xs border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 shadow-sm">
-                            Select a customer conversation to inspect CRM metadata.
+                            {__('whatsapp.crm_chat_select_crm_hint')}
                         </div>
                     )}
                 </div>

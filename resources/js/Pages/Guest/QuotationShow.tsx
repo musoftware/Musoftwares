@@ -10,6 +10,7 @@ import {
     Lock, Calendar, HelpCircle, FileText, Check, PhoneCall
 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { __ } from '@/lib/i18n';
 
 interface QuotationItem {
     id: number;
@@ -56,7 +57,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-indigo-500 selection:text-white pb-32">
-            <Head title={`عرض سعر: ${quotation.title} - مسوفتوير`} />
+            <Head title={__('quotations.guest_page_title', { title: quotation.title })} />
 
             {/* Top Brand Header */}
             <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30 print:static print:border-none">
@@ -68,7 +69,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                                 MUSOFTWARE
                             </span>
                             <span className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
-                                Software & Digital Solutions
+                                {__('quotations.guest_brand_tagline')}
                             </span>
                         </div>
                     </div>
@@ -81,13 +82,13 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                             className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground border-border print:hidden"
                         >
                             <Printer className="w-3.5 h-3.5" />
-                            طباعة العرض (PDF)
+                            {__('quotations.guest_print')}
                         </Button>
 
                         <Link href={checkoutUrl} className="print:hidden">
                             <Button className="text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all gap-1.5">
                                 <Sparkles className="w-4 h-4 text-amber-400" />
-                                قبول العرض ودفع {quotation.deposit_percentage}% مقدم
+                                {__('quotations.guest_accept_and_pay', { pct: quotation.deposit_percentage })}
                             </Button>
                         </Link>
                     </div>
@@ -101,12 +102,12 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                     <div className="relative z-10 space-y-4">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                             <span className="font-mono text-xs uppercase tracking-widest text-indigo-300 font-bold bg-white/10 px-3 py-1 rounded-full border border-white/10">
-                                عرض سعر رسمي • {quotation.quotation_number}
+                                {__('quotations.guest_official_quotation')} • {quotation.quotation_number}
                             </span>
                             {quotation.valid_until && (
                                 <span className="text-xs text-slate-300 flex items-center gap-1 font-medium">
                                     <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-                                    صالح حتى: {new Date(quotation.valid_until).toLocaleDateString('ar-EG')}
+                                    {__('quotations.guest_valid_until', { date: new Date(quotation.valid_until).toLocaleDateString('ar-EG') })}
                                 </span>
                             )}
                         </div>
@@ -116,21 +117,21 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                         </h1>
 
                         <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-                            يسعدنا تقديم هذا المقترح الفني والمالي المتكامل لتنفيذ مشروعكم بأعلى معايير الجودة والأداء، مع تفصيل كامل لكافة مراحل التطوير والتكاليف.
+                            {__('quotations.guest_intro')}
                         </p>
 
                         <div className="pt-4 flex flex-wrap items-center gap-4 text-xs text-slate-300">
                             <span className="flex items-center gap-1.5">
                                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                                ضمان جودة برمجية معتمدة
+                                {__('quotations.guest_quality_guarantee')}
                             </span>
                             <span className="flex items-center gap-1.5">
                                 <Lock className="w-4 h-4 text-indigo-400" />
-                                دفع إلكتروني مشفر وآمن 100%
+                                {__('quotations.guest_secure_payment')}
                             </span>
                             <span className="flex items-center gap-1.5">
                                 <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                                بدء التنفيذ فور سداد الدفعة المقدمة ({quotation.deposit_percentage}%)
+                                {__('quotations.guest_start_after_deposit', { pct: quotation.deposit_percentage })}
                             </span>
                         </div>
                     </div>
@@ -142,14 +143,14 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                     <Card className="border-border shadow-sm bg-card text-card-foreground">
                         <CardHeader className="pb-2">
                             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                                إجمالي أعمال التطوير (الأساس)
+                                {__('quotations.guest_dev_total')}
                             </span>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground">
                                 {quotation.development_total} <span className="text-sm font-normal text-muted-foreground">{quotation.currency}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">تكلفة البرمجة والتنفيذ الكاملة</p>
+                            <p className="text-xs text-muted-foreground mt-1">{__('quotations.guest_dev_total_desc')}</p>
                         </CardContent>
                     </Card>
 
@@ -159,14 +160,14 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                         <CardHeader className="pb-2">
                             <span className="text-xs font-bold text-emerald-100 uppercase tracking-wider flex items-center gap-1">
                                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                                الدفعة المقدمة للبدء ({quotation.deposit_percentage}%)
+                                {__('quotations.guest_deposit_title', { pct: quotation.deposit_percentage })}
                             </span>
                         </CardHeader>
                         <CardContent>
                             <div className="text-3xl sm:text-4xl font-extrabold font-mono text-white">
                                 {quotation.deposit_amount} <span className="text-sm font-normal text-emerald-100">{quotation.currency}</span>
                             </div>
-                            <p className="text-xs text-emerald-100 mt-1 font-medium">المطلوب سداده الآن لبدء العمل فوراً</p>
+                            <p className="text-xs text-emerald-100 mt-1 font-medium">{__('quotations.guest_deposit_desc')}</p>
                         </CardContent>
                     </Card>
 
@@ -174,14 +175,14 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                     <Card className="border-border shadow-sm bg-card text-card-foreground">
                         <CardHeader className="pb-2">
                             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                                الدفعة المتبقية ({100 - Number(quotation.deposit_percentage)}%)
+                                {__('quotations.guest_remaining_title', { pct: 100 - Number(quotation.deposit_percentage) })}
                             </span>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl sm:text-3xl font-extrabold font-mono text-foreground">
                                 {quotation.remaining_amount} <span className="text-sm font-normal text-muted-foreground">{quotation.currency}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">تستحق عند التسليم والاعتماد النهائي</p>
+                            <p className="text-xs text-muted-foreground mt-1">{__('quotations.guest_remaining_desc')}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -192,7 +193,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                         <CardHeader className="border-b border-border bg-muted/40 py-4">
                             <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-indigo-500" />
-                                تفاصيل ومواصفات المشروع (Scope & Deliverables)
+                                {__('quotations.guest_scope_title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 sm:p-8">
@@ -208,7 +209,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                     <CardHeader className="border-b border-border bg-muted/40 py-4">
                         <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
                             <Code className="w-4 h-4 text-emerald-500" />
-                            جدول بنود التطوير والبرمجة (Our Work)
+                            {__('quotations.guest_items_title')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
@@ -216,10 +217,10 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                             <table className="w-full text-right border-collapse">
                                 <thead>
                                     <tr className="bg-muted/40 border-b border-border text-xs font-semibold text-muted-foreground uppercase">
-                                        <th className="py-3.5 px-6">البند / الميزة</th>
-                                        <th className="py-3.5 px-4 text-center">الكمية</th>
-                                        <th className="py-3.5 px-4 text-left">السعر الفردي</th>
-                                        <th className="py-3.5 px-6 text-left">الإجمالي</th>
+                                        <th className="py-3.5 px-6">{__('quotations.guest_col_item')}</th>
+                                        <th className="py-3.5 px-4 text-center">{__('quotations.guest_col_qty')}</th>
+                                        <th className="py-3.5 px-4 text-left">{__('quotations.guest_col_unit_price')}</th>
+                                        <th className="py-3.5 px-6 text-left">{__('quotations.guest_col_total')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border text-sm">
@@ -245,7 +246,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                                 </tbody>
                                 <tfoot>
                                     <tr className="bg-muted/50 font-bold text-foreground border-t border-border">
-                                        <td colSpan={3} className="py-4 px-6 text-left">إجمالي أعمال وبرمجة المشروع:</td>
+                                        <td colSpan={3} className="py-4 px-6 text-left">{__('quotations.guest_items_total')}</td>
                                         <td className="py-4 px-6 text-left font-mono text-base text-foreground">
                                             {quotation.development_total} {quotation.currency}
                                         </td>
@@ -263,10 +264,10 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                 <CardTitle className="text-base font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">
                                     <Server className="w-4 h-4 text-amber-500" />
-                                    التكاليف الاسترشادية الخارجية (استضافة، دومين، خدمات طرف ثالث)
+                                    {__('quotations.guest_indicative_title')}
                                 </CardTitle>
                                 <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-xs w-fit">
-                                    يدفعها العميل مباشرة للمزود
+                                    {__('quotations.guest_indicative_badge')}
                                 </Badge>
                             </div>
                         </CardHeader>
@@ -285,13 +286,13 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                                                     className="inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 hover:underline font-semibold mt-1"
                                                 >
                                                     <ExternalLink className="w-3.5 h-3.5" />
-                                                    {item.link_label || 'رابط مزود الخدمة للحجز المباشر'}
+                                                    {item.link_label || __('quotations.guest_provider_link')}
                                                 </a>
                                             )}
                                         </div>
 
                                         <div className="text-left font-mono">
-                                            <span className="text-xs text-muted-foreground block">تقديري</span>
+                                            <span className="text-xs text-muted-foreground block">{__('quotations.guest_estimated')}</span>
                                             <span className="font-bold text-amber-600 dark:text-amber-400 text-base">{item.total} {quotation.currency}</span>
                                         </div>
                                     </div>
@@ -306,10 +307,10 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                     <div className="text-center space-y-2 mb-6">
                         <h3 className="text-base font-bold text-foreground flex items-center justify-center gap-2">
                             <CreditCard className="w-5 h-5 text-indigo-500" />
-                            طرق وبوابات الدفع الإلكتروني المعتمدة
+                            {__('quotations.guest_gateways_title')}
                         </h3>
                         <p className="text-xs text-muted-foreground">
-                            نوفر بوابات دفع مشفرة وآمنة بالكامل بالتعاون مع كبرى الشركات المعتمدة في مصر والشرق الأوسط والعالم
+                            {__('quotations.guest_gateways_desc')}
                         </p>
                     </div>
 
@@ -330,7 +331,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
 
                         {/* Meeza */}
                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground shadow-xs">
-                            <span className="font-extrabold text-[#00828A] dark:text-[#2dd4bf]">ميزة Meeza</span>
+                            <span className="font-extrabold text-[#00828A] dark:text-[#2dd4bf]">{__('quotations.guest_gateway_meeza')}</span>
                         </div>
 
                         {/* Kashier */}
@@ -345,12 +346,12 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
 
                         {/* Vodafone Cash / Wallets */}
                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground shadow-xs">
-                            <span className="font-extrabold text-[#E60000] dark:text-[#f87171]">المحافظ الإلكترونية (فودافون كاش)</span>
+                            <span className="font-extrabold text-[#E60000] dark:text-[#f87171]">{__('quotations.guest_gateway_wallets')}</span>
                         </div>
 
                         {/* Bank Transfer */}
                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground shadow-xs">
-                            <span>تحويل بنكي مباشر</span>
+                            <span>{__('quotations.guest_gateway_bank')}</span>
                         </div>
                     </div>
                 </Card>
@@ -361,10 +362,10 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                 <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
-                            50%
+                            {quotation.deposit_percentage}%
                         </div>
                         <div>
-                            <span className="text-xs text-muted-foreground block">الدفعة المقدمة لبدء العمل فوراً:</span>
+                            <span className="text-xs text-muted-foreground block">{__('quotations.guest_deposit_now')}</span>
                             <span className="font-mono text-xl sm:text-2xl font-extrabold text-foreground">
                                 {quotation.deposit_amount} {quotation.currency}
                             </span>
@@ -375,7 +376,7 @@ export default function QuotationShow({ quotation, checkoutUrl }: QuotationShowP
                         <Link href={checkoutUrl} className="w-full sm:w-auto">
                             <Button className="w-full sm:w-auto text-sm sm:text-base font-bold px-8 py-6 rounded-2xl shadow-lg hover:shadow-xl transition-all gap-2">
                                 <Sparkles className="w-5 h-5 text-amber-400" />
-                                الموافقة على العرض وسداد الـ 50%
+                                {__('quotations.guest_approve_and_pay', { pct: quotation.deposit_percentage })}
                                 <ArrowLeft className="w-4 h-4" />
                             </Button>
                         </Link>

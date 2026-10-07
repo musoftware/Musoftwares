@@ -116,7 +116,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
     const applyExchange = () => {
         if (toAmount <= 0) {
-            toast.error(__('general.amount_must_be_positive') || 'Amount must be greater than zero');
+            toast.error(__('general.amount_must_be_positive'));
             return;
         }
         setAmount(toAmount);
@@ -126,19 +126,19 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
     const handleAdd = () => {
         const numAmount = Number(amount);
         if (numAmount <= 0) {
-            toast.error(__('general.amount_invalid') || 'Amount is zero or invalid.');
+            toast.error(__('general.amount_invalid'));
             return;
         }
         if (numAmount > maxAmount) {
-            toast.error(__('general.amount_exceeds_balance') || 'Amount exceeds available source balance.');
+            toast.error(__('general.amount_exceeds_balance'));
             return;
         }
         if (!sourceProject || !targetProject) {
-            toast.error(__('general.select_source_target') || 'Select source and target projects.');
+            toast.error(__('general.select_source_target'));
             return;
         }
         if (sourceProject === targetProject) {
-            toast.error(__('general.source_target_same') || 'Source and target cannot be the same.');
+            toast.error(__('general.source_target_same'));
             return;
         }
 
@@ -164,7 +164,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
         setData('data', [...data.data, newItem]);
         setItemIdCounter(prev => prev + 1);
         
-        toast.success(`Added ${activeCurrency.symbol}${numAmount}`);
+        toast.success(__('admin.transfer_item_added', { amount: `${activeCurrency.symbol}${numAmount}` }));
         setAmount('');
         setSourceProject('');
         setTargetProject('');
@@ -174,11 +174,11 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
     const handleGeniusFix = async () => {
         if (!currencyId) {
-            toast.error('Select currency first');
+            toast.error(__('admin.transfer_select_currency_first'));
             return;
         }
         
-        toast.info('Calculating Genius Fix...');
+        toast.info(__('admin.transfer_genius_fix_calculating'));
         setData('data', []);
 
         try {
@@ -197,12 +197,12 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                 });
 
                 if (sumPos + sumNeg < 0) {
-                    toast.warning('Negative amount is larger than positive amount overall. Cannot fix.');
+                    toast.warning(__('admin.transfer_genius_fix_negative_too_large'));
                     return;
                 }
 
                 if (timers.length === 0 || sumNeg === 0) {
-                    toast.info('Nothing needs to be fixed.');
+                    toast.info(__('admin.transfer_genius_fix_nothing'));
                     return;
                 }
 
@@ -269,11 +269,11 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
                 setData('data', newItems);
                 setItemIdCounter(currentId);
-                toast.success('Genius Fix computed! Review and save.');
+                toast.success(__('admin.transfer_genius_fix_done'));
             }
         } catch (e) {
             console.error(e);
-            toast.error('Failed to calculate Genius Fix');
+            toast.error(__('admin.transfer_genius_fix_failed'));
         }
     };
 
@@ -286,7 +286,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (data.data.length === 0) {
-            toast.warning('Nothing to save.');
+            toast.warning(__('admin.transfer_nothing_to_save'));
             return;
         }
         
@@ -304,7 +304,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
 
     return (
         <AdminSidebarLayout title={__('general.swap_projects_budget')} header={__('general.swap_projects_budget')} user={auth?.user}>
-            <Head title={`Swap Budget: ${user.name}`} />
+            <Head title={__('admin.swap_budget_title', { name: user.name })} />
 
             <div className="w-full max-w-7xl mx-auto py-6 space-y-6">
                 <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -392,7 +392,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                         }} 
                                         className={maxAmount > 0 && Number(amount) > maxAmount ? 'border-red-500' : ''}
                                     />
-                                    <Button variant="secondary" onClick={() => setShowExchange(!showExchange)}>
+                                    <Button variant="secondary" onClick={() => setShowExchange(!showExchange)} aria-label={__('general.currency_exchange')} title={__('general.currency_exchange')}>
                                         <Repeat className="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -487,7 +487,7 @@ export default function Transfer({ user, activeProjects, currencies, exchanges }
                                                         <CurrencyDisplay amount={item.amount} currency={{ currency: activeCurrency.currency, symbol: item.currency_symbol }} />
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => removeRow(idx)}>
+                                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" aria-label={__('general.delete')} onClick={() => removeRow(idx)}>
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </td>

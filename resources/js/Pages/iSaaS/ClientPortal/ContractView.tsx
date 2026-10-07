@@ -40,19 +40,19 @@ export default function ContractView({ contract }: Props) {
 
     return (
         <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-            <Head title={`Contract: ${contract.project_name}`} />
+            <Head title={__('general.isaas_contract_page_title', { name: contract.project_name })} />
 
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-extrabold text-foreground tracking-tight">{__('general.project_contract')}</h1>
-                    <p className="mt-2 text-sm text-muted-foreground">Reference: {contract.reference || `CTR-${contract.uuid.split('-')[0]}`}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{__('general.isaas_contract_reference', { reference: contract.reference || `CTR-${contract.uuid.split('-')[0]}` })}</p>
                 </div>
 
                 <div className="bg-card text-card-foreground shadow-xl rounded-xl overflow-hidden border border-border">
                     <div className="p-8 border-b border-border bg-muted/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div>
                             <h2 className="text-xl font-bold text-foreground">{contract.project_name}</h2>
-                            <p className="text-muted-foreground mt-1">Prepared for: <span className="font-semibold text-foreground">{contract.client_name}</span></p>
+                            <p className="text-muted-foreground mt-1">{__('general.isaas_contract_prepared_for')} <span className="font-semibold text-foreground">{contract.client_name}</span></p>
                         </div>
                         <div className="text-start md:text-end">
                             <p className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">{__('general.total_amount')}</p>
@@ -62,7 +62,7 @@ export default function ContractView({ contract }: Props) {
 
                     <div className="p-8 prose prose-slate dark:prose-invert max-w-none">
                         <div className="whitespace-pre-wrap font-serif text-foreground leading-relaxed text-sm md:text-base border border-border p-8 rounded-lg bg-muted/20">
-                            {contract.contract_text || "No contract terms provided."}
+                            {contract.contract_text || __('general.isaas_contract_no_terms')}
                         </div>
                     </div>
 
@@ -73,7 +73,7 @@ export default function ContractView({ contract }: Props) {
                                     <CheckCircle className="h-8 w-8 text-emerald-500 me-4" />
                                     <div>
                                         <h3 className="text-lg font-medium text-emerald-700 dark:text-emerald-300">{__('general.contract_signed')}</h3>
-                                        <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">{__('general.signed_by')}<span className="font-semibold">{contract.client_signature}</span> on {new Date(contract.signed_at!).toLocaleString()}
+                                        <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">{__('general.signed_by')}<span className="font-semibold">{contract.client_signature}</span> {__('general.isaas_contract_signed_on', { date: new Date(contract.signed_at!).toLocaleString() })}
                                         </p>
                                     </div>
                                 </div>
@@ -93,7 +93,7 @@ export default function ContractView({ contract }: Props) {
                                                 id="signature_name"
                                                 value={data.signature_name}
                                                 onChange={e => setData('signature_name', e.target.value)}
-                                                placeholder={`e.g., ${contract.client_name}`}
+                                                placeholder={__('general.isaas_contract_signature_example', { name: contract.client_name })}
                                                 className="mt-2 text-lg py-6 border-border"
                                                 required
                                             />
@@ -102,7 +102,7 @@ export default function ContractView({ contract }: Props) {
                                     </CardContent>
                                     <CardFooter className="px-0 pb-0">
                                         <Button type="submit" disabled={processing} size="lg" className="w-full sm:w-auto px-8 h-12 text-lg">
-                                            {processing ? 'Signing...' : 'Sign Contract'}
+                                            {processing ? __('general.isaas_contract_signing') : __('general.isaas_contract_sign')}
                                         </Button>
                                     </CardFooter>
                                 </form>

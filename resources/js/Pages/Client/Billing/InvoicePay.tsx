@@ -127,7 +127,7 @@ export default function InvoicePay({
 
     return (
         <AuthenticatedLayout>
-            <Head title={`Invoice #${invoice.invoice_number} — Musoftwares Studio`} />
+            <Head title={__('client.invoice_pay_title', { number: invoice.invoice_number })} />
 
             <div className="w-full bg-[#f5f5f7] dark:bg-[#090d16] text-[#1d1d1f] dark:text-[#f8fafc] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3] transition-colors">
                 
@@ -174,7 +174,7 @@ export default function InvoicePay({
                             <div className="p-6 sm:p-8 border-b border-black/5 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
                                     <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50 dark:text-white/50 block mb-1">
-                                        Tax Invoice Statement
+                                        {__('client.invoice_tax_statement')}
                                     </span>
                                     <h2 className="text-xl font-bold font-mono text-[#1d1d1f] dark:text-white">
                                         {invoice.invoice_number}

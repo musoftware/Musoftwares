@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -28,7 +29,6 @@ class User extends Authenticatable
         'lang',
         'password',
         'currency_id',
-        'role',
         'avatar',
         'phone',
         'onboarding_completed',
@@ -42,15 +42,11 @@ class User extends Authenticatable
         'tour_completed',
         'tour_skipped',
         'current_tour_step',
-        'kyc_verified',
         'kyc_verified_at',
-        'kyc_verified_by',
         'kyc_provider',
         'kyc_reference_id',
         'kyc_notes',
         'workspace_settings',
-        'max_devices',
-        'can_view_all_devices',
         'temp_valid_until',
         'enable_custom_hour_rate',
         'hour_rate',
@@ -61,9 +57,6 @@ class User extends Authenticatable
         'tier',
         'lifetime_spend',
         'profile_completion_percentage',
-        'loyalty_points_balance',
-        'loyalty_lifetime_points',
-        'loyalty_tier_id',
         'last_activity_type',
         'winback_unsubscribed_at',
     ];
@@ -136,7 +129,7 @@ class User extends Authenticatable
                         }
                     }
                 } catch (\Throwable $e) {
-                    // Ignore and fallback
+                    Log::warning('New user: currency detection from IP failed', ['error' => $e->getMessage()]);
                 }
 
                 if (empty($user->currency_id)) {

@@ -13,6 +13,7 @@ import {
 '@/Components/ui/dialog';
 import { MoreHorizontal, Search, Plus, Trash2, Edit } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import Pagination from '@/Components/Pagination';
 
 interface PointPackage {
   id: number;
@@ -23,7 +24,7 @@ interface PointPackage {
   created_at: string;
 }
 
-interface Pagination {
+interface PaginatedPackages {
   data: PointPackage[];
   links: {url: string | null;label: string;active: boolean;}[];
   from: number;
@@ -32,7 +33,7 @@ interface Pagination {
 }
 
 interface Props {
-  pointPackages: Pagination;
+  pointPackages: PaginatedPackages;
   search: string;
 }
 
@@ -118,7 +119,7 @@ export default function Index({ pointPackages, search }: Props) {
                                             <td className="px-4 py-3 text-end">
                                                 <Dialog>
                                                     <DialogTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <Button variant="ghost" className="h-8 w-8 p-0" aria-label={__('general.actions')} title={__('general.actions')}>
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DialogTrigger>
@@ -161,30 +162,9 @@ export default function Index({ pointPackages, search }: Props) {
                     </div>
 
                     {/* Pagination */}
-                    {pointPackages.total > 0 && pointPackages.links.length > 3 &&
-          <div className="flex items-center justify-end gap-4 border-t border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                            <div className="me-auto flex items-center gap-1">
-                                {pointPackages.links.map((link, idx) =>
-              link.url ?
-              <button
-                key={idx}
-                onClick={() => router.visit(link.url!)}
-                className={`rounded-md px-3 py-1 text-sm transition-colors ${
-                link.active ?
-                'bg-slate-900 font-medium text-white shadow-sm' :
-                'text-slate-500 hover:bg-slate-100'}`
-                }
-                dangerouslySetInnerHTML={{ __html: link.label }} /> :
-
-
-              <span
-                key={idx}
-                className="rounded-md px-3 py-1 text-sm text-slate-300 cursor-not-allowed"
-                dangerouslySetInnerHTML={{ __html: link.label }} />
-
-
-              )}
-                            </div>
+                    {pointPackages.total > 0 &&
+          <div className="border-t border-slate-200 bg-slate-50 px-4 pb-3">
+                            <Pagination links={pointPackages.links} />
                         </div>
           }
                 </div>

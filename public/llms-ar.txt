@@ -14,6 +14,7 @@
 - مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
+- [Web Dev](http://localhost/marketplace/categories/web-dev): تصفح الخدمات المتاحة.
 
 ## الخدمات المميزة
 

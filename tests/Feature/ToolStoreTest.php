@@ -52,51 +52,88 @@ class ToolStoreTest extends TestCase
         );
     }
 
-    public function test_purchase_activates_software_license_on_email(): void
+    private function makeTool(bool $paid): StoreTool
     {
         $software = SerialSoftware::create([
             'name'           => 'WAContactsExtract',
             'default_status' => 'active',
         ]);
 
-        $tool = StoreTool::create([
+        return StoreTool::create([
             'name'               => 'WA Contacts Extractor',
             'serial_software_id' => $software->id,
-            'requires_payment'   => true,
-            'price'              => 29.99,
+            'requires_payment'   => $paid,
+            'price'              => $paid ? 29.99 : 0,
             'currency'           => 'USD',
             'is_published'       => true,
         ]);
+    }
 
-        $response = $this->from(route('store.tools.index'))
+    public function test_guest_cannot_purchase_tool(): void
+    {
+        $tool = $this->makeTool(false);
+
+        $this->post(route('store.tools.purchase', $tool->id), ['device_id' => 'HWID-1'])
+            ->assertRedirect(route('login'));
+
+        $this->assertSame(0, SerialSoftwareLicense::count());
+    }
+
+    public function test_free_tool_activates_license_for_signed_in_user_only(): void
+    {
+        $user = User::factory()->create();
+        $tool = $this->makeTool(false);
+
+        $this->actingAs($user)
+            ->from(route('store.tools.index'))
             ->post(route('store.tools.purchase', $tool->id), [
-                'email'     => 'client.tool@example.com',
-                'name'      => 'Test Client',
+                'email'     => 'someone.else@example.com',
                 'device_id' => 'HWID-ALPHA-999',
-            ]);
+            ])
+            ->assertSessionHas('success');
 
-        $response->assertSessionHas('success');
-
-        $user = User::where('email', 'client.tool@example.com')->first();
-        $this->assertNotNull($user);
-
-        // Assert license exists and is active
-        $license = SerialSoftwareLicense::where('user_id', $user->id)
-            ->where('serial_software_id', $software->id)
-            ->first();
+        $license = SerialSoftwareLicense::where('user_id', $user->id)->first();
         $this->assertNotNull($license);
-        $this->assertEquals(SerialSoftwareLicense::STATUS_ACTIVE, $license->status);
         $this->assertTrue($license->isActive());
+        $this->assertNull(User::where('email', 'someone.else@example.com')->first());
 
-        // Assert device record is active
         $userDevice = SerialUserDevice::where('device_id', 'HWID-ALPHA-999')->first();
-        $this->assertNotNull($userDevice);
-        $this->assertEquals($user->id, $userDevice->user_id);
-        $this->assertEquals(SerialUserDevice::STATUS_ACTIVE, $userDevice->status);
+        $this->assertSame($user->id, $userDevice->user_id);
+        $this->assertSame(SerialDevice::STATUS_ACTIVE, SerialDevice::where('device_id', 'HWID-ALPHA-999')->value('status'));
+    }
 
-        $serialDevice = SerialDevice::where('device_id', 'HWID-ALPHA-999')->first();
-        $this->assertNotNull($serialDevice);
-        $this->assertEquals(SerialDevice::STATUS_ACTIVE, $serialDevice->status);
+    public function test_paid_tool_is_not_activated_without_payment(): void
+    {
+        $user = User::factory()->create();
+        $tool = $this->makeTool(true);
+
+        $this->actingAs($user)
+            ->from(route('store.tools.index'))
+            ->post(route('store.tools.purchase', $tool->id), ['device_id' => 'HWID-PAID'])
+            ->assertSessionHas('error');
+
+        $this->assertSame(0, SerialSoftwareLicense::count());
+        $this->assertNull(SerialUserDevice::where('device_id', 'HWID-PAID')->first());
+    }
+
+    public function test_cannot_rebind_device_owned_by_another_user(): void
+    {
+        $owner = User::factory()->create();
+        $attacker = User::factory()->create();
+        $tool = $this->makeTool(false);
+
+        SerialUserDevice::create([
+            'device_id' => 'HWID-OWNED',
+            'user_id'   => $owner->id,
+            'status'    => SerialUserDevice::STATUS_ACTIVE,
+        ]);
+
+        $this->actingAs($attacker)
+            ->from(route('store.tools.index'))
+            ->post(route('store.tools.purchase', $tool->id), ['device_id' => 'HWID-OWNED'])
+            ->assertSessionHasErrors('device_id');
+
+        $this->assertSame($owner->id, SerialUserDevice::where('device_id', 'HWID-OWNED')->value('user_id'));
     }
 
     public function test_desktop_software_link_user_auto_activates_device_with_license(): void

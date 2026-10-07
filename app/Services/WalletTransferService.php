@@ -20,12 +20,109 @@ class WalletTransferService extends BaseService
         $this->exchangeRateService = $exchangeRateService;
     }
 
+    private const DAILY_LIMIT_USD = 50000.00;
+
+    private const MONTHLY_LIMIT_USD = 500000.00;
+
     /**
      * Create and process a peer-to-peer wallet transfer.
+     *
+     * Balance and daily/monthly limits are checked inside the transaction while
+     * the sender row is locked, so parallel transfers cannot overspend.
      */
     public function executeTransfer(int $senderId, int $receiverId, float $amount, int $currencyId, ?string $reason = null): WalletTransfer
     {
-        // 1. Basic validations
+        $this->assertTransferRequestValid($senderId, $receiverId, $amount);
+
+        $sender = User::findOrFail($senderId);
+        $receiver = User::findOrFail($receiverId);
+
+        if ($currencyId !== (int) $sender->currency_id) {
+            throw ValidationException::withMessages([
+                'currency' => ['You can only send transfers using your wallet currency.'],
+            ]);
+        }
+
+        $senderCurrency = $this->currencyCodeOf($sender, 'Sender');
+        $receiverCurrency = $this->currencyCodeOf($receiver, 'Receiver');
+
+        $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
+        $finalExchangeRate = $this->transferExchangeRate($senderCurrency, $receiverCurrency);
+
+        $quote = [
+            'amount' => $amount,
+            'fee' => $this->calculateFee($amount, $usdToSenderRate),
+            'converted_amount' => round($amount * $finalExchangeRate, 2),
+            'exchange_rate' => $finalExchangeRate,
+            'sender_currency' => $senderCurrency,
+            'receiver_currency' => $receiverCurrency,
+            'currency_id' => $currencyId,
+            'usd_to_sender_rate' => $usdToSenderRate,
+        ];
+
+        try {
+            return $this->executeInTransaction(fn () => $this->settleTransfer($senderId, $receiverId, $quote, $reason));
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (Exception $e) {
+            Log::error('Wallet P2P Transfer transaction failed.', [
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new Exception('The transfer transaction failed due to system error: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Must run inside a transaction. Locks both wallets (in id order to avoid
+     * deadlocks), re-checks funds and limits on fresh data, then moves the money.
+     */
+    private function settleTransfer(int $senderId, int $receiverId, array $quote, ?string $reason): WalletTransfer
+    {
+        $locked = User::whereKey([$senderId, $receiverId])->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        $sender = $locked->get($senderId);
+        $receiver = $locked->get($receiverId);
+
+        $this->assertSufficientFunds($sender, $quote['amount'] + $quote['fee'], $quote['currency_id']);
+        $this->assertWithinTransferLimits($senderId, $quote['amount'], $quote['usd_to_sender_rate'], $quote['currency_id']);
+
+        $transfer = WalletTransfer::create([
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id,
+            'amount' => $quote['amount'],
+            'fee_amount' => $quote['fee'],
+            'currency' => $quote['sender_currency'],
+            'exchange_rate' => $quote['exchange_rate'],
+            'converted_amount' => $quote['converted_amount'],
+            'converted_currency' => $quote['receiver_currency'],
+            'reason' => $reason,
+            'status' => WalletTransfer::STATUS_COMPLETED,
+            'processed_at' => now(),
+        ]);
+
+        $sender->add_balance(-1 * $quote['amount'], 'P2P transfer to '.$receiver->name, 'used');
+        if ($quote['fee'] > 0) {
+            $sender->add_balance(-1 * $quote['fee'], 'P2P transfer fee', 'used');
+        }
+        $receiver->add_balance($quote['converted_amount'], 'P2P transfer from '.$sender->name, 'received');
+
+        Log::info('Wallet P2P Transfer completed successfully.', [
+            'transfer_id' => $transfer->id,
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id,
+            'sent' => $quote['amount'].' '.$quote['sender_currency'],
+            'fee' => $quote['fee'].' '.$quote['sender_currency'],
+            'received' => $quote['converted_amount'].' '.$quote['receiver_currency'],
+        ]);
+
+        return $transfer;
+    }
+
+    private function assertTransferRequestValid(int $senderId, int $receiverId, float $amount): void
+    {
         if ($senderId === $receiverId) {
             throw ValidationException::withMessages([
                 'receiver_email' => ['You cannot transfer money to yourself.'],
@@ -37,140 +134,79 @@ class WalletTransferService extends BaseService
                 'amount' => ['Transfer amount must be greater than zero.'],
             ]);
         }
+    }
 
-        $sender = User::findOrFail($senderId);
-        $receiver = User::findOrFail($receiverId);
-
-        if ($currencyId !== (int) $sender->currency_id) {
-            throw ValidationException::withMessages([
-                'currency' => ['You can only send transfers using your wallet currency.'],
-            ]);
+    private function currencyCodeOf(User $user, string $role): string
+    {
+        $currency = Currency::find($user->currency_id);
+        if (! $currency) {
+            throw new Exception("{$role} (User #{$user->id}) is missing a currency_id configuration.");
         }
 
-        $senderCurrencyModel = Currency::find($sender->currency_id);
-        $receiverCurrencyModel = Currency::find($receiver->currency_id);
-        if (! $senderCurrencyModel) {
-            throw new Exception("Sender (User #{$senderId}) is missing a currency_id configuration.");
-        }
-        if (! $receiverCurrencyModel) {
-            throw new Exception("Receiver (User #{$receiverId}) is missing a currency_id configuration.");
-        }
-        $senderCurrency = $senderCurrencyModel->currency;
-        $receiverCurrency = $receiverCurrencyModel->currency;
+        return $currency->currency;
+    }
 
-        // Calculate P2P Fee: 1% of amount, with limits translated from USD equivalents ($0.50 min, $10.00 max)
-        $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
-        $minFee = 0.50 * $usdToSenderRate;
-        $maxFee = 10.00 * $usdToSenderRate;
+    /**
+     * P2P fee: 1% of amount, kept between $0.50 and $10.00 (USD equivalents in sender currency).
+     */
+    private function calculateFee(float $amount, float $usdToSenderRate): float
+    {
+        $fee = max($amount * 0.01, 0.50 * $usdToSenderRate);
 
-        $fee = $amount * 0.01;
-        $fee = max($fee, $minFee);
-        $fee = min($fee, $maxFee);
-        $fee = round($fee, 2);
+        return round(min($fee, 10.00 * $usdToSenderRate), 2);
+    }
 
-        $totalDebitRequired = $amount + $fee;
-
-        // Verify Sender balance
-        $senderBalance = (float) $sender->available_balance();
-        if ($senderBalance < $totalDebitRequired) {
-            throw ValidationException::withMessages([
-                'amount' => ['Insufficient funds. You need '.FinanceHelper::instance()->format_money($totalDebitRequired, $currencyId).' (including fees) but only have '.FinanceHelper::instance()->format_money($senderBalance, $currencyId).'.'],
-            ]);
-        }
-
-        // Calculate Rolling Security Limits ($50k USD daily, $500k USD monthly) in Sender's currency
-        $dailyLimitUSD = 50000.00;
-        $monthlyLimitUSD = 500000.00;
-
-        $dailyLimitSenderCurrency = $dailyLimitUSD * $usdToSenderRate;
-        $monthlyLimitSenderCurrency = $monthlyLimitUSD * $usdToSenderRate;
-
-        // Query today's completed transfers
-        $dailyTotal = WalletTransfer::where('sender_id', $senderId)
-            ->where('status', WalletTransfer::STATUS_COMPLETED)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->sum('amount');
-
-        if (($dailyTotal + $amount) > $dailyLimitSenderCurrency) {
-            throw ValidationException::withMessages([
-                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: '.FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $currencyId).'.'],
-            ]);
-        }
-
-        // Query this month's completed transfers
-        $monthlyTotal = WalletTransfer::where('sender_id', $senderId)
-            ->where('status', WalletTransfer::STATUS_COMPLETED)
-            ->where('created_at', '>=', Carbon::now()->startOfMonth())
-            ->sum('amount');
-
-        if (($monthlyTotal + $amount) > $monthlyLimitSenderCurrency) {
-            throw ValidationException::withMessages([
-                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: '.FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $currencyId).'.'],
-            ]);
-        }
-
-        // Retrieve exchange conversion rate
+    /**
+     * Cross-currency transfers get a 1.5% margin to protect the ledger.
+     */
+    private function transferExchangeRate(string $senderCurrency, string $receiverCurrency): float
+    {
         $rawExchangeRate = (float) $this->exchangeRateService->getRate($senderCurrency, $receiverCurrency);
 
-        // Apply 1.5% safe currency exchange rate margin on P2P transfers if cross-currency to protect ledger
-        $finalExchangeRate = $rawExchangeRate;
-        if ($senderCurrency !== $receiverCurrency) {
-            $finalExchangeRate = $rawExchangeRate * (1.0 - 0.015);
+        return $senderCurrency === $receiverCurrency ? $rawExchangeRate : $rawExchangeRate * (1.0 - 0.015);
+    }
+
+    private function assertSufficientFunds(User $sender, float $totalDebitRequired, int $currencyId): void
+    {
+        $senderBalance = (float) $sender->available_balance();
+        if ($senderBalance >= $totalDebitRequired) {
+            return;
         }
 
-        $convertedAmount = round($amount * $finalExchangeRate, 2);
+        $money = FinanceHelper::instance();
+        throw ValidationException::withMessages([
+            'amount' => ['Insufficient funds. You need '.$money->format_money($totalDebitRequired, $currencyId).' (including fees) but only have '.$money->format_money($senderBalance, $currencyId).'.'],
+        ]);
+    }
 
-        try {
-            return $this->executeInTransaction(function () use ($sender, $receiver, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
+    /**
+     * Rolling security limits ($50k USD daily, $500k USD monthly) in sender currency.
+     */
+    private function assertWithinTransferLimits(int $senderId, float $amount, float $usdToSenderRate, int $currencyId): void
+    {
+        $periods = [
+            'Daily' => [Carbon::now()->startOfDay(), self::DAILY_LIMIT_USD * $usdToSenderRate],
+            'Monthly' => [Carbon::now()->startOfMonth(), self::MONTHLY_LIMIT_USD * $usdToSenderRate],
+        ];
 
-                // Create pending transfer record first to bind reference IDs
-                $transfer = WalletTransfer::create([
-                    'sender_id' => $sender->id,
-                    'receiver_id' => $receiver->id,
-                    'amount' => $amount,
-                    'fee_amount' => $fee,
-                    'currency' => $senderCurrency,
-                    'exchange_rate' => $finalExchangeRate,
-                    'converted_amount' => $convertedAmount,
-                    'converted_currency' => $receiverCurrency,
-                    'reason' => $reason,
-                    'status' => WalletTransfer::STATUS_COMPLETED,
-                    'processed_at' => now(),
-                ]);
+        foreach ($periods as $label => [$since, $limit]) {
+            $sentInPeriod = $this->completedTransferTotalSince($senderId, $since);
+            if (($sentInPeriod + $amount) <= $limit) {
+                continue;
+            }
 
-                // Debit Principal from Sender balance
-                $sender->add_balance(-1 * $amount, 'P2P transfer to '.$receiver->name, 'used');
-
-                // Debit Fee from Sender balance (if any)
-                if ($fee > 0) {
-                    $sender->add_balance(-1 * $fee, 'P2P transfer fee', 'used');
-                }
-
-                // Credit Converted Principal to Receiver balance
-                $receiver->add_balance($convertedAmount, 'P2P transfer from '.$sender->name, 'received');
-
-                Log::info('Wallet P2P Transfer completed successfully.', [
-                    'transfer_id' => $transfer->id,
-                    'sender_id' => $sender->id,
-                    'receiver_id' => $receiver->id,
-                    'sent' => $amount.' '.$senderCurrency,
-                    'fee' => $fee.' '.$senderCurrency,
-                    'received' => $convertedAmount.' '.$receiverCurrency,
-                ]);
-
-                return $transfer;
-            });
-
-        } catch (Exception $e) {
-            Log::error('Wallet P2P Transfer transaction failed.', [
-                'sender_id' => $senderId,
-                'receiver_id' => $receiverId,
-                'amount' => $amount,
-                'error' => $e->getMessage(),
+            throw ValidationException::withMessages([
+                'amount' => [$label.' transfer limit exceeded. Remaining '.strtolower($label).' limit: '.FinanceHelper::instance()->format_money($limit - $sentInPeriod, $currencyId).'.'],
             ]);
-
-            throw new Exception('The transfer transaction failed due to system error: '.$e->getMessage());
         }
+    }
+
+    private function completedTransferTotalSince(int $senderId, Carbon $since): float
+    {
+        return (float) WalletTransfer::where('sender_id', $senderId)
+            ->where('status', WalletTransfer::STATUS_COMPLETED)
+            ->where('created_at', '>=', $since)
+            ->sum('amount');
     }
 
     /**
@@ -187,42 +223,18 @@ class WalletTransferService extends BaseService
             ]);
         }
 
-        $senderCurrencyModel = Currency::find($sender->currency_id);
-        $receiverCurrencyModel = Currency::find($receiver->currency_id);
-        if (! $senderCurrencyModel || ! $receiverCurrencyModel) {
-            throw new Exception('Sender or Receiver is missing a currency_id configuration.');
-        }
-        $senderCurrency = $senderCurrencyModel->currency;
-        $receiverCurrency = $receiverCurrencyModel->currency;
+        $senderCurrency = $this->currencyCodeOf($sender, 'Sender');
+        $receiverCurrency = $this->currencyCodeOf($receiver, 'Receiver');
 
         $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
 
-        // Fee preview
-        $minFee = 0.50 * $usdToSenderRate;
-        $maxFee = 10.00 * $usdToSenderRate;
-
-        $fee = $amount * 0.01;
-        $fee = max($fee, $minFee);
-        $fee = min($fee, $maxFee);
-        $fee = round($fee, 2);
-
-        // Conversion rate preview
-        $rawExchangeRate = (float) $this->exchangeRateService->getRate($senderCurrency, $receiverCurrency);
-        $finalExchangeRate = $rawExchangeRate;
-        if ($senderCurrency !== $receiverCurrency) {
-            $finalExchangeRate = $rawExchangeRate * (1.0 - 0.015);
-        }
+        $fee = $this->calculateFee($amount, $usdToSenderRate);
+        $finalExchangeRate = $this->transferExchangeRate($senderCurrency, $receiverCurrency);
 
         $convertedAmount = round($amount * $finalExchangeRate, 2);
 
-        // Limits check
-        $dailyLimitUSD = 50000.00;
-        $dailyLimit = $dailyLimitUSD * $usdToSenderRate;
-
-        $dailyTotal = WalletTransfer::where('sender_id', $senderId)
-            ->where('status', WalletTransfer::STATUS_COMPLETED)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->sum('amount');
+        $dailyLimit = self::DAILY_LIMIT_USD * $usdToSenderRate;
+        $dailyTotal = $this->completedTransferTotalSince($senderId, Carbon::now()->startOfDay());
 
         $remainingLimit = max(0.00, $dailyLimit - $dailyTotal);
 

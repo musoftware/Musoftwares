@@ -70,11 +70,14 @@ const statusStyles: Record<string, string> = {
     declined: 'bg-red-100 text-red-700',
 };
 
-const statusLabel: Record<string, string> = {
-    pending:  'Pending',
-    active:   'Approved',
-    declined: 'Declined',
+const statusLabelKeys: Record<string, string> = {
+    pending:  'general.pending',
+    active:   'general.approved',
+    declined: 'general.declined',
 };
+
+const statusLabel = (status: string): string =>
+    statusLabelKeys[status] ? __(statusLabelKeys[status]) : status;
 
 // Map payment types to icon colors for visual variety
 const typeColors: Record<string, string> = {
@@ -110,8 +113,8 @@ export default function Index({ methods, filters, stats }: Props) {
             { status },
             {
                 preserveScroll: true,
-                onSuccess: () => toastSuccess(__('general.payment_method_marked_as', { status: statusLabel[status] ?? status }) || `Payment method marked as ${statusLabel[status] ?? status}.`),
-                onError:   () => toastError(__('general.update_failed') || 'Update failed.'),
+                onSuccess: () => toastSuccess(__('admin.payment_methods_marked_as', { status: statusLabel(status) })),
+                onError:   () => toastError(__('general.update_failed')),
             }
         );
     };
@@ -121,7 +124,7 @@ export default function Index({ methods, filters, stats }: Props) {
     const columns = [
         {
             key: 'id',
-            label: 'ID',
+            label: __('admin.payment_methods_col_id'),
             className: 'w-[60px]',
             render: (m: PaymentMethod) => (
                 <span className="text-slate-400 font-mono text-xs">#{m.id}</span>
@@ -129,7 +132,7 @@ export default function Index({ methods, filters, stats }: Props) {
         },
         {
             key: 'user',
-            label: 'Employee',
+            label: __('admin.payment_methods_col_employee'),
             render: (m: PaymentMethod) =>
                 m.user ? (
                     <Link href={route('admin.users.show', m.user.id)} className="flex items-center gap-2 group cursor-pointer">
@@ -142,12 +145,12 @@ export default function Index({ methods, filters, stats }: Props) {
                         </div>
                     </Link>
                 ) : (
-                    <span className="text-slate-400 text-sm">— deleted user</span>
+                    <span className="text-slate-400 text-sm">{__('admin.payment_methods_deleted_user')}</span>
                 ),
         },
         {
             key: 'type',
-            label: 'Type',
+            label: __('general.type'),
             render: (m: PaymentMethod) => (
                 <div className="flex items-center gap-2">
                     <span className={`inline-flex h-7 w-7 items-center justify-center rounded-md flex-shrink-0 ${typeColors[m.type ?? ''] ?? 'bg-slate-100 text-slate-500'}`}>
@@ -161,7 +164,7 @@ export default function Index({ methods, filters, stats }: Props) {
         },
         {
             key: 'summary',
-            label: 'Method Details',
+            label: __('admin.payment_methods_col_method_details'),
             render: (m: PaymentMethod) => (
                 <span className="text-sm text-slate-500 max-w-[200px] truncate block">
                     {m.summary ?? m.name ?? '—'}
@@ -170,16 +173,16 @@ export default function Index({ methods, filters, stats }: Props) {
         },
         {
             key: 'status',
-            label: 'Status',
+            label: __('general.status'),
             render: (m: PaymentMethod) => (
                 <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${statusStyles[m.status] ?? 'bg-slate-100 text-slate-600'}`}>
-                    {statusLabel[m.status] ?? m.status}
+                    {statusLabel(m.status)}
                 </span>
             ),
         },
         {
             key: 'created_at',
-            label: 'Submitted',
+            label: __('admin.payment_methods_col_submitted'),
             render: (m: PaymentMethod) => (
                 <span className="text-sm text-slate-500 whitespace-nowrap">
                     {new Date(m.created_at).toLocaleDateString()}
@@ -243,10 +246,10 @@ export default function Index({ methods, filters, stats }: Props) {
     const filterBar = (
         <div className="flex items-center gap-1">
             {[
-                { value: '',         label: 'Active & Pending' },
-                { value: 'pending',  label: 'Pending' },
-                { value: 'active',   label: 'Approved' },
-                { value: 'declined', label: 'Declined' },
+                { value: '',         label: __('admin.payment_methods_filter_active_pending') },
+                { value: 'pending',  label: __('general.pending') },
+                { value: 'active',   label: __('general.approved') },
+                { value: 'declined', label: __('general.declined') },
             ].map((opt) => (
                 <button
                     key={opt.value}
@@ -271,7 +274,7 @@ export default function Index({ methods, filters, stats }: Props) {
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <AdminSidebarLayout title={__('general.payment_methods')} header="Payment Methods">
+        <AdminSidebarLayout title={__('general.payment_methods')} header={__('general.payment_methods')}>
             <Head title={__('general.payment_methods')} />
 
             {/* Stats */}
@@ -314,8 +317,8 @@ export default function Index({ methods, filters, stats }: Props) {
                     pagination={methods}
                     filters={{ ...filters, extra: filterBar }}
                     onSearch={handleSearch}
-                    emptyTitle="No payment methods found"
-                    emptyDescription="No payout methods match the current filter."
+                    emptyTitle={__('admin.payment_methods_empty_title')}
+                    emptyDescription={__('admin.payment_methods_empty_description')}
                 />
             </div>
         </AdminSidebarLayout>

@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { ArrowDownLeft, ArrowUpRight, Mail, Clock } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
@@ -22,8 +23,8 @@ export default function MessageBubble(props: MessageBubbleProps) {
     const isInbound = props.direction === 'inbound';
     const sentAt = props.sentAt || props.receivedAt;
     const ariaLabel = isInbound
-        ? `Inbound message from ${props.fromName ?? props.fromEmail ?? 'guest'}`
-        : `Outbound reply to ${props.toEmail ?? 'guest'}`;
+        ? __('admin.guest_ticket_inbound_message_from', { name: props.fromName ?? props.fromEmail ?? __('general.guest') })
+        : __('admin.guest_ticket_outbound_reply_to', { email: props.toEmail ?? __('general.guest') });
 
     return (
         <article
@@ -44,8 +45,8 @@ export default function MessageBubble(props: MessageBubbleProps) {
                     {isInbound ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                     <span className="font-semibold">
                         {isInbound
-                            ? props.fromName || props.fromEmail || 'Guest'
-                            : __('general.admin') || 'Admin'}
+                            ? props.fromName || props.fromEmail || __('general.guest')
+                            : __('general.admin')}
                     </span>
                     <span aria-hidden>·</span>
                     <span className="truncate">{isInbound ? props.fromEmail : props.toEmail}</span>
@@ -65,7 +66,7 @@ export default function MessageBubble(props: MessageBubbleProps) {
 
                 <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words ${isInbound ? 'text-slate-700' : 'text-slate-100'}`}>
                     {props.bodyHtml
-                        ? <div dangerouslySetInnerHTML={{ __html: props.bodyHtml }} />
+                        ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.bodyHtml, { FORBID_TAGS: ['style', 'form'] }) }} />
                         : (props.bodyText ?? '')}
                 </div>
 
@@ -85,7 +86,7 @@ export default function MessageBubble(props: MessageBubbleProps) {
                                 >
                                     {a.name}
                                 </a>
-                                {a.size != null && <span className="opacity-70">{Math.round(a.size / 1024)} KB</span>}
+                                {a.size != null && <span className="opacity-70">{__('admin.guest_ticket_attachment_size_kb', { size: Math.round(a.size / 1024) })}</span>}
                             </li>
                         ))}
                     </ul>

@@ -11,17 +11,14 @@ import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import {
     ArrowLeft,
     BookOpen,
+    Check,
     CheckCircle2,
     FileText,
     Gift,
-    HardDrive,
-    Layers,
     Loader2,
     Plus,
     Sparkles,
     UploadCloud,
-    X,
-    FileCode,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
@@ -71,7 +68,7 @@ export default function Create({ categories, currencies = [] }: Props) {
 
         // Dual Edition (Playbook)
         has_free_edition: false,
-        free_edition_title: 'Playbook Edition (الملخص التطبيقي)',
+        free_edition_title: __('admin.digital_products_default_playbook_title'),
         free_edition_pdf_file: null as File | null,
         free_edition_cover_data: '',
         free_edition_cover_image: null as File | null,
@@ -120,7 +117,7 @@ export default function Create({ categories, currencies = [] }: Props) {
     // Extract Cover & Metadata from PDF
     const processPdfFile = async (file: File, isPlaybook = false) => {
         if (!file || file.type !== 'application/pdf') {
-            toast.error(__('general.please_select_valid_pdf') || 'Please select a valid PDF file.');
+            toast.error(__('general.please_select_valid_pdf'));
             return;
         }
 
@@ -190,11 +187,11 @@ export default function Create({ categories, currencies = [] }: Props) {
                         coverPreview: coverDataUrl,
                     });
                 }
-                toast.success(__('general.pdf_processed_successfully') || 'PDF processed and cover extracted!');
+                toast.success(__('general.pdf_processed_successfully'));
             }
         } catch (error) {
             console.error('PDF parsing error:', error);
-            toast.error(__('general.failed_to_extract_pdf') || 'Could not extract PDF cover automatically, but file was attached.');
+            toast.error(__('general.failed_to_extract_pdf'));
         } finally {
             if (isPlaybook) {
                 setPlaybookPdfLoading(false);
@@ -221,7 +218,7 @@ export default function Create({ categories, currencies = [] }: Props) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!data.pdf_file) {
-            toast.error(__('general.pdf_file_is_required') || 'Please upload the main PDF book.');
+            toast.error(__('general.pdf_file_is_required'));
             return;
         }
 
@@ -236,7 +233,7 @@ export default function Create({ categories, currencies = [] }: Props) {
     };
 
     const categoryOptions = [
-        { value: '', label: __('general.select_category') || 'Select Category' },
+        { value: '', label: __('general.select_category') },
         ...categories.map((c) => ({
             value: String(c.id),
             label: c.name,
@@ -245,18 +242,18 @@ export default function Create({ categories, currencies = [] }: Props) {
 
     return (
         <AdminSidebarLayout
-            title={__('general.upload_new_book') || 'Upload New Digital Book (PDF)'}
+            title={__('general.upload_new_book')}
             header={
                 <div className="flex items-center gap-2">
-                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="h-4 w-4" />
+                    <Link href={route('admin.digitalproducts.index')} className="text-slate-500 hover:text-slate-900 transition-colors" aria-label={__('general.back')}>
+                        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
                     </Link>
                     <BookOpen className="h-5 w-5 text-slate-700" />
-                    <span>{__('general.upload_new_book') || 'Upload New Digital Book (PDF)'}</span>
+                    <span>{__('general.upload_new_book')}</span>
                 </div>
             }
         >
-            <Head title={__('general.upload_new_book') || 'Upload Book'} />
+            <Head title={__('general.upload_new_book')} />
 
             <div className="max-w-5xl mx-auto">
                 <form onSubmit={submit} className="space-y-6">
@@ -267,9 +264,9 @@ export default function Create({ categories, currencies = [] }: Props) {
                             <div className="flex items-center justify-between mb-3">
                                 <Label className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                     <FileText className="h-4 w-4 text-blue-600" />
-                                    <span>{__('general.main_pdf_file') || 'Main Book PDF File'} <span className="text-red-500">*</span></span>
+                                    <span>{__('general.main_pdf_file')} <span className="text-red-500">*</span></span>
                                 </Label>
-                                <span className="text-xs text-slate-400 font-medium">Max 150MB</span>
+                                <span className="text-xs text-slate-400 font-medium">{__('admin.digital_products_max_pdf_size')}</span>
                             </div>
 
                             <input
@@ -289,14 +286,14 @@ export default function Create({ categories, currencies = [] }: Props) {
                                         <UploadCloud className="h-7 w-7" />
                                     </div>
                                     <h4 className="text-sm font-bold text-slate-900 mb-1">
-                                        {__('general.drag_or_click_pdf') || 'Click to select or drag & drop PDF book'}
+                                        {__('general.drag_or_click_pdf')}
                                     </h4>
                                     <p className="text-xs text-slate-500 max-w-md mx-auto mb-3">
-                                        {__('general.pdf_auto_extraction_desc') || 'The cover thumbnail, total page count, and file size will be extracted instantly.'}
+                                        {__('general.pdf_auto_extraction_desc')}
                                     </p>
-                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 shadow-xs">
+                                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700">
                                         <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                                        <span>Instant Auto Cover & Pages Extraction</span>
+                                        <span>{__('admin.digital_products_auto_extraction_hint')}</span>
                                     </span>
                                 </div>
                             )}
@@ -305,9 +302,9 @@ export default function Create({ categories, currencies = [] }: Props) {
                                 <div className="border border-slate-200 rounded-2xl p-8 text-center bg-slate-50 flex flex-col items-center justify-center">
                                     <Loader2 className="h-8 w-8 text-blue-600 animate-spin mb-3" />
                                     <p className="text-sm font-bold text-slate-900">
-                                        {__('general.processing_pdf') || 'Analyzing PDF and extracting cover...'}
+                                        {__('general.processing_pdf')}
                                     </p>
-                                    <p className="text-xs text-slate-500 mt-1">Please wait a moment</p>
+                                    <p className="text-xs text-slate-500 mt-1">{__('admin.digital_products_please_wait')}</p>
                                 </div>
                             )}
 
@@ -316,23 +313,24 @@ export default function Create({ categories, currencies = [] }: Props) {
                                     <div className="w-20 h-28 rounded-lg bg-slate-900 border border-slate-300 overflow-hidden flex-shrink-0 relative shadow-sm">
                                         <img
                                             src={mainPdfInfo.coverPreview}
-                                            alt="Cover"
+                                            alt={__('admin.digital_products_cover_alt')}
                                             className="w-full h-full object-cover"
                                         />
-                                        <span className="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[9px] text-center text-emerald-400 font-bold py-0.5">
-                                            ✓ Extracted
+                                        <span className="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[9px] text-emerald-400 font-bold py-0.5 flex items-center justify-center gap-0.5">
+                                            <Check className="h-2.5 w-2.5" aria-hidden="true" />
+                                            <span>{__('general.extracted')}</span>
                                         </span>
                                     </div>
 
                                     <div className="flex-1 min-w-0 text-center sm:text-start">
                                         <div className="flex items-center gap-1.5 text-emerald-600 text-xs font-bold mb-1 justify-center sm:justify-start">
                                             <CheckCircle2 className="h-4 w-4" />
-                                            <span>{__('general.pdf_attached_ready') || 'PDF analyzed & ready'}</span>
+                                            <span>{__('general.pdf_attached_ready')}</span>
                                         </div>
                                         <h4 className="text-sm font-bold text-slate-900 truncate mb-2">{mainPdfInfo.fileName}</h4>
                                         <div className="flex flex-wrap items-center gap-2 text-xs">
                                             <span className="px-2.5 py-0.5 rounded-md bg-white border border-slate-200 font-medium text-slate-700">
-                                                {mainPdfInfo.pages} {__('general.pages') || 'Pages'}
+                                                {mainPdfInfo.pages} {__('general.pages')}
                                             </span>
                                             <span className="px-2.5 py-0.5 rounded-md bg-white border border-slate-200 font-medium text-slate-700">
                                                 {mainPdfInfo.fileSize}
@@ -344,7 +342,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                                 className="h-7 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                                 onClick={() => mainFileInputRef.current?.click()}
                                             >
-                                                {__('general.change_file') || 'Change File'}
+                                                {__('general.change_file')}
                                             </Button>
                                         </div>
                                     </div>
@@ -362,10 +360,10 @@ export default function Create({ categories, currencies = [] }: Props) {
                                 <div>
                                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                         <Gift className="h-4 w-4 text-emerald-600" />
-                                        <span>{__('general.dual_edition_playbook') || 'Dual Edition (Free Playbook / Summary Edition)'}</span>
+                                        <span>{__('general.dual_edition_playbook')}</span>
                                     </h3>
                                     <p className="text-xs text-slate-500 mt-0.5">
-                                        {__('general.dual_edition_desc') || 'Attach an optional free summary edition to attract visitors alongside the full book.'}
+                                        {__('general.dual_edition_desc')}
                                     </p>
                                 </div>
                                 <Switch
@@ -379,26 +377,26 @@ export default function Create({ categories, currencies = [] }: Props) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.playbook_title') || 'Playbook Title'}
+                                                {__('general.playbook_title')}
                                             </Label>
                                             <Input
                                                 value={data.free_edition_title}
                                                 onChange={(e) => setData('free_edition_title', e.target.value)}
                                                 className="h-9 text-xs"
-                                                placeholder="Playbook Edition (ملخص تطبيقي)"
+                                                placeholder={__('admin.digital_products_default_playbook_title')}
                                             />
                                         </div>
 
                                         <div className="space-y-1.5">
                                             <Label className="text-xs font-semibold text-slate-700">
-                                                {__('general.playbook_page_count') || 'Playbook Pages'}
+                                                {__('general.playbook_page_count')}
                                             </Label>
                                             <Input
                                                 type="number"
                                                 value={data.free_edition_page_count}
                                                 onChange={(e) => setData('free_edition_page_count', e.target.value)}
                                                 className="h-9 text-xs"
-                                                placeholder="e.g. 20"
+                                                placeholder={__('admin.digital_products_playbook_pages_placeholder')}
                                             />
                                         </div>
                                     </div>
@@ -406,7 +404,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                     {/* Playbook Dropzone */}
                                     <div className="space-y-1.5">
                                         <Label className="text-xs font-semibold text-slate-700">
-                                            {__('general.playbook_pdf_file') || 'Playbook PDF File'}
+                                            {__('general.playbook_pdf_file')}
                                         </Label>
                                         <input
                                             type="file"
@@ -423,27 +421,27 @@ export default function Create({ categories, currencies = [] }: Props) {
                                             >
                                                 <UploadCloud className="h-6 w-6 text-emerald-600 mx-auto mb-1" />
                                                 <p className="text-xs font-bold text-slate-800">
-                                                    {__('general.click_to_upload_playbook_pdf') || 'Click to select Playbook PDF'}
+                                                    {__('general.click_to_upload_playbook_pdf')}
                                                 </p>
-                                                <p className="text-[11px] text-slate-400 mt-0.5">Cover thumbnail will be generated automatically</p>
+                                                <p className="text-[11px] text-slate-400 mt-0.5">{__('admin.digital_products_cover_auto_generated')}</p>
                                             </div>
                                         )}
 
                                         {playbookPdfLoading && (
                                             <div className="border border-slate-200 rounded-xl p-5 text-center bg-slate-50 flex items-center justify-center gap-2">
                                                 <Loader2 className="h-4 w-4 text-emerald-600 animate-spin" />
-                                                <span className="text-xs font-semibold text-slate-700">Analyzing Playbook PDF...</span>
+                                                <span className="text-xs font-semibold text-slate-700">{__('admin.digital_products_analyzing_playbook')}</span>
                                             </div>
                                         )}
 
                                         {playbookPdfInfo && !playbookPdfLoading && (
                                             <div className="border border-emerald-200 rounded-xl p-3 bg-emerald-50/40 flex items-center gap-3">
                                                 <div className="w-12 h-16 rounded bg-slate-900 border border-emerald-300 overflow-hidden flex-shrink-0 shadow-xs">
-                                                    <img src={playbookPdfInfo.coverPreview} alt="Playbook Cover" className="w-full h-full object-cover" />
+                                                    <img src={playbookPdfInfo.coverPreview} alt={__('admin.digital_products_playbook_cover_alt')} className="w-full h-full object-cover" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h5 className="text-xs font-bold text-slate-900 truncate">{playbookPdfInfo.fileName}</h5>
-                                                    <p className="text-[11px] text-slate-500">{playbookPdfInfo.pages} pages • {playbookPdfInfo.fileSize}</p>
+                                                    <p className="text-[11px] text-slate-500">{__('admin.digital_products_pages_and_size', { pages: playbookPdfInfo.pages, size: playbookPdfInfo.fileSize })}</p>
                                                 </div>
                                                 <Button
                                                     type="button"
@@ -452,7 +450,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                                     className="h-7 text-xs text-emerald-700 hover:bg-emerald-100"
                                                     onClick={() => playbookFileInputRef.current?.click()}
                                                 >
-                                                    {__('general.change') || 'Change'}
+                                                    {__('general.change')}
                                                 </Button>
                                             </div>
                                         )}
@@ -467,19 +465,19 @@ export default function Create({ categories, currencies = [] }: Props) {
                         <CardContent className="p-6 space-y-5">
                             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
                                 <BookOpen className="h-4 w-4 text-slate-700" />
-                                <span>{__('general.book_details') || 'Book Details'}</span>
+                                <span>{__('general.book_details')}</span>
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-1.5 md:col-span-2">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.book_title') || 'Book Title'} <span className="text-red-500">*</span>
+                                        {__('general.book_title')} <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
                                         className="h-10 text-xs font-semibold"
-                                        placeholder="e.g. Master Clean Architecture in Laravel"
+                                        placeholder={__('admin.digital_products_title_placeholder')}
                                         required
                                     />
                                     {errors.title && <p className="text-xs text-red-600">{errors.title}</p>}
@@ -487,26 +485,26 @@ export default function Create({ categories, currencies = [] }: Props) {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.category') || 'Category'}
+                                        {__('general.category')}
                                     </Label>
                                     <PremiumCombobox
                                         value={data.category_id}
                                         onChange={(val) => setData('category_id', String(val || ''))}
                                         options={categoryOptions}
-                                        placeholder={__('general.select_category') || 'Select Category'}
+                                        placeholder={__('general.select_category')}
                                     />
                                     {errors.category_id && <p className="text-xs text-red-600">{errors.category_id}</p>}
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.slug') || 'URL Slug (Optional)'}
+                                        {__('general.slug')}
                                     </Label>
                                     <Input
                                         value={data.slug}
                                         onChange={(e) => setData('slug', e.target.value)}
                                         className="h-10 text-xs font-mono"
-                                        placeholder="leave blank for auto-generation"
+                                        placeholder={__('admin.digital_products_slug_placeholder')}
                                     />
                                     {errors.slug && <p className="text-xs text-red-600">{errors.slug}</p>}
                                 </div>
@@ -514,7 +512,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                 {/* Pricing */}
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.pricing') || 'Pricing'}
+                                        {__('general.pricing')}
                                     </Label>
                                     <div className="flex items-center gap-3">
                                         <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
@@ -531,7 +529,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                                 }}
                                                 className="rounded border-slate-300 text-blue-600"
                                             />
-                                            <span>{__('general.free_book') || 'Free Book'}</span>
+                                            <span>{__('general.free_book')}</span>
                                         </label>
 
                                         {!data.is_free && (
@@ -543,7 +541,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                                                     value={data.price}
                                                     onChange={(e) => setData('price', e.target.value)}
                                                     className="h-10 text-xs font-bold flex-1"
-                                                    placeholder="Price"
+                                                    placeholder={__('general.price')}
                                                 />
                                                 {currencies.length > 0 ? (
                                                     <select
@@ -567,19 +565,19 @@ export default function Create({ categories, currencies = [] }: Props) {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.author_name') || 'Author Name'}
+                                        {__('general.author_name')}
                                     </Label>
                                     <Input
                                         value={data.author_name}
                                         onChange={(e) => setData('author_name', e.target.value)}
                                         className="h-10 text-xs"
-                                        placeholder="e.g. John Doe"
+                                        placeholder={__('admin.digital_products_author_placeholder')}
                                     />
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.publisher') || 'Publisher'}
+                                        {__('general.publisher')}
                                     </Label>
                                     <Input
                                         value={data.publisher}
@@ -590,60 +588,60 @@ export default function Create({ categories, currencies = [] }: Props) {
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.publication_year') || 'Year & Language'}
+                                        {__('general.publication_year')}
                                     </Label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Input
                                             value={data.publication_year}
                                             onChange={(e) => setData('publication_year', e.target.value)}
                                             className="h-10 text-xs"
-                                            placeholder="Year"
+                                            placeholder={__('general.year')}
                                         />
                                         <Input
                                             value={data.language}
                                             onChange={(e) => setData('language', e.target.value)}
                                             className="h-10 text-xs"
-                                            placeholder="Lang (ar/en)"
+                                            placeholder={__('admin.digital_products_language_placeholder')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-1.5">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.page_count') || 'Page Count'}
+                                        {__('general.page_count')}
                                     </Label>
                                     <Input
                                         type="number"
                                         value={data.page_count}
                                         onChange={(e) => setData('page_count', e.target.value)}
                                         className="h-10 text-xs"
-                                        placeholder="Extracted automatically from PDF"
+                                        placeholder={__('admin.digital_products_page_count_placeholder')}
                                     />
                                 </div>
 
                                 <div className="space-y-1.5 md:col-span-2">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.short_description') || 'Short Summary / Teaser'}
+                                        {__('general.short_description')}
                                     </Label>
                                     <Textarea
                                         value={data.short_description}
                                         onChange={(e) => setData('short_description', e.target.value)}
                                         rows={2}
                                         className="text-xs"
-                                        placeholder="A brief punchy summary shown in cards and previews..."
+                                        placeholder={__('admin.digital_products_short_description_placeholder')}
                                     />
                                 </div>
 
                                 <div className="space-y-1.5 md:col-span-2">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.full_description') || 'Full Book Description'}
+                                        {__('general.full_description')}
                                     </Label>
                                     <Textarea
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={5}
                                         className="text-xs"
-                                        placeholder="Comprehensive overview of chapters, key takeaways, who this book is for..."
+                                        placeholder={__('admin.digital_products_description_placeholder')}
                                     />
                                 </div>
                             </div>
@@ -655,14 +653,14 @@ export default function Create({ categories, currencies = [] }: Props) {
                         <CardContent className="p-6 space-y-4">
                             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
                                 <Sparkles className="h-4 w-4 text-slate-700" />
-                                <span>{__('general.publishing_and_seo') || 'Publishing & SEO'}</span>
+                                <span>{__('general.publishing_and_seo')}</span>
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                                     <div>
-                                        <h4 className="text-xs font-bold text-slate-900">{__('general.publish_immediately') || 'Publish Immediately'}</h4>
-                                        <p className="text-[11px] text-slate-500">Visible in public library gallery</p>
+                                        <h4 className="text-xs font-bold text-slate-900">{__('general.publish_immediately')}</h4>
+                                        <p className="text-[11px] text-slate-500">{__('admin.digital_products_publish_hint')}</p>
                                     </div>
                                     <Switch
                                         checked={data.is_published}
@@ -672,8 +670,8 @@ export default function Create({ categories, currencies = [] }: Props) {
 
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
                                     <div>
-                                        <h4 className="text-xs font-bold text-slate-900">{__('general.featured_book') || 'Featured Book'}</h4>
-                                        <p className="text-[11px] text-slate-500">Highlighted on top of library and home</p>
+                                        <h4 className="text-xs font-bold text-slate-900">{__('general.featured_book')}</h4>
+                                        <p className="text-[11px] text-slate-500">{__('admin.digital_products_featured_hint')}</p>
                                     </div>
                                     <Switch
                                         checked={data.is_featured}
@@ -683,26 +681,26 @@ export default function Create({ categories, currencies = [] }: Props) {
 
                                 <div className="space-y-1.5 md:col-span-2">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.meta_title') || 'Meta SEO Title'}
+                                        {__('general.meta_title')}
                                     </Label>
                                     <Input
                                         value={data.meta_title}
                                         onChange={(e) => setData('meta_title', e.target.value)}
                                         className="h-9 text-xs"
-                                        placeholder="Defaults to book title"
+                                        placeholder={__('admin.digital_products_meta_title_placeholder')}
                                     />
                                 </div>
 
                                 <div className="space-y-1.5 md:col-span-2">
                                     <Label className="text-xs font-semibold text-slate-700">
-                                        {__('general.meta_description') || 'Meta SEO Description'}
+                                        {__('general.meta_description')}
                                     </Label>
                                     <Textarea
                                         value={data.meta_description}
                                         onChange={(e) => setData('meta_description', e.target.value)}
                                         rows={2}
                                         className="text-xs"
-                                        placeholder="Defaults to short description"
+                                        placeholder={__('admin.digital_products_meta_description_placeholder')}
                                     />
                                 </div>
                             </div>
@@ -713,7 +711,7 @@ export default function Create({ categories, currencies = [] }: Props) {
                     <div className="flex items-center justify-end gap-3 pt-2">
                         <Link href={route('admin.digitalproducts.index')}>
                             <Button type="button" variant="outline" className="h-10 px-5 text-xs">
-                                {__('general.cancel') || 'Cancel'}
+                                {__('general.cancel')}
                             </Button>
                         </Link>
 
@@ -725,12 +723,12 @@ export default function Create({ categories, currencies = [] }: Props) {
                             {processing ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                    <span>{__('general.uploading_book') || 'Uploading Book...'}</span>
+                                    <span>{__('general.uploading_book')}</span>
                                 </>
                             ) : (
                                 <>
                                     <Plus className="h-4 w-4" />
-                                    <span>{__('general.save_and_publish_book') || 'Save & Upload Book'}</span>
+                                    <span>{__('general.save_and_publish_book')}</span>
                                 </>
                             )}
                         </Button>

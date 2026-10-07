@@ -57,7 +57,7 @@ export default function Show({ ticket, isAdmin }) {
                                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] hover:underline transition-colors"
                             >
                                 <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-                                <span>{__('general.back_to_tickets') || 'Back to Tickets'}</span>
+                                <span>{__('general.back_to_tickets')}</span>
                             </Link>
 
                             <div className="flex items-center gap-2 shrink-0">
@@ -68,7 +68,7 @@ export default function Show({ ticket, isAdmin }) {
                                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-full text-xs font-semibold transition-all shadow-2xs cursor-pointer"
                                     >
                                         <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>{__('general.mark_as_resolved') || 'Mark as Resolved'}</span>
+                                        <span>{__('general.mark_as_resolved')}</span>
                                     </button>
                                 )}
                             </div>
@@ -175,7 +175,7 @@ export default function Show({ ticket, isAdmin }) {
                             <div className="flex items-center gap-2.5">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                                 <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 font-sans">
-                                    {__('general.support_conversation', {}, 'محادثة الدعم الفني')}
+                                    {__('general.support_conversation')}
                                 </span>
                             </div>
                             <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">

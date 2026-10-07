@@ -54,7 +54,7 @@ class ScopePricingEngine
             $usdId = $usdCurrency?->id ?? 1;
             $egpId = $egpCurrency?->id ?? 2;
         } catch (\Throwable $e) {
-            // DB offline or unmigrated in unit tests
+            Log::warning('Scope pricing: currency lookup failed, using default ids', ['error' => $e->getMessage()]);
         }
 
         $usdToEgpRate = 50.0;

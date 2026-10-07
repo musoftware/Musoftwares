@@ -6,15 +6,19 @@ use App\Models\Currency;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class AdminTransactionControllerTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     protected function setUp(): void
     {
         parent::setUp();
+        // This suite writes wallet/cost ledger rows, which convert amounts to the business currency.
+        $this->seedUsdEgpRates();
         $this->seed(RolesAndPermissionsSeeder::class);
     }
 
@@ -133,6 +137,31 @@ class AdminTransactionControllerTest extends TestCase
             ->has('transactions.data', 2)
             ->where('transactions.data.0.balance', 225)
             ->where('transactions.data.1.balance', 300)
+        );
+    }
+
+    public function test_transactions_index_renders_when_exchange_rates_are_missing()
+    {
+        $admin = $this->createAdmin();
+        $client = $this->createClient();
+
+        \App\Models\Transaction::create([
+            'user_id' => $client->id,
+            'amount' => 300,
+            'type' => 'received',
+            'currency_id' => self::USD,
+            'reason' => 'Deposit',
+        ]);
+
+        \App\Models\CurrenciesExchange::query()->delete();
+        \App\Models\CurrenciesExchange::flushCache();
+
+        $response = $this->actingAs($admin)->get(route('admin.transactions.index', ['user' => $client->id]));
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Transactions/Income')
+            ->has('transactions.data', 1)
         );
     }
 

@@ -19,6 +19,7 @@ param(
 $ErrorActionPreference = "Stop"
 $PROJECT_ROOT = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location $PROJECT_ROOT
+. "$PSScriptRoot\common.ps1"
 
 # Detect correct PHP binary locally
 $PHP_BIN = "php"
@@ -111,6 +112,12 @@ if (-not $SkipTests -and -not $RemoteTests) {
         }
         Pass "All tests passed."
     }
+} elseif ($SkipTests) {
+    if (-not (Confirm-Typed "You are about to deploy PHP files to PRODUCTION without running the test suite." "SKIP-TESTS")) {
+        Fail "Aborted. Nothing was uploaded."
+        exit 1
+    }
+    Write-Host "  [WARN] Tests skipped by user." -ForegroundColor Yellow
 } elseif ($RemoteTests) {
     Step 1 $totalSteps "Skipping local tests (will run on remote server)..."
 }
@@ -242,10 +249,10 @@ foreach ($file in $phpFiles) {
     }
     else {
         # Ensure remote directory exists
-        & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "mkdir -p $remoteDir" 2>&1 | Out-Null
+        & ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" "mkdir -p $remoteDir" 2>&1 | Out-Null
 
         # Upload file
-        & scp -P $SSH_PORT -o StrictHostKeyChecking=no $localFile "${SSH_USER}@${SSH_HOST}:$remoteFile" 2>&1 | Out-Null
+        & scp -P $SSH_PORT $localFile "${SSH_USER}@${SSH_HOST}:$remoteFile" 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) {
             Fail "Failed to upload: $file"
             $uploadErrors++
@@ -281,7 +288,7 @@ if ($hasPutty -and $SSH_PASSWORD -and -not $NoPassword) {
     }
 }
 else {
-    & ssh -p $SSH_PORT -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" $clearCmd 2>&1 | Out-Null
+    & ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" $clearCmd 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0 -and $RemoteTests) {
         Fail "Remote tests failed! Check the server."
     }

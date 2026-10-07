@@ -12,17 +12,14 @@ const SIZE_STYLES = {
     lg: {
         number: 'text-[28px] font-bold leading-none',
         code: 'text-sm',
-        flag: 'h-6 w-6 text-base',
     },
     md: {
         number: 'text-lg font-semibold leading-none',
         code: 'text-[10px]',
-        flag: 'h-5 w-5 text-sm',
     },
     sm: {
         number: 'text-sm font-semibold leading-none',
         code: 'text-[9px]',
-        flag: 'h-4 w-4 text-xs',
     },
 } as const;
 
@@ -51,12 +48,6 @@ export function IsoCurrencyAmount({
             className={`inline-flex items-center gap-1.5 whitespace-nowrap font-sans text-current ${className ?? ''}`}
             style={{ fontFeatureSettings: '"tnum"' }}
         >
-            <span
-                className={`currency-flag inline-flex shrink-0 items-center justify-center rounded-full bg-slate-100 leading-none ${styles.flag}`}
-                title={meta.code}
-            >
-                <span aria-hidden="true">{meta.flag}</span>
-            </span>
             <span className={styles.number}>{formattedAmount}</span>
             <span className={`currency-code font-sans font-medium text-slate-500 ${styles.code}`}>
                 {meta.code}

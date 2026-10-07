@@ -6,9 +6,12 @@ import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, Plus, Wallet, Trash2, CreditCard } from 'lucide-react';
+import { __ } from '@/lib/i18n';
+import { useConfirm } from '@/hooks/useConfirm';
 
 export default function UserLoansTab({ client, loans }) {
     const { props } = usePage();
+    const { confirm, confirmDialog } = useConfirm();
     const currencies = props.currencies || [];
     
     const [isAddLoanOpen, setIsAddLoanOpen] = useState(false);
@@ -98,20 +101,26 @@ export default function UserLoansTab({ client, loans }) {
         });
     };
 
-    const deleteLoan = (loanId) => {
-        if (confirm("Are you sure you want to delete this loan? This will also delete its repayments.")) {
-            router.delete(`/admin/users/${client.id}/loans/${loanId}`);
-        }
+    const deleteLoan = async (loanId) => {
+        const accepted = await confirm({
+            title: __('admin.loan_delete_confirm_title'),
+            description: __('admin.loan_delete_confirm_description'),
+            variant: 'danger',
+            confirmLabel: __('general.delete'),
+        });
+        if (!accepted) return;
+        router.delete(`/admin/users/${client.id}/loans/${loanId}`);
     };
 
     return (
         <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 mb-6">
+            {confirmDialog}
             <div className="flex justify-between items-center mb-4 border-b pb-2">
                 <h2 className="text-lg font-bold font-sora text-slate-900 flex items-center gap-2">
-                    <Wallet size={18} className="text-slate-400" /> {__('admin.loans') || 'السلف'}
+                    <Wallet size={18} className="text-slate-400" /> {__('admin.loans')}
                 </h2>
                 <Button size="sm" onClick={() => setIsAddLoanOpen(true)}>
-                    <Plus size={16} className="me-2" /> {__('admin.add_loan') || 'إضافة سلفة'}
+                    <Plus size={16} className="me-2" /> {__('admin.add_loan')}
                 </Button>
             </div>
 
@@ -121,12 +130,12 @@ export default function UserLoansTab({ client, loans }) {
                         <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs">
                             <tr>
                                 <th className="px-4 py-3">{__('admin.date')}</th>
-                                <th className="px-4 py-3">{__('admin.loan_type') || 'نوع السلفة'}</th>
+                                <th className="px-4 py-3">{__('admin.loan_type')}</th>
                                 <th className="px-4 py-3">{__('admin.amount')}</th>
                                 <th className="px-4 py-3">{__('admin.paid_amount')}</th>
                                 <th className="px-4 py-3">{__('admin.remaining')}</th>
                                 <th className="px-4 py-3">{__('admin.status')}</th>
-                                <th className="px-4 py-3 text-end">{__('general.actions') || 'الإجراءات'}</th>
+                                <th className="px-4 py-3 text-end">{__('general.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -138,11 +147,11 @@ export default function UserLoansTab({ client, loans }) {
                                         <td className="px-4 py-3">
                                             {loan.type === 'on_business' ? (
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-900 text-white border border-slate-900">
-                                                    {__('admin.loan_on_business') || 'عليا (على الشركة)'}
+                                                    {__('admin.loan_on_business')}
                                                 </span>
                                             ) : (
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-800 border border-slate-200">
-                                                    {__('admin.loan_on_client') || 'ليا (على العميل)'}
+                                                    {__('admin.loan_on_client')}
                                                 </span>
                                             )}
                                         </td>
@@ -151,9 +160,9 @@ export default function UserLoansTab({ client, loans }) {
                                         <td className="px-4 py-3 text-red-600 font-medium">{formatCurrencyFallback(remaining, loan.currency)}</td>
                                         <td className="px-4 py-3">
                                             {loan.status === 'paid' ? (
-                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">{__('admin.paid') || 'مسدد'}</span>
+                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">{__('admin.paid')}</span>
                                             ) : (
-                                                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold uppercase">{__('admin.active') || 'نشط'}</span>
+                                                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold uppercase">{__('admin.active')}</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-end">
@@ -168,12 +177,12 @@ export default function UserLoansTab({ client, loans }) {
                                                         title={__('admin.recharge_client_balance')}
                                                     >
                                                         <CreditCard size={14} className="me-1 text-slate-700" />
-                                                        {__('admin.recharge_client_balance') || 'شحن رصيد'}
+                                                        {__('admin.recharge_client_balance')}
                                                     </Button>
                                                 )}
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                        <Button variant="ghost" className="h-8 w-8 p-0" aria-label={__('general.open_menu')} title={__('general.open_menu')}>
                                                             <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -182,11 +191,11 @@ export default function UserLoansTab({ client, loans }) {
                                                             <>
                                                                 {loan.type === 'on_business' && (
                                                                     <DropdownMenuItem onClick={() => openRechargeModal(loan)}>
-                                                                        <CreditCard className="me-2 h-4 w-4 text-slate-700" /> {__('admin.recharge_client_balance') || 'شحن رصيد العميل'}
+                                                                        <CreditCard className="me-2 h-4 w-4 text-slate-700" /> {__('admin.recharge_client_balance')}
                                                                     </DropdownMenuItem>
                                                                 )}
                                                                 <DropdownMenuItem onClick={() => openRepayModal(loan)}>
-                                                                    <Wallet className="me-2 h-4 w-4 text-slate-700" /> {__('admin.add_repayment') || 'إضافة سداد'}
+                                                                    <Wallet className="me-2 h-4 w-4 text-slate-700" /> {__('admin.add_repayment')}
                                                                 </DropdownMenuItem>
                                                             </>
                                                         )}
@@ -205,7 +214,7 @@ export default function UserLoansTab({ client, loans }) {
                 </div>
             ) : (
                 <div className="text-center py-6 text-slate-500 text-sm">
-                    {__('admin.no_loans_found') || 'لا توجد سلف مسجلة لهذا العميل.'}
+                    {__('admin.no_loans_found')}
                 </div>
             )}
 
@@ -214,12 +223,12 @@ export default function UserLoansTab({ client, loans }) {
                 <DialogContent>
                     <form onSubmit={submitAddLoan}>
                         <DialogHeader>
-                            <DialogTitle>{__('admin.add_loan') || 'إضافة سلفة جديدة'}</DialogTitle>
-                            <DialogDescription>{__('admin.add_loan_desc') || 'أدخل تفاصيل السلفة الممنوحة أو المستحقة.'}</DialogDescription>
+                            <DialogTitle>{__('admin.add_loan')}</DialogTitle>
+                            <DialogDescription>{__('admin.add_loan_desc')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             <div>
-                                <Label>{__('admin.loan_type') || 'نوع السلفة'}</Label>
+                                <Label>{__('admin.loan_type')}</Label>
                                 <div className="grid grid-cols-2 gap-3 mt-1.5">
                                     <button
                                         type="button"
@@ -230,8 +239,8 @@ export default function UserLoansTab({ client, loans }) {
                                                 : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                                         }`}
                                     >
-                                        <div className="text-sm font-medium">{__('admin.loan_on_client') || 'ليا (على العميل)'}</div>
-                                        <div className="text-xs text-slate-500 font-normal mt-0.5">العميل مدين للشركة (مستحق لنا)</div>
+                                        <div className="text-sm font-medium">{__('admin.loan_on_client')}</div>
+                                        <div className="text-xs text-slate-500 font-normal mt-0.5">{__('admin.loan_on_client_hint')}</div>
                                     </button>
                                     <button
                                         type="button"
@@ -242,8 +251,8 @@ export default function UserLoansTab({ client, loans }) {
                                                 : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                                         }`}
                                     >
-                                        <div className="text-sm font-medium">{__('admin.loan_on_business') || 'عليا (على الشركة)'}</div>
-                                        <div className="text-xs text-slate-500 font-normal mt-0.5">الشركة مدينة للعميل (يمكن شحن رصيده منها)</div>
+                                        <div className="text-sm font-medium">{__('admin.loan_on_business')}</div>
+                                        <div className="text-xs text-slate-500 font-normal mt-0.5">{__('admin.loan_on_business_hint')}</div>
                                     </button>
                                 </div>
                             </div>
@@ -282,13 +291,13 @@ export default function UserLoansTab({ client, loans }) {
                 <DialogContent>
                     <form onSubmit={submitRepay}>
                         <DialogHeader>
-                            <DialogTitle>{__('admin.add_repayment') || 'تسجيل سداد سلفة'}</DialogTitle>
-                            <DialogDescription>{__('admin.add_repayment_desc') || 'أدخل المبلغ المسدد من هذه السلفة.'}</DialogDescription>
+                            <DialogTitle>{__('admin.add_repayment')}</DialogTitle>
+                            <DialogDescription>{__('admin.add_repayment_desc')}</DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             {activeLoan && (
                                 <div className="p-3 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 mb-2">
-                                    المبلغ المتبقي: <strong>{parseFloat(activeLoan.amount) - parseFloat(activeLoan.paid_amount)} {activeLoan.currency?.currency}</strong>
+                                    {__('admin.loan_remaining_amount')}: <strong>{parseFloat(activeLoan.amount) - parseFloat(activeLoan.paid_amount)} {activeLoan.currency?.currency}</strong>
                                 </div>
                             )}
                             <div>
@@ -317,16 +326,16 @@ export default function UserLoansTab({ client, loans }) {
                 <DialogContent>
                     <form onSubmit={submitRecharge}>
                         <DialogHeader>
-                            <DialogTitle>{__('admin.recharge_client_balance') || 'شحن رصيد العميل من السلفة'}</DialogTitle>
+                            <DialogTitle>{__('admin.recharge_client_balance')}</DialogTitle>
                             <DialogDescription>
-                                {__('admin.recharge_client_balance_desc') || 'خصم مبلغ من السلفة المستحقة وإيداعه مباشرة في رصيد محفظة العميل كدفعة مستلمة (received).'}
+                                {__('admin.recharge_client_balance_desc')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="py-4 space-y-4">
                             {rechargeLoan && (
                                 <div className="p-3 bg-slate-50 border border-slate-200 rounded text-sm text-slate-700">
                                     <div className="flex justify-between items-center mb-1">
-                                        <span className="text-slate-500">المبلغ المتبقي من السلفة:</span>
+                                        <span className="text-slate-500">{__('admin.loan_remaining_amount')}:</span>
                                         <strong className="font-semibold text-slate-900">
                                             {formatCurrencyFallback(
                                                 (parseFloat(rechargeLoan.amount) - parseFloat(rechargeLoan.paid_amount)).toFixed(2),
@@ -335,7 +344,7 @@ export default function UserLoansTab({ client, loans }) {
                                         </strong>
                                     </div>
                                     <div className="text-xs text-slate-500 mt-2">
-                                        سيتم تسجيل هذا الإجراء كسداد للسلفة وشحن المبلغ في محفظة العميل بنوع <strong>received</strong> ليتمكن من طلب الخدمات وتنفيذ الفواتير به.
+                                        {__('admin.loan_recharge_note')}
                                     </div>
                                 </div>
                             )}
@@ -364,7 +373,7 @@ export default function UserLoansTab({ client, loans }) {
                                 <Label>{__('admin.note')}</Label>
                                 <Input
                                     type="text"
-                                    placeholder="ملاحظة اختيارية (تظهر في قيود المحفظة وسجل السلفة)"
+                                    placeholder={__('admin.loan_recharge_note_placeholder')}
                                     value={rechargeForm.note}
                                     onChange={e => setRechargeForm({ ...rechargeForm, note: e.target.value })}
                                 />
@@ -372,7 +381,7 @@ export default function UserLoansTab({ client, loans }) {
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsRechargeOpen(false)}>{__('general.cancel')}</Button>
-                            <Button type="submit">{__('admin.recharge_client_balance') || 'تأكيد شحن الرصيد'}</Button>
+                            <Button type="submit">{__('admin.recharge_client_balance')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

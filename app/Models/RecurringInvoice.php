@@ -188,8 +188,7 @@ class RecurringInvoice extends Model
 
     public function apply()
     {
-        $timezone = config('app.timezone', 'Africa/Cairo');
-        $today = Carbon::today($timezone);
+        $today = static::businessToday();
 
         // Daily recurring invoices fire on the day itself to prevent bulk future charges.
         $daysBefore = ($this->recurring === 'day')
@@ -207,9 +206,8 @@ class RecurringInvoice extends Model
 
     public function fireForDate(Carbon $targetDate): ?Invoice
     {
-        $timezone = config('app.timezone', 'Africa/Cairo');
-        $today = Carbon::today($timezone);
-        $targetDateCairo = $targetDate->copy()->setTimezone($timezone)->startOfDay();
+        $today = static::businessToday();
+        $targetDateCairo = static::toBusinessDate($targetDate);
 
         if (! $this->isToday($targetDateCairo)) {
             throw new \InvalidArgumentException('Target date is not a valid scheduled recurrence date for this invoice.');
@@ -229,9 +227,8 @@ class RecurringInvoice extends Model
 
     public function generateMissingRuns(?Carbon $until = null): int
     {
-        $timezone = config('app.timezone', 'Africa/Cairo');
-        $until = $until ? $until->copy()->setTimezone($timezone)->endOfDay() : Carbon::today($timezone)->endOfDay();
-        $startDate = Carbon::parse($this->start_date)->setTimezone($timezone)->startOfDay();
+        $until = ($until ? static::toBusinessDate($until) : static::businessToday())->endOfDay();
+        $startDate = Carbon::parse($this->start_date)->startOfDay();
 
         if ($startDate->gt($until)) {
             return 0;
