@@ -63,7 +63,7 @@ export default function Index({ favorites }: FavoritesIndexProps) {
                             </p>
                             <div className="pt-2">
                                 <Link
-                                    href="/marketplace/services"
+                                    href="/marketplace/catalog"
                                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium hover:bg-slate-800 dark:hover:bg-slate-100 transition"
                                 >
                                     <ShoppingBag className="w-4 h-4" />

@@ -132,7 +132,11 @@ class UserResource extends JsonResource
             'user_balance' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), (float) $this->user_balance),
             'slug' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->slug),
             'temp_valid_until' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->temp_valid_until),
-            'referrals_count' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->my_ref_users()->count()),
+            'referrals_count' => isset($this->my_ref_users_count) 
+                ? (int) $this->my_ref_users_count 
+                : ($this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), fn () => $this->my_ref_users()->count())),
+            'total_spent' => isset($this->total_spent) ? (float) $this->total_spent : null,
+            'invoices_count' => isset($this->invoices_count) ? (int) $this->invoices_count : null,
             'aliases_count' => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->emails()->count()),
             'aliases' => $this->when(
                 $request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'),

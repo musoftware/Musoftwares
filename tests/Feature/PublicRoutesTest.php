@@ -86,10 +86,10 @@ class PublicRoutesTest extends TestCase
         $this->get('/blog/test-article')->assertStatus(200);
     }
 
-    public function test_services_redirects_to_marketplace()
+    public function test_services_shows_desktop_programs_page()
     {
         $response = $this->get('/services');
-        $response->assertRedirect(route('marketplace.services.index'));
+        $response->assertOk();
     }
 
     public function test_website_service_show_returns_successful_response()

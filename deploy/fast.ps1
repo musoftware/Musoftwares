@@ -131,7 +131,10 @@ if ($AssetsOnly) {
         "\.bat$",
         "\.ps1$",
         "^storage/logs/",
-        "^storage/framework/"
+        "^storage/framework/",
+        "^public/llms",
+        "^public/robots\.txt$",
+        "^public/\.well-known/"
     )
 
     $hasFrontendChanges = $false

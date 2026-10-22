@@ -1,0 +1,11 @@
+{
+    "name": "SoftwareStore",
+    "alias": "softwarestore",
+    "description": "Landing pages, guest checkout, WhatsApp hand-off and auto-update feed for the desktop programs.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SoftwareStore\\Providers\\SoftwareStoreServiceProvider"
+    ],
+    "files": []
+}

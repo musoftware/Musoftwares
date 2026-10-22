@@ -26,18 +26,23 @@ class InvoiceCancelledNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+        $date = \Carbon\Carbon::now('Africa/Cairo')->format('M d, Y');
+
         return (new MailMessage)
-            ->subject(__('general.notif_invoice_cancelled_subject'))
+            ->subject(__('general.notif_invoice_cancelled_subject') . ' — ' . $invoiceNumber . ' (' . $date . ')')
             ->greeting(__('general.hello_name', ['name' => $notifiable->name ?? '']))
-            ->line(__('general.notif_invoice_cancelled_body', ['invoice' => ($this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''))]))
+            ->line(__('general.notif_invoice_cancelled_body', ['invoice' => $invoiceNumber]))
             ->action(__('general.view_invoice'), url('/app/invoices/'.($this->invoice->id ?? '')));
     }
 
     public function toFcm(object $notifiable)
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+
         return $this->fcmMessage(
             __('general.notif_invoice_cancelled_title'),
-            __('general.notif_invoice_cancelled_body', ['invoice' => ($this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''))]),
+            __('general.notif_invoice_cancelled_body', ['invoice' => $invoiceNumber]),
             [
                 'url' => '/app/invoices/'.($this->invoice->id ?? ''),
                 'type' => 'invoice_cancelled',

@@ -33,6 +33,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['last_login' => now()]);
+            app(\App\Services\WinbackService::class)->touchActivity($user, 'login');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

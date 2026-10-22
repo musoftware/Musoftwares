@@ -7,6 +7,7 @@ use App\Models\WebsiteService;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
+use Modules\SoftwareStore\Models\SoftwareProduct;
 
 class SitemapController extends Controller
 {
@@ -17,6 +18,7 @@ class SitemapController extends Controller
         $staticRoutes = [
             'home' => '1.0',
             'marketplace.services.index' => '0.9',
+            'services.index' => '0.9',
             'portfolio' => '0.8',
             'platforms' => '0.8',
             'platforms.crm' => '0.8',
@@ -76,6 +78,21 @@ class SitemapController extends Controller
                         'priority' => '0.9',
                     ];
                 }
+            }
+        }
+
+        // Programs and services of the software store
+        if (class_exists(SoftwareProduct::class)) {
+            foreach (SoftwareProduct::where('is_active', true)->orderBy('sort_order')->get() as $product) {
+                $loc = $product->purchaseUrl();
+                $urls[] = [
+                    'loc' => $loc,
+                    'ar_loc' => $loc.'?lang=ar',
+                    'en_loc' => $loc.'?lang=en',
+                    'lastmod' => optional($product->updated_at)->toAtomString() ?: now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.9',
+                ];
             }
         }
 

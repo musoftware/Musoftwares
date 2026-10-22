@@ -28,7 +28,7 @@
         <!-- Center Links (Matching image.png navbar) -->
         <nav class="hidden md:flex items-center gap-8 text-[14px] font-medium text-[#515154]">
             <a href="/about/mahmoud-amin" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'من نحن' : 'About us' }}</a>
-            <a href="#services-overview" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'الخدمات' : 'Services' }}</a>
+            <a href="{{ route('services.index') }}" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'الخدمات' : 'Services' }}</a>
             <a href="#case-studies" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'أعمالنا' : 'Case Studies' }}</a>
             <a href="/compare/laravel-vs-nodejs" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'المدونة' : 'Blog' }}</a>
             <a href="#how-it-works" class="hover:text-[#0071e3] transition-colors">{{ $isAr ? 'كيف نعمل' : 'How it Works' }}</a>
@@ -63,7 +63,7 @@
     <!-- Mobile Navigation Dropdown -->
     <div id="mobile-home-menu" class="hidden md:hidden border-t border-gray-100 bg-white/98 backdrop-blur-md px-6 py-5 space-y-3 shadow-lg text-[15px] font-medium text-[#1d1d1f]">
         <a href="/about/mahmoud-amin" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'من نحن' : 'About us' }}</a>
-        <a href="#services-overview" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'الخدمات' : 'Services' }}</a>
+        <a href="{{ route('services.index') }}" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'الخدمات' : 'Services' }}</a>
         <a href="#case-studies" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'أعمالنا' : 'Case Studies' }}</a>
         <a href="/compare/laravel-vs-nodejs" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'المدونة' : 'Blog' }}</a>
         <a href="#how-it-works" onclick="document.getElementById('mobile-home-menu').classList.add('hidden')" class="block py-2 hover:text-[#0071e3] border-b border-gray-50">{{ $isAr ? 'كيف نعمل' : 'How it Works' }}</a>
@@ -326,6 +326,13 @@
                     <span class="w-12 h-0.5 bg-slate-200"></span>
                     <span>05</span>
                 </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <a href="{{ route('services.index') }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-[15px] font-semibold hover:bg-[#0077ed] transition">
+                    {{ $isAr ? 'تصفح كل البرامج والخدمات' : 'Browse all programs and services' }}
+                    <span class="rtl:rotate-180">→</span>
+                </a>
             </div>
 
         </div>
@@ -1941,7 +1948,7 @@
                 </h4>
                 <ul class="space-y-2.5 text-[13px] text-[#6e6e73]">
                     <li><a href="/about/mahmoud-amin" class="hover:text-[#0071e3] transition">{{ $isAr ? 'من نحن' : 'About Us' }}</a></li>
-                    <li><a href="#services-overview" class="hover:text-[#0071e3] transition">{{ $isAr ? 'الخدمات' : 'Services' }}</a></li>
+                    <li><a href="{{ route('services.index') }}" class="hover:text-[#0071e3] transition">{{ $isAr ? 'الخدمات' : 'Services' }}</a></li>
                     <li><a href="#case-studies" class="hover:text-[#0071e3] transition">{{ $isAr ? 'أعمالنا' : 'Case Studies' }}</a></li>
                     <li><a href="#how-it-works" class="hover:text-[#0071e3] transition">{{ $isAr ? 'كيف نعمل' : 'How it works' }}</a></li>
                     <li><a href="/compare/laravel-vs-nodejs" class="hover:text-[#0071e3] transition">{{ $isAr ? 'المدونة والتوثيق' : 'Blog' }}</a></li>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\ProcessWinbackStageJob;
+use App\Models\ClientSoftwareWinbackLog;
 use App\Models\User;
 use App\Models\WinbackEngagement;
 use App\Models\WinbackStage;
@@ -21,6 +22,7 @@ class WinbackService extends BaseService
         $user->save();
 
         WinbackEngagement::markRecovered($user->id, $activityType);
+        ClientSoftwareWinbackLog::markRecovered($user->id, $activityType);
     }
 
     /**

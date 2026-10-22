@@ -97,6 +97,13 @@ Schedule::command(\App\Console\Commands\DeductOverdueInvoiceLoyaltyPenalties::cl
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
+// Client software winback campaigns daily at 09:30 Cairo Time
+Schedule::command(\App\Console\Commands\ProcessClientSoftwareWinback::class)
+    ->dailyAt('09:30')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(5);
+
+
 
 
 

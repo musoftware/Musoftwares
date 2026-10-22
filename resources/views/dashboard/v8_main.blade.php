@@ -1463,7 +1463,7 @@
             </a>
 
             <!-- Cube 13: Marketplace / Store -->
-            <a href="{{ url('/marketplace/services') }}" class="orbital-node" data-node="13">
+            <a href="{{ url('/marketplace/catalog') }}" class="orbital-node" data-node="13">
                 <div class="cube-3d-scene cube-theme-amber">
                     <div class="cube-3d">
                         <div class="cube-face cube-face-front">

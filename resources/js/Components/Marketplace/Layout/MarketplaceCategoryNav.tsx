@@ -47,7 +47,7 @@ export default function MarketplaceCategoryNav() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <nav aria-label={__('marketplace.category_nav_label')} className="flex items-center h-11 overflow-x-auto no-scrollbar gap-1.5 sm:gap-2 py-1">
                     <Link
-                        href="/marketplace/services"
+                        href="/marketplace/catalog"
                         className={`inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold px-3 py-1.5 rounded-full transition-all shrink-0 ${
                             !activeCategory
                                 ? 'bg-indigo-600 text-white shadow-2xs'
@@ -86,7 +86,7 @@ export default function MarketplaceCategoryNav() {
                             return (
                                 <Link
                                     key={category.id || category.slug || category.name}
-                                    href={`/marketplace/services?category=${encodeURIComponent(category.slug || category.id || '')}`}
+                                    href={`/marketplace/catalog?category=${encodeURIComponent(category.slug || category.id || '')}`}
                                     className={`whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full transition-all shrink-0 ${
                                         isActive
                                             ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200/80 dark:border-indigo-800/80'

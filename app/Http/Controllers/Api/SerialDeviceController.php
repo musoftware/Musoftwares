@@ -268,7 +268,25 @@ class SerialDeviceController extends Controller
             'trial_days'           => $trialDays,
             'trial_claimed'        => $trialClaimed,
             'can_claim_trial'      => $canClaimTrial,
+            'purchase_url'         => $this->storePurchaseUrl($software, $validated['device_id'], $status),
         ]);
+    }
+
+    /**
+     * Landing page of the store product linked to this software, so the desktop program
+     * can send the buyer there with the device id and the payment activates it by itself.
+     */
+    private function storePurchaseUrl(SerialSoftware $software, string $deviceId, string $status): ?string
+    {
+        if ($status === SerialDevice::STATUS_ACTIVE || ! class_exists(\Modules\SoftwareStore\Models\SoftwareProduct::class)) {
+            return null;
+        }
+
+        $product = \Modules\SoftwareStore\Models\SoftwareProduct::where('serial_software_id', $software->id)
+            ->where('is_active', true)
+            ->first();
+
+        return $product?->purchaseUrl($deviceId);
     }
 
     /**

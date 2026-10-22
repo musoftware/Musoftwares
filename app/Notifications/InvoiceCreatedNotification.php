@@ -34,7 +34,10 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $invoice = $this->invoice;
-        $invoiceNumber = $invoice->invoice_number ?? '#'.($invoice->id ?? '');
+        $invoiceNumber = '#' . ($invoice->id ?? '');
+        $issueDate = $invoice->created_at
+            ? \Carbon\Carbon::parse($invoice->created_at)->setTimezone('Africa/Cairo')->format('M d, Y')
+            : \Carbon\Carbon::now('Africa/Cairo')->format('M d, Y');
         $dueDate = $invoice->due_date 
             ? \Carbon\Carbon::parse($invoice->due_date)->setTimezone('Africa/Cairo')->format('Y-m-d') 
             : \Carbon\Carbon::now('Africa/Cairo')->addDays(7)->format('Y-m-d');
@@ -63,7 +66,7 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
         $potentialEarlyPoints = (int) round($basePoints * 2.0);
 
         return (new MailMessage)
-            ->subject(__('general.notif_invoice_created_subject') . ' — ' . $invoiceNumber)
+            ->subject(__('general.notif_invoice_created_subject') . ' — ' . $invoiceNumber . ' (' . $issueDate . ')')
             ->view('emails.invoices.created_with_loyalty', [
                 'clientName' => $notifiable->name ?? 'Valued Client',
                 'invoiceNumber' => $invoiceNumber,
@@ -81,9 +84,11 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
 
     public function toFcm(object $notifiable)
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+
         return $this->fcmMessage(
             __('general.notif_invoice_created_title'),
-            __('general.notif_invoice_created_body', ['invoice' => ($this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''))]),
+            __('general.notif_invoice_created_body', ['invoice' => $invoiceNumber]),
             [
                 'url' => '/app/invoices/'.($this->invoice->id ?? ''),
                 'type' => 'invoice_created',
@@ -97,12 +102,13 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
      */
     public function toSms(object $notifiable): ?string
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
         $amount = $this->invoice->total() ?? $this->invoice->unpaid ?? '';
         $currency = $this->invoice->currency_id ?? '';
 
         return sprintf(
             'New invoice %s for %s %s. View: %s',
-            $this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''),
+            $invoiceNumber,
             $amount,
             $currency,
             url('/app/invoices/'.($this->invoice->id ?? ''))
@@ -114,10 +120,12 @@ class InvoiceCreatedNotification extends Notification implements ShouldQueue
      */
     public function toWhatsapp(object $notifiable): ?string
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+
         return sprintf(
             "%s\nInvoice %s has been created.\nView: %s",
             __('general.hello_name', ['name' => $notifiable->name ?? '']),
-            $this->invoice->invoice_number ?? '#'.($this->invoice->id ?? ''),
+            $invoiceNumber,
             url('/app/invoices/'.($this->invoice->id ?? ''))
         );
     }

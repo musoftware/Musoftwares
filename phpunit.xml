@@ -55,6 +55,9 @@
         <testsuite name="Fbmb">
             <directory>Modules/Fbmb/Tests/Feature</directory>
         </testsuite>
+        <testsuite name="SoftwareStore">
+            <directory>Modules/SoftwareStore/Tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

@@ -95,6 +95,8 @@ const items: MenuItem[] = [
     icon: Briefcase,
     subItems: [
         { title: "admin.sidebar_bulk_notify", url: "/admin/notifications/broadcast" },
+        { title: "admin.sidebar_winback_campaigns", url: "/admin/winback" },
+        { title: "admin.sidebar_software_products", url: "/admin/software-products" },
         { title: "admin.sidebar_website_services", url: "/admin/website-services" },
         { title: "admin.sidebar_micro_services", url: "/admin/micro-services" },
         { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets" },
@@ -171,6 +173,7 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_partner_gateway_b2b_api", url: "/admin/partner-gateway" },
         { title: "admin.sidebar_settings", url: "/admin/settings" },
         { title: "admin.sidebar_security_rate_limits", url: "/admin/settings/security" },
+        { title: "admin.sidebar_migrations", url: "/admin/system/migrations" },
     ]
   },
 ];

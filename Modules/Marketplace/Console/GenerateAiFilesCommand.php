@@ -2,6 +2,9 @@
 
 namespace Modules\Marketplace\Console;
 
+use Modules\SoftwareStore\Models\SoftwareProduct;
+use Modules\SoftwareStore\Services\StoreSeo;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Modules\Marketplace\Models\Service;
@@ -32,7 +35,7 @@ class GenerateAiFilesCommand extends Command
     {
         $this->info('Generating Marketplace AI & SEO static files...');
 
-        $baseUrl = config('app.url', 'https://musoftwares.com');
+        $baseUrl = $this->publicBaseUrl();
         $wellKnownDir = public_path('.well-known');
 
         if (!File::exists($wellKnownDir)) {
@@ -145,7 +148,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put(public_path('llms.txt'), $llmsContent);
+        File::put(public_path('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false));
         $this->info('Created public/llms.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -207,7 +210,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullContent .= "- **Content**:\n{$cleanBody}\n\n";
         }
 
-        File::put(public_path('llms-full.txt'), $llmsFullContent);
+        File::put(public_path('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true));
         $this->info('Created public/llms-full.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -264,7 +267,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put(public_path('llms-ar.txt'), $llmsArContent);
+        File::put(public_path('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false));
         $this->info('Created public/llms-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -329,7 +332,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullArContent .= "- **محتوى المقال**:\n{$cleanBody}\n\n";
         }
 
-        File::put(public_path('llms-full-ar.txt'), $llmsFullArContent);
+        File::put(public_path('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true));
         $this->info('Created public/llms-full-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -411,16 +414,22 @@ class GenerateAiFilesCommand extends Command
         $robotsContent .= "# English: {$baseUrl}/llms.txt\n";
         $robotsContent .= "# Arabic: {$baseUrl}/llms-ar.txt\n\n";
 
-        $robotsContent = "User-agent: *\n";
+        $robotsContent .= "User-agent: *\n";
         $robotsContent .= "Allow: /\n";
         $robotsContent .= "Disallow: /admin/\n";
         $robotsContent .= "Disallow: /seller/\n";
-        $robotsContent .= "Disallow: /marketplace/dashboard\n\n";
+        $robotsContent .= "Disallow: /marketplace/dashboard\n";
+        $robotsContent .= "Disallow: /software-orders/\n";
+        $robotsContent .= "Disallow: /updates/\n\n";
 
         $robotsContent .= "User-agent: GPTBot\n";
         $robotsContent .= "Allow: /\n";
         $robotsContent .= "Disallow: /admin/\n";
         $robotsContent .= "Disallow: /seller/\n\n";
+
+        foreach (['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot'] as $agent) {
+            $robotsContent .= "User-agent: {$agent}\nAllow: /\nDisallow: /admin/\nDisallow: /seller/\nDisallow: /software-orders/\nDisallow: /updates/\n\n";
+        }
 
         $robotsContent .= "User-agent: ClaudeBot\n";
         $robotsContent .= "Allow: /\n";
@@ -443,5 +452,55 @@ class GenerateAiFilesCommand extends Command
 
         $this->info('All Marketplace AI & SEO static files generated successfully!');
         return 0;
+    }
+
+    /** Settings can say "localhost" on a developer PC. Search engines and AI assistants must never read that. */
+    private function publicBaseUrl(): string
+    {
+        $url = rtrim((string) config('app.url'), '/');
+
+        return ($url === '' || preg_match('~//(localhost|127\.0\.0\.1)~', $url)) ? 'https://www.musoftwares.com' : $url;
+    }
+
+    /** Programs and services of the software store, in Markdown for AI assistants. */
+    private function storeSection(string $baseUrl, string $lang, bool $full): string
+    {
+        if (! class_exists(SoftwareProduct::class)) {
+            return '';
+        }
+
+        try {
+            $products = SoftwareProduct::where('is_active', true)->orderBy('sort_order')->get();
+        } catch (\Throwable $e) {
+            return '';
+        }
+
+        $isArabic = $lang === 'ar';
+        $previous = app()->getLocale();
+        app()->setLocale($lang);
+        // route() must print the public address even when this runs on a PC with a local APP_URL
+        \Illuminate\Support\Facades\URL::forceRootUrl($baseUrl);
+
+        $out = "\n## ".($isArabic ? 'البرامج والخدمات' : 'Programs and Services')."\n\n";
+        $out .= ($isArabic ? 'كل صفحة ليها نسخة Markdown كاملة بنفس الرابط وفي آخره .md' : 'Every page has a full Markdown copy at the same address ending in .md')."\n\n";
+        $seo = app(StoreSeo::class);
+
+        foreach ($products as $product) {
+            $url = "{$baseUrl}/services/{$product->slug}";
+            $out .= "### {$product->localized('name')}\n";
+            $out .= "- ".($isArabic ? 'الصفحة' : 'Page').": {$url}?lang={$lang}\n";
+            $out .= "- Markdown: {$url}.md?lang={$lang}\n";
+            $out .= "- ".($isArabic ? 'السعر' : 'Price').": {$seo->priceText($product)}\n";
+            $out .= "- ".($isArabic ? 'الوصف' : 'Summary').": {$product->localized('tagline')}\n\n";
+
+            if ($full) {
+                $out .= trim($seo->markdown($product))."\n\n";
+            }
+        }
+
+        app()->setLocale($previous);
+        \Illuminate\Support\Facades\URL::forceRootUrl(null);
+
+        return $out;
     }
 }

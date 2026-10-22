@@ -182,7 +182,7 @@ export default function MarketplaceDashboard({
 
                                 {isBuyer ? (
                                     <Link
-                                        href="/marketplace/services"
+                                        href="/marketplace/catalog"
                                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors shadow-sm"
                                     >
                                         <Search className="w-3.5 h-3.5" />
@@ -288,7 +288,7 @@ export default function MarketplaceDashboard({
                                             </p>
                                         </div>
                                         <Link
-                                            href="/marketplace/services"
+                                            href="/marketplace/catalog"
                                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors shadow-sm"
                                         >
                                             <Search className="w-4 h-4" />

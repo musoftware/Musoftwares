@@ -58,6 +58,8 @@ class User extends Authenticatable
         'lifetime_spend',
         'profile_completion_percentage',
         'last_activity_type',
+        'last_activity_at',
+        'last_login',
         'winback_unsubscribed_at',
     ];
 
@@ -110,6 +112,8 @@ class User extends Authenticatable
             'loyalty_points_balance'        => 'integer',
             'loyalty_lifetime_points'       => 'integer',
             'loyalty_tier_id'               => 'integer',
+            'last_activity_at'              => 'datetime',
+            'last_login'                    => 'datetime',
             'winback_unsubscribed_at'       => 'datetime',
         ];
     }
@@ -517,12 +521,18 @@ class User extends Authenticatable
         return $this->hasMany(UserReferralRequestWithdraw::class);
     }
 
-    public function my_ref_users()
+    /**
+     * @return HasMany<User, $this>
+     */
+    public function my_ref_users(): HasMany
     {
         return $this->hasMany(User::class, 'ref_user_id');
     }
 
-    public function referrals()
+    /**
+     * @return HasMany<UserReferral, $this>
+     */
+    public function referrals(): HasMany
     {
         return $this->hasMany(UserReferral::class, 'user_id');
     }

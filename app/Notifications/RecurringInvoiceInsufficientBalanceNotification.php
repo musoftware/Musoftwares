@@ -29,7 +29,7 @@ class RecurringInvoiceInsufficientBalanceNotification extends Notification imple
 
     public function toFcm(object $notifiable)
     {
-        $invoiceNum = $this->invoice->invoice_number ?? '#'.$this->invoice->id;
+        $invoiceNum = '#' . $this->invoice->id;
         $amount = (float) ($this->invoice->unpaid > 0 ? $this->invoice->unpaid : $this->invoice->total());
         $currencyId = $this->invoice->currency_id ?? $notifiable->currency_id;
         $formattedAmount = FinanceHelper::instance()->format_money($amount, $currencyId);
@@ -47,7 +47,7 @@ class RecurringInvoiceInsufficientBalanceNotification extends Notification imple
 
     public function toArray(object $notifiable): array
     {
-        $invoiceNum = $this->invoice->invoice_number ?? '#'.$this->invoice->id;
+        $invoiceNum = '#' . $this->invoice->id;
 
         return [
             'invoice_id' => $this->invoice->id,

@@ -10,5 +10,6 @@
     "WhatsappSender": true,
     "Listing": true,
     "Series": true,
-    "DigitalProducts": true
+    "DigitalProducts": true,
+    "SoftwareStore": true
 }

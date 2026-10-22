@@ -55,8 +55,11 @@ class UsersController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
+        $staffRoles = ['super_admin', 'Admin', 'tenant_admin', 'Manager', 'accountant', 'Employee', 'moderator', 'support_agent'];
+        $validTypes = ['customers', 'leads', 'top_clients', 'staff_leaders', 'affiliate_leaders'];
+
         $type = $request->get('type', 'customers');
-        if (! in_array($type, ['customers', 'leads'])) {
+        if (! in_array($type, $validTypes)) {
             $type = 'customers';
         }
 
@@ -79,7 +82,7 @@ class UsersController extends Controller
 
         // Role filter
         if ($role = $request->get('role')) {
-            $baseQuery->role($role); // Spatie HasRoles scope
+            $baseQuery->whereHas('roles', fn ($q) => $q->where('name', $role));
         }
 
         // Account status filter
@@ -100,35 +103,79 @@ class UsersController extends Controller
                 $q->whereHas('transactions')->orWhereHas('invoices');
             })->count(),
             'leads' => (clone $baseQuery)->whereDoesntHave('transactions')->whereDoesntHave('invoices')->count(),
+            'top_clients' => (clone $baseQuery)->where(function ($q) {
+                $q->whereHas('transactions')->orWhereHas('invoices');
+            })->count(),
+            'staff_leaders' => (clone $baseQuery)->whereHas('roles', fn ($q) => $q->whereIn('name', $staffRoles))->count(),
+            'affiliate_leaders' => (clone $baseQuery)->has('my_ref_users')->count(),
         ];
 
-        // Apply tab scope (Customers vs Leads)
+        // Apply tab scope
         $query = (clone $baseQuery)->with(['roles', 'loyaltyTier']);
         if ($type === 'customers') {
             $query->where(function ($q) {
                 $q->whereHas('transactions')->orWhereHas('invoices');
             });
-        } else {
+        } elseif ($type === 'leads') {
             $query->whereDoesntHave('transactions')->whereDoesntHave('invoices');
+        } elseif ($type === 'top_clients') {
+            $query->where(function ($q) {
+                $q->whereHas('transactions')->orWhereHas('invoices');
+            })
+            ->withSum(['transactions as total_spent' => function ($tq) {
+                $tq->where('type', 'received');
+            }], 'business_amount')
+            ->withCount('invoices');
+        } elseif ($type === 'staff_leaders') {
+            $query->whereHas('roles', fn ($q) => $q->whereIn('name', $staffRoles));
+        } elseif ($type === 'affiliate_leaders') {
+            $query->has('my_ref_users')
+                ->withCount('my_ref_users');
         }
 
         // Sorting
-        $sortable = ['name', 'email', 'created_at', 'id', 'last_activity_at'];
-        $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
-        // The old system defaulted to ASC sorting for users
-        $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
-        $query->orderBy($sort, $direction);
+        $sortable = ['name', 'email', 'created_at', 'id', 'last_activity_at', 'total_spent', 'invoices_count', 'my_ref_users_count', 'loyalty_points_balance'];
+        $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : null;
+
+        if ($sort) {
+            $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
+            if ($sort === 'total_spent') {
+                $query->orderByRaw('COALESCE(total_spent, 0) ' . $direction);
+            } elseif ($sort === 'my_ref_users_count') {
+                $query->orderBy('my_ref_users_count', $direction);
+            } else {
+                $query->orderBy($sort, $direction);
+            }
+        } else {
+            if ($type === 'top_clients') {
+                // Top spenders ordered from strongest to lowest
+                $query->orderByRaw('COALESCE(total_spent, 0) desc')->orderBy('id', 'asc');
+            } elseif ($type === 'affiliate_leaders') {
+                // Top affiliates ordered by referrals from strongest to lowest
+                $query->orderBy('my_ref_users_count', 'desc')->orderBy('id', 'asc');
+            } elseif ($type === 'staff_leaders') {
+                $query->orderBy('id', 'asc');
+            } else {
+                // The old system defaulted to ASC sorting for users
+                $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
+                $query->orderBy('id', $direction);
+            }
+        }
 
         $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
 
         // Dynamic statistics computed for the active tab scope
         $statsQuery = clone $baseQuery;
-        if ($type === 'customers') {
+        if ($type === 'customers' || $type === 'top_clients') {
             $statsQuery->where(function ($q) {
                 $q->whereHas('transactions')->orWhereHas('invoices');
             });
-        } else {
+        } elseif ($type === 'leads') {
             $statsQuery->whereDoesntHave('transactions')->whereDoesntHave('invoices');
+        } elseif ($type === 'staff_leaders') {
+            $statsQuery->whereHas('roles', fn ($q) => $q->whereIn('name', $staffRoles));
+        } elseif ($type === 'affiliate_leaders') {
+            $statsQuery->has('my_ref_users');
         }
 
         $stats = [
@@ -147,11 +194,14 @@ class UsersController extends Controller
             ['type' => $type]
         );
 
+        $businessCurrency = Currency::findCached(\App\Models\AdminSettings::GetValue('business_currency', 2))?->currency ?? 'EGP';
+
         return Inertia::render('Admin/Users/Index', [
             'clients' => $users,
             'filters' => $filters,
             'tabCounts' => $tabCounts,
             'stats' => $stats,
+            'businessCurrency' => $businessCurrency,
         ]);
     }
 

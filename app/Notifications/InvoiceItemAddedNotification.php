@@ -30,9 +30,11 @@ class InvoiceItemAddedNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $title = ($this->item->item_title ?? __('general.notif_invoice_item_added_title'));
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+        $date = \Carbon\Carbon::now('Africa/Cairo')->format('M d, Y');
 
         return (new MailMessage)
-            ->subject(__('general.notif_invoice_item_added_subject'))
+            ->subject(__('general.notif_invoice_item_added_subject') . ' — ' . $invoiceNumber . ' (' . $date . ')')
             ->greeting(__('general.hello_name', ['name' => $notifiable->name ?? '']))
             ->line(__('general.notif_invoice_item_added_body', ['item' => $title]))
             ->action(__('general.view_invoice'), url('/app/invoices/'.($this->invoice->id ?? '')));

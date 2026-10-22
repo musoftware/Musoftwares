@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminBlogArticleController;
 use App\Http\Controllers\Admin\AdminBusyTimesController;
+use App\Http\Controllers\Admin\AdminClientSoftwareWinbackController;
 use App\Http\Controllers\Admin\AdminContractController;
 use App\Http\Controllers\Admin\AdminCouponController;
 use App\Http\Controllers\Admin\AdminCurrencyController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Admin\AdminPointPackageController;
 use App\Http\Controllers\Admin\AdminPointsController;
 use App\Http\Controllers\Admin\AdminPromptController;
 use App\Http\Controllers\Admin\AdminQuotationController;
+use App\Http\Controllers\Admin\AdminMigrationController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminTaskController;
 use App\Http\Controllers\Admin\AdminTicketController;
@@ -126,8 +128,6 @@ use Modules\Marketplace\Http\Controllers\ServiceReviewController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
-Route::get('/services', [HomeController::class, 'services'])->name('services.index');
-Route::get('/services/{slug}', [HomeController::class, 'websiteServiceShow'])->name('website-services.show');
 
 // Public Contract Links
 Route::get('/c/{uuid}', [ClientContractController::class, 'show'])->name('client.contract.show');
@@ -632,6 +632,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/email-templates/{key}/preview', [AdminEmailTemplateController::class, 'preview'])->name('email-templates.preview');
     Route::post('/email-templates/{key}/send-test', [AdminEmailTemplateController::class, 'sendTest'])->name('email-templates.send-test');
 
+    // ── Client Software Winback Campaigns ───────────────────────────
+    Route::get('/winback', [AdminClientSoftwareWinbackController::class, 'index'])->name('winback.index');
+    Route::post('/winback/run', [AdminClientSoftwareWinbackController::class, 'runAll'])->name('winback.run');
+    Route::post('/winback/users/{user}/send', [AdminClientSoftwareWinbackController::class, 'sendToUser'])->name('winback.send-user');
+    Route::get('/winback/preview', [AdminClientSoftwareWinbackController::class, 'preview'])->name('winback.preview');
+
     // Clients (thin ERP-linked view) - removed as per request
 
     // KYC Review
@@ -749,6 +755,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('settings/calculate-hourly-rate', [AdminSettingController::class, 'calculateHourlyRate'])->name('settings.calculate-hourly-rate');
 
     Route::post('settings/sync-exchange-rates', [AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-exchange-rates');
+    Route::get('system/migrations', [AdminMigrationController::class, 'index'])->name('system.migrations');
+    Route::post('system/migrate', [AdminMigrationController::class, 'run'])->middleware('throttle:3,1')->name('system.migrate');
 
     Route::resource('language-lines', AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');

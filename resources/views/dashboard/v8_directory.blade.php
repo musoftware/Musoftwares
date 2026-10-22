@@ -333,7 +333,7 @@
                         </div>
                     </div>
                     <div class="mt-2 mt-md-0">
-                        <a href="{{ url('/marketplace/services') }}" class="btn-launch">Browse Marketplace ➔</a>
+                        <a href="{{ url('/marketplace/catalog') }}" class="btn-launch">Browse Marketplace ➔</a>
                     </div>
                 </div>
 

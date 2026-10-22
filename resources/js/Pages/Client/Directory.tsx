@@ -30,7 +30,7 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     { id: 'gold_pos', category: 'pos_engine', icon: Coins, href: '/sso/goldsaversys' },
     { id: 'affiliate_pos', category: 'pos_engine', icon: Share2, href: '/sso/affsys' },
     { id: 'contracts', category: 'legal', icon: FileCheck2, href: '/isaas/contracts' },
-    { id: 'marketplace', category: 'app_store', icon: ShoppingBag, href: '/marketplace/services', badge: 'store' },
+    { id: 'marketplace', category: 'app_store', icon: ShoppingBag, href: '/marketplace/catalog', badge: 'store' },
     { id: 'seller', category: 'app_store', icon: Store, href: '/marketplace/dashboard' },
     { id: 'recharge', category: 'finance', icon: Wallet, href: '/financial/add-balance' },
     { id: 'invoices', category: 'finance', icon: FileText, href: '/billing/invoices' },

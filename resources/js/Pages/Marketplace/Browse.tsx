@@ -110,7 +110,7 @@ export default function Browse({ services, categories, filters }: any) {
             <SeoHead
                 title={`${__('general.software_services_marketplace')} | MuSoftwares`}
                 description={__('general.marketplace_seo_description')}
-                canonicalUrl="https://www.musoftwares.com/marketplace/services"
+                canonicalUrl="https://www.musoftwares.com/marketplace/catalog"
                 type="website"
                 jsonLd={jsonLd}
             />

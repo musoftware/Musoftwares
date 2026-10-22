@@ -132,7 +132,7 @@ class NewsAggregatorService
                     'title' => 'Commodity Exchange & Real-Time Gold POS Terminal',
                     'description' => 'Sub-second market price streaming, hardware printer synchronizers, and offline-first edge resilience.',
                     'image' => '/images/hero/hero_fintech.jpg',
-                    'link' => '/marketplace/services',
+                    'link' => '/marketplace/catalog',
                     'linkText' => 'Explore Marketplace ➔',
                     'badge' => 'Marketplace',
                 ],

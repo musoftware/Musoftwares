@@ -161,4 +161,19 @@ class AdminUserUILinksTest extends TestCase
         $response = $this->actingAs($this->admin)->get('/admin/transactions?user='.$this->clientUser->id);
         $response->assertStatus(200);
     }
+
+    public function test_admin_can_view_users_tabs_for_leaderships_and_top_performers()
+    {
+        // Top clients tab
+        $response = $this->actingAs($this->admin)->get('/admin/users?type=top_clients');
+        $response->assertStatus(200);
+
+        // Staff leaders tab
+        $response = $this->actingAs($this->admin)->get('/admin/users?type=staff_leaders');
+        $response->assertStatus(200);
+
+        // Affiliate leaders tab
+        $response = $this->actingAs($this->admin)->get('/admin/users?type=affiliate_leaders');
+        $response->assertStatus(200);
+    }
 }

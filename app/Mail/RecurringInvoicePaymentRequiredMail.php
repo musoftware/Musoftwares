@@ -22,10 +22,13 @@ class RecurringInvoicePaymentRequiredMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $invoiceNum = $this->invoice->invoice_number ?? '#'.$this->invoice->id;
+        $invoiceNum = '#' . $this->invoice->id;
+        $date = $this->invoice->created_at
+            ? \Carbon\Carbon::parse($this->invoice->created_at)->setTimezone('Africa/Cairo')->format('M d, Y')
+            : \Carbon\Carbon::now('Africa/Cairo')->format('M d, Y');
 
         return new Envelope(
-            subject: "Payment Required: Invoice {$invoiceNum}",
+            subject: "Payment Required: Invoice {$invoiceNum} ({$date})",
         );
     }
 
@@ -51,7 +54,7 @@ class RecurringInvoicePaymentRequiredMail extends Mailable
             view: 'emails.recurring_invoice_payment_required',
             with: [
                 'userName' => $this->user->name ?? 'Customer',
-                'invoiceNumber' => $this->invoice->invoice_number ?? (string) $this->invoice->id,
+                'invoiceNumber' => '#' . $this->invoice->id,
                 'invoiceTitle' => $invoiceTitle,
                 'invoiceAmount' => $formattedAmount,
                 'userBalance' => $formattedBalance,

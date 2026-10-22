@@ -23,7 +23,11 @@ Route::middleware('web')
 
         // ── Public Pages & Semantic Routes ───────────────────────────────
         Route::get('/', [ServiceController::class, 'index'])->name('index');
-        Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+        Route::get('/catalog', [ServiceController::class, 'index'])->name('services.index');
+        Route::get('/services', fn (\Illuminate\Http\Request $request) => redirect()->to(
+            route('marketplace.services.index', $request->query()),
+            301
+        ))->name('services.legacy');
         Route::get('/categories/{slug}', [ServiceCategoryController::class, 'showCategory'])->name('categories.show');
         Route::get('/technologies/{tag}', [ServiceController::class, 'showTechnology'])->name('technologies.show');
         Route::get('/integrations/{tag}', [ServiceController::class, 'showIntegration'])->name('integrations.show');

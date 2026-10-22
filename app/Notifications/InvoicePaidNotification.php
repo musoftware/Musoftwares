@@ -28,8 +28,13 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+        $paidDate = $this->invoice->paid_at
+            ? \Carbon\Carbon::parse($this->invoice->paid_at)->setTimezone('Africa/Cairo')->format('M d, Y')
+            : \Carbon\Carbon::now('Africa/Cairo')->format('M d, Y');
+
         return (new MailMessage)
-            ->subject('Payment Received: '.($this->invoice->invoice_number ?? 'Invoice'))
+            ->subject('Payment Received: ' . $invoiceNumber . ' (' . $paidDate . ')')
             ->greeting('Hello '.($notifiable->name ?? 'Customer').',')
             ->line('We have successfully received your payment of '.FinanceHelper::instance()->format_money($this->invoice->amount ?? $this->invoice->total ?? 0, $this->invoice->currency_id ?? null).'.')
             ->line(__('general.thank_you_for_your_business'));
@@ -52,11 +57,13 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
 
     public function toArray(object $notifiable): array
     {
+        $invoiceNumber = '#' . ($this->invoice->id ?? '');
+
         return [
             'invoice_id' => $this->invoice->id ?? null,
             'amount' => $this->invoice->amount ?? $this->invoice->total ?? null,
             'currency' => Currency::findCached($this->invoice->currency_id ?? $this->invoice->currency)?->currency,
-            'message' => 'Invoice '.($this->invoice->invoice_number ?? '').' has been marked as paid.',
+            'message' => 'Invoice ' . $invoiceNumber . ' has been marked as paid.',
         ];
     }
 }

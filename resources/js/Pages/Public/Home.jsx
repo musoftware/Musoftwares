@@ -39,7 +39,7 @@ const FEATURED_HERO_SLIDES = [
         description: 'Sub-second market price streaming, hardware printer synchronizers, and offline-first edge resilience.',
         image: '/images/hero/hero_fintech.jpg',
         linkText: 'Explore Marketplace',
-        link: '/marketplace/services',
+        link: '/marketplace/catalog',
         slideNum: '3 / 3'
     }
 ];
