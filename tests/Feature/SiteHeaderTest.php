@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -32,6 +33,13 @@ class SiteHeaderTest extends TestCase
         $this->assertStringContainsString('href="/portfolio"', $html);
         $this->assertStringNotContainsString('mobile-home-menu', $html);
         $this->assertStringNotContainsString('STUDIO', $html);
+    }
+
+    public function test_a_signed_in_user_still_sees_the_homepage_with_a_dashboard_link(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->get('/?lang=en')->assertOk()->assertSee('href="/dashboard"', false);
     }
 
     public function test_react_public_pages_get_the_same_menu_links_from_the_server(): void

@@ -25,10 +25,6 @@ class HomeController extends Controller
 
     public function index(Request $request, \Modules\SoftwareStore\Services\StoreHighlights $store)
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-
         $isAr = app()->getLocale() === 'ar';
 
         return view('public.home', [
