@@ -650,7 +650,7 @@ class SoftwareProductsTest extends TestCase
         $this->assertStringContainsString('البرامج والخدمات', $arabic);
     }
 
-    public function test_the_six_systems_are_sold_as_source_code_or_hosted_for_one_payment(): void
+    public function test_the_six_systems_are_sold_as_source_code_or_with_changes_for_one_payment(): void
     {
         config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
         $this->seed(SoftwareProductSeeder::class);
@@ -659,18 +659,18 @@ class SoftwareProductsTest extends TestCase
         foreach ($slugs as $slug) {
             $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
             $this->assertFalse($product->is_active, 'systems start hidden until media is placed');
-            $this->assertSame([5000.0, 12000.0], array_map('floatval', array_column($product->planList(), 'price')));
-            $this->assertSame(['source', 'hosted'], array_column($product->planList(), 'key'));
+            $this->assertSame([5000.0, 20000.0], array_map('floatval', array_column($product->planList(), 'price')));
+            $this->assertSame(['source', 'custom'], array_column($product->planList(), 'key'));
             $this->assertSame('EGP', $product->saleCurrency());
         }
 
         SoftwareProduct::whereIn('slug', $slugs)->update(['is_active' => true]);
-        $this->get('/services/salon-system?lang=ar')->assertOk()->assertSee('الكود المصدري')->assertSee('النسخة المستضافة')->assertSee('دفعة واحدة');
+        $this->get('/services/salon-system?lang=ar')->assertOk()->assertSee('الكود المصدري')->assertSee('الكود مع التعديلات')->assertSee('دفعة واحدة');
 
-        $this->post('/services/clinic-system/order', $this->clientData() + ['plan_key' => 'hosted'])->assertRedirectContains('payments.kashier.io');
+        $this->post('/services/clinic-system/order', $this->clientData() + ['plan_key' => 'custom'])->assertRedirectContains('payments.kashier.io');
         $order = SoftwareOrder::firstOrFail();
-        $this->assertSame('12000.00', $order->amount);
-        $this->assertSame('hosted', $order->plan_key);
+        $this->assertSame('20000.00', $order->amount);
+        $this->assertSame('custom', $order->plan_key);
         $this->assertNull($order->product->serial_software_id);
     }
 
@@ -682,7 +682,7 @@ class SoftwareProductsTest extends TestCase
         foreach ($slugs as $slug) {
             $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
             $this->assertFalse($product->is_active, 'systems start hidden until media is placed');
-            $this->assertSame([5000.0, 12000.0], array_map('floatval', array_column($product->planList(), 'price')));
+            $this->assertSame([5000.0, 20000.0], array_map('floatval', array_column($product->planList(), 'price')));
         }
 
         SoftwareProduct::whereIn('slug', $slugs)->update(['is_active' => true]);

@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            'siteNav' => fn () => \App\Support\SiteNav::links(),
             'auth' => [
                 'user' => $user ? [
                     'id' => $user->id,

@@ -58,7 +58,7 @@ return [
     ],
     'group_hint' => [
         'programs' => 'Windows programs with a yearly license and automatic updates.',
-        'systems' => 'Full management systems for your business. Buy the source code or a hosted copy, one payment.',
+        'systems' => 'Full management systems for your business. Buy the source code as it is, or with any programming changes you need. One payment.',
         'services' => 'Work done for you by our team, with a clear scope and price.',
     ],
 ];

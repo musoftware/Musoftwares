@@ -3,14 +3,14 @@
 namespace Modules\SoftwareStore\Database\Seeders;
 
 /**
- * Ready-made Laravel systems (the first six here, three more in SystemsCatalogExtra) for small businesses, sold as source code or as a hosted copy.
+ * Ready-made Laravel systems (the first six here, three more in SystemsCatalogExtra) for small businesses, sold as source code as it is, or with the programming changes the buyer needs.
  * The facts come from the systems themselves (README, routes, seeders, tests). Prices are in EGP, one payment.
  */
 class SystemsCatalog
 {
     private const SOURCE_PRICE = 5000;
 
-    private const HOSTED_PRICE = 12000;
+    private const CUSTOM_PRICE = 20000;
 
     /** @return array<int, array<string, mixed>> */
     public static function programs(): array
@@ -49,11 +49,11 @@ class SystemsCatalog
     {
         return [
             ['key' => 'source', 'name' => 'Source code', 'name_ar' => 'الكود المصدري', 'price' => self::SOURCE_PRICE,
-                'description' => 'Full Laravel source code, install guide and demo data. You host it yourself.',
-                'description_ar' => 'كود Laravel كامل مع دليل التركيب وبيانات تجريبية. أنت اللي بتستضيفه.'],
-            ['key' => 'hosted', 'name' => 'Hosted version', 'name_ar' => 'النسخة المستضافة', 'price' => self::HOSTED_PRICE,
-                'description' => 'We install it and host it for you, and you get your owner login.',
-                'description_ar' => 'إحنا بنركّبه ونستضيفه لك، وبتستلم دخول المالك جاهز.'],
+                'description' => 'Full Laravel source code, install guide and demo data, as it is. No modifications. You host it yourself.',
+                'description_ar' => 'كود Laravel كامل مع دليل التركيب وبيانات تجريبية، زي ما هو من غير أي تعديلات. أنت اللي بتستضيفه.'],
+            ['key' => 'custom', 'name' => 'Source code with changes', 'name_ar' => 'الكود مع التعديلات', 'price' => self::CUSTOM_PRICE,
+                'description' => 'The full source code plus any programming change your business needs. Any change request is available. We agree the list with you on WhatsApp.',
+                'description_ar' => 'الكود المصدري كامل مع أي تعديل برمجي يحتاجه شغلك. أي طلب برمجي للتعديل متاح. بنتفق معاك على القائمة على الواتساب.'],
         ];
     }
 
@@ -97,54 +97,54 @@ class SystemsCatalog
             'ar' => [
                 'overview_title' => 'اعرف كل حاجة في دقيقة', 'who' => 'مناسب لمين؟', 'need' => 'محتاج إيه؟', 'after' => 'بعد الدفع إيه اللي بيحصل؟',
                 'need_body' => 'استضافة بتدعم PHP 8.3 وقاعدة بيانات SQLite أو MySQL. التركيب على استضافة عادية (cPanel) من غير Redis ولا خدمات إضافية.',
-                'after_body' => 'بعد الدفع بتبعتلنا رقم طلبك على الواتساب (الزرار بيظهر بعد الدفع)، ونسلمك الكود أو النسخة المستضافة حسب اللي اخترته.',
+                'after_body' => 'بعد الدفع بتبعتلنا رقم طلبك على الواتساب (الزرار بيظهر بعد الدفع)، ونسلمك الكود. لو اخترت الكود مع التعديلات بنتفق معاك على التعديلات المطلوبة ونبدأ فيها.',
                 'problems_kicker' => 'مشاكل الشغل اليومي', 'showcase_kicker' => 'شاشات النظام', 'pillars_kicker' => 'قدرات النظام', 'video_kicker' => 'شوف بنفسك',
                 'video_title' => 'جولة سريعة جوه النظام', 'steps_kicker' => 'خطوات الشراء', 'steps_title' => 'من الدفع للتشغيل في 4 خطوات',
                 'steps' => [
-                    ['title' => 'اختار الطريقة', 'body' => 'كود مصدري أو نسخة مستضافة.'],
+                    ['title' => 'اختار الباقة', 'body' => 'الكود زي ما هو، أو الكود مع تعديلات على مقاس شغلك.'],
                     ['title' => 'ادفع أونلاين', 'body' => 'من غير تسجيل حساب على موقعنا.'],
                     ['title' => 'ابعتلنا رقم طلبك', 'body' => 'على الواتساب بعد الدفع.'],
                     ['title' => 'استلم وشغّل', 'body' => 'بتستلم النظام وتعمل حساب المالك وتبدأ.'],
                 ],
                 'metrics_kicker' => 'ملخص', 'metrics_title' => 'النظام في أرقام', 'gallery_title' => 'صور من النظام',
-                'plans_kicker' => 'طريقة الشراء', 'plans_title' => 'اختار كود مصدري أو نسخة مستضافة', 'period' => 'دفعة واحدة',
+                'plans_kicker' => 'طريقة الشراء', 'plans_title' => 'اختار الكود زي ما هو أو مع تعديلات', 'period' => 'دفعة واحدة',
                 'included' => ['عربي وإنجليزي مع دعم الاتجاه من اليمين', 'دفع نقدي داخل النظام'],
-                'plans_note' => 'السعر دفعة واحدة. الكود المصدري بتستضيفه انت، والنسخة المستضافة بنركّبها لك على دومينك.',
+                'plans_note' => 'السعر دفعة واحدة. الكود بتستضيفه انت. أي طلب برمجي للتعديل متاح في باقة التعديلات.',
                 'details_title' => 'تفاصيل النظام', 'list_title' => 'اللي هتحصل عليه', 'faq_title' => 'أسئلة شائعة',
                 'faq' => [
-                    ['q' => 'إيه الفرق بين الكود المصدري والنسخة المستضافة؟', 'a' => 'الكود المصدري بتستلمه كامل وتركّبه على استضافتك. النسخة المستضافة إحنا بنركّبها ونستضيفها لك وبتستلم رابط ودخول المالك.'],
+                    ['q' => 'إيه الفرق بين الباقتين؟', 'a' => 'باقة 5000 هي الكود المصدري كامل زي ما هو من غير أي تعديلات. باقة 20000 هي نفس الكود مع أي تعديل برمجي يحتاجه نظامك، وأي طلب برمجي للتعديل متاح.'],
                     ['q' => 'التركيب صعب؟', 'a' => 'لا. خطوات التركيب مكتوبة في دليل مرفق: تركيب الحزم، وبناء الواجهة، وملف الإعدادات، وتشغيل قاعدة البيانات، وأمر لإنشاء حساب المالك.'],
                     ['q' => 'النظام بيدعم اللغتين؟', 'a' => 'أيوه، العربي هو الأساسي والإنجليزي متاح، وبيشتغل بالاتجاه من اليمين لليسار.'],
                     ['q' => 'بيدعم دفع أونلاين جوه النظام؟', 'a' => 'لا، الدفع جوه النظام نقدي فقط.'],
                     ['q' => 'لو احتجت مساعدة؟', 'a' => 'كلمنا على الواتساب برقم طلبك.'],
                 ],
-                'cta_kicker' => 'ابدأ النهارده', 'cta_body' => 'اختار الطريقة وادفع. بعد الدفع ابعتلنا رقم طلبك على الواتساب ونسلمك.', 'cta_button' => 'كمّل للدفع',
+                'cta_kicker' => 'ابدأ النهارده', 'cta_body' => 'اختار الباقة وادفع. بعد الدفع ابعتلنا رقم طلبك على الواتساب ونسلمك.', 'cta_button' => 'كمّل للدفع',
             ],
             'en' => [
                 'overview_title' => 'Understand everything in one minute', 'who' => 'Who is it for?', 'need' => 'What do you need?', 'after' => 'What happens after payment?',
                 'need_body' => 'Hosting with PHP 8.3 and an SQLite or MySQL database. It installs on normal shared hosting (cPanel) with no Redis or extra services.',
-                'after_body' => 'After payment you send us your order number on WhatsApp (the button appears after payment), and we deliver the code or the hosted copy, depending on what you chose.',
+                'after_body' => 'After payment you send us your order number on WhatsApp (the button appears after payment), and we deliver the code. If you chose the code with changes, we agree the changes with you and start.',
                 'problems_kicker' => 'Everyday problems', 'showcase_kicker' => 'System screens', 'pillars_kicker' => 'What the system can do', 'video_kicker' => 'See it yourself',
                 'video_title' => 'A quick tour inside the system', 'steps_kicker' => 'How to buy', 'steps_title' => 'From payment to running in 4 steps',
                 'steps' => [
-                    ['title' => 'Choose the way', 'body' => 'Source code or a hosted copy.'],
+                    ['title' => 'Choose the plan', 'body' => 'The code as it is, or the code with changes made for your business.'],
                     ['title' => 'Pay online', 'body' => 'No account needed on our site.'],
                     ['title' => 'Send us your order number', 'body' => 'On WhatsApp after payment.'],
                     ['title' => 'Receive and run', 'body' => 'You get the system, create the owner account and start.'],
                 ],
                 'metrics_kicker' => 'Summary', 'metrics_title' => 'The system in numbers', 'gallery_title' => 'Pictures of the system',
-                'plans_kicker' => 'How to buy', 'plans_title' => 'Choose source code or a hosted copy', 'period' => 'one payment',
+                'plans_kicker' => 'How to buy', 'plans_title' => 'Choose the code as it is, or with changes', 'period' => 'one payment',
                 'included' => ['Arabic and English with right-to-left support', 'Cash payments inside the system'],
-                'plans_note' => 'One payment. You host the source code yourself, and we install the hosted copy on your domain.',
+                'plans_note' => 'One payment. You host the code yourself. Any programming change request is available in the plan with changes.',
                 'details_title' => 'System details', 'list_title' => 'What you get', 'faq_title' => 'Common questions',
                 'faq' => [
-                    ['q' => 'What is the difference between source code and the hosted copy?', 'a' => 'With source code you get everything and install it on your own hosting. For the hosted copy we install and host it for you and you get a link and the owner login.'],
+                    ['q' => 'What is the difference between the two plans?', 'a' => 'The 5,000 plan is the full source code as it is, with no modifications. The 20,000 plan is the same code plus any programming change your system needs. Any change request is available.'],
                     ['q' => 'Is it hard to install?', 'a' => 'No. The steps are in an included guide: install packages, build the front end, set the settings file, run the database and run one command to create the owner account.'],
                     ['q' => 'Does it support both languages?', 'a' => 'Yes. Arabic is the main language and English is available, with right-to-left layout.'],
                     ['q' => 'Does it take online payments inside the system?', 'a' => 'No. Payments inside the system are cash only.'],
                     ['q' => 'What if I need help?', 'a' => 'Message us on WhatsApp with your order number.'],
                 ],
-                'cta_kicker' => 'Start today', 'cta_body' => 'Choose the way and pay. After payment send us your order number on WhatsApp and we deliver.', 'cta_button' => 'Continue to payment',
+                'cta_kicker' => 'Start today', 'cta_body' => 'Choose the plan and pay. After payment send us your order number on WhatsApp and we deliver.', 'cta_button' => 'Continue to payment',
             ],
         ][$lang];
     }

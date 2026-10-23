@@ -23,40 +23,24 @@ class HomeController extends Controller
 {
     use ConvertsCurrency;
 
-    public function index(Request $request, \App\Services\NewsAggregatorService $newsService)
+    public function index(Request $request, \Modules\SoftwareStore\Services\StoreHighlights $store)
     {
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
 
-        $newsFeed = $newsService->getFeaturedNewsFeed();
-
-        $dbProjects = Project::landingPortfolio()->get()->map(function($project) {
-            return [
-                'slug' => Str::slug($project->portfolio_title ?? $project->project_name),
-                'img' => $project->portfolio_image ? asset($project->portfolio_image) : null,
-                'img_original' => is_array($project->portfolio_gallery) && count($project->portfolio_gallery) > 0 
-                    ? asset($project->portfolio_gallery[0]) 
-                    : ($project->portfolio_image ? asset($project->portfolio_image) : null),
-                'title' => $project->portfolio_title ?? $project->project_name,
-                'desc' => $project->portfolio_description ?? $project->description,
-                'cat' => $project->portfolio_category ?? 'Platform',
-                'live_url' => $project->portfolio_live_url,
-                'github_url' => $project->portfolio_github_url,
-                'techs' => $project->portfolio_tech ?? [],
-                'is_db' => true,
-            ];
-        })->toArray();
+        $isAr = app()->getLocale() === 'ar';
 
         return view('public.home', [
-            'dbProjects' => $dbProjects,
-            'newsFeed' => $newsFeed,
-            'title' => app()->getLocale() === 'ar' 
-                ? 'ميوسوفت ويرز | أنظمة سحابية وبرمجة برامج الشركات ERP ومواقع سريعة' 
-                : 'Musoftwares | Enterprise Cloud Systems, ERP & Web Platforms',
-            'description' => app()->getLocale() === 'ar'
-                ? 'استوديو برمجيات متخصص في بناء أنظمة الـ ERP والحسابات، المتاجر والمواقع السريعة، وأتمتة الواتساب. مقرنا بالسويس ونشحن لعملائنا عالمياً.'
-                : 'Boutique software engineering studio crafting enterprise ERP engines, high-speed web platforms, and WhatsApp Cloud APIs in Suez, Egypt.',
+            'storeCounts' => $store->groupCounts(),
+            'featuredProducts' => $store->featured(),
+            'portfolioCount' => count(PortfolioData::all()),
+            'title' => $isAr
+                ? 'موسوفت | أنظمة وبرامج جاهزة بسعر معلن، بتستلم الكود وبتملكه'
+                : 'Musoftware | Ready-made systems and programs with public prices, you own the code',
+            'description' => $isAr
+                ? 'استوديو برمجيات مصري في السويس. أنظمة للصيدليات والمطاعم والعيادات والمراكز، وبرامج سطح مكتب، وخدمات مواقع ومتاجر. أسعار معلنة ودفع أونلاين وتواصل مباشر مع المبرمج.'
+                : 'An Egyptian software studio in Suez. Systems for pharmacies, restaurants, clinics and centers, desktop programs, and website and store services. Public prices, online payment and direct contact with the programmer.',
         ]);
     }
 

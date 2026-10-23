@@ -139,6 +139,37 @@ class PortfolioData
                 ],
             ],
 
+            'zawdha' => [
+                'slug' => 'zawdha',
+                'title_en' => 'Zawdha: Cart-Value App for Salla Stores',
+                'title_ar' => 'زودها: تطبيق زيادة قيمة السلة لمتاجر سلة',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'An app for Salla stores that shows offers to the shopper at the right moment: a countdown for each visitor, buy-together bundles, quantity discounts, a free-shipping bar and product upsell, with no code needed.',
+                'desc_ar' => 'تطبيق لمتاجر سلة يعرض على العميل عروضاً في اللحظة المناسبة: عدّاد تنازلي لكل زائر، واشتري معاً، وخصم الكميات، وشريط الشحن المجاني، وترقية المنتج، من غير أي برمجة.',
+                'img' => '/images/portfolio/zawdha.png',
+                'techs' => ['Salla App Platform', 'OAuth', 'Arabic RTL'],
+                'live_url' => 'https://zawdha.app/',
+                'metrics' => [
+                    'Platform' => 'Salla app store',
+                    'Free trial' => '7 days',
+                    'Billing' => 'Salla official payment',
+                    'Setup' => 'No code needed',
+                ],
+                'highlights_en' => [
+                    'Offers in one app, including: per-visitor countdown, buy together, quantity discounts, free-shipping bar and product upsell.',
+                    'A live preview on the site lets a store owner try the offers before installing.',
+                    'Installed from the Salla app store, with billing, renewal and cancellation handled by Salla.',
+                    'The privacy page says the app does not sell data, does not store the customer personal data in the order, and deletes access tokens on uninstall.',
+                ],
+                'highlights_ar' => [
+                    'عروض في تطبيق واحد، منها: عدّاد تنازلي لكل زائر، واشتري معاً، وخصم الكميات، وشريط الشحن المجاني، وترقية المنتج.',
+                    'معاينة حية في الموقع تخلي صاحب المتجر يجرّب العروض قبل التثبيت.',
+                    'بيتثبّت من متجر تطبيقات سلة، والفوترة والتجديد والإلغاء بتتم عن طريق سلة.',
+                    'صفحة الخصوصية بتقول إن التطبيق لا يبيع البيانات ولا يحفظ بيانات العميل الشخصية في الطلب، وبيحذف رموز الوصول عند الإلغاء.',
+                ],
+            ],
+
             'amc-academy' => [
                 'slug' => 'amc-academy',
                 'title_en' => 'AMC Academy & AMCTasks.com — AI Marketing Automation & Ecosystem',
