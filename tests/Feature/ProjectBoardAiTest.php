@@ -38,7 +38,7 @@ class ProjectBoardAiTest extends TestCase
             'status' => 'open',
             'currency' => 1,
             'ai_enabled' => true,
-            'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
+            'last_ai_charged_at' => now(),
         ]);
 
         AdminSettings::SetValue('default_ai_model', 'openai');

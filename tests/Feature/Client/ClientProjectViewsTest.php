@@ -298,7 +298,7 @@ class ClientProjectViewsTest extends TestCase
         $client = $this->makeClient();
         $project = $this->makeProject($client, [
             'ai_enabled' => true,
-            'last_ai_charged_at' => \Carbon\Carbon::now('Africa/Cairo'),
+            'last_ai_charged_at' => now(),
         ]);
 
         $response = $this->actingAs($client)->post(route('client.projects.comments.store', $project), [
