@@ -32,7 +32,6 @@ class HomeController extends Controller
             'storeFrom' => $store->groupFromPrices(),
             'featuredProducts' => $store->featured(),
             'heroShots' => $store->heroShots(),
-            'portfolioCount' => count(PortfolioData::all()),
             'title' => $isAr
                 ? 'موسوفت | أنظمة وبرامج جاهزة بسعر معلن، بتستلم الكود وبتملكه'
                 : 'Musoftware | Ready-made systems and programs with public prices, you own the code',
