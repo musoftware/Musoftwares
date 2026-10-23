@@ -20,6 +20,16 @@ class StoreHighlights
         return ['programs' => $counts['programs'] ?? 0, 'systems' => $counts['systems'] ?? 0, 'services' => $counts['services'] ?? 0];
     }
 
+    /** @return array<string, float|null> group key => lowest starting price in EGP, null when the group has no EGP product */
+    public function groupFromPrices(): array
+    {
+        $egp = $this->visible()->filter(fn (SoftwareProduct $product) => $product->saleCurrency() === 'EGP');
+
+        return collect(['programs', 'systems', 'services'])
+            ->mapWithKeys(fn (string $group) => [$group => $egp->filter(fn (SoftwareProduct $product) => $product->group() === $group)->min(fn (SoftwareProduct $product) => $product->startingPrice())])
+            ->all();
+    }
+
     /** @return Collection<int, SoftwareProduct> */
     public function featured(): Collection
     {

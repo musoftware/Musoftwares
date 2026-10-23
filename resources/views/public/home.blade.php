@@ -57,6 +57,14 @@
                     <a href="{{ route('services.index') }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('شوف الأنظمة والبرامج والأسعار', 'See the systems, programs and prices') }}</a>
                     <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
                 </div>
+                <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-[#515154]">
+                    @foreach ([$t('سعر معلن قبل الدفع', 'Public price before you pay'), $t('بتملك الكود', 'You own the code'), $t('دفع Kashier من غير حساب', 'Kashier payment, no account')] as $fact)
+                        <li class="flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-[#0071e3]" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            {{ $fact }}
+                        </li>
+                    @endforeach
+                </ul>
             </div>
 
             @if ($heroShots->isNotEmpty())
@@ -125,35 +133,86 @@
                         <span class="text-[40px] font-bold text-[#0071e3] leading-none">{{ $storeCounts[$group['key']] }}</span>
                         <h3 class="mt-4 text-[20px] font-bold">{{ $group['title'] }}</h3>
                         <p class="mt-2 text-[15px] leading-[1.8] text-[#515154] flex-1">{{ $group['body'] }}</p>
-                        <span class="mt-4 text-[14px] font-semibold text-[#0071e3]">{{ $t('تصفح القسم', 'Browse this section') }}</span>
+                        @if (! empty($storeFrom[$group['key']]))
+                            <p class="mt-4 text-[15px] font-semibold">{{ $t('من', 'From') }} {{ number_format($storeFrom[$group['key']]) }} {{ $t('جنيه', 'EGP') }}</p>
+                        @endif
+                        <span class="mt-2 text-[14px] font-semibold text-[#0071e3]">{{ $t('تصفح القسم', 'Browse this section') }}</span>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
 
-    {{-- 4. A few products --}}
+    {{-- 4. Pick your business and see the real product --}}
     @if ($featuredProducts->isNotEmpty())
-        <section class="px-4 sm:px-8 py-14 sm:py-20 bg-[#f5f5f7]">
-            <div class="max-w-[1100px] mx-auto">
-                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-                    <h2 class="text-[28px] sm:text-[36px] font-bold tracking-tight">{{ $t('بعض المنتجات', 'A few of our products') }}</h2>
-                    <a href="{{ route('services.index') }}" class="text-[15px] font-semibold text-[#0071e3] hover:underline">{{ $t('كل المنتجات والخدمات', 'All products and services') }}</a>
-                </div>
-                <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    @foreach ($featuredProducts as $product)
-                        <a href="{{ route('website-services.show', $product->slug) }}" class="bg-white rounded-2xl border border-black/5 p-6 hover:shadow-md transition-shadow flex flex-col gap-4">
-                            <img src="{{ $product->imageUrl() }}" alt="" class="w-14 h-14 object-contain" loading="lazy">
-                            <div class="flex-1">
-                                <h3 class="text-[18px] font-bold">{{ $product->localized('name') }}</h3>
-                                <p class="mt-2 text-[14px] leading-[1.7] text-[#515154]">{{ $product->localized('tagline') }}</p>
+        @php
+            $businessType = [
+                'pharmacy-system' => $t('صيدلية', 'Pharmacy'),
+                'restaurant-pos-system' => $t('مطعم أو كافيه', 'Restaurant or cafe'),
+                'dental-clinic-system' => $t('عيادة أسنان', 'Dental clinic'),
+                'shop-manager-pro' => $t('محل أو سوبر ماركت صغير', 'Small shop or grocery'),
+                'maps-leads-pro' => $t('تسويق وجمع عملاء', 'Marketing and leads'),
+                'company-website-design' => $t('موقع لشركتك', 'A website for your company'),
+            ];
+        @endphp
+        <section id="pick-your-business" class="px-4 sm:px-8 py-14 sm:py-20 bg-[#f5f5f7]">
+            <div class="max-w-[1180px] mx-auto">
+                <h2 class="text-[28px] sm:text-[36px] font-bold tracking-tight">{{ $t('اختار نشاطك وشوف المنتج بنفسك', 'Pick your business and see the product yourself') }}</h2>
+                <p class="mt-3 text-[16px] text-[#515154] max-w-[640px]">{{ $t('دي لقطات حقيقية من كل منتج وهو شغال. اضغط على نشاطك.', 'These are real screenshots of each product while it runs. Tap your type of business.') }}</p>
+
+                <div class="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start" data-business-switcher>
+                    <div class="lg:col-span-5 flex flex-col gap-3" role="tablist" aria-label="{{ $t('نوع النشاط', 'Type of business') }}">
+                        @foreach ($featuredProducts as $i => $product)
+                            <button type="button" role="tab" id="biz-tab-{{ $i }}" aria-controls="biz-panel-{{ $i }}" aria-selected="{{ $i === 0 ? 'true' : 'false' }}" data-index="{{ $i }}"
+                                    class="biz-tab text-start rounded-xl border px-5 py-4 transition-colors bg-white border-black/10 hover:border-[#0071e3] aria-selected:border-[#0071e3] aria-selected:bg-[#eef5fe]">
+                                <span class="block text-[17px] font-bold">{{ $businessType[$product->slug] ?? $product->localized('name') }}</span>
+                                <span class="block mt-1 text-[14px] text-[#515154]">{{ $product->localized('name') }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+
+                    <div class="lg:col-span-7">
+                        @foreach ($featuredProducts as $i => $product)
+                            @php $shots = $product->galleryUrls(); @endphp
+                            <div id="biz-panel-{{ $i }}" role="tabpanel" aria-labelledby="biz-tab-{{ $i }}" data-index="{{ $i }}" @if ($i !== 0) hidden @endif>
+                                <div class="rounded-xl border border-black/10 bg-white shadow-lg overflow-hidden">
+                                    <div class="flex items-center gap-1.5 px-4 h-8 bg-[#f5f5f7] border-b border-black/10" aria-hidden="true">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span>
+                                    </div>
+                                    @if (! empty($shots))
+                                        <img src="{{ $shots[min(1, count($shots) - 1)] }}" alt="{{ $product->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" loading="lazy">
+                                    @endif
+                                </div>
+                                <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div>
+                                        <p class="text-[15px] leading-[1.7] text-[#515154] max-w-[460px]">{{ $product->localized('tagline') }}</p>
+                                        <p class="mt-2 text-[17px] font-semibold">@if ($product->hasPlans())<span class="text-[13px] font-normal text-[#86868b]">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-[13px] font-normal text-[#86868b]">{{ $product->periodLabel() }}</span></p>
+                                    </div>
+                                    <a href="{{ route('website-services.show', $product->slug) }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex shrink-0 items-center justify-center px-6 py-3 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('افتح صفحة المنتج', 'Open the product page') }}</a>
+                                </div>
                             </div>
-                            <p class="text-[16px] font-semibold">@if ($product->hasPlans())<span class="text-[13px] font-normal text-[#86868b]">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-[13px] font-normal text-[#86868b]">{{ $product->periodLabel() }}</span></p>
-                        </a>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
+
+                <p class="mt-10"><a href="{{ route('services.index') }}" class="text-[15px] font-semibold text-[#0071e3] hover:underline">{{ $t('كل المنتجات والخدمات', 'All products and services') }}</a></p>
             </div>
         </section>
+        <script>
+            (function () {
+                var root = document.querySelector('[data-business-switcher]');
+                if (!root) return;
+                var tabs = root.querySelectorAll('.biz-tab');
+                var panels = root.querySelectorAll('[role="tabpanel"]');
+                tabs.forEach(function (tab) {
+                    tab.addEventListener('click', function () {
+                        var index = tab.getAttribute('data-index');
+                        tabs.forEach(function (other) { other.setAttribute('aria-selected', other === tab ? 'true' : 'false'); });
+                        panels.forEach(function (panel) { panel.hidden = panel.getAttribute('data-index') !== index; });
+                    });
+                });
+            })();
+        </script>
     @endif
 
     {{-- 5. How it works --}}
@@ -219,14 +278,19 @@
 
     {{-- 8. Questions --}}
     <section class="px-4 sm:px-8 py-14 sm:py-20 bg-[#f5f5f7]">
-        <div class="max-w-[820px] mx-auto">
-            <h2 class="text-[28px] sm:text-[36px] font-bold tracking-tight">{{ $t('أسئلة بتتسأل كتير', 'Common questions') }}</h2>
-            <div class="mt-8 divide-y divide-black/10 border-y border-black/10">
+        <div class="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div class="lg:col-span-4">
+                <h2 class="text-[28px] sm:text-[36px] font-bold tracking-tight">{{ $t('أسئلة بتتسأل كتير', 'Common questions') }}</h2>
+                <p class="mt-3 text-[16px] leading-[1.8] text-[#515154]">{{ $t('إجابات واضحة قبل ما تدفع. ولو سؤالك مش هنا، اسألنا على واتساب.', 'Clear answers before you pay. If your question is not here, ask us on WhatsApp.') }}</p>
+                <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex text-[15px] font-semibold text-[#0071e3] hover:underline">{{ $t('اسألنا على واتساب', 'Ask us on WhatsApp') }}</a>
+            </div>
+            <div class="lg:col-span-8 space-y-3">
                 @foreach ($faq as $item)
-                    <details class="group py-5">
+                    <details class="group rounded-xl border border-black/10 bg-white px-5 py-4 open:border-[#0071e3]">
                         <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold [&::-webkit-details-marker]:hidden">
                             {{ $item['q'] }}
-                            <svg class="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="shrink-0 w-7 h-7 rounded-full bg-[#f5f5f7] flex items-center justify-center text-[#0071e3] text-[18px] leading-none group-open:hidden" aria-hidden="true">+</span>
+                            <span class="shrink-0 w-7 h-7 rounded-full bg-[#eef5fe] items-center justify-center text-[#0071e3] text-[18px] leading-none hidden group-open:flex" aria-hidden="true">&minus;</span>
                         </summary>
                         <p class="mt-3 text-[15px] leading-[1.9] text-[#515154]">{{ $item['a'] }}</p>
                     </details>
@@ -236,13 +300,13 @@
     </section>
 
     {{-- 9. Next step --}}
-    <section id="cta-hire" class="px-4 sm:px-8 py-16 sm:py-24 bg-white text-center">
+    <section id="cta-hire" class="px-4 sm:px-8 py-16 sm:py-24 bg-[#1d1d1f] text-center text-white">
         <div class="max-w-[700px] mx-auto">
             <h2 class="text-[28px] sm:text-[38px] font-bold tracking-tight leading-tight">{{ $t('جاهز تبدأ؟ اختار أو كلمنا', 'Ready to start? Choose, or talk to us') }}</h2>
-            <p class="mt-4 text-[17px] leading-[1.8] text-[#515154]">{{ $t('لو عارف عايز إيه، افتح الصفحة وادفع. ولو مش متأكد، ابعتلنا على واتساب وصف شغلك وهنقولك إيه المناسب، حتى لو مش عندنا.', 'If you know what you need, open the page and pay. If you are not sure, message us on WhatsApp, describe your business and we will tell you what fits, even if it is not ours.') }}</p>
+            <p class="mt-4 text-[17px] leading-[1.8] text-white/75">{{ $t('لو عارف عايز إيه، افتح الصفحة وادفع. ولو مش متأكد، ابعتلنا على واتساب وصف شغلك وهنقولك إيه المناسب، حتى لو مش عندنا.', 'If you know what you need, open the page and pay. If you are not sure, message us on WhatsApp, describe your business and we will tell you what fits, even if it is not ours.') }}</p>
             <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <a href="{{ route('services.index') }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('تصفح كل المنتجات', 'Browse all products') }}</a>
-                <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold hover:bg-[#f5f5f7] transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
+                <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-white/30 text-[15px] font-semibold text-white hover:bg-white/10 transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
             </div>
         </div>
     </section>

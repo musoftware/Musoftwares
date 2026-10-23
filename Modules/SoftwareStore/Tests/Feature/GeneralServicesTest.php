@@ -89,6 +89,18 @@ class GeneralServicesTest extends TestCase
             ->assertSessionHasErrors('plan_key');
     }
 
+    public function test_homepage_shows_the_business_switcher_and_the_lowest_price_of_each_group(): void
+    {
+        $this->seedServices();
+        SoftwareProduct::query()->update(['is_active' => true]);
+
+        $html = $this->get('/?lang=ar')->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-business-switcher', $html);
+        $this->assertStringContainsString('صيدلية', $html);
+        $this->assertStringContainsString('من 1,000 جنيه', $html);
+    }
+
     public function test_legacy_company_service_urls_still_resolve(): void
     {
         $this->seedServices();

@@ -29,6 +29,7 @@ class HomeController extends Controller
 
         return view('public.home', [
             'storeCounts' => $store->groupCounts(),
+            'storeFrom' => $store->groupFromPrices(),
             'featuredProducts' => $store->featured(),
             'heroShots' => $store->heroShots(),
             'portfolioCount' => count(PortfolioData::all()),
