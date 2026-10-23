@@ -42,15 +42,15 @@
 @section('content')
 <div class="w-full overflow-x-clip bg-white text-[#1d1d1f] antialiased">
 
-    {{-- 1. Who we are, in one clear sentence --}}
-    <section class="px-4 sm:px-8 pt-14 sm:pt-20 pb-14 sm:pb-20 bg-white">
-        <div class="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div class="lg:col-span-7 text-start">
+    {{-- 1. Hero: who we are in one sentence, and the real products --}}
+    <section class="px-4 sm:px-8 pt-12 sm:pt-16 bg-white">
+        <div class="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            <div class="lg:col-span-6 text-start">
                 <p class="text-[14px] font-semibold text-[#0071e3] mb-4">{{ $t('موسوفت، استوديو برمجيات مصري في السويس', 'Musoftware, an Egyptian software studio in Suez') }}</p>
-                <h1 class="text-[34px] sm:text-[48px] font-bold tracking-tight leading-[1.25]">
+                <h1 class="text-[34px] sm:text-[46px] lg:text-[50px] font-bold tracking-tight leading-[1.25]">
                     {{ $t('برامج وأنظمة جاهزة لشغلك، وبسعر معلن من أول يوم', 'Ready-made programs and systems for your business, with a price you see on day one') }}
                 </h1>
-                <p class="mt-5 text-[17px] sm:text-[19px] leading-[1.8] text-[#515154] max-w-[620px]">
+                <p class="mt-5 text-[17px] sm:text-[19px] leading-[1.8] text-[#515154] max-w-[560px]">
                     {{ $t('بنبيع برامج سطح مكتب وأنظمة إدارة جاهزة للصيدليات والمطاعم والعيادات والمراكز والمحلات، وبننفذ مواقع ومتاجر وتعديلات مخصصة. بتستلم الكود وبتملكه، وبتكلم المبرمج نفسه.', 'We sell ready-made desktop programs and management systems for pharmacies, restaurants, clinics, centers and shops, and we build websites, stores and custom changes. You receive the code, you own it, and you talk to the programmer himself.') }}
                 </p>
                 <div class="mt-8 flex flex-col sm:flex-row gap-3">
@@ -58,24 +58,40 @@
                     <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
                 </div>
             </div>
-            <div class="lg:col-span-5">
-                <div class="rounded-2xl border border-black/10 bg-[#fbfbfd] p-6 sm:p-8">
-                    <p class="text-[13px] font-semibold text-[#86868b] mb-4">{{ $t('موسوفت بالأرقام اللي تقدر تتأكد منها', 'Musoftware in numbers you can check') }}</p>
-                    <dl class="space-y-5">
-                        <div class="flex items-baseline justify-between gap-4 border-b border-black/5 pb-4">
-                            <dt class="text-[15px] text-[#515154]">{{ $t('منتج وخدمة معروضة بسعرها', 'Products and services listed with a price') }}</dt>
-                            <dd class="text-[28px] font-bold text-[#0071e3]">{{ array_sum($storeCounts) }}</dd>
+
+            @if ($heroShots->isNotEmpty())
+                @php $mainShot = $heroShots->first(); $sideShots = $heroShots->slice(1); @endphp
+                <div class="lg:col-span-6">
+                    <a href="{{ route('website-services.show', $mainShot['product']->slug) }}" class="block rounded-xl border border-black/10 bg-white shadow-xl overflow-hidden" aria-label="{{ $mainShot['product']->localized('name') }}">
+                        <div class="flex items-center gap-1.5 px-4 h-8 bg-[#f5f5f7] border-b border-black/10" aria-hidden="true">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span>
                         </div>
-                        <div class="flex items-baseline justify-between gap-4 border-b border-black/5 pb-4">
-                            <dt class="text-[15px] text-[#515154]">{{ $t('مشروع في معرض الأعمال', 'Projects in our portfolio') }}</dt>
-                            <dd class="text-[28px] font-bold text-[#0071e3]">{{ $portfolioCount }}</dd>
-                        </div>
-                        <div class="flex items-baseline justify-between gap-4">
-                            <dt class="text-[15px] text-[#515154]">{{ $t('سنوات خبرة المؤسس', 'Years of experience of the founder') }}</dt>
-                            <dd class="text-[28px] font-bold text-[#0071e3]">10+</dd>
-                        </div>
-                    </dl>
+                        <img src="{{ $mainShot['image'] }}" alt="{{ $mainShot['product']->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" fetchpriority="high">
+                    </a>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        @foreach ($sideShots as $shot)
+                            <a href="{{ route('website-services.show', $shot['product']->slug) }}" class="block rounded-lg border border-black/10 bg-white shadow-md overflow-hidden" aria-label="{{ $shot['product']->localized('name') }}">
+                                <img src="{{ $shot['image'] }}" alt="{{ $shot['product']->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" loading="lazy">
+                            </a>
+                        @endforeach
+                    </div>
+                    <p class="mt-3 text-[12px] text-[#86868b]">{{ $t('لقطات حقيقية من المنتجات وهي شغالة، ببيانات تجريبية.', 'Real screenshots of the running products, with demo data.') }}</p>
                 </div>
+            @endif
+        </div>
+
+        <div class="max-w-[1180px] mx-auto mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 border-t border-black/10">
+            <div class="py-6 sm:pe-6 sm:border-e border-black/10">
+                <p class="text-[32px] font-bold text-[#0071e3] leading-none">{{ array_sum($storeCounts) }}</p>
+                <p class="mt-2 text-[15px] text-[#515154]">{{ $t('منتج وخدمة معروضة بسعرها', 'Products and services listed with a price') }}</p>
+            </div>
+            <div class="py-6 sm:px-6 sm:border-e border-black/10">
+                <p class="text-[32px] font-bold text-[#0071e3] leading-none">{{ $portfolioCount }}</p>
+                <p class="mt-2 text-[15px] text-[#515154]">{{ $t('مشروع في معرض الأعمال', 'Projects in our portfolio') }}</p>
+            </div>
+            <div class="py-6 sm:ps-6">
+                <p class="text-[32px] font-bold text-[#0071e3] leading-none">10+</p>
+                <p class="mt-2 text-[15px] text-[#515154]">{{ $t('سنوات خبرة المؤسس', 'Years of experience of the founder') }}</p>
             </div>
         </div>
     </section>

@@ -28,6 +28,20 @@ class StoreHighlights
         return collect(self::FEATURED)->map(fn (string $slug) => $visible->get($slug))->filter()->values();
     }
 
+    /**
+     * Real screenshots for the homepage hero: the first picture of the first featured products that have one.
+     *
+     * @return Collection<int, array{product: SoftwareProduct, image: string}>
+     */
+    public function heroShots(int $count = 3): Collection
+    {
+        return $this->featured()
+            ->map(fn (SoftwareProduct $product) => ['product' => $product, 'image' => $product->galleryUrls()[0] ?? null])
+            ->filter(fn (array $shot) => $shot['image'])
+            ->take($count)
+            ->values();
+    }
+
     /** @return Collection<int, SoftwareProduct> */
     private function visible(): Collection
     {

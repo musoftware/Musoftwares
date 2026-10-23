@@ -30,6 +30,7 @@ class HomeController extends Controller
         return view('public.home', [
             'storeCounts' => $store->groupCounts(),
             'featuredProducts' => $store->featured(),
+            'heroShots' => $store->heroShots(),
             'portfolioCount' => count(PortfolioData::all()),
             'title' => $isAr
                 ? 'موسوفت | أنظمة وبرامج جاهزة بسعر معلن، بتستلم الكود وبتملكه'
