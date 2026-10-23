@@ -192,8 +192,7 @@ class InvoiceController extends Controller
             ->pluck('total_unpaid', 'currency_id');
 
         foreach ($unpaidTotals as $currencyId => $unpaidSum) {
-            $convVal = CurrenciesExchange::RateToday((float) $unpaidSum, $currencyId, $businessCurrencyId);
-            $totalUnpaidAmount += (float) $convVal;
+            $totalUnpaidAmount += $this->convertForStats((float) $unpaidSum, (int) $currencyId, $businessCurrencyId);
         }
 
         $counts = (clone $query)
@@ -216,6 +215,21 @@ class InvoiceController extends Controller
             'total_unpaid_amount_str' => FinanceHelper::instance()->format_money($totalUnpaidAmount, $businessCurrencyId),
             'business_currency' => $businessCurrency,
         ];
+    }
+
+    /**
+     * Converts one currency's unpaid total for the stats card. Display only: a missing exchange rate
+     * leaves that currency out of the total (and is logged) instead of failing the whole invoices page.
+     */
+    private function convertForStats(float $amount, int $fromCurrencyId, int $toCurrencyId): float
+    {
+        try {
+            return (float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $toCurrencyId);
+        } catch (MissingExchangeRateException $e) {
+            Log::warning('Invoice stats skipped a currency: missing exchange rate.', ['from_currency_id' => $fromCurrencyId, 'to_currency_id' => $toCurrencyId]);
+
+            return 0.0;
+        }
     }
 
     private const ALLOWED_PER_PAGE = [12, 20, 50, 100];

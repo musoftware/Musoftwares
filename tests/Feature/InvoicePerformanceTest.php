@@ -7,15 +7,18 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Feature\Concerns\SeedsUsdEgpRates;
 use Tests\TestCase;
 
 class InvoicePerformanceTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsUsdEgpRates;
 
     public function test_invoice_index_page_performance_with_large_dataset(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seedUsdEgpRates();
 
         $admin = User::factory()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');

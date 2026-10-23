@@ -37,9 +37,26 @@ class CurrenciesExchange extends Model
      */
     protected static $memoryCache = [];
 
+    /** Seconds a pair without any rate is remembered, so a list of rows does not repeat the same failing lookups. */
+    private const MISSING_RATE_MEMORY_SECONDS = 30;
+
+    /** @var array<string, int> cache key => unix time until which the pair is known to have no rate */
+    protected static array $missingRates = [];
+
     public static function flushCache(): void
     {
         static::$memoryCache = [];
+        static::$missingRates = [];
+    }
+
+    private static function isKnownMissing(string $cacheKey): bool
+    {
+        return (static::$missingRates[$cacheKey] ?? 0) > time();
+    }
+
+    private static function rememberMissing(string $cacheKey): void
+    {
+        static::$missingRates[$cacheKey] = time() + self::MISSING_RATE_MEMORY_SECONDS;
     }
 
     public static function normalizeCurrencyId(Currency|int|string|null $cur): string
@@ -120,6 +137,10 @@ class CurrenciesExchange extends Model
 
         $cacheKey = 'today_'.trim($cur1).'_'.trim($cur2);
 
+        if (! isset(static::$memoryCache[$cacheKey]) && static::isKnownMissing($cacheKey)) {
+            throw new MissingExchangeRateException($cur1, $cur2, date('Y-m-d'));
+        }
+
         if (! isset(static::$memoryCache[$cacheKey])) {
             $ex = CurrenciesExchange::where('currency1', trim($cur1))
                 ->where('currency2', trim($cur2))
@@ -144,7 +165,13 @@ class CurrenciesExchange extends Model
                 if ($reverse != null && $reverse->rate > 0) {
                     static::$memoryCache[$cacheKey] = 1 / $reverse->rate;
                 } else {
-                    static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                    try {
+                        static::$memoryCache[$cacheKey] = static::Rate(date('Y-m-d'), $cur1, $cur2);
+                    } catch (MissingExchangeRateException $e) {
+                        static::rememberMissing($cacheKey);
+
+                        throw $e;
+                    }
                 }
             }
         }
