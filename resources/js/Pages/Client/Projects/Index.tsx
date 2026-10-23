@@ -245,7 +245,7 @@ export default function ProjectsIndex({ projects }: Props) {
                         </div>
                     )}
 
-                    <Pagination links={projects?.links ?? []} />
+                    <Pagination links={projects?.meta?.links ?? projects?.links} />
 
                 </div>
 

@@ -54,6 +54,8 @@ class ClientProjectViewsTest extends TestCase
         $response->assertInertia(fn ($page) => $page
             ->component('Client/Projects/Index')
             ->has('projects.data', 1)
+            // the page list lives in meta.links; the top level `links` is an object, which the pagination must not map over
+            ->has('projects.meta.links')
         );
     }
 

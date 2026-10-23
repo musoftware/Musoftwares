@@ -27,8 +27,17 @@ export function toPlainLabel(label: string, index: number, total: number): strin
         .trim();
 }
 
-export default function Pagination({ links }: { links: PaginationLink[] }) {
-    if (!links || links.length <= 3) return null;
+/**
+ * A paginator sends `links` as a list of page links. A resource collection sends `links` as an object
+ * (first, last, prev, next) and keeps the page list in `meta.links`, so only a list is usable here.
+ */
+export function pageLinks(links: unknown): PaginationLink[] {
+    return Array.isArray(links) ? (links as PaginationLink[]) : [];
+}
+
+export default function Pagination({ links: rawLinks }: { links: PaginationLink[] | Record<string, unknown> | null | undefined }) {
+    const links = pageLinks(rawLinks);
+    if (links.length <= 3) return null;
 
     return (
         <nav className="mt-6 flex justify-center" aria-label={__('general.pagination')}>
