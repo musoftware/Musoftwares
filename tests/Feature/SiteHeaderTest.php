@@ -42,6 +42,16 @@ class SiteHeaderTest extends TestCase
         $this->get('/?lang=en')->assertOk()->assertSee('href="/dashboard"', false);
     }
 
+    public function test_the_footer_follows_the_language_of_the_page(): void
+    {
+        $arabic = $this->get('/?lang=ar')->assertOk()->getContent();
+        $english = $this->get('/?lang=en')->assertOk()->getContent();
+
+        $this->assertStringContainsString('سياسة الخصوصية', $arabic);
+        $this->assertStringNotContainsString('Sovereignty', $arabic);
+        $this->assertStringContainsString('Privacy policy', $english);
+    }
+
     public function test_react_public_pages_get_the_same_menu_links_from_the_server(): void
     {
         $this->get('/estimator?lang=ar')->assertOk()->assertInertia(
