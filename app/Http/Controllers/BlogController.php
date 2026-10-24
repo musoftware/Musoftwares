@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BlogArticle;
 use App\Models\CurrenciesExchange;
 use App\Helpers\FinanceHelper;
+use App\Support\BlogSeo;
 use Inertia\Inertia;
 
 class BlogController extends Controller
@@ -31,10 +32,14 @@ class BlogController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $isAr = $locale === 'ar';
+
         return view('public.blog.index', [
             'articles' => $articles,
-            'title' => 'Technical Library & Engineering Insights | Musoftwares',
-            'description' => 'Deep architectural insights, ERP design patterns, WhatsApp APIs, and scalable infrastructure articles from Musoftwares Studio.',
+            'title' => $isAr ? 'المدونة | موسوفت' : 'Blog | Musoftware',
+            'description' => $isAr
+                ? 'مقالات عملية بالعربي عن اختيار برنامج الكاشير والمخزون، وتكلفة المواقع، والفاتورة الإلكترونية، وتسويق الأعمال في مصر.'
+                : 'Practical guides on choosing POS and inventory software, website costs, the Egyptian e-receipt and business marketing.',
         ]);
     }
 
@@ -105,11 +110,17 @@ class BlogController extends Controller
             ? (str_starts_with($article->featured_image, 'http') ? $article->featured_image : asset('storage/'.$article->featured_image))
             : ($article->service?->cover_image ?: asset('images/default-meta.png'));
 
+        $seo = app(BlogSeo::class);
+
         return view('public.blog.show', [
             'article' => $article,
-            'title' => ($article->meta_title ?: $article->title).' | Musoftwares',
+            'title' => ($article->meta_title ?: $article->title).' | Musoftware',
             'description' => $article->meta_description ?: $article->excerpt,
             'image' => $imageUrl,
+            'canonical' => route('blog.show', $article->slug),
+            'alternates' => $seo->alternates($article),
+            'articleJson' => $seo->toJson($seo->articleGraph($article, $imageUrl)),
+            'readingMinutes' => $seo->readingMinutes($article),
         ]);
     }
 }

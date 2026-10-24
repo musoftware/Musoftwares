@@ -45,28 +45,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Schema.org JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@@context": "https://schema.org",
-      "@@type": "SoftwareApplication",
-      "name": "Musoftwares",
-      "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Web, iOS, Android, Windows, Cloud",
-      "url": "https://musoftwares.com",
-      "author": {
-        "@@type": "Person",
-        "name": "Mahmoud Amin",
-        "jobTitle": "Founder & Chief Software Architect",
-        "url": "https://musoftwares.com/about/mahmoud-amin",
-        "address": {
-          "@@type": "PostalAddress",
-          "addressLocality": "Suez",
-          "addressCountry": "EG"
-        }
-      }
-    }
-    </script>
+    <!-- Schema.org JSON-LD: who the site belongs to (the same on every public page) -->
+    <script type="application/ld+json">{!! \App\Support\SiteSchema::json() !!}</script>
 
     <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />

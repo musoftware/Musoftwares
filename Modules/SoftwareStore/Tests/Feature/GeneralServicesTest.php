@@ -66,7 +66,8 @@ class GeneralServicesTest extends TestCase
             $html = $this->get("/services/{$slug}?lang=en")->assertOk()->getContent();
 
             preg_match_all('~<script type="application/ld\+json">(.*?)</script>~s', $html, $matches);
-            $storeGraph = collect($matches[1])->first(fn ($json) => str_contains($json, '"@graph"'));
+            // the page also carries the site-wide Organization graph; the store graph is the one with the breadcrumb
+            $storeGraph = collect($matches[1])->first(fn ($json) => str_contains($json, '"@graph"') && str_contains($json, 'BreadcrumbList'));
             $this->assertStringContainsString('"@type": "Service"', json_encode(json_decode($storeGraph, true), JSON_PRETTY_PRINT), $slug);
             $this->assertStringNotContainsString('SoftwareApplication', $storeGraph, $slug);
             $this->assertStringNotContainsString('aggregateRating', $storeGraph, $slug);

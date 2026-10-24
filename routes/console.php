@@ -37,12 +37,6 @@ Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::clas
 // Background translation of untranslated marketplace services hourly
 Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
 
-// Automatically generate AI blog articles daily at 02:00 Cairo Time
-Schedule::command(\App\Console\Commands\GenerateBlogArticles::class, ['--limit' => 5, '--lang' => 'all'])
-    ->dailyAt('02:00')
-    ->timezone('Africa/Cairo')
-    ->withoutOverlapping(10);
-
 // Send daily new services digest daily at 23:30 Cairo Time
 Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
 
