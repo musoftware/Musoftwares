@@ -580,6 +580,9 @@ class LoyaltyService extends BaseService
 
         switch ($txn->event_type) {
             case 'invoice_payment':
+                if (($meta['source'] ?? null) === 'marked_as_used') {
+                    return 'Payment Marked as Used #'.($meta['transaction_id'] ?? $txn->reference_id);
+                }
                 $invId = $txn->reference_id ?? $meta['invoice_id'] ?? '';
                 return $invId ? "Invoice Payment #{$invId}" : 'Invoice Payment Settlement';
             case 'ticket_portal_created':

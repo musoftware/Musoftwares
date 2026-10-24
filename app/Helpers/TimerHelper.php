@@ -5,8 +5,10 @@ namespace App\Helpers;
 use App\Events\AmountReceived;
 use App\Models\CostTransaction;
 use App\Models\Transaction;
+use App\Services\LoyaltyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TimerHelper
 {
@@ -132,8 +134,10 @@ class TimerHelper
 
     private function addTransaction(?Request $request, $client, $project, $amount, $reason, $fee, $type, $is_used, $createdAt = null)
     {
-        DB::transaction(function () use ($client, $project, $amount, $reason, $fee, $type, $is_used, $createdAt) {
-            $client->add_balance($amount,
+        $receivedId = null;
+
+        DB::transaction(function () use ($client, $project, $amount, $reason, $fee, $type, $is_used, $createdAt, &$receivedId) {
+            $receivedId = $client->add_balance($amount,
                 $reason,
                 $type, null, $project, $createdAt);
 
@@ -145,6 +149,10 @@ class TimerHelper
                     $reason.' Used', 'used', null, $project, $createdAt);
             }
         });
+
+        if ($is_used && $type === 'received' && $amount > 0 && $receivedId) {
+            $this->awardPointsForUsedPayment($client, (int) $receivedId, (float) $amount);
+        }
 
         // Fire AmountReceived event for WhatsApp notifications when money is received
         if (in_array($type, ['received', 'earned']) && $amount > 0) {
@@ -169,6 +177,29 @@ class TimerHelper
             \Log::info('✅ AmountReceived Event Dispatched Successfully');
         }
 
+    }
+
+    /**
+     * Money the client paid and the studio already spent counts like a paid invoice, so the client
+     * earns the same loyalty points. A points failure must never undo the money entry that was saved.
+     */
+    private function awardPointsForUsedPayment($client, int $receivedTransactionId, float $amount): void
+    {
+        try {
+            app(LoyaltyService::class)->awardPointsForEvent(
+                user: $client,
+                eventType: 'invoice_payment',
+                reference: Transaction::find($receivedTransactionId),
+                context: [
+                    'channel' => 'admin',
+                    'source' => 'marked_as_used',
+                    'transaction_id' => $receivedTransactionId,
+                    'amount' => $amount,
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::error('Loyalty points for a payment marked as used failed.', ['user_id' => $client->id, 'transaction_id' => $receivedTransactionId, 'error' => $e->getMessage()]);
+        }
     }
 
     public function addUsed($client, $amount, $item)

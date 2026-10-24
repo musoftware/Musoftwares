@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\AdminAuditLog;
+use App\Models\CurrenciesExchange;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 
@@ -19,6 +20,9 @@ abstract class TestCase extends BaseTestCase
 
         // Reset virtual audit logs between tests
         AdminAuditLog::$logs = [];
+
+        // The rate cache is static, so a rate (or a missing pair) from one test must not leak into the next.
+        CurrenciesExchange::flushCache();
     }
 
     /**

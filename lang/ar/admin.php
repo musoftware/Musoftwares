@@ -2013,7 +2013,7 @@ return [
     'transaction_recommended_rate' => 'الموصى به:',
     'transaction_rates_info' => 'معلومات الأسعار:',
     'transaction_fee' => 'الرسوم',
-    'transaction_funds_already_used_hint' => '(أموال تم صرفها أو استخدامها بالفعل)',
+    'transaction_funds_already_used_hint' => '(أموال تم صرفها بالفعل. لو الفلوس مستلمة، العميل بياخد نفس نقاط دفع الفاتورة)',
     'transaction_save_staged' => 'حفظ :count معاملة',
     'transfer_item_added' => 'تمت إضافة :amount',
     'transfer_select_currency_first' => 'اختر العملة أولًا',
