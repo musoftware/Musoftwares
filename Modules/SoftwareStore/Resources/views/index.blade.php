@@ -33,7 +33,7 @@
                             <p class="mt-2 text-sm text-[#1d1d1f]/60">{{ $product->localized('tagline') }}</p>
                         </div>
                         <div class="flex items-center justify-between gap-3">
-                            <span class="text-lg font-semibold">@if ($product->hasPlans())<span class="text-sm font-normal text-[#1d1d1f]/60">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-sm font-normal text-[#1d1d1f]/60">{{ $product->periodLabel() }}</span></span>
+                            <span class="text-lg font-semibold">@if ($product->hasPlans())<span class="text-sm font-normal text-[#1d1d1f]/60">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-sm font-normal text-[#1d1d1f]/60">{{ $product->approxUsdLabel($product->startingPrice()) }} {{ $product->periodLabel() }}</span></span>
                             <span class="text-sm font-semibold text-[#0071e3]">{{ __('software.details') }}</span>
                         </div>
                     </a>

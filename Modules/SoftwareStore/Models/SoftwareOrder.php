@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
  * @property string|null $plan_key
  * @property string|null $plan_name
  * @property \Illuminate\Support\Carbon|null $activated_at
+ * @property \Illuminate\Support\Carbon|null $reminder_sent_at
+ * @property string|null $locale
  * @property \Illuminate\Support\Carbon|null $license_expires_at
  * @property string $currency
  * @property string $status
@@ -38,6 +40,7 @@ class SoftwareOrder extends Model
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
         'activated_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
         'license_expires_at' => 'datetime',
     ];
 

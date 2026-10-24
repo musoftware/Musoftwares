@@ -97,6 +97,7 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_bulk_notify", url: "/admin/notifications/broadcast" },
         { title: "admin.sidebar_winback_campaigns", url: "/admin/winback" },
         { title: "admin.sidebar_software_products", url: "/admin/software-products" },
+        { title: "admin.sidebar_marketing", url: "/admin/marketing" },
         { title: "admin.sidebar_website_services", url: "/admin/website-services" },
         { title: "admin.sidebar_micro_services", url: "/admin/micro-services" },
         { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets" },

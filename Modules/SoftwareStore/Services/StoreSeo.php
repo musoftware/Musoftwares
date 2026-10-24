@@ -24,7 +24,7 @@ class StoreSeo
     /** Best picture for social cards: the first screenshot, then the icon. */
     public function ogImage(SoftwareProduct $product): string
     {
-        $url = $product->galleryUrls()[0] ?? $product->imageUrl();
+        $url = $product->galleryUrlsFor()[0] ?? $product->imageUrl();
 
         return $url ?: asset('images/apple/web-mobile-suite.jpg');
     }
@@ -107,7 +107,9 @@ class StoreSeo
         $period = $product->periodLabel();
         $price = $product->hasPlans() ? __('software.from').' '.$product->money($product->startingPrice()) : $product->money($product->salePrice());
 
-        return "{$price} {$currency} {$period}";
+        $usd = $product->approxUsdLabel($product->hasPlans() ? $product->startingPrice() : $product->salePrice());
+
+        return trim("{$price} {$currency} ".($usd ? "{$usd} " : '').$period);
     }
 
     /** "P1Y" for yearly products, null for one-time payments. */
@@ -121,7 +123,7 @@ class StoreSeo
     private function product(SoftwareProduct $product, string $url): array
     {
         $isProgram = $product->serial_software_id || $product->releases()->exists();
-        $images = array_values(array_filter([...$product->galleryUrls(), $product->imageUrl()]));
+        $images = array_values(array_filter([...$product->galleryUrlsFor(), $product->imageUrl()]));
         $data = [
             '@type' => $isProgram ? 'SoftwareApplication' : 'Service',
             '@id' => $url.'#product',
@@ -155,7 +157,7 @@ class StoreSeo
         $fields = [
             'applicationCategory' => 'BusinessApplication',
             'operatingSystem' => 'Windows 10, Windows 11, macOS',
-            'screenshot' => $product->galleryUrls(),
+            'screenshot' => $product->galleryUrlsFor(),
         ];
 
         if ($version = $product->latestRelease()?->version) {
@@ -269,7 +271,7 @@ class StoreSeo
 
         $lines = ['', '## '.__('software.choose_plan')];
         foreach ($product->planList() as $plan) {
-            $lines[] = "- **{$plan['name']}**: {$product->money((float) $plan['price'])} {$product->saleCurrency()} {$product->periodLabel()}".(empty($plan['description']) ? '' : ' - '.$plan['description']);
+            $lines[] = "- **{$plan['name']}**: {$product->money((float) $plan['price'])} {$product->saleCurrency()} ".($product->approxUsdLabel((float) $plan['price']) ? $product->approxUsdLabel((float) $plan['price']).' ' : '').$product->periodLabel().(empty($plan['description']) ? '' : ' - '.$plan['description']);
             foreach ($plan['features'] as $feature) {
                 $lines[] = "  - {$feature}";
             }

@@ -49,6 +49,16 @@ class AppServiceProvider extends ServiceProvider
 
         $this->configureRateLimiting();
 
+        // Search engines hear about changed public pages through IndexNow (one queued run for many saves)
+        \Modules\SoftwareStore\Models\SoftwareProduct::saved(function (): void {
+            \App\Jobs\SubmitIndexNowJob::dispatch();
+        });
+        \App\Models\BlogArticle::saved(function (\App\Models\BlogArticle $article): void {
+            if ($article->is_published) {
+                \App\Jobs\SubmitIndexNowJob::dispatch();
+            }
+        });
+
         // Register model observers
         \App\Models\Ticket::observe(\App\Observers\TicketLoyaltyObserver::class);
 

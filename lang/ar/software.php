@@ -41,6 +41,8 @@ return [
     'activated_account' => 'حسابك جاهز. من البرنامج اضغط Link Account واكتب :email.',
     'valid_until' => 'صالح حتى :date',
     'per_year' => 'في السنة',
+    'approx_usd' => '(حوالي :amount دولار)',
+    'usd_estimate_note' => 'الدفع بالجنيه المصري. المبلغ بالدولار تقديري فقط، وبنك الكارت هو اللي بيحوّل بسعره.',
     'from' => 'من',
     'choose_plan' => 'اختار الباقة',
     'continue_to_payment' => 'كمّل للدفع',

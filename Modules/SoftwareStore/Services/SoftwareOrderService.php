@@ -6,6 +6,8 @@ use App\Models\AdminSettings;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 
 class SoftwareOrderService
@@ -22,6 +24,8 @@ class SoftwareOrderService
 
         return $product->orders()->create([
             'plan_key' => $plan['key'] ?? null,
+            // stored only once the migration ran, so an order never fails because of this
+            ...(Schema::hasColumn('software_orders', 'locale') ? ['locale' => app()->getLocale()] : []),
             'plan_name' => $plan['name'] ?? null,
             'client_name' => $client['client_name'],
             'client_email' => $client['client_email'],
@@ -47,6 +51,17 @@ class SoftwareOrderService
         ]);
 
         $this->activateLicense($order);
+        $this->notifyOwner($order);
+    }
+
+    /** A failed mail must never undo a confirmed payment. */
+    private function notifyOwner(SoftwareOrder $order): void
+    {
+        try {
+            Mail::to(\App\Support\AdminRecipients::emails())->queue(new \App\Mail\SoftwareOrderPaidAdminMail($order->loadMissing('product')));
+        } catch (\Throwable $e) {
+            Log::warning('Software order: owner mail failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+        }
     }
 
     /** A failed activation must never undo a confirmed payment, so it is logged and can be retried by hand. */

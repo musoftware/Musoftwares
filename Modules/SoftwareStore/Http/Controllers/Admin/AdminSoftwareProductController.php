@@ -121,7 +121,9 @@ class AdminSoftwareProductController extends Controller
         $this->replaceMedia($product, 'poster_path', $request->file('poster'));
         $product->gallery = $this->updatedGallery($product, $request->file('gallery_add', []), $data['gallery_remove'] ?? []);
         $product->plans = $this->cleanPlans($data['plans'] ?? []) ?: null;
-        $product->theme = ['colors' => array_filter($data['colors'] ?? []), 'sections' => array_values($data['sections'] ?? [])];
+        // gallery_en (the English pictures) is not part of this form, so it must survive a save
+        $product->theme = ['colors' => array_filter($data['colors'] ?? []), 'sections' => array_values($data['sections'] ?? [])]
+            + array_intersect_key($product->theme ?? [], ['gallery_en' => true]);
         if (! empty($data['landing'])) {
             $product->landing = $data['landing'];
         }

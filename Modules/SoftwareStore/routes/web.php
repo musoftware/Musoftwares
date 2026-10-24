@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\SoftwareStore\Http\Controllers\Admin\AdminMarketingController;
 use Modules\SoftwareStore\Http\Controllers\Admin\AdminSoftwareProductController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareOrderController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareProductController;
@@ -15,6 +16,7 @@ Route::middleware('web')->group(function () {
 
     // ── Guest order, payment and download ───────────────────────────
     Route::post('/services/{slug}/order', [SoftwareOrderController::class, 'store'])->middleware('throttle:10,1')->name('software.orders.store');
+    Route::get('/software-orders/{uuid}/resume', [SoftwareOrderController::class, 'resume'])->middleware(['signed', 'throttle:20,1'])->name('software.orders.resume');
     Route::get('/software-orders/{uuid}/success', [SoftwareOrderController::class, 'success'])->name('software.orders.success');
     Route::get('/software-orders/{uuid}/failure', [SoftwareOrderController::class, 'failure'])->name('software.orders.failure');
     Route::get('/software-orders/{uuid}/download', [SoftwareOrderController::class, 'download'])->name('software.orders.download');
@@ -26,6 +28,7 @@ Route::middleware('web')->group(function () {
 
     // ── Admin ───────────────────────────────────────────────────────
     Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/marketing', [AdminMarketingController::class, 'index'])->name('marketing.index');
         Route::get('/software-products', [AdminSoftwareProductController::class, 'index'])->name('software.index');
         Route::get('/software-products/{product}/edit', [AdminSoftwareProductController::class, 'edit'])->name('software.edit');
         Route::post('/software-products/{product}', [AdminSoftwareProductController::class, 'update'])->name('software.update');

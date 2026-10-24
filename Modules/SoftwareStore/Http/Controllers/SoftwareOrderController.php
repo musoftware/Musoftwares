@@ -8,6 +8,7 @@ use App\Models\Currency;
 use App\Http\Controllers\Controller;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
+use Modules\SoftwareStore\Services\RecoveryDiscount;
 use Modules\SoftwareStore\Services\SoftwareOrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ use Illuminate\Validation\Rule;
 
 class SoftwareOrderController extends Controller
 {
-    public function __construct(private readonly SoftwareOrderService $orders) {}
+    public function __construct(private readonly SoftwareOrderService $orders, private readonly RecoveryDiscount $recoveryDiscount) {}
 
     public function store(Request $request, string $slug)
     {
@@ -57,6 +58,28 @@ class SoftwareOrderController extends Controller
             'whatsappLink' => $this->orders->whatsappLink($order),
             'downloadLink' => $hasRelease ? $this->orders->downloadLink($order) : null,
         ]);
+    }
+
+    /** The signed link in the reminder email: an unpaid order goes back to the payment page, a paid one to its result page. */
+    public function resume(string $uuid)
+    {
+        $order = SoftwareOrder::with('product')->where('uuid', $uuid)->firstOrFail();
+
+        if ($order->isPaid()) {
+            return redirect()->route('software.orders.success', $order->uuid);
+        }
+
+        abort_unless($order->product?->is_active, 404);
+
+        $this->recoveryDiscount->apply($order);
+
+        try {
+            return redirect()->away($this->paymentUrl($order, $order->product));
+        } catch (\Throwable $e) {
+            Log::error('Software order: resume payment failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+
+            return redirect()->route('software.orders.failure', $order->uuid);
+        }
     }
 
     public function failure(string $uuid)

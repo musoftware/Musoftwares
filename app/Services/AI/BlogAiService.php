@@ -57,6 +57,15 @@ You MUST return strictly valid JSON matching this exact structure without markdo
     }
 
     /**
+     * Sends a prompt through the central LLM router and returns the decoded JSON answer, or null when it fails.
+     * Callers that write their own prompts (such as the weekly draft) use this instead of the marketplace prompt above.
+     */
+    public function generate(string $prompt): ?array
+    {
+        return $this->callLLM($prompt);
+    }
+
+    /**
      * Central LLM Router that calls Gemini (preferred) or OpenAI.
      */
     private function callLLM(string $prompt): ?array

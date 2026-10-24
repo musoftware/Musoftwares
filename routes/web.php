@@ -208,6 +208,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/{key}.txt', \App\Http\Controllers\IndexNowKeyController::class)->where('key', '[a-f0-9]{32}')->name('indexnow.key');
 
 // Canonical locale prefix redirects (e.g. /ar/blog/{slug} -> /blog/{slug})
 Route::get('/{locale}/{path?}', [LocaleRedirectController::class, 'redirect'])

@@ -47,6 +47,10 @@
             {!! \App\Support\HtmlSanitizer::clean($article->content) !!}
         </article>
 
+        <div class="mt-12 border-t border-black/10 pt-6">
+            @include('layouts.share', ['shareUrl' => route('blog.show', $article->slug), 'shareTitle' => $article->title, 'shareCampaign' => 'blog-'.$article->slug])
+        </div>
+
         <aside class="mt-16 rounded-2xl bg-[#f5f5f7] p-8 text-center">
             <h2 class="text-[22px] font-bold">{{ $t('عايز تشوف المنتجات والأسعار؟', 'Want to see the products and prices?') }}</h2>
             <div class="mt-5 flex flex-col sm:flex-row gap-3 justify-center">

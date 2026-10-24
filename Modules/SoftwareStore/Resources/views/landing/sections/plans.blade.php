@@ -9,6 +9,9 @@
                     <p class="text-3xl font-extrabold text-[var(--sw-accent)]" dir="ltr">
                         {{ $product->money((float) $plan['price']) }}
                         <span class="text-sm font-semibold text-black/60">{{ $product->saleCurrency() }} {{ $product->periodLabel() }}</span>
+                        @if ($usd = $product->approxUsdLabel((float) $plan['price']))
+                            <span class="block text-xs font-medium text-black/50">{{ $usd }}</span>
+                        @endif
                     </p>
                     @if (! empty($plan['description']))
                         <p class="text-sm text-black/70">{{ $plan['description'] }}</p>
@@ -35,6 +38,9 @@
         </div>
         @if (! empty($copy['plans']['note']))
             <p class="mt-6 text-sm text-black/60 leading-relaxed">{{ $copy['plans']['note'] }}</p>
+        @endif
+        @if ($usdNote = $product->approxUsdNote())
+            <p class="mt-2 text-sm text-black/60 leading-relaxed">{{ $usdNote }}</p>
         @endif
     </div>
 </section>

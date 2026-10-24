@@ -110,7 +110,7 @@
 
                 <div class="mt-8 max-w-[860px] mx-auto">
                     @foreach ($featuredProducts as $i => $product)
-                        @php $shots = $product->galleryUrls(); @endphp
+                        @php $shots = $product->galleryUrlsFor(); @endphp
                         <div id="biz-panel-{{ $i }}" role="tabpanel" aria-labelledby="biz-tab-{{ $i }}" data-index="{{ $i }}" @if ($i !== 0) hidden @endif>
                             <div class="rounded-xl border border-black/10 bg-white shadow-lg overflow-hidden">
                                 <div class="flex items-center gap-1.5 px-4 h-8 bg-[#f5f5f7] border-b border-black/10" aria-hidden="true">
@@ -123,7 +123,7 @@
                             <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <div>
                                     <p class="text-[18px] font-bold">{{ $product->localized('name') }}</p>
-                                    <p class="mt-1 text-[16px] font-semibold">@if ($product->hasPlans())<span class="text-[13px] font-normal text-[#86868b]">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-[13px] font-normal text-[#86868b]">{{ $product->periodLabel() }}</span></p>
+                                    <p class="mt-1 text-[16px] font-semibold">@if ($product->hasPlans())<span class="text-[13px] font-normal text-[#86868b]">{{ __('software.from') }}</span> @endif{{ $product->money($product->startingPrice()) }} {{ $product->saleCurrency() }} <span class="text-[13px] font-normal text-[#86868b]">{{ $product->approxUsdLabel($product->startingPrice()) }} {{ $product->periodLabel() }}</span></p>
                                 </div>
                                 <a href="{{ route('website-services.show', $product->slug) }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex shrink-0 items-center justify-center px-6 py-3 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('افتح صفحة المنتج', 'Open the product page') }}</a>
                             </div>

@@ -2,6 +2,9 @@
 
 namespace Modules\SoftwareStore\Models;
 
+use App\Exceptions\MissingExchangeRateException;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
 use App\Models\SerialSoftware;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -130,6 +133,43 @@ class SoftwareProduct extends Model
         return number_format($amount, fmod($amount, 1.0) === 0.0 ? 0 : 2);
     }
 
+    /**
+     * A rough USD value next to an EGP price, for English pages only. The charge is always made in EGP,
+     * so this is an estimate. With no rate on file nothing is shown (a rate is never guessed).
+     */
+    public function approxUsdLabel(float $amount): ?string
+    {
+        if (app()->getLocale() !== 'en' || $this->saleCurrency() !== 'EGP' || $amount <= 0) {
+            return null;
+        }
+
+        $egpId = Currency::where('currency', 'EGP')->value('id');
+        $usdId = Currency::where('currency', 'USD')->value('id');
+        if (! $egpId || ! $usdId) {
+            return null;
+        }
+
+        try {
+            $usd = (float) CurrenciesExchange::RateToday($amount, $egpId, $usdId);
+        } catch (MissingExchangeRateException) {
+            return null;
+        }
+
+        if ($usd <= 0) {
+            return null;
+        }
+
+        $rounded = $usd > 100 ? round($usd / 5) * 5 : max(1, round($usd));
+
+        return __('software.approx_usd', ['amount' => number_format($rounded)]);
+    }
+
+    /** The plain-language warning that goes with the USD estimate; null when no estimate is shown. */
+    public function approxUsdNote(): ?string
+    {
+        return $this->approxUsdLabel($this->startingPrice()) ? __('software.usd_estimate_note') : null;
+    }
+
     /** What the price covers: "per year" unless the page copy says otherwise (for example "one payment"). */
     public function periodLabel(): string
     {
@@ -240,6 +280,23 @@ class SoftwareProduct extends Model
     public function galleryUrls(): array
     {
         return array_map(fn (string $path) => $this->mediaUrl($path), $this->galleryPaths());
+    }
+
+    /**
+     * Screenshots for a language. English pages use the English pictures kept in theme.gallery_en
+     * when the product has them; every other case uses the normal gallery.
+     *
+     * @return string[]
+     */
+    public function galleryUrlsFor(?string $locale = null): array
+    {
+        $english = array_values(array_filter($this->theme['gallery_en'] ?? []));
+
+        if (($locale ?? app()->getLocale()) === 'en' && $english !== []) {
+            return array_map(fn (string $path) => $this->mediaUrl($path), $english);
+        }
+
+        return $this->galleryUrls();
     }
 
     /** Turns a YouTube link into an embeddable URL. Returns null for anything else. */

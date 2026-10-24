@@ -22,7 +22,7 @@
                     @endif
                 </p>
             @endif
-            <p class="text-sm text-[#1d1d1f]/50">{{ __('software.order_number') }}: <span class="font-semibold text-[#1d1d1f]">{{ $order->reference() }}</span>@if ($order->plan_name) &middot; {{ $order->plan_name }}@endif</p>
+            <p class="text-sm text-[#1d1d1f]/50">{{ __('software.order_number') }}: <span class="font-semibold text-[#1d1d1f]">{{ $order->reference() }}</span>@if ($order->plan_name) &middot; {{ $order->product->planByKey($order->plan_key)['name'] ?? $order->plan_name }}@endif</p>
 
             <a href="{{ $whatsappLink }}" target="_blank" rel="noopener noreferrer"
                class="flex items-center justify-center w-full h-14 rounded-[980px] bg-[#25d366] hover:bg-[#1fb957] text-white font-semibold text-lg transition-colors">

@@ -10,7 +10,7 @@
 @php
     $copy = $product->landingCopy();
     $colors = $product->themeColors();
-    $gallery = $product->galleryUrls();
+    $gallery = $product->galleryUrlsFor();
     $inquiryLink = 'https://wa.me/'.app(\Modules\SoftwareStore\Services\SoftwareOrderService::class)->ownerWhatsappNumber($product)
         .'?text='.rawurlencode('Hello, I have a question about '.$product->name_en);
 @endphp
@@ -54,6 +54,13 @@
     @foreach ($product->sectionOrder() as $section)
         @includeIf('softwarestore::landing.sections.'.$section)
     @endforeach
+
+    {{-- Share links, tracked with utm parameters --}}
+    <div class="bg-white text-[#1d1d1f] px-4 sm:px-8 py-8 border-t border-black/5">
+        <div class="max-w-[1100px] mx-auto">
+            @include('layouts.share', ['shareUrl' => $product->purchaseUrl(), 'shareTitle' => $product->localized('name').': '.$product->localized('tagline'), 'shareCampaign' => $product->slug])
+        </div>
+    </div>
 
     {{-- Final call to action with the order form --}}
     @include('softwarestore::landing.order')

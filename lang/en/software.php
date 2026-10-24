@@ -41,6 +41,8 @@ return [
     'activated_account' => 'Your account is ready. In the program press Link Account and type :email.',
     'valid_until' => 'Valid until :date',
     'per_year' => '/ year',
+    'approx_usd' => '(about USD :amount)',
+    'usd_estimate_note' => 'You are charged in Egyptian pounds (EGP). The USD amount is only an estimate; your card issuer converts at its own rate.',
     'from' => 'from',
     'choose_plan' => 'Choose your plan',
     'continue_to_payment' => 'Continue to payment',

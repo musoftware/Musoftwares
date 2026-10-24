@@ -41,7 +41,7 @@
                                     @endif
                                 </span>
                             </span>
-                            <span class="font-bold shrink-0" dir="ltr">{{ $product->money((float) $plan['price']) }} {{ $product->saleCurrency() }}</span>
+                            <span class="font-bold shrink-0 text-end" dir="ltr">{{ $product->money((float) $plan['price']) }} {{ $product->saleCurrency() }}@if ($usd = $product->approxUsdLabel((float) $plan['price']))<span class="block text-xs font-medium text-black/50">{{ $usd }}</span>@endif</span>
                         </label>
                     @endforeach
                     @error('plan_key')<p class="text-sm text-red-600">{{ $message }}</p>@enderror
@@ -71,9 +71,12 @@
                     {{ $cta['button'] ?? __('software.continue_to_payment') }}
                 @else
                     {{ $cta['button'] ?? __('software.pay', ['price' => $product->money($product->salePrice()).' '.$product->saleCurrency()]) }}
-                    &middot; {{ $product->money($product->salePrice()) }} {{ $product->saleCurrency() }} {{ $product->periodLabel() }}
+                    &middot; {{ $product->money($product->salePrice()) }} {{ $product->saleCurrency() }} {{ $product->approxUsdLabel($product->salePrice()) }} {{ $product->periodLabel() }}
                 @endif
             </button>
+            @if ($usdNote = $product->approxUsdNote())
+                <p class="text-xs text-black/50 text-center">{{ $usdNote }}</p>
+            @endif
             <p class="text-xs text-black/50 text-center">{{ __('software.no_account') }}</p>
         </form>
     </div>

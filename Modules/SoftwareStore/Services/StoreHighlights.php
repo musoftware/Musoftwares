@@ -46,7 +46,7 @@ class StoreHighlights
     public function heroShots(int $count = 3): Collection
     {
         return $this->featured()
-            ->map(fn (SoftwareProduct $product) => ['product' => $product, 'image' => $product->galleryUrls()[0] ?? null])
+            ->map(fn (SoftwareProduct $product) => ['product' => $product, 'image' => $product->galleryUrlsFor()[0] ?? null])
             ->filter(fn (array $shot) => $shot['image'])
             ->take($count)
             ->values();

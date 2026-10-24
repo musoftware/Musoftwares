@@ -2148,6 +2148,7 @@ return [
     'sidebar_bulk_notify' => 'إشعار جماعي',
     'sidebar_winback_campaigns' => 'حملات استعادة العملاء',
     'sidebar_software_products' => 'برامج سطح المكتب',
+    'sidebar_marketing' => 'أدوات التسويق',
     'sidebar_busy_times' => 'أوقات الانشغال',
     'sidebar_categories' => 'التصنيفات',
     'sidebar_charity' => 'الأعمال الخيرية',
