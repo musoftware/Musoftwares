@@ -76,7 +76,7 @@ class SendCampaignBroadcastJob implements ShouldQueue
                             }
 
                             $message = CloudMessage::new()
-                                ->withTarget('token', $user->fcm_token)
+                                ->withToken($user->fcm_token)
                                 ->withNotification($personalNotification);
 
                             $messages[] = $this->configureMessageData($message, $trackingUrl);

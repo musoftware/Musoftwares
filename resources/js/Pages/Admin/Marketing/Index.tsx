@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
@@ -82,7 +82,14 @@ const WEEKLY: [string, string][] = [
     ['Write down which link brought a visit or an order (the utm links below tell you).', 'سجّل أنهي لينك جاب زيارة أو طلب (لينكات utm تحت بتقولك).'],
 ];
 
-export default function Index({ kits }: { kits: Kit[] }) {
+interface RecoveryDiscount {
+    percent: number;
+    max: number;
+    hours: number;
+}
+
+export default function Index({ kits, recoveryDiscount }: { kits: Kit[]; recoveryDiscount: RecoveryDiscount }) {
+    const [percent, setPercent] = useState<number>(recoveryDiscount.percent);
     const [lang, setLang] = useState<Lang>('ar');
     const [slug, setSlug] = useState<string | null>(kits[0]?.slug ?? null);
     const [copied, setCopied] = useState<string | null>(null);
@@ -116,6 +123,37 @@ export default function Index({ kits }: { kits: Kit[] }) {
                         <Button type="button" size="sm" variant={lang === 'en' ? 'default' : 'outline'} onClick={() => setLang('en')}>English</Button>
                     </div>
                 </div>
+
+                <section className="rounded-md border p-4 space-y-3">
+                    <h2 className="text-lg font-semibold">{t('Discount in the unpaid-order email', 'الخصم في إيميل الطلب غير المدفوع')}</h2>
+                    <p className="text-sm text-muted-foreground max-w-2xl">
+                        {t(
+                            `A customer who started an order and did not pay gets one email. The link in it applies this discount to the same order and works for ${recoveryDiscount.hours} hours. Use 0 to turn it off.`,
+                            `العميل اللي بدأ طلب وما دفعش بيوصله إيميل واحد. اللينك اللي فيه بيطبّق الخصم ده على نفس الطلب وبيشتغل ${recoveryDiscount.hours} ساعة. اكتب 0 علشان تقفله.`
+                        )}
+                    </p>
+                    <form
+                        className="flex flex-wrap items-end gap-3"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            router.put(route('admin.marketing.discount'), { percent }, { preserveScroll: true });
+                        }}
+                    >
+                        <label className="text-sm font-medium" htmlFor="recovery-percent">
+                            {t('Percent', 'النسبة')} (0 - {recoveryDiscount.max})
+                        </label>
+                        <input
+                            id="recovery-percent"
+                            type="number"
+                            min={0}
+                            max={recoveryDiscount.max}
+                            value={percent}
+                            onChange={(event) => setPercent(Number(event.target.value))}
+                            className="w-24 rounded-md border bg-background px-3 py-2 text-sm"
+                        />
+                        <Button type="submit" size="sm">{t('Save', 'حفظ')}</Button>
+                    </form>
+                </section>
 
                 <section className="rounded-md border p-4 space-y-3">
                     <h2 className="text-lg font-semibold">{t('This week', 'الأسبوع ده')}</h2>

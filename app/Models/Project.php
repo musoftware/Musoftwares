@@ -553,8 +553,10 @@ class Project extends Model
                 'currency_id' => $user->currency_id,
             ]);
 
+            // Stored as the real moment (UTC). A Cairo-clock Carbon would be saved as Cairo digits and read back as UTC,
+            // which moves the date forward after 21:00 Cairo time and charges the same day twice.
             $this->update([
-                'last_ai_charged_at' => Carbon::now('Africa/Cairo'),
+                'last_ai_charged_at' => now(),
             ]);
 
             \App\Helpers\BalancesHelper::UpdateBalance($user, $this);

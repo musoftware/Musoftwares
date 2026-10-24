@@ -126,6 +126,26 @@ class MarketingKitTest extends TestCase
         );
     }
 
+    public function test_the_admin_can_change_the_reminder_discount_and_nobody_else_can(): void
+    {
+        $this->seedAll();
+
+        $this->actingAs(User::factory()->create(['onboarding_completed' => true]))
+            ->put('/admin/marketing/discount', ['percent' => 15])->assertForbidden();
+
+        $admin = $this->actingAs($this->admin());
+        $admin->put('/admin/marketing/discount', ['percent' => 15])->assertSessionHas('success');
+        $this->assertSame(15, app(\Modules\SoftwareStore\Services\RecoveryDiscount::class)->percent());
+
+        $admin->get('/admin/marketing')->assertInertia(fn (AssertableInertia $page) => $page->where('recoveryDiscount.percent', 15));
+
+        $admin->put('/admin/marketing/discount', ['percent' => 0])->assertSessionHas('success');
+        $this->assertSame(0, app(\Modules\SoftwareStore\Services\RecoveryDiscount::class)->percent());
+
+        $admin->put('/admin/marketing/discount', ['percent' => 31])->assertSessionHasErrors('percent');
+        $admin->put('/admin/marketing/discount', ['percent' => -1])->assertSessionHasErrors('percent');
+    }
+
     public function test_share_links_are_on_product_and_blog_pages(): void
     {
         $this->seedAll();

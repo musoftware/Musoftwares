@@ -23,6 +23,8 @@ class DailyNewServicesDigestNotification extends Notification implements ShouldQ
     {
         $this->websiteServices = $websiteServices;
         $this->marketplaceServices = $marketplaceServices;
+        // The digest is written in English. MailMessage has no locale(); the notification itself does.
+        $this->locale('en');
     }
 
     /**
@@ -44,7 +46,6 @@ class DailyNewServicesDigestNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->locale('en')
             ->subject(__('services.daily_digest_subject', [], 'en'))
             ->view('emails.services.digest', [
                 'websiteServices' => $this->websiteServices,

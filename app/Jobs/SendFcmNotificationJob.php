@@ -43,7 +43,7 @@ class SendFcmNotificationJob implements ShouldQueue
             }
 
             if (count($validTokens) === 1) {
-                $messaging->send($message->withTarget('token', $validTokens[0]));
+                $messaging->send($message->withToken($validTokens[0]));
             } else {
                 // Kreait Firebase multicast chunks at most 500 tokens per request
                 foreach (array_chunk($validTokens, 500) as $chunk) {

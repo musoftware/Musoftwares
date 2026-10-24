@@ -283,7 +283,7 @@ class ProjectBoardAiTest extends TestCase
         $user->refresh();
         $this->assertEquals(10.00, (float)$user->user_balance);
 
-        $yesterday = \Carbon\Carbon::now('Africa/Cairo')->subDay();
+        $yesterday = now()->subDay();
         $project->update(['last_ai_charged_at' => $yesterday]);
 
         $chargedNextDay = $project->ensureAiIsCharged($user);
@@ -297,5 +297,24 @@ class ProjectBoardAiTest extends TestCase
         $this->assertFalse($chargedNoBalance);
         $project->refresh();
         $this->assertFalse($project->ai_enabled);
+    }
+
+    /** The fee is once per Cairo day, also late in the evening (after 21:00 Cairo time the UTC date is already tomorrow). */
+    public function test_daily_ai_fee_is_charged_once_late_in_the_cairo_evening(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-10-24 22:30:00', 'Africa/Cairo'));
+
+        $egp = \App\Models\Currency::firstOrCreate(['currency' => 'EGP'], ['symbol' => 'Egp', 'rate' => 1.000]);
+        $user = User::factory()->create(['currency_id' => $egp->id]);
+        \App\Models\Transaction::create(['user_id' => $user->id, 'amount' => 100.00, 'reason' => 'Deposit', 'category' => 'other', 'type' => 'in', 'currency_id' => $egp->id]);
+        \App\Helpers\BalancesHelper::UpdateBalance($user);
+        $project = Project::create(['user_id' => $user->id, 'project_name' => 'Evening', 'status' => 'open', 'currency' => $egp->id, 'ai_enabled' => true, 'last_ai_charged_at' => null]);
+
+        $this->assertTrue($project->ensureAiIsCharged($user));
+        $this->assertTrue($project->fresh()->ensureAiIsCharged($user));
+        $this->assertTrue($project->fresh()->ensureAiIsCharged($user));
+
+        $this->assertSame(1, \App\Models\Transaction::where('user_id', $user->id)->where('type', 'used')->count(), 'charged once for the day');
+        $this->assertEquals(90.00, (float) $user->fresh()->user_balance);
     }
 }

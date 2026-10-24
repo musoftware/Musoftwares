@@ -29,6 +29,7 @@ Route::middleware('web')->group(function () {
     // ── Admin ───────────────────────────────────────────────────────
     Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/marketing', [AdminMarketingController::class, 'index'])->name('marketing.index');
+        Route::put('/marketing/discount', [AdminMarketingController::class, 'updateDiscount'])->name('marketing.discount');
         Route::get('/software-products', [AdminSoftwareProductController::class, 'index'])->name('software.index');
         Route::get('/software-products/{product}/edit', [AdminSoftwareProductController::class, 'edit'])->name('software.edit');
         Route::post('/software-products/{product}', [AdminSoftwareProductController::class, 'update'])->name('software.update');
