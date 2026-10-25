@@ -15,6 +15,7 @@ import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import MobileBottomActionBar from '@/Components/Public/MobileBottomActionBar';
 import ThemeToggle from '@/Components/ThemeToggle';
 import SiteHeader from '@/Components/Public/SiteHeader';
+import SiteFooter from '@/Components/Public/SiteFooter';
 
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
@@ -157,73 +158,10 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                 {children}
             </main>
 
-            {/* Clean Apple Minimalist Footer */}
-            <footer className="w-full bg-[#f5f5f7] dark:bg-[#161617] border-t border-black/5 dark:border-white/10 py-16 px-6 sm:px-12 text-[12px] text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70">
-                <div className="max-w-[1280px] mx-auto flex flex-col lg:flex-row justify-between gap-12">
-
-                    {/* 4 Columns */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12 flex-1">
-                        <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.contact_us')}</div>
-                            <ul className="space-y-2 text-[12px]">
-                                <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.whatsapp_direct')}</a></li>
-                                <li><a href="mailto:admin@musoftwares.com" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.email_studio')}</a></li>
-                                <li><SafeLink href="/start-project" className="hover:text-[#0071e3] transition-colors text-[#0071e3] font-medium">{__('general.start_project_wizard')}</SafeLink></li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.solutions')}</div>
-                            <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/platforms/erp" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_erp')}</SafeLink></li>
-                                <li><SafeLink href="/platforms/crm" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">WhatsApp Cloud API</SafeLink></li>
-                                <li><SafeLink href="/platforms/cloud" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_meta_suite')}</SafeLink></li>
-                                <li><SafeLink href="/start-project" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_wizard')}</SafeLink></li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.press_center')}</div>
-                            <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/estimator" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.estimator')}</SafeLink></li>
-                                <li><SafeLink href="/portfolio" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.portfolio')}</SafeLink></li>
-                                <li><SafeLink href="/about/mahmoud-amin" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.leadership_bio')}</SafeLink></li>
-                                <li><SafeLink href="/compare/laravel-vs-nodejs" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('frontend.public_layout_footer_benchmarks')}</SafeLink></li>
-                            </ul>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="text-[#1d1d1f] dark:text-[#f5f5f7] font-semibold tracking-tight">{__('general.legal')}</div>
-                            <ul className="space-y-2 text-[12px]">
-                                <li><SafeLink href="/privacy-policy" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('landing_legal.privacy_title')}</SafeLink></li>
-                                <li><SafeLink href="/terms-of-service" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">{__('general.terms_of_service')}</SafeLink></li>
-                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">{__('frontend.public_layout_footer_security')}</span></li>
-                                <li><span className="text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">{__('frontend.public_layout_footer_gdpr')}</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Right Side */}
-                    <div className="flex flex-col justify-between items-start lg:items-end space-y-6">
-                        <div className="flex items-center space-x-5 rtl:space-x-reverse text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70">
-                            <a href="https://www.linkedin.com/in/musoftwareuno/?locale=ar" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">LinkedIn</a>
-                            <a href="https://github.com/musoftware" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">GitHub</a>
-                            <a href="https://x.com/MusoftwareUno" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">X</a>
-                            <a href="https://www.facebook.com/musoftwares.com.page/" target="_blank" rel="noopener noreferrer" className="hover:text-[#1d1d1f] dark:hover:text-white transition-colors">Facebook</a>
-                        </div>
-
-                        <div className="flex items-center space-x-2 rtl:space-x-reverse text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 text-[11px]">
-                            <span>MUSOFTWARES STUDIO</span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="max-w-[1280px] mx-auto mt-12 pt-6 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 text-[11px]">
-                    <div>&copy; {new Date().getFullYear()} Musoftwares Inc. {__('general.all_rights_reserved')}</div>
-                    <div className="mt-1 sm:mt-0">{__('frontend.public_layout_location')} • {__('general.worldwide_delivery')}</div>
-                </div>
-            </footer>
+            {/* Same footer as the Blade pages (content from App\Support\SiteNav::footer()). */}
+            <SiteFooter />
+            {/* Keeps the last footer line visible above the phone action bar (same as Blade). */}
+            <div className="h-20 lg:hidden" aria-hidden="true" />
 
             {/* Guest Ticket Dialog */}
             <Dialog open={isGuestTicketOpen} onOpenChange={setIsGuestTicketOpen}>

@@ -217,138 +217,23 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased bg-[#ffffff] text-[#1d1d1f] selection:bg-[#0071e3] selection:text-white">
 
-    <!-- Apple Exact Global Navigation Bar (Unified with Homepage Studio Header) -->
-    <header class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/5 transition-all duration-200">
-        <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 sm:px-10 min-h-[56px] py-3">
-            
-            <!-- Left: Musoftwares Official Studio Monogram Logo & Brand -->
-            <div class="flex items-center gap-8">
-                <a href="{{ url('/') }}" class="flex items-center space-x-2.5 rtl:space-x-reverse group focus:outline-none shrink-0" title="Musoftwares Studio">
-                    <svg class="w-5 h-5 fill-[#1d1d1f] group-hover:text-[#000000] transition-colors" viewBox="0 0 307 307" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 48 54 L 48 223 L 51 226 L 52 226 L 54 228 L 55 228 L 57 230 L 58 230 L 60 232 L 61 232 L 63 234 L 64 234 L 66 236 L 67 236 L 69 238 L 70 238 L 72 240 L 73 240 L 75 242 L 76 242 L 78 244 L 79 244 L 81 246 L 82 246 L 84 248 L 91 252 L 94 255 L 97 256 L 99 258 L 100 258 L 102 260 L 103 260 L 105 262 L 106 262 L 108 264 L 109 264 L 132 280 L 135 281 L 141 286 L 144 287 L 146 289 L 153 293 L 155 291 L 158 290 L 161 287 L 162 287 L 164 285 L 165 285 L 167 283 L 168 283 L 170 281 L 171 281 L 173 279 L 174 279 L 176 277 L 177 277 L 179 275 L 180 275 L 182 273 L 183 273 L 185 271 L 186 271 L 188 269 L 189 269 L 191 267 L 192 267 L 194 265 L 195 265 L 197 263 L 198 263 L 200 261 L 201 261 L 203 259 L 204 259 L 206 257 L 207 257 L 209 255 L 210 255 L 212 253 L 213 253 L 215 251 L 216 251 L 218 249 L 219 249 L 221 247 L 222 247 L 224 245 L 225 245 L 227 243 L 228 243 L 230 241 L 231 241 L 233 239 L 234 239 L 236 237 L 237 237 L 239 235 L 240 235 L 242 233 L 243 233 L 245 231 L 246 231 L 256 224 L 256 220 L 257 219 L 257 216 L 256 215 L 256 54 L 254 56 L 250 58 L 247 61 L 246 61 L 243 64 L 236 68 L 226 76 L 225 76 L 223 78 L 219 80 L 216 83 L 215 83 L 213 85 L 206 89 L 203 92 L 196 96 L 193 99 L 186 103 L 183 106 L 182 106 L 180 108 L 173 112 L 170 115 L 169 115 L 164 119 L 164 120 L 166 122 L 167 122 L 174 128 L 176 128 L 180 125 L 181 125 L 184 122 L 188 120 L 191 117 L 198 113 L 201 110 L 202 110 L 204 108 L 211 104 L 214 101 L 215 101 L 217 99 L 224 95 L 227 92 L 231 90 L 237 85 L 239 84 L 241 85 L 241 216 L 238 219 L 237 219 L 232 223 L 229 224 L 227 226 L 223 228 L 220 231 L 217 232 L 215 234 L 211 236 L 208 239 L 202 242 L 200 244 L 199 244 L 197 246 L 196 246 L 194 248 L 193 248 L 191 250 L 190 250 L 188 252 L 187 252 L 185 254 L 184 254 L 182 256 L 181 256 L 179 258 L 178 258 L 176 260 L 175 260 L 173 262 L 172 262 L 170 264 L 163 268 L 160 271 L 159 271 L 154 275 L 151 275 L 149 273 L 148 273 L 146 271 L 145 271 L 143 269 L 142 269 L 140 267 L 139 267 L 137 265 L 136 265 L 134 263 L 133 263 L 131 261 L 130 261 L 128 259 L 127 259 L 125 257 L 124 257 L 122 255 L 121 255 L 119 253 L 118 253 L 116 251 L 115 251 L 92 235 L 86 232 L 80 227 L 77 226 L 75 224 L 68 220 L 64 216 L 64 85 L 66 84 L 68 86 L 69 86 L 72 89 L 73 89 L 75 91 L 82 95 L 85 98 L 86 98 L 92 103 L 93 103 L 95 105 L 102 109 L 105 112 L 106 112 L 112 117 L 113 117 L 115 119 L 122 123 L 125 126 L 126 126 L 128 128 L 129 128 L 131 130 L 138 134 L 145 140 L 152 144 L 159 150 L 163 152 L 166 155 L 167 155 L 175 161 L 177 161 L 180 158 L 181 158 L 183 156 L 184 156 L 186 154 L 187 154 L 189 152 L 190 152 L 192 150 L 199 146 L 202 143 L 203 143 L 210 138 L 211 139 L 211 204 L 201 211 L 200 211 L 198 213 L 197 213 L 195 215 L 194 215 L 192 217 L 191 217 L 189 219 L 188 219 L 186 221 L 185 221 L 183 223 L 182 223 L 180 225 L 179 225 L 177 227 L 176 227 L 174 229 L 173 229 L 171 231 L 170 231 L 168 233 L 167 233 L 165 235 L 164 235 L 162 237 L 161 237 L 159 239 L 158 239 L 156 241 L 155 241 L 153 243 L 152 243 L 150 241 L 149 241 L 147 239 L 146 239 L 144 237 L 143 237 L 141 235 L 140 235 L 138 233 L 137 233 L 135 231 L 134 231 L 132 229 L 131 229 L 108 213 L 105 212 L 102 209 L 99 208 L 94 204 L 94 141 L 93 140 L 94 139 L 98 140 L 104 145 L 105 145 L 128 161 L 130 161 L 140 153 L 141 153 L 137 149 L 134 148 L 131 145 L 130 145 L 127 142 L 120 138 L 117 135 L 116 135 L 114 133 L 113 133 L 111 131 L 110 131 L 108 129 L 101 125 L 98 122 L 97 122 L 95 120 L 88 116 L 85 113 L 78 109 L 78 211 L 88 218 L 89 218 L 91 220 L 92 220 L 94 222 L 95 222 L 97 224 L 98 224 L 100 226 L 101 226 L 103 228 L 104 228 L 106 230 L 107 230 L 109 232 L 110 232 L 112 234 L 113 234 L 115 236 L 116 236 L 118 238 L 119 238 L 121 240 L 122 240 L 124 242 L 125 242 L 127 244 L 128 244 L 130 246 L 131 246 L 133 248 L 134 248 L 136 250 L 137 250 L 139 252 L 140 252 L 142 254 L 143 254 L 145 256 L 146 256 L 148 258 L 149 258 L 151 260 L 155 259 L 157 257 L 158 257 L 160 255 L 161 255 L 163 253 L 164 253 L 166 251 L 167 251 L 169 249 L 170 249 L 172 247 L 173 247 L 175 245 L 176 245 L 178 243 L 179 243 L 181 241 L 182 241 L 184 239 L 185 239 L 187 237 L 188 237 L 211 221 L 214 220 L 217 217 L 223 214 L 227 210 L 227 109 L 224 110 L 222 112 L 218 114 L 215 117 L 214 117 L 212 119 L 208 121 L 205 124 L 204 124 L 202 126 L 201 126 L 199 128 L 192 132 L 189 135 L 186 136 L 183 139 L 182 139 L 177 143 L 174 143 L 168 138 L 167 138 L 161 133 L 160 133 L 157 130 L 153 128 L 150 125 L 143 121 L 133 113 L 132 113 L 130 111 L 126 109 L 123 106 L 122 106 L 120 104 L 113 100 L 110 97 L 109 97 L 107 95 L 100 91 L 97 88 L 90 84 L 87 81 L 83 79 L 80 76 L 73 72 L 70 69 L 63 65 L 56 59 L 55 59 L 49 54 Z"/>
-                    </svg>
-                    <span class="text-[19px] sm:text-[21px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
-                        Musoftware
-                    </span>
-                    <span class="hidden sm:inline text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3]">
-                        Marketplace
-                    </span>
-                </a>
+    {{-- Same header as every public page (layouts/site-header). Marketplace-only links live in the
+         section bar below, the way large sites keep one global header plus a section menu. --}}
+    @include('layouts.site-header')
 
-                <!-- Desktop Navigation Links -->
-                <nav class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse text-[13px] font-normal text-[#1d1d1f]/75">
-                    <a href="{{ route('marketplace.services.index') }}" class="font-medium text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'استكشف الخدمات والأدوات' : 'Explore Store' }}</a>
-                    <a href="/platforms" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'المنصات' : 'Platforms' }}</a>
-                    <a href="/solutions" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'الحلول' : 'Solutions' }}</a>
-                    <a href="/portfolio" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
-                    <a href="/estimator" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'حاسبة التكلفة' : 'Estimator' }}</a>
-                    <a href="{{ route('library.index') }}" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Library' }}</a>
-                </nav>
-            </div>
-
-            <!-- Right: Actions & User Navigation -->
-            <div class="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse shrink-0">
-                
-                <!-- Language Switcher -->
-                @php
-                    $isArabic = $locale === 'ar';
-                    $switchUrl = $isArabic ? (Str::contains(url()->full(), '?') ? url()->full().'&lang=en' : url()->full().'?lang=en') : (Str::contains(url()->full(), '?') ? url()->full().'&lang=ar' : url()->full().'?lang=ar');
-                @endphp
-                <a href="{{ $switchUrl }}" class="px-2.5 py-1 rounded-[980px] text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition-all" title="Switch Language">
-                    <span>{{ $isArabic ? 'English' : 'العربية' }}</span>
-                </a>
-
-                <!-- Add / Publish Service Button -->
-                <a href="{{ route('marketplace.services.create') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[980px] text-[12px] font-medium border border-black/10 bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed] transition-all shadow-xs">
-                    <i class="ri-add-line text-sm"></i>
-                    <span>{{ $locale === 'ar' ? 'أضف خدمتك' : 'Sell a Service' }}</span>
-                </a>
-
-                <!-- Auth Navigation & Wallet Balance -->
-                @auth
-                    <!-- Wallet Balance Pill -->
-                    <a href="{{ Route::has('billing.invoices.index') ? route('billing.invoices.index') : url('/dashboard') }}" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-[980px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[12px] font-medium transition-all shadow-2xs" title="{{ $locale === 'ar' ? 'رصيد المحفظة المتاح' : 'Available Balance' }}">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span class="font-mono font-semibold">${{ number_format(auth()->user()->available_balance(), 2) }}</span>
-                    </a>
-
-                    <div class="relative group">
-                        <button type="button" class="flex items-center gap-1.5 p-1 rounded-full hover:bg-[#f5f5f7] transition-all">
-                            <div class="w-7 h-7 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center font-bold text-[11px]">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
-                            </div>
-                            <i class="ri-arrow-down-s-line text-[#86868b] text-xs"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div class="absolute {{ $locale === 'ar' ? 'left-0' : 'right-0' }} top-full mt-2 w-56 rounded-2xl bg-white border border-black/10 shadow-xl py-2 hidden group-hover:block z-50">
-                            <div class="px-4 py-2 border-b border-black/5">
-                                <p class="text-xs font-bold text-[#1d1d1f] truncate">{{ auth()->user()->name }}</p>
-                                <p class="text-[11px] text-[#86868b] truncate">{{ auth()->user()->email }}</p>
-                            </div>
-                            <a href="{{ route('marketplace.orders.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
-                                <i class="ri-shopping-bag-3-line text-[#0071e3]"></i>
-                                <span>{{ $locale === 'ar' ? 'طلباتي ومشترياتي' : 'My Orders' }}</span>
-                            </a>
-                            <a href="{{ route('marketplace.favorites.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
-                                <i class="ri-bookmark-line text-rose-500"></i>
-                                <span>{{ $locale === 'ar' ? 'المفضلة' : 'Saved' }}</span>
-                            </a>
-                            <a href="{{ route('marketplace.home') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
-                                <i class="ri-dashboard-3-line text-indigo-500"></i>
-                                <span>{{ $locale === 'ar' ? 'لوحة تحكم السوق' : 'Marketplace Command' }}</span>
-                            </a>
-                            <a href="/dashboard" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
-                                <i class="ri-apps-2-line text-slate-700"></i>
-                                <span>{{ $locale === 'ar' ? 'بوابة الأعمال الرئيسية' : 'Studio Portal' }}</span>
-                            </a>
-                            <div class="border-t border-black/5 my-1"></div>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-start">
-                                    <i class="ri-logout-box-r-line"></i>
-                                    <span>{{ $locale === 'ar' ? 'تسجيل الخروج' : 'Log Out' }}</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    {{-- Phones get Sign in / Join from the menu; the header only fits logo, language and menu at 360px. --}}
-                    <a href="{{ route('login') }}" class="hidden sm:inline text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
-                        {{ $locale === 'ar' ? 'دخول' : 'Sign in' }}
-                    </a>
-                    <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
-                        {{ $locale === 'ar' ? 'انضم للمنصة' : 'Join' }}
-                    </a>
-                @endauth
-
-                <!-- Mobile Hamburger Toggle -->
-                <button onclick="document.getElementById('market-mobile-menu').classList.toggle('hidden')" class="lg:hidden p-2 text-[#1d1d1f]/70 hover:text-[#1d1d1f] transition-colors" aria-label="Toggle navigation">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7h16M4 17h16"/></svg>
-                </button>
-            </div>
-
-        </div>
-
-        <!-- Apple Mobile Menu Dropdown -->
-        <div id="market-mobile-menu" class="hidden lg:hidden bg-white/95 backdrop-blur-xl border-b border-black/[0.08] px-6 py-6 space-y-3 text-[14px] font-medium text-[#1d1d1f]">
-            <a href="{{ route('marketplace.services.index') }}" class="block py-1.5 text-[#0071e3] font-semibold border-b border-black/[0.05]">{{ $locale === 'ar' ? 'استكشف الخدمات والأدوات' : 'Explore Store' }}</a>
-            <a href="/platforms" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'المنصات السحابية' : 'Platforms' }}</a>
-            <a href="/solutions" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'الحلول القطاعية' : 'Solutions' }}</a>
-            <a href="/portfolio" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
-            <a href="/estimator" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'حاسبة التكلفة' : 'Estimator' }}</a>
-            <a href="{{ route('library.index') }}" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Library' }}</a>
+    <nav class="w-full bg-white border-b border-black/[0.06]" aria-label="{{ $locale === 'ar' ? 'قائمة سوق الخدمات' : 'Marketplace menu' }}">
+        <div class="max-w-[1240px] mx-auto px-4 sm:px-8 h-12 flex items-center gap-5 overflow-x-auto whitespace-nowrap text-[13px] font-medium">
+            <a href="{{ route('marketplace.services.index') }}" class="shrink-0 font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</a>
+            <span class="shrink-0 h-4 w-px bg-black/10" aria-hidden="true"></span>
+            <a href="{{ route('marketplace.services.index') }}" class="shrink-0 {{ request()->routeIs('marketplace.services.index') ? 'text-[#0071e3]' : 'text-[#1d1d1f]/70 hover:text-[#0071e3]' }}">{{ $locale === 'ar' ? 'استكشف الخدمات' : 'Explore' }}</a>
+            <a href="{{ route('marketplace.services.create') }}" class="shrink-0 text-[#1d1d1f]/70 hover:text-[#0071e3]">{{ $locale === 'ar' ? 'أضف خدمتك' : 'Sell a service' }}</a>
             @auth
-                <a href="{{ route('marketplace.orders.index') }}" class="block py-1.5 hover:text-[#0071e3] border-b border-black/[0.05]">{{ $locale === 'ar' ? 'طلباتي' : 'My Orders' }}</a>
-                <a href="{{ route('marketplace.home') }}" class="block py-1.5 text-[#0071e3] font-semibold">{{ $locale === 'ar' ? 'لوحة تحكم السوق ➔' : 'Marketplace Dashboard ➔' }}</a>
-            @else
-                <div class="pt-2 flex items-center gap-3">
-                    <a href="{{ route('login') }}" class="flex-1 text-center py-2 rounded-xl border border-black/10 text-sm font-medium">{{ $locale === 'ar' ? 'دخول' : 'Sign in' }}</a>
-                    <a href="{{ route('register') }}" class="flex-1 text-center py-2 rounded-xl bg-[#0071e3] text-white text-sm font-medium">{{ $locale === 'ar' ? 'انضمام' : 'Join' }}</a>
-                </div>
+                <a href="{{ route('marketplace.orders.index') }}" class="shrink-0 {{ request()->routeIs('marketplace.orders.*') ? 'text-[#0071e3]' : 'text-[#1d1d1f]/70 hover:text-[#0071e3]' }}">{{ $locale === 'ar' ? 'طلباتي' : 'My orders' }}</a>
+                <a href="{{ route('marketplace.favorites.index') }}" class="shrink-0 {{ request()->routeIs('marketplace.favorites.*') ? 'text-[#0071e3]' : 'text-[#1d1d1f]/70 hover:text-[#0071e3]' }}">{{ $locale === 'ar' ? 'المفضلة' : 'Saved' }}</a>
+                <a href="{{ route('marketplace.home') }}" class="shrink-0 {{ request()->routeIs('marketplace.home') ? 'text-[#0071e3]' : 'text-[#1d1d1f]/70 hover:text-[#0071e3]' }}">{{ $locale === 'ar' ? 'لوحة السوق' : 'Seller dashboard' }}</a>
             @endauth
         </div>
-    </header>
+    </nav>
 
     <!-- Apple Exact Announcement Ribbon Banner -->
     <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-2.5 px-4 text-center text-[12px] text-[#1d1d1f] flex items-center justify-center gap-1.5">
@@ -390,10 +275,9 @@
         @yield('content')
     </main>
 
-    <!-- Apple Exact 5-Column Global Directory Footer -->
-    <footer class="w-full bg-[#f5f5f7] border-t border-black/[0.08] pt-12 pb-12 px-6 sm:px-12 text-[#86868b] text-[12px] mt-16">
-        <div class="max-w-[1024px] mx-auto space-y-6">
-            
+    {{-- Marketplace trust notes and breadcrumb, then the same footer as every public page. --}}
+    <section class="w-full bg-[#f5f5f7] border-t border-black/[0.08] pt-10 pb-8 px-6 sm:px-12 text-[#86868b] text-[12px] mt-16">
+        <div class="max-w-[1100px] mx-auto space-y-6">
             <!-- Numbered Footnotes Disclosures -->
             <div class="space-y-2 border-b border-[#d2d2d7]/60 pb-6 text-[11px] leading-relaxed text-[#86868b]">
                 <p>1. Escrow Protection: Funds for custom software projects and digital tools are locked safely until buyer confirmation and approval of final deliverables.</p>
@@ -416,80 +300,9 @@
                     <span class="text-[#1d1d1f] truncate max-w-[200px]">{{ $title ?? $meta['title'] }}</span>
                 @endif
             </div>
-
-            <!-- 5-Column Apple Directory Links Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pt-4 pb-8">
-                
-                <!-- Col 1: Software Categories -->
-                <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'أقسام الخدمات' : 'Categories' }}</h3>
-                    <ul class="space-y-2 text-[12px]">
-                        <li><a href="{{ route('marketplace.services.index', ['category' => 'web-development']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'تطوير الويب والمتاجر' : 'Web & Platforms' }}</a></li>
-                        <li><a href="{{ route('marketplace.services.index', ['category' => 'graphic-design']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'تصميم واجهات UI/UX' : 'UI/UX Design' }}</a></li>
-                        <li><a href="{{ route('marketplace.services.index', ['category' => 'programming-tech']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'الأدوات والبوتات' : 'Scripts & Bots' }}</a></li>
-                        <li><a href="{{ route('marketplace.services.index', ['category' => 'digital-marketing']) }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'أتمتة التسويق' : 'Marketing & SEO' }}</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 2: Studio Architecture -->
-                <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'الهندسة والمعايير' : 'Architecture' }}</h3>
-                    <ul class="space-y-2 text-[12px]">
-                        <li><a href="/estimator" class="hover:text-[#0071e3] transition-colors">Project Scope Estimator</a></li>
-                        <li><a href="/portfolio" class="hover:text-[#0071e3] transition-colors">Production Case Studies</a></li>
-                        <li><a href="/compare" class="hover:text-[#0071e3] transition-colors">Tech Benchmarks</a></li>
-                        <li><a href="/start-project" class="hover:text-[#0071e3] transition-colors">Custom System Builder</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Direct Consultation -->
-                <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'الاستشارات المباشرة' : 'Direct Access' }}</h3>
-                    <ul class="space-y-2 text-[12px]">
-                        <li><a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors text-[#0066cc] font-medium">WhatsApp Direct ➔</a></li>
-                        <li><a href="mailto:admin@musoftwares.com" class="hover:text-[#0071e3] transition-colors">admin@musoftwares.com</a></li>
-                        <li><a href="/company/contact" class="hover:text-[#0071e3] transition-colors">Suez Engineering Lab</a></li>
-                        <li><a href="{{ route('marketplace.services.create') }}" class="hover:text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'انضم كبائع معتمد' : 'Become a Seller' }}</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Mahmoud Amin (Founder) -->
-                <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'عن المهندس' : 'Solo Founder' }}</h3>
-                    <ul class="space-y-2 text-[12px]">
-                        <li><a href="/about/mahmoud-amin" class="hover:text-[#0071e3] transition-colors">Mahmoud Amin (Profile)</a></li>
-                        <li><a href="/about" class="hover:text-[#0071e3] transition-colors">Studio Philosophy</a></li>
-                        <li><a href="https://github.com/musoftware" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors">GitHub Repository</a></li>
-                        <li><a href="https://www.linkedin.com/in/musoftwareuno/?locale=ar" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors">LinkedIn Profile</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 5: Security & Escrow -->
-                <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'الأمان والضمان' : 'Trust & Escrow' }}</h3>
-                    <ul class="space-y-2 text-[12px]">
-                        <li><a href="/privacy-policy" class="hover:text-[#0071e3] transition-colors">Security Architecture</a></li>
-                        <li><a href="/terms-of-service" class="hover:text-[#0071e3] transition-colors">100% Escrow Guarantee</a></li>
-                        <li><a href="/terms-of-service" class="hover:text-[#0071e3] transition-colors">Terms of Service</a></li>
-                        <li><a href="/cookie-policy" class="hover:text-[#0071e3] transition-colors">Privacy & Data</a></li>
-                    </ul>
-                </div>
-
-            </div>
-
-            <!-- Footer Copyright Bottom Row -->
-            <div class="border-t border-[#d2d2d7]/60 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#86868b]">
-                <p>© {{ date('Y') }} Musoftwares Inc. {{ $locale === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.' }}</p>
-                <div class="flex items-center gap-4">
-                    <a href="/privacy-policy" class="hover:text-[#1d1d1f]">Privacy Policy</a>
-                    <a href="/terms-of-service" class="hover:text-[#1d1d1f]">Terms of Use</a>
-                    <a href="/cookie-policy" class="hover:text-[#1d1d1f]">Legal</a>
-                    <a href="{{ route('marketplace.services.index') }}" class="text-[#0071e3]">Marketplace</a>
-                </div>
-            </div>
-
         </div>
-    </footer>
+    </section>
+    @include('layouts.site-footer')
 
     @stack('scripts')
 </body>

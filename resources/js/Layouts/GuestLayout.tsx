@@ -37,7 +37,7 @@ export default function Guest({ children }: PropsWithChildren) {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
-                                Musoftwares
+                                Musoftware
                             </span>
                             <span className="text-[10px] uppercase tracking-wider text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 font-semibold">
                                 {__('frontend.guest_layout_tagline')}
@@ -67,7 +67,7 @@ export default function Guest({ children }: PropsWithChildren) {
 
                 {/* Bottom Footer Links */}
                 <div className="flex items-center justify-between text-xs text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 border-t border-black/5 dark:border-white/10 pt-6 relative z-10">
-                    <span>© {new Date().getFullYear()} Musoftwares Studio</span>
+                    <span>© {new Date().getFullYear()} Musoftware</span>
                     <div className="flex space-x-6 text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60">
                         <Link href="/docs" className="hover:text-[#0071e3] transition-colors">{__('general.help')}</Link>
                         <Link href="/privacy-policy" className="hover:text-[#0071e3] transition-colors">{__('general.privacy')}</Link>
@@ -90,7 +90,7 @@ export default function Guest({ children }: PropsWithChildren) {
                             <ApplicationLogo className="w-full h-full object-contain" />
                         </div>
                         <span className="text-base font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
-                            Musoftwares
+                            Musoftware
                         </span>
                     </Link>
                 </div>

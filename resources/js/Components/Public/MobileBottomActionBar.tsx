@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import { MessageCircle, LayoutGrid, User, Sparkles, Send } from 'lucide-react';
-import { __ } from '@/lib/i18n';
+import { usePage } from '@inertiajs/react';
+import { MessageCircle, LayoutGrid, User } from 'lucide-react';
+import SafeLink from '@/Components/SafeLink';
+import type { SiteFooterData } from '@/Components/Public/SiteFooter';
 
 interface MobileBottomActionBarProps {
-    phoneNumber?: string;
+    /** Kept for compatibility; the bar now opens WhatsApp like the Blade version. */
     onOpenTicket?: () => void;
 }
 
-export default function MobileBottomActionBar({
-    phoneNumber = "201015218548",
-    onOpenTicket,
-}: MobileBottomActionBarProps) {
-    const { auth } = usePage<any>().props || {};
+/**
+ * Phone action bar. Items come from App\Support\SiteNav::footer()['mobile_bar'], the same data the
+ * Blade partial resources/views/layouts/site-mobile-actions.blade.php renders, so both look alike.
+ */
+export default function MobileBottomActionBar(_props: MobileBottomActionBarProps) {
+    const { siteFooter } = usePage().props as unknown as { siteFooter: SiteFooterData };
+    const bar = siteFooter.mobile_bar;
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -20,10 +23,8 @@ export default function MobileBottomActionBar({
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             if (currentScrollY > 100 && currentScrollY > lastScrollY + 15) {
-                // Scrolling down fast -> hide
                 setIsVisible(false);
             } else if (currentScrollY < lastScrollY - 10) {
-                // Scrolling up -> show
                 setIsVisible(true);
             }
             setLastScrollY(currentScrollY);
@@ -33,11 +34,7 @@ export default function MobileBottomActionBar({
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
 
-    const openWhatsApp = () => {
-        const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
-        const msg = encodeURIComponent(__('general.whatsapp_float_default_msg'));
-        window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
-    };
+    const sideLink = 'flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold';
 
     return (
         <div
@@ -46,43 +43,25 @@ export default function MobileBottomActionBar({
             }`}
         >
             <div className="max-w-md mx-auto flex items-center justify-between gap-2">
-                {/* 1. Explore Tools / Ecosystem */}
-                <Link
-                    href="/pricing"
-                    className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
-                >
+                <SafeLink href={bar.pricing.url} className={sideLink}>
                     <LayoutGrid className="w-5 h-5 mb-0.5 text-zinc-700" />
-                    <span>{__('general.pricing')}</span>
-                </Link>
+                    <span>{bar.pricing.label}</span>
+                </SafeLink>
 
-                {/* 2. WhatsApp Direct Action (Hero Button) */}
-                <button
-                    type="button"
-                    onClick={openWhatsApp}
-                    className="flex-[2] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 transition shadow-sm text-xs font-bold uppercase tracking-wider cursor-pointer"
+                <a
+                    href={bar.whatsapp.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-[2] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 transition shadow-sm text-xs font-bold uppercase tracking-wider"
                 >
                     <MessageCircle className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
-                    <span>{__('general.chat_whatsapp')}</span>
-                </button>
+                    <span>{bar.whatsapp.label}</span>
+                </a>
 
-                {/* 3. Account / Login / Dashboard */}
-                {auth?.user ? (
-                    <Link
-                        href="/dashboard"
-                        className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
-                    >
-                        <User className="w-5 h-5 mb-0.5 text-zinc-700" />
-                        <span>{__('general.dashboard')}</span>
-                    </Link>
-                ) : (
-                    <Link
-                        href="/login"
-                        className="flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-zinc-600 hover:text-zinc-900 active:bg-zinc-100 transition text-[11px] font-bold"
-                    >
-                        <User className="w-5 h-5 mb-0.5 text-zinc-700" />
-                        <span>{__('general.login')}</span>
-                    </Link>
-                )}
+                <SafeLink href={bar.account.url} className={sideLink}>
+                    <User className="w-5 h-5 mb-0.5 text-zinc-700" />
+                    <span>{bar.account.label}</span>
+                </SafeLink>
             </div>
         </div>
     );
