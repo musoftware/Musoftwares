@@ -120,6 +120,26 @@ class StoreLanguageAuditTest extends TestCase
         $this->assertSame([], $problems, json_encode($problems, JSON_UNESCAPED_UNICODE));
     }
 
+    public function test_free_tool_pages_are_one_language_in_both_languages(): void
+    {
+        $this->seedStore();
+        $problems = [];
+
+        foreach (\Modules\SoftwareStore\Services\FreeTools::slugs() as $slug) {
+            $english = $this->visibleText($this->get("/services/tools/{$slug}?lang=en")->assertOk()->getContent());
+            $arabic = $this->visibleText($this->get("/services/tools/{$slug}?lang=ar")->assertOk()->getContent());
+
+            if ($found = $this->arabicFragments($english)) {
+                $problems["{$slug} en"] = array_slice($found, 0, 3);
+            }
+            if ($found = $this->latinFragments($arabic)) {
+                $problems["{$slug} ar"] = array_slice($found, 0, 8);
+            }
+        }
+
+        $this->assertSame([], $problems, json_encode($problems, JSON_UNESCAPED_UNICODE));
+    }
+
     public function test_homepage_and_footer_are_one_language_in_both_languages(): void
     {
         $this->seedStore();

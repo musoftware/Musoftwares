@@ -34,6 +34,7 @@ class SiteNav
             ['url' => '/services#services', 'ar' => 'خدمات مواقع وتسويق', 'en' => 'Websites and marketing services'],
             ['url' => '/marketplace/catalog', 'ar' => 'سوق الخدمات', 'en' => 'Services marketplace'],
             ['url' => '/estimator', 'ar' => 'احسب تكلفة مشروعك', 'en' => 'Estimate your project'],
+            ['url' => '/services#tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools'],
         ]],
         ['ar' => 'موسوفت', 'en' => 'Musoftware', 'links' => [
             ['url' => '/about/mahmoud-amin', 'ar' => 'من نحن', 'en' => 'About us'],

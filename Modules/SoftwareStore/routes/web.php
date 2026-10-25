@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\SoftwareStore\Http\Controllers\Admin\AdminMarketingController;
 use Modules\SoftwareStore\Http\Controllers\Admin\AdminSoftwareProductController;
+use Modules\SoftwareStore\Http\Controllers\FreeToolController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareOrderController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareProductController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareUpdateFeedController;
@@ -11,6 +12,14 @@ Route::middleware('web')->group(function () {
 
     // ── Public landing pages ────────────────────────────────────────
     Route::get('/services', [SoftwareProductController::class, 'index'])->name('services.index');
+
+    // ── Free tools (listed in /services) ────────────────────────────
+    Route::redirect('/services/tools', '/services#tools', 301);
+    Route::get('/services/tools/{slug}', [FreeToolController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('services.tools.show');
+    Route::post('/services/tools/qr-menu', [FreeToolController::class, 'storeMenu'])->middleware('throttle:5,10')->name('services.tools.menu.store');
+    Route::put('/services/tools/qr-menu/{code}', [FreeToolController::class, 'updateMenu'])->middleware('throttle:30,10')->name('services.tools.menu.update');
+    Route::get('/services/tools/qr-menu/{code}/data', [FreeToolController::class, 'menuData'])->middleware('throttle:30,1')->name('services.tools.menu.data');
+    Route::get('/menu/{code}', [FreeToolController::class, 'menu'])->where('code', '[a-z0-9]{8}')->name('services.tools.menu');
     Route::get('/services/{slug}.md', [SoftwareProductController::class, 'markdown'])->where('slug', '[a-z0-9-]+')->name('software.markdown');
     Route::get('/services/{slug}', [SoftwareProductController::class, 'show'])->name('website-services.show');
 

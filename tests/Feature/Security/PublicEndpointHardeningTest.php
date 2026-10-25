@@ -53,12 +53,12 @@ class PublicEndpointHardeningTest extends TestCase
 
     public function test_retired_tools_redirect_to_services_and_their_url_fetchers_are_gone(): void
     {
-        $this->get('/tools')->assertRedirect('/services')->assertStatus(301);
-        $this->get('/tools/website-checker')->assertRedirect('/services')->assertStatus(301);
+        $this->get('/tools')->assertRedirect('/services#tools')->assertStatus(301);
+        $this->get('/tools/website-checker')->assertRedirect('/services#tools')->assertStatus(301);
         $this->get('/tools/cost')->assertRedirect('/estimator');
 
         foreach (['inspect-website', 'inspect-speed-loss', 'inspect-payment-gateway', 'inspect-pixel', 'inspect-competitor'] as $endpoint) {
-            $this->postJson('/tools/'.$endpoint, ['url' => 'http://169.254.169.254/latest/meta-data/'])->assertRedirect('/services');
+            $this->postJson('/tools/'.$endpoint, ['url' => 'http://169.254.169.254/latest/meta-data/'])->assertRedirect('/services#tools');
         }
 
         // The estimator's lead form still posts here.

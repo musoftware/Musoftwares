@@ -76,6 +76,37 @@ class StoreSeo
         ];
     }
 
+    /** A free tool page: the tool as a free web app, its FAQ and the breadcrumb. */
+    public function toolGraph(string $slug): array
+    {
+        $url = FreeTools::url($slug);
+        $copy = __("free_tools.tools.{$slug}");
+
+        return [
+            [
+                '@type' => 'WebApplication',
+                'name' => $copy['name'],
+                'description' => $copy['description'],
+                'url' => $url,
+                'inLanguage' => app()->getLocale(),
+                'applicationCategory' => 'BusinessApplication',
+                'operatingSystem' => 'Any',
+                'isAccessibleForFree' => true,
+                'offers' => ['@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'EGP'],
+                'publisher' => ['@type' => 'Organization', 'name' => 'Musoftware', 'url' => url('/')],
+            ],
+            [
+                '@type' => 'FAQPage',
+                'mainEntity' => array_map(fn (array $item) => [
+                    '@type' => 'Question',
+                    'name' => $item['q'],
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+                ], $copy['faq']),
+            ],
+            $this->breadcrumb([[__('software.home'), url('/')], [__('software.title'), route('services.index')], [$copy['name'], $url]]),
+        ];
+    }
+
     /** One JSON-LD block that is safe to print inside a script tag. */
     public function toJson(array $graph): string
     {

@@ -9,6 +9,7 @@ use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
 use Modules\SoftwareStore\Models\SoftwareProduct;
+use Modules\SoftwareStore\Services\FreeTools;
 
 class SitemapController extends Controller
 {
@@ -72,6 +73,18 @@ class SitemapController extends Controller
                     'lastmod' => optional($product->updated_at)->toAtomString() ?: now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.9',
+                ];
+            }
+        }
+
+        // Free tools listed in /services
+        if (\Route::has('services.tools.show')) {
+            foreach (FreeTools::slugs() as $slug) {
+                $urls[] = [
+                    'loc' => FreeTools::url($slug),
+                    'lastmod' => now()->startOfDay()->toAtomString(),
+                    'changefreq' => 'monthly',
+                    'priority' => '0.8',
                 ];
             }
         }
