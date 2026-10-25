@@ -352,6 +352,9 @@ class SubscriptionService extends BaseService
                             'started_at' => now(),
                             'expires_at' => $expiry,
                             'auto_renew' => true,
+                            // A renewal starts a fresh reminder cycle for the next expiry.
+                            'expired_reminders_sent' => 0,
+                            'last_expired_reminder_sent_at' => null,
                         ]
                     );
 

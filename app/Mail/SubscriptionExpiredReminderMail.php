@@ -54,9 +54,21 @@ class SubscriptionExpiredReminderMail extends Mailable
                 'userName' => $this->user->name ?? 'Customer',
                 'moduleName' => $moduleName,
                 'expiresAt' => $expiresAtFormatted,
-                'renewUrl' => url('/subscriptions/manage'),
+                'renewUrl' => $this->renewUrl(),
                 'isArabic' => $locale === 'ar',
             ]
         );
+    }
+
+    /**
+     * Plans sold from a satellite system (saas.external_plans) renew on that system's
+     * own pricing page, e.g. GoldSaver Pro on gold.musoftwares.com/pricing.
+     */
+    private function renewUrl(): string
+    {
+        $plan = collect(config('saas.external_plans', []))->firstWhere('object', $this->subscription->object);
+        $systemUrl = $plan ? config('services.'.$plan['system'].'.url') : null;
+
+        return $systemUrl ? rtrim((string) $systemUrl, '/').'/pricing' : url('/subscriptions/manage');
     }
 }

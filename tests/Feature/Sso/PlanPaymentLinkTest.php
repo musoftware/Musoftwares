@@ -229,4 +229,35 @@ class PlanPaymentLinkTest extends TestCase
         $this->post($tampered, ['password' => 'new-password-123', 'password_confirmation' => 'new-password-123'])
             ->assertForbidden();
     }
+
+    public function test_expiry_reminder_for_gold_links_back_to_gold_pricing(): void
+    {
+        $user = User::factory()->create();
+        $sub = UserSubscription::create([
+            'user_id' => $user->id, 'object' => 'gold-saver', 'status' => 'expired',
+            'started_at' => now()->subDays(31), 'expires_at' => now()->subDay(),
+        ]);
+
+        $html = (new \App\Mail\SubscriptionExpiredReminderMail($sub, $user))->render();
+
+        $this->assertStringContainsString('https://gold.example.test/pricing', $html);
+    }
+
+    public function test_renewal_resets_the_expiry_reminder_cycle(): void
+    {
+        $user = User::factory()->create();
+        UserSubscription::create([
+            'user_id' => $user->id, 'object' => 'gold-saver', 'status' => 'expired',
+            'started_at' => now()->subDays(60), 'expires_at' => now()->subDays(30),
+            'expired_reminders_sent' => 4, 'last_expired_reminder_sent_at' => now()->subDays(2),
+        ]);
+        $this->postSigned(['plan' => self::PLAN, 'user_id' => $user->id])->assertCreated();
+
+        $this->payViaWebhook(PaymentLink::sole());
+
+        $sub = $this->goldSubscription($user);
+        $this->assertSame('active', $sub->status);
+        $this->assertSame(0, (int) $sub->expired_reminders_sent);
+        $this->assertNull($sub->last_expired_reminder_sent_at);
+    }
 }
