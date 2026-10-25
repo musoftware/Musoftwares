@@ -125,6 +125,13 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
                         </div>
                         <p className={`text-2xl font-bold tabular-nums ${valueClass}`}>{value}</p>
                         {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+                        {/* Always visible: touch screens have no hover to reveal the arrow. */}
+                        {href && (
+                            <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-slate-700 group-hover:text-slate-900">
+                                {__('general.view_details', { default: 'View details' })}
+                                <ArrowUpRight className="h-3 w-3 rtl:-scale-x-100" />
+                            </p>
+                        )}
                     </div>
                     {Icon && (
                         <div className={`rounded-lg p-2 flex-shrink-0 relative bg-slate-50 ${href ? 'group-hover:bg-slate-100 transition-colors' : ''}`}>
@@ -137,8 +144,14 @@ function MetricCard({ label, value, sub, icon: Icon, tooltip, accent = false, da
         </Card>
     );
 
+    const linkClass = 'block h-full outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 rounded-xl';
+
+    // In-page anchors (e.g. #top-earners) scroll instead of making an Inertia visit.
+    if (href?.startsWith('#')) {
+        return <a href={href} className={linkClass}>{cardContent}</a>;
+    }
     if (href) {
-        return <Link href={href} className="block h-full outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 rounded-xl">{cardContent}</Link>;
+        return <Link href={href} className={linkClass}>{cardContent}</Link>;
     }
 
     return cardContent;
@@ -264,13 +277,14 @@ export default function EarningAnalyze({
                         value={fmt(stats?.total_earnings)}
                         sub={__('admin.earning_total_commissions_sub')}
                         tooltip={__('admin.earning_total_commissions_tip')}
+                        href="/admin/commissions"
                     />
                     <MetricCard
                         icon={Users}
                         label={__('general.unique_earners')}
                         value={(stats?.total_earners ?? 0).toLocaleString()}
                         sub={__('admin.earning_unique_earners_sub')}
-                        href="/admin/users"
+                        href="#top-earners"
                     />
                     <MetricCard
                         icon={CheckCircle2}
@@ -279,6 +293,7 @@ export default function EarningAnalyze({
                         sub={__('admin.earning_cleared_sub')}
                         success
                         tooltip={__('admin.earning_cleared_tip')}
+                        href="/admin/commissions?status=cleared"
                     />
                     <MetricCard
                         icon={Clock}
@@ -289,6 +304,8 @@ export default function EarningAnalyze({
                             : __('admin.earning_in_holding_window', { amount: fmt(stats?.in_window_clearing) })}
                         warning={stats?.overdue_clearing > 0}
                         tooltip={__('admin.earning_pending_clearing_tip')}
+                        // Overdue items need action first; otherwise show what is still in the holding window.
+                        href={stats?.overdue_clearing > 0 ? '/admin/commissions?status=due' : '/admin/commissions?status=pending'}
                     />
                 </div>
 
@@ -519,7 +536,7 @@ export default function EarningAnalyze({
             </div>
 
             {/* ── Section 7: Top Earners ────────────────────────────────── */}
-            <Card className="mb-6 border-slate-200">
+            <Card id="top-earners" className="mb-6 border-slate-200 scroll-mt-24">
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-800">
                         <Award className="h-4 w-4 text-slate-500" />{__('general.top_earners')}</CardTitle>

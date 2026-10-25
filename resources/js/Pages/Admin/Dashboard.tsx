@@ -132,12 +132,12 @@ export default function Dashboard({
                 <div>
                     <h2 className="text-lg font-bold text-slate-900 mb-4">{__('general.performance_overview')}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                        <MetricCard label={__('general.monthly_revenue')} value={maskValue(formatCurrency(stats?.revenueThisMonth, businessCurrency))} icon={DollarSign} />
-                        <MetricCard label={__('general.monthly_expenses')} value={maskValue(formatCurrency(stats?.monthlyExpenses, businessCurrency))} icon={ArrowDownRight} />
+                        <MetricCard label={__('general.monthly_revenue')} value={maskValue(formatCurrency(stats?.revenueThisMonth, businessCurrency))} icon={DollarSign} href="/admin/transactions" />
+                        <MetricCard label={__('general.monthly_expenses')} value={maskValue(formatCurrency(stats?.monthlyExpenses, businessCurrency))} icon={ArrowDownRight} href="/admin/business/costs" />
                         <MetricCard label={__('general.booking_price')} value={maskValue(formatCurrency(stats?.bookingPrice, businessCurrency))} icon={Activity} />
                         <MetricCard label={__('general.hourly_rate')} value={maskValue(formatCurrency(stats?.bookingRatePerHour, businessCurrency))} icon={Clock} />
-                        <MetricCard label={__('general.pending_payments')} value={maskValue(formatCurrency(stats?.pendingPayments, businessCurrency))} icon={ArrowUpRight} />
-                        <MetricCard label={__('general.total_users')} value={maskValue(stats?.totalUsers)} icon={Users} />
+                        <MetricCard label={__('general.pending_payments')} value={maskValue(formatCurrency(stats?.pendingPayments, businessCurrency))} icon={ArrowUpRight} href="/admin/invoices/unpaid" />
+                        <MetricCard label={__('general.total_users')} value={maskValue(stats?.totalUsers)} icon={Users} href="/admin/users" />
                     </div>
                 </div>
 
@@ -186,10 +186,10 @@ export default function Dashboard({
 
                 {/* Operational Metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <MetricCard label={__('general.total_projects')} value={maskValue(operationalStats?.totalProjects)} icon={Briefcase} />
-                    <MetricCard label={__('general.total_tasks')} value={maskValue(operationalStats?.totalTasks)} icon={Activity} />
-                    <MetricCard label={__('general.open_tickets')} value={maskValue(operationalStats?.openTickets)} icon={Ticket} />
-                    <MetricCard label={__('general.premium_users')} value={maskValue(operationalStats?.premiumUsers)} icon={UserPlus} />
+                    <MetricCard label={__('general.total_projects')} value={maskValue(operationalStats?.totalProjects)} icon={Briefcase} href="/admin/projects" />
+                    <MetricCard label={__('general.total_tasks')} value={maskValue(operationalStats?.totalTasks)} icon={Activity} href="/admin/tasks/board-explorer" />
+                    <MetricCard label={__('general.open_tickets')} value={maskValue(operationalStats?.openTickets)} icon={Ticket} href="/admin/tickets?status=open" />
+                    <MetricCard label={__('general.premium_users')} value={maskValue(operationalStats?.premiumUsers)} icon={UserPlus} href="/admin/users" />
                 </div>
 
                 {/* System Health & WhatsApp */}
