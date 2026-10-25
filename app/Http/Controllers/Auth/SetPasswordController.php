@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -77,8 +78,15 @@ class SetPasswordController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($user, $data) {
+        $next = $this->safeNextPath($request);
+
+        DB::transaction(function () use ($user, $data, $next) {
             $user->password = Hash::make($data['password']);
+            // `next` links are only ever emailed (plan checkout), so using one proves the
+            // inbox. Admin links may go out over WhatsApp and must not verify the email.
+            if ($next !== null && ! $user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
             $user->setRememberToken(Str::random(60));
             // Force logout from any other session.
             if (method_exists($user, 'tokens')) {
@@ -87,7 +95,24 @@ class SetPasswordController extends Controller
             $user->save();
         });
 
+        if ($next !== null) {
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect($next);
+        }
+
         return redirect()->route('login')->with('status', __('auth.set_password.password_set'));
+    }
+
+    /**
+     * `next` is part of the signed URL (tamper-proof); still only allow local paths.
+     */
+    private function safeNextPath(Request $request): ?string
+    {
+        $next = (string) $request->query('next', '');
+
+        return preg_match('#^/(?!/)[A-Za-z0-9/_-]*$#', $next) === 1 ? $next : null;
     }
 
     /**
@@ -95,7 +120,7 @@ class SetPasswordController extends Controller
      * 32-byte string; the URL is signed by Laravel's URL signer (so an attacker
      * cannot construct or tamper with it).
      */
-    public static function issueLink(User $user, ?int $issuedBy = null): string
+    public static function issueLink(User $user, ?int $issuedBy = null, ?string $next = null): string
     {
         $token = Str::random(48);
 
@@ -109,7 +134,7 @@ class SetPasswordController extends Controller
         return URL::temporarySignedRoute(
             'password.set.show',
             now()->addHours(self::TTL_HOURS),
-            ['token' => $token, 'uid' => $user->id]
+            array_filter(['token' => $token, 'uid' => $user->id, 'next' => $next])
         );
     }
 

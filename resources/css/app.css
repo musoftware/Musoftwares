@@ -5,9 +5,11 @@
 
 @theme {
     --font-sora: "Sora", sans-serif;
-    --font-sans: "DM Sans", "Figtree", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    /* One stack site-wide (same as the marketplace /services pages): Apple system font, then Inter (Latin) + Cairo (Arabic). */
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo",
+        system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Cairo", "Inter", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
     --color-background: var(--background);

@@ -17,18 +17,23 @@ class GuestPaymentLinkController extends Controller
 
     public function show(Request $request, $uuid)
     {
-        $paymentLink = PaymentLink::with('currency')->where('uuid', $uuid)->firstOrFail();
+        $paymentLink = PaymentLink::with(['currency', 'client'])->where('uuid', $uuid)->firstOrFail();
 
         if ($paymentLink->status === 'paid') {
             return Inertia::render('Guest/PaymentResult', [
                 'status' => 'success',
                 'message' => __('general.payment_already_paid', ['default' => 'This payment link has already been paid.']),
+                'continue_url' => $paymentLink->metadata['return_url'] ?? null,
             ]);
         }
 
         return Inertia::render('Guest/PaymentLinkShow', [
-            'paymentLink' => $paymentLink,
+            'paymentLink' => $paymentLink->makeHidden(['client', 'metadata']),
             'pay_url' => route('guest.payment-links.pay', ['uuid' => $paymentLink->uuid]),
+            'prefill' => [
+                'name' => $paymentLink->client?->name,
+                'email' => $paymentLink->client?->email,
+            ],
         ]);
     }
 
@@ -55,6 +60,11 @@ class GuestPaymentLinkController extends Controller
         }
         $currency = $paymentLink->currency->currency;
 
+        // Plan links activate an account by this email after payment (see PlanPaymentLinkService).
+        $paymentLink->forceFill(['metadata' => array_merge($paymentLink->metadata ?? [], [
+            'payer' => ['name' => $request->input('guest_name'), 'email' => $request->input('guest_email')],
+        ])])->save();
+
         $paymentUrl = KashierCheckoutBuilder::make()
             ->forAmount($amount, $currency)
             ->forGuest($request->input('guest_name'), $request->input('guest_email'), 'guest_plnk_'.$paymentLink->uuid)
@@ -64,7 +74,7 @@ class GuestPaymentLinkController extends Controller
                 'user_id' => $paymentLink->user_id,
             ])
             ->withRoutes(
-                success: route('guest.payment-links.success'),
+                success: route('guest.payment-links.success', ['link' => $paymentLink->uuid]),
                 failure: route('guest.payment-links.failure'),
                 webhook: route('guest.payment-links.webhook')
             )
@@ -75,9 +85,14 @@ class GuestPaymentLinkController extends Controller
 
     public function paymentSuccess(Request $request)
     {
+        $link = $request->filled('link')
+            ? PaymentLink::where('uuid', (string) $request->query('link'))->first()
+            : null;
+
         return Inertia::render('Guest/PaymentResult', [
             'status' => 'success',
             'message' => __('general.payment_successful_thank_you'),
+            'continue_url' => $link?->metadata['return_url'] ?? null,
         ]);
     }
 

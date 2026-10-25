@@ -33,6 +33,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Plans Sold From Satellite Systems
+    |--------------------------------------------------------------------------
+    | A satellite system (e.g. GoldSaver) asks the monolith for a guest payment
+    | link for one of these plans. The monolith owns the price; when the link is
+    | paid the `object` subscription is extended by `days` for the payer.
+    */
+    'external_plans' => [
+        'gold-saver-pro-monthly' => [
+            'system' => 'goldsaversys',
+            'object' => 'gold-saver',
+            'title' => 'GoldSaver Pro - 1 month',
+            'amount' => (float) env('GOLD_PRO_MONTHLY_PRICE', 1),
+            'currency' => 'USD',
+            'days' => 30,
+        ],
+    ],
+
+    // Owner (merchant) recorded on system-created payment links; falls back to the first admin.
+    'payment_link_owner_email' => env('SYSTEM_PAYMENT_LINK_OWNER_EMAIL'),
+
+    /*
+    |--------------------------------------------------------------------------
     | A La Carte Add-ons (Capabilities)
     |--------------------------------------------------------------------------
     */

@@ -5,7 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-export default function PaymentResult({ status, message }: { status: 'success' | 'error', message: string }) {
+export default function PaymentResult({ status, message, continue_url = null }: { status: 'success' | 'error', message: string, continue_url?: string | null }) {
     const isSuccess = status === 'success';
 
     return (
@@ -31,9 +31,16 @@ export default function PaymentResult({ status, message }: { status: 'success' |
                         {message}
                     </p>
                 </CardContent>
-                <CardFooter className="bg-muted/40 border-t border-border p-6 flex justify-center">
+                <CardFooter className="bg-muted/40 border-t border-border p-6 flex flex-wrap justify-center gap-3">
+                    {isSuccess && continue_url && (
+                        <a href={continue_url}>
+                            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                {__('general.continue', { default: 'Continue' })}
+                            </Button>
+                        </a>
+                    )}
                     <Link href="/">
-                        <Button variant={isSuccess ? "default" : "outline"} className={isSuccess ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}>
+                        <Button variant={isSuccess && !continue_url ? "default" : "outline"} className={isSuccess && !continue_url ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}>
                             {__('general.return_to_home')}
                         </Button>
                     </Link>

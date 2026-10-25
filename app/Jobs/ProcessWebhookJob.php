@@ -11,6 +11,7 @@ use App\Models\PaymentLink;
 use App\Models\User;
 use App\Services\BalanceService;
 use App\Services\KashierCheckoutFulfillment;
+use App\Services\PlanPaymentLinkService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -277,7 +278,10 @@ class ProcessWebhookJob implements ShouldQueue
                 throw new \Exception("Payment amount mismatch for payment link {$paymentLinkId}");
             }
 
-            $paymentLink->markPaid(PaymentLink::METHOD_KASHIER, (string) $trxId);
+            if ($paymentLink->markPaid(PaymentLink::METHOD_KASHIER, (string) $trxId)) {
+                // Plan links (e.g. GoldSaver Pro) activate the payer's subscription in the same transaction.
+                app(PlanPaymentLinkService::class)->fulfil($paymentLink);
+            }
             Log::info("Kashier payment link processed successfully for Link {$paymentLinkId}");
         });
     }

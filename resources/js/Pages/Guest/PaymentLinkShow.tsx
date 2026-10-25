@@ -8,10 +8,11 @@ import { Label } from '@/Components/ui/label';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function PaymentLinkShow({ paymentLink, pay_url }) {
+export default function PaymentLinkShow({ paymentLink, pay_url, prefill = {} }) {
+    // Payers who are already known (e.g. signed in to GoldSaver) do not retype their details.
     const { data, setData, post, processing, errors } = useForm({
-        guest_name: '',
-        guest_email: '',
+        guest_name: prefill.name ?? '',
+        guest_email: prefill.email ?? '',
     });
 
     const submit = (e) => {

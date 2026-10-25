@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\PaymentLink;
+use App\Services\PlanPaymentLinkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -132,7 +134,16 @@ class PaymentLinkController extends Controller
     {
         $this->authorize('forceMarkPaid', $paymentLink);
 
-        if ($paymentLink->markPaid(PaymentLink::METHOD_MANUAL, null, Auth::id())) {
+        $marked = DB::transaction(function () use ($paymentLink) {
+            $paid = $paymentLink->markPaid(PaymentLink::METHOD_MANUAL, null, Auth::id());
+            if ($paid) {
+                app(PlanPaymentLinkService::class)->fulfil($paymentLink);
+            }
+
+            return $paid;
+        });
+
+        if ($marked) {
             return redirect()->back()->with('success', __('admin.payment_link_marked_paid', ['default' => 'Payment link marked as paid.']));
         }
 

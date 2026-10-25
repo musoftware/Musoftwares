@@ -232,6 +232,7 @@ Route::get('currencies', function () {
 
 Route::post('/sso/verify', [SsoController::class, 'verify'])->name('sso.verify');
 Route::post('/sso/subscriptions/sync', [SubscriptionSyncController::class, 'sync'])->name('sso.subscriptions.sync');
+Route::post('/sso/payment-links', [\App\Http\Controllers\Api\SsoPaymentLinkController::class, 'store'])->middleware('throttle:30,1')->name('sso.payment-links.store');
 Route::post('/sso/notify', [\App\Http\Controllers\Api\SsoNotificationController::class, 'notify'])->name('sso.notify');
 Route::post('/sso/exchange-rates/sync', [ExchangeRateSyncController::class, 'sync'])->name('sso.exchange-rates.sync');
 
