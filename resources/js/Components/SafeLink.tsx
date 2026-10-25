@@ -17,8 +17,7 @@ const BLADE_PREFIXES = [
     '/contact',
     '/pricing',
     '/cost',
-    '/tools/cost',
-    '/tools/website-cost',
+    '/tools',
     '/dashboard',
     '/sso',
 ];

@@ -49,18 +49,23 @@ class PublicEndpointHardeningTest extends TestCase
             ->assertRedirect(url('/'));
     }
 
-    // ── SSRF on public website tools ──────────────────────────────────────
+    // ── Retired website tools ─────────────────────────────────────────────
 
-    public function test_public_inspect_tools_refuse_internal_addresses(): void
+    public function test_retired_tools_redirect_to_services_and_their_url_fetchers_are_gone(): void
     {
+        $this->get('/tools')->assertRedirect('/services')->assertStatus(301);
+        $this->get('/tools/website-checker')->assertRedirect('/services')->assertStatus(301);
+        $this->get('/tools/cost')->assertRedirect('/estimator');
+
         foreach (['inspect-website', 'inspect-speed-loss', 'inspect-payment-gateway', 'inspect-pixel', 'inspect-competitor'] as $endpoint) {
-            $this->postJson('/tools/'.$endpoint, ['url' => 'http://169.254.169.254/latest/meta-data/'])
-                ->assertStatus(422)
-                ->assertJson(['success' => false]);
+            $this->postJson('/tools/'.$endpoint, ['url' => 'http://169.254.169.254/latest/meta-data/'])->assertRedirect('/services');
         }
 
-        $this->postJson('/tools/inspect-website', ['url' => 'file:///etc/passwd'])->assertStatus(422);
-        $this->postJson('/tools/inspect-pixel', ['url' => 'localhost:6379'])->assertStatus(422);
+        // The estimator's lead form still posts here.
+        $this->postJson('/tools/lead-capture', [
+            'name' => 'Lead', 'email' => 'lead@example.com', 'mobile' => '0100',
+            'tool_name' => 'Estimator', 'breakdown' => 'Website',
+        ])->assertOk()->assertJson(['success' => true]);
     }
 
     // ── Impersonation ─────────────────────────────────────────────────────

@@ -44,14 +44,12 @@ class SsoController extends Controller
             abort(404, 'System not found');
         }
 
-        // Guests attempting to access toolsys are routed to the public tools page
+        // tools.musoftwares.com was retired; its tools now live in /services.
+        if ($canonicalSystem === 'toolsys') {
+            return redirect('/services');
+        }
+
         if (! Auth::check()) {
-            if ($canonicalSystem === 'toolsys') {
-                $toolsUrl = (string) config('services.toolsys.url', 'https://tools.musoftwares.com');
-
-                return redirect()->away(rtrim($toolsUrl, '/').'/tools');
-            }
-
             return redirect()->route('login');
         }
 

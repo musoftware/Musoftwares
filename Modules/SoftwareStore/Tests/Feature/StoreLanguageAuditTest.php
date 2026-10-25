@@ -22,7 +22,7 @@ class StoreLanguageAuditTest extends TestCase
     private const LATIN_OK = [
         'Musoftware', 'Musoftwares', 'Kashier', 'WhatsApp', 'Windows', 'Mac', 'macOS', 'Laravel', 'PHP', 'MySQL', 'SQLite', 'cPanel', 'Redis',
         'Facebook', 'Google', 'Maps', 'Telegram', 'Excel', 'CSV', 'PDF', 'API', 'ETA', 'SEO', 'POS', 'QR', 'URL', 'USB', 'AI', 'ERP', 'CRM',
-        'Salla', 'Zid', 'Shopify', 'WooCommerce', 'WordPress', 'Elementor', 'Meta', 'Instagram', 'TikTok', 'LinkedIn', 'Gmail', 'Outlook',
+        'Salla', 'Zid', 'Shopify', 'WooCommerce', 'WordPress', 'Elementor', 'Meta', 'Instagram', 'TikTok', 'LinkedIn', 'GitHub', 'Gmail', 'Outlook',
         'Chrome', 'Edge', 'Android', 'iOS', 'EGP', 'USD', 'SAR', 'AED', 'OMR', 'EN', 'AR', 'SMS', 'FEFO', 'KDS', 'RTL', 'LTR', 'VAT', 'GS1',
         'Flutter', 'React', 'Figma', 'Canva', 'HTML', 'CSS', 'JSON', 'OAuth', 'Cloud', 'SSL', 'DNS', 'MX', 'SMTP', 'IMAP', 'Pro', 'Inbox', 'Sender',
         'Email', 'Finder', 'Leads', 'Shop', 'Manager', 'Systems', 'Smile', 'Dental', 'Center', 'Cairo', 'Grill', 'Care', 'Pharmacy', 'Admin', 'Main', 'Suez',

@@ -77,12 +77,11 @@ class SsoControllerTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_guest_accessing_toolsys_is_redirected_to_public_tools_page(): void
+    public function test_toolsys_goes_to_services_now_that_the_tools_site_is_retired(): void
     {
-        config(['services.toolsys.url' => 'https://tools.musoftwares.com']);
+        $this->get('/sso/toolsys')->assertRedirect('/services');
 
-        $response = $this->get('/sso/toolsys');
-        $response->assertRedirect('https://tools.musoftwares.com/tools');
+        $this->actingAs(User::factory()->create())->get('/sso/toolsys')->assertRedirect('/services');
     }
 
     public function test_authenticated_user_is_redirected_with_sso_token(): void

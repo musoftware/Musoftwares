@@ -33,15 +33,6 @@ class SitemapController extends Controller
             'legal.cookies' => '0.5',
             'estimator' => '0.8',
             'blog.index' => '0.8',
-            'public.tools.index' => '0.8',
-            'public.tools.facebook-cost' => '0.8',
-            'public.tools.website-cost' => '0.8',
-            'public.tools.invoice-generator' => '0.8',
-            'public.tools.website-checker' => '0.8',
-            'public.tools.speed-loss-calculator' => '0.8',
-            'public.tools.payment-gateway-auditor' => '0.8',
-            'public.tools.pixel-tracker-auditor' => '0.8',
-            'public.tools.competitor-tech-spy' => '0.8',
         ];
 
         foreach ($staticRoutes as $route => $priority) {

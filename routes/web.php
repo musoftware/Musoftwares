@@ -218,23 +218,13 @@ Route::get('/{locale}/{path?}', [LocaleRedirectController::class, 'redirect'])
     ->where('path', '.*')
     ->name('locale.redirect');
 
-// Public Free Tools
-Route::get('/tools', [PublicToolsController::class, 'index'])->name('public.tools.index');
-Route::get('/tools/image-cropper', [PublicToolsController::class, 'imageCropper'])->name('public.tools.image-cropper');
-Route::get('/tools/facebook-page-cost', [PublicToolsController::class, 'facebookCostCalculator'])->name('public.tools.facebook-cost');
-Route::get('/tools/invoice-generator', [PublicToolsController::class, 'invoiceGenerator'])->name('public.tools.invoice-generator');
-Route::get('/tools/website-checker', [PublicToolsController::class, 'websiteChecker'])->name('public.tools.website-checker');
-Route::post('/tools/inspect-website', [PublicToolsController::class, 'inspectWebsite'])->middleware('throttle:20,1')->name('public.tools.inspect-website');
-Route::get('/tools/speed-loss-calculator', [PublicToolsController::class, 'speedLossCalculator'])->name('public.tools.speed-loss-calculator');
-Route::post('/tools/inspect-speed-loss', [PublicToolsController::class, 'inspectSpeedLoss'])->middleware('throttle:20,1')->name('public.tools.inspect-speed-loss');
-Route::get('/tools/payment-gateway-auditor', [PublicToolsController::class, 'paymentGatewayAuditor'])->name('public.tools.payment-gateway-auditor');
-Route::post('/tools/inspect-payment-gateway', [PublicToolsController::class, 'inspectPaymentGateway'])->middleware('throttle:20,1')->name('public.tools.inspect-payment-gateway');
-Route::get('/tools/pixel-tracker-auditor', [PublicToolsController::class, 'pixelAuditor'])->name('public.tools.pixel-tracker-auditor');
-Route::post('/tools/inspect-pixel', [PublicToolsController::class, 'inspectPixel'])->middleware('throttle:20,1')->name('public.tools.inspect-pixel');
-Route::get('/tools/competitor-tech-spy', [PublicToolsController::class, 'competitorSpy'])->name('public.tools.competitor-tech-spy');
-Route::post('/tools/inspect-competitor', [PublicToolsController::class, 'inspectCompetitor'])->middleware('throttle:20,1')->name('public.tools.inspect-competitor');
+// The free tools moved into /services (tools.musoftwares.com was retired). Keep old links and
+// search results working; /tools/cost and /tools/website-cost go to /estimator (above).
 Route::post('/tools/lead-capture', [PublicToolsController::class, 'captureLead'])->name('public.tools.lead-capture');
 Route::post('/newsletter/subscribe', [PublicToolsController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
+// Registered after the lead form so its POST is not caught by the redirect.
+Route::redirect('/tools', '/services', 301);
+Route::permanentRedirect('/tools/{any}', '/services')->where('any', '.*');
 
 // Shared project board (public guest view)
 Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])
