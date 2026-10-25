@@ -61,8 +61,8 @@
     <!-- 2. CATEGORY TABS ROW (Apple Horizontal Pill Navigation)                -->
     <!-- ══════════════════════════════════════════════════════════════════════ -->
     <div class="mb-8">
-        <div class="flex items-center justify-between gap-4 mb-4">
-            <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 mb-4">
+            <div class="flex items-center gap-3 min-w-0">
                 <!-- Mobile Filter Toggle -->
                 <button 
                     type="button" 
@@ -73,7 +73,7 @@
                     <span>{{ app()->getLocale() === 'ar' ? 'الفلاتر' : 'Filters' }}</span>
                 </button>
 
-                <h2 class="text-[17px] font-semibold text-[#1d1d1f] tracking-[-0.01em]">
+                <h2 class="text-[17px] font-semibold text-[#1d1d1f] tracking-[-0.01em] whitespace-nowrap">
                     {{ app()->getLocale() === 'ar' ? 'تصفح حسب القسم' : 'Browse by Category' }}
                 </h2>
             </div>

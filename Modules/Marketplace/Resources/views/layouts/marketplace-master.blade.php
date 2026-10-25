@@ -230,7 +230,7 @@
                     <span class="text-[19px] sm:text-[21px] font-semibold tracking-[-0.03em] text-[#1d1d1f]">
                         Musoftware
                     </span>
-                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3]">
+                    <span class="hidden sm:inline text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#f5f5f7] border border-black/5 text-[#0071e3]">
                         Marketplace
                     </span>
                 </a>
@@ -313,10 +313,11 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
+                    {{-- Phones get Sign in / Join from the menu; the header only fits logo, language and menu at 360px. --}}
+                    <a href="{{ route('login') }}" class="hidden sm:inline text-[12px] font-medium text-[#1d1d1f]/75 hover:text-[#1d1d1f] transition-colors px-2">
                         {{ $locale === 'ar' ? 'دخول' : 'Sign in' }}
                     </a>
-                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
+                    <a href="{{ route('register') }}" class="hidden sm:inline-flex items-center justify-center rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white text-[12px] font-medium px-3.5 py-1.5 transition-all shadow-sm">
                         {{ $locale === 'ar' ? 'انضم للمنصة' : 'Join' }}
                     </a>
                 @endauth
