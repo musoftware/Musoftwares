@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Currency;
 use App\Models\User;
+use GeoIp2\Database\Reader;
 use Illuminate\Support\Facades\Log;
 use Stevebauman\Location\Facades\Location;
 
@@ -102,6 +103,12 @@ class IpGeolocationService extends BaseService
                 return null;
             }
 
+            // Primary: the bundled offline MaxMind database (no network, no rate limits).
+            $code = $this->countryFromLocalDatabase($ip);
+            if ($code !== null) {
+                return $code;
+            }
+
             // Try using torann/geoip package if available
             if (function_exists('geoip')) {
                 try {
@@ -147,6 +154,46 @@ class IpGeolocationService extends BaseService
 
         } catch (\Exception $e) {
             Log::error("IpGeolocationService: Error detecting country for IP {$ip}: ".$e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * Country from storage/app/geoip.mmdb (MaxMind GeoLite2 City/Country format).
+     * The reader is opened once per process; a missing or unreadable file falls
+     * through to the other strategies.
+     */
+    protected function countryFromLocalDatabase(string $ip): ?string
+    {
+        static $reader = null;
+        static $unavailable = false;
+
+        if ($unavailable) {
+            return null;
+        }
+
+        try {
+            if ($reader === null) {
+                $path = storage_path('app/geoip.mmdb');
+                if (! is_file($path)) {
+                    $unavailable = true;
+
+                    return null;
+                }
+                $reader = new Reader($path);
+            }
+
+            // City databases refuse country(); both models expose ->country.
+            $isCityDb = str_contains($reader->metadata()->databaseType, 'City');
+            $code = ($isCityDb ? $reader->city($ip) : $reader->country($ip))->country->isoCode;
+
+            return $code ? strtoupper($code) : null;
+        } catch (\GeoIp2\Exception\AddressNotFoundException) {
+            return null;
+        } catch (\Throwable $e) {
+            $unavailable = true;
+            Log::warning('IpGeolocationService: local GeoIP database unusable: '.$e->getMessage());
 
             return null;
         }

@@ -218,9 +218,10 @@ class DashboardService extends BaseService
         }
 
         try {
-            $marketplaceRevenue = (float) DB::table('orders')
+            // Platform earnings on marketplace orders are the commission kept per completed order.
+            $marketplaceRevenue = (float) DB::table('marketplace_orders')
                 ->where('status', 'completed')
-                ->sum('platform_fee');
+                ->sum('commission_amount');
             if ($marketplaceRevenue > 0) {
                 $breakdown[] = ['name' => 'Marketplace', 'value' => round($marketplaceRevenue, 2), 'color' => '#06b6d4'];
             }
@@ -229,9 +230,10 @@ class DashboardService extends BaseService
         }
 
         try {
-            $pointsRevenue = (float) DB::table('point_transactions')
-                ->where('type', 'purchase')
-                ->sum('amount');
+            // Point purchases are wallet debits (negative amounts) recorded by PointPurchaseService.
+            $pointsRevenue = abs((float) Transaction::where('type', 'used')
+                ->where(fn ($q) => $q->where('reason', 'purchased_points')->orWhere('reason', 'like', 'Purchased % points via Kashier'))
+                ->sum('business_amount'));
             if ($pointsRevenue > 0) {
                 $breakdown[] = ['name' => 'Points', 'value' => round($pointsRevenue, 2), 'color' => '#eab308'];
             }

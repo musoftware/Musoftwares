@@ -63,17 +63,15 @@ class PurePhpImapClient
 
         $this->readGreeting();
 
-        $this->command('LOGIN "%s" "%s"', $username, $password);
-        $this->expectOk();
-
-        $this->command('CAPABILITY');
-        $this->expectOk();
+        // command() already consumes the reply up to the tagged line; check that reply
+        // instead of reading again (a second read waits for a reply that never comes).
+        $this->expectOk($this->command('LOGIN "%s" "%s"', $username, $password));
+        $this->expectOk($this->command('CAPABILITY'));
     }
 
     public function select(string $folder): void
     {
-        $this->command('SELECT "%s"', $folder);
-        $this->expectOk();
+        $this->expectOk($this->command('SELECT "%s"', $folder));
     }
 
     /**
@@ -99,7 +97,8 @@ class PurePhpImapClient
      */
     public function fetchRawByUid(int $uid): string
     {
-        $line = $this->command('UID FETCH %d BODY[]', $uid);
+        // BODY.PEEK[] leaves the message unread; markSeen() is called only after it was processed.
+        $line = $this->command('UID FETCH %d BODY.PEEK[]', $uid);
         $this->expectOk($line);
 
         return $this->parseFetchedBody($line);
@@ -110,8 +109,7 @@ class PurePhpImapClient
      */
     public function markSeen(int $uid): void
     {
-        $this->command('UID STORE %d +FLAGS (\\Seen)', $uid);
-        $this->expectOk();
+        $this->expectOk($this->command('UID STORE %d +FLAGS (\\Seen)', $uid));
     }
 
     public function disconnect(): void
@@ -153,7 +151,8 @@ class PurePhpImapClient
     private function expectOk(?string $response = null): void
     {
         $r = $response ?? $this->readUntilTagged();
-        if (! preg_match('/^'.$this->tag.' OK/i', $r)) {
+        // Untagged lines ("* CAPABILITY ...") come first, so match the tagged line anywhere.
+        if (! preg_match('/^'.preg_quote($this->tag, '/').' OK/im', $r)) {
             $cleanResp = trim((string) $r);
             throw new RuntimeException('IMAP command failed: '.($cleanResp !== '' ? $cleanResp : 'No response from server'));
         }
@@ -212,32 +211,18 @@ class PurePhpImapClient
         return $uids;
     }
 
+    /**
+     * The message is an IMAP literal: "{size}
+" followed by exactly size bytes.
+     */
     private function parseFetchedBody(string $buffer): string
     {
-        $lines = preg_split("/\r\n|\n|\r/", $buffer);
-        $body = '';
-        $inLiteral = false;
-        $literalRemaining = 0;
-        foreach ($lines as $line) {
-            if ($inLiteral) {
-                $body .= $line."\n";
-                $literalRemaining -= strlen($line) + 1;
-                if ($literalRemaining <= 0) {
-                    $inLiteral = false;
-                }
-
-                continue;
-            }
-            if (preg_match('/\{(\d+)\}\r?$/', $line, $m)) {
-                $literalRemaining = (int) $m[1];
-                $inLiteral = true;
-
-                continue;
-            }
+        if (! preg_match('/\{(\d+)\}\r\n/', $buffer, $m, PREG_OFFSET_CAPTURE)) {
+            return '';
         }
 
-        $body = rtrim($body, "\n");
+        $start = $m[0][1] + strlen($m[0][0]);
 
-        return $body;
+        return substr($buffer, $start, (int) $m[1][0]);
     }
 }

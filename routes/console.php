@@ -16,7 +16,6 @@ Schedule::command(FetchExchangeRates::class)->dailyAt('00:00');
 
 Schedule::command(RenewSubscriptions::class)->dailyAt('03:00')->withoutOverlapping(10);
 Schedule::command(\App\Console\Commands\SendSubscriptionExpiryReminders::class)->dailyAt('03:15')->timezone('Africa/Cairo');
-Schedule::command(\App\Console\Commands\RenewPlatformSubscriptions::class)->dailyAt('03:30')->withoutOverlapping(10);
 Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 
 // Recurring Business Commands
