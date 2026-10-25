@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogArticle;
 use App\Models\WebsiteService;
+use App\Support\BlogSeo;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
@@ -24,11 +25,6 @@ class SitemapController extends Controller
             'platforms.crm' => '0.8',
             'platforms.erp' => '0.8',
             'solutions' => '0.8',
-            'solutions.healthcare' => '0.8',
-            'solutions.education' => '0.8',
-            'solutions.ecommerce' => '0.8',
-            'solutions.real-estate' => '0.8',
-            'solutions.finance' => '0.8',
             'company.about' => '0.7',
             'company.careers' => '0.7',
             'company.contact' => '0.7',
@@ -53,8 +49,6 @@ class SitemapController extends Controller
                 $loc = route($route);
                 $urls[] = [
                     'loc' => $loc,
-                    'ar_loc' => $loc.'?lang=ar',
-                    'en_loc' => $loc.'?lang=en',
                     'lastmod' => now()->startOfDay()->toAtomString(),
                     'changefreq' => $route === 'home' || $route === 'marketplace.services.index' ? 'daily' : 'weekly',
                     'priority' => $priority,
@@ -70,8 +64,6 @@ class SitemapController extends Controller
                     $loc = route('website-services.show', $service->slug);
                     $urls[] = [
                         'loc' => $loc,
-                        'ar_loc' => $loc.'?lang=ar',
-                        'en_loc' => $loc.'?lang=en',
                         'lastmod' => optional($service->updated_at)->toAtomString() ?: now()->toAtomString(),
                         'changefreq' => 'weekly',
                         'priority' => '0.9',
@@ -86,8 +78,6 @@ class SitemapController extends Controller
                 $loc = $product->purchaseUrl();
                 $urls[] = [
                     'loc' => $loc,
-                    'ar_loc' => $loc.'?lang=ar',
-                    'en_loc' => $loc.'?lang=en',
                     'lastmod' => optional($product->updated_at)->toAtomString() ?: now()->toAtomString(),
                     'changefreq' => 'weekly',
                     'priority' => '0.9',
@@ -101,10 +91,10 @@ class SitemapController extends Controller
             foreach ($articles as $article) {
                 if (\Route::has('blog.show') && ! empty($article->slug)) {
                     $loc = route('blog.show', $article->slug);
+                    $languages = app(BlogSeo::class)->alternates($article)->all();
                     $urls[] = [
                         'loc' => $loc,
-                        'ar_loc' => $loc.'?lang=ar',
-                        'en_loc' => $loc.'?lang=en',
+                        'alternates' => $languages + ['x-default' => $languages['en'] ?? $loc],
                         'lastmod' => optional($article->updated_at)->toAtomString() ?: now()->toAtomString(),
                         'changefreq' => 'weekly',
                         'priority' => '0.8',
@@ -121,8 +111,6 @@ class SitemapController extends Controller
                     $loc = route('marketplace.services.show', ['id' => $mpService->id, 'slug' => $mpService->slug ?: 'service']);
                     $urls[] = [
                         'loc' => $loc,
-                        'ar_loc' => $loc.'?lang=ar',
-                        'en_loc' => $loc.'?lang=en',
                         'lastmod' => optional($mpService->updated_at)->toAtomString() ?: now()->toAtomString(),
                         'changefreq' => 'daily',
                         'priority' => '0.9',
@@ -131,21 +119,16 @@ class SitemapController extends Controller
             }
         }
 
-        // Marketplace Categories
-        if (class_exists(MarketplaceCategory::class)) {
-            $categories = MarketplaceCategory::all();
-            foreach ($categories as $cat) {
-                if (\Route::has('marketplace.services.index') && ! empty($cat->slug)) {
-                    $loc = route('marketplace.services.index', ['category' => $cat->slug]);
-                    $urls[] = [
-                        'loc' => $loc,
-                        'ar_loc' => $loc.'?lang=ar',
-                        'en_loc' => $loc.'?lang=en',
-                        'lastmod' => optional($cat->updated_at)->toAtomString() ?: now()->toAtomString(),
-                        'changefreq' => 'weekly',
-                        'priority' => '0.8',
-                    ];
-                }
+        // Marketplace Categories (their own pages, not the ?category= filter of the catalog)
+        if (class_exists(MarketplaceCategory::class) && \Route::has('marketplace.categories.show')) {
+            foreach (MarketplaceCategory::whereNotNull('slug')->get() as $cat) {
+                $loc = route('marketplace.categories.show', ['slug' => $cat->slug]);
+                $urls[] = [
+                    'loc' => $loc,
+                    'lastmod' => optional($cat->updated_at)->toAtomString() ?: now()->toAtomString(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.8',
+                ];
             }
         }
 
@@ -160,8 +143,6 @@ class SitemapController extends Controller
                     $loc = route('services.landing-page.show', ['slug' => $lp->slug]);
                     $urls[] = [
                         'loc' => $loc,
-                        'ar_loc' => $loc.'?lang=ar',
-                        'en_loc' => $loc.'?lang=en',
                         'lastmod' => optional($lp->updated_at)->toAtomString() ?: now()->toAtomString(),
                         'changefreq' => 'weekly',
                         'priority' => '0.9',

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use App\Support\PageSeo;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -49,9 +50,7 @@ class HomeController extends Controller
         return view('public.portfolio', [
             'projects' => $projects,
             'locale' => $locale,
-            'title' => 'Case Studies & Production Platforms | Musoftwares',
-            'description' => 'Explore our portfolio of over 30 production platforms, enterprise ERP engines, and custom SaaS systems.',
-        ]);
+        ] + PageSeo::for('portfolio'));
     }
 
     public function portfolioShow($slug)
@@ -98,7 +97,7 @@ class HomeController extends Controller
         }
 
         $locale = app()->getLocale();
-        $title = ($project['title_' . $locale] ?? $project['title_en']) . ' | Musoftwares';
+        $title = ($project['title_' . $locale] ?? $project['title_en']).__('seo.suffix');
         $description = $project['desc_' . $locale] ?? $project['desc_en'];
 
         $viewName = view()->exists("public.portfolio.{$slug}") 
@@ -151,26 +150,17 @@ class HomeController extends Controller
 
     public function platforms()
     {
-        return view('public.platforms', [
-            'title' => 'Digital Architecture & Business Platforms | Musoftwares',
-            'description' => 'Scalable digital platforms engineered for longevity, mission-critical ERP engines, and high-performance business infrastructure in Suez, Egypt.',
-        ]);
+        return view('public.platforms', PageSeo::for('platforms'));
     }
 
     public function platformCrm()
     {
-        return view('public.platforms.crm', [
-            'title' => 'WhatsApp Cloud API & CRM Platform | Musoftwares',
-            'description' => 'Direct Meta WhatsApp Cloud API integration, transactional OTP notifications, multi-agent unified inbox, and automated bots.',
-        ]);
+        return view('public.platforms.crm', PageSeo::for('platforms_crm'));
     }
 
     public function platformErp()
     {
-        return view('public.platforms.erp', [
-            'title' => 'Enterprise ERP & Double-Entry Accounting | Musoftwares',
-            'description' => 'Custom double-entry accounting ledgers, multi-warehouse stock management, and ETA / ZATCA e-invoicing compliance.',
-        ]);
+        return view('public.platforms.erp', PageSeo::for('platforms_erp'));
     }
 
     public function platformCloud()
@@ -180,51 +170,13 @@ class HomeController extends Controller
 
     public function solutions()
     {
-        return view('public.solutions', [
-            'title' => 'Tailored Software Solutions | Musoftwares',
-            'description' => 'Bespoke software engines tailored for healthcare, e-commerce, real estate, and finance workflows.',
-        ]);
+        return view('public.solutions', PageSeo::for('solutions'));
     }
 
-    public function solutionHealthcare()
-    {
-        return view('public.solutions', [
-            'title' => 'Healthcare & Clinic Solutions | Musoftwares',
-            'description' => 'Advanced digital health and clinic management software solutions.',
-        ]);
-    }
 
-    public function solutionEducation()
-    {
-        return view('public.solutions', [
-            'title' => 'Education & Academy Platforms | Musoftwares',
-            'description' => 'Innovative e-learning platforms and academy management systems.',
-        ]);
-    }
 
-    public function solutionEcommerce()
-    {
-        return view('public.solutions', [
-            'title' => 'E-commerce & Multi-Vendor Platforms | Musoftwares',
-            'description' => 'Scalable online stores and multi-vendor marketplace solutions.',
-        ]);
-    }
 
-    public function solutionRealEstate()
-    {
-        return view('public.solutions', [
-            'title' => 'Real Estate Platforms | Musoftwares',
-            'description' => 'Property management and real estate listing platforms.',
-        ]);
-    }
 
-    public function solutionFinance()
-    {
-        return view('public.solutions', [
-            'title' => 'Financial Software & Ledgers | Musoftwares',
-            'description' => 'Secure financial software, accounting tools, and fintech solutions.',
-        ]);
-    }
 
     public function company()
     {
@@ -233,18 +185,12 @@ class HomeController extends Controller
 
     public function companyAbout()
     {
-        return view('public.about', [
-            'title' => 'About Us — Boutique Software Engineering Studio | Musoftwares',
-            'description' => 'Musoftwares is an elite software engineering studio crafting bespoke Enterprise ERP systems, Meta API cloud integrations, and business platforms in Suez, Egypt.',
-        ]);
+        return view('public.about', PageSeo::for('about'));
     }
 
     public function leadershipBio()
     {
-        return view('public.bio', [
-            'title' => 'Mahmoud Amin — Founder & Chief Software Architect | Musoftwares',
-            'description' => 'Biography and engineering profile of Mahmoud Amin, Founder and Chief Software Architect at Musoftwares in Suez, Egypt.',
-        ]);
+        return view('public.bio', PageSeo::for('bio'));
     }
 
     public function startProject()
@@ -254,8 +200,7 @@ class HomeController extends Controller
             'canRegister' => Route::has('register'),
         ])->withViewData([
             'meta' => [
-                'title' => 'Start a Project — System Architecture Wizard | Musoftwares',
-                'description' => 'Configure your custom enterprise system, ERP, WhatsApp automation, or SaaS application step-by-step with transparent modules and instant quotation.',
+                ...PageSeo::for('start_project'),
                 'image' => asset('images/default-meta.png'),
                 'url' => url()->current(),
             ],
@@ -264,50 +209,32 @@ class HomeController extends Controller
 
     public function companyCareers()
     {
-        return view('public.careers', [
-            'title' => 'Careers — Join Our Engineering Studio | Musoftwares',
-            'description' => 'Explore engineering and systems architecture roles at Musoftwares Studio in Suez, Egypt.',
-        ]);
+        return view('public.careers', PageSeo::for('careers'));
     }
 
     public function companyContact()
     {
-        return view('public.contact', [
-            'title' => 'Contact Us — Talk Directly with Chief Software Architect | Musoftwares',
-            'description' => 'Direct technical communication with Mahmoud Amin. No middle management. Rapid responses and transparent project scoping.',
-        ]);
+        return view('public.contact', PageSeo::for('contact'));
     }
 
     public function privacyPolicy()
     {
-        return view('public.legal.privacy', [
-            'title' => 'Privacy Policy | Data Protection & Security | Musoftwares',
-            'description' => 'Learn how Musoftwares protects your personal data and maintains strict privacy and security standards.',
-        ]);
+        return view('public.legal.privacy', PageSeo::for('privacy'));
     }
 
     public function termsOfService()
     {
-        return view('public.legal.terms', [
-            'title' => 'Terms of Service | Enterprise Agreement | Musoftwares',
-            'description' => 'Read our Terms of Service governing the use of Musoftwares software and infrastructure.',
-        ]);
+        return view('public.legal.terms', PageSeo::for('terms'));
     }
 
     public function cookiePolicy()
     {
-        return view('public.legal.cookies', [
-            'title' => 'Cookie Policy | Tracking & Analytics | Musoftwares',
-            'description' => 'Information about how cookies and session storage are used on Musoftwares platforms.',
-        ]);
+        return view('public.legal.cookies', PageSeo::for('cookies'));
     }
 
     public function compare($slug = 'laravel-vs-nodejs')
     {
-        return view('public.compare', [
-            'title' => 'Laravel vs Node.js: 2026 Enterprise Architecture Benchmark | Musoftwares',
-            'description' => 'Technical comparison and performance benchmark: Laravel 12 vs Node.js for Enterprise ERP, SaaS platforms, and real-time APIs.',
-        ]);
+        return view('public.compare', PageSeo::for('compare'));
     }
 
     public function pricing()

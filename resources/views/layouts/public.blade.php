@@ -15,7 +15,9 @@
 
     @php
         $currentUrl = url()->current();
-        $canonicalUrl = $canonical ?? $currentUrl;
+        // A page that passes its own canonical also prints its own hreflang links.
+        $canonicalUrl = $canonical ?? \App\Support\LocaleUrl::canonical($currentUrl);
+        $languageAlternates = isset($canonical) ? [] : \App\Support\LocaleUrl::alternates($currentUrl);
         $ogImage = $image ?? asset('images/apple/web-mobile-suite.jpg');
         $locale = app()->getLocale();
     @endphp
@@ -24,13 +26,16 @@
     <meta name="description" content="{{ $description ?? 'Custom web applications, mobile apps, and enterprise automation platforms engineered by Mahmoud Amin in Suez, Egypt.' }}">
 
     <link rel="canonical" href="{{ $canonicalUrl }}">
-    
+    @foreach ($languageAlternates as $hreflang => $href)
+        <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}">
+    @endforeach
+
     <!-- Open Graph & Social Cards -->
     <meta property="og:site_name" content="Musoftwares">
     <meta property="og:title" content="{{ $title ?? 'Musoftwares | Software Engineering Studio' }}">
     <meta property="og:description" content="{{ $description ?? 'Custom Web Apps, Mobile Apps & Enterprise Platforms' }}">
     <meta property="og:image" content="{{ $ogImage }}">
-    <meta property="og:url" content="{{ $currentUrl }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{{ $locale === 'ar' ? 'ar_AR' : 'en_US' }}">
 

@@ -159,8 +159,6 @@ class ServiceController extends Controller
             'image' => url('/v8main/img/logo.png'),
             'url' => $canonicalUrl,
             'canonical_url' => $canonicalUrl,
-            'en_url' => $canonicalUrl.'?lang=en',
-            'ar_url' => $canonicalUrl.'?lang=ar',
             'type' => 'website',
             'schema_json' => $schemaJson,
         ];
@@ -370,8 +368,6 @@ class ServiceController extends Controller
             'image' => $shareImage,
             'url' => $canonicalUrl,
             'canonical_url' => $canonicalUrl,
-            'en_url' => $canonicalUrl.'?lang=en',
-            'ar_url' => $canonicalUrl.'?lang=ar',
             'type' => 'product',
             'schema_json' => $schemaJson,
         ];
@@ -954,8 +950,6 @@ class ServiceController extends Controller
             'description' => "Find best freelancers and services specialized in {$tagClean} on MuSoftwares Marketplace.",
             'url' => $canonicalUrl,
             'canonical_url' => $canonicalUrl,
-            'en_url' => $canonicalUrl.'?lang=en',
-            'ar_url' => $canonicalUrl.'?lang=ar',
             'type' => 'website',
             'schema_json' => $schemaJson,
         ];
@@ -1008,8 +1002,6 @@ class ServiceController extends Controller
             'description' => "Explore {$tagClean} integrations, tools, and automated services on MuSoftwares Marketplace.",
             'url' => $canonicalUrl,
             'canonical_url' => $canonicalUrl,
-            'en_url' => $canonicalUrl.'?lang=en',
-            'ar_url' => $canonicalUrl.'?lang=ar',
             'type' => 'website',
             'schema_json' => $schemaJson,
         ];

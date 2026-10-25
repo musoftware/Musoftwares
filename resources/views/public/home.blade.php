@@ -83,10 +83,10 @@
         </div>
 
         <div class="max-w-[1180px] mx-auto mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-4 border-t border-black/10">
-            @foreach ($facts as [$title, $line])
+            @foreach ($facts as [$factTitle, $factLine])
                 <div class="py-5 sm:px-5 sm:border-e last:border-e-0 border-black/10">
-                    <p class="text-[17px] font-bold">{{ $title }}</p>
-                    <p class="mt-1 text-[14px] text-[#515154]">{{ $line }}</p>
+                    <p class="text-[17px] font-bold">{{ $factTitle }}</p>
+                    <p class="mt-1 text-[14px] text-[#515154]">{{ $factLine }}</p>
                 </div>
             @endforeach
         </div>
@@ -173,11 +173,11 @@
         <div class="max-w-[1180px] mx-auto">
             <h2 class="text-[28px] sm:text-[38px] font-bold tracking-tight text-center">{{ $t('إزاي بنشتغل؟', 'How do we work?') }}</h2>
             <ol class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-5">
-                @foreach ($steps as $i => [$title, $line])
+                @foreach ($steps as $i => [$stepTitle, $stepLine])
                     <li class="rounded-2xl bg-white border border-black/5 p-6">
                         <span class="text-[28px] font-bold text-[#0071e3] leading-none">{{ $i + 1 }}</span>
-                        <h3 class="mt-3 text-[18px] font-bold">{{ $title }}</h3>
-                        <p class="mt-1 text-[14px] text-[#515154]">{{ $line }}</p>
+                        <h3 class="mt-3 text-[18px] font-bold">{{ $stepTitle }}</h3>
+                        <p class="mt-1 text-[14px] text-[#515154]">{{ $stepLine }}</p>
                     </li>
                 @endforeach
             </ol>

@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AdminPointsController;
 use App\Http\Controllers\Admin\AdminPromptController;
 use App\Http\Controllers\Admin\AdminQuotationController;
 use App\Http\Controllers\Admin\AdminMigrationController;
+use App\Http\Controllers\Admin\AdminSetupController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminTaskController;
 use App\Http\Controllers\Admin\AdminTicketController;
@@ -147,11 +148,12 @@ Route::get('/platforms/cloud', [HomeController::class, 'platformCloud'])->name('
 
 // Solutions
 Route::get('/solutions', [HomeController::class, 'solutions'])->name('solutions');
-Route::get('/solutions/healthcare', [HomeController::class, 'solutionHealthcare'])->name('solutions.healthcare');
-Route::get('/solutions/education', [HomeController::class, 'solutionEducation'])->name('solutions.education');
-Route::get('/solutions/ecommerce', [HomeController::class, 'solutionEcommerce'])->name('solutions.ecommerce');
-Route::get('/solutions/real-estate', [HomeController::class, 'solutionRealEstate'])->name('solutions.real-estate');
-Route::get('/solutions/finance', [HomeController::class, 'solutionFinance'])->name('solutions.finance');
+// The field pages showed the same page as /solutions; each now goes to the matching system.
+Route::permanentRedirect('/solutions/healthcare', '/services/clinic-system');
+Route::permanentRedirect('/solutions/education', '/services/education-center-system');
+Route::permanentRedirect('/solutions/ecommerce', '/services/online-store-development');
+Route::permanentRedirect('/solutions/real-estate', '/services/real-estate-system');
+Route::permanentRedirect('/solutions/finance', '/solutions');
 
 // Company
 Route::get('/company', [HomeController::class, 'company'])->name('company');
@@ -758,6 +760,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('settings/sync-exchange-rates', [AdminSettingController::class, 'syncExchangeRates'])->name('settings.sync-exchange-rates');
     Route::get('system/migrations', [AdminMigrationController::class, 'index'])->name('system.migrations');
     Route::post('system/migrate', [AdminMigrationController::class, 'run'])->middleware('throttle:3,1')->name('system.migrate');
+    Route::get('setup', [AdminSetupController::class, 'index'])->name('setup.index');
+    Route::post('setup/{key}', [AdminSetupController::class, 'mark'])->where('key', '[a-z_]+')->name('setup.mark');
 
     Route::resource('language-lines', AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');

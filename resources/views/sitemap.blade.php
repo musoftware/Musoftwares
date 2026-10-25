@@ -3,13 +3,9 @@
     @foreach ($urls as $url)
         <url>
             <loc>{{ $url['loc'] }}</loc>
-            @if(isset($url['ar_loc']))
-                <xhtml:link rel="alternate" hreflang="ar" href="{{ $url['ar_loc'] }}"/>
-            @endif
-            @if(isset($url['en_loc']))
-                <xhtml:link rel="alternate" hreflang="en" href="{{ $url['en_loc'] }}"/>
-            @endif
-            <xhtml:link rel="alternate" hreflang="x-default" href="{{ $url['loc'] }}"/>
+            @foreach ($url['alternates'] ?? \App\Support\LocaleUrl::alternates($url['loc']) as $lang => $href)
+                <xhtml:link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}"/>
+            @endforeach
             <lastmod>{{ $url['lastmod'] }}</lastmod>
             <changefreq>{{ $url['changefreq'] }}</changefreq>
             <priority>{{ $url['priority'] }}</priority>

@@ -43,6 +43,28 @@ class BlogSeoTest extends TestCase
         $this->assertSame(1, preg_match_all('/<h1[\s>]/', $html));
     }
 
+    public function test_an_arabic_article_opens_for_an_english_visitor_instead_of_redirecting(): void
+    {
+        $this->article();
+        $this->article(['language' => 'en', 'title' => 'Website cost', 'slug' => 'website-cost-en']);
+
+        $html = $this->get('/blog/website-cost?lang=en')->assertOk()->getContent();
+
+        $this->assertStringContainsString('<html lang="ar" dir="rtl"', $html);
+        $this->assertStringContainsString('<link rel="canonical" href="'.url('/blog/website-cost').'"', $html);
+    }
+
+    public function test_the_sitemap_links_each_article_to_its_translation_by_its_own_address(): void
+    {
+        $this->article();
+        $this->article(['language' => 'en', 'title' => 'Website cost', 'slug' => 'website-cost-en']);
+
+        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+
+        $this->assertStringContainsString('hreflang="en" href="'.url('/blog/website-cost-en').'"', $xml);
+        $this->assertStringNotContainsString('/blog/website-cost?lang=', $xml);
+    }
+
     public function test_the_blog_pages_speak_the_language_of_the_visitor(): void
     {
         $this->article();

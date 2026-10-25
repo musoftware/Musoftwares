@@ -2185,6 +2185,7 @@
         "sidebar_currencies": "Currencies",
         "sidebar_currency_exchanges": "Currency Exchanges",
         "sidebar_dashboard": "Dashboard",
+        "sidebar_setup": "Setup",
         "sidebar_digital_books": "Digital Books",
         "sidebar_earning_analyze": "Earning Analyze",
         "sidebar_email_templates": "Email Templates",
@@ -15444,6 +15445,69 @@
         "view_in_admin_panel": "View In Admin Panel",
         "yes_the_android_app_only": "Yes The Android App Only"
     },
+    "seo": {
+        "suffix": " | Musoftware",
+        "portfolio": {
+            "title": "Our Work: Systems and Platforms We Built",
+            "description": "More than 30 real projects: ERP and accounting systems, online stores, booking platforms and custom SaaS apps, with what each one solved."
+        },
+        "platforms": {
+            "title": "Business Platforms: ERP, CRM and WhatsApp",
+            "description": "Ready platforms to run your business: accounting and stock (ERP), customer follow-up (CRM) and the official WhatsApp API. Built in Suez, Egypt."
+        },
+        "platforms_crm": {
+            "title": "WhatsApp Cloud API and CRM Platform",
+            "description": "Official Meta WhatsApp API: one shared inbox for your team, OTP and order messages, and automatic replies. Follow every customer in one place."
+        },
+        "platforms_erp": {
+            "title": "ERP and Double-Entry Accounting System",
+            "description": "Accounting with double-entry ledgers, stock across many warehouses, and Egyptian ETA and Saudi ZATCA e-invoicing. Built for your business."
+        },
+        "solutions": {
+            "title": "Software for Clinics, Stores, Schools and More",
+            "description": "Systems made for your field: clinics and pharmacies, online stores, education centers, real estate offices and finance teams."
+        },
+        "about": {
+            "title": "About Musoftware, a Software Studio in Suez",
+            "description": "Musoftware is a software studio in Suez, Egypt. We build business systems, ERP, WhatsApp integrations and websites, and you talk to the programmer directly."
+        },
+        "bio": {
+            "title": "Mahmoud Amin, Founder and Lead Programmer",
+            "description": "Who Mahmoud Amin is, the projects he built, and how he works with clients as the founder and lead programmer of Musoftware in Suez, Egypt."
+        },
+        "careers": {
+            "title": "Careers at Musoftware",
+            "description": "Open roles for programmers and system designers at Musoftware in Suez, Egypt, and how to apply."
+        },
+        "contact": {
+            "title": "Contact Us: Talk to the Programmer Directly",
+            "description": "Talk to Mahmoud Amin directly by WhatsApp, phone or email. No sales layer: fast answers and a clear scope and price for your project."
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "description": "What data Musoftware collects, why, how we keep it safe, and how you can ask us to see or delete it."
+        },
+        "terms": {
+            "title": "Terms of Service",
+            "description": "The terms that govern using Musoftware websites, programs and services, including payment, delivery and support."
+        },
+        "cookies": {
+            "title": "Cookie Policy",
+            "description": "Which cookies and browser storage Musoftware uses, what each one does, and how to turn them off."
+        },
+        "compare": {
+            "title": "Laravel vs Node.js for Business Systems in 2026",
+            "description": "A plain comparison of Laravel and Node.js for ERP, SaaS and real-time apps: speed, cost, hiring and when to choose each one."
+        },
+        "start_project": {
+            "title": "Start a Project: Build Your System Step by Step",
+            "description": "Choose the parts your system needs, such as ERP, WhatsApp automation or a web app, and get a clear quotation right away."
+        },
+        "tools": {
+            "title": "Free Tools for Business Owners and Developers",
+            "description": "Free online tools: invoice generator, website checker, ad cost and speed loss calculators, payment and pixel auditors."
+        }
+    },
     "series": {
         "index_import_playlist": "Import a playlist (YouTube)",
         "index_heading": "Series & Courses Academy",
@@ -15713,6 +15777,42 @@
         "explore_website_services": "Official Musoftwares Services",
         "explore_marketplace_services": "New Freelance Services",
         "explore_button": "Explore Service"
+    },
+    "setup": {
+        "title": "Setup",
+        "intro": "Everything that still needs an action from you. Items with a check box are done outside the site, so tick them yourself when you finish.",
+        "all_done": "All done. Nothing needs your action now.",
+        "progress": ":done of :total done",
+        "open": "Open",
+        "mark_done": "Mark as done",
+        "mark_not_done": "Mark as not done",
+        "group_site": "Site settings",
+        "group_seo": "Google and search engines",
+        "group_queue": "Waiting for you",
+        "migrations": "Run the pending database updates",
+        "migrations_note": ":count update(s) are waiting. Take a backup, then run them.",
+        "analytics": "Add Google Analytics or Google Tag Manager",
+        "analytics_note": "Without it you cannot see visitors or which pages bring customers.",
+        "payments": "Add the real Kashier payment keys",
+        "payments_note": "Set KASHIER_MERCHANT_ID and KASHIER_SECRET in the .env file on the server. The site uses test values now.",
+        "mail": "Set up sending email",
+        "mail_note": "MAIL_MAILER in .env is \":mailer\", so no email leaves the site. Use smtp or another real mailer.",
+        "product_screenshots": "Add screenshots to every program in the store",
+        "product_screenshots_note": "No screenshots: :names",
+        "search_console_sitemap": "Send the sitemap to Google Search Console",
+        "search_console_sitemap_note": "Search Console > Sitemaps > add :url. Do it again after big changes to the site.",
+        "search_console_reindex": "Ask Google to read the main pages again",
+        "search_console_reindex_note": "Search Console > URL inspection > Request indexing, for the home page and \/services, in English and with ?lang=ar.",
+        "bing_webmaster": "Add the site to Bing Webmaster Tools",
+        "bing_webmaster_note": "Import it from Search Console in one click, then send the same sitemap. Bing also feeds ChatGPT search.",
+        "google_business_profile": "Create a Google Business Profile",
+        "google_business_profile_note": "Add the Suez address, phone, working hours and a link to the site, so you show on Google Maps.",
+        "open_tickets": "Answer open support tickets",
+        "open_tickets_note": ":count ticket(s) are waiting.",
+        "pending_services": "Review marketplace services waiting for approval",
+        "pending_services_note": ":count service(s) are waiting.",
+        "withdrawals": "Review withdrawal requests",
+        "withdrawals_note": ":count request(s) are waiting."
     },
     "shortlink": {
         "actions": "Actions",

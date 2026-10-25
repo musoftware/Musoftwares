@@ -55,9 +55,9 @@
         
         @php
             $cleanCurrentUrl = strtok(url()->full(), '?');
-            $canonicalUrl = $meta['canonical_url'] ?? $cleanCurrentUrl;
-            $enAlternateUrl = $meta['en_url'] ?? ($cleanCurrentUrl . '?lang=en');
-            $arAlternateUrl = $meta['ar_url'] ?? ($cleanCurrentUrl . '?lang=ar');
+            $baseUrl = $meta['canonical_url'] ?? $cleanCurrentUrl;
+            $canonicalUrl = \App\Support\LocaleUrl::canonical($baseUrl);
+            $languageAlternates = \App\Support\LocaleUrl::alternates($baseUrl);
             $defaultSiteName = 'Musoftware';
             $defaultMetaTitle = 'Musoftware | Systems, ERP & Digital Solutions';
             $defaultMetaDesc = 'Comprehensive ERP and CRM solutions, business management systems, automated workflows, and technical consulting to scale operations.';
@@ -66,15 +66,15 @@
             $effectiveTitle = (!empty($meta) && !empty($meta['title'])) ? $meta['title'] : $defaultMetaTitle;
             $effectiveDesc = (!empty($meta) && !empty($meta['description'])) ? $meta['description'] : $defaultMetaDesc;
             $effectiveImage = (!empty($meta) && !empty($meta['image'])) ? $meta['image'] : $defaultMetaImage;
-            $effectiveUrl = (!empty($meta) && !empty($meta['url'])) ? $meta['url'] : $cleanCurrentUrl;
+            $effectiveUrl = $canonicalUrl;
             $effectiveType = (!empty($meta) && !empty($meta['type'])) ? $meta['type'] : 'website';
             $effectiveRobots = (!empty($meta) && !empty($meta['robots'])) ? $meta['robots'] : 'index, follow';
         @endphp
 
         <link rel="canonical" href="{{ $canonicalUrl }}">
-        <link rel="alternate" hreflang="en" href="{{ $enAlternateUrl }}" />
-        <link rel="alternate" hreflang="ar" href="{{ $arAlternateUrl }}" />
-        <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}" />
+        @foreach ($languageAlternates as $hreflang => $href)
+            <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}" />
+        @endforeach
 
         <meta name="description" content="{{ $effectiveDesc }}">
         <meta name="robots" content="{{ $effectiveRobots }}">

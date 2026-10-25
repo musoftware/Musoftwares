@@ -1,7 +1,7 @@
 @extends('layouts.public', [
     'title' => $product->localized('name').' | Musoftwares',
     'description' => app(\Modules\SoftwareStore\Services\StoreSeo::class)->description($product),
-    'canonical' => $product->purchaseUrl(),
+    'canonical' => \App\Support\LocaleUrl::canonical($product->purchaseUrl()),
     'image' => app(\Modules\SoftwareStore\Services\StoreSeo::class)->ogImage($product),
 ])
 

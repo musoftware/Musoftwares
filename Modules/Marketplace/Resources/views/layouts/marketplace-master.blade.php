@@ -11,17 +11,15 @@
     <meta name="description" content="{{ $meta['description'] ?? __('marketplace.meta_description') ?? 'Discover, buy, and hire top software developers, custom tools, scripts, AI bots, and digital services with secure escrow protection.' }}">
     <meta name="robots" content="{{ $meta['robots'] ?? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' }}">
     
-    <link rel="canonical" href="{{ $meta['canonical_url'] ?? $meta['url'] ?? url()->current() }}">
-    
     @php
         $currentUrl = url()->current();
-        $enUrl = $meta['en_url'] ?? (Str::contains($currentUrl, '?') ? $currentUrl.'&lang=en' : $currentUrl.'?lang=en');
-        $arUrl = $meta['ar_url'] ?? (Str::contains($currentUrl, '?') ? $currentUrl.'&lang=ar' : $currentUrl.'?lang=ar');
+        $baseUrl = $meta['canonical_url'] ?? $meta['url'] ?? $currentUrl;
         $locale = app()->getLocale();
     @endphp
-    <link rel="alternate" hreflang="en" href="{{ $enUrl }}">
-    <link rel="alternate" hreflang="ar" href="{{ $arUrl }}">
-    <link rel="alternate" hreflang="x-default" href="{{ $meta['canonical_url'] ?? $currentUrl }}">
+    <link rel="canonical" href="{{ \App\Support\LocaleUrl::canonical($baseUrl) }}">
+    @foreach (\App\Support\LocaleUrl::alternates($baseUrl) as $hreflang => $href)
+        <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $href }}">
+    @endforeach
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">

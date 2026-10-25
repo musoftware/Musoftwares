@@ -541,9 +541,11 @@ class SoftwareProductsTest extends TestCase
                 $html = $this->withSession(['locale' => $lang])->get("/services/{$product->slug}?lang={$lang}")->assertOk()->getContent();
                 $url = route('website-services.show', $product->slug);
 
-                $this->assertStringContainsString('<link rel="canonical" href="'.$url.'">', $html, "{$product->slug} canonical");
+                $canonical = $lang === 'ar' ? $url.'?lang=ar' : $url;
+
+                $this->assertStringContainsString('<link rel="canonical" href="'.$canonical.'">', $html, "{$product->slug} canonical");
                 $this->assertStringContainsString('hreflang="ar" href="'.$url.'?lang=ar"', $html);
-                $this->assertStringContainsString('hreflang="en" href="'.$url.'?lang=en"', $html);
+                $this->assertStringContainsString('hreflang="en" href="'.$url.'"', $html);
                 $this->assertStringContainsString('hreflang="x-default"', $html);
                 $this->assertStringContainsString('type="text/markdown"', $html);
                 $this->assertStringContainsString('max-image-preview:large', $html);

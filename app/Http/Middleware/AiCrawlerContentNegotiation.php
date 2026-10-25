@@ -7,78 +7,53 @@ use Illuminate\Http\Request;
 use Inertia\Response as InertiaResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Returns a page's props as JSON only when the caller asks for it
+ * (?format=json or an Accept: application/json header).
+ *
+ * Crawlers are never detected by User-Agent: search engines must get the same
+ * HTML a visitor gets, or Google treats the page as cloaked and drops it.
+ */
 class AiCrawlerContentNegotiation
 {
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-        // Check if request is coming from an AI crawler or explicitly requesting JSON
-        if ($this->shouldServeJson($request)) {
-
-            // 1. If the controller returns an Inertia Response directly
-            if ($response instanceof InertiaResponse) {
-                return response()->json(
-                    $response->toResponse($request)->getOriginalContent()->getData()['page']['props'] ?? [],
-                    200,
-                    ['Content-Type' => 'application/json; charset=utf-8'],
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-                );
-            }
-
-            // 2. If the response was already rendered to standard HTML
-            $content = $response->getContent();
-            if (is_string($content) && str_contains($content, 'data-page="')) {
-                preg_match('/data-page="([^"]+)"/', $content, $matches);
-                if (!empty($matches[1])) {
-                    $pageData = json_decode(htmlspecialchars_decode($matches[1], ENT_QUOTES), true);
-                    return response()->json(
-                        $pageData['props'] ?? $pageData,
-                        200,
-                        ['Content-Type' => 'application/json; charset=utf-8'],
-                        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-                    );
-                }
-            }
+        if (! $this->shouldServeJson($request)) {
+            return $response;
         }
 
-        return $response;
+        if ($response instanceof InertiaResponse) {
+            return $this->json($response->toResponse($request)->getOriginalContent()->getData()['page']['props'] ?? []);
+        }
+
+        $content = $response->getContent();
+        if (! is_string($content) || ! preg_match('/data-page="([^"]+)"/', $content, $matches)) {
+            return $response;
+        }
+
+        $pageData = json_decode(htmlspecialchars_decode($matches[1], ENT_QUOTES), true);
+
+        return $this->json($pageData['props'] ?? $pageData);
     }
 
     private function shouldServeJson(Request $request): bool
     {
-        // If the user or bot explicitly requests format via query or headers
-        if ($request->query('format') === 'json' || $request->wantsJson()) {
-            // Exclude internal Inertia navigation requests
-            if (!$request->header('X-Inertia')) {
-                return true;
-            }
+        if ($request->header('X-Inertia')) {
+            return false;
         }
 
-        // List of supported AI crawler and bot user-agents
-        $userAgent = strtolower($request->header('User-Agent', ''));
+        return $request->query('format') === 'json' || $request->wantsJson();
+    }
 
-        $aiBots = [
-            'google-extended',
-            'googlebot',
-            'gptbot',
-            'chatgpt-user',
-            'claudebot',
-            'claude-web',
-            'perplexitybot',
-            'bytespider',
-            'cohere-ai',
-            'applebot-extended',
-            'diffbot',
-            'meta-externalagent',
-        ];
-
-        foreach ($aiBots as $bot) {
-            if (str_contains($userAgent, $bot)) {
-                return true;
-            }
-        }
-
-        return false;
+    private function json(mixed $data): Response
+    {
+        return response()->json(
+            $data,
+            200,
+            ['Content-Type' => 'application/json; charset=utf-8'],
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+        );
     }
 }

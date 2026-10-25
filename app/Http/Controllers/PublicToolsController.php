@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\PageSeo;
 use App\Models\Currency;
 use App\Models\CurrenciesExchange;
 use App\Models\GuestTicket;
@@ -17,10 +18,7 @@ class PublicToolsController extends Controller
      */
     public function index()
     {
-        return view('public.tools.index', [
-            'title' => 'Developer & Business Tools Directory | Musoftwares',
-            'description' => 'Explore our collection of free developer, business, and architecture estimation tools.',
-        ]);
+        return view('public.tools.index', PageSeo::for('tools'));
     }
 
     /**
@@ -55,7 +53,7 @@ class PublicToolsController extends Controller
             'pricingConfig' => $pricingConfig,
         ])->withViewData([
             'meta' => [
-                'title' => __('tools.fb_title') . ' | Musoftwares',
+                'title' => __('tools.fb_title').__('seo.suffix'),
                 'description' => __('tools.fb_desc'),
                 'url' => route('public.tools.facebook-cost'),
             ],
@@ -78,7 +76,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/InvoiceGenerator')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.invoice_title') . ' | Musoftwares',
+                    'title' => __('tools.invoice_title').__('seo.suffix'),
                     'description' => __('tools.invoice_desc'),
                     'url' => route('public.tools.invoice-generator'),
                 ],
@@ -123,7 +121,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/WebsiteChecker')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.audit_title') . ' | Musoftwares',
+                    'title' => __('tools.audit_title').__('seo.suffix'),
                     'description' => __('tools.audit_desc'),
                     'url' => route('public.tools.website-checker'),
                 ],
@@ -323,7 +321,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/SpeedLossCalculator')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.speed_loss_title') . ' | Musoftwares',
+                    'title' => __('tools.speed_loss_title').__('seo.suffix'),
                     'description' => __('tools.speed_loss_desc'),
                     'url' => route('public.tools.speed-loss-calculator'),
                 ],
@@ -369,7 +367,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/PaymentGatewayAuditor')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.pay_audit_title') . ' | Musoftwares',
+                    'title' => __('tools.pay_audit_title').__('seo.suffix'),
                     'description' => __('tools.pay_audit_desc'),
                     'url' => route('public.tools.payment-gateway-auditor'),
                 ],
@@ -476,7 +474,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/PixelTrackerAuditor')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.pixel_title') . ' | Musoftwares',
+                    'title' => __('tools.pixel_title').__('seo.suffix'),
                     'description' => __('tools.pixel_desc'),
                     'url' => route('public.tools.pixel-tracker-auditor'),
                 ],
@@ -563,7 +561,7 @@ class PublicToolsController extends Controller
         return Inertia::render('Public/Tools/CompetitorTechSpy')
             ->withViewData([
                 'meta' => [
-                    'title' => __('tools.spy_title') . ' | Musoftwares',
+                    'title' => __('tools.spy_title').__('seo.suffix'),
                     'description' => __('tools.spy_desc'),
                     'url' => route('public.tools.competitor-tech-spy'),
                 ],

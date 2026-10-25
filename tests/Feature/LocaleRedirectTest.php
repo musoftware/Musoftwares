@@ -41,7 +41,7 @@ class LocaleRedirectTest extends TestCase
         $response->assertSessionHas('locale', 'en');
     }
 
-    public function test_blog_show_redirects_to_group_translation_if_matching_group_found(): void
+    public function test_blog_show_keeps_the_requested_article_and_links_its_translation(): void
     {
         $groupId = (string) Str::uuid();
 
@@ -67,11 +67,13 @@ class LocaleRedirectTest extends TestCase
             'published_at' => now(),
         ]);
 
-        // When in Arabic locale and requesting the English slug, it redirects to the Arabic article slug
+        // Each language version has its own address, so an Arabic visitor still gets the English
+        // article they asked for, with a link to the Arabic one (a redirect hid it from Google).
         $response = $this->withSession(['locale' => 'ar'])
             ->get('/blog/how-to-add-telegram-members');
 
-        $response->assertStatus(301);
-        $response->assertRedirect(route('blog.show', 'kyfy-adaf-aaadaaa-tylygram'));
+        $response->assertOk();
+        $response->assertSee('<html lang="en"', false);
+        $response->assertSee('hreflang="ar" href="'.route('blog.show', $arArticle->slug).'"', false);
     }
 }

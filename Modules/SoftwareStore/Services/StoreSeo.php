@@ -2,6 +2,7 @@
 
 namespace Modules\SoftwareStore\Services;
 
+use App\Support\LocaleUrl;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Modules\SoftwareStore\Models\SoftwareProduct;
@@ -32,7 +33,7 @@ class StoreSeo
     /** @return array<string, string> language => address */
     public function alternates(string $url): array
     {
-        return ['ar' => $url.'?lang=ar', 'en' => $url.'?lang=en', 'x-default' => $url];
+        return LocaleUrl::alternates($url);
     }
 
     /** @return array<int, array<string, mixed>> */

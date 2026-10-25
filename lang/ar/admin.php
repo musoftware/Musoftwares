@@ -2163,6 +2163,7 @@ return [
     'sidebar_currencies' => 'العملات',
     'sidebar_currency_exchanges' => 'تحويلات العملات',
     'sidebar_dashboard' => 'لوحة التحكم',
+    'sidebar_setup' => 'الإعداد',
     'sidebar_digital_books' => 'الكتب الرقمية',
     'sidebar_earning_analyze' => 'تحليل الأرباح',
     'sidebar_email_templates' => 'قوالب البريد',

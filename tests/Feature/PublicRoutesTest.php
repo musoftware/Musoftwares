@@ -41,11 +41,8 @@ class PublicRoutesTest extends TestCase
     public function test_solutions_pages_return_successful_response()
     {
         $this->get('/solutions')->assertStatus(200);
-        $this->get('/solutions/healthcare')->assertStatus(200);
-        $this->get('/solutions/education')->assertStatus(200);
-        $this->get('/solutions/ecommerce')->assertStatus(200);
-        $this->get('/solutions/real-estate')->assertStatus(200);
-        $this->get('/solutions/finance')->assertStatus(200);
+        $this->get('/solutions/healthcare')->assertStatus(301)->assertRedirect('/services/clinic-system');
+        $this->get('/solutions/finance')->assertStatus(301)->assertRedirect('/solutions');
     }
 
     public function test_company_pages_return_successful_response()

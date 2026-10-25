@@ -187,8 +187,6 @@ class ServiceCategoryController extends Controller
             'description' => $category->description ?? "Explore {$category->name} services and digital solutions on MuSoftwares Marketplace.",
             'url' => $canonicalUrl,
             'canonical_url' => $canonicalUrl,
-            'en_url' => $canonicalUrl.'?lang=en',
-            'ar_url' => $canonicalUrl.'?lang=ar',
             'type' => 'website',
             'schema_json' => $schemaJson,
         ];

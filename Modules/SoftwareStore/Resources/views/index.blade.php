@@ -1,4 +1,4 @@
-@extends('layouts.public', ['title' => __('software.title').' | Musoftwares', 'description' => __('software.meta_description'), 'canonical' => route('services.index')])
+@extends('layouts.public', ['title' => __('software.title').' | Musoftwares', 'description' => __('software.meta_description'), 'canonical' => \App\Support\LocaleUrl::canonical(route('services.index'))])
 
 @include('softwarestore::landing.seo-index', ['products' => $products])
 

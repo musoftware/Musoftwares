@@ -55,17 +55,11 @@ class BlogController extends Controller
 
         $currentLocale = app()->getLocale();
 
+        // Each language version has its own URL and is linked by hreflang, so an
+        // existing article is always shown as is. Redirecting by the visitor's
+        // language hid the Arabic articles from Google (it crawls in English).
         if ($article) {
-            if ($article->language !== $currentLocale && ! empty($article->group_id)) {
-                $localizedTranslation = BlogArticle::published()
-                    ->where('group_id', $article->group_id)
-                    ->where('language', $currentLocale)
-                    ->first();
-
-                if ($localizedTranslation && $localizedTranslation->id !== $article->id) {
-                    return redirect()->route('blog.show', $localizedTranslation->slug, 301);
-                }
-            }
+            app()->setLocale($article->language === 'ar' ? 'ar' : 'en');
         } else {
             $translationArticle = BlogArticle::published()
                 ->whereHas('translations', function ($q) use ($slug) {
