@@ -244,6 +244,9 @@ Route::prefix('/shared-board/{token}')->name('public.comments.')->group(function
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
+Route::get('/settings', [\App\Http\Controllers\Client\SettingsController::class, 'index'])
+    ->middleware(['auth', 'verified', 'onboarding'])->name('client.settings');
+
 Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
     ->middleware(['auth', 'verified'])->name('dashboard.directory');
 

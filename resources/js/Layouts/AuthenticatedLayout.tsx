@@ -25,6 +25,7 @@ import {
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
     MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download,
     FolderKanban,
+    Languages,
     ListTodo,
     Calculator,
     Grid,
@@ -41,6 +42,7 @@ import { __ } from '@/lib/i18n';
 import { useFCM } from '@/hooks/useFCM';
 import { PageTransition } from '@/Components/ui/PageTransition';
 import { UnifiedMenuItem } from '@/Components/ui/UnifiedMenuItem';
+import ClientBottomNav from '@/Components/Client/ClientBottomNav';
 
 type NavLinkProps = PropsWithChildren<{ href: string; active: boolean }>;
 
@@ -71,7 +73,8 @@ function AuthenticatedContent({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const { auth, notifications, flash, wallet } = usePage().props as any;
+    const { auth, notifications, flash, wallet, locale } = usePage().props as any;
+    const otherLocale = locale === 'ar' ? 'en' : 'ar';
     useInertiaNotifications();
     const { permission, requestPermission } = useFCM();
     const user = auth.user;
@@ -438,7 +441,7 @@ function AuthenticatedContent({
                                         active={auth?.team_member ? isRouteActive('erp') : isRouteActive('dashboard')}
                                     >
                                         <LayoutDashboard className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                        <span>{__('general.dashboard')}</span>
+                                        <span>{auth?.team_member ? __('general.dashboard') : __('client_home.nav.home')}</span>
                                     </NavLink>
                                     {(!auth?.team_member && isTourOpen && tourStep === 2) && (
                                         <span className="absolute -top-1 end-0 flex h-3 w-3">
@@ -450,6 +453,14 @@ function AuthenticatedContent({
                                 
                                 {!auth?.team_member && (
                                     <>
+                                        <NavLink href="/billing/invoices" active={isInvoicesMenuActive}>
+                                            <FileText className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                            <span>{__('client_home.nav.billing')}</span>
+                                        </NavLink>
+                                        <NavLink href="/loyalty" active={isRouteActive('loyalty')}>
+                                            <Award className="h-3.5 w-3.5 opacity-70 shrink-0" />
+                                            <span>{__('client_home.nav.rewards')}</span>
+                                        </NavLink>
                                         <DropdownMenu>
                                             <div className="relative inline-block">
                                                 <DropdownMenuTrigger className={cn(
@@ -459,7 +470,7 @@ function AuthenticatedContent({
                                                         : "text-[#1d1d1f]/70 dark:text-zinc-300 hover:bg-black/5 dark:hover:bg-white/10 hover:text-[#1d1d1f] dark:hover:text-white"
                                                 )}>
                                                     <Grid className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                                                    <span>{__('general.menu') || 'Menu'}</span>
+                                                    <span>{__('client_home.nav.more')}</span>
                                                     <ChevronDown className="ms-0.5 h-3 w-3 opacity-50 shrink-0" />
                                                 </DropdownMenuTrigger>
                                                 {isTourOpen && (tourStep === 2 || tourStep === 4 || tourStep === 5) && (
@@ -834,6 +845,17 @@ function AuthenticatedContent({
                                     {!auth?.team_member ? (
                                         <>
                                             <DropdownMenuGroup className="space-y-0.5">
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 transition-colors"
+                                                    render={<SafeLink href="/settings" className="flex items-center w-full" />}
+                                                >
+                                                    <Settings className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('client_home.nav.settings')}</DropdownMenuItem>
+                                                {/* plain link: a full page load switches language and direction; SetLocale saves the choice */}
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 mb-1 transition-colors"
+                                                    render={<a href={`${typeof window !== 'undefined' ? window.location.pathname : '/dashboard'}?lang=${otherLocale}`} lang={otherLocale} className="flex items-center w-full" />}
+                                                >
+                                                    <Languages className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('client_home.nav.language')}</DropdownMenuItem>
                                                 {user?.role === 'admin' && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"
@@ -846,14 +868,14 @@ function AuthenticatedContent({
                                                         className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"
                                                         render={<SafeLink href={safeRoute('seller.dashboard')} className="flex items-center w-full font-bold" />}
                                                     >
-                                                        <Building2 className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />Seller Portal</DropdownMenuItem>
+                                                        <Building2 className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />{__('client_home.nav.seller_portal')}</DropdownMenuItem>
                                                 )}
                                                 {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"
                                                         render={<SafeLink href={safeRoute('portal.devices.index')} className="flex items-center w-full font-bold" />}
                                                     >
-                                                        <Laptop className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />Reseller Portal</DropdownMenuItem>
+                                                        <Laptop className="me-2 h-3.5 w-3.5 text-[#0071e3] dark:text-[#3898ec]" />{__('client_home.nav.reseller_portal')}</DropdownMenuItem>
                                                 )}
                                                 {(user?.roles?.includes('moderator') || user?.roles?.includes('support_agent')) && (
                                                     <DropdownMenuItem 
@@ -971,7 +993,7 @@ function AuthenticatedContent({
             )}
 
             {/* Main Content */}
-            <main className="flex-1 w-full max-w-full min-w-0 overflow-x-clip relative">
+            <main className={cn("flex-1 w-full max-w-full min-w-0 overflow-x-clip relative", !auth?.team_member && "pb-20 md:pb-0")}>
                 <PageTransition>{children}</PageTransition>
             </main>
 
@@ -985,7 +1007,10 @@ function AuthenticatedContent({
             />
 
             <Toaster />
-            <FloatingWhatsAppButton />
+            <FloatingWhatsAppButton className={auth?.team_member ? '' : 'hidden md:flex'} />
+            {!auth?.team_member && (
+                <ClientBottomNav unread={notifications?.unread_count ?? 0} onOpenMenu={() => setIsMobileOpen(true)} />
+            )}
         </div>
     );
 }

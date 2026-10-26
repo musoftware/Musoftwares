@@ -64,6 +64,7 @@ class LoyaltyController extends Controller
                 'points_earned'=> $referralPointsEarned,
             ],
             'pointsConversionRate' => LoyaltyService::POINTS_TO_CURRENCY_RATE,
+            'monthlyRanking'   => app(\App\Services\Client\MonthlyLeaderboardService::class)->forUser($user, 10),
         ]);
     }
 }

@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageShell } from '@/Components/ui/PageShell';
 import { PageHeroHeader } from '@/Components/ui/PageHeroHeader';
 import { ContentCard } from '@/Components/ui/ContentCard';
+import MonthlyRanking, { MonthlyRankingData } from '@/Components/Client/MonthlyRanking';
 import { BentoStatCard } from '@/Components/ui/BentoStatCard';
 import { Button } from '@/Components/ui/button';
 import { 
@@ -88,6 +89,7 @@ interface LoyaltyPageProps {
         points_earned: number;
     };
     pointsConversionRate: number;
+    monthlyRanking?: MonthlyRankingData;
 }
 
 export default function LoyaltyIndex({
@@ -97,6 +99,7 @@ export default function LoyaltyIndex({
     rewards = [],
     referral,
     pointsConversionRate = 1 / 30,
+    monthlyRanking,
 }: LoyaltyPageProps) {
     const [currentBalance, setCurrentBalance] = useState<number>(summary?.balance || 0);
     const [redeemingId, setRedeemingId] = useState<number | null>(null);
@@ -231,6 +234,23 @@ export default function LoyaltyIndex({
                             accentColor="purple"
                         />
                     </div>
+
+                    {/* Monthly ranking: other clients are anonymous */}
+                    {monthlyRanking && (
+                        <div id="ranking" className="scroll-mt-24">
+                            <ContentCard
+                                title={__('client_home.rewards.ranking_title')}
+                                subtitle={__('client_home.rewards.ranking_hint')}
+                            >
+                                {monthlyRanking.me.position !== null && (
+                                    <p className="mb-3 text-sm font-semibold text-[#0071e3]">
+                                        {__('client_home.rewards.rank', { position: monthlyRanking.me.position, total: monthlyRanking.participants })} · {__('client_home.rewards.top_percent', { percent: monthlyRanking.me.top_percent ?? 100 })}
+                                    </p>
+                                )}
+                                <MonthlyRanking ranking={monthlyRanking} />
+                            </ContentCard>
+                        </div>
+                    )}
 
                     {/* 2. Tier Progression Track (Visual Ladder) */}
                     <ContentCard

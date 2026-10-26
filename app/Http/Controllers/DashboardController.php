@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Client\ClientHomeService;
 use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,7 @@ class DashboardController extends Controller
     {
         $dashboardService = app(DashboardService::class);
         $data = $dashboardService->getClientDashboardData($user);
+        $data['home'] = app(ClientHomeService::class)->build($user);
 
         return Inertia::render('Client/Dashboard', $data);
     }
