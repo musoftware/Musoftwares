@@ -239,11 +239,7 @@
     <div class="w-full bg-[#fbfbfd] border-b border-black/[0.06] py-2.5 px-4 text-center text-[12px] text-[#1d1d1f] flex items-center justify-center gap-1.5">
         <span class="flex items-center gap-1.5">
             <i class="ri-shield-check-line text-emerald-600"></i>
-            <span>
-                {{ $locale === 'ar' 
-                    ? 'سوق الخدمات البرمجية والحلول الرقمية المعتمدة: حماية مالية بنظام الضمان (Escrow) 100% بدون مخاطرة.' 
-                    : 'Verified Software Marketplace: 100% Escrow-Protected Deliverables & Instant Digital Deployments.' }}
-            </span>
+            <span>{{ __('marketplace_ui.ribbon') }}</span>
         </span>
     </div>
 
@@ -280,9 +276,9 @@
         <div class="max-w-[1100px] mx-auto space-y-6">
             <!-- Numbered Footnotes Disclosures -->
             <div class="space-y-2 border-b border-[#d2d2d7]/60 pb-6 text-[11px] leading-relaxed text-[#86868b]">
-                <p>1. Escrow Protection: Funds for custom software projects and digital tools are locked safely until buyer confirmation and approval of final deliverables.</p>
-                <p>2. Direct Source & Verification: Every service package includes transparent timeline commitments, direct revisions, and direct developer communication.</p>
-                <p>3. 1-Click Instant Delivery: Digital licenses, source code repositories, and pre-packaged extensions activate immediately via platform wallet balance.</p>
+                @foreach (__('marketplace_ui.notes') as $note)
+                    <p>{{ $loop->iteration }}. {{ $note }}</p>
+                @endforeach
             </div>
 
             <!-- Breadcrumb Navigation Trail -->
@@ -297,7 +293,7 @@
                 </a>
                 @if(isset($title) || isset($meta['title']))
                     <span>›</span>
-                    <span class="text-[#1d1d1f] truncate max-w-[200px]">{{ $title ?? $meta['title'] }}</span>
+                    <span class="text-[#1d1d1f] truncate max-w-[200px]">{{ \Illuminate\Support\Str::before($title ?? $meta['title'], ' | ') }}</span>
                 @endif
             </div>
         </div>

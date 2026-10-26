@@ -15,6 +15,15 @@ class ServiceCategory extends Model
 
     protected $fillable = ['name', 'slug', 'description'];
 
+    /** Category names are stored in English; the marketplace_ui.categories translations are keyed by the slugged name. */
+    public function localizedName(): string
+    {
+        $key = 'marketplace_ui.categories.'.\Illuminate\Support\Str::slug($this->name);
+        $text = __($key);
+
+        return is_string($text) && $text !== $key ? $text : $this->name;
+    }
+
     public function services(): HasMany
     {
         return $this->hasMany(Service::class, 'category_id');

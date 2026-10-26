@@ -67,6 +67,22 @@ class MarketplaceBladeSeoTest extends TestCase
         $response->assertSee('Web Development');
     }
 
+    public function test_arabic_catalog_shows_arabic_titles_and_categories_and_no_made_up_rating(): void
+    {
+        $this->service->update(['title_translations' => ['ar' => 'تطوير تطبيق ويب بلارافيل'], 'tagline_translations' => ['ar' => 'تطبيقات سريعة ومخصصة']]);
+
+        $this->get(route('marketplace.services.index', ['lang' => 'ar']))
+            ->assertOk()
+            ->assertSee('تطوير تطبيق ويب بلارافيل')
+            ->assertSee('تطبيقات سريعة ومخصصة')
+            ->assertSee('تطوير المواقع') // "Web Development" category
+            ->assertDontSee('4.9')
+            ->assertDontSee('Escrow Protection:');
+
+        // the English page keeps the original title
+        $this->get(route('marketplace.services.index', ['lang' => 'en']))->assertSee('Custom Laravel Web Application Development');
+    }
+
     public function test_marketplace_service_show_renders_blade_with_schema_and_meta(): void
     {
         $response = $this->get(route('marketplace.services.show', [

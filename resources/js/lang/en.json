@@ -15537,6 +15537,49 @@
         "seller_nav_label": "Seller sections",
         "category_nav_label": "Service categories"
     },
+    "marketplace_ui": {
+        "title": "Services marketplace",
+        "subtitle": "Ready services from verified developers. Your payment is held until you approve the delivery.",
+        "search": "Search services, for example WhatsApp bot or website",
+        "all": "All",
+        "sort": "Sort",
+        "sorts": {
+            "popular": "Most ordered",
+            "newest": "Newest",
+            "price_low": "Lowest price",
+            "price_high": "Highest price"
+        },
+        "delivery": "Delivery",
+        "deliveries": {
+            "": "Any time",
+            "1": "Within a day",
+            "3": "Up to 3 days",
+            "7": "Up to 7 days",
+            "14": "Up to 14 days"
+        },
+        "from": "From",
+        "details": "Details",
+        "days": ":count days delivery",
+        "one_day": "Delivered within a day",
+        "save": "Save",
+        "saved": "Saved",
+        "empty": "No services match your search.",
+        "show_all": "Show all services",
+        "page": "Page :page of :pages",
+        "results": ":count services",
+        "previous": "Previous",
+        "next": "Next",
+        "sell_title": "Do you build software?",
+        "sell_text": "List your service and get paid safely when the client approves your work.",
+        "sell_action": "Sell a service",
+        "ribbon": "Your payment is held safely until you approve the delivery.",
+        "notes": [
+            "Safe payment: money for custom work is held until you confirm and approve the final delivery.",
+            "Clear terms: every package states its delivery time and revisions, and you talk to the developer directly.",
+            "Instant products: licenses, source code and ready extensions are delivered right after paying from your wallet."
+        ],
+        "categories": []
+    },
     "messages": {
         "all_test_data_cleared_success": "All Test Data Cleared Success",
         "all_transactions_cleared_success": "All Transactions Cleared Success",

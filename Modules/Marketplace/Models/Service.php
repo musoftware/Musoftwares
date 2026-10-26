@@ -59,6 +59,21 @@ class Service extends Model
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    /** Title in the visitor's language when a translation exists, otherwise the original. */
+    public function localizedTitle(?string $locale = null): string
+    {
+        return (string) ($this->title_translations[$locale ?? app()->getLocale()] ?? null ?: $this->title);
+    }
+
+    public function localizedTagline(?string $locale = null): ?string
+    {
+        $locale ??= app()->getLocale();
+
+        return ($this->tagline_translations[$locale] ?? null)
+            ?: $this->tagline
+            ?: (\Illuminate\Support\Str::limit(strip_tags((string) (($this->description_translations[$locale] ?? null) ?: $this->description)), 110) ?: null);
+    }
+
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ServiceCategory::class, 'category_id');
