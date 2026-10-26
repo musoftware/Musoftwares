@@ -43,6 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(\App\Http\Middleware\StripPublicFromUrl::class);
         $middleware->append(SecurityEnforcement::class);
         $middleware->append(RemoveSecurityHeaders::class);
         $middleware->web(append: [

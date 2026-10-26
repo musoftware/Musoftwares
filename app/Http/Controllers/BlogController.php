@@ -80,7 +80,7 @@ class BlogController extends Controller
                 return redirect()->route('blog.show', $translationArticle->slug, 301);
             }
 
-            abort(404);
+            return $this->removedArticle($slug);
         }
 
         if ($article->service) {
@@ -116,6 +116,25 @@ class BlogController extends Controller
             'articleJson' => $seo->toJson($seo->articleGraph($article, $imageUrl)),
             'readingMinutes' => $seo->readingMinutes($article),
         ]);
+    }
+
+    /**
+     * An article that was taken off the blog (the old auto-generated ones were unpublished or
+     * soft-deleted when the blog was curated). Send visitors to the service it was about when that
+     * service is still listed; otherwise answer 410 so search engines drop the address.
+     */
+    private function removedArticle(string $slug)
+    {
+        $old = BlogArticle::withTrashed()->with('service')->where('slug', $slug)->first();
+        // drafts and scheduled articles were never public: keep them a plain 404
+        abort_unless($old && $old->published_at && $old->published_at->isPast(), 404);
+
+        $service = $old->service;
+        if ($service && $service->status === 'active' && \Route::has('marketplace.services.show')) {
+            return redirect()->route('marketplace.services.show', ['id' => $service->id, 'slug' => $service->slug ?: 'service'], 301);
+        }
+
+        abort(410);
     }
 }
 

@@ -88,7 +88,8 @@ class BlogSeoTest extends TestCase
     {
         $this->article(['slug' => 'hidden', 'is_published' => false]);
 
-        $this->get('/blog/hidden')->assertNotFound();
+        // it was published before, so the address answers 410 Gone (see RemovedPagesTest)
+        $this->get('/blog/hidden')->assertStatus(410);
         $this->assertStringNotContainsString('/blog/hidden', $this->get('/sitemap.xml')->getContent());
     }
 }
