@@ -4331,7 +4331,7 @@ return array (
   'new_invoice' => 'New invoice',
   'new_link' => 'New link',
   'new_lookup' => 'New Lookup',
-  'new_message_from' => 'New Message From',
+  'new_message_from' => 'New message from :name',
   'new_name' => 'New name',
   'new_note' => 'New Note',
   'new_notification' => 'New notice',

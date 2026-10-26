@@ -30,6 +30,11 @@ class NotificationController extends Controller
             if (isset($notification->data['url'])) {
                 return redirect($notification->data['url']);
             }
+
+            // message notifications saved before they carried a url
+            if (isset($notification->data['conversation_id'])) {
+                return redirect('/messages?conversation='.(int) $notification->data['conversation_id']);
+            }
         }
 
         return back();

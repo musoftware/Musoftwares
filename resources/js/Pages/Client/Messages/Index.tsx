@@ -98,7 +98,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
     const currentUser = auth.user;
 
     const [activeTab, setActiveTab] = useState<string>(
-        activeConversationId ? 'direct_messages' : 'all',
+        'all',
     );
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [selectedConvId, setSelectedConvId] = useState<number | null>(

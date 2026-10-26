@@ -75,6 +75,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
             'sender_name' => $senderName,
             'title' => __('general.new_message_from', ['name' => $senderName]),
             'body' => Str::limit($this->message->body ?? '', 100),
+            'url' => url('/messages?conversation='.$this->message->conversation_id),
         ];
     }
 }

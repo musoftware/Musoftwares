@@ -507,7 +507,15 @@ class TextHelper
 
         $qr_img = null;
 
-        $pdf = Pdf::loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
+        // DomPDF cannot join Arabic letters, so the PDF is always rendered with the English labels.
+        $locale = app()->getLocale();
+        app()->setLocale('en');
+        try {
+            $pdf = Pdf::setOption(['isFontSubsettingEnabled' => true])
+                ->loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
+        } finally {
+            app()->setLocale($locale);
+        }
 
         return $pdf;
     }

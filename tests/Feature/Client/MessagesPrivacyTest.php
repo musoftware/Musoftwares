@@ -58,6 +58,28 @@ class MessagesPrivacyTest extends TestCase
         $this->assertDatabaseHas('messages', ['sender_id' => $client->id, 'body' => 'hi']);
     }
 
+    public function test_message_notification_names_the_sender_and_opens_the_conversation(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $client = $this->user('client');
+        $agent = $this->user('support_agent', ['name' => 'Support Sara']);
+        $stranger = $this->user('client');
+
+        $this->actingAs($agent)->post(route('messages.direct.store'), ['recipient_id' => $client->id, 'message' => 'test']);
+        $notification = $client->notifications()->latest()->firstOrFail();
+        $conversationId = $notification->data['conversation_id'];
+
+        $this->assertSame('New message from Support Sara', $notification->data['title']);
+        $this->actingAs($client)->post(route('notifications.mark-read', ['id' => $notification->id]))
+            ->assertRedirect('/messages?conversation='.$conversationId);
+        $this->actingAs($client)->get('/messages?conversation='.$conversationId)
+            ->assertInertia(fn (Assert $page) => $page->where('activeConversationId', $conversationId));
+
+        // someone who is not in the conversation cannot open it through the link
+        $this->actingAs($stranger)->get('/messages?conversation='.$conversationId)
+            ->assertInertia(fn (Assert $page) => $page->where('activeConversationId', null));
+    }
+
     public function test_admin_still_sees_everyone_with_emails(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

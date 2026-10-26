@@ -19,6 +19,11 @@ class MessagesController extends Controller
         $recipientId = $request->query('recipient_id') ?? $request->query('user_id');
         $activeConversationId = null;
 
+        $requested = (int) $request->query('conversation');
+        if ($requested && Conversation::whereKey($requested)->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))->exists()) {
+            $activeConversationId = $requested;
+        }
+
         if ($recipientId && (int) $recipientId !== (int) $user->id) {
             $recipient = User::find($recipientId);
             if ($recipient && $this->canMessage($user, $recipient)) {
@@ -151,7 +156,7 @@ class MessagesController extends Controller
     {
         $query = User::where('id', '!=', $user->id)->select('id', 'name', 'email')->with('roles')->orderBy('name');
 
-        if (! $user->isAdmin()) {
+        if (! $this->isStaff($user)) {
             $query->where(fn ($q) => $q
                 ->whereHas('roles', fn ($r) => $r->whereIn('name', self::STAFF_ROLES))
                 ->orWhereIn('id', $this->counterpartIds($user)));
@@ -160,16 +165,22 @@ class MessagesController extends Controller
         return $query->get()->map(fn (User $u) => [
             'id' => $u->id,
             'name' => $u->name,
-            'email' => $user->isAdmin() ? $u->email : null,
+            'email' => $this->isStaff($user) ? $u->email : null,
             'role' => $u->roles->first()?->name ?? 'user',
         ]);
     }
 
     private function canMessage(User $sender, User $recipient): bool
     {
-        return $sender->isAdmin()
+        return $this->isStaff($sender)
             || $recipient->hasRole(self::STAFF_ROLES)
             || in_array($recipient->id, $this->counterpartIds($sender), true);
+    }
+
+    /** Our team (admins, moderators, support agents) can write to and see every user. */
+    private function isStaff(User $user): bool
+    {
+        return $user->isAdmin() || $user->hasRole(self::STAFF_ROLES);
     }
 
     /** @return array<int, int> users who share a conversation with this user */
@@ -209,7 +220,7 @@ class MessagesController extends Controller
         $categoryLabel = __('general.direct_messages') ?: 'Direct Messages';
         $title = $otherUserName;
         // other people's e-mail addresses are only shown to admins
-        $subtitle = $user->isAdmin() && $otherUser?->email ? $otherUser->email : __('general.support_team');
+        $subtitle = $this->isStaff($user) && $otherUser?->email ? $otherUser->email : __('general.support_team');
         $targetUrl = null;
 
         if ($type === 'marketplace_order' || $type === 'service_order' || str_contains($conversableType, 'ServiceOrder')) {

@@ -1,410 +1,199 @@
+@php
+    // Rendered by DomPDF: only CSS 2.1 tables/floats, and the bundled DejaVu Sans font (remote fonts are not loaded).
+    $money = fn ($amount, $currencyId = null) => \App\Helpers\FinanceHelper::instance()->format_money($amount, $currencyId ?? $invoice->currency_id);
+    $business = [
+        'name' => \App\Models\AdminSettings::GetValue('business_name', 'Musoftware') ?: 'Musoftware',
+        'address' => \App\Models\AdminSettings::GetValue('business_address', 'Suez, Egypt') ?: 'Suez, Egypt',
+        'email' => \App\Models\AdminSettings::GetValue('business_email', 'admin@musoftwares.com') ?: 'admin@musoftwares.com',
+        'phone' => \App\Models\AdminSettings::GetValue('business_phone', '') ?: '',
+    ];
+    $logo = file_exists(public_path('favicon.png')) ? public_path('favicon.png') : null;
+
+    $status = $invoice->status ?: 'unpaid';
+    $paid = round((float) $invoice->paid, 2);
+    $total = round((float) $invoice->total(), 2);
+    $balance = max(0, round($total - $paid, 2));
+    $dueDate = $invoice->due_date ? \Carbon\Carbon::parse($invoice->due_date) : null;
+    $isOpen = in_array($status, ['unpaid', 'partially_paid'], true) && $balance > 0;
+    $isOverdue = $isOpen && $dueDate && $dueDate->copy()->endOfDay()->isPast();
+    $statusColors = [
+        'paid' => ['#ecfdf5', '#047857'], 'partially_paid' => ['#fffbeb', '#b45309'], 'unpaid' => ['#eff6ff', '#0071e3'],
+        'cancelled' => ['#f5f5f7', '#6e6e73'], 'refunded' => ['#f5f5f7', '#6e6e73'], 'draft' => ['#f5f5f7', '#6e6e73'],
+    ];
+    [$statusBg, $statusFg] = $isOverdue ? ['#fef2f2', '#dc2626'] : ($statusColors[$status] ?? $statusColors['unpaid']);
+    $statusLabel = $isOverdue ? __('invoice_pdf.overdue') : __('invoice_pdf.status.'.$status);
+
+    $subtotal = $invoice->sub_total();
+    $discount = (float) $invoice->discount + (float) $invoice->second_discount;
+    $tax = (float) $invoice->tax();
+    $taxRate = $user && $user->invoice_taxable == '1' ? \App\Models\AdminSettings::GetValue('business_tax', 22.5) : 0;
+    $businessCurrencyId = \App\Models\AdminSettings::GetValue('business_currency', 2);
+    $businessCurrency = \App\Models\Currency::find($businessCurrencyId);
+    $payUrl = $invoice->uuid && \Illuminate\Support\Facades\Route::has('billing.invoices.pay') ? route('billing.invoices.pay', $invoice->uuid) : null;
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ __('erp.invoice') }} {{ $invoice->enc_id() }}</title>
+    <title>{{ __('invoice_pdf.invoice') }} {{ $invoice->enc_id() }}</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;600;700&display=swap');
-
-        :root {
-            --background: #f8f9fc;
-            --surface: #ffffff;
-            --surface-raised: #f1f4f9;
-            --border: #e2e8f0;
-            --border-strong: #cbd5e1;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --primary-light: #eef2ff;
-            --success: #10b981;
-            --success-light: #ecfdf5;
-            --warning: #f59e0b;
-            --warning-light: #fffbeb;
-            --danger: #ef4444;
-            --danger-light: #fef2f2;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            color: #0f172a;
-            margin: 0;
-            padding: 0;
-            position: relative;
-        }
-
-        .container {
-            padding: 48px;
-            background-color: #ffffff;
-        }
-
-        /* Fonts */
-        .heading {
-            font-family: 'Sora', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .money-code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-        }
-
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
-            font-family: 'Sora', sans-serif;
-            font-weight: 700;
-            opacity: 0.1;
-            z-index: -1;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        .watermark.draft {
-            color: #ef4444; /* danger */
-        }
-
-        .watermark.paid {
-            color: #10b981; /* success */
-        }
-
-        /* Header Layout */
-        .header-table {
-            width: 100%;
-            margin-bottom: 48px;
-            border-collapse: collapse;
-        }
-
-        .header-table td {
-            vertical-align: top;
-        }
-
-        .logo {
-            max-width: 150px;
-            max-height: 50px;
-        }
-
-        .company-info {
-            color: #475569;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .invoice-title {
-            font-family: 'Sora', sans-serif;
-            font-size: 32px;
-            font-weight: 700;
-            color: #6366f1; /* primary */
-            text-align: right;
-            margin-bottom: 8px;
-        }
-
-        .invoice-details {
-            text-align: right;
-            font-size: 13px;
-            color: #475569;
-            line-height: 1.5;
-        }
-
-        /* Bill To Section */
-        .bill-to-section {
-            margin-bottom: 32px;
-        }
-
-        .bill-to-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #94a3b8; /* text-muted */
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.05em;
-        }
-
-        .client-info {
-            font-size: 14px;
-            color: #0f172a;
-            line-height: 1.5;
-        }
-
-        /* Items Table */
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 32px;
-        }
-
-        .items-table th {
-            background-color: #f8f9fc;
-            padding: 12px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 700;
-            color: #475569;
-            border-bottom: 1px solid #cbd5e1; /* border-strong */
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .items-table th.text-end {
-            text-align: right;
-        }
-
-        .items-table th.text-center {
-            text-align: center;
-        }
-
-        .items-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
-            vertical-align: top;
-        }
-
-        .items-table tr:nth-child(even) td {
-            background-color: #f8f9fc;
-        }
-
-        .items-table td.text-end {
-            text-align: right;
-        }
-
-        .items-table td.text-center {
-            text-align: center;
-        }
-
-        .item-title {
-            font-weight: 500;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .item-desc {
-            font-size: 12px;
-            color: #475569;
-        }
-
-        /* Totals Section */
-        .totals-container {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .totals-table {
-            width: 350px;
-            float: right;
-            border-collapse: collapse;
-        }
-
-        .totals-table td {
-            padding: 8px 12px;
-            font-size: 14px;
-        }
-
-        .totals-table td:first-child {
-            text-align: right;
-            color: #475569;
-        }
-
-        .totals-table td:last-child {
-            text-align: right;
-        }
-
-        .totals-table tr.total-row td {
-            font-weight: 700;
-            color: #6366f1; /* primary */
-            font-size: 16px;
-            border-top: 1px solid #cbd5e1; /* border-strong */
-            padding-top: 12px;
-        }
-
-        .totals-table tr.currency-row td {
-            color: #475569;
-            font-size: 13px;
-        }
-
-        /* Notes Section */
-        .notes-section {
-            margin-top: 64px;
-            clear: both;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 16px;
-        }
-
-        .notes-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.05em;
-        }
-
-        .notes-content {
-            font-size: 13px;
-            color: #475569;
-            line-height: 1.5;
-        }
-
-        .page-break {
-            page-break-after: always;
-        }
+        @page { margin: 40px 44px 60px; }
+        * { font-family: 'DejaVu Sans', sans-serif; }
+        body { font-size: 10.5px; color: #1d1d1f; margin: 0; line-height: 1.45; }
+        table { border-collapse: collapse; width: 100%; }
+        td, th { vertical-align: top; }
+        .muted { color: #6e6e73; }
+        .small { font-size: 9px; }
+        .right { text-align: right; }
+        .center { text-align: center; }
+        .brand { font-size: 17px; font-weight: bold; color: #1d1d1f; }
+        .title { font-size: 26px; font-weight: bold; color: #0071e3; letter-spacing: 1px; }
+        .status { display: inline-block; padding: 4px 10px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+        .box { background: #f5f5f7; border-radius: 8px; padding: 12px 14px; }
+        .label { font-size: 8.5px; font-weight: bold; color: #6e6e73; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+        .items th { background: #1d1d1f; color: #ffffff; font-size: 9px; font-weight: bold; padding: 8px 10px; text-align: left; }
+        .items th.right { text-align: right; }
+        .items th.center { text-align: center; }
+        .items td { padding: 9px 10px; border-bottom: 1px solid #e8e8ed; }
+        .items tr.alt td { background: #fafafa; }
+        .totals td { padding: 5px 10px; }
+        .totals .grand td { font-size: 13px; font-weight: bold; border-top: 1px solid #d2d2d7; padding-top: 9px; }
+        .totals .balance td { font-size: 13px; font-weight: bold; color: #ffffff; background: #0071e3; }
+        .num { white-space: nowrap; }
+        .pay { border: 1px solid #0071e3; border-radius: 8px; padding: 12px 14px; }
+        .pay a { color: #0071e3; text-decoration: none; word-break: break-all; }
+        .footer { position: fixed; bottom: -36px; left: 0; right: 0; font-size: 8.5px; color: #86868b; border-top: 1px solid #e8e8ed; padding-top: 6px; }
     </style>
 </head>
 <body>
-    @if($invoice->status === 'draft')
-        <div class="watermark draft">{{ strtoupper(__('erp.status_draft')) }}</div>
-    @elseif($invoice->status === 'paid' || $invoice->paid_at)
-        <div class="watermark paid">{{ strtoupper(__('erp.status_paid')) }}</div>
-    @endif
-
-    <div class="container">
-        <!-- Header -->
-        <table class="header-table">
-            <tr>
-                <td style="width: 50%;">
-                    @if(config('app.logo'))
-                        <!-- Ensure logo is accessible to dompdf -->
-                        <img src="{{ public_path(config('app.logo')) }}" alt="Business Logo" class="logo" style="margin-bottom: 16px;">
-                    @endif
-
-                    <div class="heading" style="margin-bottom: 16px;">{{ $user->name ?? 'Client' }}</div>
-
-                    <div class="company-info">
-                        @if($user && $user->email)
-                            {{ $user->email }}<br>
-                        @endif
-                        @if($user && $user->phone)
-                            {{ $user->phone }}<br>
-                        @endif
-                    </div>
-                </td>
-                <td style="width: 50%;">
-                    <div class="invoice-title">{{ strtoupper(__('erp.invoice')) }}</div>
-                    <div class="invoice-details">
-                        <span class="money-code">{{ $invoice->enc_id() }}</span><br>
-                        {{ __('erp.issued') }}: {{ $invoice->created_at->format('M j, Y') }}<br>
-                        {{ __('erp.due_date') }}: -
-                    </div>
-                </td>
-            </tr>
-        </table>
-
-        <!-- Items Table -->
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;" class="text-center">#</th>
-                    <th style="width: 50%;">{{ __('erp.description') }}</th>
-                    <th style="width: 15%;" class="text-center">{{ __('erp.qty') }}</th>
-                    <th style="width: 15%;" class="text-end">{{ __('erp.rate') }}</th>
-                    <th style="width: 15%;" class="text-end">{{ __('erp.total') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($invoice_items as $index => $item)
-                    <tr>
-                        <td class="text-center">{{ $index + 1 }}</td>
-                        <td>
-                            <div class="item-title">{{ $item->item_title }}</div>
-                        </td>
-                        <td class="text-center">
-                            {{ $item->qty }}
-                        </td>
-                        <td class="text-end money-code">
-                            @php
-                                $true_rate = $item->qty > 0 ? ($item->total() / $item->qty) : 0;
-                            @endphp
-                            {{ \App\Helpers\FinanceHelper::instance()->format_money($true_rate, $invoice->currency_id) }}
-                        </td>
-                        <td class="text-end money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total(), $invoice->currency_id) }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="text-center" style="padding: 24px; color: #94a3b8;">{{ __('erp.no_items_found') }}</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <!-- Totals -->
-        <div class="totals-container">
-            <table class="totals-table">
-                @php
-                    $subtotal = $invoice->sub_total();
-                    $discount_amount = $invoice->discount + $invoice->second_discount;
-                    $tax_amount = $invoice->tax();
-                    $tax_rate = $user && $user->invoice_taxable == '1' ? \App\Models\AdminSettings::GetValue('business_tax', 22.5) : 0;
-                    $business_currency_id = \App\Models\AdminSettings::GetValue('business_currency', 2);
-                    $business_currency_model = \App\Models\Currency::find($business_currency_id);
-                @endphp
-                <tr>
-                    <td>{{ __('erp.subtotal') }}:</td>
-                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($subtotal, $invoice->currency_id) }}</td>
-                </tr>
-                @if($discount_amount > 0)
-                    <tr>
-                        <td>{{ __('erp.discount') }}:</td>
-                        <td class="money-code">-{{ \App\Helpers\FinanceHelper::instance()->format_money($discount_amount, $invoice->currency_id) }}</td>
-                    </tr>
-                @endif
-                @if($tax_amount > 0)
-                    <tr>
-                        <td>{{ __('erp.tax') }} ({{ number_format($tax_rate, 0) }}%):</td>
-                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($tax_amount, $invoice->currency_id) }}</td>
-                    </tr>
-                @endif
-                <tr class="total-row">
-                    <td>{{ strtoupper(__('erp.total')) }}:</td>
-                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->total(), $invoice->currency_id) }}</td>
-                </tr>
-                @if($invoice->business_total() && $invoice->currency_id != $business_currency_id)
-                    <tr class="currency-row">
-                        <td>{{ __('erp.in_currency', ['currency' => $business_currency_model ? $business_currency_model->currency : 'Base']) }}:</td>
-                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->business_total(), $business_currency_id) }}</td>
-                    </tr>
-                @endif
-            </table>
-            <div style="clear: both;"></div>
-        </div>
-
-        <!-- Notes -->
-        <div class="notes-section">
-            <div class="notes-title">{{ strtoupper(__('erp.notes')) }}:</div>
-            <div class="notes-content">
-                @if(isset($invoice->notes) && $invoice->notes)
-                    {!! nl2br(e($invoice->notes)) !!}
-                @else
-                    {{ __('erp.thank_you_for_business') }}<br><br>
-                    {{ __('erp.payment_due_upon_receipt') }}
-                @endif
-            </div>
-        </div>
-
-        <!-- Page Number footer using DomPDF features -->
-        <script type="text/php">
-            if (isset($pdf)) {
-                $x = 540;
-                $y = 820;
-                $text = "{!! __('erp.page_x_of_y') !!}";
-                $font = $fontMetrics->get_font("DM Sans", "normal");
-                $size = 10;
-                $color = array(0.58, 0.64, 0.72); // #94a3b8 text-muted
-                $word_space = 0.0;
-                $char_space = 0.0;
-                $angle = 0.0;
-                $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-                
-                @if(!($user && $user->hasModuleSubscription('erp-white-label')))
-                    $pdf->page_text(40, 820, "{!! __('erp.powered_by') !!}", $font, 9, $color, 0.0, 0.0, 0.0);
-                @endif
-            }
-        </script>
+    <div class="footer">
+        <table><tr>
+            <td>{{ $business['name'] }} · {{ $business['address'] }} · {{ $business['email'] }}@if($business['phone']) · {{ $business['phone'] }}@endif</td>
+            <td class="right">{{ __('invoice_pdf.invoice') }} {{ $invoice->enc_id() }}</td>
+        </tr></table>
     </div>
+
+    {{-- Header: who issues the invoice, and the invoice itself --}}
+    <table>
+        <tr>
+            <td style="width: 55%;">
+                <table style="width: auto;"><tr>
+                    @if($logo)<td style="padding-right: 10px; vertical-align: middle;"><img src="{{ $logo }}" style="width: 38px; height: 38px;" alt=""></td>@endif
+                    <td style="vertical-align: middle;"><div class="brand">{{ $business['name'] }}</div><div class="muted small">{{ $business['address'] }}</div></td>
+                </tr></table>
+                <div class="muted small" style="margin-top: 8px;">
+                    {{ $business['email'] }}@if($business['phone'])<br>{{ $business['phone'] }}@endif<br>www.musoftwares.com
+                </div>
+            </td>
+            <td style="width: 45%;" class="right">
+                <div class="title">{{ strtoupper(__('invoice_pdf.invoice')) }}</div>
+                <div style="margin-top: 6px;"><span class="status" style="background: {{ $statusBg }}; color: {{ $statusFg }};">{{ $statusLabel }}</span></div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Bill to + invoice facts --}}
+    <table style="margin-top: 22px;">
+        <tr>
+            <td style="width: 55%; padding-right: 12px;">
+                <div class="box">
+                    <div class="label">{{ __('invoice_pdf.bill_to') }}</div>
+                    <div style="font-size: 12px; font-weight: bold;">{{ $user->name ?? '-' }}</div>
+                    @if($user?->email)<div class="muted">{{ $user->email }}</div>@endif
+                    @if($user?->phone_number ?? $user?->phone)<div class="muted">{{ $user->phone_number ?? $user->phone }}</div>@endif
+                    @if($project)<div class="muted" style="margin-top: 4px;">{{ __('invoice_pdf.project') }}: {{ $project->project_name ?? $project->name }}</div>@endif
+                </div>
+            </td>
+            <td style="width: 45%;">
+                <table>
+                    <tr><td class="muted">{{ __('invoice_pdf.number') }}</td><td class="right" style="font-weight: bold;">{{ $invoice->enc_id() }}</td></tr>
+                    <tr><td class="muted">{{ __('invoice_pdf.issued') }}</td><td class="right">{{ $invoice->created_at?->format('M j, Y') }}</td></tr>
+                    <tr><td class="muted">{{ __('invoice_pdf.due') }}</td><td class="right" @if($isOverdue) style="color: #dc2626; font-weight: bold;" @endif>{{ $dueDate ? $dueDate->format('M j, Y') : __('invoice_pdf.upon_receipt') }}</td></tr>
+                    <tr><td class="muted">{{ __('invoice_pdf.balance') }}</td><td class="right num" style="font-weight: bold;">{{ $money($balance) }}</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Items --}}
+    <table class="items" style="margin-top: 22px;">
+        <thead>
+            <tr>
+                <th style="width: 6%;" class="center">#</th>
+                <th style="width: 50%;">{{ __('invoice_pdf.item') }}</th>
+                <th style="width: 10%;" class="center">{{ __('invoice_pdf.qty') }}</th>
+                <th style="width: 17%;" class="right">{{ __('invoice_pdf.unit') }}</th>
+                <th style="width: 17%;" class="right">{{ __('invoice_pdf.amount') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($invoice_items as $index => $item)
+                @php $qty = (float) ($item->qty ?: 1); @endphp
+                <tr @if($index % 2) class="alt" @endif>
+                    <td class="center muted">{{ $index + 1 }}</td>
+                    <td style="font-weight: bold;">{{ $item->item_title }}</td>
+                    <td class="center">{{ rtrim(rtrim(number_format($qty, 2, '.', ''), '0'), '.') }}</td>
+                    <td class="right num">{{ $money($qty > 0 ? $item->total() / $qty : 0) }}</td>
+                    <td class="right num" style="font-weight: bold;">{{ $money($item->total()) }}</td>
+                </tr>
+            @empty
+                <tr><td colspan="5" class="center muted" style="padding: 18px;">{{ __('invoice_pdf.no_items') }}</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    {{-- Payment instructions (left) and totals (right) --}}
+    <table style="margin-top: 18px;">
+        <tr>
+            <td style="width: 52%; padding-right: 18px;">
+                @if($isOpen && $payUrl)
+                    <div class="pay">
+                        <div class="label" style="color: #0071e3;">{{ __('invoice_pdf.pay_online') }}</div>
+                        <div class="muted">{{ __('invoice_pdf.pay_hint') }}</div>
+                        <div style="margin-top: 4px;"><a href="{{ $payUrl }}">{{ $payUrl }}</a></div>
+                    </div>
+                @endif
+            </td>
+            <td style="width: 48%;">
+                <table class="totals">
+                    <tr><td class="muted">{{ __('invoice_pdf.subtotal') }}</td><td class="right num">{{ $money($subtotal) }}</td></tr>
+                    @if($discount > 0)<tr><td class="muted">{{ __('invoice_pdf.discount') }}</td><td class="right num">-{{ $money($discount) }}</td></tr>@endif
+                    @if($tax > 0)<tr><td class="muted">{{ __('invoice_pdf.tax', ['rate' => number_format((float) $taxRate, 0)]) }}</td><td class="right num">{{ $money($tax) }}</td></tr>@endif
+                    <tr class="grand"><td>{{ __('invoice_pdf.total') }}</td><td class="right num">{{ $money($total) }}</td></tr>
+                    @if($paid > 0)<tr><td class="muted">{{ __('invoice_pdf.paid') }}</td><td class="right num">-{{ $money($paid) }}</td></tr>@endif
+                    @if($status !== 'cancelled')
+                        @if($balance > 0)
+                            <tr class="balance"><td>{{ __('invoice_pdf.balance') }}</td><td class="right num">{{ $money($balance) }}</td></tr>
+                        @else
+                            <tr class="balance"><td style="background: #047857;">{{ __('invoice_pdf.paid_in_full') }}</td><td class="right" style="background: #047857;">&#10003;</td></tr>
+                        @endif
+                    @endif
+                    @if($invoice->currency_id != $businessCurrencyId && $invoice->business_total())
+                        <tr><td class="muted small">{{ __('invoice_pdf.in_currency', ['currency' => $businessCurrency?->currency ?? '']) }}</td><td class="right num muted small">{{ $money($invoice->business_total(), $businessCurrencyId) }}</td></tr>
+                    @endif
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Notes --}}
+    <div style="margin-top: 26px; border-top: 1px solid #e8e8ed; padding-top: 12px;">
+        <div class="label">{{ __('invoice_pdf.notes') }}</div>
+        <div class="muted">
+            @if(! empty($invoice->notes))
+                {!! nl2br(e($invoice->notes)) !!}
+            @else
+                {{ __('invoice_pdf.thanks') }}
+            @endif
+        </div>
+        <div class="muted small" style="margin-top: 8px;">{{ __('invoice_pdf.questions', ['contact' => $business['email']]) }}</div>
+    </div>
+
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->get_font("DejaVu Sans", "normal");
+            $pdf->page_text($pdf->get_width() - 120, $pdf->get_height() - 28, "{!! __('invoice_pdf.page') !!}", $font, 8, array(0.53, 0.53, 0.55));
+        }
+    </script>
 </body>
 </html>

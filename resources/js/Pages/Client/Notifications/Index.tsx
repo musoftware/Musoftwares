@@ -37,7 +37,9 @@ export default function NotificationsIndex({ notifications }: PageProps<{ notifi
                 <ul className="divide-y divide-black/5 overflow-hidden rounded-[20px] bg-white shadow-sm dark:divide-white/10 dark:bg-zinc-900">
                     {notifList.map((n: any) => {
                         const unread = !n.read_at;
-                        const title = n.data?.title || n.data?.message || __('client_account.notifications.new');
+                        const rawTitle = n.data?.title || n.data?.message || __('client_account.notifications.new');
+                        // older message notifications were saved as "New Message From" without the name
+                        const title = n.data?.sender_name && !String(rawTitle).includes(n.data.sender_name) ? `${rawTitle} ${n.data.sender_name}` : rawTitle;
                         const body = n.data?.body || (n.data?.title && n.data?.message ? n.data.message : null);
                         return (
                             <li key={n.id} className={cn('flex items-start gap-3 px-4 py-3.5', unread && 'bg-[#0071e3]/[0.04]')}>

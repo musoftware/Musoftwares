@@ -4328,7 +4328,7 @@ return array (
   'new_invoice' => 'جديد فاتورة',
   'new_link' => 'رابط جديد',
   'new_lookup' => 'جديد Lookup',
-  'new_message_from' => 'New Message From',
+  'new_message_from' => 'رسالة جديدة من :name',
   'new_name' => 'الاسم الجديد',
   'new_note' => 'ملاحظة جديدة',
   'new_notification' => 'إشعار جديد',
