@@ -27,6 +27,8 @@ class FinancialController extends Controller
             'id' => null,
             'balance' => (float) $user->user_balance,
             'locked_balance' => (float) $user->locked_balance(),
+            // what can be withdrawn: earned money minus pending withdrawal requests
+            'earned_balance' => app(BalanceService::class)->availableEarnedBalance($user),
             'currency' => $user->currency_name(),
         ];
         $transactions = $user->transactions()->latest()->paginate(15);
@@ -60,6 +62,8 @@ class FinancialController extends Controller
             'id' => null,
             'balance' => (float) $user->user_balance,
             'locked_balance' => (float) $user->locked_balance(),
+            // what can be withdrawn: earned money minus pending withdrawal requests
+            'earned_balance' => app(BalanceService::class)->availableEarnedBalance($user),
             'currency' => $user->currency_name(),
         ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();

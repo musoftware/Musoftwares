@@ -39,7 +39,12 @@ class PointPurchaseController extends Controller
         $rate = 1.0;
 
         if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
-            $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
+            try {
+                $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
+            } catch (\App\Exceptions\MissingExchangeRateException) {
+                // no rate today: show the EGP prices instead of failing the page
+                $currencyCode = 'EGP';
+            }
         }
 
         $tiers = $this->pointsService->getTiers();

@@ -40,7 +40,7 @@ export default function UpdateProfileInformation({
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value={__('client_account.profile.name')} />
 
                     <TextInput
                         id="name"
@@ -48,7 +48,6 @@ export default function UpdateProfileInformation({
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         required
-                        isFocused
                         autoComplete="name"
                     />
 
@@ -56,7 +55,7 @@ export default function UpdateProfileInformation({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value={__('client_account.profile.email')} />
 
                     <TextInput
                         id="email"

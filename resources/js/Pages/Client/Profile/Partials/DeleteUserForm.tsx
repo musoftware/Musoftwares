@@ -79,7 +79,7 @@ export default function DeleteUserForm({
                     <div className="mt-6">
                         <InputLabel
                             htmlFor="password"
-                            value="Password"
+                            value={__('client_account.profile.password')}
                             className="sr-only"
                         />
 

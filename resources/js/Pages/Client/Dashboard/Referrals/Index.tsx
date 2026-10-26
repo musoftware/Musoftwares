@@ -1,197 +1,101 @@
-import React, { useState } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useState } from 'react';
+import { router, useForm } from '@inertiajs/react';
+import { Check, Copy, Lock, MessageCircle, Share2 } from 'lucide-react';
+import ClientPage, { Card, Section, TextAction } from '@/Components/Client/ClientPage';
+import ReferralTabs from './Partials/ReferralTabs';
 import { __ } from '@/lib/i18n';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
-import { Badge } from '@/Components/ui/badge';
-import { Copy, Link as LinkIcon, Code, Save, Lock } from 'lucide-react';
-import { Input } from '@/Components/ui/input';
-import { Button } from '@/Components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { Label } from '@/Components/ui/label';
 
-export default function Index({ auth, referral, commission_percentage, embedKey }: any) {
-    const origin = window.location.origin;
-    const referralLink = `${origin}/r/${referral?.slug || referral?.key || ''}`;
-    const formattedCommission = ((commission_percentage - 1) * 100).toFixed(0) + '%';
-    const [copied, setCopied] = useState(false);
-    const [copiedEmbed, setCopiedEmbed] = useState(false);
+/** Invite friends: the link to share first, then the optional short name and the developer key. */
+export default function Index({ referral, commission_percentage, embedKey }: any) {
+    const referralLink = `${window.location.origin}/r/${referral?.slug || referral?.key || ''}`;
+    const percent = `${((Number(commission_percentage) - 1) * 100).toFixed(0)}%`;
+    const [copied, setCopied] = useState<'link' | 'key' | null>(null);
+    const hasSlug = !!referral?.slug && referral.slug.trim() !== '';
+    const shareText = `${__('client_rewards.referrals.share_text')} ${referralLink}`;
+    const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
-    const handleCopy = (text: string, isEmbed = false) => {
-        navigator.clipboard.writeText(text);
-        if (isEmbed) {
-            setCopiedEmbed(true);
-            setTimeout(() => setCopiedEmbed(false), 2000);
-        } else {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
+    const { data, setData, post, processing, errors } = useForm({ slug: referral?.slug || '' });
+
+    const copy = async (text: string, what: 'link' | 'key') => {
+        try { await navigator.clipboard.writeText(text); } catch { /* the field stays selectable */ }
+        setCopied(what);
+        setTimeout(() => setCopied(null), 2000);
     };
-
-    const handleTabChange = (val: string) => {
-        router.visit(route(val));
-    };
-
-    // Form for custom slug
-    const { data, setData, post, processing, errors } = useForm({
-        slug: referral?.slug || '',
-    });
-
-    const handleUpdateSlug = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('referrals.update_slug'), {
-            preserveScroll: true,
-        });
-    };
-
-    const handleGenerateEmbedKey = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.post(route('referrals.generate_embed_key'), {}, {
-            preserveScroll: true,
-        });
-    };
-
-    const hasCustomSlug = referral?.slug && referral.slug.trim() !== '';
 
     return (
-        <AuthenticatedLayout>
-            <Head title={__('general.referrals')} />
+        <ClientPage title={__('client_rewards.referrals.title')} hint={__('client_rewards.referrals.hint', { percent })}>
+            <ReferralTabs active="link" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="flex justify-between items-center">
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                            {__('general.referrals')}
-                        </h2>
+            <Section title={__('client_rewards.referrals.your_link')}>
+                <Card className="space-y-4">
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                        <input value={referralLink} readOnly dir="ltr" aria-label={__('client_rewards.referrals.your_link')}
+                            className="w-full rounded-xl border border-black/10 bg-[#f5f5f7] px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
+                        <button type="button" onClick={() => copy(referralLink, 'link')}
+                            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-6 text-sm font-semibold text-white hover:bg-[#0077ed]">
+                            {copied === 'link' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            {copied === 'link' ? __('client_rewards.referrals.copied') : __('client_rewards.referrals.copy')}
+                        </button>
                     </div>
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 hover:underline">
+                            <MessageCircle className="h-4 w-4" />{__('client_rewards.referrals.share_whatsapp')}
+                        </a>
+                        {canShare && (
+                            <button type="button" onClick={() => navigator.share({ text: shareText }).catch(() => {})}
+                                className="inline-flex items-center gap-1.5 font-semibold text-[#0071e3] hover:underline">
+                                <Share2 className="h-4 w-4" />{__('client_rewards.referrals.share')}
+                            </button>
+                        )}
+                    </div>
+                    <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.referrals.commission', { percent })}</p>
+                </Card>
+            </Section>
 
-                    <Tabs value="referrals.index" onValueChange={handleTabChange} className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 max-w-md bg-slate-100 p-1 rounded-lg">
-                            <TabsTrigger value="referrals.index" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md py-1.5 text-sm font-medium transition-all">
-                                {__('general.referral_link')}
-                            </TabsTrigger>
-                            <TabsTrigger value="referrals.earns" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md py-1.5 text-sm font-medium transition-all">
-                                {__('general.referral_earnings')}
-                            </TabsTrigger>
-                            <TabsTrigger value="referrals.registers" className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md py-1.5 text-sm font-medium transition-all">
-                                {__('general.referred_users')}
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <LinkIcon className="w-5 h-5 text-indigo-500" />
-                                {__('messages.your_referral_link')}
-                            </CardTitle>
-                            <CardDescription>
-                                {__('messages.share_referral_desc')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                                <Input value={referralLink} readOnly aria-label={__('client.referral_link_label')} className="bg-gray-50 font-mono text-sm" />
-                                <Button onClick={() => handleCopy(referralLink, false)} variant="outline">
-                                    <Copy className="w-4 h-4 me-2" />
-                                    {copied ? __('general.copied') : __('general.copy')}
-                                </Button>
+            <Section title={__('client_rewards.referrals.short_link')}>
+                <Card>
+                    {hasSlug ? (
+                        <p className="flex items-center gap-2 text-sm text-[#1d1d1f]/70 dark:text-zinc-300">
+                            <Lock className="h-4 w-4 shrink-0" />{__('client_rewards.referrals.short_link_locked')}
+                            <span className="font-mono" dir="ltr">/r/{referral.slug}</span>
+                        </p>
+                    ) : (
+                        <form onSubmit={(e) => { e.preventDefault(); post(route('referrals.update_slug'), { preserveScroll: true }); }} className="space-y-2">
+                            <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.referrals.short_link_hint')}</p>
+                            <div className="flex gap-2">
+                                <input id="slug" value={data.slug} onChange={(e) => setData('slug', e.target.value)} disabled={processing} dir="ltr"
+                                    placeholder="my-store" aria-label={__('client_rewards.referrals.short_link')}
+                                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
+                                <button type="submit" disabled={processing}
+                                    className="h-11 shrink-0 rounded-full bg-[#1d1d1f] px-5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black">
+                                    {__('client_rewards.referrals.save')}
+                                </button>
                             </div>
+                            {errors.slug && <p className="text-sm text-rose-600">{errors.slug}</p>}
+                        </form>
+                    )}
+                </Card>
+            </Section>
 
-                            <div className="mt-4 p-4 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center justify-between gap-4">
-                                <div>
-                                    <h4 className="font-semibold text-indigo-900">{__('general.your_commission_rate')}</h4>
-                                    <p className="text-sm text-indigo-700">{__('general.you_earn_this_percentage_from_all_paymen')}</p>
-                                </div>
-                                <Badge className="bg-indigo-600 text-white text-lg py-1 px-3">
-                                    {formattedCommission}
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Custom Slug Section */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <LinkIcon className="w-5 h-5 text-indigo-500" />
-                                {__('general.custom_referral_slug')}
-                            </CardTitle>
-                            <CardDescription>
-                                {__('general.customize_your_link_slug')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleUpdateSlug} className="space-y-4">
-                                <div className="flex flex-col gap-2">
-                                    <Label htmlFor="slug">{__('general.slug')}</Label>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="flex-1 relative">
-                                            <Input
-                                                id="slug"
-                                                value={data.slug}
-                                                onChange={(e) => setData('slug', e.target.value)}
-                                                disabled={hasCustomSlug || processing}
-                                                className={`bg-slate-50 font-mono ${hasCustomSlug ? 'pe-10' : ''}`}
-                                                placeholder="my-custom-code"
-                                            />
-                                            {hasCustomSlug && (
-                                                <div className="absolute inset-y-0 right-3 flex items-center text-slate-400">
-                                                    <Lock className="w-4 h-4" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        {!hasCustomSlug && (
-                                            <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">
-                                                <Save className="w-4 h-4 me-2" />
-                                                {__('general.save')}
-                                            </Button>
-                                        )}
-                                    </div>
-                                    {errors.slug && <p className="text-sm text-red-600 font-medium">{errors.slug}</p>}
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-
-                    {/* Embed Keys Card */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Code className="w-5 h-5 text-emerald-500" />
-                                {__('messages.embed_modules')}
-                            </CardTitle>
-                            <CardDescription>
-                                {__('general.you_can_embed_modules_or_tools_directly')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {embedKey ? (
-                                <div className="space-y-4">
-                                    <Label className="text-slate-700 font-medium">{__('general.embed_key')}</Label>
-                                    <div className="flex items-center space-x-2">
-                                        <Input value={embedKey.key} readOnly aria-label={__('general.embed_key')} className="bg-gray-50 font-mono text-sm" />
-                                        <Button onClick={() => handleCopy(embedKey.key, true)} variant="outline">
-                                            <Copy className="w-4 h-4 me-2" />
-                                            {copiedEmbed ? __('general.copied') : __('general.copy')}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="bg-gray-50 p-6 rounded-lg text-center border border-dashed border-gray-300">
-                                    <p className="text-gray-600 mb-4">{__('general.you_have_not_generated_any_embed_keys_ye')}</p>
-                                    <form onSubmit={handleGenerateEmbedKey}>
-                                        <Button type="submit">
-                                            {__('general.generate_embed_key')}
-                                        </Button>
-                                    </form>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                </div>
-            </div>
-        </AuthenticatedLayout>
+            <Section title={__('client_rewards.referrals.developers')}>
+                <Card className="space-y-3">
+                    <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.referrals.embed_hint')}</p>
+                    {embedKey ? (
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                            <input value={embedKey.key} readOnly dir="ltr" aria-label={__('client_rewards.referrals.embed_key')}
+                                className="w-full rounded-xl border border-black/10 bg-[#f5f5f7] px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
+                            <TextAction onClick={() => copy(embedKey.key, 'key')}>
+                                {copied === 'key' ? __('client_rewards.referrals.copied') : __('client_rewards.loyalty.copy')}
+                            </TextAction>
+                        </div>
+                    ) : (
+                        <TextAction onClick={() => router.post(route('referrals.generate_embed_key'), {}, { preserveScroll: true })}>
+                            {__('client_rewards.referrals.make_key')}
+                        </TextAction>
+                    )}
+                </Card>
+            </Section>
+        </ClientPage>
     );
 }

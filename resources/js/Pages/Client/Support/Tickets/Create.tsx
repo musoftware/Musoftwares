@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import ClientPage from '@/Components/Client/ClientPage';
 import { 
-    ArrowLeft, 
     Send, 
     Sparkles, 
     FolderKanban, 
@@ -306,8 +305,11 @@ export default function Create({ projects = [], initialProjectId = null }: Props
     };
 
     return (
-        <AuthenticatedLayout>
-            <Head title={`${__('client.ticket_create_title')} — Musoftwares`} />
+        <ClientPage
+            title={__('client.ticket_create_title')}
+            hint={__('client.ticket_create_intro')}
+            width="sm"
+        >
 
             {/* Hidden Native File Inputs */}
             <input
@@ -332,45 +334,14 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                 className="hidden"
             />
 
-            <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased pb-24">
-                
-                {/* Apple-style Top Bar Navigation */}
-                <header className="sticky top-0 z-30 w-full backdrop-blur-xl bg-white/70 dark:bg-black/70 border-b border-black/5 dark:border-white/10 transition-colors">
-                    <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-                        <Link
-                            href={route('tickets.index')}
-                            className="inline-flex items-center gap-2 text-xs font-semibold text-[#1d1d1f]/70 dark:text-white/70 hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors"
-                        >
-                            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
-                            <span>{__('general.back_to_tickets')}</span>
-                        </Link>
-
-                        {/* Discreet Loyalty Incentive Badge */}
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/[0.03] dark:bg-white/[0.06] border border-black/5 dark:border-white/10 text-xs font-medium">
-                            <Sparkles className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#2997ff]" />
-                            <span className="text-[#1d1d1f] dark:text-white font-semibold">{__('client.ticket_create_loyalty_points')}</span>
-                            <span className="text-black/30 dark:text-white/30">|</span>
-                            <span className="text-black/60 dark:text-white/60">{__('client.ticket_create_loyalty_on_close')}</span>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Main Content Container with Breathable Apple Spacing */}
-                <main className="max-w-3xl mx-auto px-6 pt-12 sm:pt-16">
-                    
-                    {/* Header Section */}
-                    <div className="text-start mb-10">
-                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] dark:text-white">
-                            {__('client.ticket_create_title')}
-                        </h1>
-                        <p className="mt-3 text-base text-[#1d1d1f]/60 dark:text-white/60 leading-relaxed max-w-xl">
-                            {__('client.ticket_create_intro')}
-                        </p>
-                    </div>
+            <p className="-mt-4 flex items-center gap-2 text-sm text-[#1d1d1f]/60 dark:text-zinc-400">
+                <Sparkles className="h-4 w-4 text-[#0071e3]" />
+                {__('client.ticket_create_loyalty_points')} · {__('client.ticket_create_loyalty_on_close')}
+            </p>
 
                     {/* Presets - Apple Segmented Chips */}
-                    <div className="mb-10">
-                        <div className="text-[11px] font-semibold uppercase tracking-wider text-[#1d1d1f]/40 dark:text-white/40 mb-3 px-1">
+                    <div>
+                        <div className="mb-3 px-1 text-sm font-semibold text-[#1d1d1f]/60 dark:text-zinc-400">
                             {__('client.ticket_create_presets_heading')}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -410,7 +381,7 @@ export default function Create({ projects = [], initialProjectId = null }: Props
                     </div>
 
                     {/* Clean Apple Form Card */}
-                    <div className="bg-white dark:bg-[#121214] border border-black/5 dark:border-white/10 rounded-[28px] p-8 sm:p-12 shadow-sm">
+                    <div className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-zinc-900 sm:p-8">
                         <form onSubmit={submitTicket} className="space-y-8">
                             
                             {/* Project Association (Optional) */}
@@ -731,10 +702,6 @@ export default function Create({ projects = [], initialProjectId = null }: Props
 
                         </form>
                     </div>
-
-                </main>
-
-            </div>
-        </AuthenticatedLayout>
+        </ClientPage>
     );
 }

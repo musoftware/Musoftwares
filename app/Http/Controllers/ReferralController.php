@@ -169,11 +169,32 @@ class ReferralController extends Controller
         // commissions were lost.
         $globalTotal = $this->referralService->calculateTotalCommissionForReferrer($auth);
 
+        // Only what the page shows: the full User models (e-mail, phone, balances...) of other
+        // people must not reach the referrer's browser.
+        $referred_users->through(fn (User $referred) => [
+            'id' => $referred->id,
+            'name' => $referred->name,
+            'email' => $this->maskEmail((string) $referred->email),
+            'created_at' => $referred->created_at?->toDateString(),
+            'email_verified_at' => $referred->email_verified_at?->toDateString(),
+        ]);
+
         return Inertia::render('Client/Dashboard/Referrals/Registers', [
             'referred_users' => $referred_users,
             'commissionByUserId' => $commissionByUserId,
             'global_commission_total' => $globalTotal,
         ]);
+    }
+
+    /** a***@gmail.com: enough for the referrer to recognise someone, not enough to contact them. */
+    private function maskEmail(string $email): string
+    {
+        if (! str_contains($email, '@')) {
+            return '***';
+        }
+        [$local, $domain] = explode('@', $email, 2);
+
+        return mb_substr($local, 0, 1).'***@'.$domain;
     }
 
     public function referral_redirect(Request $request, $ref = null)

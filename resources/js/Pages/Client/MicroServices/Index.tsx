@@ -1,32 +1,12 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageShell } from '@/Components/ui/PageShell';
+import { Link, useForm, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckCircle2, Clock, Search, ShieldCheck, Wallet } from 'lucide-react';
+import ClientPage, { Card, EmptyNote, TextAction } from '@/Components/Client/ClientPage';
 import { Button } from '@/Components/ui/button';
-import { Badge } from '@/Components/ui/badge';
 import { Textarea } from '@/Components/ui/textarea';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/Components/ui/dialog';
-import {
-    Sparkles,
-    Clock,
-    Wallet,
-    Plus,
-    CheckCircle2,
-    AlertCircle,
-    FileText,
-    ArrowRight,
-    Search,
-    ShieldCheck,
-    HelpCircle
-} from 'lucide-react';
-import { __, getLoadedLocale } from '@/lib/i18n';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { __ } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 interface MicroServiceItem {
     id: number;
@@ -61,390 +41,176 @@ interface Props {
     currency_symbol: string;
 }
 
-export default function MicroServicesIndex({
-    services = [],
-    orders = [],
-    available_balance = 0,
-    formatted_balance = '0.00',
-    currency_symbol = 'EGP',
-}: Props) {
+/** Small fixed-price jobs paid from the wallet: pick one, describe what you need, follow your orders. */
+export default function MicroServicesIndex({ services = [], orders = [], available_balance = 0, formatted_balance = '0.00' }: Props) {
+    const { locale } = usePage().props as any;
     const [activeTab, setActiveTab] = useState<'catalog' | 'orders'>('catalog');
     const [selectedService, setSelectedService] = useState<MicroServiceItem | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const { data, setData, post, processing, errors, reset } = useForm({ requirements: '' });
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        requirements: '',
-    });
-
-    const openOrderModal = (service: MicroServiceItem) => {
-        setSelectedService(service);
-        setData('requirements', '');
-    };
-
-    const closeOrderModal = () => {
-        setSelectedService(null);
-        reset();
-    };
-
+    const openOrderModal = (service: MicroServiceItem) => { setSelectedService(service); setData('requirements', ''); };
+    const closeOrderModal = () => { setSelectedService(null); reset(); };
     const handleConfirmOrder = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedService) return;
-
         post(route('micro-services.order', selectedService.id), {
             preserveScroll: true,
-            onSuccess: () => {
-                closeOrderModal();
-                setActiveTab('orders');
-            },
+            onSuccess: () => { closeOrderModal(); setActiveTab('orders'); },
         });
     };
 
-    const hasEnoughBalance = selectedService
-        ? available_balance >= selectedService.price
-        : true;
-
-    const filteredServices = services.filter((s) =>
-        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const hasEnoughBalance = selectedService ? available_balance >= selectedService.price : true;
+    const q = searchQuery.toLowerCase();
+    const filteredServices = services.filter((s) => s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q));
+    const tab = (key: 'catalog' | 'orders', label: string) => (
+        <button
+            type="button"
+            onClick={() => setActiveTab(key)}
+            className={cn('rounded-full px-4 py-2 text-sm font-semibold transition-colors', activeTab === key ? 'bg-[#1d1d1f] text-white dark:bg-white dark:text-black' : 'text-[#1d1d1f]/70 hover:bg-black/5 dark:text-zinc-300')}
+        >
+            {label}
+        </button>
     );
 
     return (
-        <AuthenticatedLayout>
-            <Head title={__('client.micro_page_title')} />
+        <ClientPage title={__('client.micro_page_title')} hint={__('client.micro_subtitle')}>
+            <Card className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                <span className="flex items-center gap-2 text-[#1d1d1f]/70 dark:text-zinc-300">
+                    <Wallet className="h-4 w-4 text-emerald-600" />{__('client.micro_current_balance')}: <b dir="ltr">{formatted_balance}</b>
+                </span>
+                <TextAction href={route('financial.add-balance')}>{__('client.micro_top_up')}</TextAction>
+            </Card>
 
-            <div className="border-b border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-md">
-                <PageShell maxWidth="7xl" className="py-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                        <div className="space-y-1.5">
-                            <div className="flex items-center gap-2">
-                                <span className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                                    <Sparkles className="w-5 h-5" />
-                                </span>
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white">
-                                    {__('client.micro_page_title')}
-                                </h1>
-                            </div>
-                            <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 max-w-2xl">
-                                {__('client.micro_subtitle')}
-                            </p>
-                        </div>
-
-                        {/* Balance Card */}
-                        <div className="flex items-center gap-4 bg-[#f5f5f7] dark:bg-zinc-900 border border-black/5 dark:border-white/10 p-4 rounded-2xl">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                                <Wallet className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <div className="text-[11px] font-medium text-[#1d1d1f]/60 dark:text-zinc-400">
-                                    {__('client.micro_current_balance')}
-                                </div>
-                                <div className="text-lg font-bold text-[#1d1d1f] dark:text-zinc-100">
-                                    {formatted_balance}
-                                </div>
-                            </div>
-                            <Link
-                                href={route('financial.add-balance')}
-                                className="ms-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center gap-1 shadow-xs"
-                            >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>{__('client.micro_top_up')}</span>
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Navigation Tabs */}
-                    <div className="flex items-center gap-2 mt-8 border-b border-black/5 dark:border-white/10 pb-0">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('catalog')}
-                            className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
-                                activeTab === 'catalog'
-                                    ? 'border-[#0071e3] text-[#0071e3] dark:border-blue-400 dark:text-blue-400'
-                                    : 'border-transparent text-[#1d1d1f]/60 dark:text-zinc-400 hover:text-[#1d1d1f] dark:hover:text-white'
-                            }`}
-                        >
-                            {__('client.micro_catalog_tab', { count: services.length })}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('orders')}
-                            className={`pb-3 px-4 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
-                                activeTab === 'orders'
-                                    ? 'border-[#0071e3] text-[#0071e3] dark:border-blue-400 dark:text-blue-400'
-                                    : 'border-transparent text-[#1d1d1f]/60 dark:text-zinc-400 hover:text-[#1d1d1f] dark:hover:text-white'
-                            }`}
-                        >
-                            <span>{__('client.micro_orders_tab')}</span>
-                            {orders.length > 0 && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-mono font-bold">
-                                    {orders.length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
-                </PageShell>
+            <div className="flex flex-wrap items-center gap-2">
+                {tab('catalog', __('client.micro_catalog_tab', { count: services.length }))}
+                {tab('orders', `${__('client.micro_orders_tab')}${orders.length ? ` (${orders.length})` : ''}`)}
             </div>
 
-            <PageShell maxWidth="7xl" className="py-8">
-                {activeTab === 'catalog' ? (
-                    <div className="space-y-6">
-                        {/* Search Bar */}
-                        <div className="relative max-w-md">
-                            <Search className="w-4 h-4 text-[#1d1d1f]/40 dark:text-zinc-500 absolute start-3.5 top-1/2 -translate-y-1/2" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder={__('client.micro_search_placeholder')}
-                                aria-label={__('client.micro_search_placeholder')}
-                                className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/30"
-                            />
-                        </div>
-
-                        {filteredServices.length === 0 ? (
-                            <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-black/5 dark:border-white/10 p-8">
-                                <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-3 opacity-60" />
-                                <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white">
-                                    {__('client.micro_no_match_title')}
-                                </h3>
-                                <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 mt-1">
-                                    {__('client.micro_no_match_desc')}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredServices.map((service) => (
-                                    <div
-                                        key={service.id}
-                                        className="bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md hover:border-black/15 dark:hover:border-white/20 transition-all duration-200"
-                                    >
-                                        <div className="space-y-3">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <h3 className="font-bold text-base text-[#1d1d1f] dark:text-white line-clamp-2">
-                                                    {service.title}
-                                                </h3>
-                                                <span className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
-                                                    <Sparkles className="w-4 h-4" />
-                                                </span>
-                                            </div>
-
-                                            <p className="text-xs sm:text-sm text-[#1d1d1f]/70 dark:text-zinc-300 leading-relaxed min-h-[40px]">
-                                                {service.description}
-                                            </p>
-
-                                            <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/50 dark:text-zinc-400 pt-2 border-t border-black/5 dark:border-white/5">
-                                                <Clock className="w-3.5 h-3.5 text-blue-500" />
-                                                <span>
-                                                    {__(service.delivery_days === 1 ? 'client.micro_delivery_one' : 'client.micro_delivery_many', { days: service.delivery_days })}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/10 flex items-center justify-between gap-4">
-                                            <div>
-                                                <div className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400 font-medium">
-                                                    {__('client.micro_price')}
-                                                </div>
-                                                <div className="text-lg font-extrabold text-[#0071e3] dark:text-blue-400">
-                                                    {service.formatted_price}
-                                                </div>
-                                            </div>
-
-                                            <Button
-                                                type="button"
-                                                onClick={() => openOrderModal(service)}
-                                                className="rounded-xl px-4 py-2 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-sm active:scale-98 transition-all"
-                                            >
-                                                <span>{__('client.micro_order_service')}</span>
-                                                <ArrowRight className="w-3.5 h-3.5 ms-1 rtl:rotate-180" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+            {activeTab === 'catalog' ? (
+                <div className="space-y-4">
+                    <div className="relative max-w-md">
+                        <Search className="absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1d1d1f]/40" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={__('client.micro_search_placeholder')}
+                            aria-label={__('client.micro_search_placeholder')}
+                            className="h-11 w-full rounded-xl border border-black/10 bg-white pe-4 ps-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/30 dark:border-white/10 dark:bg-zinc-900"
+                        />
                     </div>
-                ) : (
-                    /* Orders View */
-                    <div className="space-y-4">
-                        {orders.length === 0 ? (
-                            <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-black/5 dark:border-white/10 p-8">
-                                <FileText className="w-12 h-12 text-[#1d1d1f]/30 dark:text-zinc-600 mx-auto mb-3" />
-                                <h3 className="text-lg font-bold text-[#1d1d1f] dark:text-white">
-                                    {__('client.micro_no_orders_title')}
-                                </h3>
-                                <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
-                                    {__('client.micro_no_orders_desc')}
-                                </p>
-                                <Button
-                                    type="button"
-                                    onClick={() => setActiveTab('catalog')}
-                                    className="mt-4 rounded-xl text-xs"
-                                >
-                                    {__('client.micro_browse_services')}
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {orders.map((order) => (
-                                    <div
-                                        key={order.id}
-                                        className="bg-white dark:bg-zinc-900 border border-black/5 dark:border-white/10 rounded-2xl p-5 shadow-xs space-y-3"
-                                    >
-                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-black/5 dark:border-white/10">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs font-mono font-bold text-[#1d1d1f]/50 dark:text-zinc-400">
-                                                        #{order.id}
-                                                    </span>
-                                                    <h4 className="font-bold text-base text-[#1d1d1f] dark:text-white">
-                                                        {order.service_title}
-                                                    </h4>
-                                                </div>
-                                                <div className="text-xs text-[#1d1d1f]/50 dark:text-zinc-400">
-                                                    {__('client.micro_order_date', { date: order.created_at ? new Date(order.created_at).toLocaleString(getLoadedLocale() === 'ar' ? 'ar-EG' : 'en-US', { timeZone: 'Africa/Cairo' }) : '-' })}
-                                                </div>
-                                            </div>
 
-                                            <div className="flex items-center gap-3">
-                                                <div className="text-end">
-                                                    <div className="text-[11px] text-[#1d1d1f]/50 dark:text-zinc-400">
-                                                        {__('client.micro_amount_paid')}
-                                                    </div>
-                                                    <div className="text-sm font-bold text-[#1d1d1f] dark:text-zinc-100">
-                                                        {order.formatted_amount}
-                                                    </div>
-                                                </div>
-
-                                                {order.status === 'completed' ? (
-                                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                                        <span>{__('client.micro_status_completed')}</span>
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                                        <Clock className="w-3.5 h-3.5 animate-spin" />
-                                                        <span>{__('client.micro_status_in_progress')}</span>
-                                                    </span>
-                                                )}
-                                            </div>
+                    {filteredServices.length === 0 ? (
+                        <EmptyNote>{__('client.micro_no_match_desc')}</EmptyNote>
+                    ) : (
+                        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            {filteredServices.map((service) => (
+                                <li key={service.id}>
+                                    <Card className="flex h-full flex-col gap-3">
+                                        <h3 className="text-lg font-bold leading-snug">{service.title}</h3>
+                                        <p className="flex-1 text-sm leading-relaxed text-[#1d1d1f]/70 dark:text-zinc-300">{service.description}</p>
+                                        <p className="flex items-center gap-1.5 text-sm text-[#1d1d1f]/55 dark:text-zinc-400">
+                                            <Clock className="h-4 w-4" />
+                                            {__(service.delivery_days === 1 ? 'client.micro_delivery_one' : 'client.micro_delivery_many', { days: service.delivery_days })}
+                                        </p>
+                                        <div className="flex items-center justify-between gap-3 border-t border-black/5 pt-3 dark:border-white/10">
+                                            <span className="text-lg font-bold text-[#0071e3]" dir="ltr">{service.formatted_price}</span>
+                                            <button type="button" onClick={() => openOrderModal(service)} className="inline-flex h-11 items-center rounded-full bg-[#0071e3] px-5 text-sm font-semibold text-white hover:bg-[#0077ed]">
+                                                {__('client.micro_order_service')}
+                                            </button>
                                         </div>
-
-                                        {/* Requirements */}
-                                        <div className="bg-[#f9f9fb] dark:bg-zinc-950/50 p-3.5 rounded-xl border border-black/5 dark:border-white/5 space-y-1">
-                                            <span className="text-[11px] font-bold text-[#1d1d1f]/60 dark:text-zinc-400">
-                                                {__('client.micro_submitted_details')}
-                                            </span>
-                                            <p className="text-xs text-[#1d1d1f]/80 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed">
-                                                {order.requirements}
-                                            </p>
-                                        </div>
-
-                                        {/* Admin Completion Notes */}
-                                        {order.admin_notes && (
-                                            <div className="bg-emerald-500/5 dark:bg-emerald-500/10 p-3.5 rounded-xl border border-emerald-500/20 space-y-1">
-                                                <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                                                    <ShieldCheck className="w-3.5 h-3.5" />
-                                                    {__('client.micro_admin_notes')}
-                                                </span>
-                                                <p className="text-xs text-emerald-950 dark:text-emerald-200 whitespace-pre-wrap leading-relaxed">
-                                                    {order.admin_notes}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </PageShell>
-
-            {/* Order Confirmation Modal */}
-            <Dialog open={!!selectedService} onOpenChange={(open) => !open && closeOrderModal()}>
-                <DialogContent className="max-w-lg rounded-3xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 p-6">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                            <span>{__('client.micro_order_title', { title: selectedService?.title ?? '' })}</span>
-                        </DialogTitle>
-                        <DialogDescription className="text-xs text-[#1d1d1f]/60 dark:text-zinc-400 pt-1">
-                            {selectedService?.description}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <form onSubmit={handleConfirmOrder} className="space-y-4 pt-2">
-                        {/* Financial breakdown */}
-                        <div className="bg-[#f5f5f7] dark:bg-zinc-950/60 p-4 rounded-2xl border border-black/5 dark:border-white/10 space-y-2">
-                            <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_service_price')}</span>
-                                <span className="font-bold text-base text-[#0071e3] dark:text-blue-400">
-                                    {selectedService?.formatted_price}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_balance_label')}</span>
-                                <span className={`font-bold text-sm ${hasEnoughBalance ? 'text-emerald-600' : 'text-red-500'}`}>
-                                    {formatted_balance}
-                                </span>
-                            </div>
-
-                            {!hasEnoughBalance && (
-                                <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
-                                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                                    <div className="space-y-1">
-                                        <p className="font-semibold">{__('client.micro_insufficient')}</p>
-                                        <p className="text-[11px] opacity-80">
-                                            {__('client.micro_insufficient_hint')}
+                                    </Card>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            ) : orders.length === 0 ? (
+                <EmptyNote action={<TextAction onClick={() => setActiveTab('catalog')}>{__('client.micro_browse_services')}</TextAction>}>
+                    {__('client.micro_no_orders_title')}
+                </EmptyNote>
+            ) : (
+                <ul className="space-y-3">
+                    {orders.map((order) => (
+                        <li key={order.id}>
+                            <Card className="space-y-3">
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold">#{order.id} · {order.service_title}</h3>
+                                        <p className="text-xs text-[#1d1d1f]/55 dark:text-zinc-400">
+                                            {__('client.micro_order_date', { date: order.created_at ? new Date(order.created_at).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-' })}
                                         </p>
                                     </div>
+                                    <div className="text-end">
+                                        <p className="text-sm font-bold" dir="ltr">{order.formatted_amount}</p>
+                                        {order.status === 'completed' ? (
+                                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400"><CheckCircle2 className="h-3.5 w-3.5" />{__('client.micro_status_completed')}</p>
+                                        ) : (
+                                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 dark:text-amber-400"><Clock className="h-3.5 w-3.5" />{__('client.micro_status_in_progress')}</p>
+                                        )}
+                                    </div>
                                 </div>
+                                <div className="rounded-xl bg-[#f5f5f7] p-3 dark:bg-zinc-800">
+                                    <p className="text-xs font-semibold text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_submitted_details')}</p>
+                                    <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed" dir="auto">{order.requirements}</p>
+                                </div>
+                                {order.admin_notes && (
+                                    <div className="rounded-xl bg-emerald-50 p-3 dark:bg-emerald-950/30">
+                                        <p className="flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400"><ShieldCheck className="h-3.5 w-3.5" />{__('client.micro_admin_notes')}</p>
+                                        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-emerald-950 dark:text-emerald-100" dir="auto">{order.admin_notes}</p>
+                                    </div>
+                                )}
+                            </Card>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            <Dialog open={!!selectedService} onOpenChange={(open) => !open && closeOrderModal()}>
+                <DialogContent className="max-w-lg rounded-3xl p-6">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold">{__('client.micro_order_title', { title: selectedService?.title ?? '' })}</DialogTitle>
+                        <DialogDescription className="pt-1 text-sm">{selectedService?.description}</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleConfirmOrder} className="space-y-4 pt-2">
+                        <div className="space-y-2 rounded-2xl bg-[#f5f5f7] p-4 text-sm dark:bg-zinc-800">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_service_price')}</span>
+                                <span className="font-bold text-[#0071e3]" dir="ltr">{selectedService?.formatted_price}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[#1d1d1f]/60 dark:text-zinc-400">{__('client.micro_balance_label')}</span>
+                                <span className={cn('font-bold', hasEnoughBalance ? 'text-emerald-600' : 'text-rose-600')} dir="ltr">{formatted_balance}</span>
+                            </div>
+                            {!hasEnoughBalance && (
+                                <p className="mt-2 flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-xs text-rose-700 dark:bg-rose-950/30 dark:text-rose-300">
+                                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                                    <span><b>{__('client.micro_insufficient')}</b> {__('client.micro_insufficient_hint')}</span>
+                                </p>
                             )}
                         </div>
-
-                        {/* Requirements Textarea */}
                         <div className="space-y-1.5">
-                            <label htmlFor="micro_requirements" className="text-xs font-bold text-[#1d1d1f] dark:text-zinc-200">
-                                {__('client.micro_requirements_label')} <span className="text-red-500">*</span>
-                            </label>
+                            <label htmlFor="micro_requirements" className="text-sm font-semibold">{__('client.micro_requirements_label')} <span className="text-rose-500">*</span></label>
                             <Textarea
                                 id="micro_requirements"
                                 rows={4}
                                 value={data.requirements}
                                 onChange={(e) => setData('requirements', e.target.value)}
                                 placeholder={__('client.micro_requirements_placeholder')}
-                                className="w-full text-xs rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-950 p-3 focus:ring-2 focus:ring-[#0071e3]/30"
+                                className="w-full rounded-xl text-sm"
                                 required
                             />
-                            {errors.requirements && (
-                                <p className="text-xs text-red-500 font-medium">{errors.requirements}</p>
-                            )}
+                            {errors.requirements && <p className="text-sm text-rose-600">{errors.requirements}</p>}
                         </div>
-
-                        <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-3">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={closeOrderModal}
-                                className="rounded-xl text-xs"
-                            >
-                                {__('general.cancel')}
-                            </Button>
-
+                        <DialogFooter className="flex flex-col gap-2 pt-2 sm:flex-row">
+                            <Button type="button" variant="outline" onClick={closeOrderModal} className="rounded-full">{__('general.cancel')}</Button>
                             {!hasEnoughBalance ? (
-                                <Link
-                                    href={route('financial.add-balance')}
-                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    <span>{__('client.micro_top_up_now')}</span>
+                                <Link href={route('financial.add-balance')} className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white hover:bg-emerald-700">
+                                    {__('client.micro_top_up_now')}
                                 </Link>
                             ) : (
-                                <Button
-                                    type="submit"
-                                    disabled={processing || !data.requirements.trim()}
-                                    className="rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold shadow-sm"
-                                >
+                                <Button type="submit" disabled={processing || !data.requirements.trim()} className="rounded-full bg-[#0071e3] text-white hover:bg-[#0077ed]">
                                     {processing ? __('client.micro_processing') : __('client.micro_confirm_order')}
                                 </Button>
                             )}
@@ -452,6 +218,6 @@ export default function MicroServicesIndex({
                     </form>
                 </DialogContent>
             </Dialog>
-        </AuthenticatedLayout>
+        </ClientPage>
     );
 }

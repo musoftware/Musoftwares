@@ -1,148 +1,73 @@
-import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { Bell, CheckCheck, ArrowLeft, Clock } from 'lucide-react';
-import { __ } from '@/lib/i18n';
+import { Link, useForm, usePage } from '@inertiajs/react';
+import { Bell, CheckCheck } from 'lucide-react';
+import ClientPage, { EmptyNote } from '@/Components/Client/ClientPage';
 import Pagination from '@/Components/Pagination';
+import { PageProps } from '@/types';
+import { __ } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
-export default function NotificationsIndex({
-    auth,
-    notifications,
-}: PageProps<{ notifications: any }>) {
+/** Notifications as one plain list: unread first-glance via a blue dot, tap to open what it is about. */
+export default function NotificationsIndex({ notifications }: PageProps<{ notifications: any }>) {
+    const { locale } = usePage().props as any;
     const { post, processing } = useForm();
-
-    const markAllRead = () => {
-        post(route('notifications.mark-all-read'));
-    };
-
     const notifList = (notifications?.data as any[]) || [];
+    const hasUnread = notifList.some((n) => !n.read_at);
+    const when = (date: string) =>
+        new Date(date).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
     return (
-        <AuthenticatedLayout>
-            <Head title={`${__('general.notifications')} — Musoftwares Studio`} />
-
-            <div className="w-full bg-[#f5f5f7] dark:bg-[#090d16] text-[#1d1d1f] dark:text-[#f8fafc] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3] transition-colors">
-                
-                {/* Hero Header */}
-                <div className="w-full bg-white dark:bg-[#0f172a] border-b border-black/5 dark:border-white/10 py-8 px-6 sm:px-10 transition-colors">
-                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1.5">
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] dark:text-[#2997ff] hover:text-[#0077ed] transition-colors mb-1"
-                            >
-                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
-                                {__('general.back_to_dashboard')}
-                            </Link>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
-                                {__('general.notifications')}
-                            </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 dark:text-white/60 font-sans">
-                                {__('client.notif_subtitle')}
-                            </p>
-                        </div>
-
-                        {notifList.length > 0 && (
-                            <button
-                                onClick={markAllRead}
-                                disabled={processing}
-                                className="px-5 py-2.5 bg-white dark:bg-zinc-800/80 hover:bg-[#f5f5f7] dark:hover:bg-zinc-700/80 text-[#1d1d1f] dark:text-white border border-black/10 dark:border-white/10 text-xs font-semibold rounded-[980px] shadow-sm transition-all flex items-center gap-2 cursor-pointer shrink-0"
-                            >
-                                <CheckCheck className="w-4 h-4 text-[#0071e3] dark:text-[#2997ff]" />
-                                <span>{__('general.mark_all_as_read')}</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Main Content Area */}
-                <div className="max-w-[1000px] mx-auto px-6 sm:px-10 py-8 space-y-4">
-                    
-                    {notifList.length === 0 ? (
-                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[24px] p-12 text-center shadow-sm transition-colors">
-                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 dark:bg-[#2997ff]/20 flex items-center justify-center text-[#0071e3] dark:text-[#2997ff] mx-auto mb-4">
-                                <Bell className="w-7 h-7" />
-                            </div>
-                            <h3 className="text-base font-bold text-[#1d1d1f] dark:text-white font-sans">
-                                {__('general.no_notifications_found')}
-                            </h3>
-                            <p className="text-xs text-[#1d1d1f]/60 dark:text-white/60 max-w-md mx-auto mt-1 leading-relaxed">
-                                {__('client.notif_up_to_date')}
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="bg-white dark:bg-[#0f172a] border border-black/5 dark:border-white/10 rounded-[24px] shadow-sm overflow-hidden divide-y divide-black/5 dark:divide-white/10 transition-colors">
-                            {notifList.map((notification: any) => {
-                                const isUnread = !notification.read_at;
-                                return (
-                                    <div
-                                        key={notification.id}
-                                        className={`p-5 transition-colors flex items-start justify-between gap-4 ${
-                                            isUnread ? 'bg-[#0071e3]/3 dark:bg-[#0071e3]/10' : 'hover:bg-[#f5f5f7]/60 dark:hover:bg-white/[0.02]'
-                                        }`}
+        <ClientPage
+            title={__('client_account.notifications.title')}
+            hint={__('client_account.notifications.hint')}
+            width="sm"
+            action={hasUnread ? (
+                <button
+                    type="button"
+                    onClick={() => post(route('notifications.mark-all-read'))}
+                    disabled={processing}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0071e3] hover:underline disabled:opacity-50"
+                >
+                    <CheckCheck className="h-4 w-4" />{__('client_account.notifications.mark_all')}
+                </button>
+            ) : undefined}
+        >
+            {notifList.length === 0 ? (
+                <EmptyNote icon={<Bell className="h-5 w-5" />}>{__('client_account.notifications.empty')}</EmptyNote>
+            ) : (
+                <ul className="divide-y divide-black/5 overflow-hidden rounded-[20px] bg-white shadow-sm dark:divide-white/10 dark:bg-zinc-900">
+                    {notifList.map((n: any) => {
+                        const unread = !n.read_at;
+                        const title = n.data?.title || n.data?.message || __('client_account.notifications.new');
+                        const body = n.data?.body || (n.data?.title && n.data?.message ? n.data.message : null);
+                        return (
+                            <li key={n.id} className={cn('flex items-start gap-3 px-4 py-3.5', unread && 'bg-[#0071e3]/[0.04]')}>
+                                <span className={cn('mt-2 h-2.5 w-2.5 shrink-0 rounded-full', unread ? 'bg-[#0071e3]' : 'bg-transparent')} aria-hidden="true" />
+                                <Link
+                                    href={route('notifications.mark-read', { id: n.id })}
+                                    method="post"
+                                    as="button"
+                                    className="min-w-0 flex-1 text-start"
+                                >
+                                    <p className={cn('text-[15px]', unread ? 'font-semibold' : 'font-medium text-[#1d1d1f]/80 dark:text-zinc-300')}>{title}</p>
+                                    {body && <p className="mt-0.5 line-clamp-2 text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{body}</p>}
+                                    <p className="mt-1 text-xs text-[#1d1d1f]/40 dark:text-zinc-500">{when(n.created_at)}</p>
+                                </Link>
+                                {unread && (
+                                    <Link
+                                        href={route('notifications.mark-read', { id: n.id, no_redirect: 1 })}
+                                        method="post"
+                                        as="button"
+                                        className="shrink-0 text-xs font-semibold text-[#0071e3] hover:underline"
                                     >
-                                        <div className="flex items-start gap-3.5 flex-1 min-w-0">
-                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                                                isUnread
-                                                    ? 'bg-[#0071e3]/10 dark:bg-[#0071e3]/20 text-[#0071e3] dark:text-[#2997ff]'
-                                                    : 'bg-[#f5f5f7] dark:bg-white/5 text-[#1d1d1f]/40 dark:text-white/40'
-                                            }`}>
-                                                <Bell className="w-5 h-5" />
-                                            </div>
-
-                                            <Link
-                                                href={route('notifications.mark-read', { id: notification.id })}
-                                                method="post"
-                                                as="button"
-                                                className="flex-1 text-start outline-none"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <p className={`text-xs sm:text-sm font-semibold text-[#1d1d1f] dark:text-white ${
-                                                        isUnread ? 'font-bold' : ''
-                                                    }`}>
-                                                        {notification.data?.title || notification.data?.message || __('general.new_notification')}
-                                                    </p>
-                                                    {isUnread && (
-                                                        <span className="w-2 h-2 rounded-full bg-[#0071e3] dark:bg-[#2997ff] shrink-0" />
-                                                    )}
-                                                </div>
-
-                                                {(notification.data?.body || (notification.data?.title && notification.data?.message)) && (
-                                                    <p className="text-xs text-[#1d1d1f]/60 dark:text-white/60 mt-1 line-clamp-2 font-sans">
-                                                        {notification.data?.body || notification.data?.message}
-                                                    </p>
-                                                )}
-
-                                                <div className="flex items-center gap-1.5 text-[11px] text-[#1d1d1f]/40 dark:text-white/40 mt-1.5 font-sans">
-                                                    <Clock className="w-3 h-3" />
-                                                    <span>{new Date(notification.created_at).toLocaleString()}</span>
-                                                </div>
-                                            </Link>
-                                        </div>
-
-                                        {isUnread && (
-                                            <Link
-                                                href={route('notifications.mark-read', { id: notification.id, no_redirect: 1 })}
-                                                method="post"
-                                                as="button"
-                                                className="px-3 py-1.5 rounded-full bg-[#f5f5f7] dark:bg-white/5 hover:bg-[#0071e3] dark:hover:bg-[#0071e3] hover:text-white text-[11px] font-semibold text-[#1d1d1f]/70 dark:text-white/70 border border-black/5 dark:border-white/10 transition-all shrink-0 cursor-pointer"
-                                            >
-                                                {__('general.mark_read_1')}
-                                            </Link>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                    {/* Pagination */}
-                    <Pagination links={notifications?.links} />
-
-                </div>
-
-            </div>
-        </AuthenticatedLayout>
+                                        {__('client_account.notifications.mark_read')}
+                                    </Link>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+            <Pagination links={notifications?.links} />
+        </ClientPage>
     );
 }

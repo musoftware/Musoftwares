@@ -937,36 +937,35 @@ function AuthenticatedContent({
                 </div>
             </header>
 
-            {/* Notification Permission Banner — hidden once dismissed or permission already granted */}
+            {/* Notification Permission Banner (a slim bar, shown on every page until dismissed or granted) */}
             {permission !== 'granted' && !auth?.has_ios_shortcut_active && !notifBannerDismissed && (
-                <div className="bg-indigo-600 px-4 py-3 text-white sm:px-6 lg:px-8">
-                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                        <p className="text-sm leading-6">
-                            <strong className="font-semibold">{__('general.notifications')}</strong>
-                            <svg viewBox="0 0 2 2" className="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true"><circle cx="1" cy="1" r="1" /></svg>
-                            {__('general.notifications_disabled_message')}
+                <div className="border-b border-[#0071e3]/10 bg-[#0071e3]/[0.06] px-4 py-2 text-[#1d1d1f] dark:text-zinc-200 sm:px-6 lg:px-8">
+                    <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3">
+                        <p className="flex min-w-0 items-center gap-2 text-xs sm:text-sm">
+                            <Bell className="h-4 w-4 shrink-0 text-[#0071e3]" />
+                            <span className="truncate">{__('general.notifications_disabled_message')}</span>
                         </p>
                         <div className="flex items-center gap-2">
                             {isIOS ? (
                                 <Link
                                     href={safeRoute('freelance.settings.notifications') || '#'}
-                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
+                                    className="flex-none rounded-full bg-[#0071e3] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0077ed] transition-colors"
                                 >
-                                    {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                                    {__('general.enable_notifications')}
                                 </Link>
                             ) : (
                                 <button
                                     onClick={requestPermission}
-                                    className="flex-none rounded-full bg-indigo-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors"
+                                    className="flex-none rounded-full bg-[#0071e3] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0077ed] transition-colors"
                                 >
-                                    {__('general.enable_notifications')} <span aria-hidden="true">&rarr;</span>
+                                    {__('general.enable_notifications')}
                                 </button>
                             )}
                             {/* Dismiss: hides the banner permanently via localStorage */}
                             <button
                                 onClick={dismissNotifBanner}
                                 aria-label="Dismiss notification banner"
-                                className="rounded-full p-1 hover:bg-indigo-500 transition-colors"
+                                className="rounded-full p-1 text-[#1d1d1f]/50 hover:bg-black/5 dark:text-zinc-400 transition-colors"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M18 6 6 18M6 6l12 12" />

@@ -1,400 +1,162 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router, Link } from '@inertiajs/react';
-import { 
-    CreditCard, Plus, Trash2, Edit2, CheckCircle2, 
-    Building, DollarSign, Smartphone, Send, ArrowLeft, Check 
-} from 'lucide-react';
-import Modal from '@/Components/Modal';
-import { Label } from '@/Components/ui/label';
-import { Input } from '@/Components/ui/input';
-import { __ } from '@/lib/i18n';
+import { router, useForm } from '@inertiajs/react';
+import { Building, DollarSign, Pencil, Plus, Send, Smartphone, Trash2 } from 'lucide-react';
+import ClientPage, { Card, EmptyNote, PrimaryAction, Section, TextAction } from '@/Components/Client/ClientPage';
 import { useConfirm } from '@/hooks/useConfirm';
+import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
-export default function PayoutMethods({ payoutMethods }) {
+const TYPES = [
+    { id: 'bank_transfer', label: () => __('client.payout_tab_bank'), icon: Building, blank: { full_name: '', bank_name: '', account_number: '', routing_number: '' } },
+    { id: 'vodafone_cash', label: () => __('client.payout_tab_vodafone'), icon: Smartphone, blank: { mobile_number: '' } },
+    { id: 'instapay', label: () => __('client.payout_type_instapay'), icon: Send, blank: { mobile_number: '', instapay_username: '' } },
+    { id: 'paypal', label: () => __('client.payout_type_paypal'), icon: DollarSign, blank: { paypal_email: '' } },
+];
+
+/** Fields per method type: [detail key, label key, input type, required]. */
+const FIELDS = {
+    bank_transfer: [['full_name', 'client.payout_full_name', 'text', true], ['bank_name', 'client.payout_bank_name', 'text', true], ['account_number', 'client.payout_account_number', 'text', true], ['routing_number', 'client.payout_routing_number', 'text', false]],
+    vodafone_cash: [['mobile_number', 'client.payout_vodafone_mobile', 'tel', true]],
+    instapay: [['instapay_username', 'client.payout_instapay_username', 'text', true], ['mobile_number', 'client.payout_mobile_optional', 'tel', false]],
+    paypal: [['paypal_email', 'client.payout_paypal_email', 'email', true]],
+};
+
+const summary = (pm) => {
+    const d = pm.details || {};
+    if (pm.type === 'bank_transfer') return [d.full_name, d.bank_name, d.account_number ? `••••${String(d.account_number).slice(-4)}` : null].filter(Boolean).join(' · ');
+    if (pm.type === 'paypal') return d.paypal_email;
+    if (pm.type === 'instapay') return [d.instapay_username, d.mobile_number].filter(Boolean).join(' · ');
+    return d.mobile_number;
+};
+
+/** Saved payout methods as a simple list; adding or editing opens one form card. */
+export default function PayoutMethods({ payoutMethods = [] }) {
     const { confirm, confirmDialog } = useConfirm();
-    const [isCreating, setIsCreating] = useState(false);
-    const [editingMethod, setEditingMethod] = useState(null);
+    const [formOpen, setFormOpen] = useState(false);
+    const [editing, setEditing] = useState(null);
+    const { data, setData, post, patch, processing, errors, reset, clearErrors } = useForm({ type: 'bank_transfer', details: { ...TYPES[0].blank }, is_default: false });
 
-    const { data, setData, post, patch, processing, reset } = useForm({
-        type: 'bank_transfer',
-        details: { full_name: '', bank_name: '', account_number: '', routing_number: '' },
-        is_default: false,
-    });
-
-    const handleTypeChange = (type) => {
-        if (type === 'bank_transfer') {
-            setData({ type, details: { full_name: '', bank_name: '', account_number: '', routing_number: '' }, is_default: data.is_default });
-        } else if (type === 'paypal') {
-            setData({ type, details: { paypal_email: '' }, is_default: data.is_default });
-        } else if (type === 'vodafone_cash') {
-            setData({ type, details: { mobile_number: '' }, is_default: data.is_default });
-        } else if (type === 'instapay') {
-            setData({ type, details: { mobile_number: '', instapay_username: '' }, is_default: data.is_default });
-        }
+    const openNew = () => {
+        setEditing(null);
+        reset();
+        clearErrors();
+        setFormOpen(true);
     };
-
-    const handleDetailChange = (key, val) => {
-        setData('details', { ...data.details, [key]: val });
-    };
-
     const openEdit = (method) => {
-        setEditingMethod(method);
-        setData({
-            type: method.type,
-            details: method.details || {},
-            is_default: method.is_default,
-        });
-        setIsCreating(true);
+        setEditing(method);
+        clearErrors();
+        setData({ type: method.type, details: method.details || {}, is_default: !!method.is_default });
+        setFormOpen(true);
     };
-
-    const handleSubmit = (e) => {
+    const close = () => {
+        setFormOpen(false);
+        setEditing(null);
+        reset();
+    };
+    const changeType = (type) => setData({ type, details: { ...TYPES.find((t) => t.id === type).blank }, is_default: data.is_default });
+    const submit = (e) => {
         e.preventDefault();
-        if (editingMethod) {
-            patch(route('financial.payout-methods.update', editingMethod.id), {
-                onSuccess: () => {
-                    setIsCreating(false);
-                    setEditingMethod(null);
-                    reset();
-                },
-            });
-        } else {
-            post(route('financial.payout-methods.store'), {
-                onSuccess: () => {
-                    setIsCreating(false);
-                    reset();
-                },
-            });
-        }
+        if (editing) patch(route('financial.payout-methods.update', editing.id), { onSuccess: close });
+        else post(route('financial.payout-methods.store'), { onSuccess: close });
     };
-
-    const handleDelete = async (id) => {
-        const accepted = await confirm({
-            title: __('client.payout_delete_title'),
-            description: __('client.payout_delete_confirm'),
-            variant: 'danger',
-        });
-        if (!accepted) return;
-        router.delete(route('financial.payout-methods.destroy', id));
+    const remove = async (id) => {
+        if (await confirm({ title: __('client.payout_delete_title'), description: __('client.payout_delete_confirm'), variant: 'danger' })) {
+            router.delete(route('financial.payout-methods.destroy', id));
+        }
     };
 
     return (
-        <AuthenticatedLayout>
-            <Head title={__('client.payout_page_title')} />
-
-            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
-                
-                {/* Hero Header */}
-                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
-                    <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1.5">
-                            <Link
-                                href="/financial/withdrawals"
-                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
-                            >
-                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
-                                {__('general.request_withdrawal')}
-                            </Link>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                {__('general.stored_payout_methods')}
-                            </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                                {__('general.manage_destination_accounts_for_withdrawing_earned_funds')}
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }}
-                            className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>{__('general.add_new_method')}</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Main Grid */}
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8">
-                    {(!payoutMethods || payoutMethods.length === 0) ? (
-                        <div className="bg-white border border-black/5 rounded-[24px] p-12 text-center shadow-sm max-w-xl mx-auto">
-                            <div className="w-14 h-14 rounded-2xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3] mx-auto mb-4">
-                                <CreditCard className="w-7 h-7" />
+        <ClientPage
+            width="sm"
+            title={__('client_money.payout.title')}
+            hint={__('client_money.payout.hint')}
+            action={!formOpen && <PrimaryAction onClick={openNew} icon={<Plus className="h-4 w-4" />}>{__('client_money.payout.add')}</PrimaryAction>}
+        >
+            {formOpen && (
+                <Card>
+                    <form onSubmit={submit} className="space-y-4">
+                        <h2 className="text-lg font-bold">{editing ? __('client.payout_edit_title') : __('client.payout_add_title')}</h2>
+                        <fieldset>
+                            <legend className="mb-2 text-sm font-semibold">{__('client_money.payout.type')}</legend>
+                            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                {TYPES.map(({ id, label, icon: Icon }) => (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => changeType(id)}
+                                        aria-pressed={data.type === id}
+                                        className={cn('flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-xs font-semibold transition-colors',
+                                            data.type === id ? 'border-[#0071e3] bg-[#0071e3]/5 text-[#0071e3]' : 'border-black/10 hover:bg-[#f5f5f7] dark:border-white/10 dark:hover:bg-zinc-800')}
+                                    >
+                                        <Icon className="h-5 w-5" />{label()}
+                                    </button>
+                                ))}
                             </div>
-                            <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
-                                {__('general.no_payout_methods_configured')}
-                            </h3>
-                            <p className="text-xs text-[#1d1d1f]/60 max-w-md mx-auto mt-1.5 mb-6 leading-relaxed">
-                                {__('general.add_a_bank_account_paypal_vodafone_cash_or_instapay_to_enable_fast_secure_withdrawals_from_your_earned_balance')}
-                            </p>
-                            <button
-                                onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }}
-                                className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all cursor-pointer inline-flex items-center gap-2"
-                            >
-                                <Plus className="w-4 h-4" />
-                                <span>{__('general.setup_payout_method')}</span>
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {payoutMethods.map((pm) => (
-                                <div
-                                    key={pm.id}
-                                    className={`bg-white border rounded-[24px] p-6 shadow-sm flex flex-col justify-between transition-all relative overflow-hidden ${
-                                        pm.is_default
-                                            ? 'border-[#0071e3] ring-2 ring-[#0071e3]/10'
-                                            : 'border-black/5 hover:border-[#0071e3]/30 hover:shadow-md'
-                                    }`}
-                                >
-                                    <div>
-                                        <div className="flex items-center justify-between mb-5">
-                                            <div className="w-12 h-12 rounded-2xl bg-[#0071e3]/10 border border-[#0071e3]/15 flex items-center justify-center text-[#0071e3]">
-                                                {pm.type === 'bank_transfer' && <Building className="w-6 h-6" />}
-                                                {pm.type === 'paypal' && <DollarSign className="w-6 h-6" />}
-                                                {pm.type === 'vodafone_cash' && <Smartphone className="w-6 h-6" />}
-                                                {pm.type === 'instapay' && <Send className="w-6 h-6" />}
-                                            </div>
-                                            {pm.is_default ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-mono">
-                                                    <CheckCircle2 className="w-3 h-3" />
-                                                    {__('general.default')}
-                                                </span>
-                                            ) : (
-                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#f5f5f7] border border-black/5 text-[#1d1d1f]/60 font-mono capitalize">
-                                                    {pm.status}
-                                                </span>
-                                            )}
-                                        </div>
+                            {errors.type && <p className="mt-1 text-sm font-medium text-rose-600">{errors.type}</p>}
+                        </fieldset>
 
-                                        <h3 className="text-base font-bold text-[#1d1d1f] font-sans capitalize mb-3">
-                                            {__(`client.payout_type_${pm.type}`)}
-                                        </h3>
-
-                                        <div className="space-y-1.5 p-4 bg-[#f5f5f7] rounded-[16px] border border-black/5 text-xs text-[#1d1d1f]/70 font-sans">
-                                            {pm.type === 'bank_transfer' && (
-                                                <>
-                                                    <div className="flex justify-between"><span>{__('client.payout_label_name')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.full_name}</span></div>
-                                                    <div className="flex justify-between"><span>{__('client.payout_label_bank')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.bank_name}</span></div>
-                                                    <div className="flex justify-between"><span>{__('client.payout_label_account')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">••••{pm.details?.account_number?.slice(-4)}</span></div>
-                                                </>
-                                            )}
-                                            {pm.type === 'paypal' && (
-                                                <div className="flex flex-col gap-0.5"><span>{__('client.payout_label_email')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.paypal_email}</span></div>
-                                            )}
-                                            {pm.type === 'vodafone_cash' && (
-                                                <div className="flex justify-between"><span>{__('client.payout_label_mobile')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
-                                            )}
-                                            {pm.type === 'instapay' && (
-                                                <>
-                                                    <div className="flex justify-between"><span>{__('client.payout_label_ipa')}</span> <span className="font-semibold text-[#1d1d1f]">{pm.details?.instapay_username}</span></div>
-                                                    {pm.details?.mobile_number && (
-                                                        <div className="flex justify-between"><span>{__('client.payout_label_mobile')}</span> <span className="font-mono font-semibold text-[#1d1d1f]">{pm.details?.mobile_number}</span></div>
-                                                    )}
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-end gap-2 pt-4 mt-4 border-t border-black/5">
-                                        <button
-                                            onClick={() => openEdit(pm)}
-                                            className="w-8 h-8 rounded-full bg-[#f5f5f7] hover:bg-black/5 text-[#1d1d1f]/70 hover:text-[#1d1d1f] flex items-center justify-center transition-colors cursor-pointer"
-                                            title={__('client.payout_edit_method')}
-                                            aria-label={__('client.payout_edit_method')}
-                                        >
-                                            <Edit2 className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(pm.id)}
-                                            className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
-                                            title={__('client.payout_delete_method')}
-                                            aria-label={__('client.payout_delete_method')}
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Create/Edit Modal */}
-                <Modal show={isCreating} onClose={() => { setIsCreating(false); setEditingMethod(null); reset(); }}>
-                    <div className="p-6 sm:p-8 space-y-6">
-                        <div className="flex items-center gap-3 pb-4 border-b border-black/5">
-                            <div className="w-10 h-10 rounded-xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
-                                <CreditCard className="w-5 h-5" />
-                            </div>
-                            <h2 className="text-lg font-bold text-[#1d1d1f] font-sans">
-                                {editingMethod ? __('client.payout_edit_title') : __('client.payout_add_title')}
-                            </h2>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            {!editingMethod && (
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-semibold text-[#1d1d1f]">{__('client.payout_method_type')}</Label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                        {[
-                                            { id: 'bank_transfer', label: __('client.payout_tab_bank'), icon: Building },
-                                            { id: 'vodafone_cash', label: __('client.payout_tab_vodafone'), icon: Smartphone },
-                                            { id: 'instapay', label: __('client.payout_type_instapay'), icon: Send },
-                                            { id: 'paypal', label: __('client.payout_type_paypal'), icon: DollarSign },
-                                        ].map((opt) => {
-                                            const Icon = opt.icon;
-                                            const isSelected = data.type === opt.id;
-                                            return (
-                                                <button
-                                                    type="button"
-                                                    key={opt.id}
-                                                    onClick={() => handleTypeChange(opt.id)}
-                                                    className={`flex flex-col items-center gap-2 p-3.5 rounded-2xl border text-xs font-semibold transition-all cursor-pointer ${
-                                                        isSelected
-                                                            ? 'border-[#0071e3] bg-[#0071e3]/10 text-[#0071e3] shadow-xs'
-                                                            : 'border-black/5 bg-[#f5f5f7] text-[#1d1d1f]/70 hover:bg-black/5'
-                                                    }`}
-                                                >
-                                                    <Icon className="w-4 h-4" />
-                                                    {opt.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {data.type === 'bank_transfer' && (
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="full_name" className="text-xs font-semibold">{__('client.payout_full_name')}</Label>
-                                        <Input
-                                            id="full_name"
-                                            value={data.details.full_name || ''}
-                                            onChange={(e) => handleDetailChange('full_name', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="bank_name" className="text-xs font-semibold">{__('client.payout_bank_name')}</Label>
-                                        <Input
-                                            id="bank_name"
-                                            value={data.details.bank_name || ''}
-                                            onChange={(e) => handleDetailChange('bank_name', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="account_number" className="text-xs font-semibold">{__('client.payout_account_number')}</Label>
-                                        <Input
-                                            id="account_number"
-                                            value={data.details.account_number || ''}
-                                            onChange={(e) => handleDetailChange('account_number', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm font-mono"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="routing_number" className="text-xs font-semibold">{__('client.payout_routing_number')}</Label>
-                                        <Input
-                                            id="routing_number"
-                                            value={data.details.routing_number || ''}
-                                            onChange={(e) => handleDetailChange('routing_number', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm font-mono"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {data.type === 'paypal' && (
-                                <div className="space-y-1">
-                                    <Label htmlFor="paypal_email" className="text-xs font-semibold">{__('client.payout_paypal_email')}</Label>
-                                    <Input
-                                        id="paypal_email"
-                                        type="email"
-                                        value={data.details.paypal_email || ''}
-                                        onChange={(e) => handleDetailChange('paypal_email', e.target.value)}
-                                        className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm"
-                                        required
-                                    />
-                                </div>
-                            )}
-
-                            {data.type === 'vodafone_cash' && (
-                                <div className="space-y-1">
-                                    <Label htmlFor="mobile_number" className="text-xs font-semibold">{__('client.payout_vodafone_mobile')}</Label>
-                                    <Input
-                                        id="mobile_number"
-                                        type="tel"
-                                        value={data.details.mobile_number || ''}
-                                        onChange={(e) => handleDetailChange('mobile_number', e.target.value)}
-                                        className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm font-mono"
-                                        required
-                                    />
-                                </div>
-                            )}
-
-                            {data.type === 'instapay' && (
-                                <div className="space-y-3">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="instapay_username" className="text-xs font-semibold">{__('client.payout_instapay_username')}</Label>
-                                        <Input
-                                            id="instapay_username"
-                                            value={data.details.instapay_username || ''}
-                                            onChange={(e) => handleDetailChange('instapay_username', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="mobile_number" className="text-xs font-semibold">{__('client.payout_mobile_optional')}</Label>
-                                        <Input
-                                            id="mobile_number"
-                                            type="tel"
-                                            value={data.details.mobile_number || ''}
-                                            onChange={(e) => handleDetailChange('mobile_number', e.target.value)}
-                                            className="h-10 rounded-xl bg-white border-black/10 text-xs sm:text-sm font-mono"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            <label className="flex items-center gap-3 cursor-pointer pt-2">
+                        {FIELDS[data.type].map(([key, labelKey, type, required]) => (
+                            <div key={key}>
+                                <label htmlFor={key} className="mb-1.5 block text-sm font-semibold">{__(labelKey)}</label>
                                 <input
-                                    type="checkbox"
-                                    checked={data.is_default}
-                                    onChange={(e) => setData('is_default', e.target.checked)}
-                                    className="rounded border-black/10 text-[#0071e3] focus:ring-[#0071e3] w-4 h-4"
+                                    id={key}
+                                    type={type}
+                                    dir={type === 'text' ? undefined : 'ltr'}
+                                    value={data.details?.[key] || ''}
+                                    onChange={(e) => setData('details', { ...data.details, [key]: e.target.value })}
+                                    required={required}
+                                    className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-base focus:border-[#0071e3] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 dark:border-white/10 dark:bg-zinc-900"
                                 />
-                                <span className="text-xs font-semibold text-[#1d1d1f]">
-                                    {__('general.set_as_default_payout_method')}
-                                </span>
-                            </label>
-
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-black/5">
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsCreating(false); setEditingMethod(null); reset(); }}
-                                    className="px-5 py-2.5 text-xs font-semibold text-[#1d1d1f]/70 hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
-                                >
-                                    {__('general.cancel')}
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all cursor-pointer"
-                                >
-                                    {editingMethod ? __('client.payout_save_changes') : __('client.payout_save_method')}
-                                </button>
+                                {errors[`details.${key}`] && <p className="mt-1 text-sm font-medium text-rose-600">{errors[`details.${key}`]}</p>}
                             </div>
-                        </form>
-                    </div>
-                </Modal>
-                {confirmDialog}
+                        ))}
+                        {errors.details && <p className="text-sm font-medium text-rose-600">{errors.details}</p>}
 
-            </div>
-        </AuthenticatedLayout>
+                        <label className="flex items-center gap-3 text-sm">
+                            <input type="checkbox" checked={!!data.is_default} onChange={(e) => setData('is_default', e.target.checked)} className="h-4 w-4 rounded border-black/20 text-[#0071e3]" />
+                            {__('client_money.payout.make_default')}
+                        </label>
+
+                        <div className="flex flex-wrap items-center gap-4 pt-2">
+                            <button type="submit" disabled={processing} className="inline-flex h-11 items-center justify-center rounded-full bg-[#0071e3] px-6 text-sm font-semibold text-white hover:bg-[#0077ed] disabled:opacity-50">
+                                {__('client_money.payout.save')}
+                            </button>
+                            <TextAction onClick={close}>{__('client_money.cancel')}</TextAction>
+                        </div>
+                    </form>
+                </Card>
+            )}
+
+            <Section>
+                {payoutMethods.length === 0 ? (
+                    <EmptyNote>{__('client_money.payout.empty')}</EmptyNote>
+                ) : (
+                    <ul className="divide-y divide-black/5 overflow-hidden rounded-[20px] bg-white shadow-sm dark:divide-white/10 dark:bg-zinc-900">
+                        {payoutMethods.map((pm) => {
+                            const Icon = (TYPES.find((t) => t.id === pm.type) || TYPES[0]).icon;
+                            return (
+                                <li key={pm.id} className="flex items-center gap-3 px-4 py-3">
+                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0071e3]/10 text-[#0071e3]"><Icon className="h-5 w-5" /></span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-[15px] font-medium">
+                                            {__(`client.payout_type_${pm.type}`)}
+                                            {pm.is_default && <span className="ms-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400">· {__('client_money.payout.default')}</span>}
+                                        </p>
+                                        <p className="truncate text-xs text-[#1d1d1f]/50 dark:text-zinc-500" dir="auto">{summary(pm)}</p>
+                                    </div>
+                                    <button type="button" onClick={() => openEdit(pm)} title={__('client_money.payout.edit')} aria-label={__('client_money.payout.edit')} className="rounded-full p-2 text-[#1d1d1f]/60 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800">
+                                        <Pencil className="h-4 w-4" />
+                                    </button>
+                                    <button type="button" onClick={() => remove(pm.id)} title={__('client_money.payout.delete')} aria-label={__('client_money.payout.delete')} className="rounded-full p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+            </Section>
+            {confirmDialog}
+        </ClientPage>
     );
 }

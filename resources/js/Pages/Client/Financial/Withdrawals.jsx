@@ -1,288 +1,122 @@
-import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
-import { 
-    Wallet, ArrowUpRight, ShieldAlert, CreditCard, 
-    ArrowLeft, CheckCircle2, Clock, XCircle, Sparkles, Check 
-} from 'lucide-react';
-import Modal from '@/Components/Modal';
-import { Label } from '@/Components/ui/label';
-import { Input } from '@/Components/ui/input';
-import { formatMoney } from '@/lib/utils';
+import React from 'react';
+import { useForm, usePage } from '@inertiajs/react';
+import { ArrowUpRight, ShieldCheck, Wallet } from 'lucide-react';
+import ClientPage, { Card, EmptyNote, PrimaryAction, Section, TextAction } from '@/Components/Client/ClientPage';
+import Pagination from '@/Components/Pagination';
+import { cn, formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        amount: '',
-        payout_method_id: payoutMethods?.[0]?.id || '',
-    });
+const STATUS_STYLE = {
+    pending: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
+    approved: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400',
+    paid: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+    rejected: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400',
+};
 
-    const handleSubmit = (e) => {
+const methodLabel = (pm) => pm?.details?.bank_name || pm?.details?.instapay_username || pm?.details?.mobile_number || pm?.details?.paypal_email || __('client_money.withdraw.account');
+
+/** What can be withdrawn, the request form (once identity and a payout method are ready), then past requests. */
+export default function Withdrawals({ auth, withdrawals, payoutMethods = [], wallet }) {
+    const { locale } = usePage().props;
+    const available = Number(wallet?.earned_balance || 0);
+    const currency = wallet?.currency;
+    const rows = withdrawals?.data ?? [];
+    const { data, setData, post, processing, errors, reset } = useForm({ amount: '', payout_method_id: payoutMethods?.[0]?.id || '' });
+    const verified = !!auth?.user?.kyc_verified;
+    const canRequest = verified && payoutMethods.length > 0 && available > 0;
+    const formatDate = (value) =>
+        value ? new Date(value).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+    const submit = (e) => {
         e.preventDefault();
-        post(route('financial.withdrawals.store'), {
-            onSuccess: () => {
-                setIsModalOpen(false);
-                reset();
-            },
-        });
+        post(route('financial.withdrawals.store'), { onSuccess: () => reset('amount') });
     };
 
-    const maxAvailable = Number(wallet?.earned_balance || 0);
-    const currency = wallet?.currency;
-
     return (
-        <AuthenticatedLayout>
-            <Head title={`${__('general.withdrawals')} — Musoftwares Studio`} />
+        <ClientPage
+            title={__('client_money.withdraw.title')}
+            hint={__('client_money.withdraw.hint')}
+            action={<TextAction href={route('financial.payout-methods.index')}>{__('client_money.withdraw.methods')}</TextAction>}
+        >
+            <Card>
+                <p className="flex items-center gap-2 text-sm text-[#1d1d1f]/60 dark:text-zinc-400"><Wallet className="h-4 w-4 text-emerald-600" />{__('client_money.withdraw.available')}</p>
+                <p className="mt-1 text-3xl font-bold tracking-tight" dir="ltr">{formatMoney(available, currency)}</p>
 
-            <div className="w-full bg-[#f5f5f7] text-[#1d1d1f] min-h-[calc(100vh-68px)] font-sans antialiased selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
-                
-                {/* Hero Header */}
-                <div className="w-full bg-white border-b border-black/5 py-8 px-6 sm:px-10">
-                    <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="space-y-1.5">
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex items-center text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] transition-colors mb-1"
-                            >
-                                <ArrowLeft className="me-1.5 h-3.5 w-3.5" />
-                                {__('general.back_to_dashboard')}
-                            </Link>
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                {__('general.request_withdrawal')}
-                            </h1>
-                            <p className="text-xs sm:text-sm text-[#1d1d1f]/60 font-sans">
-                                {__('general.you_can_only_withdraw_funds_that_have_been_earned_on_the_platform')}
-                            </p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-3 shrink-0">
-                            {!auth?.user?.kyc_verified ? (
-                                <Link
-                                    href={route('kyc.index')}
-                                    className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-amber-500/20"
-                                >
-                                    <ShieldAlert className="w-4 h-4" />
-                                    <span>{__('client.withdraw_verify_kyc')}</span>
-                                </Link>
-                            ) : (!payoutMethods || payoutMethods.length === 0) ? (
-                                <Link
-                                    href={route('financial.payout-methods.index')}
-                                    className="px-5 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-sm shadow-blue-500/20"
-                                >
-                                    <CreditCard className="w-4 h-4" />
-                                    <span>{__('general.setup_payout_method')}</span>
-                                </Link>
-                            ) : (
-                                <button
-                                    onClick={() => setIsModalOpen(true)}
-                                    disabled={maxAvailable <= 0}
-                                    className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-[980px] transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 cursor-pointer"
-                                >
-                                    <ArrowUpRight className="w-4 h-4" />
-                                    <span>{__('general.request_payout')}</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main Content Area */}
-                <div className="max-w-[1400px] mx-auto px-6 sm:px-10 py-8 space-y-8">
-                    
-                    {/* Available Earned Balance Bento Tile */}
-                    <div className="bg-white border border-black/5 rounded-[24px] p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shrink-0">
-                                <Wallet className="w-7 h-7" />
-                            </div>
-                            <div>
-                                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#1d1d1f]/50">
-                                    {__('general.available_earned_funds')}
-                                </span>
-                                <div className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1d1d1f] font-sans">
-                                    {formatMoney(maxAvailable, currency)}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-xs text-[#1d1d1f]/60 bg-[#f5f5f7] px-4 py-2.5 rounded-xl border border-black/5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span>{__('client.withdraw_balance_ready')}</span>
-                        </div>
-                    </div>
-
-                    {/* Withdrawal History Card */}
-                    <div className="bg-white border border-black/5 rounded-[24px] shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-black/5 flex items-center justify-between">
-                            <div>
-                                <h3 className="text-base font-bold text-[#1d1d1f] font-sans">
-                                    {__('general.withdrawal_history')}
-                                </h3>
-                                <p className="text-xs text-[#1d1d1f]/60 mt-0.5">
-                                    {__('general.view_your_past_withdrawal_requests_and_their_statuses')}
-                                </p>
-                            </div>
-                            <span className="text-[11px] font-semibold px-3 py-1 bg-[#f5f5f7] text-[#1d1d1f]/70 rounded-full border border-black/5">
-                                {withdrawals?.total || 0} Requests
-                            </span>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-start border-collapse">
-                                <thead>
-                                    <tr className="bg-[#f5f5f7]/60 text-[11px] font-semibold text-[#1d1d1f]/60 uppercase tracking-wider border-b border-black/5">
-                                        <th className="py-3.5 ps-6 pe-4 text-start">ID #</th>
-                                        <th className="py-3.5 px-4 text-start">{__('general.payout_method')}</th>
-                                        <th className="py-3.5 px-4 text-start">{__('general.amount')}</th>
-                                        <th className="py-3.5 px-4 text-start">{__('general.status')}</th>
-                                        <th className="py-3.5 ps-4 pe-6 text-end">{__('general.date')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-black/5">
-                                    {(!withdrawals?.data || withdrawals.data.length === 0) ? (
-                                        <tr>
-                                            <td colSpan={5} className="py-16 text-center text-xs text-[#1d1d1f]/50">
-                                                <Wallet className="w-8 h-8 mx-auto text-[#1d1d1f]/30 mb-2" />
-                                                {__('general.no_withdrawal_requests_found')}
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        withdrawals.data.map((w) => {
-                                            const isPaid = w.status === 'paid';
-                                            const isApproved = w.status === 'approved';
-                                            const isRejected = w.status === 'rejected';
-                                            return (
-                                                <tr key={w.id} className="hover:bg-[#f5f5f7]/50 transition-colors">
-                                                    <td className="py-4 ps-6 pe-4 font-mono text-xs font-semibold text-[#1d1d1f]/70">
-                                                        #{w.id}
-                                                    </td>
-                                                    <td className="py-4 px-4 text-xs sm:text-sm font-semibold text-[#1d1d1f] capitalize">
-                                                        {w.payout_method ? __(`client.payout_type_${w.payout_method.type}`) : __('client.withdraw_standard_method')}
-                                                    </td>
-                                                    <td className="py-4 px-4 font-mono font-bold text-xs sm:text-sm text-[#1d1d1f]">
-                                                        {formatMoney(w.amount, w.currency || currency)}
-                                                    </td>
-                                                    <td className="py-4 px-4">
-                                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border capitalize ${
-                                                            isPaid
-                                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
-                                                                : isApproved
-                                                                    ? 'bg-blue-50 text-blue-700 border-blue-200/60'
-                                                                    : isRejected
-                                                                        ? 'bg-rose-50 text-rose-700 border-rose-200/60'
-                                                                        : 'bg-amber-50 text-amber-700 border-amber-200/60'
-                                                        }`}>
-                                                            {isPaid && <CheckCircle2 className="w-3 h-3" />}
-                                                            {isRejected && <XCircle className="w-3 h-3" />}
-                                                            {!isPaid && !isRejected && <Clock className="w-3 h-3" />}
-                                                            {w.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 ps-4 pe-6 text-end text-xs text-[#1d1d1f]/60 font-sans">
-                                                        {new Date(w.created_at).toLocaleDateString(undefined, {
-                                                            year: 'numeric', month: 'short', day: 'numeric'
-                                                        })}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Request Payout Modal */}
-                <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="md">
-                    <div className="p-6 sm:p-8 space-y-6">
-                        <div className="flex items-center gap-3 pb-4 border-b border-black/5">
-                            <div className="w-10 h-10 rounded-xl bg-[#0071e3]/10 flex items-center justify-center text-[#0071e3]">
-                                <Wallet className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-[#1d1d1f] font-sans">
-                                    {__('general.request_withdrawal')}
-                                </h2>
-                                <p className="text-xs text-[#1d1d1f]/60">
-                                    Available: {formatMoney(maxAvailable, currency)}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div className="space-y-2">
-                                <Label htmlFor="amount" className="text-xs font-semibold text-[#1d1d1f]">
-                                    Amount to Withdraw ({currency})
-                                </Label>
-                                <div className="relative">
-                                    <Input
-                                        id="amount"
-                                        type="number"
-                                        step="0.01"
-                                        min="1"
-                                        max={maxAvailable}
-                                        value={data.amount}
-                                        onChange={(e) => setData('amount', e.target.value)}
-                                        className="h-11 pe-20 font-bold text-sm bg-white border border-black/10 rounded-xl focus:ring-2 focus:ring-[#0071e3]"
-                                        placeholder="0.00"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setData('amount', maxAvailable.toString())}
-                                        className="absolute end-2 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#f5f5f7] hover:bg-black/5 text-[#1d1d1f] text-[11px] font-bold rounded-lg border border-black/5 transition-colors cursor-pointer"
-                                    >
-                                        {__('general.max')}
-                                    </button>
-                                </div>
-                                {errors.amount && <p className="text-xs font-medium text-rose-600">{errors.amount}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="payout_method" className="text-xs font-semibold text-[#1d1d1f]">
-                                    {__('general.destination_payout_method')}
-                                </Label>
-                                <select
-                                    id="payout_method"
-                                    value={data.payout_method_id}
-                                    onChange={(e) => setData('payout_method_id', e.target.value)}
-                                    className="flex h-11 w-full rounded-xl border border-black/10 bg-white px-3.5 py-2 text-xs sm:text-sm font-medium text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-[#0071e3]"
+                {!verified ? (
+                    <div className="mt-4"><PrimaryAction href={route('kyc.index')} icon={<ShieldCheck className="h-4 w-4" />}>{__('client_money.withdraw.verify_first')}</PrimaryAction></div>
+                ) : payoutMethods.length === 0 ? (
+                    <div className="mt-4"><PrimaryAction href={route('financial.payout-methods.index')}>{__('client_money.withdraw.method_first')}</PrimaryAction></div>
+                ) : canRequest ? (
+                    <form onSubmit={submit} className="mt-5 grid grid-cols-1 gap-4 border-t border-black/5 pt-5 dark:border-white/10 sm:grid-cols-2">
+                        <div>
+                            <label htmlFor="amount" className="mb-1.5 block text-sm font-semibold">{__('client_money.withdraw.amount')}</label>
+                            <div className="flex gap-2">
+                                <input
+                                    id="amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="1"
+                                    max={available}
+                                    inputMode="decimal"
+                                    dir="ltr"
+                                    value={data.amount}
+                                    onChange={(e) => setData('amount', e.target.value)}
+                                    className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-base focus:border-[#0071e3] focus:outline-none focus:ring-2 focus:ring-[#0071e3]/20 dark:border-white/10 dark:bg-zinc-900"
                                     required
-                                >
-                                    {payoutMethods?.map((pm) => (
-                                        <option key={pm.id} value={pm.id}>
-                                            {__(`client.payout_type_${pm.type}`)} — {pm.details?.bank_name || pm.details?.instapay_username || pm.details?.mobile_number || pm.details?.paypal_email || __('client.withdraw_account')}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.payout_method_id && <p className="text-xs font-medium text-rose-600">{errors.payout_method_id}</p>}
-                            </div>
-
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-black/5">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-5 py-2.5 text-xs font-semibold text-[#1d1d1f]/70 hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
-                                >
-                                    {__('general.cancel')}
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-2.5 bg-[#0071e3] hover:bg-[#0077ed] text-white text-xs font-semibold rounded-[980px] shadow-sm shadow-blue-500/20 transition-all cursor-pointer"
-                                >
-                                    {__('general.confirm_withdrawal')}
+                                />
+                                <button type="button" onClick={() => setData('amount', available.toString())} className="shrink-0 rounded-xl bg-[#f5f5f7] px-4 text-sm font-semibold hover:bg-black/5 dark:bg-zinc-800">
+                                    {__('client_money.withdraw.max')}
                                 </button>
                             </div>
-                        </form>
-                    </div>
-                </Modal>
+                            {errors.amount && <p className="mt-1 text-sm font-medium text-rose-600">{errors.amount}</p>}
+                        </div>
+                        <div>
+                            <label htmlFor="payout_method_id" className="mb-1.5 block text-sm font-semibold">{__('client_money.withdraw.send_to')}</label>
+                            <select
+                                id="payout_method_id"
+                                value={data.payout_method_id}
+                                onChange={(e) => setData('payout_method_id', e.target.value)}
+                                className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm focus:border-[#0071e3] focus:outline-none dark:border-white/10 dark:bg-zinc-900"
+                                required
+                            >
+                                {payoutMethods.map((pm) => (
+                                    <option key={pm.id} value={pm.id}>{__(`client.payout_type_${pm.type}`)} — {methodLabel(pm)}</option>
+                                ))}
+                            </select>
+                            {errors.payout_method_id && <p className="mt-1 text-sm font-medium text-rose-600">{errors.payout_method_id}</p>}
+                        </div>
+                        <div className="sm:col-span-2">
+                            <button type="submit" disabled={processing || !data.amount} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-6 text-sm font-semibold text-white hover:bg-[#0077ed] disabled:opacity-50">
+                                <ArrowUpRight className="h-4 w-4" />{__('client_money.withdraw.request')}
+                            </button>
+                        </div>
+                    </form>
+                ) : null}
+            </Card>
 
-            </div>
-        </AuthenticatedLayout>
+            <Section title={__('client_money.withdraw.requests')}>
+                {rows.length === 0 ? (
+                    <EmptyNote>{__('client_money.withdraw.empty')}</EmptyNote>
+                ) : (
+                    <ul className="divide-y divide-black/5 overflow-hidden rounded-[20px] bg-white shadow-sm dark:divide-white/10 dark:bg-zinc-900">
+                        {rows.map((w) => (
+                            <li key={w.id} className="flex items-center gap-3 px-4 py-3">
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-[15px] font-medium">
+                                        {w.payout_method ? __(`client.payout_type_${w.payout_method.type}`) : __('client_money.withdraw.standard')}
+                                    </p>
+                                    <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{formatDate(w.created_at)}</p>
+                                </div>
+                                <span className={cn('shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold', STATUS_STYLE[w.status] || 'bg-[#f5f5f7] text-[#1d1d1f]/70')}>
+                                    {__(`client_money.withdraw.status.${w.status}`) === `client_money.withdraw.status.${w.status}` ? w.status : __(`client_money.withdraw.status.${w.status}`)}
+                                </span>
+                                <span className="shrink-0 text-sm font-semibold" dir="ltr">{formatMoney(w.amount, w.currency || currency)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                {withdrawals?.links?.length > 3 && <div className="mt-4"><Pagination links={withdrawals.links} /></div>}
+            </Section>
+        </ClientPage>
     );
 }

@@ -1,15 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
-import { ShieldCheck, UploadCloud, FileText, CheckCircle2, AlertCircle, XCircle, Trash2, Download, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/Components/ui/card';
-import { useToast } from '@/Components/ui/use-toast';
-import { Badge } from '@/Components/ui/badge';
+import React, { useCallback, useState } from 'react';
+import { router, useForm } from '@inertiajs/react';
+import { AlertCircle, CheckCircle2, Download, ShieldCheck, Trash2, UploadCloud, XCircle } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { motion, AnimatePresence } from 'framer-motion';
-import { __ } from '@/lib/i18n';
+import ClientPage, { Card, PrimaryAction } from '@/Components/Client/ClientPage';
+import { useToast } from '@/Components/ui/use-toast';
 import { useConfirm } from '@/hooks/useConfirm';
+import { __ } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 interface DocumentType {
     id: number;
@@ -29,330 +26,201 @@ interface KycStatus {
 }
 
 interface Props {
-    auth: { user: any };
     kycStatus: KycStatus;
     documents: DocumentType[];
     missingDocs: string[];
     requiredDocs: string[];
 }
 
-const STEPS = [
+const DOCS = [
     { id: 'id_front', label: 'client.kyc_step_id_label', desc: 'client.kyc_step_id_desc', required: true },
     { id: 'selfie', label: 'client.kyc_step_selfie_label', desc: 'client.kyc_step_selfie_desc', required: true },
-    { id: 'proof_of_address', label: 'client.kyc_step_address_label', desc: 'client.kyc_step_address_desc', required: false }
+    { id: 'proof_of_address', label: 'client.kyc_step_address_label', desc: 'client.kyc_step_address_desc', required: false },
 ];
 
-export default function KycIndex({ auth, kycStatus, documents, missingDocs, requiredDocs }: Props) {
+/** Identity verification as one short list: where you stand, each document, then one submit button. */
+export default function KycIndex({ kycStatus, documents, missingDocs }: Props) {
     const { toast } = useToast();
     const { confirm, confirmDialog } = useConfirm();
-    const [activeStep, setActiveStep] = useState(0);
     const [uploadingType, setUploadingType] = useState<string | null>(null);
-
-    const { data, setData, post, processing, errors, reset } = useForm({
-        document_type: '',
-        document: null as File | null,
-    });
+    const { data, setData, post, processing, errors, reset } = useForm({ document_type: '', document: null as File | null });
 
     const isVerified = kycStatus.isVerified;
-    const isPendingReview = !isVerified && kycStatus.notes?.includes('submitted');
-    const isRejected = !isVerified && kycStatus.notes?.includes('rejected');
+    const isPendingReview = !isVerified && !!kycStatus.notes?.includes('submitted');
+    const isRejected = !isVerified && !!kycStatus.notes?.includes('rejected');
     const canSubmit = missingDocs.length === 0 && !isVerified && !isPendingReview;
+    const state = isVerified ? 'verified' : isPendingReview ? 'review' : isRejected ? 'rejected' : 'required';
 
-    const onDrop = useCallback((acceptedFiles: File[], docType: string) => {
-        const file = acceptedFiles[0];
-        if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                toast({ title: __('client.kyc_file_too_large'), description: __('client.kyc_max_size'), variant: "destructive" });
-                return;
-            }
-            setData({ document_type: docType, document: file });
-            setUploadingType(docType);
+    const onDrop = useCallback((files: File[], docType: string) => {
+        const file = files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            toast({ title: __('client.kyc_file_too_large'), description: __('client.kyc_max_size'), variant: 'destructive' });
+            return;
         }
+        setData({ document_type: docType, document: file });
+        setUploadingType(docType);
     }, [setData, toast]);
 
-    const handleUpload = (docType: string) => {
-        post(route('kyc.upload'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                toast({ title: __('client.kyc_uploaded'), description: __('client.kyc_uploaded_desc') });
-                reset();
-                setUploadingType(null);
-                if (activeStep < STEPS.length - 1) {
-                    setActiveStep(prev => prev + 1);
-                }
-            },
-            onError: () => {
-                setUploadingType(null);
-            }
-        });
-    };
+    const upload = () => post(route('kyc.upload'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            toast({ title: __('client.kyc_uploaded'), description: __('client.kyc_uploaded_desc') });
+            reset();
+            setUploadingType(null);
+        },
+        onError: () => setUploadingType(null),
+    });
 
-    const handleSubmitForReview = () => {
-        router.post(route('kyc.submit'), {}, {
-            preserveScroll: true,
-            onSuccess: () => {
-                toast({ title: __('client.kyc_submitted'), description: __('client.kyc_submitted_desc') });
-            }
-        });
-    };
+    const submitForReview = () => router.post(route('kyc.submit'), {}, {
+        preserveScroll: true,
+        onSuccess: () => toast({ title: __('client.kyc_submitted'), description: __('client.kyc_submitted_desc') }),
+    });
 
-    const handleDelete = async (id: number) => {
-        const accepted = await confirm({
-            title: __('client.kyc_delete_title'),
-            description: __('client.kyc_delete_confirm'),
-            variant: 'danger',
-        });
-        if (!accepted) return;
+    const remove = async (id: number) => {
+        if (!(await confirm({ title: __('client.kyc_delete_title'), description: __('client.kyc_delete_confirm'), variant: 'danger' }))) return;
         router.delete(route('kyc.delete', id), {
             preserveScroll: true,
-            onSuccess: () => toast({ title: __('client.kyc_deleted'), description: __('client.kyc_deleted_desc') })
+            onSuccess: () => toast({ title: __('client.kyc_deleted'), description: __('client.kyc_deleted_desc') }),
         });
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'approved': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-            case 'rejected': return 'bg-rose-50 text-rose-700 border-rose-200';
-            default: return 'bg-amber-50 text-amber-700 border-amber-200';
-        }
-    };
-
-    const DropzoneStep = ({ docDef, documents, data, uploadingType, processing, errors, onDrop, handleUpload, handleDelete }: any) => {
-        const { getRootProps, getInputProps, isDragActive } = useDropzone({
-            onDrop: (files) => onDrop(files, docDef.id),
-            accept: {
-                'image/jpeg': [],
-                'image/png': [],
-                'application/pdf': []
-            },
-            maxSize: 5242880, // 5MB
-            multiple: false
-        });
-
-        const uploadedDoc = documents.find((d: any) => d.document_type === docDef.id);
-        const isCurrentUploading = data.document && data.document_type === docDef.id;
-
-        if (uploadedDoc) {
-            return (
-                <div className="flex flex-col items-center justify-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl">
-                    <CheckCircle2 className="w-12 h-12 text-emerald-500 mb-3" />
-                    <h4 className="text-sm font-semibold text-slate-900">{uploadedDoc.original_filename}</h4>
-                    <p className="text-xs text-slate-500 mt-1 mb-4">{__('general.uploaded_successfully')}</p>
-                    <div className="flex gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                            <a href={route('kyc.download', uploadedDoc.id)} target="_blank" rel="noreferrer">
-                                <Download className="w-4 h-4 me-2" /> {__('general.view')}</a>
-                        </Button>
-                        {!isPendingReview && uploadedDoc.status !== 'approved' && (
-                            <Button variant="destructive" size="sm" onClick={() => handleDelete(uploadedDoc.id)}>
-                                <Trash2 className="w-4 h-4 me-2" /> {__('general.remove')}</Button>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        return (
-            <div className="space-y-4">
-                <div 
-                    {...getRootProps()} 
-                    className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
-                        isDragActive ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-slate-400'
-                    }`}
-                >
-                    <input {...getInputProps()} />
-                    <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
-                        <UploadCloud className="w-6 h-6" />
-                    </div>
-                    {isCurrentUploading ? (
-                        <div className="text-center">
-                            <p className="text-sm font-semibold text-slate-900">{data.document?.name}</p>
-                            <p className="text-xs text-slate-500 mt-1">{__('general.ready_to_upload')}</p>
-                        </div>
-                    ) : (
-                        <div className="text-center">
-                            <p className="text-sm font-semibold text-slate-900">{__('general.drag_drop_your_file_here')}</p>
-                            <p className="text-xs text-slate-500 mt-1">{__('client.kyc_or_browse')}</p>
-                            <p className="text-xs text-slate-400 mt-2">{__('general.jpg_png_pdf_up_to_5mb')}</p>
-                        </div>
-                    )}
-                </div>
-                
-                {isCurrentUploading && (
-                    <div className="flex justify-end">
-                        <Button 
-                            onClick={() => handleUpload(docDef.id)} 
-                            disabled={processing}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md"
-                        >
-                            {processing ? __('client.kyc_uploading') : __('client.kyc_confirm_upload')}
-                        </Button>
-                    </div>
-                )}
-                {errors.document && uploadingType === docDef.id && (
-                    <p className="text-rose-500 text-xs mt-2">{errors.document}</p>
-                )}
-            </div>
-        );
-    };
+    const StatusIcon = { verified: CheckCircle2, review: AlertCircle, rejected: XCircle, required: ShieldCheck }[state];
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-foreground leading-tight">{__('general.identity_verification')}</h2>}>
-            <Head title={__('general.kyc_verification')} />
-
-            <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
-                {/* STATUS BANNER */}
-                <div className={`p-6 rounded-2xl border shadow-sm ${
-                    isVerified ? 'bg-emerald-50 border-emerald-200' :
-                    isPendingReview ? 'bg-amber-50 border-amber-200' :
-                    isRejected ? 'bg-rose-50 border-rose-200' :
-                    'bg-slate-50 border-slate-200'
-                }`}>
-                    <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-full ${
-                            isVerified ? 'bg-emerald-100 text-emerald-600' :
-                            isPendingReview ? 'bg-amber-100 text-amber-600' :
-                            isRejected ? 'bg-rose-100 text-rose-600' :
-                            'bg-slate-200 text-slate-600'
-                        }`}>
-                            {isVerified ? <CheckCircle2 className="w-6 h-6" /> :
-                             isPendingReview ? <AlertCircle className="w-6 h-6" /> :
-                             isRejected ? <XCircle className="w-6 h-6" /> :
-                             <ShieldCheck className="w-6 h-6" />}
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-1">
-                                {isVerified ? __('client.kyc_identity_verified') :
-                                 isPendingReview ? __('client.kyc_under_review') :
-                                 isRejected ? __('client.kyc_rejected') :
-                                 __('client.kyc_verification_required')}
-                            </h3>
-                            <p className="text-sm text-slate-600">
-                                {isVerified ? __('client.kyc_verified_desc') :
-                                 isPendingReview ? __('client.kyc_review_desc') :
-                                 isRejected ? __('client.kyc_rejected_desc', { reason: kycStatus.notes?.replace('KYC rejected: ', '') ?? '' }) :
-                                 __('client.kyc_required_desc')}
-                            </p>
-                        </div>
+        <ClientPage title={__('client_account.kyc.title')} hint={__('client_account.kyc.hint')} width="sm">
+            <Card className={cn(
+                state === 'verified' && 'border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-950/30',
+                state === 'review' && 'border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30',
+                state === 'rejected' && 'border-rose-200 bg-rose-50 dark:border-rose-900/50 dark:bg-rose-950/30',
+            )}>
+                <div className="flex items-start gap-3">
+                    <StatusIcon className={cn('mt-0.5 h-6 w-6 shrink-0',
+                        state === 'verified' ? 'text-emerald-600' : state === 'review' ? 'text-amber-600' : state === 'rejected' ? 'text-rose-600' : 'text-[#0071e3]')} />
+                    <div>
+                        <h2 className="font-bold">
+                            {state === 'verified' ? __('client.kyc_identity_verified') : state === 'review' ? __('client.kyc_under_review')
+                                : state === 'rejected' ? __('client.kyc_rejected') : __('client.kyc_verification_required')}
+                        </h2>
+                        <p className="mt-1 text-sm text-[#1d1d1f]/70 dark:text-zinc-300">
+                            {state === 'verified' ? __('client.kyc_verified_desc') : state === 'review' ? __('client.kyc_review_desc')
+                                : state === 'rejected' ? __('client.kyc_rejected_desc', { reason: kycStatus.notes?.replace('KYC rejected: ', '') ?? '' })
+                                : __('client.kyc_required_desc')}
+                        </p>
                     </div>
                 </div>
+            </Card>
 
-                {!isVerified && !isPendingReview && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* WIZARD SIDEBAR */}
-                        <div className="md:col-span-1 space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-slate-900">{__('general.verification_steps')}</h3>
-                                <div className="space-y-3 relative">
-                                    <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-slate-200" />
-                                    {STEPS.map((step, idx) => {
-                                        const isCompleted = documents.some(d => d.document_type === step.id);
-                                        const isActive = idx === activeStep;
-                                        return (
-                                            <div 
-                                                key={step.id} 
-                                                className={`relative flex items-center gap-4 p-3 rounded-xl cursor-pointer transition-colors ${isActive ? 'bg-indigo-50 border border-indigo-100 shadow-sm' : 'hover:bg-slate-50'}`}
-                                                onClick={() => setActiveStep(idx)}
-                                            >
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 relative z-10 ${
-                                                    isCompleted ? 'bg-emerald-500 text-white shadow-md' :
-                                                    isActive ? 'bg-indigo-600 text-white shadow-md ring-4 ring-indigo-100' :
-                                                    'bg-slate-200 text-slate-500 border-2 border-white'
-                                                }`}>
-                                                    {isCompleted ? <CheckCircle2 className="w-4 h-4" /> : <span className="text-sm font-bold">{idx + 1}</span>}
-                                                </div>
-                                                <div>
-                                                    <p className={`text-sm font-semibold ${isActive ? 'text-indigo-900' : 'text-slate-700'}`}>{__(step.label)}</p>
-                                                    {step.required && <span className="text-[10px] uppercase font-bold text-rose-500 tracking-wider">{__('general.required')}</span>}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                            
-                            <div className="bg-slate-50 p-5 rounded-xl border border-slate-100">
-                                <h4 className="font-semibold text-slate-900 text-sm flex items-center gap-2 mb-2">
-                                    <ShieldCheck className="w-4 h-4 text-indigo-500"/>
-                                    {__('general.bankgrade_security')}</h4>
-                                <p className="text-xs text-slate-600 leading-relaxed">
-                                    {__('general.your_documents_are_encrypted_and_stored')}</p>
-                            </div>
-                        </div>
+            {!isVerified && !isPendingReview && (
+                <>
+                    <ol className="space-y-3">
+                        {DOCS.map((doc, i) => (
+                            <li key={doc.id}>
+                                <Card>
+                                    <div className="mb-3 flex items-start gap-3">
+                                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-sm font-bold text-white">{i + 1}</span>
+                                        <div>
+                                            <h3 className="font-semibold">
+                                                {__(doc.label)}
+                                                <span className="ms-2 text-xs font-normal text-[#1d1d1f]/50 dark:text-zinc-500">
+                                                    {doc.required ? __('client_account.kyc.required') : __('client_account.kyc.optional')}
+                                                </span>
+                                            </h3>
+                                            <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__(doc.desc)}</p>
+                                        </div>
+                                    </div>
+                                    <DocumentDrop
+                                        docId={doc.id}
+                                        uploaded={documents.find((d) => d.document_type === doc.id)}
+                                        pendingFile={data.document && data.document_type === doc.id ? data.document : null}
+                                        canRemove={!isPendingReview}
+                                        processing={processing}
+                                        error={uploadingType === doc.id ? errors.document : undefined}
+                                        onDrop={onDrop}
+                                        onUpload={upload}
+                                        onRemove={remove}
+                                    />
+                                </Card>
+                            </li>
+                        ))}
+                    </ol>
 
-                        {/* WIZARD CONTENT */}
-                        <div className="md:col-span-2">
-                            <Card className="shadow-lg border-slate-200">
-                                <AnimatePresence mode="wait">
-                                    <motion.div
-                                        key={activeStep}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.2 }}
-                                    >
-                                        <CardHeader>
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <CardTitle>{__(STEPS[activeStep].label)}</CardTitle>
-                                                    <CardDescription className="mt-1">{__(STEPS[activeStep].desc)}</CardDescription>
-                                                </div>
-                                                <ImageIcon className="w-8 h-8 text-slate-300" />
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <DropzoneStep 
-                                                docDef={STEPS[activeStep]} 
-                                                documents={documents} 
-                                                data={data} 
-                                                uploadingType={uploadingType} 
-                                                processing={processing} 
-                                                errors={errors} 
-                                                onDrop={onDrop} 
-                                                handleUpload={handleUpload} 
-                                                handleDelete={handleDelete} 
-                                            />
-                                        </CardContent>
-                                        <CardFooter className="bg-slate-50 border-t flex justify-end gap-4 p-6">
-                                            <Button 
-                                                variant="outline" 
-                                                onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}
-                                                disabled={activeStep === 0}
-                                            >
-                                                <ArrowLeft className="w-4 h-4 me-2" /> {__('general.back')}</Button>
-                                            
-                                            {activeStep < STEPS.length - 1 ? (
-                                                <Button onClick={() => setActiveStep(prev => prev + 1)}>
-                                                    {__('general.next')}<ArrowRight className="w-4 h-4 ms-2" />
-                                                </Button>
-                                            ) : (
-                                                <Button 
-                                                    onClick={handleSubmitForReview} 
-                                                    disabled={!canSubmit}
-                                                    className={canSubmit ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''}
-                                                >
-                                                    <CheckCircle2 className="w-4 h-4 me-2" /> {__('general.submit_application')}</Button>
-                                            )}
-                                        </CardFooter>
-                                    </motion.div>
-                                </AnimatePresence>
-                            </Card>
-                        </div>
+                    <div className="flex flex-col items-start gap-2">
+                        <PrimaryAction onClick={canSubmit ? submitForReview : undefined} icon={<CheckCircle2 className="h-4 w-4" />}
+                            className={cn(!canSubmit && 'pointer-events-none opacity-50')}>
+                            {__('client_account.kyc.submit')}
+                        </PrimaryAction>
+                        {!canSubmit && <p className="text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{__('client_account.kyc.submit_hint')}</p>}
+                        <p className="flex items-center gap-1.5 text-xs text-[#1d1d1f]/50 dark:text-zinc-500">
+                            <ShieldCheck className="h-3.5 w-3.5" />{__('general.your_documents_are_encrypted_and_stored')}
+                        </p>
                     </div>
-                )}
-                
-                {isPendingReview && (
-                    <div className="text-center p-12 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle2 className="w-10 h-10 text-indigo-500" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{__('general.application_received')}</h2>
-                        <p className="text-slate-600 max-w-7xl mx-auto">
-                            {__('general.thank_you_for_submitting_your_documents')}</p>
-                    </div>
+                </>
+            )}
+            {confirmDialog}
+        </ClientPage>
+    );
+}
+
+function DocumentDrop({ docId, uploaded, pendingFile, canRemove, processing, error, onDrop, onUpload, onRemove }: {
+    docId: string;
+    uploaded?: DocumentType;
+    pendingFile: File | null;
+    canRemove: boolean;
+    processing: boolean;
+    error?: string;
+    onDrop: (files: File[], docType: string) => void;
+    onUpload: () => void;
+    onRemove: (id: number) => void;
+}) {
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop: (files) => onDrop(files, docId),
+        accept: { 'image/jpeg': [], 'image/png': [], 'application/pdf': [] },
+        maxSize: 5242880,
+        multiple: false,
+    });
+
+    if (uploaded) {
+        return (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-50 p-3 text-sm dark:bg-emerald-950/30">
+                <span className="flex min-w-0 items-center gap-2 text-emerald-800 dark:text-emerald-300">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" /><span className="truncate" dir="ltr">{uploaded.original_filename}</span>
+                </span>
+                <span className="flex items-center gap-4">
+                    <a href={route('kyc.download', uploaded.id)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-[#0071e3]">
+                        <Download className="h-4 w-4" />{__('general.view')}
+                    </a>
+                    {canRemove && uploaded.status !== 'approved' && (
+                        <button type="button" onClick={() => onRemove(uploaded.id)} className="inline-flex items-center gap-1 font-semibold text-rose-600">
+                            <Trash2 className="h-4 w-4" />{__('general.remove')}
+                        </button>
+                    )}
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-3">
+            <div {...getRootProps()} className={cn('flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-colors',
+                isDragActive ? 'border-[#0071e3] bg-[#0071e3]/5' : 'border-black/10 bg-[#f5f5f7] hover:border-black/20 dark:border-white/10 dark:bg-zinc-800')}>
+                <input {...getInputProps()} />
+                <UploadCloud className="mb-2 h-7 w-7 text-[#0071e3]" />
+                {pendingFile ? (
+                    <p className="text-sm font-semibold" dir="ltr">{pendingFile.name}</p>
+                ) : (
+                    <>
+                        <p className="text-sm font-semibold">{__('client_account.kyc.choose_file')}</p>
+                        <p className="mt-1 text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{__('general.jpg_png_pdf_up_to_5mb')}</p>
+                    </>
                 )}
             </div>
-            {confirmDialog}
-        </AuthenticatedLayout>
+            {pendingFile && (
+                <PrimaryAction onClick={processing ? undefined : onUpload} icon={<UploadCloud className="h-4 w-4" />} className={cn(processing && 'opacity-60')}>
+                    {processing ? __('client.kyc_uploading') : __('client.kyc_confirm_upload')}
+                </PrimaryAction>
+            )}
+            {error && <p className="text-xs text-rose-600">{error}</p>}
+        </div>
     );
 }

@@ -1,0 +1,97 @@
+<?php
+
+// Client work pages: projects, a project, tasks, the day board.
+return [
+    'projects' => [
+        'title' => 'Projects',
+        'hint' => 'Everything we are building for you, and how far each one is.',
+        'new' => 'New project',
+        'list' => 'List',
+        'board' => 'Day board',
+        'all_tasks' => 'All tasks',
+        'empty' => 'You have no projects yet. Start one and we will reply with a plan and a price.',
+        'ongoing' => 'ongoing',
+        'progress' => 'Progress',
+        'tasks' => 'Tasks',
+        'reports' => 'Reports',
+        'files' => 'Files',
+        'today' => 'Today',
+        'open' => 'Open',
+    ],
+
+    'create' => [
+        'title' => 'Start a project',
+        'hint' => 'Give it a name and tell us what you need. We reply with questions, a plan and a price.',
+        'presets' => 'Start from an example',
+        'name' => 'Project name',
+        'description' => 'What do you need?',
+        'tip' => 'A few lines are enough: who it is for, the main features, and any deadline.',
+        'cancel' => 'Cancel',
+        'creating' => 'Creating…',
+        'submit' => 'Start project',
+    ],
+
+    'show' => [
+        'back' => 'Projects',
+        'stage' => 'Project stage',
+        'now' => 'Where it is now',
+        'next' => 'What is next',
+        'next_unknown' => 'We will set the next step together in the chat below.',
+        'need_from_you' => 'We need from you',
+        'invoice_waiting' => 'An invoice is waiting for payment',
+        'open_invoices' => 'Open invoices',
+        'answer' => 'Answer',
+        'dismiss' => 'Not now',
+        'features' => ':done done, :left left',
+        'tasks' => 'Tasks',
+        'files' => 'Files',
+        'today' => 'Today',
+        'ticket' => 'Report a problem',
+        'chat_hint' => 'Ask anything about this project. Files are welcome.',
+        'confirm_invoice_title' => 'Ready to issue the invoice and start work?',
+        'confirm_invoice' => 'Issue the invoice',
+    ],
+
+    'stages' => [
+        'discovery' => 'Understanding your idea',
+        'valuation' => 'Pricing',
+        'proposal' => 'Agreement',
+        'execution' => 'Building',
+        'completed' => 'Delivered',
+    ],
+
+    'stage_hint' => [
+        'discovery' => 'We are asking questions to understand exactly what you need.',
+        'valuation' => 'We are working out the time and the cost.',
+        'proposal' => 'The price and scope are ready for your approval.',
+        'execution' => 'The team is building your project.',
+        'completed' => 'Your project is delivered. Tell us if you need anything else.',
+    ],
+
+    'tasks' => [
+        'title' => 'All tasks',
+        'hint' => 'Tasks and to-dos from all your projects, by when they are due.',
+        'overdue' => 'Overdue',
+        'today' => 'Today',
+        'week' => 'Next 7 days',
+        'later' => 'Later',
+        'no_date' => 'No due date',
+        'all_projects' => 'All projects',
+        'archived' => 'archived',
+        'hide_done' => 'Hide finished',
+        'show_done' => 'Show finished',
+        'empty' => 'Nothing to do right now.',
+        'task' => 'Task',
+        'todo' => 'To-do',
+        'no_description' => 'No details.',
+        'open_project' => 'Open project',
+    ],
+
+    'board' => [
+        'title' => 'Day board',
+        'hint' => 'What is planned for one day across all your projects.',
+        'prev' => 'Previous day',
+        'next' => 'Next day',
+        'today' => 'Back to today',
+    ],
+];
