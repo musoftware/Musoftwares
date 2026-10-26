@@ -104,6 +104,27 @@ return [
         'saved' => 'تم الحفظ',
     ],
 
+    'invoices' => [
+        'title' => 'الفواتير',
+        'hint' => 'ادفع الفواتير المفتوحة وحمّل أي فاتورة بصيغة PDF.',
+        'to_pay' => 'مطلوب دفعها',
+        'to_pay_total' => 'إجمالي المطلوب',
+        'pay_oldest' => 'ادفع الأقدم',
+        'nothing_to_pay' => 'مفيش حاجة مطلوب دفعها. كله تمام.',
+        'and_more' => '+ :count بنود أخرى',
+        'pdf' => 'PDF',
+        'history' => 'السجل',
+        'history_empty' => 'لسه مفيش فواتير مدفوعة.',
+        'paid_on' => 'اتدفعت :date',
+        'issued_on' => 'صدرت :date',
+        'wallet' => 'رصيد المحفظة',
+        'wallet_hint' => 'لو رصيد المحفظة يغطي الفاتورة بتتدفع منها، غير كده بتدفع بالكارت.',
+        'add_balance' => 'شحن الرصيد',
+        'status' => ['paid' => 'مدفوعة', 'cancelled' => 'ملغاة', 'refunded' => 'مستردة', 'unpaid' => 'غير مدفوعة', 'partially_paid' => 'مدفوعة جزئيًا'],
+        'previous' => 'السابق',
+        'next' => 'التالي',
+    ],
+
     'tiers' => [
         'standard' => 'عادي', 'bronze' => 'برونزي', 'silver' => 'فضي', 'gold' => 'ذهبي', 'platinum' => 'بلاتيني',
         'emerald' => 'زمردي', 'ruby' => 'ياقوتي', 'diamond' => 'ماسي', 'obsidian' => 'أوبسيديان',

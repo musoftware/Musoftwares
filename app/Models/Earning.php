@@ -24,13 +24,24 @@ class Earning extends Model
         'cost_transaction_id',
     ];
 
+    /**
+     * Currency the amount is stored in. Rows from before the currency -> currency_id rename may only
+     * have the old column, and newer rows leave the old column at 0, so neither can be read alone.
+     */
+    public function sourceCurrencyId(): int
+    {
+        return (int) ($this->attributes['currency_id'] ?? 0)
+            ?: (int) ($this->attributes['currency'] ?? 0)
+            ?: (int) AdminSettings::business_currency();
+    }
+
     protected static function booted(): void
     {
         static::saving(function ($earning) {
             // Force user currency conversion if different
             if ($earning->user_id && $earning->user) {
                 $userCurrencyId = $earning->user->currency_id ?? AdminSettings::business_currency();
-                $currentCurrencyId = $earning->currency_id ?? $earning->currency ?? AdminSettings::business_currency();
+                $currentCurrencyId = $earning->sourceCurrencyId();
 
                 if ($currentCurrencyId != $userCurrencyId) {
                     $date = $earning->created_at ?? now();

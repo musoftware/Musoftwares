@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Invoice;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +20,8 @@ use Inertia\Inertia;
 class InvoiceController extends Controller
 {
     /**
-     * List all platform invoices for the authenticated user.
+     * The client's invoices in two parts: what is still to pay (every open invoice, oldest due first)
+     * and the history of settled ones (paid, cancelled, refunded), paginated.
      */
     public function index(Request $request)
     {
@@ -31,45 +33,60 @@ class InvoiceController extends Controller
         }
         $walletCurrency = Currency::findCached($walletCurrencyId) ?? Currency::find($walletCurrencyId);
 
-        $invoices = Invoice::where('user_id', $user->id)
+        $row = function (Invoice $inv) use ($walletCurrencyId, $walletCurrency) {
+            $curr = Currency::findCached($inv->currency_id) ?? Currency::find($inv->currency_id) ?? $walletCurrency;
+            $dueDate = $inv->due_date ? Carbon::parse($inv->due_date)->toDateString() : null;
+            $titles = $inv->items->pluck('item_title')->filter()->values();
+            $open = in_array($inv->status, ['unpaid', 'partially_paid'], true);
+
+            return [
+                'id' => $inv->id,
+                'uuid' => $inv->uuid,
+                'invoice_number' => $inv->id,
+                'title' => $titles->first(),
+                'more_items' => max(0, $titles->count() - 1),
+                'amount' => round((float) $inv->total(), 2),
+                'paid_amount' => round((float) $inv->paid, 2),
+                'remaining' => $inv->unpaid_total(),
+                'wallet_amount' => $this->walletAmountOrNull($inv->total(), $inv->currency_id, $walletCurrencyId),
+                'wallet_remaining' => $this->walletAmountOrNull($inv->unpaid_total(), $inv->currency_id, $walletCurrencyId),
+                'currency' => $curr ? [
+                    'id' => $curr->id,
+                    'currency' => $curr->currency,
+                    'symbol' => $curr->symbol,
+                    'string_format' => $curr->string_format,
+                ] : null,
+                'status' => $inv->status,
+                'due_date' => $dueDate,
+                'is_overdue' => $open && $dueDate !== null && Carbon::parse($dueDate)->endOfDay()->isPast(),
+                'issued_at' => $inv->created_at?->format('Y-m-d'),
+                'paid_at' => $inv->paid_at?->format('Y-m-d'),
+            ];
+        };
+
+        $base = fn () => Invoice::where('user_id', $user->id)
             ->where('is_suspended', false)
-            ->with(['currency'])
+            ->with(['currency', 'items:id,invoice_id,item_title']);
+
+        $unpaidInvoices = $base()
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get()
+            ->filter(fn (Invoice $inv) => $inv->unpaid_total() > 0)
+            ->map($row)
+            ->sortBy(fn (array $inv) => $inv['due_date'] ?? $inv['issued_at'])
+            ->values();
+
+        $invoices = $base()
+            ->whereNotIn('status', ['unpaid', 'partially_paid'])
             ->latest()
             ->paginate(14)
-            ->through(function ($inv) use ($walletCurrencyId, $walletCurrency) {
-                $curr = Currency::findCached($inv->currency_id) ?? Currency::find($inv->currency_id) ?? $walletCurrency;
-
-                return [
-                    'id' => $inv->id,
-                    'uuid' => $inv->uuid,
-                    'invoice_number' => $inv->id,
-                    'amount' => round((float) $inv->total(), 2),
-                    'paid_amount' => round((float) $inv->paid, 2),
-                    'remaining' => $inv->unpaid_total(),
-                    'wallet_amount' => $this->walletAmountOrNull($inv->total(), $inv->currency_id, $walletCurrencyId),
-                    'wallet_remaining' => $this->walletAmountOrNull($inv->unpaid_total(), $inv->currency_id, $walletCurrencyId),
-                    'currency' => $curr ? [
-                        'id' => $curr->id,
-                        'currency' => $curr->currency,
-                        'symbol' => $curr->symbol,
-                        'string_format' => $curr->string_format,
-                    ] : null,
-                    'status' => $inv->status,
-                    'due_date' => $inv->schedule['start_date'] ?? null,
-                    'issued_at' => $inv->created_at?->format('Y-m-d'),
-                ];
-            });
-
-        $collection = $invoices->getCollection();
-        $unpaidInvoices = $collection->filter(fn ($i) => in_array($i['status'], ['unpaid', 'partially_paid']))->values();
-        $paidInvoices = $collection->filter(fn ($i) => $i['status'] === 'paid')->values();
+            ->through($row);
 
         $totalOutstanding = round((float) $user->unpaid_invoices_amount(true), 2);
 
         return Inertia::render('Client/Billing/Invoices', [
             'invoices' => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
-            'paid_invoices' => $paidInvoices,
             'total_outstanding' => $totalOutstanding,
             'client_balance' => round((float) $user->balance(), 2),
             'wallet_currency' => $walletCurrency,

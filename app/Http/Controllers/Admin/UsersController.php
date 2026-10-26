@@ -1115,7 +1115,7 @@ class UsersController extends Controller
             foreach ($earnings as $earning) {
                 // If the app has CurrenciesExchange::RateToday, we use it, otherwise fallback
                 if (class_exists(CurrenciesExchange::class)) {
-                    $total_commission += CurrenciesExchange::RateToday($earning->amount, $earning->currency, $client->currency);
+                    $total_commission += CurrenciesExchange::RateToday($earning->amount, $earning->sourceCurrencyId(), $client->currency_id ?: \App\Models\AdminSettings::business_currency());
                 } else {
                     $total_commission += $earning->amount; // Fallback
                 }

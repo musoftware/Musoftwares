@@ -121,11 +121,12 @@ class BillingInvoiceCurrencyTest extends TestCase
             ->component('Client/Billing/Invoices')
             ->where('total_outstanding', 10000)
             ->has('unpaid_invoices', 1)
-            ->where('invoices.data.0.status', 'unpaid')
-            ->where('invoices.data.0.amount', 200)
-            ->where('invoices.data.0.currency.currency', 'USD')
-            ->where('invoices.data.0.wallet_amount', 10000)
-            ->where('invoices.data.0.wallet_remaining', 10000)
+            ->has('invoices.data', 0) // open invoices are listed under "to pay", not in the history
+            ->where('unpaid_invoices.0.status', 'unpaid')
+            ->where('unpaid_invoices.0.amount', 200)
+            ->where('unpaid_invoices.0.currency.currency', 'USD')
+            ->where('unpaid_invoices.0.wallet_amount', 10000)
+            ->where('unpaid_invoices.0.wallet_remaining', 10000)
         );
     }
 

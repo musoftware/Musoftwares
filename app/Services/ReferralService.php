@@ -62,7 +62,7 @@ class ReferralService extends BaseService
             $total = 0;
             foreach ($userEarnings as $e) {
                 if (class_exists(CurrenciesExchange::class)) {
-                    $total += CurrenciesExchange::RateToday($e->amount, $e->currency, $auth->currency);
+                    $total += CurrenciesExchange::RateToday($e->amount, $e->sourceCurrencyId(), $auth->currency_id ?: \App\Models\AdminSettings::business_currency());
                 } else {
                     $total += $e->amount;
                 }
@@ -91,7 +91,7 @@ class ReferralService extends BaseService
                     ->chunk(500, function ($chunk) use (&$total, $auth) {
                         foreach ($chunk as $e) {
                             if (class_exists(CurrenciesExchange::class)) {
-                                $total += CurrenciesExchange::RateToday($e->amount, $e->currency, $auth->currency);
+                                $total += CurrenciesExchange::RateToday($e->amount, $e->sourceCurrencyId(), $auth->currency_id ?: \App\Models\AdminSettings::business_currency());
                             } else {
                                 $total += $e->amount;
                             }

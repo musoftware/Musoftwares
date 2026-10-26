@@ -104,6 +104,27 @@ return [
         'saved' => 'Saved',
     ],
 
+    'invoices' => [
+        'title' => 'Invoices',
+        'hint' => 'Pay open invoices and download any invoice as PDF.',
+        'to_pay' => 'To pay',
+        'to_pay_total' => 'Total to pay',
+        'pay_oldest' => 'Pay the oldest',
+        'nothing_to_pay' => 'Nothing to pay. You are all set.',
+        'and_more' => '+ :count more',
+        'pdf' => 'PDF',
+        'history' => 'History',
+        'history_empty' => 'No paid invoices yet.',
+        'paid_on' => 'Paid :date',
+        'issued_on' => 'Issued :date',
+        'wallet' => 'Wallet balance',
+        'wallet_hint' => 'If your wallet covers an invoice, it is paid from the wallet. Otherwise you pay by card.',
+        'add_balance' => 'Add balance',
+        'status' => ['paid' => 'Paid', 'cancelled' => 'Cancelled', 'refunded' => 'Refunded', 'unpaid' => 'Unpaid', 'partially_paid' => 'Partly paid'],
+        'previous' => 'Previous',
+        'next' => 'Next',
+    ],
+
     'tiers' => [
         'standard' => 'Standard', 'bronze' => 'Bronze', 'silver' => 'Silver', 'gold' => 'Gold', 'platinum' => 'Platinum',
         'emerald' => 'Emerald', 'ruby' => 'Ruby', 'diamond' => 'Diamond', 'obsidian' => 'Obsidian',

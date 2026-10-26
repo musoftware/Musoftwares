@@ -93,6 +93,27 @@ class ClientHomeTest extends TestCase
         );
     }
 
+    public function test_invoices_page_lists_what_to_pay_oldest_first_and_keeps_history_apart(): void
+    {
+        $user = $this->client();
+        $later = $this->invoice($user, 200, now()->addDays(10)->toDateString());
+        $overdue = $this->invoice($user, 300, now()->subDays(3)->toDateString());
+        $paid = $this->invoice($user, 0, null);
+        $paid->forceFill(['status' => 'paid'])->saveQuietly();
+
+        $this->actingAs($user)->get('/billing/invoices')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Client/Billing/Invoices')
+            ->has('unpaid_invoices', 2)
+            ->where('unpaid_invoices.0.id', $overdue->id)
+            ->where('unpaid_invoices.0.is_overdue', true)
+            ->where('unpaid_invoices.0.title', 'Work')
+            ->where('unpaid_invoices.1.id', $later->id)
+            ->where('unpaid_invoices.1.is_overdue', false)
+            ->has('invoices.data', 1)
+            ->where('invoices.data.0.id', $paid->id)
+        );
+    }
+
     public function test_subscription_ending_soon_needs_attention_unless_it_renews(): void
     {
         $user = $this->client();
