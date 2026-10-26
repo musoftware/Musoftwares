@@ -125,6 +125,28 @@ return [
         'next' => 'Next',
     ],
 
+    'subs' => [
+        'title' => 'Subscriptions',
+        'hint' => 'Your systems, when each one ends, and renewing it.',
+        'browse' => 'Browse plans',
+        'empty' => 'You have no subscriptions yet.',
+        'per_month' => ':amount / month',
+        'active' => 'Active',
+        'ending' => 'Ends soon',
+        'ended' => 'Ended',
+        'renews_on' => 'Renews automatically on :date',
+        'ends_on' => 'Ends on :date',
+        'ended_on' => 'Ended on :date',
+        'days_left' => '(:days days left)',
+        'renew' => 'Renew now',
+        'renew_confirm' => 'Renew :name for :price from your wallet?',
+        'low_balance' => 'Your wallet has :balance. Add balance to renew for :price.',
+        'auto_off' => 'Turn off auto-renew',
+        'auto_off_confirm' => ':name will stop renewing and end on :date.',
+        'wallet' => 'Renewals are paid from your wallet: :balance',
+        'invoices' => 'Payment history is under Invoices.',
+    ],
+
     'tiers' => [
         'standard' => 'Standard', 'bronze' => 'Bronze', 'silver' => 'Silver', 'gold' => 'Gold', 'platinum' => 'Platinum',
         'emerald' => 'Emerald', 'ruby' => 'Ruby', 'diamond' => 'Diamond', 'obsidian' => 'Obsidian',

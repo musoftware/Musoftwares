@@ -420,14 +420,24 @@ class SubscriptionService extends BaseService
         $userCurrency = Currency::find($currencyId);
         $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
 
+        // A missing daily rate must not take the plans and subscriptions pages down:
+        // fall back to USD prices (or the default EGP rate) until the rate is fetched again.
         $rate = 1.0;
         if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
-            $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+            try {
+                $rate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+            } catch (\App\Exceptions\MissingExchangeRateException) {
+                $currencyCode = $currencyCode === 'EGP' ? 'EGP' : 'USD';
+            }
         }
 
         $egpRate = 50; // Fallback
         if ($usdCurrency && $egpCurrencyId) {
-            $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+            try {
+                $egpRate = CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+            } catch (\App\Exceptions\MissingExchangeRateException) {
+                $egpRate = 50;
+            }
         }
 
         return [
@@ -542,6 +552,7 @@ class SubscriptionService extends BaseService
                     'status' => $sub->status,
                     'started_at' => Carbon::parse($sub->started_at)->format('M d, Y'),
                     'expires_at' => Carbon::parse($sub->expires_at)->format('M d, Y'),
+                    'expires_on' => $sub->expires_at ? Carbon::parse($sub->expires_at)->toDateString() : null,
                     'auto_renew' => (bool) $sub->auto_renew,
                     'custom_items' => [$sub->object],
                     'is_custom' => false,

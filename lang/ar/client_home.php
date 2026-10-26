@@ -125,6 +125,28 @@ return [
         'next' => 'التالي',
     ],
 
+    'subs' => [
+        'title' => 'الاشتراكات',
+        'hint' => 'أنظمتك، وإمتى كل واحد بينتهي، وتجديده.',
+        'browse' => 'تصفح الخطط',
+        'empty' => 'لسه معندكش اشتراكات.',
+        'per_month' => ':amount / شهريًا',
+        'active' => 'فعّال',
+        'ending' => 'ينتهي قريبًا',
+        'ended' => 'منتهي',
+        'renews_on' => 'يتجدد تلقائيًا يوم :date',
+        'ends_on' => 'ينتهي يوم :date',
+        'ended_on' => 'انتهى يوم :date',
+        'days_left' => '(باقي :days يوم)',
+        'renew' => 'جدّد الآن',
+        'renew_confirm' => 'تجديد :name بمبلغ :price من محفظتك؟',
+        'low_balance' => 'رصيد محفظتك :balance. اشحن الرصيد عشان تجدد بـ :price.',
+        'auto_off' => 'إيقاف التجديد التلقائي',
+        'auto_off_confirm' => 'هيتوقف تجديد :name وينتهي يوم :date.',
+        'wallet' => 'التجديد بيتدفع من محفظتك: :balance',
+        'invoices' => 'سجل المدفوعات موجود في صفحة الفواتير.',
+    ],
+
     'tiers' => [
         'standard' => 'عادي', 'bronze' => 'برونزي', 'silver' => 'فضي', 'gold' => 'ذهبي', 'platinum' => 'بلاتيني',
         'emerald' => 'زمردي', 'ruby' => 'ياقوتي', 'diamond' => 'ماسي', 'obsidian' => 'أوبسيديان',

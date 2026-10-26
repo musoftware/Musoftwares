@@ -1,272 +1,119 @@
-import React from 'react';
-import { __ } from '@/lib/i18n';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { Head, router, Link } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { RefreshCw, Ban, Calendar, Clock, Receipt, Wallet, Layers, Sparkles, Building2, Settings, Crown, ArrowRight } from 'lucide-react';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { MetricCard } from '@/Components/ui/MetricCard';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
-import { EmptyState } from '@/Components/ui/EmptyState';
-import { DataTable } from '@/Components/ui/DataTable';
-import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
-import { StatusBadge } from '@/Components/ui/StatusBadge';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { router, usePage } from '@inertiajs/react';
+import { RefreshCw, Sparkles, Wallet } from 'lucide-react';
+import ClientPage, { Card, EmptyNote, PrimaryAction, Section, TextAction } from '@/Components/Client/ClientPage';
 import { useConfirm } from '@/hooks/useConfirm';
-
-const BILLING_CYCLE_KEYS: Record<string, string> = {
-    monthly: 'client.subs_cycle_monthly',
-    yearly: 'client.subs_cycle_yearly',
-};
+import { __ } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 interface Subscription {
     id: number;
     plan_name: string;
-    plan_slug: string;
-    billing_cycle: string;
     amount: number;
     currency: string;
     status: string;
-    started_at: string;
-    expires_at: string;
+    expires_on: string | null;
     auto_renew: boolean;
-    custom_items: string[] | null;
-    is_custom: boolean;
 }
 
-interface Invoice {
-    id: number;
-    invoice_number: string;
-    amount: number;
-    currency: string;
-    status: string;
-    payment_method: string;
-    paid_at: string;
-}
-
-interface ManageProps {
-    subscriptions: Subscription[];
-    invoices: Invoice[];
-    walletBalance: number;
-    currency: string;
-}
-
-export default function Manage({ subscriptions, invoices, walletBalance, currency }: ManageProps) {
+/** Each subscription as one card: what it is, when it ends or renews, and the one thing to do. */
+export default function Manage({ subscriptions = [], walletBalance = 0, currency }: { subscriptions: Subscription[]; walletBalance: number; currency: string }) {
+    const { locale } = usePage().props as any;
     const { confirm, confirmDialog } = useConfirm();
-
-    const formatMoney = (amount: number, customCurr?: string) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: customCurr || currency
-        }).format(amount);
+    const money = (amount: number) => {
+        try {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount);
+        } catch {
+            return `${amount} ${currency}`;
+        }
     };
+    const formatDate = (date: string | null) =>
+        date ? new Date(date + 'T00:00:00').toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const daysLeft = (date: string | null) => (date ? Math.ceil((new Date(date + 'T00:00:00').getTime() - Date.now()) / 86400000) : null);
 
-    const handleCancel = async (subId: number) => {
-        const accepted = await confirm({
-            title: __('client.subs_cancel_title'),
-            description: __('client.subs_cancel_confirm'),
-            variant: 'danger',
-        });
-        if (!accepted) return;
-        router.post(route('subscriptions.cancel'), { id: subId });
-    };
-
-    const handleRenew = async (subId: number, price: number) => {
-        if (walletBalance < price) {
-            toast.error(__('client.subs_insufficient_balance', { price: formatMoney(price) }));
+    const renew = async (sub: Subscription) => {
+        if (walletBalance < sub.amount) {
+            const add = await confirm({ title: __('client_home.subs.renew'), description: __('client_home.subs.low_balance', { balance: money(walletBalance), price: money(sub.amount) }) });
+            if (add) router.visit('/financial/add-balance');
             return;
         }
-        const accepted = await confirm({
-            title: __('client.subs_renew_title'),
-            description: __('client.subs_renew_confirm', { price: formatMoney(price) }),
-        });
-        if (!accepted) return;
-        router.post(route('subscriptions.renew'), { id: subId });
+        if (await confirm({ title: __('client_home.subs.renew'), description: __('client_home.subs.renew_confirm', { name: sub.plan_name, price: money(sub.amount) }) })) {
+            router.post(route('subscriptions.renew'), { id: sub.id });
+        }
     };
 
-    const invoiceColumns: any[] = [
-        { key: 'invoice_number', label: __('client.subs_invoice_no'), render: (row: any) => <span className="font-mono font-medium">{row.invoice_number}</span> },
-        { key: 'amount', label: __('client.subs_amount_paid'), render: (row: any) => <CurrencyDisplay amount={row.amount} currency={row.currency} className="font-semibold" /> },
-        { key: 'payment_method', label: __('general.payment_method'), render: (row: any) => <span className="text-xs">{row.payment_method}</span> },
-        { key: 'paid_at', label: __('general.date'), render: (row: any) => <span className="text-xs text-text-muted">{row.paid_at}</span> },
-        { key: 'status', label: __('general.status'), render: (row: any) => <StatusBadge status={row.status} size="sm" /> }
-    ];
-
-    const menuItems = [
-        { id: 'dashboard', label: __('general.overview'), icon: Building2, href: '/dashboard', isActive: false },
-        { id: 'wallet', label: __('general.wallet'), icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
-        { id: 'subscriptions', label: __('general.subscriptions'), icon: Crown, href: '/subscriptions/manage', isActive: true },
-        { id: 'plans', label: __('client.subs_browse_plans'), icon: Sparkles, href: '/subscriptions/plans', isActive: false },
-        { id: 'settings', label: __('general.settings'), icon: Settings, href: '/profile', isActive: false },
-    ];
-
-    const activeCount = subscriptions.filter(s => s.status === 'active').length;
-    const monthlySpend = subscriptions
-        .filter(s => s.status === 'active')
-        .reduce((sum, s) => {
-            if (s.billing_cycle === 'yearly') return sum + (s.amount / 12);
-            return sum + s.amount;
-        }, 0);
+    const stopAutoRenew = async (sub: Subscription) => {
+        if (await confirm({ title: __('client_home.subs.auto_off'), description: __('client_home.subs.auto_off_confirm', { name: sub.plan_name, date: formatDate(sub.expires_on) }), variant: 'danger' })) {
+            router.post(route('subscriptions.cancel'), { id: sub.id });
+        }
+    };
 
     return (
-        <WorkspaceLayout 
-            title={__('general.my_subscriptions')}
-            workspaceName={__('client.subs_workspace_name')}
-            tenantId="CUST-PORTAL"
-            menuItems={menuItems}
+        <ClientPage
+            title={__('client_home.subs.title')}
+            hint={__('client_home.subs.hint')}
+            action={<PrimaryAction href={route('subscriptions.plans')} icon={<Sparkles className="h-4 w-4" />}>{__('client_home.subs.browse')}</PrimaryAction>}
         >
-            <div className="space-y-8">
-                <ModulePageHeader 
-                    title={__('general.my_subscriptions')}
-                    description={__('general.manage_your_unified_platform_subscription_renewals_and_billing_history')}
-                    actions={
-                        <Link href={route('subscriptions.plans')}>
-                            <Button className="shadow-sm bg-primary hover:bg-primary-hover text-white font-semibold h-9 text-xs gap-1.5">
-                                <Crown className="h-3.5 w-3.5" />{__('general.explore_plans')}</Button>
-                        </Link>
-                    }
-                />
+            <Card className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                <span className="flex items-center gap-2 text-[#1d1d1f]/70 dark:text-zinc-300">
+                    <Wallet className="h-4 w-4 text-emerald-600" />
+                    {__('client_home.subs.wallet', { balance: money(walletBalance) })}
+                </span>
+                <TextAction href="/financial/add-balance">{__('client_home.money.add_balance')}</TextAction>
+            </Card>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <MetricCard 
-                        label={__('general.active_subscription')}
-                        value={activeCount > 0 ? subscriptions.find(s => s.status === 'active')?.plan_name ?? __('general.none') : __('general.none')}
-                        icon={Layers}
-                    />
-                    <MetricCard 
-                        label={__('general.monthly_run_rate')}
-                        value={__('client.subs_per_month_value', { amount: formatMoney(monthlySpend) })}
-                        icon={Receipt}
-                    />
-                    <MetricCard 
-                        label={__('general.wallet_balance')}
-                        value={formatMoney(walletBalance)}
-                        icon={Wallet}
-                    />
-                </div>
+            <Section>
+                {subscriptions.length === 0 ? (
+                    <EmptyNote action={<TextAction href={route('subscriptions.plans')}>{__('client_home.subs.browse')}</TextAction>}>
+                        {__('client_home.subs.empty')}
+                    </EmptyNote>
+                ) : (
+                    <ul className="space-y-3">
+                        {subscriptions.map((sub) => {
+                            const left = daysLeft(sub.expires_on);
+                            const ended = sub.status !== 'active' || (left !== null && left < 0);
+                            const endingSoon = !ended && !sub.auto_renew && left !== null && left <= 14;
+                            const state = ended ? 'ended' : endingSoon ? 'ending' : 'active';
 
-                <div className="space-y-6">
-                    <h3 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                        <Layers className="h-4 w-4" />{__('general.subscription_history')}</h3>
-                    
-                    {subscriptions.length === 0 ? (
-                        <OperationalCard>
-                            <EmptyState 
-                                icon={Clock}
-                                title={__('general.no_subscriptions_yet')}
-                                description={__('general.subscribe_to_a_plan_to_unlock_platform_features_build_your_own_or_pick_from_our_curated_tiers')}
-                                action={{ label: __('general.explore_plans'), href: route('subscriptions.plans') }}
-                            />
-                        </OperationalCard>
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {subscriptions.map((sub) => {
-                                const isActive = sub.status === 'active';
-                                const isCancelled = sub.status === 'cancelled';
-                                const isExpired = sub.status === 'expired';
-
-                                return (
-                                    <div key={sub.id} className={cn(
-                                        "bg-surface border flex flex-col rounded-xl overflow-hidden shadow-sm transition-all hover:shadow relative",
-                                        isActive ? "border-s-4 border-s-emerald-500 border-border" : 
-                                        isCancelled ? "border-s-4 border-s-amber-500 border-border" : 
-                                        "border-s-4 border-s-danger border-border"
-                                    )}>
-                                        <div className="p-6 space-y-5">
-                                            <div className="flex justify-between items-start">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] uppercase font-bold text-text-muted bg-surface-raised px-2 py-1 rounded">
-                                                            {sub.is_custom ? __('client.subs_custom') : sub.plan_slug.toUpperCase().replace('_', ' ')}
-                                                        </span>
-                                                        <span className="text-[10px] uppercase font-medium text-slate-400">
-                                                            {BILLING_CYCLE_KEYS[sub.billing_cycle] ? __(BILLING_CYCLE_KEYS[sub.billing_cycle]) : sub.billing_cycle}
-                                                        </span>
-                                                    </div>
-                                                    <h4 className="text-lg font-bold tracking-tight mt-1 text-text-primary">{sub.plan_name}</h4>
-                                                    <div className="text-sm font-semibold text-primary">
-                                                        <CurrencyDisplay amount={sub.amount} currency={sub.currency} /> {sub.billing_cycle === 'yearly' ? __('client.subs_per_year') : __('client.subs_per_month')}
-                                                    </div>
+                            return (
+                                <li key={sub.id}>
+                                    <Card>
+                                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <h3 className="text-lg font-bold">{sub.plan_name}</h3>
+                                                    <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                                                        state === 'active' && 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+                                                        state === 'ending' && 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
+                                                        state === 'ended' && 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400')}>
+                                                        {__(`client_home.subs.${state}`)}
+                                                    </span>
                                                 </div>
-
-                                                <div>
-                                                    {isActive && <StatusBadge status="active" />}
-                                                    {isCancelled && <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[12px] font-sans font-medium bg-amber-50 text-amber-700 border-amber-100"><span className="me-1.5 h-1.5 w-1.5 rounded-full bg-amber-500"></span>{__('general.pending_expiry')}</span>}
-                                                    {isExpired && <StatusBadge status="expired" />}
-                                                </div>
+                                                {sub.amount > 0 && <p className="mt-1 text-sm font-semibold text-[#0071e3]" dir="auto">{__('client_home.subs.per_month', { amount: money(sub.amount) })}</p>}
+                                                <p className="mt-1 text-sm text-[#1d1d1f]/60 dark:text-zinc-400">
+                                                    {__(ended ? 'client_home.subs.ended_on' : sub.auto_renew ? 'client_home.subs.renews_on' : 'client_home.subs.ends_on', { date: formatDate(sub.expires_on) })}
+                                                    {!ended && left !== null && ` ${__('client_home.subs.days_left', { days: left })}`}
+                                                </p>
                                             </div>
-
-                                            {/* Custom items list */}
-                                            {sub.is_custom && sub.custom_items && sub.custom_items.length > 0 && (
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {sub.custom_items.map((item, i) => (
-                                                        <span key={i} className="text-[10px] font-medium bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100 px-2 py-0.5 rounded-full">
-                                                            {item}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className="grid grid-cols-2 gap-4 text-xs font-medium text-text-muted border-t border-b border-border/40 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4" />
-                                                    <span>{__('client.subs_started', { date: sub.started_at })}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="h-4 w-4" />
-                                                    <span>{__('client.subs_expires', { date: sub.expires_at })}</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-end gap-3 pt-1">
-                                                {isActive && sub.auto_renew && walletBalance >= sub.amount && (
-                                                    <Button
-                                                        onClick={() => handleCancel(sub.id)}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="shadow-none text-danger hover:text-danger hover:bg-danger/10 border-border bg-transparent h-8 text-xs font-semibold gap-1.5"
-                                                    >
-                                                        <Ban className="h-3.5 w-3.5" />{__('general.cancel_auto_renew')}</Button>
+                                            <div className="flex flex-wrap items-center gap-4">
+                                                {(ended || !sub.auto_renew) && (
+                                                    <PrimaryAction onClick={() => renew(sub)} icon={<RefreshCw className="h-4 w-4" />}>{__('client_home.subs.renew')}</PrimaryAction>
                                                 )}
-
-                                                {(isCancelled || isExpired) && (
-                                                    <Button
-                                                        onClick={() => handleRenew(sub.id, sub.amount)}
-                                                        size="sm"
-                                                        className="shadow-none bg-primary hover:bg-primary-hover text-white font-semibold h-8 text-xs gap-1.5"
-                                                    >
-                                                        <RefreshCw className="h-3.5 w-3.5" />{__('general.renew_via_wallet')}</Button>
+                                                {!ended && sub.auto_renew && (
+                                                    <TextAction danger onClick={() => stopAutoRenew(sub)}>{__('client_home.subs.auto_off')}</TextAction>
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-6">
-                    <h3 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                        <Receipt className="h-4 w-4" />{__('general.platform_billing_history')}</h3>
-
-                    <OperationalCard noPadding>
-                        <DataTable 
-                            columns={invoiceColumns as any}
-                            data={invoices as any}
-                            emptyState={
-                                <EmptyState 
-                                    icon={Receipt}
-                                    title={__('general.no_invoice_history_found')}
-                                />
-                            }
-                            className="border-0 shadow-none rounded-none"
-                        />
-                    </OperationalCard>
-                </div>
-            </div>
+                                    </Card>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+                <p className="mt-4 text-sm text-[#1d1d1f]/60 dark:text-zinc-400">
+                    {__('client_home.subs.invoices')} <TextAction href="/billing/invoices">{__('client_home.nav.billing')}</TextAction>
+                </p>
+            </Section>
             {confirmDialog}
-        </WorkspaceLayout>
+        </ClientPage>
     );
 }
