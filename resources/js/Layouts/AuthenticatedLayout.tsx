@@ -422,16 +422,10 @@ function AuthenticatedContent({
                                 </SheetContent>
                             </Sheet>
 
-                            <SafeLink href="/" className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center text-white shadow-sm shrink-0">
-                                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                        <path d="M4 17V7l8 5 8-5v10" />
-                                    </svg>
-                                </div>
-                                <span className="font-semibold text-[17px] tracking-[-0.03em] text-[#1d1d1f] dark:text-white hidden sm:inline">Musoftware</span>
-                                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#f5f5f7] dark:bg-zinc-800 border border-black/5 dark:border-white/10 text-[#1d1d1f]/60 dark:text-zinc-400 hidden lg:inline">
-                                    STUDIO
-                                </span>
+                            {/* Same brand mark as the public site header (SiteHeader / site-header.blade.php) */}
+                            <SafeLink href="/" className="flex items-center gap-2.5 shrink-0" title="Musoftware">
+                                <ApplicationLogo className="w-6 h-6 text-[#0071e3] shrink-0" />
+                                <span className="text-[20px] font-bold tracking-tight text-[#1d1d1f] dark:text-white hidden sm:inline">Musoftware</span>
                             </SafeLink>
 
                             <nav className="hidden md:flex items-center gap-1">

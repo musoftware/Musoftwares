@@ -1059,13 +1059,9 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
     // P2P Wallet Transfer Routes
     Route::get('/transfer', [WalletTransferController::class, 'create'])->name('transfer.create');
 
-    Route::get('/messages', function () {
-        return Inertia::render('Client/Messages/Index');
-    })->name('messages.index');
-
-    Route::get('/notifications', function () {
-        return Inertia::render('Client/Notifications/Index');
-    })->name('notifications.index');
+    // Old duplicates of /messages and /notifications that rendered empty pages (and crashed).
+    Route::redirect('/messages', '/messages')->name('messages.index');
+    Route::redirect('/notifications', '/notifications')->name('notifications.index');
 
     Route::get('/transfer-api/calculate-fee', [WalletTransferController::class, 'calculateFee'])->name('transfer.calculate-fee');
     Route::get('/transfer-api/search-users', [WalletTransferController::class, 'searchUsers'])->middleware('throttle:30,1')->name('transfer.search-users');

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import {
+    ArrowLeft,
     Briefcase,
     ExternalLink,
     Headphones,
@@ -104,6 +105,8 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
         activeConversationId || (conversations.length > 0 ? conversations[0].id : null),
     );
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+    // Phones show one thing at a time, like WhatsApp: the list, or the open conversation.
+    const [mobileView, setMobileView] = useState<'list' | 'chat'>(activeConversationId ? 'chat' : 'list');
 
     const { data, setData, post, processing, errors, reset } = useForm({
         recipient_id: '',
@@ -175,26 +178,14 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
         });
     };
 
-    const getBadgeStyle = (category: string) => {
-        switch (category) {
-            case 'service_orders':
-                return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-            case 'custom_projects':
-                return 'bg-amber-50 text-amber-700 border-amber-200';
-            case 'support_tickets':
-                return 'bg-rose-50 text-rose-700 border-rose-200';
-            default:
-                return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-        }
-    };
-
     const tabsConfig = [
         { id: 'all', label: __('general.all_messages'), icon: MessageSquare },
         { id: 'service_orders', label: __('general.service_orders'), icon: ShoppingBag },
         { id: 'custom_projects', label: __('general.custom_projects'), icon: Briefcase },
         { id: 'support_tickets', label: __('general.support_tickets'), icon: ShieldAlert },
         { id: 'direct_messages', label: __('general.direct_messages'), icon: UserCheck },
-    ];
+    ].filter((t) => t.id === 'all' || (tabCounts[t.id] ?? 0) > 0);
+    const showTabs = tabsConfig.length > 2;
 
     return (
         <AuthenticatedLayout>
@@ -223,7 +214,8 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                         </PrimaryButton>
                     </div>
 
-                    {/* Service Tabs */}
+                    {/* Category tabs, only when there is more than one kind of conversation */}
+                    {showTabs && (
                     <div className="mt-5 flex items-center gap-2 overflow-x-auto border-t border-slate-100 pt-4 scrollbar-none">
                         {tabsConfig.map((t) => {
                             const Icon = t.icon;
@@ -258,12 +250,13 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                             );
                         })}
                     </div>
+                    )}
                 </div>
 
                 {/* Main 2-Column Chat Grid */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:h-[720px]">
                     {/* Conversations Sidebar (4 Columns) */}
-                    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:col-span-4">
+                    <div className={cn('h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:col-span-4 lg:flex', mobileView === 'list' ? 'flex' : 'hidden')}>
                         {/* Search Input */}
                         <div className="border-b border-slate-100 p-3.5">
                             <div className="relative">
@@ -310,7 +303,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                         <button
                                             key={conv.id}
                                             type="button"
-                                            onClick={() => setSelectedConvId(conv.id)}
+                                            onClick={() => { setSelectedConvId(conv.id); setMobileView('chat'); }}
                                             className={cn(
                                                 'flex w-full items-start gap-3 rounded-xl p-3 text-start transition-all',
                                                 isSelected
@@ -340,14 +333,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                                                 </p>
 
                                                 <div className="flex items-center justify-between gap-1">
-                                                    <span
-                                                        className={cn(
-                                                            'rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider',
-                                                            getBadgeStyle(conv.category),
-                                                        )}
-                                                    >
-                                                        {conv.category_label}
-                                                    </span>
+                                                    <span className="truncate text-[11px] text-slate-400">{conv.category_label}</span>
 
                                                     {!!conv.unread_count && conv.unread_count > 0 && (
                                                         <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-600 px-1.5 text-[9px] font-bold text-white shadow-sm">
@@ -364,7 +350,7 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                     </div>
 
                     {/* Chat Area (8 Columns) */}
-                    <div className="flex h-full flex-col lg:col-span-8">
+                    <div className={cn('h-[calc(100dvh-220px)] min-h-[420px] flex-col lg:col-span-8 lg:flex lg:h-full', mobileView === 'chat' ? 'flex' : 'hidden')}>
                         {!activeConv ? (
                             <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
                                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
@@ -380,20 +366,20 @@ export default function MessagesIndex({ conversations = [], users = [], activeCo
                         ) : (
                             <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                                 {/* Chat Header */}
-                                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-5 py-3.5">
-                                    <div className="min-w-0">
+                                <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/50 px-4 py-3.5 sm:px-5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileView('list')}
+                                        aria-label={__('general.back')}
+                                        className="-ms-1 rounded-full p-1.5 text-slate-600 hover:bg-slate-100 lg:hidden"
+                                    >
+                                        <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+                                    </button>
+                                    <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
                                             <h2 className="truncate text-sm font-bold text-slate-900">
                                                 {activeConv.title}
                                             </h2>
-                                            <span
-                                                className={cn(
-                                                    'rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider',
-                                                    getBadgeStyle(activeConv.category),
-                                                )}
-                                            >
-                                                {activeConv.category_label}
-                                            </span>
                                         </div>
                                         {activeConv.subtitle && (
                                             <p className="mt-0.5 truncate text-[11px] text-slate-500">

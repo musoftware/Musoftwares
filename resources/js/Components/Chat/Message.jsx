@@ -96,7 +96,7 @@ export default function Message({ message, isOwnMessage }) {
                             <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
                                 {message.sender?.name || 'Support'}
                             </span>
-                            {message.is_internal && (
+                            {!!message.is_internal && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-medium">
                                     Internal
                                 </span>

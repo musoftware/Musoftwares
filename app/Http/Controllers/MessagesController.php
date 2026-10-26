@@ -10,6 +10,9 @@ use Inertia\Inertia;
 
 class MessagesController extends Controller
 {
+    /** Roles a client can always write to (our team). */
+    private const STAFF_ROLES = ['super_admin', 'admin', 'superadmin', 'Admin', 'moderator', 'support_agent'];
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -18,7 +21,7 @@ class MessagesController extends Controller
 
         if ($recipientId && (int) $recipientId !== (int) $user->id) {
             $recipient = User::find($recipientId);
-            if ($recipient) {
+            if ($recipient && $this->canMessage($user, $recipient)) {
                 // Find or create direct_message conversation between user and recipient
                 $conv = Conversation::where('type', 'direct_message')
                     ->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))
@@ -61,17 +64,7 @@ class MessagesController extends Controller
             ->get()
             ->map(fn ($conv) => $this->formatConversation($conv, $user));
 
-        $users = User::where('id', '!=', $user->id)
-            ->select('id', 'name', 'email')
-            ->with('roles')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($u) {
-                $arr = $u->toArray();
-                $arr['role'] = $u->roles->first()?->name ?? 'user';
-
-                return $arr;
-            });
+        $users = $this->contactableUsers($user);
 
         return Inertia::render('Client/Messages/Index', [
             'conversations' => $conversations,
@@ -93,6 +86,7 @@ class MessagesController extends Controller
         if ($sender->id === $recipient->id) {
             return back()->withErrors(['recipient_id' => 'Cannot send message to yourself.']);
         }
+        abort_unless($this->canMessage($sender, $recipient), 403);
 
         try {
             DB::transaction(function () use ($sender, $recipient, $request) {
@@ -150,6 +144,48 @@ class MessagesController extends Controller
     }
 
     /**
+     * People this user may start a conversation with. Clients only see our team and people they
+     * already talk to, by name; the full user list with e-mails is for admins only.
+     */
+    private function contactableUsers(User $user)
+    {
+        $query = User::where('id', '!=', $user->id)->select('id', 'name', 'email')->with('roles')->orderBy('name');
+
+        if (! $user->isAdmin()) {
+            $query->where(fn ($q) => $q
+                ->whereHas('roles', fn ($r) => $r->whereIn('name', self::STAFF_ROLES))
+                ->orWhereIn('id', $this->counterpartIds($user)));
+        }
+
+        return $query->get()->map(fn (User $u) => [
+            'id' => $u->id,
+            'name' => $u->name,
+            'email' => $user->isAdmin() ? $u->email : null,
+            'role' => $u->roles->first()?->name ?? 'user',
+        ]);
+    }
+
+    private function canMessage(User $sender, User $recipient): bool
+    {
+        return $sender->isAdmin()
+            || $recipient->hasRole(self::STAFF_ROLES)
+            || in_array($recipient->id, $this->counterpartIds($sender), true);
+    }
+
+    /** @return array<int, int> users who share a conversation with this user */
+    private function counterpartIds(User $user): array
+    {
+        return DB::table('conversation_participants as mine')
+            ->join('conversation_participants as other', 'other.conversation_id', '=', 'mine.conversation_id')
+            ->where('mine.user_id', $user->id)
+            ->where('other.user_id', '!=', $user->id)
+            ->distinct()
+            ->pluck('other.user_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    /**
      * Format conversation data into a standardized structure for the frontend UI.
      */
     private function formatConversation(Conversation $conv, User $user): array
@@ -172,7 +208,8 @@ class MessagesController extends Controller
         $category = 'direct_messages';
         $categoryLabel = __('general.direct_messages') ?: 'Direct Messages';
         $title = $otherUserName;
-        $subtitle = $otherUser?->email ?? __('general.support_team');
+        // other people's e-mail addresses are only shown to admins
+        $subtitle = $user->isAdmin() && $otherUser?->email ? $otherUser->email : __('general.support_team');
         $targetUrl = null;
 
         if ($type === 'marketplace_order' || $type === 'service_order' || str_contains($conversableType, 'ServiceOrder')) {

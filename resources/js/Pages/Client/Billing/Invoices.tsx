@@ -2,9 +2,8 @@ import { Head, usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle2, CreditCard, Download, FileText, Plus, Wallet } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SafeLink from '@/Components/SafeLink';
-import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { __ } from '@/lib/i18n';
-import { cn } from '@/lib/utils';
+import { cn, formatMoney } from '@/lib/utils';
 
 interface Invoice {
     id: number;
@@ -57,7 +56,7 @@ export default function Invoices({ invoices, unpaid_invoices = [], total_outstan
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                             <div>
                                 <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_home.invoices.to_pay_total')}</p>
-                                <CurrencyDisplay amount={total_outstanding} currency={wallet_currency} className="mt-1 block text-3xl font-bold tracking-tight sm:text-4xl" />
+                                <span className="mt-1 block text-3xl font-bold tracking-tight sm:text-4xl" dir="ltr">{formatMoney(total_outstanding, wallet_currency)}</span>
                             </div>
                             {oldest && (
                                 <SafeLink href={route('billing.invoices.pay', oldest.uuid)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-7 text-[15px] font-semibold text-white shadow-sm hover:bg-[#0077ed]">
@@ -74,7 +73,7 @@ export default function Invoices({ invoices, unpaid_invoices = [], total_outstan
                     <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-black/5 pt-4 text-sm dark:border-white/10">
                         <span className="flex items-center gap-2 text-[#1d1d1f]/70 dark:text-zinc-300">
                             <Wallet className="h-4 w-4 text-emerald-600" />{__('client_home.invoices.wallet')}:
-                            <CurrencyDisplay amount={client_balance} currency={wallet_currency} className="font-bold" />
+                            <span className="font-bold" dir="ltr">{formatMoney(client_balance, wallet_currency)}</span>
                         </span>
                         <SafeLink href={route('financial.add-balance')} className="inline-flex items-center gap-1 font-semibold text-[#0071e3]">
                             <Plus className="h-4 w-4" />{__('client_home.invoices.add_balance')}
@@ -102,14 +101,14 @@ export default function Invoices({ invoices, unpaid_invoices = [], total_outstan
                                             </p>
                                             {inv.paid_amount > 0 && (
                                                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-[#1d1d1f]/60 dark:text-zinc-400">
-                                                    {__('client_home.invoices.status.partially_paid')}: <CurrencyDisplay amount={inv.paid_amount} currency={inv.currency} /> / <CurrencyDisplay amount={inv.amount} currency={inv.currency} />
+                                                    {__('client_home.invoices.status.partially_paid')}: <span dir="ltr">{formatMoney(inv.paid_amount, inv.currency)}</span> / <span dir="ltr">{formatMoney(inv.amount, inv.currency)}</span>
                                                 </p>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <SafeLink href={route('billing.invoices.pay', inv.uuid)} className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-5 text-sm font-semibold text-white hover:bg-[#0077ed] sm:flex-none">
                                                 <CreditCard className="h-4 w-4" />
-                                                <CurrencyDisplay amount={inv.remaining} currency={inv.currency} />
+                                                <span dir="ltr">{formatMoney(inv.remaining, inv.currency)}</span>
                                             </SafeLink>
                                             <PdfLink uuid={inv.uuid} />
                                         </div>
@@ -140,7 +139,7 @@ export default function Invoices({ invoices, unpaid_invoices = [], total_outstan
                                                 : __('client_home.invoices.issued_on', { date: formatDate(inv.issued_at) })}
                                         </p>
                                     </SafeLink>
-                                    <CurrencyDisplay amount={inv.amount} currency={inv.currency} className="shrink-0 text-sm font-semibold" />
+                                    <span className="shrink-0 text-sm font-semibold" dir="ltr">{formatMoney(inv.amount, inv.currency)}</span>
                                     <PdfLink uuid={inv.uuid} />
                                 </li>
                             ))}
