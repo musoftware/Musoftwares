@@ -4303,7 +4303,8 @@
             "clear": "مسح",
             "remove": "حذف",
             "currency": "العملة",
-            "details": "التفاصيل"
+            "details": "التفاصيل",
+            "views": ":count مشاهدة"
         },
         "tools": {
             "whatsapp-link-generator": {

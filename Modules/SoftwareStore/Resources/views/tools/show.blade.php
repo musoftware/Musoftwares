@@ -77,6 +77,9 @@
             </span>
             <h1 class="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">{{ $copy['name'] }}</h1>
             <p class="mt-4 text-base sm:text-lg text-[#1d1d1f]/60 max-w-2xl mx-auto leading-relaxed">{{ $copy['intro'] }}</p>
+            <p class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#1d1d1f]/70">
+                <i class="ri-eye-line" aria-hidden="true"></i>{{ __('free_tools.ui.views', ['count' => number_format(\Modules\SoftwareStore\Services\FreeTools::viewsOf($slug))]) }}
+            </p>
         </header>
 
         <section class="mt-10 bg-white border border-black/5 rounded-[24px] shadow-sm p-5 sm:p-8" id="tool">

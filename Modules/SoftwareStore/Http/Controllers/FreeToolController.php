@@ -14,9 +14,11 @@ use Modules\SoftwareStore\Services\FreeTools;
  */
 class FreeToolController extends Controller
 {
-    public function show(string $slug)
+    public function show(Request $request, string $slug)
     {
         abort_unless(FreeTools::exists($slug), 404);
+
+        FreeTools::recordView($slug, $request->userAgent());
 
         return view('softwarestore::tools.show', [
             'slug' => $slug,

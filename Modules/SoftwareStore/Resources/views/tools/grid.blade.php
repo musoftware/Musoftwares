@@ -11,6 +11,7 @@
                     <span class="rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[11px] font-semibold">{{ __('free_tools.section.free') }}</span>
                 </span>
                 <span class="mt-1 block text-sm text-[#1d1d1f]/60">{{ __("free_tools.tools.{$toolSlug}.tagline") }}</span>
+                <span class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#1d1d1f]/50"><i class="ri-eye-line" aria-hidden="true"></i>{{ __('free_tools.ui.views', ['count' => number_format(\Modules\SoftwareStore\Services\FreeTools::viewsOf($toolSlug))]) }}</span>
             </span>
         </a>
     @endforeach

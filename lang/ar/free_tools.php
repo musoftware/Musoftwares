@@ -27,6 +27,7 @@ return [
         'remove' => 'حذف',
         'currency' => 'العملة',
         'details' => 'التفاصيل',
+        'views' => ':count مشاهدة',
     ],
 
     'tools' => [

@@ -4303,7 +4303,8 @@
             "clear": "Clear",
             "remove": "Remove",
             "currency": "Currency",
-            "details": "Details"
+            "details": "Details",
+            "views": ":count views"
         },
         "tools": {
             "whatsapp-link-generator": {

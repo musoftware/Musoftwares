@@ -44,6 +44,19 @@ class FreeToolsTest extends TestCase
         }
     }
 
+    public function test_every_visit_counts_and_the_counter_is_public(): void
+    {
+        $browser = ['User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'];
+
+        $this->get('/services/tools/vat-calculator?lang=en', $browser)->assertSee('1 views');
+        $this->get('/services/tools/vat-calculator?lang=en', $browser)->assertSee('2 views');
+        $this->get('/services/tools/vat-calculator?lang=en', ['User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1)'])->assertSee('2 views');
+
+        $this->assertSame(2, FreeTools::viewsOf('vat-calculator'));
+        $this->get('/services?lang=en')->assertSee('2 views')->assertSee('0 views');
+        $this->get('/services?lang=ar')->assertSee('2 مشاهدة');
+    }
+
     public function test_unknown_tool_is_not_found(): void
     {
         $this->get('/services/tools/nope')->assertNotFound();

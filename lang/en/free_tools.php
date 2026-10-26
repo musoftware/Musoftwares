@@ -27,6 +27,7 @@ return [
         'remove' => 'Remove',
         'currency' => 'Currency',
         'details' => 'Details',
+        'views' => ':count views',
     ],
 
     'tools' => [

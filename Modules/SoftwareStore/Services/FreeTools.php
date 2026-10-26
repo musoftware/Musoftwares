@@ -3,6 +3,7 @@
 namespace Modules\SoftwareStore\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 
 /**
@@ -42,6 +43,34 @@ class FreeTools
     {
         return route('services.tools.show', $slug);
     }
+
+    /** Adds one view to the public counter. Search engine bots are not counted. */
+    public static function recordView(string $slug, ?string $userAgent): void
+    {
+        if ($userAgent === null || preg_match('~bot|crawl|spider|slurp|facebookexternalhit|preview|headless~i', $userAgent)) {
+            return;
+        }
+
+        $now = now();
+        if (DB::table('free_tool_stats')->where('slug', $slug)->increment('views', 1, ['updated_at' => $now]) === 0) {
+            DB::table('free_tool_stats')->insertOrIgnore(['slug' => $slug, 'views' => 1, 'created_at' => $now, 'updated_at' => $now]);
+        }
+        self::$views = null;
+    }
+
+    /** @return array<string, int> slug => views */
+    public static function views(): array
+    {
+        return self::$views ??= DB::table('free_tool_stats')->pluck('views', 'slug')->map(fn ($views) => (int) $views)->all();
+    }
+
+    public static function viewsOf(string $slug): int
+    {
+        return self::views()[$slug] ?? 0;
+    }
+
+    /** @var array<string, int>|null per-request cache of the counters */
+    private static ?array $views = null;
 
     /** @return Collection<int, SoftwareProduct> active related products, in the order listed above */
     public static function relatedProducts(string $slug): Collection
