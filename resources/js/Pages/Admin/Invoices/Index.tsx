@@ -1146,7 +1146,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
             {/* Floating Sticky Bulk Action Bar */}
             {selectedCount > 0 && (
-                <div className="fixed bottom-6 start-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl border border-slate-700 animate-in fade-in slide-in-from-bottom-5">
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-full shadow-2xl border border-slate-700 animate-in fade-in slide-in-from-bottom-5">
                     <span className="text-xs font-semibold whitespace-nowrap">
                         {__('admin.selected_invoices_count', { count: selectedCount })}
                     </span>

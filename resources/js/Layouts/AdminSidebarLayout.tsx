@@ -11,6 +11,7 @@ import { TooltipProvider } from '@/Components/ui/tooltip';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { __ } from '@/lib/i18n';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
+import { Languages } from 'lucide-react';
 
 interface AdminSidebarLayoutProps extends PropsWithChildren {
     title?: string;
@@ -22,7 +23,8 @@ interface AdminSidebarLayoutProps extends PropsWithChildren {
 export default function AdminSidebarLayout({ title, header, user, children, actions }: AdminSidebarLayoutProps) {
     useInertiaNotifications();
 
-    const { auth } = usePage<any>().props;
+    const { auth, locale } = usePage<any>().props;
+    const otherLocale = locale === 'ar' ? 'en' : 'ar';
     const currentUser = user || auth?.user;
     const displayName = currentUser?.name || '';
     const displayEmail = currentUser?.email || '';
@@ -76,6 +78,13 @@ export default function AdminSidebarLayout({ title, header, user, children, acti
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1 dark:text-zinc-200 dark:hover:text-white" asChild>
                                 <Link href={route().has('profile.edit') ? route('profile.edit') : '#'}>{__('general.profile')}</Link>
+                            </DropdownMenuItem>
+                            {/* plain link: a full page load switches language and direction; SetLocale saves the choice */}
+                            <DropdownMenuItem className="cursor-pointer rounded-lg text-sm mb-1 dark:text-zinc-200 dark:hover:text-white" asChild>
+                                <a href={`${typeof window !== 'undefined' ? window.location.pathname : '/admin'}?lang=${otherLocale}`} lang={otherLocale} className="flex items-center gap-2">
+                                    <Languages className="h-4 w-4 text-slate-500 dark:text-zinc-400" />
+                                    {__('client_home.nav.language')}
+                                </a>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="dark:bg-white/10" />
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-slate-900 dark:text-zinc-200 focus:bg-red-50 dark:focus:bg-red-950/30 focus:text-slate-900 dark:focus:text-red-400" asChild>

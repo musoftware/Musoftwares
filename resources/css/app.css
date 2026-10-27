@@ -465,3 +465,15 @@
     background: linear-gradient(to left, #090d16, transparent);
   }
 }
+
+/*
+ * Native dropdowns: the forms plugin draws the arrow on the right and reserves space for it, but a px-* class
+ * removes that space, and in Arabic the text starts on the right, so the arrow covered the first word.
+ * Unlayered on purpose so it wins over the px-* utilities: space for the arrow on the end side, arrow on the end side.
+ */
+select:not([multiple]):not([size]) {
+    padding-inline-end: 2.25rem;
+}
+[dir="rtl"] select:not([multiple]):not([size]) {
+    background-position: left 0.5rem center;
+}

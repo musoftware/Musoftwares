@@ -360,7 +360,7 @@ export default function HoursCalendar({ years, auth }: any) {
                         >
                             <div className="font-semibold">{tooltip.date}</div>
                             <div className="text-slate-300">{tooltip.hours}</div>
-                            <div className="absolute w-2 h-2 bg-slate-900 rotate-45 -bottom-1 start-1/2 transform -translate-x-1/2"></div>
+                            <div className="absolute w-2 h-2 bg-slate-900 rotate-45 -bottom-1 left-1/2 transform -translate-x-1/2"></div>
                         </div>
                     )}
                 </OperationalCard>
