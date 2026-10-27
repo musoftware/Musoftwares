@@ -16,12 +16,12 @@ return [
 
     'migrations' => 'شغّل تحديثات قاعدة البيانات المتأخرة',
     'migrations_note' => 'فيه :count تحديث مستني. خد نسخة احتياطية الأول، وبعدين شغّلهم.',
-    'analytics' => 'ضيف Google Analytics أو Google Tag Manager',
+    'analytics' => 'أضف Google Analytics أو Google Tag Manager',
     'analytics_note' => 'من غيره مش هتعرف عدد الزوار ولا أنهي صفحات بتجيب عملاء.',
     'payments' => 'حط مفاتيح الدفع الحقيقية بتاعة Kashier',
-    'payments_note' => 'اكتب KASHIER_MERCHANT_ID و KASHIER_SECRET في ملف .env على السيرفر. الموقع شغال بقيم تجريبية دلوقتي.',
+    'payments_note' => 'اضبط KASHIER_MERCHANT_ID و KASHIER_SECRET في ملف .env على الخادم. يعمل الموقع حاليًا بقيم تجريبية.',
     'mail' => 'ظبط إرسال الإيميلات',
-    'mail_note' => 'قيمة MAIL_MAILER في .env هي ":mailer"، يعني مفيش إيميل بيطلع من الموقع. استخدم smtp أو خدمة إرسال حقيقية.',
+    'mail_note' => 'قيمة MAIL_MAILER في ملف .env هي ":mailer"، لذلك لا تُرسل أي رسائل بريد إلكتروني من الموقع. استخدم smtp أو خدمة بريد فعلية.',
     'product_screenshots' => 'ضيف صور لكل برنامج في المتجر',
     'product_screenshots_note' => 'من غير صور: :names',
 

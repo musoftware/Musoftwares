@@ -74,7 +74,7 @@ return [
     'wordpress_integration' => 'إضافة ووردبريس',
     'wordpress_integration_desc' => 'اربط بوابة الدفع عبر الرسائل مباشرة مع متجر ووكومرس أو موقع ووردبريس الخاص بك.',
     'wordpress_plugin' => 'إضافة ووردبريس',
-    'wordpress_plugin_desc' => 'قم بتحميل إضافة ووردبريس لاستقبال المدفوعات عبر الرموز المختصرة (Shortcodes).',
+    'wordpress_plugin_desc' => 'حمّل إضافة WordPress لاستقبال المدفوعات عبر الرموز المختصرة.',
     'download_wp_plugin' => 'تحميل الإضافة',
     'setup_instructions' => 'تعليمات التثبيت',
     'setup_instructions_step1' => 'قم بتثبيت وتفعيل الإضافة من لوحة تحكم ووردبريس، ثم أضف مفاتيح الـ API في الإعدادات.',
@@ -93,15 +93,7 @@ return [
     'the_app_reads_incoming_sms' => 'يقوم التطبيق بقراءة رسائل SMS الواردة من مزودي الدفع المحلميين مثل فودافون كاش أو إنستاباي، واستخراج المبلغ والمرسل ومطابقتها مع جلسات الدفع الخاصة بك عبر API.',
     'yes_the_android_app_only' => 'نعم، يقرأ تطبيق الأندرويد فقط رسائل SMS من مزودي الدفع المعتمدين (مثل فودافون كاش) ولا يصل أبدًا إلى رسائلك الشخصية الأخرى.',
     'how_to_allow_sms_permission' => 'كيفية السماح بإذن الرسائل النصية في هواتف Vivo؟',
-    'open_settings_apps_app_manager' => 'افتح الإعدادات (Settings) في موبايل Vivo.
-
-اضغط على التطبيقات (Apps) أو إدارة التطبيقات (Apps & Permissions).
-
-اختر إدارة التطبيقات (App Manager) وابحث عن تطبيق SMS Payment Gateway.
-
-اضغط على الأذونات (Permissions).
-
-ابحث عن إذن الرسائل (SMS) واضغط عليه، ثم اختر سماح (Allow). من هناك هتشتغل معاك بدون مشاكل.',
+    'open_settings_apps_app_manager' => 'افتح الإعدادات ← التطبيقات ← مدير التطبيقات ← ابحث عن SMS Payment Gateway ← الأذونات ← اسمح بإذن SMS.',
     'custom_wallet_logos' => 'لوجوهات المحافظ المخصصة',
     'custom_wallet_logos_hint' => 'يمكنك استخدام صورك الخاصة للمحافظ بدلا من الصور الافتراضية',
     'etisalat_cash_logo' => 'لوجو اتصالات كاش',

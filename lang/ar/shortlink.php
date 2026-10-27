@@ -90,8 +90,8 @@ return [
     'fetch_meta' => 'جلب البيانات تلقائياً من الرابط',
     'fetching_meta' => 'جاري جلب البيانات...',
     'preview_card_heading' => 'معاينة المشاركة (WhatsApp / Facebook)',
-    'seo_description' => 'وصف المعاينة (Description)',
-    'seo_image' => 'رابط صورة المعاينة (Image URL)',
-    'seo_preview_title' => 'بيانات ومعاينة الرابط (SEO & Social Preview)',
-    'seo_title' => 'عنوان المعاينة (Title)'
+    'seo_description' => 'وصف المعاينة',
+    'seo_image' => 'رابط صورة المعاينة',
+    'seo_preview_title' => 'بيانات الرابط (معاينة SEO ووسائل التواصل)',
+    'seo_title' => 'عنوان المعاينة'
 ];

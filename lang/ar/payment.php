@@ -2,8 +2,8 @@
 
 return [
     'cost_line_already_recorded' => 'Cost Line Already Recorded',
-    'cost_line_record_failed' => 'Cost Line Record فشل',
-    'cost_line_record_invalid_status' => 'حالة Cost Line Record Invalid',
+    'cost_line_record_failed' => 'فشل سجل بند التكلفة',
+    'cost_line_record_invalid_status' => 'حالة سجل بند التكلفة غير صالحة',
     'cost_line_record_not_found' => 'Cost Line Record Not Found',
     'cost_line_record_zero' => 'Cost Line Record Zero',
     'manage_discounts' => 'إدارة الخصومات',

@@ -5,7 +5,7 @@ return [
   'index_heading' => 'أكاديمية السلاسل والمساقات',
   'index_page_title' => 'سلاسل التعلم والدراسة | Series Academy',
   'index_import_title' => 'استيراد كورس برمجي جديد من يوتيوب',
-  'index_playlist_label' => 'أدخل رابط قائمة تشغيل يوتيوب (Playlist URL) أو الرمز التعريفي (ID):',
+  'index_playlist_label' => 'أدخل رابط قائمة تشغيل YouTube أو معرّفها:',
   'index_playlist_placeholder' => 'مثال: https://www.youtube.com/playlist?list=PL38_yG2P4bT_X2w5pwe...',
   'index_importing' => 'جاري الاستيراد...',
   'index_start_import' => 'بدء الاستيراد',

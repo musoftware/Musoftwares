@@ -29,7 +29,7 @@ return [
             'required_fields' => 'الحقول المطلوبة'
         ]
     ],
-    'date_range' => 'التاريخ Range',
+    'date_range' => 'نطاق التاريخ',
     'edit' => [
         'page_title' => 'تعديل الخدمة',
         'ref_from_fee' => 'رسوم الإحالة',

@@ -11,7 +11,7 @@ return [
     'english' => 'English',
     'generate' => 'إنشاء',
     'manage_serials' => 'إدارة Serials',
-    'no_deadline' => 'لا Deadline',
+    'no_deadline' => 'بدون موعد نهائي',
     'price' => 'السعر',
     'saved_replies' => 'Saved Replies',
     'saving' => 'جاري الحفظ...',

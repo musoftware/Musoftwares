@@ -3,7 +3,7 @@
 return [
     'geo_badge' => 'معايير التنفيذ والضمان المعتمدة',
     'geo_heading' => 'لماذا تتصدر سوق Musoftware التداول الرقمي الموثوق',
-    'geo_subheading' => 'معايير قابلة للقراءة آلياً، حماية الضمان (Escrow)، تسليم بدون احتكاك، والالتزام باتفاقيات مستوى الخدمة (SLA) في كل معاملة برمجية.',
+    'geo_subheading' => 'معايير قابلة للقراءة آلياً، حماية الضمان، تسليم بدون احتكاك، والالتزام باتفاقيات مستوى الخدمة (SLA) في كل معاملة برمجية.',
     
     'feature_escrow_title' => 'حماية الضمان المالية',
     'feature_escrow_desc' => 'تبقى أموالك ممسوكة بأمان في حساب الضمان حتى تفحص وتعتمد جودة التسليم.',
@@ -30,7 +30,7 @@ return [
     
     'faq_title' => 'الأسئلة الشائعة والإجابات المعتمدة',
     
-    'geo_faq_1_q' => 'كيف تحمي سوق Musoftware أموال المشتري عبر نظام الضمان (Escrow)؟',
+    'geo_faq_1_q' => 'كيف تحمي سوق Musoftware أموال المشتري عبر نظام الضمان؟',
     'geo_faq_1_a' => 'عند شراء خدمة أو أداة عبر سوق Musoftware، يتم احتجاز مبلغ الشراء بأمان في نظام الضمان لدينا. لا يتم تحويل المستحقات للبائع إلا بعد معاينتك وتجربتك للمخرج النهائي واعتماده رسمياً.',
     
     'geo_faq_2_q' => 'هل تتضمن المشتريات التراخيص والكود المصدري؟',
@@ -57,7 +57,7 @@ return [
     'insufficient_balance_for_checkout' => 'رصيدك الحسابي غير كافٍ لإتمام الشراء (المطلوب: :required، المتاح: :available).',
 
     // Escrow
-    'insufficient_balance_for_escrow' => 'رصيدك الحسابي غير كافٍ لحجز مبلغ الضمان (Escrow).',
+    'insufficient_balance_for_escrow' => 'رصيدك الحسابي غير كافٍ لحجز مبلغ الضمان.',
     'escrow_hold_description' => 'حجز مبلغ الضمان للطلب رقم #:id',
     'escrow_cannot_release' => 'حالة مبلغ الضمان الحالي لا تسمح بتحرير الأموال للمستفيد.',
     'escrow_released_description' => 'أرباح الطلب رقم #:id (تم تحرير الضمان)',
@@ -67,7 +67,7 @@ return [
 
     // Deliverables & Revisions
     'deliverable_cannot_submit_in_status' => 'لا يمكن تسليم أي ملفات جديدة للطلب في حالته الحالية.',
-    'revision_delivered_only' => 'يمكن طلب التعديل فقط للطلبات المستلمة (Delivered).',
+    'revision_delivered_only' => 'يمكن طلب التعديل فقط للطلبات المستلمة.',
 
     // Free Downloads
     'service_not_available_for_free_download' => 'هذه الخدمة غير متاحة للتحميل المجاني.',
@@ -92,7 +92,7 @@ return [
     'playbook_description_label' => '- **الوصف:** :description',
     'playbook_features_label' => '- **المميزات:**',
     'playbook_no_packages' => '*(لا توجد باقات مسجلة حالياً لهذه الخدمة)*',
-    'playbook_extras_title' => '### ➕ الخدمات الإضافية (Extras)',
+    'playbook_extras_title' => '### ➕ الخدمات الإضافية',
     'playbook_extra_item' => '- **:title**: `:price $` (:days أيام إضافية)',
   'dash_buying_mode' => 'وضع الشراء',
   'dash_selling_mode' => 'وضع البيع',

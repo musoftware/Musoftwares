@@ -66,7 +66,7 @@ return [
     'slug' => 'عنوان المتجر',
     'slug_hint' => 'حروف إنجليزي صغيرة وأرقام وشرطة.',
     'logo' => 'اللوجو',
-    'logo_hint' => 'PNG أو JPG أو WebP، لحد ١ ميجا.',
+    'logo_hint' => 'PNG أو JPG أو WebP، بحد أقصى 1 ميجابايت.',
     'accent_color' => 'اللون',
     'support_whatsapp' => 'رقم واتساب لعملاءك',
     'support_email' => 'إيميل لعملاءك',
