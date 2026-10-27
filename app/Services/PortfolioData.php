@@ -436,6 +436,39 @@ class PortfolioData
                 ],
             ],
 
+            'amc-academy-portal' => [
+                'slug' => 'amc-academy-portal',
+                'title_en' => 'AMC Academy: Members Portal and Back Office',
+                'title_ar' => 'AMC Academy: بوابة الأعضاء والإدارة',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'The members\' portal and back office for Ahmed Maher\'s AMC Academy, a digital marketing academy in Egypt. Students activate their account with a serial number, renew with coupons, and get the courses, downloads and the AM Controls marketing tools from one dashboard. The team runs users, serials, coupons and packages from the control panel, and the sales staff record each student application by branch.',
+                'desc_ar' => 'بوابة الأعضاء ولوحة الإدارة لأكاديمية AMC بتاعة أحمد ماهر، أكاديمية تسويق رقمي في مصر. الطالب بيفعّل حسابه برقم سيريال، ويجدد بكوبونات، وياخد الكورسات والتحميلات وأدوات التسويق AM Controls من لوحة واحدة. والفريق بيدير المستخدمين والسيريالات والكوبونات والباقات من لوحة التحكم، وموظفين المبيعات بيسجلوا طلب كل طالب حسب الفرع.',
+                'img' => '/images/portfolio/amc-academy-portal-1.webp',
+                // screenshots taken from a local run with demo data
+                'gallery' => ['/images/portfolio/amc-academy-portal-1.webp', '/images/portfolio/amc-academy-portal-2.webp', '/images/portfolio/amc-academy-portal-3.webp', '/images/portfolio/amc-academy-portal-4.webp'],
+                'techs' => ['PHP', 'CodeIgniter', 'MySQL', 'Redis', 'jQuery', 'Bootstrap', 'Firebase'],
+                'live_url' => null,
+                'metrics' => [
+                    'Members' => 'Serial activation and coupon renewals',
+                    'Packages' => 'Paid and free balances with expiry',
+                    'Desktop' => 'License keys for the desktop tools',
+                    'Team' => 'Branches, sales and student applications',
+                ],
+                'highlights_en' => [
+                    'Accounts activated by serial number, with packages, paid and free balances, expiry dates and usage limits.',
+                    'One dashboard for courses, downloads, ads library, site tracking, push campaigns, audiences and short links.',
+                    'A control panel for users, serials, coupons, gifts, logs and per-user limits, with PIN checks for admins.',
+                    'An employee system for branches, sales targets, student applications, refunds, commissions and salaries, plus an API for the desktop program\'s licence keys.',
+                ],
+                'highlights_ar' => [
+                    'الحسابات بتتفعل برقم سيريال، بباقات ورصيد مدفوع ومجاني بتواريخ انتهاء وحدود استخدام.',
+                    'لوحة واحدة للكورسات والتحميلات ومكتبة الإعلانات وتتبع المواقع وحملات الإشعارات والجماهير والروابط المختصرة.',
+                    'لوحة تحكم للمستخدمين والسيريالات والكوبونات والهدايا والسجلات وحدود كل مستخدم، وكود PIN للأدمن.',
+                    'نظام موظفين للفروع وأهداف المبيعات وطلبات الطلاب والمرتجعات والعمولات والمرتبات، وAPI لتراخيص برنامج الديسكتوب.',
+                ],
+            ],
+
             'amc-academy' => [
                 'slug' => 'amc-academy',
                 'title_en' => 'AmcTasks: Marketing Platform for AMC Academy',
