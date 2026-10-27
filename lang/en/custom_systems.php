@@ -23,7 +23,7 @@ return [
     'examples_all' => 'See all our work',
     'examples' => [
         ['icon' => 'ri-store-2-line', 'title' => 'Sales, stock and branches', 'text' => 'A cashier with barcode and receipt printer, stock in several stores, shifts, suppliers and a daily report for the owner. Works even when the internet is down.', 'project' => 'stock-manager'],
-        ['icon' => 'ri-shopping-cart-2-line', 'title' => 'Online store with cash on delivery', 'text' => 'A fast store for ad campaigns: order in one click, pay on delivery, recover abandoned carts and connect to the warehouse and shipping.', 'project' => 'altayaraa'],
+        ['icon' => 'ri-truck-line', 'title' => 'Orders and delivery', 'text' => 'Customers send their orders, you assign them to drivers, and everyone follows each order live until it is delivered.', 'project' => 'altayaraa'],
         ['icon' => 'ri-share-forward-line', 'title' => 'Dropshipping and marketers', 'text' => 'Suppliers, marketers and shipping companies on one platform, with each marketer\'s commission worked out by itself and every shipment tracked.', 'project' => 'kbdny'],
         ['icon' => 'ri-apps-2-line', 'title' => 'Apps for Salla stores', 'text' => 'Add-ons that raise the cart value: countdowns, buy-together bundles, quantity discounts and a free-shipping bar, set up with no code.', 'project' => 'zawdha'],
         ['icon' => 'ri-smartphone-line', 'title' => 'A mobile app for your customers', 'text' => 'Shopping, payments and live tracking of the delivery driver, on Android and iPhone, connected to the same system you use.', 'project' => 'nokhpa'],
