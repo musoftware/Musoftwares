@@ -139,50 +139,7 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
           
                 </div>
 
-                {/* Global Management Section */}
-                <Card className="border-primary/20 shadow-sm">
-                    <CardHeader className="pb-3 border-b bg-muted/30">
-                        <div className="flex items-center gap-2">
-                            <Settings className="w-5 h-5 text-primary" />
-                            <CardTitle className="text-lg">{__('admin.charity_counter_manage_title')}</CardTitle>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="grid md:grid-cols-2 gap-6 items-center">
-                            <div className="bg-primary/10 rounded-xl p-6 border border-primary/20 text-center md:text-end">
-                                <div className="flex items-center justify-center md:justify-start gap-2 text-primary font-semibold mb-2">
-                                    <Heart className="w-5 h-5" />
-                                    <span>{__('admin.charity_counter_current_balance')}</span>
-                                </div>
-                                <div className="text-4xl font-bold text-primary mb-1">
-                                    {formatMoney(stats.totalBalance)}
-                                </div>
-                                <p className="text-sm text-primary/80">{__('admin.charity_counter_balance_hint')}</p>
-                            </div>
-                            
-                            <div className="flex flex-col sm:flex-row gap-3 h-full justify-center md:justify-end">
-                                <Button
-                  size="lg"
-                  className="flex-1 sm:flex-none h-16 text-lg"
-                  onClick={() => setIsAddModalOpen(true)}>
-                  
-                                    <Plus className="w-5 h-5 me-2" />
-                                    {__('admin.charity_counter_add_amount_title')}
-                                </Button>
-                                <Button
-                  size="lg"
-                  variant="outline"
-                  className="flex-1 sm:flex-none h-16 text-lg border-destructive text-destructive hover:bg-destructive/10"
-                  onClick={() => setIsSubtractModalOpen(true)}>
-                  
-                                    <Minus className="w-5 h-5 me-2" />
-                                    {__('admin.charity_counter_subtract_button')}
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
+                {/* the balance is the first card above and add/subtract are in the page header, so there is no second "management" card */}
                 {/* Users List */}
                 <Card>
                     <CardHeader className="flex flex-col sm:flex-row justify-end gap-4 sm:items-center gap-4 border-b pb-4">
