@@ -25,7 +25,10 @@ class BlogSeo
             ? collect([$article])
             : BlogArticle::published()->where('group_id', $article->group_id)->get();
 
-        return $group->mapWithKeys(fn (BlogArticle $item) => [$item->language => route('blog.show', $item->slug)]);
+        // some generated articles have a translation without a slug or language; skip those instead of failing
+        return $group
+            ->filter(fn (BlogArticle $item) => filled($item->slug) && filled($item->language))
+            ->mapWithKeys(fn (BlogArticle $item) => [$item->language => route('blog.show', $item->slug)]);
     }
 
     /** @return array<string, mixed> */

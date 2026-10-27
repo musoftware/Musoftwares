@@ -84,6 +84,17 @@ class BlogSeoTest extends TestCase
         $this->get('/blog?search=موقع')->assertOk()->assertSee('noindex,follow', false);
     }
 
+    public function test_a_translation_without_a_slug_does_not_break_the_sitemap_or_the_article(): void
+    {
+        $this->article(['group_id' => 'g-9', 'slug' => 'with-slug']);
+        // generated content: a published translation in the same group whose slug is empty
+        $broken = $this->article(['group_id' => 'g-9', 'language' => 'en', 'slug' => 'temp-slug']);
+        \Illuminate\Support\Facades\DB::table('blog_articles')->where('id', $broken->id)->update(['slug' => '']);
+
+        $this->get('/sitemap.xml')->assertOk()->assertSee('/blog/with-slug', false);
+        $this->get('/blog/with-slug')->assertOk();
+    }
+
     public function test_unpublished_articles_are_not_reachable_or_in_the_sitemap(): void
     {
         $this->article(['slug' => 'hidden', 'is_published' => false]);
