@@ -469,6 +469,39 @@ class PortfolioData
                 ],
             ],
 
+            'marketingapix' => [
+                'slug' => 'marketingapix',
+                'title_en' => 'AMC Founders: White-Label Social Media Automation',
+                'title_ar' => 'AMC Founders: منصة أتمتة السوشيال ميديا بعلامتك',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'A social media automation platform that an agency runs on its own domain, with its own name, logo and packages, and sells to its customers. Customers connect their pages and accounts on Facebook, Instagram, Twitter, LinkedIn, YouTube, VK, Telegram, Viber, WhatsApp, WordPress and Blogger, then post to all of them from one form, run chatbots, reply to comments automatically and build landing pages.',
+                'desc_ar' => 'منصة أتمتة سوشيال ميديا الوكالة بتشغلها على الدومين بتاعها، باسمها ولوجو بتاعها وباقاتها، وبتبيعها لعملائها. العميل بيربط صفحاته وحساباته على فيسبوك وإنستجرام وتويتر ولينكدإن ويوتيوب وVK وتليجرام وفايبر وواتساب وWordPress وBlogger، وبعدين ينشر عليهم كلهم من فورم واحد، ويشغل بوتات، ويرد على التعليقات تلقائي، ويعمل صفحات هبوط.',
+                'img' => '/images/portfolio/marketingapix-1.webp',
+                // screenshots taken from a local run with demo data
+                'gallery' => ['/images/portfolio/marketingapix-1.webp', '/images/portfolio/marketingapix-2.webp', '/images/portfolio/marketingapix-3.webp', '/images/portfolio/marketingapix-4.webp'],
+                'techs' => ['PHP', 'CodeIgniter', 'MySQL', 'Redis', 'Bootstrap', 'Chart.js', 'Facebook Graph API', 'Cloudflare API'],
+                'live_url' => null,
+                'metrics' => [
+                    'Channels' => 'Thirteen platforms in one dashboard',
+                    'Posting' => 'One form, scheduled to every channel',
+                    'Bots' => 'Messenger, Instagram, Telegram, Viber and more',
+                    'White label' => 'Own domain, name, logo and packages',
+                ],
+                'highlights_en' => [
+                    'Scheduled cross-posting to pages, accounts, blogs and channels from one form, plus feed-based auto-posting.',
+                    'Chatbots with quick replies, buttons, lists, keywords, events, broadcasts and a hand-over alert for a human agent.',
+                    'Automatic replies to Facebook, Instagram and YouTube comments, and SMS campaigns to contact groups.',
+                    'Landing pages with an order form, a shop, coupons, an affiliate program, packages and payments, on the agency\'s own domain.',
+                ],
+                'highlights_ar' => [
+                    'نشر مجدول على الصفحات والحسابات والمدونات والقنوات من فورم واحد، ونشر تلقائي من الفيد.',
+                    'بوتات بردود سريعة وأزرار وقوايم وكلمات مفتاحية وأحداث ورسايل جماعية وتنبيه لما العميل يحتاج موظف.',
+                    'ردود تلقائية على تعليقات فيسبوك وإنستجرام ويوتيوب، وحملات SMS لمجموعات العملاء.',
+                    'صفحات هبوط بفورم طلب، ومتجر وكوبونات وبرنامج أفلييت وباقات ومدفوعات، على دومين الوكالة نفسها.',
+                ],
+            ],
+
             'amc-academy' => [
                 'slug' => 'amc-academy',
                 'title_en' => 'AmcTasks: Marketing Platform for AMC Academy',
