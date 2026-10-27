@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
  * @property string $status
  * @property string|null $payment_gateway
  * @property string|null $payment_reference
+ * @property int|null $white_label_partner_id
  */
 class SoftwareOrder extends Model
 {
@@ -38,6 +39,8 @@ class SoftwareOrder extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'base_amount' => 'decimal:2',
+        'partner_commission' => 'decimal:2',
         'paid_at' => 'datetime',
         'activated_at' => 'datetime',
         'reminder_sent_at' => 'datetime',
@@ -54,6 +57,12 @@ class SoftwareOrder extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(SoftwareProduct::class, 'software_product_id');
+    }
+
+    /** Set when the order came through a white label partner's store. */
+    public function partner(): BelongsTo
+    {
+        return $this->belongsTo(WhiteLabelPartner::class, 'white_label_partner_id');
     }
 
     public function isPaid(): bool

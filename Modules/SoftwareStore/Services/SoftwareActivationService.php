@@ -76,7 +76,12 @@ class SoftwareActivationService
 
         $expiresAt = $days === null ? null : $this->baseDate($license)->addDays($days);
 
-        $license->fill(['status' => SerialSoftwareLicense::STATUS_ACTIVE, 'expires_at' => $expiresAt])->save();
+        $license->fill([
+            'status' => SerialSoftwareLicense::STATUS_ACTIVE,
+            'expires_at' => $expiresAt,
+            // the program shows the brand of whoever sold the latest period
+            'white_label_partner_id' => $order->white_label_partner_id,
+        ])->save();
 
         return $expiresAt;
     }

@@ -29,6 +29,7 @@
         Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
     SetEnvIf Request_URI "^/sms-pay/.*$" ALLOW_FRAMING
+    SetEnvIf Request_URI "^/shop/.*$" ALLOW_FRAMING
     Header always unset X-Frame-Options env=ALLOW_FRAMING
     Header unset X-Frame-Options env=ALLOW_FRAMING
 </IfModule>

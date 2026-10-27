@@ -66,6 +66,7 @@ class SitemapController extends Controller
             'services.index' => '0.9',
             'portfolio' => '0.8',
             'how-we-work' => '0.9',
+            'white-label' => '0.7',
             'company.about' => '0.7',
             'company.careers' => '0.7',
             'company.contact' => '0.7',

@@ -2,9 +2,12 @@
 
 namespace Modules\SoftwareStore\Services;
 
+use App\Builders\KashierCheckoutBuilder;
 use App\Models\AdminSettings;
+use App\Models\Currency;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
+use Modules\SoftwareStore\Models\WhiteLabelPartner;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
@@ -16,11 +19,14 @@ class SoftwareOrderService
 
     private const DOWNLOAD_LINK_HOURS = 48;
 
-    public function __construct(private readonly SoftwareActivationService $activation) {}
+    public function __construct(private readonly SoftwareActivationService $activation, private readonly WhiteLabelService $whiteLabel) {}
 
-    public function createPendingOrder(SoftwareProduct $product, array $client): SoftwareOrder
+    /** With a partner, the customer pays the partner's price and the partner's share is fixed now. */
+    public function createPendingOrder(SoftwareProduct $product, array $client, ?WhiteLabelPartner $partner = null): SoftwareOrder
     {
         $plan = $product->planByKey($client['plan_key'] ?? null);
+        $base = $product->salePrice($plan['key'] ?? null);
+        $amount = $partner ? $this->whiteLabel->partnerPrice($partner, $product, $plan['key'] ?? null) : $base;
 
         return $product->orders()->create([
             'plan_key' => $plan['key'] ?? null,
@@ -31,10 +37,36 @@ class SoftwareOrderService
             'client_email' => $client['client_email'],
             'client_whatsapp' => $client['client_whatsapp'],
             'device_id' => $client['device_id'] ?? null,
-            'amount' => $product->salePrice($plan['key'] ?? null),
+            'amount' => $amount,
+            ...($partner ? [
+                'white_label_partner_id' => $partner->id,
+                'base_amount' => $base,
+                'partner_commission' => $this->whiteLabel->commission($base, $amount),
+            ] : []),
             'currency' => $product->saleCurrency(),
             'status' => SoftwareOrder::STATUS_PENDING,
         ]);
+    }
+
+    /** The Kashier checkout link for an unpaid order. Throws when the order's currency has no rate. */
+    public function paymentUrl(SoftwareOrder $order): string
+    {
+        // The gateway converts to EGP with our own rates. An unknown currency would be charged as EGP, so stop.
+        if ($order->currency !== 'EGP' && ! Currency::where('currency', $order->currency)->exists()) {
+            throw new \RuntimeException("No exchange rate for {$order->currency}");
+        }
+
+        return KashierCheckoutBuilder::make()
+            ->forAmount((float) $order->amount, $order->currency)
+            ->forGuest($order->client_name, $order->client_email, 'swo_'.$order->id)
+            ->withSource('software-order', 'swo_')
+            ->withMetadata(['invoice_id' => $order->id, 'software_product_id' => $order->software_product_id])
+            ->withRoutes(
+                success: route('software.orders.success', $order->uuid),
+                failure: route('software.orders.failure', $order->uuid),
+                webhook: route('software.orders.webhook')
+            )
+            ->build();
     }
 
     public function markPaid(SoftwareOrder $order, ?string $transactionId): void
@@ -51,6 +83,7 @@ class SoftwareOrderService
         ]);
 
         $this->activateLicense($order);
+        $this->whiteLabel->recordCommission($order);
         $this->notifyOwner($order);
     }
 
@@ -97,7 +130,10 @@ class SoftwareOrderService
             $order->device_id ? 'Device ID: '.$order->device_id : null,
         ]));
 
-        return 'https://wa.me/'.$this->ownerWhatsappNumber($order->product).'?text='.rawurlencode($message);
+        // a partner's customer talks to the partner, never to us
+        $number = $order->partner?->whatsappNumber() ?? $this->ownerWhatsappNumber($order->product);
+
+        return 'https://wa.me/'.$number.'?text='.rawurlencode($message);
     }
 
     public function downloadLink(SoftwareOrder $order): string

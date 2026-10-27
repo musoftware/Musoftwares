@@ -60,6 +60,7 @@ class RecoveryDiscount
     private function eligible(SoftwareOrder $order): bool
     {
         return ! $order->isPaid()
+            && $order->white_label_partner_id === null
             && $order->product !== null
             && $order->reminder_sent_at !== null
             && $order->reminder_sent_at->copy()->addHours(self::VALID_HOURS)->isFuture();

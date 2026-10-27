@@ -38,6 +38,19 @@
                     </a>
                 @endforeach
             </div>
+            @if ($key === 'programs')
+                {{-- White label: sell these programs under your own name --}}
+                <a href="{{ route('white-label') }}" class="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[24px] bg-[#1d1d1f] text-white p-6 hover:bg-black transition-colors">
+                    <span class="flex items-center gap-4 min-w-0">
+                        <span class="flex w-11 h-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-xl"><i class="ri-price-tag-3-line" aria-hidden="true"></i></span>
+                        <span class="min-w-0">
+                            <span class="block font-bold">{{ __('white_label.banner_title') }}</span>
+                            <span class="block text-sm text-white/70">{{ __('white_label.banner_text') }}</span>
+                        </span>
+                    </span>
+                    <span class="inline-flex h-10 items-center rounded-full bg-white px-5 text-sm font-semibold text-[#1d1d1f]">{{ __('white_label.banner_action') }}</span>
+                </a>
+            @endif
         </section>
     @empty
         <p class="text-center text-[#1d1d1f]/60">{{ __('software.empty') }}</p>

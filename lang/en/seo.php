@@ -8,6 +8,10 @@ return [
         'title' => 'Our Work: Systems and Platforms We Built',
         'description' => 'More than 30 real projects: ERP and accounting systems, online stores, booking platforms and custom SaaS apps, with what each one solved.',
     ],
+    'white_label' => [
+        'title' => 'White Label Software: Sell Our Programs Under Your Brand',
+        'description' => 'Add our programs to your website with one line of code, under your name and your prices. Earn 30% of every sale plus your markup, for 1,000 EGP a month.',
+    ],
     'how_we_work' => [
         'title' => 'How We Work: Custom Systems, Prices and Support',
         'description' => 'We learn how your business runs and build the system for it. Prices from the cost estimator, a free month of support and two free changes, then monthly or per-change support.',

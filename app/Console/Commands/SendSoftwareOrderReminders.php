@@ -48,6 +48,8 @@ class SendSoftwareOrderReminders extends Command
         return SoftwareOrder::with('product')
             ->where('status', SoftwareOrder::STATUS_PENDING)
             ->whereNull('reminder_sent_at')
+            // a white label customer never hears from us under our name
+            ->whereNull('white_label_partner_id')
             ->whereBetween('created_at', [now()->subHours(self::MAX_AGE_HOURS), now()->subHours(self::MIN_AGE_HOURS)])
             ->get();
     }

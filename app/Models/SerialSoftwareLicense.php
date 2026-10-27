@@ -26,6 +26,7 @@ class SerialSoftwareLicense extends Model
         'expires_at',
         'max_devices',
         'notes',
+        'white_label_partner_id',
     ];
 
     protected $casts = [

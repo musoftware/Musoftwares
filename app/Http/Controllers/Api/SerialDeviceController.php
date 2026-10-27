@@ -242,6 +242,8 @@ class SerialDeviceController extends Controller
         $trialClaimed = (bool) ($device->trial_claimed_at !== null || ($userDevice && $userDevice->trial_claimed_at !== null));
         $canClaimTrial = $trialEnabled && ! $trialClaimed && $status !== SerialDevice::STATUS_ACTIVE && ! $isExpired;
 
+        $brand = $this->whiteLabelBrand($software, $userDevice?->user_id);
+
         // Return the device status — client software acts on this.
         return response()->json([
             'status'               => $status,
@@ -269,7 +271,29 @@ class SerialDeviceController extends Controller
             'trial_claimed'        => $trialClaimed,
             'can_claim_trial'      => $canClaimTrial,
             'purchase_url'         => $this->storePurchaseUrl($software, $validated['device_id'], $status),
+            // Sold by a white label partner: the program shows their name, logo and contact instead of ours.
+            'brand'                => $brand,
+            ...($brand ? array_filter([
+                'whatsapp_number' => $brand['whatsapp_number'],
+                'logo_url'        => $brand['logo_url'],
+                'purchase_url'    => $status !== SerialDevice::STATUS_ACTIVE ? $brand['store_url'] : null,
+            ]) : []),
         ]);
+    }
+
+    /** The brand of the partner who sold this user's license, while the partner's subscription is active. */
+    private function whiteLabelBrand(SerialSoftware $software, ?int $userId): ?array
+    {
+        if (! $userId || ! \Illuminate\Support\Facades\Schema::hasColumn('serial_software_licenses', 'white_label_partner_id')) {
+            return null;
+        }
+
+        $partnerId = \App\Models\SerialSoftwareLicense::where('user_id', $userId)
+            ->where('serial_software_id', $software->id)
+            ->value('white_label_partner_id');
+        $partner = $partnerId ? \Modules\SoftwareStore\Models\WhiteLabelPartner::find($partnerId) : null;
+
+        return $partner?->isActive() ? $partner->brand() : null;
     }
 
     /**

@@ -2,9 +2,7 @@
 
 namespace Modules\SoftwareStore\Http\Controllers;
 
-use App\Builders\KashierCheckoutBuilder;
 use App\Helpers\KashierHelper;
-use App\Models\Currency;
 use App\Http\Controllers\Controller;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
@@ -39,7 +37,7 @@ class SoftwareOrderController extends Controller
         $order = $this->orders->createPendingOrder($product, $client);
 
         try {
-            return redirect()->away($this->paymentUrl($order, $product));
+            return redirect()->away($this->orders->paymentUrl($order));
         } catch (\Throwable $e) {
             Log::error('Software order: payment start failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
 
@@ -52,7 +50,7 @@ class SoftwareOrderController extends Controller
         $order = SoftwareOrder::with('product')->where('uuid', $uuid)->firstOrFail();
         $hasRelease = $order->isPaid() && $order->product->latestRelease();
 
-        return view('softwarestore::result', [
+        return view($order->partner ? 'softwarestore::white-label.result' : 'softwarestore::result', [
             'order' => $order,
             'succeeded' => true,
             'whatsappLink' => $this->orders->whatsappLink($order),
@@ -74,7 +72,7 @@ class SoftwareOrderController extends Controller
         $this->recoveryDiscount->apply($order);
 
         try {
-            return redirect()->away($this->paymentUrl($order, $order->product));
+            return redirect()->away($this->orders->paymentUrl($order));
         } catch (\Throwable $e) {
             Log::error('Software order: resume payment failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
 
@@ -86,7 +84,7 @@ class SoftwareOrderController extends Controller
     {
         $order = SoftwareOrder::with('product')->where('uuid', $uuid)->firstOrFail();
 
-        return view('softwarestore::result', ['order' => $order, 'succeeded' => false]);
+        return view($order->partner ? 'softwarestore::white-label.result' : 'softwarestore::result', ['order' => $order, 'succeeded' => false]);
     }
 
     public function webhook(Request $request)
@@ -125,25 +123,5 @@ class SoftwareOrderController extends Controller
         abort_unless($release && Storage::disk('local')->exists($release->file_path), 404);
 
         return Storage::disk('local')->download($release->file_path, $release->file_name);
-    }
-
-    private function paymentUrl(SoftwareOrder $order, SoftwareProduct $product): string
-    {
-        // The gateway converts to EGP with our own rates. An unknown currency would be charged as EGP, so stop.
-        if ($order->currency !== 'EGP' && ! Currency::where('currency', $order->currency)->exists()) {
-            throw new \RuntimeException("No exchange rate for {$order->currency}");
-        }
-
-        return KashierCheckoutBuilder::make()
-            ->forAmount((float) $order->amount, $order->currency)
-            ->forGuest($order->client_name, $order->client_email, 'swo_'.$order->id)
-            ->withSource('software-order', 'swo_')
-            ->withMetadata(['invoice_id' => $order->id, 'software_product_id' => $product->id])
-            ->withRoutes(
-                success: route('software.orders.success', $order->uuid),
-                failure: route('software.orders.failure', $order->uuid),
-                webhook: route('software.orders.webhook')
-            )
-            ->build();
     }
 }

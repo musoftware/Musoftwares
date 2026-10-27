@@ -29,7 +29,8 @@ import {
     ListTodo,
     Calculator,
     Grid,
-    Laptop
+    Laptop,
+    Tag
 } from 'lucide-react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -400,6 +401,9 @@ function AuthenticatedContent({
                                                                             <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
                                                                             </SafeLink>
+                                                                            <SafeLink href="/white-label/settings" onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
+                                                                                <Tag className="w-4 h-4 text-[#0071e3]" /> {__('white_label.title')}
+                                                                            </SafeLink>
                                                                             <SafeLink href={safeRoute('marketplace.services.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
                                                                                 <Briefcase className="w-4 h-4 text-[#0071e3]" /> {__('general.services')}
                                                                             </SafeLink>
@@ -651,6 +655,14 @@ function AuthenticatedContent({
                                                         title={__('general.referrals')}
                                                         description={__('general.referrals_desc')}
                                                         isActive={isReferralsMenuActive}
+                                                    />
+
+                                                    <UnifiedMenuItem
+                                                        href="/white-label/settings"
+                                                        icon={Tag}
+                                                        title={__('white_label.title')}
+                                                        description={__('white_label.settings_hint')}
+                                                        isActive={route().current('white-label.*')}
                                                     />
 
                                                     <UnifiedMenuItem

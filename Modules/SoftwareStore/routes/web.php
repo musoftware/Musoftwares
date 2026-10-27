@@ -7,6 +7,8 @@ use Modules\SoftwareStore\Http\Controllers\FreeToolController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareOrderController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareProductController;
 use Modules\SoftwareStore\Http\Controllers\SoftwareUpdateFeedController;
+use Modules\SoftwareStore\Http\Controllers\WhiteLabelController;
+use Modules\SoftwareStore\Http\Controllers\WhiteLabelStoreController;
 
 Route::middleware('web')->group(function () {
 
@@ -30,6 +32,18 @@ Route::middleware('web')->group(function () {
     Route::get('/software-orders/{uuid}/failure', [SoftwareOrderController::class, 'failure'])->name('software.orders.failure');
     Route::get('/software-orders/{uuid}/download', [SoftwareOrderController::class, 'download'])->name('software.orders.download');
     Route::post('/software-orders/webhook', [SoftwareOrderController::class, 'webhook'])->name('software.orders.webhook');
+
+    // ── White label: partners sell our programs under their own name ─
+    Route::get('/white-label', [WhiteLabelController::class, 'landing'])->name('white-label');
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/white-label/settings', [WhiteLabelController::class, 'settings'])->name('white-label.settings');
+        Route::post('/white-label/settings', [WhiteLabelController::class, 'save'])->name('white-label.save');
+        Route::post('/white-label/subscribe', [WhiteLabelController::class, 'subscribe'])->middleware('throttle:5,1')->name('white-label.subscribe');
+    });
+    // the partner's store; the list page may be framed on the partner's site (RemoveSecurityHeaders)
+    Route::get('/shop/{partner}', [WhiteLabelStoreController::class, 'index'])->name('white-label.store');
+    Route::get('/shop/{partner}/{slug}', [WhiteLabelStoreController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('white-label.product');
+    Route::post('/shop/{partner}/{slug}/order', [WhiteLabelStoreController::class, 'order'])->where('slug', '[a-z0-9-]+')->middleware('throttle:10,1')->name('white-label.order');
 
     // ── Auto-update feed read by electron-updater (generic provider) ─
     Route::get('/updates/{slug}/latest.yml', [SoftwareUpdateFeedController::class, 'latest'])->middleware('throttle:60,1')->name('software.updates.latest');
