@@ -12,14 +12,22 @@ Partners sell our desktop programs under their own name. Code: `Modules/Software
 | URL | What |
 | --- | --- |
 | `/white-label` | Public offer page (SEO, sitemap) |
-| `/white-label/settings` | Partner page: subscription, brand, prices, iframe code, sales |
+| `/white-label/settings` | Partner page: subscription, brand, prices, embed code, sales |
 | `/shop/{slug}` | Partner store. `?embed=1` hides the header for the iframe. Framing is allowed for `/shop/*` (`RemoveSecurityHeaders`, `.htaccess`). |
-| `/shop/{slug}/{product}` | Checkout. Opens in its own tab from the iframe, so the session cookie and the Kashier page work. |
+| `/shop/{slug}/embed.js` | The partner's one-line embed: `<script src=".../shop/{slug}/embed.js" async></script>` (optional `data-lang="ar"`). It puts the store in a frame where the line is, and the store posts its height (`wl-store-height`) so the frame fits it. A plain `<iframe>` is offered too, for sites that block scripts. |
+| `/shop/{slug}/{product}` | Checkout. Opens in its own tab from the frame, so the session cookie and the Kashier page work. |
+| `/shop/{slug}/{product}/download` | The latest setup, named `{file}.wl-{slug}.exe`. Each download is logged in `white_label_downloads`. |
 
 A closed store (subscription ended) returns 404. The result page after payment shows the partner's brand and WhatsApp.
 
 ## Programs (desktop)
-A paid partner order tags the license with `white_label_partner_id`. While that partner's subscription is active, `POST /api/serial/device` returns:
+The program shows the partner's brand when:
+- its license was bought from the partner (the paid order tags the license with `white_label_partner_id`), or
+- it has no license yet and was downloaded from the partner's store (`serial_devices.white_label_partner_id`).
+
+A device learns its store once, on check-in: from `setup_name` (the setup file name, written by each program's `build/installer.nsh` and sent by SerialSystem), or, for programs built before that, from a store download made from the same IP in the last 48 hours on the device's first check-in. A license bought from us always shows our brand.
+
+While the partner's subscription is active, `POST /api/serial/device` returns:
 
 ```json
 "brand": {
@@ -33,7 +41,7 @@ A paid partner order tags the license with `white_label_partner_id`. While that 
 }
 ```
 
-and replaces `logo_url`, `whatsapp_number` and (when not active) `purchase_url` with the partner's. When there is no partner, or the subscription ended, `brand` is `null` and our values come back.
+and replaces `logo_url`, `whatsapp_number` and (when not active) `purchase_url` with the partner's; `purchase_url` is the partner's page for that program with `?device=`, so the payment activates the device by itself. When there is no partner, or the subscription ended, `brand` is `null` and our values come back.
 
 Programs that already show `logo_url` and `whatsapp_number` pick this up with no update. To hide our name completely, each program should:
 1. Use `brand.name` as the window title and in the About box when `brand` is not null.
@@ -41,4 +49,3 @@ Programs that already show `logo_url` and `whatsapp_number` pick this up with no
 3. Point "Renew" / "Buy" to `purchase_url` (already the partner's store when branded).
 4. Cache the last `brand` so the program keeps the partner's look when offline.
 
-Not covered yet: a program downloaded from a partner's site shows our brand until it is activated, because the device has no license before the first payment.

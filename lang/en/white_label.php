@@ -82,7 +82,8 @@ return [
     'price_too_low' => 'Your price for :program cannot be under :price.',
 
     'embed_section' => 'Put it on your website',
-    'embed_hint' => 'Copy this code into your website where you want the store to show.',
+    'embed_hint' => 'Copy this line into your website where you want the store to show. The store fits its height by itself.',
+    'iframe_hint' => 'If your website does not accept scripts, use this frame instead:',
     'store_link' => 'Your store link',
     'copy' => 'Copy',
     'copied' => 'Copied',
@@ -104,4 +105,6 @@ return [
     'contact' => 'Contact us',
     'back_to_store' => 'Back to the store',
     'activates_itself' => 'After payment the program activates by itself.',
+    'download_program' => 'Download the program',
+    'download_hint' => 'Version :version for Windows. Install it, then buy from inside the program or from this page.',
 ];

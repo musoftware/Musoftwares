@@ -36,6 +36,7 @@ class SerialDevice extends Model
         'current_ui_culture',
         'last_check_date',
         'trial_claimed_at',
+        'white_label_partner_id',
     ];
 
     protected $casts = [

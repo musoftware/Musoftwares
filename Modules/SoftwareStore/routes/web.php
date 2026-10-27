@@ -44,8 +44,10 @@ Route::middleware('web')->group(function () {
     });
     // the partner's store; the list page may be framed on the partner's site (RemoveSecurityHeaders)
     Route::get('/shop/{partner}', [WhiteLabelStoreController::class, 'index'])->name('white-label.store');
+    Route::get('/shop/{partner}/embed.js', [WhiteLabelStoreController::class, 'embed'])->name('white-label.embed');
     Route::get('/shop/{partner}/{slug}', [WhiteLabelStoreController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('white-label.product');
-    Route::post('/shop/{partner}/{slug}/order', [WhiteLabelStoreController::class, 'order'])->where('slug', '[a-z0-9-]+')->middleware('throttle:10,1')->name('white-label.order');
+    Route::get('/shop/{partner}/{slug}/download', [WhiteLabelStoreController::class, 'download'])->where('slug', '[a-z0-9-]+')->middleware('throttle:10,1')->name('white-label.download');
+    Route::post('/shop/{partner}/{slug}/order',[WhiteLabelStoreController::class, 'order'])->where('slug', '[a-z0-9-]+')->middleware('throttle:10,1')->name('white-label.order');
 
     // ── Auto-update feed read by electron-updater (generic provider) ─
     Route::get('/updates/{slug}/latest.yml', [SoftwareUpdateFeedController::class, 'latest'])->middleware('throttle:60,1')->name('software.updates.latest');

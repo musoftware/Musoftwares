@@ -46,6 +46,18 @@
 
     <main>@yield('content')</main>
 
+    @if ($embed)
+        {{-- tells embed.js on the partner's page how tall the store is, so the frame fits it --}}
+        <script>
+            (function () {
+                function send() { parent.postMessage({ type: 'wl-store-height', height: document.documentElement.scrollHeight }, '*'); }
+                if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+                window.addEventListener('load', send);
+                send();
+            })();
+        </script>
+    @endif
+
     @unless ($embed)
         <footer class="py-8 text-center text-sm text-black/50">
             &copy; {{ date('Y') }} {{ $partner->brand_name }}

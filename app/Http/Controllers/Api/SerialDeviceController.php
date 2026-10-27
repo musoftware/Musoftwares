@@ -242,7 +242,8 @@ class SerialDeviceController extends Controller
         $trialClaimed = (bool) ($device->trial_claimed_at !== null || ($userDevice && $userDevice->trial_claimed_at !== null));
         $canClaimTrial = $trialEnabled && ! $trialClaimed && $status !== SerialDevice::STATUS_ACTIVE && ! $isExpired;
 
-        $brand = $this->whiteLabelBrand($software, $userDevice?->user_id);
+        $partner = $this->whiteLabelPartner($software, $device, $userDevice?->user_id, $request, ! $deviceExisted);
+        $brand = $partner?->brand();
 
         // Return the device status — client software acts on this.
         return response()->json([
@@ -271,29 +272,33 @@ class SerialDeviceController extends Controller
             'trial_claimed'        => $trialClaimed,
             'can_claim_trial'      => $canClaimTrial,
             'purchase_url'         => $this->storePurchaseUrl($software, $validated['device_id'], $status),
-            // Sold by a white label partner: the program shows their name, logo and contact instead of ours.
+            // Sold by, or downloaded from, a white label partner: the program shows their name, logo and contact instead of ours.
             'brand'                => $brand,
             ...($brand ? array_filter([
                 'whatsapp_number' => $brand['whatsapp_number'],
                 'logo_url'        => $brand['logo_url'],
-                'purchase_url'    => $status !== SerialDevice::STATUS_ACTIVE ? $brand['store_url'] : null,
+                'purchase_url'    => $status !== SerialDevice::STATUS_ACTIVE
+                    ? app(\Modules\SoftwareStore\Services\WhiteLabelService::class)->devicePurchaseUrl($partner, $software, $validated['device_id'])
+                    : null,
             ]) : []),
         ]);
     }
 
-    /** The brand of the partner who sold this user's license, while the partner's subscription is active. */
-    private function whiteLabelBrand(SerialSoftware $software, ?int $userId): ?array
+    /**
+     * The white label partner whose brand this program shows, while their subscription is active.
+     * `setup_name` is the name of the setup file, which carries the partner when it came from their store.
+     */
+    private function whiteLabelPartner(SerialSoftware $software, SerialDevice $device, ?int $userId, Request $request, bool $isNewDevice): ?\Modules\SoftwareStore\Models\WhiteLabelPartner
     {
-        if (! $userId || ! \Illuminate\Support\Facades\Schema::hasColumn('serial_software_licenses', 'white_label_partner_id')) {
+        if (! \Illuminate\Support\Facades\Schema::hasColumn('serial_devices', 'white_label_partner_id')) {
             return null;
         }
 
-        $partnerId = \App\Models\SerialSoftwareLicense::where('user_id', $userId)
-            ->where('serial_software_id', $software->id)
-            ->value('white_label_partner_id');
-        $partner = $partnerId ? \Modules\SoftwareStore\Models\WhiteLabelPartner::find($partnerId) : null;
+        $setupName = $request->input('setup_name');
 
-        return $partner?->isActive() ? $partner->brand() : null;
+        return app(\Modules\SoftwareStore\Services\WhiteLabelService::class)->partnerForDevice(
+            $software, $device, $userId, is_string($setupName) ? mb_substr($setupName, 0, 255) : null, $request->ip(), $isNewDevice
+        );
     }
 
     /**
@@ -600,7 +605,7 @@ class SerialDeviceController extends Controller
             'expires_at'           => $expiresAt?->toIso8601String(),
             'price'                => $software->price !== null ? (float) $software->price : null,
             'currency'             => $software->currency ?? 'USD',
-            'whatsapp_number'      => $software->whatsapp_number,
+            'whatsapp_number'      => $this->partnerWhatsapp($software, $device, $user->id) ?? $software->whatsapp_number,
             'payment_instructions' => $software->payment_instructions,
             'message'              => $message,
         ]);
@@ -755,10 +760,21 @@ class SerialDeviceController extends Controller
             'show_whatsapp'        => (bool) ($software->show_whatsapp ?? true),
             'price'                => $software->price !== null ? (float) $software->price : null,
             'currency'             => $software->currency ?? 'USD',
-            'whatsapp_number'      => $software->whatsapp_number,
+            'whatsapp_number'      => $this->partnerWhatsapp($software, $device, $user->id) ?? $software->whatsapp_number,
             'payment_instructions' => $software->payment_instructions,
             'message'              => $message,
         ]);
+    }
+
+    /** The partner's WhatsApp for the payment dialog, when this program was sold by or downloaded from one. */
+    private function partnerWhatsapp(SerialSoftware $software, SerialDevice $device, int $userId): ?string
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasColumn('serial_devices', 'white_label_partner_id')) {
+            return null;
+        }
+
+        return app(\Modules\SoftwareStore\Services\WhiteLabelService::class)
+            ->partnerForDevice($software, $device, $userId, null, null, false)?->whatsappNumber();
     }
 
     /**

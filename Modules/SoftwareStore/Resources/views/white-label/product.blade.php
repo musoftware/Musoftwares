@@ -20,6 +20,14 @@
         @if ($product->imageUrl())
             <img src="{{ $product->imageUrl() }}" alt="" class="mt-6 w-full rounded-2xl border border-black/5 shadow-sm">
         @endif
+        @if ($latest)
+            {{-- the setup carries this store's name, so the program shows this brand when it asks for activation --}}
+            <a href="{{ route('white-label.download', [$partner, $product->slug]) }}"
+               class="mt-6 inline-flex h-12 items-center gap-2 rounded-xl border border-black/15 bg-white px-5 font-semibold hover:bg-[#f5f5f7]">
+                <i class="ri-download-2-line" aria-hidden="true"></i>{{ __('white_label.download_program') }}
+            </a>
+            <p class="mt-2 text-sm text-black/60">{{ __('white_label.download_hint', ['version' => $latest->version]) }}</p>
+        @endif
     </div>
 
     <form method="POST" action="{{ route('white-label.order', [$partner, $product->slug]) }}" class="bg-white rounded-2xl border border-black/5 p-6 space-y-4 shadow-sm">

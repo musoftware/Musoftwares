@@ -8,6 +8,7 @@ use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\RecoveryDiscount;
 use Modules\SoftwareStore\Services\SoftwareOrderService;
+use Modules\SoftwareStore\Services\WhiteLabelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -123,6 +124,9 @@ class SoftwareOrderController extends Controller
         $release = $order->product->latestRelease();
         abort_unless($release && Storage::disk('local')->exists($release->file_path), 404);
 
-        return Storage::disk('local')->download($release->file_path, $release->file_name);
+        // bought from a partner: the setup carries their name, so the program shows their brand
+        $name = $order->partner ? app(WhiteLabelService::class)->setupFileName($release, $order->partner) : $release->file_name;
+
+        return Storage::disk('local')->download($release->file_path, $name);
     }
 }

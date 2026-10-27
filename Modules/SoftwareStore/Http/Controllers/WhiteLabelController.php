@@ -49,6 +49,7 @@ class WhiteLabelController extends Controller
                 'is_active' => $partner->isActive(),
                 'expires_at' => $partner->subscription_expires_at?->toDateString(),
                 'store_url' => $partner->storeUrl(),
+                'embed' => $this->whiteLabel->embedCode($partner),
                 'iframe' => $this->whiteLabel->iframeCode($partner),
             ] : null,
             'suggestedSlug' => Str::slug($user->name) ?: 'store-'.$user->id,

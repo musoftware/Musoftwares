@@ -18,6 +18,7 @@ interface Partner {
     is_active: boolean;
     expires_at: string | null;
     store_url: string;
+    embed: string;
     iframe: string;
 }
 
@@ -188,8 +189,15 @@ export default function WhiteLabelIndex({ partner, suggestedSlug, rows, sales, w
                         </div>
                         <div>
                             <Label>{__('white_label.embed_hint')}</Label>
+                            <textarea readOnly value={partner.embed} dir="ltr" rows={2} onFocus={(e) => e.target.select()} className="mt-1 w-full rounded-xl border border-black/10 bg-[#f5f5f7] p-3 font-mono text-xs dark:border-white/10 dark:bg-zinc-800" />
+                            <button type="button" onClick={() => copy('embed', partner.embed)} className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#1d1d1f] px-5 text-sm font-semibold text-white">
+                                {copied === 'embed' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied === 'embed' ? __('white_label.copied') : __('white_label.copy')}
+                            </button>
+                        </div>
+                        <div>
+                            <p className="text-sm text-black/60 dark:text-zinc-400">{__('white_label.iframe_hint')}</p>
                             <textarea readOnly value={partner.iframe} dir="ltr" rows={3} onFocus={(e) => e.target.select()} className="mt-1 w-full rounded-xl border border-black/10 bg-[#f5f5f7] p-3 font-mono text-xs dark:border-white/10 dark:bg-zinc-800" />
-                            <button type="button" onClick={() => copy('iframe', partner.iframe)} className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-full bg-[#1d1d1f] px-5 text-sm font-semibold text-white">
+                            <button type="button" onClick={() => copy('iframe', partner.iframe)} className="mt-2 inline-flex h-10 items-center gap-1.5 rounded-full border border-black/10 px-5 text-sm font-semibold dark:border-white/10">
                                 {copied === 'iframe' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied === 'iframe' ? __('white_label.copied') : __('white_label.copy')}
                             </button>
                         </div>

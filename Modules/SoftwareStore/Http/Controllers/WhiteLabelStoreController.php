@@ -5,6 +5,7 @@ namespace Modules\SoftwareStore\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Models\WhiteLabelPartner;
@@ -38,6 +39,15 @@ class WhiteLabelStoreController extends Controller
         ]);
     }
 
+    /** The script behind the partner's one-line embed code. A closed store leaves an empty script. */
+    public function embed(WhiteLabelPartner $partner)
+    {
+        return response($partner->isActive() ? $this->whiteLabel->embedScript($partner) : '', 200, [
+            'Content-Type' => 'application/javascript; charset=utf-8',
+            'Cache-Control' => 'public, max-age=300',
+        ]);
+    }
+
     public function show(WhiteLabelPartner $partner, string $slug)
     {
         abort_unless($partner->isActive(), 404);
@@ -50,6 +60,7 @@ class WhiteLabelStoreController extends Controller
             'product' => $product,
             'plans' => $plans,
             'price' => $this->whiteLabel->partnerPrice($partner, $product),
+            'latest' => $product->latestRelease(),
         ]);
     }
 
@@ -76,6 +87,25 @@ class WhiteLabelStoreController extends Controller
 
             return back()->withInput()->with('error', __('software.payment_start_failed'));
         }
+    }
+
+    /**
+     * The program's setup, named after the partner so the installed program shows their brand from its
+     * first start. The download is logged too, for programs that do not send the setup name yet.
+     */
+    public function download(Request $request, WhiteLabelPartner $partner, string $slug)
+    {
+        abort_unless($partner->isActive(), 404);
+        $product = $this->sellable($slug);
+        $release = $product->latestRelease();
+        abort_unless($release && Storage::disk('local')->exists($release->file_path), 404);
+
+        $this->whiteLabel->recordDownload($partner, $product, (string) $request->ip());
+
+        return response()->file(Storage::disk('local')->path($release->file_path), [
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="'.$this->whiteLabel->setupFileName($release, $partner).'"',
+        ]);
     }
 
     private function sellable(string $slug): SoftwareProduct
