@@ -73,7 +73,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                         <div className="p-5">
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <Label>{__('admin.settings_security_module_label')}</Label>
+                                    <Label className="mb-1.5 block">{__('admin.settings_security_module_label')}</Label>
                                     <Input
                                         value={form.module}
                                         onChange={e => setForm({ ...form, module: e.target.value })}
@@ -82,7 +82,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                     />
                                 </div>
                                 <div>
-                                    <Label>{__('admin.settings_security_tenant_optional')}</Label>
+                                    <Label className="mb-1.5 block">{__('admin.settings_security_tenant_optional')}</Label>
                                     <Input
                                         type="number"
                                         value={form.tenant_id}
@@ -91,7 +91,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                     />
                                 </div>
                                 <div>
-                                    <Label>{__('admin.settings_security_ip_optional')}</Label>
+                                    <Label className="mb-1.5 block">{__('admin.settings_security_ip_optional')}</Label>
                                     <Input
                                         value={form.ip_address}
                                         onChange={e => setForm({ ...form, ip_address: e.target.value })}
@@ -100,7 +100,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Label>{__('general.max_requests')}</Label>
+                                        <Label className="mb-1.5 block">{__('general.max_requests')}</Label>
                                         <Input
                                             type="number"
                                             value={form.max_requests}
@@ -109,7 +109,7 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                         />
                                     </div>
                                     <div>
-                                        <Label>{__('admin.settings_security_decay_minutes')}</Label>
+                                        <Label className="mb-1.5 block">{__('admin.settings_security_decay_minutes')}</Label>
                                         <Input
                                             type="number"
                                             value={form.decay_minutes}
@@ -133,8 +133,8 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                 <div className="p-5 text-sm text-gray-500 text-center">{__('general.no_custom_rate_limits_configured')}</div>
                             ) : (
                                 rateLimits.map((limit: any) => (
-                                    <div key={limit.id} className="p-4 flex items-center justify-end gap-4">
-                                        <div>
+                                    <div key={limit.id} className="p-4 flex items-center justify-between gap-4">
+                                        <div className="min-w-0 flex-1">
                                             <p className="font-medium text-sm text-gray-900">{limit.module}</p>
                                             <p className="text-xs text-gray-500 mt-1">
                                                 {[
@@ -175,12 +175,12 @@ export default function Security({ blockedIps, rateLimits }: any) {
                                 </div>
                             ) : (
                                 blockedIps.map((ip: any) => (
-                                    <div key={ip.id} className="p-4 flex items-center justify-end gap-4">
-                                        <div>
-                                            <p className="font-medium text-sm text-gray-900 font-mono">{ip.ip_address}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{ip.reason}</p>
+                                    <div key={ip.id} className="p-4 flex items-center justify-between gap-4">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-medium text-sm text-gray-900 font-mono"><span dir="ltr">{ip.ip_address}</span></p>
+                                            <p className="text-xs text-gray-500 mt-1 break-words"><bdi>{ip.reason}</bdi></p>
                                             <p className="text-xs text-gray-400 mt-0.5">
-                                                {__('admin.settings_security_blocked_until', { date: ip.blocked_until ? new Date(ip.blocked_until).toLocaleString() : __('admin.settings_security_forever') })}
+                                                {__('admin.settings_security_blocked_until', { date: '' })}<span dir="ltr">{ip.blocked_until ? new Date(ip.blocked_until).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : __('admin.settings_security_forever')}</span>
                                             </p>
                                         </div>
                                         <Button
