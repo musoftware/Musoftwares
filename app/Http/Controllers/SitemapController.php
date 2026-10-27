@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogArticle;
 use App\Models\WebsiteService;
-use App\Support\BlogSeo;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
@@ -91,11 +90,17 @@ class SitemapController extends Controller
 
         // Blog Articles
         if (class_exists(BlogArticle::class)) {
-            $articles = BlogArticle::published()->get();
+            // Only the columns the sitemap needs (not the article bodies), and the language versions
+            // worked out in memory: one query instead of one per article.
+            $articles = BlogArticle::published()->get(['id', 'slug', 'language', 'group_id', 'updated_at'])
+                ->filter(fn (BlogArticle $a) => filled($a->slug));
+            $groups = $articles->filter(fn (BlogArticle $a) => filled($a->group_id) && filled($a->language))->groupBy('group_id');
             foreach ($articles as $article) {
-                if (\Route::has('blog.show') && ! empty($article->slug)) {
+                if (\Route::has('blog.show')) {
                     $loc = route('blog.show', $article->slug);
-                    $languages = app(BlogSeo::class)->alternates($article)->all();
+                    $languages = filled($article->group_id) && isset($groups[$article->group_id])
+                        ? $groups[$article->group_id]->mapWithKeys(fn (BlogArticle $a) => [$a->language => route('blog.show', $a->slug)])->all()
+                        : (filled($article->language) ? [$article->language => $loc] : []);
                     $urls[] = [
                         'loc' => $loc,
                         'alternates' => $languages + ['x-default' => $languages['en'] ?? $loc],
