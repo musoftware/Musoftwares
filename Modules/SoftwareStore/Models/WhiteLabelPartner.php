@@ -55,7 +55,7 @@ class WhiteLabelPartner extends Model
 
     public function logoUrl(): ?string
     {
-        return $this->logo_path ? asset('storage/'.$this->logo_path) : null;
+        return $this->logo_path ? asset('uploads/'.$this->logo_path) : null;
     }
 
     public function whatsappNumber(): ?string

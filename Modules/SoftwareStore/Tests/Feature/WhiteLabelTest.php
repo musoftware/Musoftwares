@@ -8,6 +8,8 @@ use App\Models\SerialSoftware;
 use App\Models\SerialSoftwareLicense;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Models\WhiteLabelPartner;
@@ -94,6 +96,21 @@ class WhiteLabelTest extends TestCase
 
         $this->actingAs($user)->get('/white-label/settings')->assertOk()
             ->assertInertia(fn ($page) => $page->component('Client/WhiteLabel/Index')->where('partner.slug', 'nile-soft')->where('rows.0.base', 1000));
+    }
+
+    public function test_logo_is_saved_where_the_server_serves_it(): void
+    {
+        Storage::fake('public_uploads');
+        $user = $this->partnerUser();
+
+        $this->actingAs($user)->post('/white-label/settings', [
+            'brand_name' => 'Nile Soft', 'slug' => 'nile-soft', 'accent_color' => '#ff5500',
+            'logo' => UploadedFile::fake()->image('logo.png', 200, 200),
+        ])->assertSessionHas('success');
+
+        $partner = WhiteLabelPartner::firstOrFail();
+        Storage::disk('public_uploads')->assertExists($partner->logo_path);
+        $this->assertStringContainsString('/uploads/white-label/', $partner->logoUrl());
     }
 
     public function test_subscription_is_paid_from_the_wallet_and_adds_thirty_days(): void

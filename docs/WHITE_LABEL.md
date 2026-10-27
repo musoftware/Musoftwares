@@ -24,7 +24,7 @@ A paid partner order tags the license with `white_label_partner_id`. While that 
 ```json
 "brand": {
   "name": "Nile Soft",
-  "logo_url": "https://www.musoftwares.com/storage/white-label/....png",
+  "logo_url": "https://www.musoftwares.com/uploads/white-label/....png",
   "accent_color": "#ff5500",
   "whatsapp_number": "201112223333",
   "email": "help@nilesoft.com",

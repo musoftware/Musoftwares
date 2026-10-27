@@ -89,9 +89,9 @@ class WhiteLabelController extends Controller
 
         if ($request->hasFile('logo')) {
             if ($partner->logo_path) {
-                Storage::disk('public')->delete($partner->logo_path);
+                Storage::disk('public_uploads')->delete($partner->logo_path);
             }
-            $partner->logo_path = $request->file('logo')->store('white-label', 'public');
+            $partner->logo_path = $request->file('logo')->store('white-label', 'public_uploads');
         }
 
         $partner->save();
