@@ -21,6 +21,12 @@ class FreeTools
         'vat-calculator' => ['ri-percent-line', ['shop-manager-pro', 'wholesale-system', 'pharmacy-system']],
         'salary-tax-calculator' => ['ri-money-dollar-circle-line', ['clinic-system', 'workshop-system', 'education-center-system']],
         'profit-margin-calculator' => ['ri-line-chart-line', ['shop-manager-pro', 'supermarket-system', 'paid-ads-management']],
+        'qr-code-generator' => ['ri-qr-scan-2-line', ['company-website-design', 'landing-page-design', 'social-media-management']],
+        'email-signature-generator' => ['ri-mail-settings-line', ['logo-and-brand-identity', 'company-website-design', 'email-sender-pro']],
+        'utm-link-builder' => ['ri-links-line', ['paid-ads-management', 'social-media-management', 'landing-page-design']],
+        'meta-tag-generator' => ['ri-google-line', ['company-website-design', 'website-care-plans', 'online-store-development']],
+        'break-even-calculator' => ['ri-scales-3-line', ['shop-manager-pro', 'restaurant-pos-system', 'supermarket-system']],
+        'freelance-rate-calculator' => ['ri-time-line', ['custom-web-app-development', 'company-website-design', 'logo-and-brand-identity']],
     ];
 
     public static function exists(string $slug): bool

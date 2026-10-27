@@ -5163,6 +5163,251 @@
                     "selling_price": "Selling price",
                     "total_profit": "Total profit"
                 }
+            },
+            "qr-code-generator": {
+                "name": "QR code generator",
+                "tagline": "Free QR codes for a link, text, Wi-Fi, contact card, email or SMS. No sign-up, no expiry.",
+                "title": "Free QR Code Generator: Link, Wi-Fi, Contact Card (No Sign-Up)",
+                "description": "Create a free QR code for a website link, Wi-Fi password, contact card (vCard), email, SMS or text. Pick a color, download PNG. No sign-up and the code never expires.",
+                "intro": "Choose what the code should do, fill in the details and download it. These are static codes: they work forever and nothing passes through our servers.",
+                "steps": [
+                    "Choose the type: link, Wi-Fi, contact, email, SMS or text.",
+                    "Fill in the details and pick a color.",
+                    "Download the PNG and print or share it."
+                ],
+                "faq": [
+                    {
+                        "q": "Do these QR codes expire?",
+                        "a": "No. They are static codes: the information is inside the code itself, so they keep working forever with no account."
+                    },
+                    {
+                        "q": "Can I change where a code points later?",
+                        "a": "Not with a static code. If you need to change the destination after printing, point the code to a page you control, such as your website."
+                    },
+                    {
+                        "q": "How big should I print it?",
+                        "a": "At least 2 cm (about 0.8 in) wide, with dark color on a light background. Test it with your phone before printing many copies."
+                    }
+                ],
+                "form": {
+                    "type": "Type",
+                    "types": {
+                        "url": "Link",
+                        "wifi": "Wi-Fi",
+                        "vcard": "Contact",
+                        "email": "Email",
+                        "sms": "SMS",
+                        "text": "Text"
+                    },
+                    "url": "Website link",
+                    "ssid": "Network name",
+                    "password": "Password",
+                    "security": "Security",
+                    "none": "No password",
+                    "first_name": "First name",
+                    "last_name": "Last name",
+                    "phone": "Phone",
+                    "email": "Email",
+                    "company": "Company",
+                    "website": "Website",
+                    "subject": "Subject",
+                    "message": "Message",
+                    "text": "Text",
+                    "color": "Color"
+                }
+            },
+            "email-signature-generator": {
+                "name": "Email signature generator",
+                "tagline": "A clean, professional email signature for Gmail, Outlook and Apple Mail in one minute.",
+                "title": "Free Email Signature Generator for Gmail, Outlook & Apple Mail",
+                "description": "Make a professional HTML email signature for free. Add your name, title, company, phone, website and photo, pick a color, then copy it into Gmail, Outlook or Apple Mail.",
+                "intro": "Fill in your details and watch the signature update. Copy it and paste it into your email settings: it keeps its look in Gmail, Outlook and Apple Mail.",
+                "steps": [
+                    "Type your details and pick a color.",
+                    "Press “Copy signature”.",
+                    "Paste it into the signature box of Gmail, Outlook or Apple Mail."
+                ],
+                "faq": [
+                    {
+                        "q": "How do I add it to Gmail?",
+                        "a": "Open Gmail settings, then General, then Signature. Create a new signature and paste with Ctrl+V (Cmd+V on Mac), then save at the bottom of the page."
+                    },
+                    {
+                        "q": "How do I add it to Outlook?",
+                        "a": "In Outlook go to Settings, Mail, Compose and reply (or File, Options, Mail, Signatures on desktop), paste the signature and save."
+                    },
+                    {
+                        "q": "Why does my photo not show?",
+                        "a": "Email signatures need an image link that is online, such as your profile photo on your website. Pictures from your computer cannot be embedded."
+                    }
+                ],
+                "form": {
+                    "name": "Full name",
+                    "job": "Job title",
+                    "company": "Company",
+                    "phone": "Phone",
+                    "email": "Email",
+                    "website": "Website",
+                    "address": "Address (optional)",
+                    "photo": "Photo link (optional)",
+                    "photo_hint": "A link to an image that is already online.",
+                    "color": "Color",
+                    "preview": "Preview",
+                    "copy": "Copy signature",
+                    "copy_html": "Copy HTML code"
+                }
+            },
+            "utm-link-builder": {
+                "name": "UTM link builder",
+                "tagline": "Add UTM tags to your links and see exactly which ad, post or email brings visitors.",
+                "title": "Free UTM Link Builder (Campaign URL Builder for Google Analytics)",
+                "description": "Build campaign links with UTM source, medium and campaign tags for Google Analytics 4. Copy the tracked link or get a QR code. Free and no sign-up.",
+                "intro": "Paste your link and describe where it will be shared. The tool adds the UTM tags so Google Analytics shows which campaign brought each visitor.",
+                "steps": [
+                    "Paste the page link.",
+                    "Fill in source, medium and campaign.",
+                    "Copy the tracked link and use it in your ad, post or email."
+                ],
+                "faq": [
+                    {
+                        "q": "What are source, medium and campaign?",
+                        "a": "Source is where the visitor comes from (facebook, newsletter), medium is the type of traffic (cpc, social, email) and campaign is the name of your promotion (black_friday)."
+                    },
+                    {
+                        "q": "Where do I see the results?",
+                        "a": "In Google Analytics 4 under Reports, Acquisition, Traffic acquisition. Change the table to show session source, medium or campaign."
+                    },
+                    {
+                        "q": "Should I use capital letters?",
+                        "a": "Use lowercase and underscores. Analytics treats Facebook and facebook as two different sources."
+                    }
+                ],
+                "form": {
+                    "url": "Page link",
+                    "source": "Campaign source",
+                    "source_hint": "Where: facebook, google, newsletter",
+                    "medium": "Campaign medium",
+                    "medium_hint": "Type: cpc, social, email",
+                    "campaign": "Campaign name",
+                    "campaign_hint": "For example: black_friday",
+                    "term": "Campaign term (optional)",
+                    "content": "Campaign content (optional)",
+                    "result": "Your tracked link",
+                    "invalid": "Enter a full link starting with https:\/\/"
+                }
+            },
+            "meta-tag-generator": {
+                "name": "Google preview and meta tags",
+                "tagline": "See how your page looks in Google search and get the meta tags ready to paste.",
+                "title": "Free Meta Tag Generator with Google Search Preview (SERP Snippet)",
+                "description": "Write your page title and meta description, preview how they appear in Google search, then copy the meta tags and social sharing tags. Free tool.",
+                "intro": "Type the title and description of your page. The preview shows how Google may display it, warns when text is too long, and builds the tags for your website.",
+                "steps": [
+                    "Type the page title, description and link.",
+                    "Check the preview and the length warnings.",
+                    "Copy the tags into the head of your page."
+                ],
+                "faq": [
+                    {
+                        "q": "How long should the title be?",
+                        "a": "About 50 to 60 characters. Longer titles are cut off in Google results."
+                    },
+                    {
+                        "q": "How long should the description be?",
+                        "a": "About 120 to 155 characters. Google may still choose its own text, but a clear description often gets used."
+                    },
+                    {
+                        "q": "Will this make my page rank first?",
+                        "a": "No tag guarantees a ranking. A clear title and description help people choose your result, which brings more clicks."
+                    }
+                ],
+                "form": {
+                    "page_title": "Page title",
+                    "page_desc": "Meta description",
+                    "url": "Page link",
+                    "site_name": "Site name",
+                    "image": "Share image link (optional)",
+                    "chars": ":count characters",
+                    "too_long": "Too long, it may be cut off",
+                    "preview": "Google preview",
+                    "tags": "Meta tags",
+                    "copy": "Copy tags"
+                }
+            },
+            "break-even-calculator": {
+                "name": "Break-even calculator",
+                "tagline": "How many units you need to sell each month to cover your costs, and to reach your profit goal.",
+                "title": "Free Break-Even Calculator: Units & Sales to Cover Your Costs",
+                "description": "Find your break-even point in units and sales. Enter fixed costs, price and variable cost per unit, and see how many sales you need to cover costs and hit a profit target.",
+                "intro": "Enter your monthly fixed costs (rent, salaries, subscriptions), your selling price and what each unit costs you. The calculator shows the sales you need to stop losing money.",
+                "steps": [
+                    "Enter monthly fixed costs.",
+                    "Enter the price and variable cost per unit.",
+                    "Read the break-even units and sales, and add a profit goal if you have one."
+                ],
+                "faq": [
+                    {
+                        "q": "What is the break-even point?",
+                        "a": "The number of sales where income equals all costs: no profit and no loss. Every sale after it adds profit."
+                    },
+                    {
+                        "q": "What are fixed and variable costs?",
+                        "a": "Fixed costs stay the same each month (rent, salaries, software). Variable costs grow with each sale (materials, packaging, payment fees)."
+                    },
+                    {
+                        "q": "How can I lower my break-even point?",
+                        "a": "Raise the price, cut the cost per unit or reduce fixed costs. The calculator updates as you try different numbers."
+                    }
+                ],
+                "form": {
+                    "fixed": "Fixed costs per month",
+                    "price": "Price per unit",
+                    "variable": "Variable cost per unit",
+                    "target": "Profit goal per month (optional)",
+                    "units": "Units to break even",
+                    "sales": "Sales to break even",
+                    "contribution": "Profit per unit sold",
+                    "target_units": "Units to reach your goal",
+                    "impossible": "The price must be higher than the cost per unit, or you lose money on every sale."
+                }
+            },
+            "freelance-rate-calculator": {
+                "name": "Freelance rate calculator",
+                "tagline": "Find the hourly and daily rate you need to earn your target income as a freelancer.",
+                "title": "Freelance Hourly Rate Calculator: What Should I Charge?",
+                "description": "Calculate your freelance hourly and day rate from your income goal, business costs, taxes, vacation and billable hours. Free rate calculator for designers, developers and writers.",
+                "intro": "Most freelancers charge too little because not every hour is billable. Enter the income you want and your real working time, and see the rate that gets you there.",
+                "steps": [
+                    "Enter the yearly income you want to take home.",
+                    "Add your yearly costs, tax and time off.",
+                    "Read your hourly, daily and monthly rate."
+                ],
+                "faq": [
+                    {
+                        "q": "Why is the rate higher than I expected?",
+                        "a": "Admin, sales and learning take time you cannot bill. Most freelancers bill 20 to 30 hours a week, not 40."
+                    },
+                    {
+                        "q": "Should I charge by the hour or by project?",
+                        "a": "Use the hourly rate to price projects: estimate the hours, add a margin for changes, and quote one project price."
+                    },
+                    {
+                        "q": "What should I include in costs?",
+                        "a": "Software, equipment, internet, insurance, accounting, courses and anything else you pay to run your work."
+                    }
+                ],
+                "form": {
+                    "income": "Yearly income you want",
+                    "costs": "Yearly business costs",
+                    "tax": "Tax rate %",
+                    "hours": "Billable hours per week",
+                    "weeks_off": "Weeks off per year",
+                    "hourly": "Hourly rate",
+                    "daily": "Day rate (8 hours)",
+                    "monthly": "Monthly revenue needed",
+                    "yearly": "Yearly revenue needed",
+                    "billable": ":hours billable hours a year"
+                }
             }
         }
     },

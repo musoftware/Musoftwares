@@ -52,11 +52,12 @@
             const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = name; link.click();
             setTimeout(() => URL.revokeObjectURL(link.href), 1000);
         },
-        qr(canvas, text, size = 280) {
+        qr(canvas, text, size = 280, color = '#000000') {
+            qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']; // Arabic names in contact cards
             const code = qrcode(0, 'M'); code.addData(text); code.make();
             const count = code.getModuleCount(), cell = Math.max(2, Math.floor(size / (count + 8))), full = cell * (count + 8);
             canvas.width = canvas.height = full;
-            const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, full, full); ctx.fillStyle = '#000';
+            const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, full, full); ctx.fillStyle = color;
             for (let r = 0; r < count; r++) for (let c = 0; c < count; c++) if (code.isDark(r, c)) ctx.fillRect((c + 4) * cell, (r + 4) * cell, cell, cell);
         },
     };
