@@ -11,7 +11,7 @@ return [
 
     'how_title' => 'How we work',
     'steps' => [
-        ['title' => 'We understand your work', 'text' => 'We talk with you and your team, see how orders, stock, money and people move today, and where time is lost.'],
+        ['title' => 'We understand your work', 'text' => 'We talk with you and your team, see how your work runs today step by step, and where time and effort are lost.'],
         ['title' => 'A clear plan and price', 'text' => 'You get a written plan: the screens, the reports, what each person can do, the timeline and one fixed price.'],
         ['title' => 'We build in stages you can see', 'text' => 'Every week or two you try what is ready and tell us what to change, before we move on.'],
         ['title' => 'Training, launch and support', 'text' => 'We move your data, train your team, and stay with you after launch for fixes and new needs.'],
