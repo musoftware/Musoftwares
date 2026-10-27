@@ -10,10 +10,9 @@ class SiteNav
 {
     private const MAIN = [
         ['url' => '/services', 'match' => ['services', 'services/*'], 'ar' => 'الخدمات', 'en' => 'Services'],
-        ['url' => '/custom-systems', 'match' => ['custom-systems'], 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
+        ['url' => '/how-we-work', 'match' => ['how-we-work'], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
         ['url' => '/portfolio', 'match' => ['portfolio', 'portfolio/*'], 'ar' => 'أعمالنا', 'en' => 'Our work'],
         ['url' => '/estimator', 'match' => ['estimator', 'pricing'], 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
-        ['url' => '/#how-it-works', 'match' => [], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
         ['url' => '/about/mahmoud-amin', 'match' => ['about/*'], 'ar' => 'من نحن', 'en' => 'About us'],
     ];
 
@@ -30,7 +29,7 @@ class SiteNav
         ['ar' => 'المنتجات', 'en' => 'Products', 'links' => [
             ['url' => '/services#programs', 'ar' => 'برامج سطح المكتب', 'en' => 'Desktop programs'],
             ['url' => '/services#systems', 'ar' => 'أنظمة إدارة الأعمال', 'en' => 'Business systems'],
-            ['url' => '/custom-systems', 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
+            ['url' => '/how-we-work', 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
             ['url' => '/services#services', 'ar' => 'خدمات مواقع وتسويق', 'en' => 'Websites and marketing services'],
             ['url' => '/marketplace/catalog', 'ar' => 'سوق الخدمات', 'en' => 'Services marketplace'],
             ['url' => '/estimator', 'ar' => 'احسب تكلفة مشروعك', 'en' => 'Estimate your project'],
@@ -39,7 +38,7 @@ class SiteNav
         ['ar' => 'موسوفت', 'en' => 'Musoftware', 'links' => [
             ['url' => '/about/mahmoud-amin', 'ar' => 'من نحن', 'en' => 'About us'],
             ['url' => '/portfolio', 'ar' => 'أعمالنا', 'en' => 'Our work'],
-            ['url' => '/#how-it-works', 'ar' => 'كيف نعمل', 'en' => 'How we work'],
+            ['url' => '/how-we-work', 'ar' => 'كيف نعمل', 'en' => 'How we work'],
             ['url' => '/blog', 'ar' => 'المدونة', 'en' => 'Blog'],
             ['url' => '/compare/laravel-vs-nodejs', 'ar' => 'المقارنات والمقالات', 'en' => 'Comparisons and articles'],
         ]],

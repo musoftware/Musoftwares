@@ -10,6 +10,7 @@ const BLADE_PREFIXES = [
     '/portfolio',
     '/blog',
     '/compare',
+    '/how-we-work',
     '/custom-systems',
     '/start-project',
     '/legal',

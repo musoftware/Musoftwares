@@ -65,7 +65,7 @@ class SitemapController extends Controller
             'marketplace.services.index' => '0.9',
             'services.index' => '0.9',
             'portfolio' => '0.8',
-            'custom-systems' => '0.9',
+            'how-we-work' => '0.9',
             'company.about' => '0.7',
             'company.careers' => '0.7',
             'company.contact' => '0.7',

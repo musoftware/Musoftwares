@@ -8,9 +8,9 @@ return [
         'title' => 'Our Work: Systems and Platforms We Built',
         'description' => 'More than 30 real projects: ERP and accounting systems, online stores, booking platforms and custom SaaS apps, with what each one solved.',
     ],
-    'custom_systems' => [
-        'title' => 'Custom Business Systems Built Around How You Work',
-        'description' => 'We learn how your business runs, then build the system for it: sales and stock, bookings, staff and payroll, customers, delivery and production. Clear plan and fixed price.',
+    'how_we_work' => [
+        'title' => 'How We Work: Custom Systems, Prices and Support',
+        'description' => 'We learn how your business runs and build the system for it. Prices from the cost estimator, a free month of support and two free changes, then monthly or per-change support.',
     ],
     'about' => [
         'title' => 'About Musoftware, a Software Studio in Suez',

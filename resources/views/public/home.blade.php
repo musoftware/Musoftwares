@@ -181,6 +181,7 @@
                     </li>
                 @endforeach
             </ol>
+            <p class="mt-8 text-center"><a href="/how-we-work{{ app()->getLocale() === 'ar' ? '?lang=ar' : '' }}" class="text-sm font-semibold text-[#0071e3] hover:underline">{{ $t('الأسعار والدعم بعد التسليم بالتفصيل', 'Prices and support after delivery in detail') }}</a></p>
         </div>
     </section>
 

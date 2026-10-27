@@ -17,13 +17,23 @@ class PublicRoutesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_custom_systems_page_replaces_the_old_platforms_pages()
+    public function test_how_we_work_page_states_prices_and_support()
     {
-        $this->get('/custom-systems')->assertStatus(200)->assertSee(__('custom_systems.title', [], 'en'));
-        $this->get('/custom-systems?lang=ar')->assertStatus(200)->assertSee('بنفهم شغلك الأول');
+        $this->get('/how-we-work?lang=en')->assertOk()
+            ->assertSee('10% of the project price per month')
+            ->assertSee('One month of free support')
+            ->assertSee('Two free changes')
+            ->assertSee('href="/estimator"', false);
+        $this->get('/how-we-work?lang=ar')->assertOk()->assertSee('شهر دعم فني مجاني')->assertSee('تعديلين مجانًا');
+    }
 
-        foreach (['/platforms', '/platforms/crm', '/platforms/erp', '/platforms/cloud', '/solutions'] as $old) {
-            $this->get($old)->assertStatus(301)->assertRedirect('/custom-systems');
+    public function test_how_we_work_replaces_the_platforms_solutions_and_custom_systems_pages()
+    {
+        $this->get('/how-we-work?lang=en')->assertStatus(200)->assertSee(__('custom_systems.title', [], 'en'))->assertSee('Sales, stock and branches');
+        $this->get('/how-we-work?lang=ar')->assertStatus(200)->assertSee('بنفهم شغلك الأول');
+
+        foreach (['/custom-systems', '/platforms', '/platforms/crm', '/platforms/erp', '/platforms/cloud', '/solutions'] as $old) {
+            $this->get($old)->assertStatus(301)->assertRedirect('/how-we-work');
         }
     }
 
@@ -43,7 +53,7 @@ class PublicRoutesTest extends TestCase
     public function test_solutions_pages_return_successful_response()
     {
         $this->get('/solutions/healthcare')->assertStatus(301)->assertRedirect('/services/clinic-system');
-        $this->get('/solutions/finance')->assertStatus(301)->assertRedirect('/custom-systems');
+        $this->get('/solutions/finance')->assertStatus(301)->assertRedirect('/how-we-work');
     }
 
     public function test_company_pages_return_successful_response()

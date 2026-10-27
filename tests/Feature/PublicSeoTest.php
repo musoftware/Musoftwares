@@ -27,9 +27,9 @@ class PublicSeoTest extends TestCase
 
     public function test_fixed_pages_have_a_title_and_description_in_the_page_language(): void
     {
-        $this->get('/custom-systems?lang=ar')->assertOk()
-            ->assertSee('<title>'.e(__('seo.custom_systems.title', [], 'ar')).' | موسوفت</title>', false)
-            ->assertSee('<meta name="description" content="'.e(__('seo.custom_systems.description', [], 'ar')).'">', false);
+        $this->get('/how-we-work?lang=ar')->assertOk()
+            ->assertSee('<title>'.e(__('seo.how_we_work.title', [], 'ar')).' | موسوفت</title>', false)
+            ->assertSee('<meta name="description" content="'.e(__('seo.how_we_work.description', [], 'ar')).'">', false);
 
         $this->get('/company/contact?lang=en')->assertOk()
             ->assertSee('<title>'.e(__('seo.contact.title', [], 'en')).' | Musoftware</title>', false);
@@ -37,18 +37,18 @@ class PublicSeoTest extends TestCase
 
     public function test_english_page_points_to_itself_and_to_its_arabic_version(): void
     {
-        $html = $this->get('/custom-systems?lang=en')->assertOk()->getContent();
+        $html = $this->get('/how-we-work?lang=en')->assertOk()->getContent();
 
-        $this->assertStringContainsString('<link rel="canonical" href="'.url('/custom-systems').'">', $html);
-        $this->assertStringContainsString('hreflang="ar" href="'.url('/custom-systems').'?lang=ar"', $html);
-        $this->assertStringContainsString('hreflang="en" href="'.url('/custom-systems').'"', $html);
+        $this->assertStringContainsString('<link rel="canonical" href="'.url('/how-we-work').'">', $html);
+        $this->assertStringContainsString('hreflang="ar" href="'.url('/how-we-work').'?lang=ar"', $html);
+        $this->assertStringContainsString('hreflang="en" href="'.url('/how-we-work').'"', $html);
     }
 
     public function test_arabic_page_is_its_own_canonical_so_google_can_index_it(): void
     {
-        $html = $this->get('/custom-systems?lang=ar')->assertOk()->getContent();
+        $html = $this->get('/how-we-work?lang=ar')->assertOk()->getContent();
 
-        $this->assertStringContainsString('<link rel="canonical" href="'.url('/custom-systems').'?lang=ar">', $html);
+        $this->assertStringContainsString('<link rel="canonical" href="'.url('/how-we-work').'?lang=ar">', $html);
     }
 
     public function test_react_pages_follow_the_same_language_rule(): void
@@ -63,8 +63,8 @@ class PublicSeoTest extends TestCase
     {
         $xml = $this->sitemapXml();
 
-        $this->assertStringContainsString('hreflang="en" href="'.url('/custom-systems').'"', $xml);
-        $this->assertStringContainsString('hreflang="ar" href="'.url('/custom-systems').'?lang=ar"', $xml);
+        $this->assertStringContainsString('hreflang="en" href="'.url('/how-we-work').'"', $xml);
+        $this->assertStringContainsString('hreflang="ar" href="'.url('/how-we-work').'?lang=ar"', $xml);
         $this->assertStringNotContainsString('lang=en', $xml);
         $this->assertStringNotContainsString('catalog?category=', $xml);
     }

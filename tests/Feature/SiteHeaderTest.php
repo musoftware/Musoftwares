@@ -11,7 +11,7 @@ class SiteHeaderTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const PAGES = ['/', '/services', '/custom-systems', '/portfolio', '/library'];
+    private const PAGES = ['/', '/services', '/how-we-work', '/portfolio', '/library'];
 
     public function test_every_public_page_shows_the_same_header_with_a_more_menu(): void
     {
@@ -56,9 +56,9 @@ class SiteHeaderTest extends TestCase
     {
         $this->get('/estimator?lang=ar')->assertOk()->assertInertia(
             fn (AssertableInertia $page) => $page
-                ->has('siteNav.main', 6)
+                ->has('siteNav.main', 5)
                 ->has('siteNav.more', 2)
-                ->where('siteNav.main.1.url', '/custom-systems')
+                ->where('siteNav.main.1.url', '/how-we-work')
                 ->where('siteNav.main.0.url', '/services')
         );
     }

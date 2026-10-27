@@ -148,10 +148,10 @@ class HomeController extends Controller
         ]);
     }
 
-    /** We learn how the business works, then build its system (replaces the CRM/ERP platform pages). */
-    public function customSystems()
+    /** Custom systems built around the business, the two ways to work with us, prices and support. */
+    public function howWeWork()
     {
-        return view('public.custom-systems', PageSeo::for('custom_systems'));
+        return view('public.how-we-work', PageSeo::for('how_we_work'));
     }
 
 
