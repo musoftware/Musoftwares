@@ -74,6 +74,14 @@ class AdminSoftwareProductController extends Controller
         return back();
     }
 
+    /** A link to send one customer; it works for the chosen days even while the program is hidden. */
+    public function shareLink(Request $request, SoftwareProduct $product)
+    {
+        $days = (int) $request->validate(['days' => 'required|integer|min:1|max:90'])['days'];
+
+        return response()->json(['url' => $product->shareUrl($days), 'expires_at' => now()->addDays($days)->toDateTimeString()]);
+    }
+
     public function update(Request $request, SoftwareProduct $product)
     {
         $data = $request->validate([

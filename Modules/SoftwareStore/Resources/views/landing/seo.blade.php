@@ -1,6 +1,7 @@
 @php $seo = app(\Modules\SoftwareStore\Services\StoreSeo::class); @endphp
 @push('head')
-    <meta name="robots" content="index,follow,max-image-preview:large">
+    {{-- a private link sent to one customer stays out of search results --}}
+    <meta name="robots" content="{{ ($shared ?? false) ? 'noindex,nofollow' : 'index,follow,max-image-preview:large' }}">
     @foreach ($seo->alternates($product->purchaseUrl()) as $lang => $href)
         <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
     @endforeach

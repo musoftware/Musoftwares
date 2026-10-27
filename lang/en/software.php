@@ -63,4 +63,5 @@ return [
         'systems' => 'Full management systems for your business. Buy the source code as it is, or with any programming changes you need. One payment.',
         'services' => 'Work done for you by our team, with a clear scope and price.',
     ],
+    'share_expired' => 'This link has expired. Ask us on WhatsApp for a new one.',
 ];

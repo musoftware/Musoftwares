@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { Head, Link, router } from '@inertiajs/react';
+import { Check, Link2 } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
@@ -34,6 +36,61 @@ interface Order {
 }
 
 const formatPrice = (row: Row) => `${row.has_plans ? t('from ', 'من ') : ''}${Number(row.price).toLocaleString('en-US')} ${row.currency}`;
+
+const SHARE_DAYS = [1, 3, 7, 14, 30];
+
+/** A link for one customer that opens the program's page, even while hidden, for the chosen number of days. */
+function ShareLink({ row }: { row: Row }) {
+    const [days, setDays] = useState(3);
+    const [link, setLink] = useState<{ url: string; expires_at: string } | null>(null);
+    const [copied, setCopied] = useState(false);
+    const [busy, setBusy] = useState(false);
+
+    const create = async () => {
+        setBusy(true);
+        try {
+            const { data } = await axios.post(`/admin/software-products/${row.id}/share`, { days });
+            setLink(data);
+            try {
+                await navigator.clipboard.writeText(data.url);
+                setCopied(true);
+            } catch {
+                setCopied(false);
+            }
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    return (
+        <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-1">
+                <select
+                    value={days}
+                    onChange={(e) => { setDays(Number(e.target.value)); setLink(null); }}
+                    className="h-8 min-w-[6.5rem] rounded-md border bg-background ps-2 text-sm"
+                    aria-label={t('Link valid for', 'صلاحية الرابط')}
+                >
+                    {SHARE_DAYS.map((d) => (
+                        <option key={d} value={d}>{d === 1 ? t('1 day', 'يوم واحد') : t(`${d} days`, `${d} أيام`)}</option>
+                    ))}
+                </select>
+                <Button variant="outline" size="sm" onClick={create} disabled={busy}>
+                    {copied && link ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+                    {copied && link ? t('Copied', 'اتنسخ') : t('Customer link', 'رابط لعميل')}
+                </Button>
+            </div>
+            {link && (
+                <div className="flex max-w-xs flex-col items-end gap-0.5">
+                    <input readOnly value={link.url} onFocus={(e) => e.target.select()} dir="ltr" className="w-full rounded border bg-muted px-2 py-1 text-xs" />
+                    <span className="text-xs text-muted-foreground">
+                        {t('Works until', 'شغال لحد')} {link.expires_at}{!row.is_active && ` · ${t('opens even though the program is hidden', 'بيفتح حتى والبرنامج مخفي')}`}
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function Index({ products, orders }: { products: Row[]; orders: Order[] }) {
     return (
@@ -91,6 +148,7 @@ export default function Index({ products, orders }: { products: Row[]; orders: O
                                         <Button asChild variant="outline" size="sm">
                                             <a href={row.page_url} target="_blank" rel="noreferrer">{t('View page', 'فتح الصفحة')}</a>
                                         </Button>
+                                        <div className="mt-2"><ShareLink row={row} /></div>
                                     </TableCell>
                                 </TableRow>
                             ))}

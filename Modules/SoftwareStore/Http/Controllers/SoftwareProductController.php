@@ -4,6 +4,7 @@ namespace Modules\SoftwareStore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
+use Illuminate\Http\Request;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\StoreSeo;
 
@@ -24,6 +25,20 @@ class SoftwareProductController extends Controller
             ->filter(fn ($items) => $items->isNotEmpty());
 
         return view('softwarestore::index', compact('products', 'groups'));
+    }
+
+    /**
+     * The admin's time-limited link: shows the page even when the program is hidden, and lets this
+     * visitor order it until the link expires. An expired or edited link is refused.
+     */
+    public function shared(Request $request, string $slug)
+    {
+        abort_unless($request->hasValidSignature(), 410, __('software.share_expired'));
+
+        $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
+        $product->rememberShare((int) $request->query('expires'));
+
+        return view('softwarestore::show', ['product' => $product, 'latest' => $product->latestRelease(), 'shared' => true]);
     }
 
     /** The page as plain Markdown, for AI assistants. */

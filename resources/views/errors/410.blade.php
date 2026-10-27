@@ -123,8 +123,9 @@
 <body>
     <div class="container">
         <h1>410</h1>
-        <h2>{{ $ar ? 'تم حذف هذه الصفحة' : 'This page was removed' }}</h2>
-        <p>{{ $ar ? 'المقال ده اتشال من المدونة. تقدر تقرأ مقالاتنا الحالية أو تتصفح الخدمات.' : 'This article is no longer on our blog. Read our current articles or browse our services.' }}</p>
+        @php($reason = isset($exception) ? $exception->getMessage() : ''){{-- e.g. an expired private product link --}}
+        <h2>{{ $reason ? ($ar ? 'انتهت صلاحية الرابط' : 'This link has expired') : ($ar ? 'تم حذف هذه الصفحة' : 'This page was removed') }}</h2>
+        <p>{{ $reason ?: ($ar ? 'المقال ده اتشال من المدونة. تقدر تقرأ مقالاتنا الحالية أو تتصفح الخدمات.' : 'This article is no longer on our blog. Read our current articles or browse our services.') }}</p>
         <div class="btn-wrapper">
             <a href="/blog{{ $ar ? '?lang=ar' : '' }}" class="btn">{{ $ar ? 'المدونة' : 'Blog' }}</a>
             <a href="/services{{ $ar ? '?lang=ar' : '' }}" class="btn">{{ $ar ? 'البرامج والخدمات' : 'Programs and services' }}</a>

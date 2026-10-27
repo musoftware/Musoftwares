@@ -19,7 +19,8 @@ class SoftwareOrderController extends Controller
 
     public function store(Request $request, string $slug)
     {
-        $product = SoftwareProduct::where('is_active', true)->where('slug', $slug)->firstOrFail();
+        $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
+        abort_unless($product->canBeOrdered(), 404);
 
         $client = $request->validate([
             'client_name' => 'required|string|max:255',
@@ -67,7 +68,7 @@ class SoftwareOrderController extends Controller
             return redirect()->route('software.orders.success', $order->uuid);
         }
 
-        abort_unless($order->product?->is_active, 404);
+        abort_unless($order->product?->canBeOrdered(), 404);
 
         $this->recoveryDiscount->apply($order);
 

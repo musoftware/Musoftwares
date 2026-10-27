@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\URL;
 
 /**
  * @property int $id
@@ -209,6 +210,24 @@ class SoftwareProduct extends Model
         $url = route('website-services.show', $this->slug);
 
         return $deviceId ? $url.'?device='.rawurlencode($deviceId) : $url;
+    }
+
+    /** A link for one customer that opens this page, hidden or not, for the given number of days. */
+    public function shareUrl(int $days): string
+    {
+        return URL::temporarySignedRoute('software.shared', now()->addDays($days), ['slug' => $this->slug]);
+    }
+
+    /** Remembers, until the link's expiry, that this visitor came through a shared link, so the order form works. */
+    public function rememberShare(int $expiresAt): void
+    {
+        session()->put("software_share.{$this->id}", $expiresAt);
+    }
+
+    /** A program can be ordered when it is on the website, or when this visitor holds an unexpired shared link. */
+    public function canBeOrdered(): bool
+    {
+        return $this->is_active || (int) session("software_share.{$this->id}") > now()->timestamp;
     }
 
     public function releases(): HasMany

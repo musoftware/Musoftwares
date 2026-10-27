@@ -23,6 +23,8 @@ Route::middleware('web')->group(function () {
     Route::get('/services/tools/qr-menu/{code}/data', [FreeToolController::class, 'menuData'])->middleware('throttle:30,1')->name('services.tools.menu.data');
     Route::get('/menu/{code}', [FreeToolController::class, 'menu'])->where('code', '[a-z0-9]{8}')->name('services.tools.menu');
     Route::get('/services/{slug}.md', [SoftwareProductController::class, 'markdown'])->where('slug', '[a-z0-9-]+')->name('software.markdown');
+    // a time-limited link the admin sends to one customer; it opens the page even when the program is hidden
+    Route::get('/services/{slug}/private', [SoftwareProductController::class, 'shared'])->where('slug', '[a-z0-9-]+')->name('software.shared');
     Route::get('/services/{slug}', [SoftwareProductController::class, 'show'])->name('website-services.show');
 
     // ── Guest order, payment and download ───────────────────────────
@@ -57,6 +59,7 @@ Route::middleware('web')->group(function () {
         Route::get('/software-products/{product}/edit', [AdminSoftwareProductController::class, 'edit'])->name('software.edit');
         Route::post('/software-products/{product}', [AdminSoftwareProductController::class, 'update'])->name('software.update');
         Route::post('/software-products/{product}/toggle', [AdminSoftwareProductController::class, 'toggleActive'])->name('software.toggle');
+        Route::post('/software-products/{product}/share', [AdminSoftwareProductController::class, 'shareLink'])->name('software.share');
         Route::post('/software-products/{product}/releases', [AdminSoftwareProductController::class, 'storeRelease'])->name('software.releases.store');
         Route::post('/software-releases/{release}/toggle', [AdminSoftwareProductController::class, 'toggleRelease'])->name('software.releases.toggle');
         Route::delete('/software-releases/{release}', [AdminSoftwareProductController::class, 'destroyRelease'])->name('software.releases.destroy');
