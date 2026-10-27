@@ -61,7 +61,7 @@ class PublicSeoTest extends TestCase
 
     public function test_sitemap_english_alternate_is_the_plain_address(): void
     {
-        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+        $xml = $this->sitemapXml();
 
         $this->assertStringContainsString('hreflang="en" href="'.url('/platforms').'"', $xml);
         $this->assertStringContainsString('hreflang="ar" href="'.url('/platforms').'?lang=ar"', $xml);

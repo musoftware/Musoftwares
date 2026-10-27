@@ -52,4 +52,16 @@ abstract class TestCase extends BaseTestCase
 
         return parent::assertDatabaseHas($table, $data, $connection);
     }
+
+    /** The whole sitemap: /sitemap.xml is an index, so fetch every part it lists and join them. */
+    protected function sitemapXml(): string
+    {
+        $index = $this->get('/sitemap.xml')->assertOk()->getContent();
+        preg_match_all('#<loc>([^<]+)</loc>#', $index, $matches);
+
+        return collect($matches[1])
+            ->map(fn (string $url) => $this->get(parse_url($url, PHP_URL_PATH))->assertOk()->getContent())
+            ->implode("
+");
+    }
 }

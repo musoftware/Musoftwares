@@ -625,7 +625,7 @@ class SoftwareProductsTest extends TestCase
         $this->seed(SoftwareProductSeeder::class);
         SoftwareProduct::where('slug', 'audfinder')->update(['is_active' => true]);
 
-        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+        $xml = $this->sitemapXml();
 
         $this->assertStringContainsString('<loc>'.route('services.index').'</loc>', $xml);
         $this->assertStringContainsString('<loc>'.route('website-services.show', 'audfinder').'</loc>', $xml);

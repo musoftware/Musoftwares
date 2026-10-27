@@ -59,7 +59,7 @@ class BlogSeoTest extends TestCase
         $this->article();
         $this->article(['language' => 'en', 'title' => 'Website cost', 'slug' => 'website-cost-en']);
 
-        $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
+        $xml = $this->sitemapXml();
 
         $this->assertStringContainsString('hreflang="en" href="'.url('/blog/website-cost-en').'"', $xml);
         $this->assertStringNotContainsString('/blog/website-cost?lang=', $xml);
@@ -91,7 +91,7 @@ class BlogSeoTest extends TestCase
         $broken = $this->article(['group_id' => 'g-9', 'language' => 'en', 'slug' => 'temp-slug']);
         \Illuminate\Support\Facades\DB::table('blog_articles')->where('id', $broken->id)->update(['slug' => '']);
 
-        $this->get('/sitemap.xml')->assertOk()->assertSee('/blog/with-slug', false);
+        $this->assertStringContainsString('/blog/with-slug', $this->sitemapXml());
         $this->get('/blog/with-slug')->assertOk();
     }
 
@@ -101,6 +101,6 @@ class BlogSeoTest extends TestCase
 
         // it was published before, so the address answers 410 Gone (see RemovedPagesTest)
         $this->get('/blog/hidden')->assertStatus(410);
-        $this->assertStringNotContainsString('/blog/hidden', $this->get('/sitemap.xml')->getContent());
+        $this->assertStringNotContainsString('/blog/hidden', $this->sitemapXml());
     }
 }

@@ -79,10 +79,10 @@ class FreeToolsTest extends TestCase
 
     public function test_sitemap_lists_every_tool(): void
     {
-        $response = $this->get('/sitemap.xml')->assertOk();
+        $xml = $this->sitemapXml();
 
         foreach (FreeTools::slugs() as $slug) {
-            $response->assertSee(url("/services/tools/{$slug}"), false);
+            $this->assertStringContainsString(url("/services/tools/{$slug}"), $xml);
         }
     }
 

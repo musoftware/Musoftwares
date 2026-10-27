@@ -207,6 +207,7 @@ Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemaps/{name}.xml', [SitemapController::class, 'part'])->where('name', 'pages|marketplace|blog-[1-9][0-9]*')->name('sitemap.part');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
