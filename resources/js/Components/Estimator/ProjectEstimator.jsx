@@ -43,7 +43,6 @@ import {
     Loader2
 } from 'lucide-react';
 import axios from 'axios';
-import MouseScrollContainer from '@/Components/ui/MouseScrollContainer';
 import { downloadProposalPdf } from '@/Utils/proposalPdfExport';
 
 export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = true, title = "Calculate Your Project Investment", subtitle = "Combine platforms and in-demand modules to calculate your transparent development estimate." }) {
@@ -1083,26 +1082,23 @@ Please let me know when we can review the technical specification!`;
                                 )}
                             </div>
 
-                            {/* Category Filter Tabs */}
-                            <MouseScrollContainer 
-                                className="bg-[#f5f5f7] p-1.5 rounded-full border border-black/5"
-                                contentClassName="gap-1.5"
-                            >
+                            {/* Category Filter Tabs: every category visible at once, two rows on wider screens, no scrolling */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[#f5f5f7] p-1.5 rounded-2xl border border-black/5">
                                 {categories.map(cat => (
                                     <button
                                         key={cat.id}
                                         type="button"
                                         onClick={() => setActiveCategory(cat.id)}
-                                        className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer text-xs shrink-0 ${
+                                        className={`px-3 py-2 rounded-full text-center leading-tight transition-all cursor-pointer text-xs ${
                                             activeCategory === cat.id
                                                 ? 'bg-white text-[#1d1d1f] font-semibold shadow-sm'
-                                                : 'text-[#1d1d1f]/70 hover:text-[#1d1d1f]'
+                                                : 'text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-white/60'
                                         }`}
                                     >
                                         {cat.title}
                                     </button>
                                 ))}
-                            </MouseScrollContainer>
+                            </div>
 
                             {/* Modules Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
