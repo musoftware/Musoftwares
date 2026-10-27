@@ -78,12 +78,21 @@
             <p class="mt-3 text-center text-[#1d1d1f]/60">{{ __('custom_systems.examples_hint') }}</p>
             <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach (__('custom_systems.examples') as $example)
-                    <div class="rounded-[24px] bg-[#fbfbfd] border border-black/5 p-6">
+                    {{-- Most examples are real delivered projects and link to them in the portfolio --}}
+                    <div class="flex flex-col rounded-[24px] bg-[#fbfbfd] border border-black/5 p-6">
                         <span class="flex w-11 h-11 items-center justify-center rounded-2xl bg-[#0071e3]/10 text-[#0071e3] text-xl"><i class="{{ $example['icon'] }}" aria-hidden="true"></i></span>
                         <h3 class="mt-4 font-bold">{{ $example['title'] }}</h3>
-                        <p class="mt-2 text-sm text-[#1d1d1f]/60 leading-relaxed">{{ $example['text'] }}</p>
+                        <p class="mt-2 flex-1 text-sm text-[#1d1d1f]/60 leading-relaxed">{{ $example['text'] }}</p>
+                        @if (! empty($example['project']))
+                            <a href="{{ route('portfolio.show', $example['project']) }}{{ $q }}" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#0071e3] hover:underline">
+                                {{ __('custom_systems.examples_link') }}<i class="ri-arrow-right-line rtl:rotate-180" aria-hidden="true"></i>
+                            </a>
+                        @endif
                     </div>
                 @endforeach
+            </div>
+            <div class="mt-8 text-center">
+                <a href="{{ route('portfolio') }}{{ $q }}" class="inline-flex h-11 items-center rounded-full bg-white border border-black/10 px-6 text-sm font-semibold hover:bg-[#f5f5f7]">{{ __('custom_systems.examples_all') }}</a>
             </div>
         </div>
     </section>
