@@ -370,6 +370,72 @@ class PortfolioData
                 ],
             ],
 
+            'mailforge' => [
+                'slug' => 'mailforge',
+                'title_en' => 'MailForge: Bulk Email Marketing Platform',
+                'title_ar' => 'MailForge: منصة حملات الإيميل',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'A self-hosted email marketing platform: the business installs it on its own server, connects its own SMTP accounts and sends newsletters and campaigns to its lists. Sending rotates between the accounts within their hourly and daily limits, new accounts warm up slowly, and every campaign reports opens, clicks and bounces.',
+                'desc_ar' => 'منصة حملات إيميل بتتسطب على سيرفر الشركة نفسها: الشركة بتربط حسابات SMTP بتاعتها وتبعت نشرات وحملات لقوايمها. الإرسال بيتوزع على الحسابات في حدود كل ساعة وكل يوم، والحسابات الجديدة بتسخن بالتدريج، وكل حملة ليها تقرير بالفتح والضغطات والمرتجع.',
+                'img' => '/images/portfolio/mailforge-1.webp',
+                // screenshots taken from a local run with demo data
+                'gallery' => ['/images/portfolio/mailforge-1.webp', '/images/portfolio/mailforge-2.webp', '/images/portfolio/mailforge-3.webp', '/images/portfolio/mailforge-4.webp'],
+                'techs' => ['Laravel', 'Alpine.js', 'Tailwind CSS', 'Queues'],
+                'live_url' => null,
+                'metrics' => [
+                    'Sending' => 'Rotation across SMTP accounts',
+                    'Limits' => 'Hourly and daily per account',
+                    'Warm-up' => 'New accounts ramp up slowly',
+                    'Reports' => 'Opens, clicks and bounces',
+                ],
+                'highlights_en' => [
+                    'Sending picks the next SMTP account by priority and least recent use, with hourly and daily caps and a cooldown.',
+                    'Warm-up for new accounts and per-domain throttling, with extra care for Gmail, Outlook and Yahoo.',
+                    'Contact lists imported from CSV, and templates that insert each contact\'s details.',
+                    'Per-campaign progress, logs and reports for opens, clicks, bounces and failures.',
+                ],
+                'highlights_ar' => [
+                    'الإرسال بيختار حساب SMTP اللي عليه الدور بالأولوية والأقل استخدامًا، بحد لكل ساعة وكل يوم وفترة راحة.',
+                    'تسخين للحسابات الجديدة وتحكم في السرعة لكل دومين، بحرص زيادة مع Gmail وOutlook وYahoo.',
+                    'قوايم العملاء بتتستورد من CSV، والقوالب بتحط بيانات كل عميل في رسالته.',
+                    'لكل حملة متابعة وسجل وتقرير بالفتح والضغطات والمرتجع والفاشل.',
+                ],
+            ],
+
+            'amc-ai-blogging' => [
+                'slug' => 'amc-ai-blogging',
+                'title_en' => 'AMC AI: Automatic Blogging with AI',
+                'title_ar' => 'AMC AI: تدوين تلقائي بالذكاء الاصطناعي',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'A system that runs blogs on its own. It researches keywords on a subject, suggests headlines, writes the articles with AI and publishes them to the client\'s WordPress and Blogger sites. In auto-blogging mode it picks trending keywords per country and keeps the sites posting; the writing jobs are picked up by a desktop worker program.',
+                'desc_ar' => 'سيستم بيدير المدونات لوحده: بيدور على الكلمات المفتاحية لموضوع، ويقترح عناوين، ويكتب المقالات بالذكاء الاصطناعي، وينشرها على مواقع WordPress وBlogger بتاعة العميل. وفي وضع التدوين التلقائي بيختار الكلمات الرايجة في كل بلد ويفضل ينشر، والكتابة نفسها بيستلمها برنامج ديسكتوب شغال جنبه.',
+                'img' => '/images/portfolio/amc-ai-blogging-1.webp',
+                // screenshots taken from a local run with demo data
+                'gallery' => ['/images/portfolio/amc-ai-blogging-1.webp', '/images/portfolio/amc-ai-blogging-2.webp', '/images/portfolio/amc-ai-blogging-3.webp'],
+                'techs' => ['Laravel', 'Laravel Modules', 'Gemini', 'WordPress REST API'],
+                'live_url' => null,
+                'metrics' => [
+                    'Research' => 'Keywords and headlines per subject',
+                    'Writing' => 'AI articles from editable prompts',
+                    'Publishing' => 'WordPress and Blogger',
+                    'Auto mode' => 'Trending keywords per country',
+                ],
+                'highlights_en' => [
+                    'Keyword research per subject, with suggested headlines to choose from.',
+                    'Articles written by AI from editable prompts, through more than one AI provider.',
+                    'Managed WordPress and Blogger sites, with articles published straight to them.',
+                    'Bulk orders and an article queue, with a desktop worker that does the writing.',
+                ],
+                'highlights_ar' => [
+                    'بحث كلمات مفتاحية لكل موضوع، وعناوين مقترحة تختار منها.',
+                    'مقالات بيكتبها الذكاء الاصطناعي من أوامر (prompts) تقدر تعدلها، وبأكتر من مزود.',
+                    'إدارة مواقع WordPress وBlogger، والمقالات بتتنشر عليها على طول.',
+                    'طلبات بالجملة وطابور مقالات، وبرنامج ديسكتوب هو اللي بيكتب.',
+                ],
+            ],
+
             'amc-academy' => [
                 'slug' => 'amc-academy',
                 'title_en' => 'AmcTasks: Marketing Platform for AMC Academy',
@@ -824,10 +890,10 @@ class PortfolioData
                 'title_ar' => 'Stocktalk: كتالوج قطع غيار العربيات',
                 'category' => 'Web Apps',
                 'category_ar' => 'تطبيقات ومواقع الويب',
-                'desc_en' => 'An Arabic web system for a car spare parts catalogue: brands, car models and years, each part linked to the cars it fits, search words, Excel import, and alerts for parts not linked yet.',
-                'desc_ar' => 'نظام ويب عربي لكتالوج قطع غيار العربيات: الماركات والموديلات والسنين، وكل قطعة مربوطة بالعربيات اللي بتركب عليها، وكلمات بحث، واستيراد من إكسل، وتنبيه للقطع اللي لسه متربطتش.',
+                'desc_en' => 'An Arabic web system for a car spare parts catalogue: brands, car models and years, each part linked to the cars it fits, search words, Excel import, and alerts for parts not linked yet. A local AI model, running on the company\'s own server, helps find the right part.',
+                'desc_ar' => 'نظام ويب عربي لكتالوج قطع غيار العربيات: الماركات والموديلات والسنين، وكل قطعة مربوطة بالعربيات اللي بتركب عليها، وكلمات بحث، واستيراد من إكسل، وتنبيه للقطع اللي لسه متربطتش. وفيه ذكاء اصطناعي محلي شغال على سيرفر الشركة نفسها بيساعد في الوصول للقطعة الصح.',
                 'img' => '/images/portfolio/stocktalk.png',
-                'techs' => ['Laravel', 'MySQL'],
+                'techs' => ['Laravel', 'MySQL', 'Local AI'],
                 'live_url' => null,
                 'metrics' => [
                     'Catalogue' => 'Brands, models and years',
