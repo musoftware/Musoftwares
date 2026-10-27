@@ -32,6 +32,7 @@ import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
 import axios from 'axios';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { HideAmountsToggle, PrivateAmount } from '@/Components/Admin/PrivateAmount';
 
 export default function Index({ 
     clients, 
@@ -308,7 +309,7 @@ export default function Index({
                 sortable: true,
                 render: (client) => (
                     <span className="font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 text-xs">
-                        {formatCurrency(client.total_spent || 0, businessCurrency)}
+                        <PrivateAmount>{formatCurrency(client.total_spent || 0, businessCurrency)}</PrivateAmount>
                     </span>
                 ),
             },
@@ -655,6 +656,7 @@ export default function Index({
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
+                    {activeTab === 'top_clients' && <HideAmountsToggle />}
                     <Link href="/admin/users/bulk-create">
                         <Button variant="outline">{__('general.bulk_create')}</Button>
                     </Link>
@@ -693,7 +695,7 @@ export default function Index({
                                 <div>
                                     <span className="text-[11px] text-slate-500 font-medium">{__('general.total_spent')}</span>
                                     <p className="text-base font-extrabold font-mono text-emerald-700">
-                                        {formatCurrency(clients.data[0].total_spent || 0, businessCurrency)}
+                                        <PrivateAmount>{formatCurrency(clients.data[0].total_spent || 0, businessCurrency)}</PrivateAmount>
                                     </p>
                                 </div>
                                 <div className="text-end">
@@ -730,7 +732,7 @@ export default function Index({
                                 <div>
                                     <span className="text-[11px] text-slate-500 font-medium">{__('general.total_spent')}</span>
                                     <p className="text-base font-extrabold font-mono text-emerald-700">
-                                        {formatCurrency(clients.data[1].total_spent || 0, businessCurrency)}
+                                        <PrivateAmount>{formatCurrency(clients.data[1].total_spent || 0, businessCurrency)}</PrivateAmount>
                                     </p>
                                 </div>
                                 <div className="text-end">
@@ -767,7 +769,7 @@ export default function Index({
                                 <div>
                                     <span className="text-[11px] text-slate-500 font-medium">{__('general.total_spent')}</span>
                                     <p className="text-base font-extrabold font-mono text-emerald-700">
-                                        {formatCurrency(clients.data[2].total_spent || 0, businessCurrency)}
+                                        <PrivateAmount>{formatCurrency(clients.data[2].total_spent || 0, businessCurrency)}</PrivateAmount>
                                     </p>
                                 </div>
                                 <div className="text-end">
