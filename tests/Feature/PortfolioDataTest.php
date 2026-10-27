@@ -21,6 +21,10 @@ class PortfolioDataTest extends TestCase
             $hash = md5_file($file);
             $this->assertArrayNotHasKey($hash, $seen, "{$slug} uses the same picture as ".($seen[$hash] ?? ''));
             $seen[$hash] = $slug;
+
+            foreach ($project['gallery'] ?? [] as $shot) {
+                $this->assertFileExists(public_path(ltrim($shot, '/')), "{$slug} gallery");
+            }
         }
     }
 

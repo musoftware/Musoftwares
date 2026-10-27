@@ -118,6 +118,22 @@
 
         </div>
 
+        {{-- More screens of the same project (real screenshots taken on demo data) --}}
+        @if(count($project['gallery'] ?? []) > 1)
+            <div class="mt-16 pt-12 border-t border-black/[0.08]">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
+                    {{ $locale === 'ar' ? 'شاشات من النظام' : 'Screens from the system' }}
+                </h2>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                    @foreach(array_slice($project['gallery'], 1) as $shot)
+                        <a href="{{ $shot }}" target="_blank" rel="noopener" class="block bg-[#f5f5f7] rounded-2xl border border-black/[0.06] p-3 hover:shadow-md transition-shadow">
+                            <img src="{{ $shot }}" alt="{{ $title }}" loading="lazy" class="w-full h-auto rounded-xl">
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <!-- Custom Case Study Deep Dive (Extended by dedicated blade files) -->
         @yield('case_study')
 
