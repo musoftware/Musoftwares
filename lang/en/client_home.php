@@ -14,6 +14,27 @@ return [
         'seller_portal' => 'Seller portal',
         'reseller_portal' => 'Reseller portal',
     ],
+    // the More menu (desktop and mobile)
+    'menu' => [
+        'work' => 'Work',
+        'apps' => 'Programs and systems',
+        'money' => 'Billing and wallet',
+        'grow' => 'Order and earn',
+        'tickets_desc' => 'Ask us anything and follow the reply',
+        'software_store' => 'Software store',
+        'software_store_desc' => 'Desktop programs that activate by themselves',
+        'licenses' => 'My licenses and devices',
+        'licenses_desc' => 'Your active licenses and the devices using them',
+        'payment_gateway_desc' => 'Confirm wallet payments automatically from SMS',
+        'partner_api' => 'Partner API',
+        'partner_api_desc' => 'API keys and usage balance for developers',
+        'gold_saver' => 'Gold Saver',
+        'gold_saver_desc' => 'Track your gold and silver, zakat and savings goals',
+        'subscription_desc' => 'Your plan, renewal and add-ons',
+        'services_desc' => 'Order websites, systems and marketing work',
+        'micro_services_desc' => 'Small quick jobs paid from your wallet',
+        'estimator_desc' => 'Know the cost of your project in minutes',
+    ],
 
     'greeting' => 'Hi, :name',
 

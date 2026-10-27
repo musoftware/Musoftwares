@@ -14,6 +14,27 @@ return [
         'seller_portal' => 'بوابة البائع',
         'reseller_portal' => 'بوابة الموزع',
     ],
+    // the More menu (desktop and mobile)
+    'menu' => [
+        'work' => 'الشغل',
+        'apps' => 'البرامج والأنظمة',
+        'money' => 'الفواتير والمحفظة',
+        'grow' => 'اطلب واكسب',
+        'tickets_desc' => 'اسألنا في أي حاجة وتابع الرد',
+        'software_store' => 'متجر البرامج',
+        'software_store_desc' => 'برامج كمبيوتر بتتفعل لوحدها',
+        'licenses' => 'تراخيصي وأجهزتي',
+        'licenses_desc' => 'تراخيصك الشغالة والأجهزة اللي عليها',
+        'payment_gateway_desc' => 'تأكيد دفع المحافظ تلقائيًا من الرسايل',
+        'partner_api' => 'API الشركاء',
+        'partner_api_desc' => 'مفاتيح API ورصيد الاستخدام للمطورين',
+        'gold_saver' => 'Gold Saver',
+        'gold_saver_desc' => 'تابع دهبك وفضتك وزكاتك وأهداف ادخارك',
+        'subscription_desc' => 'باقتك والتجديد والإضافات',
+        'services_desc' => 'اطلب مواقع وأنظمة وشغل تسويق',
+        'micro_services_desc' => 'شغلانات صغيرة سريعة تدفعها من محفظتك',
+        'estimator_desc' => 'اعرف تكلفة مشروعك في دقايق',
+    ],
 
     'greeting' => 'أهلًا، :name',
 

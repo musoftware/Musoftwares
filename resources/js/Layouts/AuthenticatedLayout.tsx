@@ -170,6 +170,56 @@ function AuthenticatedContent({
         isSmsGatewayMenuActive;
     const activeModules = auth?.active_modules || { erp: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
+    // The "More" menu, defined once: the desktop mega menu and the mobile drawer both render this list.
+    // Wallet top-up, rewards and role portals are not repeated here: they live in the header, the top bar and the profile menu.
+    const ticketsHref = user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets');
+    const menuGroups: { key: string; title: string; items: { key: string; href: string; icon: any; title: string; description?: string; color?: 'blue' | 'emerald' | 'amber' | 'purple' | 'rose'; active?: boolean }[] }[] = [
+        {
+            key: 'work',
+            title: __('client_home.menu.work'),
+            items: [
+                { key: 'projects', href: safeRoute('client.projects.index'), icon: FolderKanban, title: __('general.projects'), description: __('general.projects_desc'), active: isProjectsMenuActive },
+                { key: 'tasks', href: safeRoute('client.projects.all-tasks'), icon: ListTodo, title: __('general.all_tasks'), description: __('general.all_tasks_desc'), active: isAllTasksMenuActive },
+                { key: 'messages', href: safeRoute('messages.index'), icon: MessageSquare, title: __('general.messages'), description: __('general.messages_desc'), active: isMessagesMenuActive },
+                { key: 'tickets', href: ticketsHref, icon: LifeBuoy, title: __('general.support_tickets'), description: __('client_home.menu.tickets_desc'), active: isTicketsMenuActive },
+            ],
+        },
+        {
+            key: 'apps',
+            title: __('client_home.menu.apps'),
+            items: [
+                { key: 'store', href: safeRoute('store.tools.index'), icon: Wrench, title: __('client_home.menu.software_store'), description: __('client_home.menu.software_store_desc'), active: isRouteActive('store.tools') && !isRouteActive('store.tools.my-licenses') },
+                { key: 'licenses', href: safeRoute('store.tools.my-licenses'), icon: Key, color: 'emerald', title: __('client_home.menu.licenses'), description: __('client_home.menu.licenses_desc'), active: isRouteActive('store.tools.my-licenses') },
+                { key: 'sms_gateway', href: safeRoute('sms-payment-gateway.index'), icon: CreditCard, color: 'rose', title: __('general.payment_gateway'), description: __('client_home.menu.payment_gateway_desc'), active: isSmsGatewayMenuActive },
+                { key: 'partner_api', href: safeRoute('client.partner-gateway.index', undefined, '/partner-gateway'), icon: Lock, title: __('client_home.menu.partner_api'), description: __('client_home.menu.partner_api_desc'), active: isRouteActive('client.partner-gateway') },
+                { key: 'gold', href: safeRoute('sso.redirect', { system: 'goldsaversys' }), icon: Coins, color: 'amber', title: __('client_home.menu.gold_saver'), description: __('client_home.menu.gold_saver_desc') },
+            ],
+        },
+        {
+            key: 'money',
+            title: __('client_home.menu.money'),
+            items: [
+                { key: 'invoices', href: safeRoute('billing.invoices.index'), icon: FileText, title: __('general.my_invoices'), description: __('general.my_invoices_desc'), active: isInvoicesMenuActive },
+                { key: 'transactions', href: safeRoute('financial.transactions'), icon: ArrowRightLeft, title: __('general.transactions'), description: __('general.transactions_desc'), active: isTransactionsMenuActive },
+                { key: 'withdrawals', href: safeRoute('financial.withdrawals'), icon: ArrowUpRight, title: __('general.request_withdrawal'), description: __('general.request_withdrawal_desc'), active: isWithdrawalsMenuActive },
+                { key: 'payout_methods', href: safeRoute('financial.payout-methods.index'), icon: CreditCard, title: __('general.payout_methods'), description: __('general.payout_methods_desc'), active: isPayoutMethodsMenuActive },
+                { key: 'subscription', href: safeRoute('subscriptions.manage'), icon: Box, title: __('general.subscription'), description: __('client_home.menu.subscription_desc'), active: isSubscriptionsMenuActive },
+            ],
+        },
+        {
+            key: 'grow',
+            title: __('client_home.menu.grow'),
+            items: [
+                { key: 'services', href: safeRoute('marketplace.services.index'), icon: Briefcase, title: __('general.services'), description: __('client_home.menu.services_desc'), active: isServicesMenuActive },
+                { key: 'micro_services', href: safeRoute('micro-services.index', undefined, '/micro-services'), icon: Sparkles, color: 'purple', title: __('general.micro_services'), description: __('client_home.menu.micro_services_desc'), active: isRouteActive('micro-services') },
+                { key: 'estimator', href: safeRoute('estimator', undefined, '/estimator'), icon: Calculator, title: __('general.estimator'), description: __('client_home.menu.estimator_desc'), active: isEstimatorMenuActive },
+                { key: 'referrals', href: safeRoute('referrals.index'), icon: Users, title: __('general.referrals'), description: __('general.referrals_desc'), active: isReferralsMenuActive },
+                { key: 'white_label', href: '/white-label/settings', icon: Tag, title: __('white_label.title'), description: __('white_label.settings_hint'), active: isRouteActive('white-label') },
+            ],
+        },
+    ];
+    const mobileIconColor = { blue: 'text-[#0071e3]', emerald: 'text-emerald-500', amber: 'text-amber-500', purple: 'text-purple-500', rose: 'text-rose-500' };
+
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
 
@@ -303,119 +353,22 @@ function AuthenticatedContent({
  
                                                         <div className="mt-4 pt-2 border-t border-black/5 dark:border-white/10">
                                                             <Accordion className="w-full">
-                                                                {/* 1. Workspace & Projects */}
-                                                                <AccordionItem value="workspace" className="border-b-0">
-                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline font-medium">
-                                                                        <div className="flex items-center gap-3 font-medium">
-                                                                            <FolderKanban className="w-5 h-5 text-[#0071e3]" /> {__('general.workspace_projects') || __('general.workspace')}
-                                                                        </div>
-                                                                    </AccordionTrigger>
-                                                                    <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={safeRoute('client.projects.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <FolderKanban className="w-4 h-4 text-[#0071e3]" /> {__('general.projects')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('client.projects.all-tasks')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <ListTodo className="w-4 h-4 text-[#0071e3]" /> {__('general.all_tasks')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('messages.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <MessageSquare className="w-4 h-4 text-[#0071e3]" /> {__('general.messages')}
-                                                                            </SafeLink>
-                                                                        </div>
-                                                                    </AccordionContent>
-                                                                </AccordionItem>
-
-                                                                {/* 2. Core Solutions */}
-                                                                <AccordionItem value="core_solutions" className="border-b-0">
-                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline">
-                                                                        <div className="flex items-center gap-3 font-medium">
-                                                                            <Sparkles className="w-5 h-5 text-[#0071e3]" /> {__('general.cloud_apps') || 'Solutions'}
-                                                                        </div>
-                                                                    </AccordionTrigger>
-                                                                    <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={safeRoute('store.tools.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Wrench className="w-4 h-4 text-[#0071e3]" /> {__('general.tools_amp_plugins') || 'Software Store'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('store.tools.my-licenses')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Key className="w-4 h-4 text-emerald-500" /> My Licenses & Devices
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('sms-payment-gateway.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-rose-500" /> {__('general.payment_gateway') || 'Payment Gateway'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('sso.redirect', { system: 'goldsaversys' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Coins className="w-4 h-4 text-amber-500" /> {__('general.gold_savers') || 'Gold Saver'}
-                                                                            </SafeLink>
-                                                                            {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
-                                                                                <SafeLink href={safeRoute('portal.devices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#0071e3]/10 dark:hover:bg-[#0071e3]/20 text-[#0071e3] font-semibold">
-                                                                                    <Laptop className="w-4 h-4 text-[#0071e3]" /> Reseller Portal
-                                                                                </SafeLink>
-                                                                            )}
-                                                                        </div>
-                                                                    </AccordionContent>
-                                                                </AccordionItem>
-
-                                                                {/* 3. Financials & Billing */}
-                                                                <AccordionItem value="financials" className="border-b-0">
-                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline font-medium">
-                                                                        <div className="flex items-center gap-3 font-medium">
-                                                                            <FileText className="w-5 h-5 text-[#0071e3]" /> {__('general.financials_billing') || __('general.financials')}
-                                                                        </div>
-                                                                    </AccordionTrigger>
-                                                                    <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <FileText className="w-4 h-4 text-[#0071e3]" /> {__('general.my_invoices')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('financial.transactions')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <ArrowRightLeft className="w-4 h-4 text-[#0071e3]" /> {__('general.transactions')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('financial.withdrawals')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <ArrowUpRight className="w-4 h-4 text-[#0071e3]" /> {__('general.request_withdrawal')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('financial.payout-methods.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.payout_methods')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('subscriptions.plans')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <CreditCard className="w-4 h-4 text-[#0071e3]" /> {__('general.subscription')}
-                                                                            </SafeLink>
-                                                                        </div>
-                                                                    </AccordionContent>
-                                                                </AccordionItem>
-
-                                                                {/* 4. Support & Resources */}
-                                                                <AccordionItem value="support_resources" className="border-b-0">
-                                                                    <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline font-medium">
-                                                                        <div className="flex items-center gap-3 font-medium">
-                                                                            <LifeBuoy className="w-5 h-5 text-[#0071e3]" /> {__('general.support_and_resources') || 'Support & Resources'}
-                                                                        </div>
-                                                                    </AccordionTrigger>
-                                                                    <AccordionContent className="pb-1 px-2">
-                                                                        <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-5 ps-4">
-                                                                            <SafeLink href={user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#0071e3] dark:text-[#3898ec] font-semibold">
-                                                                                <LifeBuoy className="w-4 h-4 text-[#0071e3]" /> {__('general.support_tickets')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('loyalty.index', undefined, '/loyalty')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Award className="w-4 h-4 text-amber-500" /> {__('loyalty.loyalty_hub') || 'Loyalty & Points'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('referrals.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Users className="w-4 h-4 text-[#0071e3]" /> {__('general.referrals')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href="/white-label/settings" onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Tag className="w-4 h-4 text-[#0071e3]" /> {__('white_label.title')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('marketplace.services.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Briefcase className="w-4 h-4 text-[#0071e3]" /> {__('general.services')}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('micro-services.index', undefined, '/micro-services')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Sparkles className="w-4 h-4 text-purple-500" /> {__('general.micro_services') || 'Micro Services'}
-                                                                            </SafeLink>
-                                                                            <SafeLink href={safeRoute('estimator', undefined, '/estimator')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 text-[#1d1d1f]/80 dark:text-zinc-200 font-medium">
-                                                                                <Calculator className="w-4 h-4 text-[#0071e3]" /> {__('general.estimator') || 'Estimator'}
-                                                                            </SafeLink>
-                                                                        </div>
-                                                                    </AccordionContent>
-                                                                </AccordionItem>
+                                                                {menuGroups.map((group) => (
+                                                                    <AccordionItem key={group.key} value={group.key} className="border-b-0">
+                                                                        <AccordionTrigger className="px-3 py-2 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 rounded-xl text-[#1d1d1f] dark:text-zinc-100 hover:no-underline font-medium">
+                                                                            {group.title}
+                                                                        </AccordionTrigger>
+                                                                        <AccordionContent className="pb-1 px-2">
+                                                                            <div className="flex flex-col space-y-1 mt-1 border-s-2 border-black/5 dark:border-white/10 ms-3 ps-3">
+                                                                                {group.items.map(({ key, href, icon: Icon, title, color = 'blue', active }) => (
+                                                                                    <SafeLink key={key} href={href} onClick={() => setIsMobileOpen(false)} className={cn('flex items-center gap-3 px-3 py-2 rounded-xl no-underline! hover:bg-[#f5f5f7] dark:hover:bg-zinc-800/80 font-medium', active ? 'bg-[#0071e3]/10 text-[#0071e3] dark:text-[#3898ec]' : 'text-[#1d1d1f]/80 dark:text-zinc-200')}>
+                                                                                        <Icon className={cn('w-4 h-4 shrink-0', mobileIconColor[color])} /> {title}
+                                                                                    </SafeLink>
+                                                                                ))}
+                                                                            </div>
+                                                                        </AccordionContent>
+                                                                    </AccordionItem>
+                                                                ))}
                                                             </Accordion>
                                                         </div>
                                                     </>
@@ -479,225 +432,16 @@ function AuthenticatedContent({
                                                 )}
                                             </div>
                                             <DropdownMenuContent align="start" className="w-[960px] max-h-[85vh] overflow-y-auto p-5 grid grid-cols-4 gap-5 rounded-[24px] border border-black/10 dark:border-white/10 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl text-[#1d1d1f] dark:text-zinc-100 isolate z-50 shadow-[0_20px_50px_rgba(0,0,0,0.12)] dark:shadow-2xl">
-                                                {/* Column 1: Workspace & Execution */}
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.workspace_projects') || __('general.workspace')}</p>
+                                                {menuGroups.map((group) => (
+                                                    <div key={group.key} className="flex flex-col gap-1.5">
+                                                        <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
+                                                            <p className="text-[11px] font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{group.title}</p>
+                                                        </div>
+                                                        {group.items.map(({ key, href, icon, title, description, color, active }) => (
+                                                            <UnifiedMenuItem key={key} href={href} icon={icon} color={color} title={title} description={description} isActive={!!active} />
+                                                        ))}
                                                     </div>
-                                                    
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('client.projects.index')}
-                                                        icon={FolderKanban}
-                                                        title={__('general.projects')}
-                                                        description={__('general.projects_desc')}
-                                                        isActive={isProjectsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('client.projects.all-tasks')}
-                                                        icon={ListTodo}
-                                                        title={__('general.all_tasks')}
-                                                        description={__('general.all_tasks_desc')}
-                                                        isActive={isAllTasksMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('messages.index')}
-                                                        icon={MessageSquare}
-                                                        title={__('general.messages')}
-                                                        description={__('general.messages_desc')}
-                                                        isActive={isMessagesMenuActive}
-                                                    />
-                                                </div>
-
-                                                {/* Column 2: Core Solutions & Cloud Apps */}
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.cloud_apps') || 'Solutions'}</p>
-                                                    </div>
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('store.tools.index')}
-                                                        icon={Wrench}
-                                                        color="blue"
-                                                        title={__('general.tools_amp_plugins') || 'Software Store'}
-                                                        description="Desktop utilities with automated email activation"
-                                                        isActive={route().current('store.tools.*')}
-                                                        badge={route().current('store.tools.*') ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('store.tools.my-licenses')}
-                                                        icon={Key}
-                                                        color="emerald"
-                                                        title="My Licenses & Devices"
-                                                        description="View active licenses and machine bindings"
-                                                        isActive={route().current('store.tools.my-licenses')}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('sms-payment-gateway.index')}
-                                                        icon={CreditCard}
-                                                        color="rose"
-                                                        title={__('general.payment_gateway') || 'Payment Gateway'}
-                                                        description={__('general.android_automated_sms') || 'Automated SMS & partner payments'}
-                                                        isActive={isSmsGatewayMenuActive}
-                                                        badge={isSmsGatewayMenuActive ? <span className="text-[10px] font-semibold px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-500/20 rounded-full">{__('general.active')}</span> : null}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('sso.redirect', { system: 'goldsaversys' })}
-                                                        icon={Coins}
-                                                        color="amber"
-                                                        title={__('general.gold_savers') || 'Gold Saver'}
-                                                        description="Real-time gold vault, hedging & savings"
-                                                    />
-
-                                                    {(user?.is_reseller || user?.roles?.includes('software_reseller') || user?.role === 'software_reseller' || user?.is_admin || user?.role === 'admin') && (
-                                                        <UnifiedMenuItem
-                                                            href={safeRoute('portal.devices.index')}
-                                                            icon={Laptop}
-                                                            color="blue"
-                                                            title="Reseller Portal"
-                                                            description="Licenses & client devices"
-                                                            isActive={route().current('portal.devices.*')}
-                                                            badge={<span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 rounded-full">Reseller</span>}
-                                                        />
-                                                    )}
-                                                </div>
-
-                                                {/* Column 3: Financials & Billing */}
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">{__('general.financials_billing') || __('general.financials')}</p>
-                                                    </div>
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('billing.invoices.index')}
-                                                        icon={FileText}
-                                                        title={__('general.my_invoices')}
-                                                        description={__('general.my_invoices_desc')}
-                                                        isActive={isInvoicesMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('financial.transactions')}
-                                                        icon={ArrowRightLeft}
-                                                        title={__('general.transactions')}
-                                                        description={__('general.transactions_desc')}
-                                                        isActive={isTransactionsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('financial.add-balance')}
-                                                        icon={Plus}
-                                                        color="emerald"
-                                                        title={__('general.add_balance')}
-                                                        description={__('general.deposit_to_wallet') || 'Top-up wallet balance'}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('financial.withdrawals')}
-                                                        icon={ArrowUpRight}
-                                                        title={__('general.request_withdrawal')}
-                                                        description={__('general.request_withdrawal_desc')}
-                                                        isActive={isWithdrawalsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('financial.payout-methods.index')}
-                                                        icon={CreditCard}
-                                                        title={__('general.payout_methods')}
-                                                        description={__('general.payout_methods_desc')}
-                                                        isActive={isPayoutMethodsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('subscriptions.plans')}
-                                                        icon={CreditCard}
-                                                        title={__('general.subscription')}
-                                                        description={__('general.manage_plans_and_addons') || 'Plans, modules & addons'}
-                                                        isActive={isSubscriptionsMenuActive}
-                                                    />
-                                                </div>
-
-                                                {/* Column 4: Support & Resources (Far Right Column) */}
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="px-2 py-2 mb-1 border-b border-black/5 dark:border-white/10 flex items-center justify-between">
-                                                        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071e3] dark:text-[#3898ec]">
-                                                            {__('general.support_and_resources') || 'Support & Resources'}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Support Tickets - Prominent in Right Column */}
-                                                    <UnifiedMenuItem
-                                                        href={user?.is_admin || user?.role === 'admin' ? safeRoute('admin.tickets.index', undefined, '/admin/tickets') : safeRoute('tickets.index', undefined, '/tickets')}
-                                                        icon={LifeBuoy}
-                                                        color="blue"
-                                                        title={__('general.support_tickets')}
-                                                        description={__('general.support_tickets_desc') || 'Get instant help, raise tickets & track SLA'}
-                                                        isActive={isTicketsMenuActive}
-                                                        badge={<span className="text-[10px] font-semibold px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60 dark:border-blue-500/20 rounded-full">SLA Live</span>}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('loyalty.index', undefined, '/loyalty')}
-                                                        icon={Award}
-                                                        color="amber"
-                                                        title={__('loyalty.loyalty_hub') || 'Loyalty & Points'}
-                                                        description={__('loyalty.loyalty_tagline') || 'Points ledger, rewards catalog & tier perks'}
-                                                        isActive={route().current('loyalty.*')}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('referrals.index')}
-                                                        icon={Users}
-                                                        title={__('general.referrals')}
-                                                        description={__('general.referrals_desc')}
-                                                        isActive={isReferralsMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href="/white-label/settings"
-                                                        icon={Tag}
-                                                        title={__('white_label.title')}
-                                                        description={__('white_label.settings_hint')}
-                                                        isActive={route().current('white-label.*')}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('marketplace.services.index')}
-                                                        icon={Briefcase}
-                                                        title={__('general.services')}
-                                                        description={__('general.marketplace_services_desc') || 'Browse & order digital services'}
-                                                        isActive={isServicesMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('micro-services.index', undefined, '/micro-services')}
-                                                        icon={Sparkles}
-                                                        color="purple"
-                                                        title={__('general.micro_services') || 'Micro Services'}
-                                                        description={__('general.micro_services_desc') || 'Fast on-demand digital services at wallet balance rates'}
-                                                        isActive={route().current('micro-services.*')}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href={safeRoute('estimator', undefined, '/estimator')}
-                                                        icon={Calculator}
-                                                        title={__('general.estimator') || 'Estimator'}
-                                                        description={__('general.cost_estimator_desc') || 'Instant cost calculation'}
-                                                        isActive={isEstimatorMenuActive}
-                                                    />
-
-                                                    <UnifiedMenuItem
-                                                        href="/partner-gateway"
-                                                        icon={Key}
-                                                        color="emerald"
-                                                        title={__('general.partner_gateway_api') || 'Partner Gateway API'}
-                                                        description={__('general.partner_gateway_desc') || 'Developer Keys & B2B Usage Wallet'}
-                                                    />
-                                                </div>
+                                                ))}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </>
@@ -902,16 +646,6 @@ function AuthenticatedContent({
                                                     <Shield className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('general.identity_verification')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-[12px] text-xs text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 transition-colors"
-                                                    render={<SafeLink href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
-                                                >
-                                                    <History className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('general.balance_history')}</DropdownMenuItem>
-                                                <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-[12px] text-xs text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 transition-colors"
-                                                    render={<SafeLink href={safeRoute('profile.edit')} className="flex items-center w-full" />}
-                                                >
-                                                    <Shield className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('general.security_settings')}</DropdownMenuItem>
-                                                <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-[12px] text-xs text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 transition-colors"
                                                     render={<SafeLink href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
                                                 >
                                                     <Download className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('general.backup_restore')}</DropdownMenuItem>
@@ -920,11 +654,6 @@ function AuthenticatedContent({
                                                     render={<SafeLink href={safeRoute('settings.automations.index')} className="flex items-center w-full" />}
                                                 >
                                                     <Settings className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('general.automations')}</DropdownMenuItem>
-                                                <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-[12px] text-xs text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 transition-colors"
-                                                    render={<SafeLink href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
-                                                >
-                                                    <Box className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" /> {__('general.subscriptions')}</DropdownMenuItem>
                                             </DropdownMenuGroup>
                                             
                                             <DropdownMenuSeparator className="my-1.5 bg-black/5 dark:bg-white/10" />
