@@ -10,6 +10,7 @@ class SiteNav
 {
     private const MAIN = [
         ['url' => '/services', 'match' => ['services', 'services/*'], 'ar' => 'الخدمات', 'en' => 'Services'],
+        ['url' => '/custom-systems', 'match' => ['custom-systems'], 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
         ['url' => '/portfolio', 'match' => ['portfolio', 'portfolio/*'], 'ar' => 'أعمالنا', 'en' => 'Our work'],
         ['url' => '/estimator', 'match' => ['estimator', 'pricing'], 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
         ['url' => '/#how-it-works', 'match' => [], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
@@ -18,8 +19,6 @@ class SiteNav
 
     private const MORE = [
         ['url' => '/library', 'match' => ['library', 'library/*'], 'ar' => 'المكتبة الرقمية', 'en' => 'Digital library'],
-        ['url' => '/platforms', 'match' => ['platforms', 'platforms/*'], 'ar' => 'المنصات', 'en' => 'Platforms'],
-        ['url' => '/solutions', 'match' => ['solutions', 'solutions/*'], 'ar' => 'الحلول', 'en' => 'Solutions'],
         ['url' => '/compare/laravel-vs-nodejs', 'match' => ['compare/*'], 'ar' => 'المقارنات والمقالات', 'en' => 'Comparisons and articles'],
     ];
 
@@ -31,6 +30,7 @@ class SiteNav
         ['ar' => 'المنتجات', 'en' => 'Products', 'links' => [
             ['url' => '/services#programs', 'ar' => 'برامج سطح المكتب', 'en' => 'Desktop programs'],
             ['url' => '/services#systems', 'ar' => 'أنظمة إدارة الأعمال', 'en' => 'Business systems'],
+            ['url' => '/custom-systems', 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
             ['url' => '/services#services', 'ar' => 'خدمات مواقع وتسويق', 'en' => 'Websites and marketing services'],
             ['url' => '/marketplace/catalog', 'ar' => 'سوق الخدمات', 'en' => 'Services marketplace'],
             ['url' => '/estimator', 'ar' => 'احسب تكلفة مشروعك', 'en' => 'Estimate your project'],

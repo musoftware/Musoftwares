@@ -8,21 +8,9 @@ return [
         'title' => 'Our Work: Systems and Platforms We Built',
         'description' => 'More than 30 real projects: ERP and accounting systems, online stores, booking platforms and custom SaaS apps, with what each one solved.',
     ],
-    'platforms' => [
-        'title' => 'Business Platforms: ERP, CRM and WhatsApp',
-        'description' => 'Ready platforms to run your business: accounting and stock (ERP), customer follow-up (CRM) and the official WhatsApp API. Built in Suez, Egypt.',
-    ],
-    'platforms_crm' => [
-        'title' => 'WhatsApp Cloud API and CRM Platform',
-        'description' => 'Official Meta WhatsApp API: one shared inbox for your team, OTP and order messages, and automatic replies. Follow every customer in one place.',
-    ],
-    'platforms_erp' => [
-        'title' => 'ERP and Double-Entry Accounting System',
-        'description' => 'Accounting with double-entry ledgers, stock across many warehouses, and Egyptian ETA and Saudi ZATCA e-invoicing. Built for your business.',
-    ],
-    'solutions' => [
-        'title' => 'Software for Clinics, Stores, Schools and More',
-        'description' => 'Systems made for your field: clinics and pharmacies, online stores, education centers, real estate offices and finance teams.',
+    'custom_systems' => [
+        'title' => 'Custom Business Systems Built Around How You Work',
+        'description' => 'We learn how your business runs, then build the system for it: sales and stock, bookings, staff and payroll, customers, delivery and production. Clear plan and fixed price.',
     ],
     'about' => [
         'title' => 'About Musoftware, a Software Studio in Suez',

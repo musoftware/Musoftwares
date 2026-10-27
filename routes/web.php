@@ -140,20 +140,18 @@ Route::get('/install-app', function () {
 
 
 
-// Platforms
-Route::get('/platforms', [HomeController::class, 'platforms'])->name('platforms');
-Route::get('/platforms/crm', [HomeController::class, 'platformCrm'])->name('platforms.crm');
-Route::get('/platforms/erp', [HomeController::class, 'platformErp'])->name('platforms.erp');
-Route::get('/platforms/cloud', [HomeController::class, 'platformCloud'])->name('platforms.cloud');
-
-// Solutions
-Route::get('/solutions', [HomeController::class, 'solutions'])->name('solutions');
+// Custom systems: we learn how the business works, then build its system.
+// It replaces the old CRM/ERP "platforms" pages and the "solutions" page; their addresses lead here.
+Route::get('/custom-systems', [HomeController::class, 'customSystems'])->name('custom-systems');
+Route::permanentRedirect('/platforms', '/custom-systems');
+Route::permanentRedirect('/platforms/{any}', '/custom-systems')->where('any', 'crm|erp|cloud');
+Route::permanentRedirect('/solutions', '/custom-systems');
 // The field pages showed the same page as /solutions; each now goes to the matching system.
 Route::permanentRedirect('/solutions/healthcare', '/services/clinic-system');
 Route::permanentRedirect('/solutions/education', '/services/education-center-system');
 Route::permanentRedirect('/solutions/ecommerce', '/services/online-store-development');
 Route::permanentRedirect('/solutions/real-estate', '/services/real-estate-system');
-Route::permanentRedirect('/solutions/finance', '/solutions');
+Route::permanentRedirect('/solutions/finance', '/custom-systems');
 
 // Company
 Route::get('/company', [HomeController::class, 'company'])->name('company');

@@ -148,29 +148,10 @@ class HomeController extends Controller
         ]);
     }
 
-    public function platforms()
+    /** We learn how the business works, then build its system (replaces the CRM/ERP platform pages). */
+    public function customSystems()
     {
-        return view('public.platforms', PageSeo::for('platforms'));
-    }
-
-    public function platformCrm()
-    {
-        return view('public.platforms.crm', PageSeo::for('platforms_crm'));
-    }
-
-    public function platformErp()
-    {
-        return view('public.platforms.erp', PageSeo::for('platforms_erp'));
-    }
-
-    public function platformCloud()
-    {
-        return redirect()->route('platforms');
-    }
-
-    public function solutions()
-    {
-        return view('public.solutions', PageSeo::for('solutions'));
+        return view('public.custom-systems', PageSeo::for('custom_systems'));
     }
 
 

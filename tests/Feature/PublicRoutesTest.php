@@ -17,12 +17,14 @@ class PublicRoutesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_platforms_pages_return_successful_response()
+    public function test_custom_systems_page_replaces_the_old_platforms_pages()
     {
-        $this->get('/platforms')->assertStatus(200);
-        $this->get('/platforms/crm')->assertStatus(200);
-        $this->get('/platforms/erp')->assertStatus(200);
-        $this->get('/platforms/cloud')->assertRedirect(route('platforms'));
+        $this->get('/custom-systems')->assertStatus(200)->assertSee(__('custom_systems.title', [], 'en'));
+        $this->get('/custom-systems?lang=ar')->assertStatus(200)->assertSee('بنفهم شغلك الأول');
+
+        foreach (['/platforms', '/platforms/crm', '/platforms/erp', '/platforms/cloud', '/solutions'] as $old) {
+            $this->get($old)->assertStatus(301)->assertRedirect('/custom-systems');
+        }
     }
 
     public function test_portfolio_page_returns_successful_response()
@@ -40,9 +42,8 @@ class PublicRoutesTest extends TestCase
 
     public function test_solutions_pages_return_successful_response()
     {
-        $this->get('/solutions')->assertStatus(200);
         $this->get('/solutions/healthcare')->assertStatus(301)->assertRedirect('/services/clinic-system');
-        $this->get('/solutions/finance')->assertStatus(301)->assertRedirect('/solutions');
+        $this->get('/solutions/finance')->assertStatus(301)->assertRedirect('/custom-systems');
     }
 
     public function test_company_pages_return_successful_response()
