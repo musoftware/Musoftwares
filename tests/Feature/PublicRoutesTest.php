@@ -29,7 +29,7 @@ class PublicRoutesTest extends TestCase
 
     public function test_how_we_work_replaces_the_platforms_solutions_and_custom_systems_pages()
     {
-        $this->get('/how-we-work?lang=en')->assertStatus(200)->assertSee(__('custom_systems.title', [], 'en'))->assertSee('Sales, stock and branches');
+        $this->get('/how-we-work?lang=en')->assertStatus(200)->assertSee(__('custom_systems.title', [], 'en'))->assertSee('Sales, stock and shifts');
         $this->get('/how-we-work?lang=ar')->assertStatus(200)->assertSee('بنفهم شغلك الأول');
 
         foreach (['/custom-systems', '/platforms', '/platforms/crm', '/platforms/erp', '/platforms/cloud', '/solutions'] as $old) {

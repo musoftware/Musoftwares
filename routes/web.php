@@ -128,6 +128,11 @@ use Modules\Marketplace\Http\Controllers\ServiceReviewController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/portfolio', [HomeController::class, 'portfolio'])->name('portfolio');
+// Projects that were listed twice now live under one address
+Route::permanentRedirect('/portfolio/forex-bot', '/portfolio/chartcash');
+Route::permanentRedirect('/portfolio/forex-app', '/portfolio/chartcash');
+Route::permanentRedirect('/portfolio/wallet-app', '/portfolio/qcoin-wallet');
+Route::permanentRedirect('/portfolio/telecom-system', '/portfolio/vodafone-crm');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
 
 // Public Contract Links

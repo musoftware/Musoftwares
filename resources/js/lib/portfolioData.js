@@ -14,7 +14,7 @@ export const portfolioItems = [
     { slug: 'kbdny', img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', contentKey: 'portfolio_kbdny_content', cat: 'Platform' },
     { slug: 'stock-manager', img: '/images/portfolio/stockmanager.png', titleKey: 'portfolio_stock_manager_title', descKey: 'portfolio_stock_manager_desc', contentKey: 'portfolio_stock_manager_content', cat: 'ERP' },
     { slug: 'mini-fatora', img: '/images/portfolio/minifatora.png', titleKey: 'portfolio_mini_fatora_title', descKey: 'portfolio_mini_fatora_desc', contentKey: 'portfolio_mini_fatora_content', cat: 'SaaS' },
-    { slug: 'vodafone-crm', img: '/images/portfolio/vodafone-crm.jpg', titleKey: 'portfolio_vodafone_crm_title', descKey: 'portfolio_vodafone_crm_desc', contentKey: 'portfolio_vodafone_crm_content', cat: 'CRM' },
+    { slug: 'vodafone-crm', img: '/images/portfolio/telecom-system.png', titleKey: 'portfolio_vodafone_crm_title', descKey: 'portfolio_vodafone_crm_desc', contentKey: 'portfolio_vodafone_crm_content', cat: 'CRM' },
     { slug: 'amc-academy', img: '/images/portfolio/amcacademy.jpg', titleKey: 'portfolio_amc_academy', descKey: 'portfolio_amc_academy_desc', contentKey: 'portfolio_amc_academy_content', cat: 'E-Learning' },
     { slug: 'project-manager', img: '/images/portfolio/projectmanager.png', titleKey: 'portfolio_project_manager', descKey: 'portfolio_project_manager_desc', contentKey: 'portfolio_project_manager_content', cat: 'Management' },
     { slug: 'telecom-system', img: '/images/portfolio/telecom-system.png', titleKey: 'portfolio_telecom_system_title', descKey: 'portfolio_telecom_system_desc', contentKey: 'portfolio_telecom_system_content', cat: 'Platform' },
