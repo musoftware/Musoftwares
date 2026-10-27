@@ -433,7 +433,7 @@ return [
     'user' => 'المستخدم',
     'vacation' => 'إجازة سنوية',
     'view_all_cost_transactions' => 'عرض كل معاملات التكاليف.',
-    'view_all_income_and_related' => 'عرض كل الإيرادات والمعاملات المرتبطة بها.',
+    'view_all_income_and_related' => 'كل حركة على محافظ العملاء: إيداعات وخصومات وأرباح واستردادات وسحب.',
     'view_combined_income_and_costs' => 'عرض الإيرادات والتكاليف مجمعة.',
     'view_details' => 'عرض التفاصيل',
     'view_outstanding_statements_and_settle' => 'اعرض الكشوف المستحقة وسدد الأرصدة بأمان من محفظتك.',

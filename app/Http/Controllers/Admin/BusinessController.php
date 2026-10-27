@@ -137,7 +137,8 @@ class BusinessController extends Controller
                 'currency_id' => $currId,
                 'category' => ['name' => ucfirst($categoryName ?: 'Income')],
                 'category_slug' => Str::slug((string) ($categoryName ?? '')),
-                'category_raw' => $categoryName,
+                // only a real category: the reason already has its own column
+                'category_raw' => $entry->category ?: null,
                 'is_recurring' => false,
                 'next_due_date' => $entry->due_date,
                 'status' => $entry->status ?? 'completed',

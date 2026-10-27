@@ -27,6 +27,10 @@ export default function TransactionUserCard({ user }) {
         });
     };
 
+    // the stored balance should be the sum of the statement; recalculating is only offered when they differ
+    const drifted = user.ledger_balance !== undefined && user.balance !== undefined
+        && Math.abs(Number(user.ledger_balance) - Number(user.balance)) >= 0.01;
+
     return (
         <Card className="mb-6 bg-slate-50/50">
             <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -42,17 +46,24 @@ export default function TransactionUserCard({ user }) {
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-6">
+                    {/* the wallet is the last line of the statement; "available" also takes off what is due on unpaid invoices */}
                     <div className="flex flex-col items-center sm:items-end">
-                        <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
-                            {__('general.balance')}
-                        </span>
-                        <span className="font-mono text-lg font-medium text-slate-900">
-                            {formatCurrency(user.available_balance || 0, user.currency)}
+                        <span className="text-xs text-slate-500 font-semibold mb-1">{__('admin.tx_wallet_balance')}</span>
+                        <span className="font-mono text-lg font-medium text-slate-900" dir="ltr">
+                            {formatCurrency(user.balance ?? user.available_balance ?? 0, user.currency)}
                         </span>
                     </div>
+                    {user.balance !== undefined && Number(user.balance) !== Number(user.available_balance) && (
+                        <div className="flex flex-col items-center sm:items-end">
+                            <span className="text-xs text-slate-500 font-semibold mb-1">{__('admin.tx_available_after_invoices')}</span>
+                            <span className="font-mono text-lg font-medium text-slate-900" dir="ltr">
+                                {formatCurrency(user.available_balance || 0, user.currency)}
+                            </span>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-2">
-                        <Button
+                        {drifted && <Button
                             type="button"
                             variant="outline"
                             size="sm"
@@ -62,7 +73,7 @@ export default function TransactionUserCard({ user }) {
                         >
                             <RefreshCw className={`w-4 h-4 ${recalcLoading ? 'animate-spin' : ''}`} />
                             {recalcLoading ? __('general.recalculating') : __('general.recalc_balance')}
-                        </Button>
+                        </Button>}
                         <Button variant="outline" size="sm" asChild className="gap-2">
                             <Link href={`/admin/users/${user.id}`}>
                                 {__('general.profile')}
@@ -72,6 +83,11 @@ export default function TransactionUserCard({ user }) {
                     </div>
                 </div>
             </CardContent>
+            {drifted && (
+                <p className="px-4 pb-3 text-xs text-yellow-800">
+                    {__('admin.tx_balance_drift', { ledger: formatCurrency(user.ledger_balance, user.currency) })}
+                </p>
+            )}
             {confirmDialog}
         </Card>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { router, Head, Link } from '@inertiajs/react';
+import { router, Head, Link, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
 import { Button } from '@/Components/ui/button';
@@ -187,7 +187,6 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
     // Check if advanced filters have any active values
     const advancedActive = Boolean(
-        filters?.user ||
         filters?.project ||
         filters?.currency ||
         filters?.from_date ||
@@ -287,44 +286,42 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
     const colorClass = amountColorize === 'green' ? 'text-emerald-600' : 'text-rose-600';
 
+    const { locale } = usePage<any>().props;
+    const rows: any[] = transactions?.data || [];
+    const businessCode = businessCurrency?.currency ?? businessCurrency?.code;
+    const showUser = !filteredUser;
+    const showProject = rows.some((tx) => tx.project);
+    const showBusinessAmount = rows.some((tx) => (tx.currency?.currency ?? tx.currency?.code) !== businessCode);
+    const formatDate = (value: string) => new Date(value).toLocaleDateString(locale === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const typeStyle: Record<string, string> = {
+        received: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40',
+        earned: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800/40',
+        refunded: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40',
+        used: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700',
+        sent: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/40',
+    };
+
     const columns = [
         {
-            key: 'id',
-            label: __('general.id'),
+            key: 'created_at',
+            label: __('general.date'),
             sortable: true,
-            className: 'w-[70px]',
-            render: (tx: any) => <span className="text-slate-500 font-mono text-xs">#{tx.id}</span>,
+            render: (tx: any) => <span className="text-slate-600 dark:text-zinc-400 whitespace-nowrap text-xs">{formatDate(tx.created_at)}</span>,
         },
         {
-            key: 'user',
-            label: __('general.user'),
-            render: (tx: any) => tx.user ? (
-                <div className="flex flex-col">
-                    <span className="font-medium text-slate-900 dark:text-zinc-100">{tx.user.name}</span>
-                    <span className="text-xs text-slate-500 dark:text-zinc-400">{tx.user.email}</span>
-                </div>
-            ) : <span className="text-slate-400">—</span>,
-        },
-        {
-            key: 'project',
-            label: __('erp.project'),
-            render: (tx: any) => tx.project ? (
-                <span className="text-slate-700 dark:text-zinc-300 font-medium">{tx.project.project_name}</span>
-            ) : <span className="text-slate-400">—</span>,
+            key: 'reason',
+            label: __('admin.tx_description'),
+            render: (tx: any) => <span className="text-slate-800 dark:text-zinc-200 max-w-[280px] truncate block text-sm" title={tx.reason}>{tx.reason || '—'}</span>,
         },
         ...(type === 'income' ? [{
             key: 'type',
             label: __('general.type'),
             sortable: true,
-            render: (tx: any) => {
-                const creditTypes = ['earned', 'received'];
-                const isCredit = creditTypes.includes(tx.type);
-                return (
-                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border ${isCredit ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/40' : 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700'}`}>
-                        {tx.type}
-                    </span>
-                );
-            },
+            render: (tx: any) => (
+                <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium border whitespace-nowrap ${typeStyle[tx.type] || typeStyle.used}`}>
+                    {__(`admin.tx_types.${tx.type}`)}
+                </span>
+            ),
         }] : []),
         {
             key: 'amount',
@@ -332,48 +329,55 @@ export function TransactionsPage(props: TransactionsPageProps) {
             className: 'text-end',
             sortable: true,
             render: (tx: any) => (
-                <span className="font-medium font-mono text-slate-800 dark:text-zinc-200">
-                    {formatMoney(tx.amount || 0, tx.currency)}
-                </span>
-            ),
-        },
-        {
-            key: 'business_amount',
-            label: __('general.business_amount'),
-            className: 'text-end',
-            sortable: true,
-            render: (tx: any) => (
-                <span className={`font-medium font-mono ${colorClass}`}>
-                    {formatMoney(tx.business_amount || 0, tx.business_currency || businessCurrency)}
+                <span className={`font-semibold font-mono whitespace-nowrap ${type === 'income' ? (tx.amount < 0 ? 'text-rose-600' : 'text-emerald-600') : colorClass}`} dir="ltr">
+                    {tx.amount > 0 && type === 'income' ? '+' : ''}{formatMoney(tx.amount || 0, tx.currency)}
                 </span>
             ),
         },
         ...(type === 'income' ? [{
             key: 'balance',
-            label: __('general.balance'),
+            label: __('admin.tx_balance_after'),
             className: 'text-end',
             render: (tx: any) => (
-                <span className={`font-medium font-mono ${tx.balance !== undefined && tx.balance !== null ? (tx.balance < 0 ? 'text-rose-600' : tx.balance > 0 ? 'text-emerald-600' : 'text-slate-800 dark:text-zinc-200') : 'text-slate-400'}`}>
-                    {tx.balance !== undefined && tx.balance !== null
-                        ? formatMoney(tx.balance, tx.currency)
-                        : '—'}
+                <span className={`font-mono whitespace-nowrap ${tx.balance < 0 ? 'text-rose-600' : 'text-slate-700 dark:text-zinc-300'}`} dir="ltr">
+                    {tx.balance !== undefined && tx.balance !== null ? formatMoney(tx.balance, tx.currency) : '—'}
                 </span>
             ),
         }] : []),
-        {
-            key: 'reason',
-            label: __('general.reason'),
-            render: (tx: any) => <span className="text-slate-600 dark:text-zinc-400 max-w-[240px] truncate block text-xs" title={tx.reason}>{tx.reason || '—'}</span>,
-        },
-        {
-            key: 'created_at',
-            label: __('general.date'),
+        ...(showBusinessAmount ? [{
+            key: 'business_amount',
+            label: __('general.business_amount'),
+            className: 'text-end',
             sortable: true,
             render: (tx: any) => (
-                <span className="text-slate-600 dark:text-zinc-400 whitespace-nowrap text-xs">
-                    {new Date(tx.created_at).toLocaleDateString()}
+                <span className="font-mono text-xs text-slate-500 whitespace-nowrap" dir="ltr">
+                    {formatMoney(tx.business_amount || 0, tx.business_currency || businessCurrency)}
                 </span>
             ),
+        }] : []),
+        ...(showProject ? [{
+            key: 'project',
+            label: __('erp.project'),
+            render: (tx: any) => tx.project
+                ? <span className="text-slate-700 dark:text-zinc-300 text-xs">{tx.project.project_name}</span>
+                : <span className="text-slate-400">—</span>,
+        }] : []),
+        ...(showUser ? [{
+            key: 'user',
+            label: __('general.client'),
+            render: (tx: any) => tx.user ? (
+                <Link href={`/admin/transactions?type=${type}&user=${tx.user.id}`} className="flex flex-col hover:underline">
+                    <span className="font-medium text-slate-900 dark:text-zinc-100">{tx.user.name}</span>
+                    <span className="text-xs text-slate-500 dark:text-zinc-400">{tx.user.email}</span>
+                </Link>
+            ) : <span className="text-slate-400">—</span>,
+        }] : []),
+        {
+            key: 'id',
+            label: '#',
+            sortable: true,
+            className: 'w-[70px]',
+            render: (tx: any) => <span className="text-slate-400 font-mono text-xs">{tx.id}</span>,
         },
         {
             key: 'actions',
@@ -395,19 +399,19 @@ export function TransactionsPage(props: TransactionsPageProps) {
                     <div className="flex items-center gap-2 mb-1">
                         <nav className="inline-flex rounded-lg p-1 bg-slate-100 dark:bg-zinc-800/80 border border-slate-200 dark:border-zinc-700/60 text-xs font-medium">
                             <Link
-                                href="/admin/transactions?type=income"
+                                href={`/admin/transactions?type=income${userParam}`}
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'income' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
-                                {__('erp.income_transactions')}
+                                {__('admin.tx_tab_wallets')}
                             </Link>
                             <Link
-                                href="/admin/transactions?type=cost"
+                                href={`/admin/transactions?type=cost${userParam}`}
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'cost' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
-                                {__('erp.cost_transactions')}
+                                {__('admin.tx_tab_costs')}
                             </Link>
                             <Link
-                                href="/admin/transactions?type=revenue"
+                                href={`/admin/transactions?type=revenue${userParam}`}
                                 className={`px-3 py-1 rounded-md transition-colors ${type === 'revenue' ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white shadow-sm font-semibold' : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'}`}
                             >
                                 {__('general.revenue')}
@@ -418,18 +422,15 @@ export function TransactionsPage(props: TransactionsPageProps) {
                 </div>
 
                 <div className="flex gap-2 flex-wrap items-center">
-                    <Button asChild className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100">
-                        <a href={`/admin/transactions/create?type=${primaryCreateType}${userParam}`}>
-                            <Plus className="w-4 h-4 me-1.5" />
-                            {__(primaryCreateLabelKey)}
-                        </a>
-                    </Button>
-                    {showMoreMenu && (
-                        <Button variant="outline" asChild className="border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800">
-                            <a href={`/admin/transactions/create?type=${type === 'income' ? 'used' : 'send'}${userParam}`}>
-                                {type === 'income' ? __('general.used') : __('general.send')}
+                    {filteredUser ? (
+                        <Button asChild className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100">
+                            <a href={`/admin/transactions/create?type=${primaryCreateType}${userParam}`}>
+                                <Plus className="w-4 h-4 me-1.5" />
+                                {__('admin.tx_new_for', { name: filteredUser.name })}
                             </a>
                         </Button>
+                    ) : (
+                        <span className="text-xs text-slate-500 dark:text-zinc-400">{__('admin.tx_pick_client_hint')}</span>
                     )}
                 </div>
             </div>
@@ -452,7 +453,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
                     <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                         <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                            <span className="text-xs font-medium">{__('general.volume')}</span>
+                            <span className="text-xs font-medium">{type === 'income' ? __('admin.tx_net') : __('general.volume')}</span>
                             <Coins className="w-3.5 h-3.5" />
                         </div>
                         <div className="text-lg font-bold font-mono text-slate-900 dark:text-zinc-100">
@@ -464,7 +465,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
                         <>
                             <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                                 <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                                    <span className="text-xs font-medium">{__('general.received')}</span>
+                                    <span className="text-xs font-medium">{__('admin.tx_money_in')}</span>
                                     <ArrowDownRight className="w-3.5 h-3.5 text-emerald-600" />
                                 </div>
                                 <div className="text-lg font-bold font-mono text-emerald-600">
@@ -474,7 +475,7 @@ export function TransactionsPage(props: TransactionsPageProps) {
 
                             <div className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 p-3.5 shadow-sm">
                                 <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400 mb-1">
-                                    <span className="text-xs font-medium">{__('general.used')}</span>
+                                    <span className="text-xs font-medium">{__('admin.tx_money_out')}</span>
                                     <ArrowUpRight className="w-3.5 h-3.5 text-rose-600" />
                                 </div>
                                 <div className="text-lg font-bold font-mono text-rose-600">

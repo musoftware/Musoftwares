@@ -433,7 +433,7 @@ return [
     'user' => 'User',
     'vacation' => 'Vacation',
     'view_all_cost_transactions' => 'View all cost transactions.',
-    'view_all_income_and_related' => 'View all income and related transactions.',
+    'view_all_income_and_related' => 'Every movement on client wallets: deposits, charges, earnings, refunds and withdrawals.',
     'view_combined_income_and_costs' => 'View combined income and costs.',
     'view_details' => 'View Details',
     'view_outstanding_statements_and_settle' => 'View outstanding statements and settle balances securely using your wallet.',

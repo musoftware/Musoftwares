@@ -59,7 +59,7 @@ import {
     Legend
 } from 'recharts';
 import { __ } from '@/lib/i18n';
-import { ChartTooltip, PERIOD_PRESETS, SortHeader, monthLabel, presetLabel } from './Components/LedgerParts';
+import { ChartTooltip, LedgerPeriodSelect, SortHeader, ledgerDate, presetLabel } from './Components/LedgerParts';
 import {
     Table,
     TableBody,
@@ -159,6 +159,8 @@ export default function Income() {
     const tooltipFormatter = (value: number) => formatCurrency(value, stats.business_currency_code);
 
     const preset = filters?.preset || '';
+    // most entries have no category of their own; the column only shows when some do
+    const showCategory = (entries?.data || []).some((entry: any) => entry.category_raw);
     const activeFilterPills: { key: string; label: string; value: string }[] = [];
     if (preset && preset !== '') activeFilterPills.push({ key: 'preset', label: __('admin.ledger_filter_period'), value: presetLabel(preset) });
     if (filters?.project_id) {
@@ -265,73 +267,44 @@ export default function Income() {
                             <Filter className="h-4 w-4" />
                             <span className="text-sm font-medium">{__('admin.ledger_filters_label')}</span>
                         </div>
-                        <Select
-                            value={preset || 'month'}
-                            onValueChange={(val) => {
+                        <LedgerPeriodSelect
+                            preset={preset}
+                            year={filters?.year}
+                            month={filters?.month}
+                            availableYears={filters?.available_years}
+                            availableMonths={filters?.available_months}
+                            onPreset={(val) => {
                                 if (val === 'month') {
                                     router.get(route('admin.income.index'), { ...(filters || {}), preset: '' }, { preserveState: true, preserveScroll: true });
                                 } else {
                                     handleFilterChange('preset', val);
                                 }
                             }}
-                        >
-                            <SelectTrigger className="w-[140px] bg-white h-9 rounded-lg">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {PERIOD_PRESETS.map((item) => (
-                                    <SelectItem key={item.value} value={item.value}>{__(item.labelKey)}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {(!preset || preset === '') && (
-                            <>
-                                <Select
-                                    value={String(filters?.year ?? new Date().getFullYear())}
-                                    onValueChange={(val) => { if (val) handleFilterChange('year', val); }}
-                                >
-                                    <SelectTrigger className="w-[110px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder={__('admin.ledger_year')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {(filters?.available_years || [new Date().getFullYear()]).map((y: number) => (
-                                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Select
-                                    value={String(filters?.month ?? new Date().getMonth() + 1)}
-                                    onValueChange={(val) => { if (val) handleFilterChange('month', val); }}
-                                >
-                                    <SelectTrigger className="w-[130px] bg-white h-9 rounded-lg">
-                                        <SelectValue placeholder={__('admin.ledger_month')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {(filters?.available_months || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).map((m: number) => (
-                                            <SelectItem key={m} value={String(m)}>{monthLabel(m)}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </>
-                        )}
+                            onYear={(val) => handleFilterChange('year', val)}
+                            onMonth={(val) => handleFilterChange('month', val)}
+                        />
                         <PremiumCombobox
+                            className="w-full sm:w-48"
                             value={filters?.project_id ? String(filters.project_id) : ''}
                             onChange={(val) => handleFilterChange('project_id', (val as string) || '')}
                             options={(options?.projects || []).map((p: any) => ({ value: String(p.id), label: p.name }))}
                             placeholder={__('general.project')}
                         />
                         <UserSearchCombobox
+                            className="w-full sm:w-48"
                             value={filters?.user_id ? String(filters.user_id) : ''}
                             onChange={(val) => handleFilterChange('user_id', (val as string) || '')}
                             placeholder={__('general.client')}
                         />
                         <PremiumCombobox
+                            className="w-full sm:w-48"
                             value={filters?.currency_id ? String(filters.currency_id) : ''}
                             onChange={(val) => handleFilterChange('currency_id', (val as string) || '')}
                             options={(options?.currencies || []).map((c: any) => ({ value: String(c.id), label: `${c.code} (${c.symbol})` }))}
                             placeholder={__('general.currency')}
                         />
                         <PremiumCombobox
+                            className="w-full sm:w-48"
                             value={filters?.category ? String(filters.category) : ''}
                             onChange={(val) => handleFilterChange('category', (val as string) || '')}
                             options={(options?.categories || []).map((c: any) => ({ value: String(c.value), label: c.label }))}
@@ -391,7 +364,7 @@ export default function Income() {
                         <CardDescription>{__('general.last_12_months')}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[260px] mt-2">
+                        <div className="h-[260px] mt-2" dir="ltr">
                             <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                 <AreaChart data={stats.monthly_trends}>
                                     <defs>
@@ -419,7 +392,7 @@ export default function Income() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[260px] mt-2">
+                        <div className="h-[260px] mt-2" dir="ltr">
                             {(stats.monthly_category_breakdown?.length ?? 0) > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                     <PieChart>
@@ -452,7 +425,7 @@ export default function Income() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="h-[260px] mt-2">
+                            <div className="h-[260px] mt-2" dir="ltr">
                                 <ResponsiveContainer width="100%" height="100%" minWidth={1}>
                                     <BarChart data={stats.monthly_client_breakdown} layout="vertical" margin={{ left: 60 }}>
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
@@ -500,7 +473,7 @@ export default function Income() {
                                 <TableHead className="font-semibold">
                                     <SortHeader field="reason" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort}>{__('general.reason')}</SortHeader>
                                 </TableHead>
-                                <TableHead className="font-semibold">{__('general.category')}</TableHead>
+                                {showCategory && <TableHead className="font-semibold">{__('general.category')}</TableHead>}
                                 <TableHead className="font-semibold">{__('general.project_client')}</TableHead>
                                 <TableHead className="text-end font-semibold">
                                     <SortHeader field="amount" sortBy={filters?.sort_by} sortDir={filters?.sort_dir} onSort={handleSort} align="end">{__('general.amount')}</SortHeader>
@@ -512,7 +485,7 @@ export default function Income() {
                             {entries?.data?.map((entry: any) => (
                                 <TableRow key={entry.id} className={`group hover:bg-slate-50/80 transition-colors ${entry.deleted_at ? 'opacity-60' : ''}`}>
                                     <TableCell className="text-xs text-slate-500 whitespace-nowrap">
-                                        {new Date(entry.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        {ledgerDate(entry.created_at)}
                                     </TableCell>
                                     <TableCell>
                                         <div className="font-medium text-slate-900 truncate max-w-[260px]" title={entry.reason}>
@@ -531,7 +504,7 @@ export default function Income() {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    {showCategory && <TableCell>
                                         {entry.category_raw ? (
                                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700">
                                                 {entry.category.name}
@@ -539,7 +512,7 @@ export default function Income() {
                                         ) : (
                                             <span className="text-slate-400 text-xs">—</span>
                                         )}
-                                    </TableCell>
+                                    </TableCell>}
                                     <TableCell>
                                         {entry.project ? (
                                             <div className="text-sm font-medium text-slate-900 truncate max-w-[180px]" title={entry.project.name}>{entry.project.name}</div>
@@ -591,7 +564,7 @@ export default function Income() {
                             ))}
                             {entries?.data?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-32 text-center text-slate-500">
+                                    <TableCell colSpan={showCategory ? 6 : 5} className="h-32 text-center text-slate-500">
                                         {__('general.no_income_records_found_for_this_period')}
                                     </TableCell>
                                 </TableRow>

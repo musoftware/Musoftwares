@@ -16,6 +16,52 @@ export function presetLabel(value: string): string {
 }
 
 /** Month name (1-12) in the active UI language. */
+const periodSelectClass = 'h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900';
+
+/** Period, then year and month for a single month. Native selects, so the closed box shows the label, not the stored value. */
+export function LedgerPeriodSelect({ preset, year, month, availableYears, availableMonths, onPreset, onYear, onMonth }: {
+    preset: string;
+    year?: number | string;
+    month?: number | string;
+    availableYears?: number[];
+    availableMonths?: number[];
+    onPreset: (value: string) => void;
+    onYear: (value: string) => void;
+    onMonth: (value: string) => void;
+}) {
+    const isMonth = !preset || preset === 'month';
+
+    return (
+        <>
+            <select value={isMonth ? 'month' : preset} onChange={(e) => onPreset(e.target.value)} className={periodSelectClass} aria-label={__('admin.ledger_filter_period')}>
+                {PERIOD_PRESETS.map((item) => (
+                    <option key={item.value} value={item.value}>{__(item.labelKey)}</option>
+                ))}
+            </select>
+            {isMonth && (
+                <>
+                    <select value={String(month ?? new Date().getMonth() + 1)} onChange={(e) => onMonth(e.target.value)} className={periodSelectClass} aria-label={__('admin.ledger_month')}>
+                        {(availableMonths || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]).map((m) => (
+                            <option key={m} value={String(m)}>{monthLabel(m)}</option>
+                        ))}
+                    </select>
+                    <select value={String(year ?? new Date().getFullYear())} onChange={(e) => onYear(e.target.value)} className={periodSelectClass} aria-label={__('admin.ledger_year')}>
+                        {(availableYears || [new Date().getFullYear()]).map((y) => (
+                            <option key={y} value={String(y)}>{y}</option>
+                        ))}
+                    </select>
+                </>
+            )}
+        </>
+    );
+}
+
+/** "22 Oct 2026" / "22 أكتوبر 2026", with Latin digits like the rest of the admin. */
+export function ledgerDate(value: string): string {
+    const locale = getLoadedLocale() === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB';
+    return new Date(value).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export function monthLabel(month: number): string {
     const locale = getLoadedLocale() || 'en';
     return new Date(2000, month - 1, 1).toLocaleString(locale, { month: 'long' });

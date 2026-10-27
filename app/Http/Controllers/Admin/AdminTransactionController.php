@@ -107,6 +107,9 @@ class AdminTransactionController extends Controller
                     'name' => $u->name,
                     'email' => $u->email,
                     'avatar_url' => $u->avatar_url,
+                    'balance' => $u->balance(),
+                    // the stored balance should equal the sum of the statement; when it does not, the admin recalculates
+                    'ledger_balance' => (float) $u->transactions()->sum('amount'),
                     'available_balance' => $u->available_balance(),
                     'currency' => $u->currency,
                 ];
