@@ -104,7 +104,7 @@ class FreeToolsTest extends TestCase
             ->assertOk()
             ->assertSee('Cafe Nile')
             ->assertSee('Espresso')
-            ->assertSee('45 EGP')
+            ->assertSee('45 ج.م')
             ->assertSee('noindex, nofollow', false)
             ->assertSee('dir="rtl"', false);
 

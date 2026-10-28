@@ -10,14 +10,14 @@ use Illuminate\Support\Str;
  */
 class FreeQrMenu extends Model
 {
-    protected $fillable = ['code', 'edit_token_hash', 'data', 'ip'];
+    protected $fillable = ['code', 'user_id', 'edit_token_hash', 'data', 'ip'];
 
     protected $hidden = ['edit_token_hash', 'ip'];
 
     protected $casts = ['data' => 'array'];
 
     /** @return array{0: self, 1: string} the menu and its plain edit token (only returned once) */
-    public static function createWithToken(array $data, ?string $ip): array
+    public static function createWithToken(array $data, ?string $ip, ?int $userId = null): array
     {
         $token = Str::random(40);
 
@@ -25,7 +25,7 @@ class FreeQrMenu extends Model
             $code = Str::lower(Str::random(8));
         } while (self::where('code', $code)->exists());
 
-        $menu = self::create(['code' => $code, 'edit_token_hash' => hash('sha256', $token), 'data' => $data, 'ip' => $ip]);
+        $menu = self::create(['code' => $code, 'user_id' => $userId, 'edit_token_hash' => hash('sha256', $token), 'data' => $data, 'ip' => $ip]);
 
         return [$menu, $token];
     }

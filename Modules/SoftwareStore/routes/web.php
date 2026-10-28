@@ -21,6 +21,8 @@ Route::middleware('web')->group(function () {
     Route::post('/services/tools/qr-menu', [FreeToolController::class, 'storeMenu'])->middleware('throttle:5,10')->name('services.tools.menu.store');
     Route::put('/services/tools/qr-menu/{code}', [FreeToolController::class, 'updateMenu'])->middleware('throttle:30,10')->name('services.tools.menu.update');
     Route::get('/services/tools/qr-menu/{code}/data', [FreeToolController::class, 'menuData'])->middleware('throttle:30,1')->name('services.tools.menu.data');
+    Route::post('/services/tools/qr-menu/image', [FreeToolController::class, 'uploadMenuImage'])->middleware('throttle:40,10')->name('services.tools.menu.image');
+    Route::get('/services/tools/qr-menu/mine', [FreeToolController::class, 'myMenus'])->middleware(['auth', 'throttle:30,1'])->name('services.tools.menu.mine');
     Route::get('/menu/{code}', [FreeToolController::class, 'menu'])->where('code', '[a-z0-9]{8}')->name('services.tools.menu');
     Route::get('/services/{slug}.md', [SoftwareProductController::class, 'markdown'])->where('slug', '[a-z0-9-]+')->name('software.markdown');
     // a time-limited link the admin sends to one customer; it opens the page even when the program is hidden

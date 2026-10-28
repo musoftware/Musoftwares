@@ -16,8 +16,15 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        // a page that sends people to sign in (e.g. the QR menu maker) brings them back after it;
+        // only a path on this site, so the parameter cannot send anyone elsewhere
+        $back = (string) $request->query('redirect', '');
+        if (str_starts_with($back, '/') && ! str_starts_with($back, '//') && ! str_contains($back, '\\')) {
+            $request->session()->put('url.intended', url($back));
+        }
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
