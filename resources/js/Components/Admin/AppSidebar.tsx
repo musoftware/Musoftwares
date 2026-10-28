@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -97,8 +97,6 @@ const items: MenuItem[] = [
     subItems: [
         { title: "admin.sidebar_bulk_notify", url: "/admin/notifications/broadcast" },
         { title: "admin.sidebar_winback_campaigns", url: "/admin/winback" },
-        { title: "admin.sidebar_software_products", url: "/admin/software-products" },
-        { title: "admin.sidebar_marketing", url: "/admin/marketing" },
         { title: "admin.sidebar_website_services", url: "/admin/website-services" },
         { title: "admin.sidebar_micro_services", url: "/admin/micro-services" },
         { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets" },
@@ -114,12 +112,25 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_commissions", url: "/admin/commissions" },
     ]
   },
+  {
+    // selling and licensing the desktop programs, in one place
+    title: "admin.sidebar_programs",
+    url: "/admin/software-products",
+    icon: Laptop,
+    subItems: [
+        { title: "admin.sidebar_software_products", url: "/admin/software-products" },
+        { title: "admin.sidebar_marketing", url: "/admin/marketing" },
+        { title: "admin.sidebar_serial_softwares", url: "/admin/serial-softwares" },
+        { title: "admin.sidebar_serial_devices", url: "/admin/serial-devices" },
+        { title: "admin.sidebar_user_assignments", url: "/admin/serial-user-devices" },
+        { title: "admin.sidebar_quick_activate", url: "/admin/serial-devices-quick-activate" },
+    ]
+  },
   { 
     title: "admin.sidebar_marketplace", 
     url: "/admin/marketplace", 
     icon: Building2,
     subItems: [
-        { title: "admin.sidebar_software_tools_store", url: "/admin/store-tools" },
         { title: "admin.sidebar_digital_books", url: "/admin/digital-products" },
         { title: "admin.sidebar_upload_book_pdf", url: "/admin/digital-products/create" },
         { title: "admin.sidebar_book_categories", url: "/admin/digital-products/categories" },
@@ -166,11 +177,6 @@ const items: MenuItem[] = [
     url: "/admin/system", 
     icon: Settings,
     subItems: [
-        { title: "admin.sidebar_software_tools_store", url: "/admin/store-tools" },
-        { title: "admin.sidebar_user_assignments", url: "/admin/serial-user-devices" },
-        { title: "admin.sidebar_serial_softwares", url: "/admin/serial-softwares" },
-        { title: "admin.sidebar_serial_devices", url: "/admin/serial-devices" },
-        { title: "admin.sidebar_quick_activate", url: "/admin/serial-devices-quick-activate" },
         
         { title: "admin.sidebar_partner_gateway_b2b_api", url: "/admin/partner-gateway" },
         { title: "admin.sidebar_settings", url: "/admin/settings" },

@@ -188,7 +188,7 @@ function AuthenticatedContent({
             key: 'apps',
             title: __('client_home.menu.apps'),
             items: [
-                { key: 'store', href: safeRoute('store.tools.index'), icon: Wrench, title: __('client_home.menu.software_store'), description: __('client_home.menu.software_store_desc'), active: isRouteActive('store.tools') && !isRouteActive('store.tools.my-licenses') },
+                { key: 'store', href: safeRoute('services.index', undefined, '/services'), icon: Wrench, title: __('client_home.menu.software_store'), description: __('client_home.menu.software_store_desc'), active: isRouteActive('services') },
                 { key: 'licenses', href: safeRoute('store.tools.my-licenses'), icon: Key, color: 'emerald', title: __('client_home.menu.licenses'), description: __('client_home.menu.licenses_desc'), active: isRouteActive('store.tools.my-licenses') },
                 { key: 'sms_gateway', href: safeRoute('sms-payment-gateway.index'), icon: CreditCard, color: 'rose', title: __('general.payment_gateway'), description: __('client_home.menu.payment_gateway_desc'), active: isSmsGatewayMenuActive },
                 { key: 'partner_api', href: safeRoute('client.partner-gateway.index', undefined, '/partner-gateway'), icon: Lock, title: __('client_home.menu.partner_api'), description: __('client_home.menu.partner_api_desc'), active: isRouteActive('client.partner-gateway') },

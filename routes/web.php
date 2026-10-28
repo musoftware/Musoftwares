@@ -56,7 +56,6 @@ use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SerialDeviceController;
 use App\Http\Controllers\Admin\SerialSoftwareController;
 use App\Http\Controllers\Admin\SerialUserDeviceController;
-use App\Http\Controllers\Admin\StoreToolController;
 use App\Http\Controllers\Admin\UserFileController;
 use App\Http\Controllers\Admin\UserNoteController;
 use App\Http\Controllers\Admin\UsersController;
@@ -921,11 +920,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/serial-softwares/{serialSoftware}/packages/{package}', [SerialSoftwareController::class, 'destroyPackage'])->name('serial-softwares.packages.destroy');
 
     // Software & Tools Store Management (Admin catalog)
-    Route::get('/store-tools', [StoreToolController::class, 'index'])->name('store-tools.index');
-    Route::post('/store-tools', [StoreToolController::class, 'store'])->name('store-tools.store');
-    Route::put('/store-tools/{storeTool}', [StoreToolController::class, 'update'])->name('store-tools.update');
-    Route::delete('/store-tools/{storeTool}', [StoreToolController::class, 'destroy'])->name('store-tools.destroy');
-    Route::patch('/store-tools/{storeTool}/toggle-status', [StoreToolController::class, 'toggleStatus'])->name('store-tools.toggle-status');
+    // one program store: the old "store tools" list is replaced by /admin/software-products
+    Route::redirect('/store-tools', '/admin/software-products', 301);
 
     // Device registry (auto-created by API check-in, admin manages status)
     Route::get('/serial-devices', [SerialDeviceController::class, 'index'])->name('serial-devices.index');
@@ -1013,11 +1009,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-licenses', [ToolStoreController::class, 'myLicenses'])->name('store.tools.my-licenses');
 });
 
-// Software & Tools Store Public Routes
-Route::get('/store/tools', [ToolStoreController::class, 'index'])->name('store.tools.index');
-Route::post('/store/tools/{storeTool}/purchase', [ToolStoreController::class, 'purchase'])
-    ->middleware(['auth', 'throttle:10,1'])
-    ->name('store.tools.purchase');
+// One program store: programs are sold at /services (online payment, automatic activation)
+Route::permanentRedirect('/store/tools', '/services');
 
 require __DIR__.'/auth.php';
 

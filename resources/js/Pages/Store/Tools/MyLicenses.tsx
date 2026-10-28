@@ -22,7 +22,7 @@ export default function MyLicenses({ licenses = [], linkedDevices = [] }: { lice
         <ClientPage
             title={__('tools.store_my_licenses_title')}
             hint={__('tools.store_my_licenses_desc')}
-            action={<PrimaryAction href={route('store.tools.index')}>{__('tools.store_browse_more')}</PrimaryAction>}
+            action={<PrimaryAction href="/services">{__('tools.store_browse_more')}</PrimaryAction>}
         >
             <Section title={__('tools.store_active_licenses_count', { count: licenses.length })}>
                 {licenses.length === 0 ? (
