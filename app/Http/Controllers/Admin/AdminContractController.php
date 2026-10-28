@@ -28,7 +28,7 @@ class AdminContractController extends Controller
 
     public function create()
     {
-        $priceItems = ContractPriceItem::all();
+        $priceItems = $this->priceItems();
         $currencies = Currency::all();
 
         $exchangeRates = [];
@@ -88,7 +88,7 @@ class AdminContractController extends Controller
     public function edit(Contract $contract)
     {
         $contract->load('versions');
-        $priceItems = ContractPriceItem::all();
+        $priceItems = $this->priceItems();
         $currencies = Currency::all();
 
         $exchangeRates = [];
@@ -155,5 +155,18 @@ class AdminContractController extends Controller
         $contract->delete();
 
         return redirect()->route('admin.contracts.index')->with('success', __('general.contract_deleted_successfully'));
+    }
+
+    /** The price list, each item with its real price in USD (its fixed price, or its hours at the hourly rate). */
+    private function priceItems()
+    {
+        $rate = ContractPriceItem::hourlyRateUsd();
+        $usd = \App\Models\Currency::where('currency', 'USD')->value('id');
+
+        return ContractPriceItem::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get()
+            ->each(function (ContractPriceItem $item) use ($rate, $usd) {
+                $item->default_price = $item->unitPriceUsd($rate);
+                $item->currency_id = $usd; // the form converts from the item's currency
+            });
     }
 }

@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\ContractPriceItem;
+
 class ProjectEstimatorDataService extends BaseService
 {
     /**
      * Get structured estimator configuration and items.
      *
+     * The add-ons come from the price list (contract_price_items, the items with a platform), which
+     * contracts and the AI pricing use too. The list written below is only the starting data that the
+     * price list was filled from, and the fallback while it is empty.
+     *
      * @param float $exchangeRate
+     * @param bool $fromPriceList false returns the built-in starting list
      * @return array
      */
-    public function getEstimatorData(float $exchangeRate = 50.0): array
+    public function getEstimatorData(float $exchangeRate = 50.0, bool $fromPriceList = true): array
     {
         $platforms = [
             'web' => [
@@ -712,6 +719,10 @@ class ProjectEstimatorDataService extends BaseService
             'guarantee' => '100% transparent pricing, source code delivery, and 30-day post-delivery technical warranty.',
         ];
 
+        if ($fromPriceList) {
+            $modules = $this->modulesFromPriceList($exchangeRate) ?: $modules;
+        }
+
         return [
             'overview' => [
                 'title' => 'Project Cost & Budget Estimator',
@@ -731,5 +742,39 @@ class ProjectEstimatorDataService extends BaseService
                 'method' => 'POST',
             ],
         ];
+    }
+
+    /** @return array<string, array<int, array>> the estimator add-ons per platform, from the price list */
+    private function modulesFromPriceList(float $exchangeRate): array
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasColumn('contract_price_items', 'platform')) {
+            return [];
+        }
+
+        $hourlyRate = ContractPriceItem::hourlyRateUsd();
+
+        return ContractPriceItem::query()
+            ->where('is_active', true)
+            ->whereIn('platform', ContractPriceItem::PLATFORMS)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('platform')
+            ->map(fn ($items) => $items->map(function (ContractPriceItem $item) use ($exchangeRate, $hourlyRate) {
+                $price = $item->unitPriceUsd($hourlyRate);
+
+                return array_filter([
+                    'id' => $item->key,
+                    'title' => $item->name_en ?: $item->name,
+                    'title_ar' => $item->name_ar ?: null,
+                    'category' => $item->category ?: 'core',
+                    'price_usd' => $price,
+                    'price_egp' => round($price * $exchangeRate),
+                    'platform' => $item->platform,
+                    'icon' => $item->icon ?: 'Box',
+                    'desc' => (string) $item->description,
+                ], fn ($v) => $v !== null) + ($item->meta ?? []);
+            })->values()->all())
+            ->all();
     }
 }
