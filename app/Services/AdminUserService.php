@@ -121,7 +121,8 @@ class AdminUserService extends BaseService
             $val = $request->input('hour_rate_currency');
             $user->hour_rate_currency_id = $val ?: ($user->currency_id ?? 1);
         }
-        if ($request->has('hour_rate')) {
+        // hour_rate is NOT NULL: an empty box keeps the current (or default) rate
+        if ($request->filled('hour_rate')) {
             $user->hour_rate = $request->input('hour_rate');
         }
 

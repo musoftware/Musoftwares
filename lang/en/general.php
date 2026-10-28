@@ -4285,7 +4285,7 @@ return array (
   'name_asc' => 'Client A→Z',
   'name_company_com' => 'name@company.com',
   'name_email_or_phone' => 'Name, email, or phone...',
-  'name_must_include_a_last_name' => 'Name Name Must Include A Last',
+  'name_must_include_a_last_name' => 'The name must include a last name.',
   'name_optional' => 'Name (optional)',
   'name_servers' => 'Name Servers',
   'name_workspace_com' => 'name@workspace.com',
@@ -8543,4 +8543,5 @@ return array (
   'isaas_contract_signature_example' => 'e.g., :name',
   'isaas_contract_signing' => 'Signing...',
   'isaas_contract_sign' => 'Sign Contract',
+  'please_fix_the_errors_below' => 'Please fix the following, then save again:',
 );

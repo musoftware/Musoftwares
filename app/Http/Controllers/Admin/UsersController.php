@@ -676,7 +676,7 @@ class UsersController extends Controller
             'roles' => ['client', 'user', 'software_reseller', 'admin', 'manager', 'employee', 'moderator'],
             'currencies' => Currency::all(),
             'plans' => ModulePlan::where('is_active', true)->get(),
-            'statuses' => ['active', 'blocked', 'suspended'],
+            'statuses' => ['active', 'blocked'],
         ]);
     }
 

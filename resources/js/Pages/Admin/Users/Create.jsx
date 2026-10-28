@@ -1,5 +1,6 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import FormErrorSummary from '@/Components/Admin/FormErrorSummary';
 import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
@@ -86,6 +87,7 @@ export default function Create({ currencies = [], plans = [], statuses = [], rol
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-6 md:p-8">
+                        <FormErrorSummary errors={errors} />
                         
                         {/* User Details */}
                         <div className="mb-10">

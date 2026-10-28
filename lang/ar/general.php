@@ -8543,4 +8543,5 @@ return array (
   'isaas_contract_signature_example' => 'مثال: :name',
   'isaas_contract_signing' => 'جارٍ التوقيع...',
   'isaas_contract_sign' => 'توقيع العقد',
+  'please_fix_the_errors_below' => 'صحح الآتي ثم احفظ تاني:',
 );

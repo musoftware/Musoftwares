@@ -2,50 +2,24 @@
 
 namespace App\Http\Requests\Admin\User;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
 
 class StoreUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    use ValidatesUserFields;
+
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->isAdmin(); // Add specific role authorization if needed later
+        return $this->user() && $this->user()->isAdmin();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,client,user,employee,manager,moderator,software_reseller',
-            'currency_id' => 'nullable|integer|exists:currencies,id',
-            'enable_notifications' => 'nullable|boolean',
-            'enable_custom_hour_rate' => 'nullable|boolean',
-            'enable_3d_dashboard' => 'nullable|boolean',
-        ];
+        return ['role' => 'required|in:admin,client,user,employee,manager,moderator,software_reseller'] + $this->userFieldRules();
     }
 
-    /**
-     * Configure the validator instance.
-     *
-     * @param  Validator  $validator
-     * @return void
-     */
-    public function withValidator($validator)
+    public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
-            if (! str_contains(trim($this->input('name')), ' ')) {
-                $validator->errors()->add('name', 'Full name must include a last name.');
-            }
-        });
+        $this->requireLastName($validator);
     }
 }

@@ -477,3 +477,6 @@ select:not([multiple]):not([size]) {
 [dir="rtl"] select:not([multiple]):not([size]) {
     background-position: left 0.5rem center;
 }
+
+/* fields marked by FormErrorSummary: native selects and textareas get the same red edge as inputs */
+select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, .15); }
