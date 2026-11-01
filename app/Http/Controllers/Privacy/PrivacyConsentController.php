@@ -74,3 +74,4 @@ class PrivacyConsentController extends Controller
         return redirect('/');
     }
 }
+

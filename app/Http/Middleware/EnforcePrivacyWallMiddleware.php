@@ -72,3 +72,4 @@ class EnforcePrivacyWallMiddleware
         return $ua !== '' && preg_match(self::CRAWLER_UA_REGEX, $ua) === 1;
     }
 }
+

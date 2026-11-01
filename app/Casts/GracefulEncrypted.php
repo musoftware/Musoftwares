@@ -38,3 +38,4 @@ class GracefulEncrypted implements CastsAttributes
         return Crypt::encryptString((string) $value);
     }
 }
+

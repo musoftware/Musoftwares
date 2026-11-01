@@ -84,3 +84,4 @@ class AdminDataSubjectRequestController extends Controller
         return back()->with('success', __('privacy_compliance.admin_dsr_updated_toast'));
     }
 }
+

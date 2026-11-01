@@ -29,3 +29,4 @@ trait ScopesToLegalWindow
         return false;
     }
 }
+

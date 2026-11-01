@@ -34,3 +34,4 @@ final class LegalWindowScope implements Scope
         });
     }
 }
+

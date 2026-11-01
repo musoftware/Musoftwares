@@ -43,3 +43,4 @@ return new class extends Migration
         // Column widening is kept intact to avoid truncating AES-256 encrypted payloads.
     }
 };
+

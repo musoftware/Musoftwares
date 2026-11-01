@@ -77,3 +77,4 @@ class CreateEncryptedBackupCommand extends Command
         ];
     }
 }
+

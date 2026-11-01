@@ -101,3 +101,4 @@ class DataSubjectRequestController extends Controller
         return back()->with('status', __('privacy_compliance.dsr_submitted_success'));
     }
 }
+

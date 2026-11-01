@@ -69,3 +69,4 @@ final class LegalWindow
         return $parsed->lt($cutoff) ? $cutoff : $parsed;
     }
 }
+

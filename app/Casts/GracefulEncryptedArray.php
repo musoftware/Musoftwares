@@ -51,3 +51,4 @@ class GracefulEncryptedArray implements CastsAttributes
         return Crypt::encryptString((string) $json);
     }
 }
+

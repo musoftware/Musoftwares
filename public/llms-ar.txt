@@ -4,19 +4,231 @@
 
 ## نظرة عامة على المنصة
 توفر ميوزوفت ويرز خدمات تطوير المواقع، البرمجيات الجاهزة، الإضافات البرمجية للمتاجر والمواقع، وحلول الأتمتة المخصصة.
-رابط المنصة الرئيسي: http://localhost
-الفهرس الشامل والتفصيلي: http://localhost/llms-full-ar.txt
+رابط المنصة الرئيسي: https://www.musoftwares.com
+الفهرس الشامل والتفصيلي: https://www.musoftwares.com/llms-full-ar.txt
 
 ## روابط برمجية سهلة القراءة
-- واجهة برمجة الخدمات: http://localhost/marketplace/api/v1/services
-- واجهة برمجة التصنيفات: http://localhost/marketplace/api/v1/categories
-- واجهة برمجة البحث: http://localhost/marketplace/api/v1/search
-- مواصفات OpenAPI: http://localhost/marketplace/api/v1/openapi.json
+- واجهة برمجة الخدمات: https://www.musoftwares.com/marketplace/api/v1/services
+- واجهة برمجة التصنيفات: https://www.musoftwares.com/marketplace/api/v1/categories
+- واجهة برمجة البحث: https://www.musoftwares.com/marketplace/api/v1/search
+- مواصفات OpenAPI: https://www.musoftwares.com/marketplace/api/v1/openapi.json
 
 ## تصنيفات الخدمات
-- [Web Dev](http://localhost/marketplace/categories/web-dev): تصفح الخدمات المتاحة.
 
 ## الخدمات المميزة
 
 ## مقالات المدونة الحديثة
+
+### مقال للمشاركة
+- **مقتطف**: ملخص
+- **الرابط**: http://localhost/blog/share-me?lang=ar
+
+
+## البرامج والخدمات
+
+كل صفحة ليها نسخة Markdown كاملة بنفس الرابط وفي آخره .md
+
+### أود فايندر
+- الصفحة: https://www.musoftwares.com/services/audfinder?lang=ar
+- Markdown: https://www.musoftwares.com/services/audfinder.md?lang=ar
+- السعر: 0 EGP في السنة
+- الوصف: حوّل قوائم بروفايلات فيسبوك إلى أرقام تليفون وبيانات جمهور.
+
+### إيميل سيندر برو
+- الصفحة: https://www.musoftwares.com/services/email-sender-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/email-sender-pro.md?lang=ar
+- السعر: 0 EGP في السنة
+- الوصف: ابعت حملات إيميل جماعية مع تدوير ذكي لحسابات SMTP.
+
+### واتساب بلك سيندر
+- الصفحة: https://www.musoftwares.com/services/whatsapp-bulk-sender?lang=ar
+- Markdown: https://www.musoftwares.com/services/whatsapp-bulk-sender.md?lang=ar
+- السعر: 0 EGP في السنة
+- الوصف: ابعت رسائل واتساب جماعية من أكتر من حساب.
+
+### حزمة موسوفت للتسويق
+- الصفحة: https://www.musoftwares.com/services/marketing-suite?lang=ar
+- Markdown: https://www.musoftwares.com/services/marketing-suite.md?lang=ar
+- السعر: من 4,924 EGP في السنة
+- الوصف: خمستاشر أداة تسويق في عضوية سنوية واحدة.
+
+### إنبوكس سيندر برو
+- الصفحة: https://www.musoftwares.com/services/inbox-sender-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/inbox-sender-pro.md?lang=ar
+- السعر: 2,000 EGP في السنة
+- الوصف: ابعت رسايل وصور متنوعة لمحادثات صفحة فيسبوك بتاعتك بفواصل زمنية عشوائية آمنة.
+
+### خدمة موسوفت لواتساب الرسمي
+- الصفحة: https://www.musoftwares.com/services/whatsapp-official?lang=ar
+- Markdown: https://www.musoftwares.com/services/whatsapp-official.md?lang=ar
+- السعر: من 46.80 USD دفعة واحدة
+- الوصف: تجهيز واتساب الأعمال الرسمي وحملاته عن طريق Cloud API من ميتا.
+
+### مابس ليدز برو
+- الصفحة: https://www.musoftwares.com/services/maps-leads-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/maps-leads-pro.md?lang=ar
+- السعر: 1,500 EGP في السنة
+- الوصف: حوّل بحث خرائط جوجل لقائمة نضيفة بالأنشطة التجارية بالتليفون والموقع والعنوان.
+
+### إيميل فايندر برو
+- الصفحة: https://www.musoftwares.com/services/email-finder-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/email-finder-pro.md?lang=ar
+- السعر: 1,500 EGP في السنة
+- الوصف: اعثر على الإيميلات العامة في مواقع الشركات، وافحص كل عنوان قبل ما تبعت.
+
+### نظام إدارة ورشة السيارات
+- الصفحة: https://www.musoftwares.com/services/workshop-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/workshop-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: موقع وحجز أونلاين وإدارة كاملة لورشة سيارات أو مغسلة.
+
+### تليجرام سيندر برو
+- الصفحة: https://www.musoftwares.com/services/telegram-sender-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/telegram-sender-pro.md?lang=ar
+- السعر: 1,000 EGP في السنة
+- الوصف: ابعت رسايل متنوعة لمستخدمي تليجرام اللي وافقوا يسمعوا منك، بحد يومي وفواصل عشوائية.
+
+### نظام حجز وإدارة العيادة
+- الصفحة: https://www.musoftwares.com/services/clinic-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/clinic-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: موقع وحجز مواعيد وإدارة المرضى لعيادة أو مجمع طبي خاص.
+
+### مدير المحل برو
+- الصفحة: https://www.musoftwares.com/services/shop-manager-pro?lang=ar
+- Markdown: https://www.musoftwares.com/services/shop-manager-pro.md?lang=ar
+- السعر: 1,500 EGP في السنة
+- الوصف: فواتير ومخزون بسيطين لمحل صغير. بيع وشراء ومرتجع وطباعة ونسخ احتياطي، على جهازك أنت.
+
+### نظام طلبات الكافيه
+- الصفحة: https://www.musoftwares.com/services/coffee-shop-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/coffee-shop-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: موقع متحرك ونظام طلبات لكافيه: داخل المكان وتيك أواي وتوصيل.
+
+### نظام إدارة الجيم
+- الصفحة: https://www.musoftwares.com/services/gym-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/gym-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: إدارة الاشتراكات وتسجيل الحضور وموقع للجيم أو النادي الرياضي.
+
+### نظام إدارة محلات الموبايل
+- الصفحة: https://www.musoftwares.com/services/mobile-shop-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/mobile-shop-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: نقطة بيع وإدارة محلات الموبايل مع تتبع IMEI والفروع.
+
+### نظام حجز وإدارة الصالون
+- الصفحة: https://www.musoftwares.com/services/salon-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/salon-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: موقع حجز ولوحة تحكم للموظفين لصالون أو حلاق أو سبا.
+
+### نظام إدارة الصيدلية
+- الصفحة: https://www.musoftwares.com/services/pharmacy-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/pharmacy-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: كاشير ودفعات وتنبيهات صلاحية لصيدلية، مع البيع بالأقرب انتهاءً أولاً.
+
+### نظام كاشير وإدارة المطعم
+- الصفحة: https://www.musoftwares.com/services/restaurant-pos-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/restaurant-pos-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: طاولات وشاشة مطبخ وتقسيم فاتورة وتقرير نهاية اليوم لمطعم.
+
+### نظام عيادة الأسنان
+- الصفحة: https://www.musoftwares.com/services/dental-clinic-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/dental-clinic-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: مخطط أسنان وخطط علاج وأقساط وصور أشعة لعيادة أسنان.
+
+### نظام إدارة السناتر والمراكز التعليمية
+- الصفحة: https://www.musoftwares.com/services/education-center-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/education-center-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: طلاب ومجموعات وحضور ومصروفات شهرية وتذكير لأولياء الأمور لسنتر دروس.
+
+### نظام معمل تحاليل ومركز أشعة
+- الصفحة: https://www.musoftwares.com/services/lab-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/lab-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: طلبات وباركود للعينات ونتائج بعلامات مرتفع ومنخفض تلقائية وتقارير أشعة ورابط نتائج خاص لمعمل أو مركز أشعة.
+
+### نظام مكتب العقارات
+- الصفحة: https://www.musoftwares.com/services/real-estate-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/real-estate-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: عقارات وعملاء ومعاينات وصفقات وعقود إيجار وإيجار شهري وعمولات لمكتب عقارات.
+
+### نظام المخازن والجملة والتوزيع
+- الصفحة: https://www.musoftwares.com/services/wholesale-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/wholesale-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: عروض أسعار وأوامر بيع وفواتير وحسابات عملاء وشيكات ومناديب وأرصدة مخازن.
+
+### نظام إدارة السوبر ماركت
+- الصفحة: https://www.musoftwares.com/services/supermarket-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/supermarket-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: كاشير بالباركود وبيع بالوزن وورديات كاشير ومخزون لسوبر ماركت أو بقالة.
+
+### نظام الحضانة ونادي الأطفال
+- الصفحة: https://www.musoftwares.com/services/nursery-system?lang=ar
+- Markdown: https://www.musoftwares.com/services/nursery-system.md?lang=ar
+- السعر: من 5,000 EGP دفعة واحدة
+- الوصف: استلام آمن وتقرير يومي لولي الأمر وحضور ومصروفات بخصم للإخوة لحضانة أو نادي أطفال.
+
+### تصميم موقع شركة
+- الصفحة: https://www.musoftwares.com/services/company-website-design?lang=ar
+- Markdown: https://www.musoftwares.com/services/company-website-design.md?lang=ar
+- السعر: من 9,000 EGP دفعة واحدة
+- الوصف: موقع شركة سريع بالعربي والإنجليزي على ووردبريس، بسعر ثابت.
+
+### تصميم صفحة هبوط
+- الصفحة: https://www.musoftwares.com/services/landing-page-design?lang=ar
+- Markdown: https://www.musoftwares.com/services/landing-page-design.md?lang=ar
+- السعر: من 4,000 EGP دفعة واحدة
+- الوصف: صفحة واحدة مركزة تحوّل الزيارة لرسالة أو مكالمة أو طلب.
+
+### تصميم متجر إلكتروني
+- الصفحة: https://www.musoftwares.com/services/online-store-development?lang=ar
+- Markdown: https://www.musoftwares.com/services/online-store-development.md?lang=ar
+- السعر: من 15,000 EGP دفعة واحدة
+- الوصف: متجر إلكتروني جاهز للبيع على سلة أو زد أو ووكومرس، بالدفع والشحن متظبطين.
+
+### تطوير تطبيق ويب ولوحة تحكم
+- الصفحة: https://www.musoftwares.com/services/custom-web-app-development?lang=ar
+- Markdown: https://www.musoftwares.com/services/custom-web-app-development.md?lang=ar
+- السعر: من 7,500 EGP الدفعة الأولى
+- الوصف: تطبيق ويب أو لوحة تحكم مبنية لشغلك بلارافيل وريأكت.
+
+### صيانة ومتابعة المواقع
+- الصفحة: https://www.musoftwares.com/services/website-care-plans?lang=ar
+- Markdown: https://www.musoftwares.com/services/website-care-plans.md?lang=ar
+- السعر: من 1,000 EGP في الشهر
+- الوصف: تحديثات ونسخ احتياطي ومراقبة شهرية عشان موقعك يفضل آمن وشغال.
+
+### إدارة صفحات السوشيال ميديا
+- الصفحة: https://www.musoftwares.com/services/social-media-management?lang=ar
+- Markdown: https://www.musoftwares.com/services/social-media-management.md?lang=ar
+- السعر: من 5,000 EGP في الشهر
+- الوصف: محتوى ونشر وردود شهرية لصفحاتك على فيسبوك وانستجرام وتيك توك.
+
+### إدارة الحملات الإعلانية المدفوعة
+- الصفحة: https://www.musoftwares.com/services/paid-ads-management?lang=ar
+- Markdown: https://www.musoftwares.com/services/paid-ads-management.md?lang=ar
+- السعر: من 5,500 EGP في الشهر
+- الوصف: بنجهز ونشغل إعلانات ميتا وجوجل بأتعاب شهرية ثابتة. ميزانية الإعلان بتتدفع للمنصة.
+
+### تصميم لوجو وهوية بصرية
+- الصفحة: https://www.musoftwares.com/services/logo-and-brand-identity?lang=ar
+- Markdown: https://www.musoftwares.com/services/logo-and-brand-identity.md?lang=ar
+- السعر: من 3,500 EGP دفعة واحدة
+- الوصف: لوجو وألوان وخطوط، من لوجو بسيط لدليل هوية كامل.
+
+### شات بوت واتساب بالذكاء الاصطناعي
+- الصفحة: https://www.musoftwares.com/services/ai-chatbot-whatsapp-automation?lang=ar
+- Markdown: https://www.musoftwares.com/services/ai-chatbot-whatsapp-automation.md?lang=ar
+- السعر: من 9,000 EGP تجهيز، دفعة واحدة
+- الوصف: شات بوت بيرد على عملائك على موقعك وعلى واتساب، وبيحوّل لفريقك لما يحتاج.
 

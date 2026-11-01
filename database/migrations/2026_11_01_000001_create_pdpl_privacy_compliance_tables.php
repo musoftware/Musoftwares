@@ -72,3 +72,4 @@ return new class extends Migration
         Schema::dropIfExists('user_consents_log');
     }
 };
+

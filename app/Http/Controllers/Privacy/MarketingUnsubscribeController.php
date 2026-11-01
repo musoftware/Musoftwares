@@ -36,3 +36,4 @@ class MarketingUnsubscribeController extends Controller
         ]);
     }
 }
+

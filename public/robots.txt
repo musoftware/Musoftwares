@@ -1,13 +1,40 @@
+# LLM Search Agent Indexes:
+# English: https://www.musoftwares.com/llms.txt
+# Arabic: https://www.musoftwares.com/llms-ar.txt
+
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /seller/
 Disallow: /marketplace/dashboard
+Disallow: /software-orders/
+Disallow: /updates/
 
 User-agent: GPTBot
 Allow: /
 Disallow: /admin/
 Disallow: /seller/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /software-orders/
+Disallow: /updates/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /software-orders/
+Disallow: /updates/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /software-orders/
+Disallow: /updates/
 
 User-agent: ClaudeBot
 Allow: /
@@ -24,4 +51,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /seller/
 
-Sitemap: http://localhost/sitemap.xml
+Sitemap: https://www.musoftwares.com/sitemap.xml

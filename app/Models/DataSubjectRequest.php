@@ -72,3 +72,4 @@ class DataSubjectRequest extends Model
         return $this->belongsTo(User::class, 'processed_by_admin_id');
     }
 }
+
