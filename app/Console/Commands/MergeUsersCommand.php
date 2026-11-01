@@ -43,6 +43,15 @@ class MergeUsersCommand extends Command
             return self::FAILURE;
         }
 
+        if (! in_array($survivorId, $duplicateIds, true)) {
+            [$resolvedSurvivorId, $resolvedDuplicateIds] = $service->resolveOldestSurvivor($survivorId, $duplicateIds);
+            if ($resolvedSurvivorId !== $survivorId) {
+                $this->info("Auto-selected oldest user #{$resolvedSurvivorId} as survivor (instead of #{$survivorId}).");
+                $survivorId = $resolvedSurvivorId;
+                $duplicateIds = $resolvedDuplicateIds;
+            }
+        }
+
         $allConflicts = [];
         $allCounts = [];
         foreach ($duplicateIds as $duplicateId) {

@@ -31,9 +31,13 @@ class UserEmailController extends Controller
         if ($filter !== '') {
             $suggestions = User::query()
                 ->where('id', '!=', $user->id)
+                ->whereNull('merged_into_user_id')
                 ->where(function ($q) use ($filter) {
                     $needle = strtolower($filter);
-                    $q->whereRaw('LOWER(email) LIKE ?', ["%{$needle}%"])
+                    if (is_numeric($filter)) {
+                        $q->where('id', (int) $filter);
+                    }
+                    $q->orWhereRaw('LOWER(email) LIKE ?', ["%{$needle}%"])
                         ->orWhereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
                 })
                 ->orderBy('id')
