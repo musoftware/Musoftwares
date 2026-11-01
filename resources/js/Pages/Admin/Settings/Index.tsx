@@ -18,6 +18,7 @@ import {
     Calendar,
     Globe,
     Bell,
+    ShieldCheck,
 } from 'lucide-react';
 import { CurrencySelect } from '@/Components/CurrencySelect';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
@@ -73,6 +74,16 @@ interface SettingsData {
     global_dso_limit?: string | number | null;
     invoice_notification_channels?: string[] | string | null;
     enable_dso_system: boolean;
+    legal_company_name?: string | null;
+    legal_commercial_registry?: string | null;
+    legal_headquarters_address?: string | null;
+    dpo_email?: string | null;
+    dpo_phone?: string | null;
+    hosting_regions_disclosure?: string | null;
+    privacy_policy_version?: string | null;
+    data_retention_unverified_days?: string | number | null;
+    data_retention_inactive_months?: string | number | null;
+    encrypted_backups_enabled?: boolean;
 }
 
 interface Props {
@@ -704,6 +715,94 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                     />
                                 </Field>
                             </div>
+                        </div>
+                    </div>
+                </SectionCard>
+
+                {/* Egyptian PDPL Compliance & Legal Controller Identity */}
+                <SectionCard title={__('privacy_compliance.admin_settings_section_title')} icon={ShieldCheck}>
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <Field label={__('privacy_compliance.admin_legal_company_name')}>
+                                <Input
+                                    id="legal_company_name"
+                                    value={form.legal_company_name ?? ''}
+                                    onChange={(e) => set('legal_company_name', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_legal_commercial_registry')}>
+                                <Input
+                                    id="legal_commercial_registry"
+                                    value={form.legal_commercial_registry ?? ''}
+                                    onChange={(e) => set('legal_commercial_registry', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_legal_headquarters')}>
+                                <Input
+                                    id="legal_headquarters_address"
+                                    value={form.legal_headquarters_address ?? ''}
+                                    onChange={(e) => set('legal_headquarters_address', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_hosting_regions')}>
+                                <Input
+                                    id="hosting_regions_disclosure"
+                                    value={form.hosting_regions_disclosure ?? ''}
+                                    onChange={(e) => set('hosting_regions_disclosure', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_dpo_email')}>
+                                <Input
+                                    id="dpo_email"
+                                    type="email"
+                                    value={form.dpo_email ?? ''}
+                                    onChange={(e) => set('dpo_email', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_dpo_phone')}>
+                                <Input
+                                    id="dpo_phone"
+                                    value={form.dpo_phone ?? ''}
+                                    onChange={(e) => set('dpo_phone', e.target.value)}
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-gray-100">
+                            <Field label={__('privacy_compliance.admin_policy_version')}>
+                                <Input
+                                    id="privacy_policy_version"
+                                    value={form.privacy_policy_version ?? 'v2.0-2026'}
+                                    onChange={(e) => set('privacy_policy_version', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_retention_unverified_days')}>
+                                <Input
+                                    id="data_retention_unverified_days"
+                                    type="number"
+                                    min={7}
+                                    value={form.data_retention_unverified_days ?? 30}
+                                    onChange={(e) => set('data_retention_unverified_days', e.target.value)}
+                                />
+                            </Field>
+                            <Field label={__('privacy_compliance.admin_retention_inactive_months')}>
+                                <Input
+                                    id="data_retention_inactive_months"
+                                    type="number"
+                                    min={6}
+                                    value={form.data_retention_inactive_months ?? 24}
+                                    onChange={(e) => set('data_retention_inactive_months', e.target.value)}
+                                />
+                            </Field>
+                        </div>
+
+                        <div className="pt-2">
+                            <Toggle
+                                id="encrypted_backups_enabled"
+                                label={__('privacy_compliance.admin_encrypted_backups')}
+                                checked={Boolean(form.encrypted_backups_enabled ?? true)}
+                                onChange={(v) => set('encrypted_backups_enabled', v)}
+                            />
                         </div>
                     </div>
                 </SectionCard>

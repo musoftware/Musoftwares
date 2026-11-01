@@ -29,7 +29,12 @@
 
         <div class="mt-10 pt-6 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-3 text-[13px] text-[#86868b]">
             <p>{{ $footer['copyright'] }}</p>
-            <p><a href="{{ $footer['language_switch']['url'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a></p>
+            <div class="flex flex-wrap items-center gap-4">
+                <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-privacy-consent-gate'))" class="hover:text-[#1d1d1f] transition-colors cursor-pointer">
+                    {{ __('privacy_compliance.manage_cookie_preferences') }}
+                </button>
+                <a href="{{ $footer['language_switch']['url'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a>
+            </div>
         </div>
     </div>
 </footer>

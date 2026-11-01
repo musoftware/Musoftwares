@@ -29,6 +29,9 @@ class SystemConfigurationService extends BaseService
             'custom_head_scripts', 'custom_body_scripts',
             'notif_channels_invoice_created', 'market_hourly_rate',
             'auto_pay_after_days', 'enable_dso_decrement', 'global_dso_limit', 'enable_dso_system',
+            'legal_company_name', 'legal_commercial_registry', 'legal_headquarters_address',
+            'dpo_email', 'dpo_phone', 'hosting_regions_disclosure', 'privacy_policy_version',
+            'data_retention_unverified_days', 'data_retention_inactive_months', 'encrypted_backups_enabled',
         ];
 
         foreach ($supportedKeys as $key) {
@@ -36,7 +39,7 @@ class SystemConfigurationService extends BaseService
                 $value = $settings[$key];
 
                 // Handle booleans/checkboxes correctly
-                if (in_array($key, ['ownwallet', 'payoneer_active', 'paymob_active', 'friday_work_allowed', 'enable_dso_decrement', 'enable_dso_system'])) {
+                if (in_array($key, ['ownwallet', 'payoneer_active', 'paymob_active', 'friday_work_allowed', 'enable_dso_decrement', 'enable_dso_system', 'encrypted_backups_enabled'])) {
                     $value = $value ? '1' : '0';
                 }
 
