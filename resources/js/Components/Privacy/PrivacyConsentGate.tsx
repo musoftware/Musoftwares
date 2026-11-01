@@ -162,9 +162,10 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
             role="dialog"
             aria-modal="true"
             aria-labelledby="pdpl-react-gate-title"
-            className="fixed inset-0 z-[99990] flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-6 overflow-x-clip"
+            className="fixed inset-0 z-[99990] flex items-end justify-center bg-black/45 p-0 sm:p-4 overflow-x-clip"
         >
-            <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border border-black/15 bg-white text-[#1d1d1f] shadow-2xl p-5 sm:p-7">
+            <style>{`@keyframes pdpl-sheet-up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}.pdpl-sheet-up{animation:pdpl-sheet-up .28s ease-out}@media (prefers-reduced-motion:reduce){.pdpl-sheet-up{animation:none}}`}</style>
+            <div className="pdpl-sheet-up w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-black/15 bg-white text-[#1d1d1f] shadow-2xl p-5 sm:p-6">
                 <div className="flex items-start gap-3 mb-4">
                     <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/10 bg-[#f5f5f7] text-[#0071e3]">
                         <ShieldCheck className="h-5 w-5" aria-hidden="true" />
@@ -260,3 +261,4 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
         </div>
     );
 }
+
