@@ -40,14 +40,16 @@ class DataRetentionService
     {
         DB::transaction(function () use ($user): void {
             $token = bin2hex(random_bytes(4));
+            $existingColumns = array_flip(Schema::getColumnListing('users'));
 
             $user->emails()->delete();
             $user->tokens()->delete();
 
-            $user->forceFill([
+            $candidateScrub = [
                 'name' => "Anonymized User #{$user->id}",
                 'email' => "deleted-{$user->id}-{$token}@anonymized.invalid",
                 'phone' => null,
+                'phone_number' => null,
                 'mobile_1' => null,
                 'mobile_2' => null,
                 'whatsapp_number' => null,
@@ -59,7 +61,10 @@ class DataRetentionService
                 'kyc_notes' => null,
                 'enable_notifications' => false,
                 'winback_unsubscribed_at' => now(),
-            ])->save();
+            ];
+
+            $scrubbed = array_intersect_key($candidateScrub, $existingColumns);
+            $user->forceFill($scrubbed)->save();
 
             $user->delete();
         });
@@ -69,10 +74,12 @@ class DataRetentionService
     {
         $purged = 0;
 
-        if (Schema::hasTable('password_reset_tokens')) {
-            $purged += DB::table('password_reset_tokens')
-                ->where('created_at', '<', now()->subHours(24))
-                ->delete();
+        foreach (['password_reset_tokens', 'password_resets'] as $resetTable) {
+            if (Schema::hasTable($resetTable)) {
+                $purged += DB::table($resetTable)
+                    ->where('created_at', '<', now()->subHours(24))
+                    ->delete();
+            }
         }
 
         if (Schema::hasTable('sso_tokens')) {
