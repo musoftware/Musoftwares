@@ -29,8 +29,20 @@ function useDebouncedValue(value, delay = 350) {
 export default function MergeSelect({ survivor, search: initialSearch = '', suggestions = [], recently_merged = [] }) {
     const [search, setSearch] = useState(initialSearch || '');
     const [selected, setSelected] = useState([]);
+    const [selectedMeta, setSelectedMeta] = useState({});
     const debouncedSearch = useDebouncedValue(search, 350);
     const lastIssuedRef = useRef(initialSearch || '');
+
+    useEffect(() => {
+        if (!suggestions.length) return;
+        setSelectedMeta((prev) => {
+            const next = { ...prev };
+            suggestions.forEach((s) => {
+                next[s.id] = s;
+            });
+            return next;
+        });
+    }, [suggestions]);
 
     useEffect(() => {
         const next = debouncedSearch.trim();
@@ -64,30 +76,43 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
         });
     }, [suggestions, selected]);
 
+    const effectiveSurvivor = useMemo(() => {
+        const candidates = [
+            survivor,
+            ...selected.map((id) => selectedMeta[id] || suggestions.find((s) => s.id === id) || { id }),
+        ];
+        return candidates.reduce((oldest, current) => (current.id < oldest.id ? current : oldest), survivor);
+    }, [survivor, selected, selectedMeta, suggestions]);
+
     const continueToReview = () => {
         if (selected.length === 0) return;
+        const allIds = [survivor.id, ...selected];
+        const effectiveSurvivorId = Math.min(...allIds);
+        const effectiveDuplicates = allIds.filter((id) => id !== effectiveSurvivorId);
         const url =
-            route('admin.users.merge.preview', survivor.id) +
+            route('admin.users.merge.preview', effectiveSurvivorId) +
             '?' +
-            selected.map((id) => `duplicate_ids[]=${id}`).join('&');
+            effectiveDuplicates.map((id) => `duplicate_ids[]=${id}`).join('&');
         router.get(url);
     };
 
-    const survivorInitial = (survivor.name || survivor.email || '?').trim().charAt(0).toUpperCase();
+    const survivorInitial = (effectiveSurvivor.name || effectiveSurvivor.email || '?').trim().charAt(0).toUpperCase();
+    const isAutoSwapped = effectiveSurvivor.id !== survivor.id;
+    const effectiveVerified = Boolean(effectiveSurvivor.email_verified_at || effectiveSurvivor.email_verified);
 
     return (
-        <AdminSidebarLayout auth={{ user: survivor }}>
-            <Head title={`${__('general.merge_accounts_into')} #${survivor.id}`} />
+        <AdminSidebarLayout>
+            <Head title={`${__('general.merge_accounts_into')} #${effectiveSurvivor.id}`} />
 
-            <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6 overflow-x-clip">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <p className="text-xs font-semibold tracking-wider uppercase text-slate-500">
                             {__('general.users')} · {__('general.merge')}
                         </p>
                         <h1 className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900 flex items-center gap-3">
-                            <GitMerge className="h-7 w-7 text-indigo-600" />
-                            {__('general.merge_accounts_into')} #{survivor.id}
+                            <GitMerge className="h-7 w-7 text-indigo-600 shrink-0" />
+                            <span>{__('general.merge_accounts_into')} #{effectiveSurvivor.id}</span>
                         </h1>
                         <p className="mt-1 text-sm text-slate-500">
                             {__('general.merge_select_intro')}
@@ -101,36 +126,48 @@ export default function MergeSelect({ survivor, search: initialSearch = '', sugg
                     </Button>
                 </div>
 
-                <section className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 sm:p-6 shadow-sm">
+                <section className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-5 sm:p-6 shadow-sm">
                     <div className="flex items-start gap-4">
-                        <div className="h-12 w-12 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shrink-0">
+                        <div className="h-12 w-12 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shrink-0">
                             {survivorInitial}
                         </div>
                         <div className="min-w-0 flex-1">
                             <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-2">
                                 <ShieldCheck className="h-3.5 w-3.5" />
-                                {__('general.survivor_primary_account')}
+                                <span>{__('general.survivor_primary_account')}</span>
+                                <span className="font-mono">#{effectiveSurvivor.id}</span>
                             </div>
                             <div className="mt-1 text-lg font-semibold text-slate-900 truncate">
-                                {survivor.name || '—'}
+                                {effectiveSurvivor.name || '—'}
                             </div>
                             <div className="text-sm text-slate-600 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                <span className="inline-flex items-center gap-1.5">
-                                    <Mail className="h-3.5 w-3.5 text-slate-400" />
-                                    <span className="font-mono truncate">{survivor.email}</span>
+                                <span className="inline-flex items-center gap-1.5 min-w-0">
+                                    <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                    <span className="font-mono truncate">{effectiveSurvivor.email || '—'}</span>
                                 </span>
-                                {survivor.role && (
-                                    <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-emerald-200 text-emerald-700">
-                                        {survivor.role}
+                                {effectiveSurvivor.role && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white border border-emerald-200 text-emerald-700">
+                                        {effectiveSurvivor.role}
                                     </span>
                                 )}
-                                {survivor.email_verified_at && (
+                                {effectiveVerified && (
                                     <span className="inline-flex items-center gap-1 text-emerald-700 text-xs font-semibold">
                                         <CheckCircle2 className="h-3.5 w-3.5" />
                                         {__('general.email_verified')}
                                     </span>
                                 )}
                             </div>
+                            {isAutoSwapped && (
+                                <div className="mt-3 flex items-start gap-2 rounded-lg border border-emerald-200 bg-white/80 px-3 py-2 text-xs text-emerald-900">
+                                    <Info className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                    <span>
+                                        {__('admin.merge_oldest_id_auto_selected', {
+                                            oldest: effectiveSurvivor.id,
+                                            newer: survivor.id,
+                                        })}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
