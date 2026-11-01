@@ -37,6 +37,48 @@ class UserMergeService
         'peer_id',
     ];
 
+    /**
+     * Elect the oldest (smallest) active user ID among the candidate survivor
+     * and duplicates so merges always preserve the older user ID.
+     *
+     * @param  array<int, int>  $duplicateIds
+     * @return array{0: int, 1: array<int, int>}
+     */
+    public function resolveOldestSurvivor(int $survivorId, array $duplicateIds): array
+    {
+        $cleanDuplicates = array_values(array_unique(array_filter(
+            array_map('intval', $duplicateIds),
+            static fn (int $id): bool => $id > 0 && $id !== $survivorId
+        )));
+
+        if ($cleanDuplicates === []) {
+            return [$survivorId, $cleanDuplicates];
+        }
+
+        $activeIds = User::query()
+            ->whereIn('id', array_merge([$survivorId], $cleanDuplicates))
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+
+        if (! in_array($survivorId, $activeIds, true)) {
+            return [$survivorId, $cleanDuplicates];
+        }
+
+        $oldestId = min($activeIds);
+        if ($oldestId === $survivorId) {
+            return [$survivorId, $cleanDuplicates];
+        }
+
+        $remaining = array_values(array_filter(
+            array_unique(array_merge([$survivorId], $cleanDuplicates)),
+            static fn (int $id): bool => $id !== $oldestId
+        ));
+        sort($remaining);
+
+        return [$oldestId, $remaining];
+    }
+
     public function preview(int $survivorId, int $duplicateId): array
     {
         [$survivor, $duplicate] = $this->loadPair($survivorId, $duplicateId);
@@ -53,7 +95,7 @@ class UserMergeService
             }
         }
 
-        $childCounts = $this->collectChildCounts($duplicateId);
+        $childCounts = $this->collectChildCounts((int) $duplicate->id);
 
         return [
             'survivor' => $survivor->only(['id', 'name', 'email']),
@@ -71,121 +113,211 @@ class UserMergeService
     /**
      * Merge one or more duplicate accounts into a survivor.
      *
-     * Wraps the entire batch in a single DB transaction. Each duplicate is
-     * sequentially reassigned, the duplicate's email is auto-promoted to a
-     * verified `user_emails` alias on the survivor (unless it conflicts with
-     * the survivor's primary email or an existing alias).
+     * Wraps the entire batch in a single DB transaction. Always elects the
+     * oldest (smallest) active user ID among the involved accounts as the
+     * surviving primary account.
      *
      * @param  array<int, int>  $duplicateIds
-     * @return array<int, array{duplicate_id:int, status:string, alias_added:bool, error?:string}>
+     * @return array<int, array{survivor_id:int, duplicate_id:int, status:string, alias_added:bool, error?:string}>
      */
     public function mergeMany(int $survivorId, array $duplicateIds, array $resolutions, int $adminId): array
     {
-        $duplicateIds = array_values(array_unique(array_filter(array_map('intval', $duplicateIds), static fn ($v) => $v > 0)));
-        if ($duplicateIds === []) {
-            throw new RuntimeException('At least one duplicate user id is required.');
-        }
-        foreach ($duplicateIds as $d) {
-            if ($d === $survivorId) {
-                throw new RuntimeException("Duplicate id {$d} cannot equal survivor id {$survivorId}.");
-            }
-        }
-
+        $duplicateIds = $this->validateDuplicateIds($survivorId, $duplicateIds);
         $outcomes = [];
 
         DB::transaction(function () use ($survivorId, $duplicateIds, $resolutions, $adminId, &$outcomes) {
-            $survivor = User::withTrashed()->lockForUpdate()->find($survivorId);
-            if (! $survivor || $survivor->trashed()) {
-                throw new RuntimeException("Survivor user #{$survivorId} not found or already soft-deleted.");
+            [$survivor, $effectiveDuplicateIds, $lockedUsers] = $this->lockAndElectOldest($survivorId, $duplicateIds);
+            $effectiveSurvivorId = (int) $survivor->id;
+
+            $batchStats = [
+                'per_duplicate' => [],
+                'reassignments' => [],
+                'tokens_revoked' => 0,
+                'roles_deduped' => 0,
+                'collisions' => [],
+            ];
+
+            foreach ($effectiveDuplicateIds as $duplicateId) {
+                $outcomes[] = $this->mergeLockedDuplicate(
+                    $survivor,
+                    $lockedUsers->get($duplicateId),
+                    $duplicateId,
+                    $resolutions,
+                    $adminId,
+                    $batchStats
+                );
             }
 
-            $perDuplicateSnapshots = [];
-            $totalReassignments = [];
-            $totalTokensRevoked = 0;
-            $totalRolesDeduped = 0;
-            $allCollisions = [];
-
-            foreach ($duplicateIds as $duplicateId) {
-                $duplicate = User::withTrashed()->lockForUpdate()->find($duplicateId);
-                if (! $duplicate || $duplicate->trashed()) {
-                    $outcomes[] = [
-                        'duplicate_id' => $duplicateId,
-                        'status' => 'skipped',
-                        'alias_added' => false,
-                        'error' => 'Duplicate not found or already merged.',
-                    ];
-
-                    continue;
-                }
-
-                $snapshot = [
-                    'survivor_before' => $survivor->only(self::RESOLVABLE_FIELDS),
-                    'duplicate_before' => $duplicate->only(self::RESOLVABLE_FIELDS),
-                    'resolutions' => $resolutions,
-                    'reassignments' => [],
-                    'tokens_revoked' => 0,
-                    'roles_deduped' => 0,
-                    'collisions' => [],
-                ];
-
-                if ((int) $duplicate->id === (int) $survivorId) {
-                    throw new RuntimeException("Cannot merge user #{$survivorId} into itself.");
-                }
-
-                $this->applyFieldResolutions($survivor, $duplicate, $resolutions);
-
-                $snapshot['reassignments'] = $this->reassignChildRows($duplicateId, $survivorId, $snapshot['collisions']);
-                $snapshot['tokens_revoked'] = $this->revokeDuplicateTokens($duplicateId);
-                $snapshot['roles_deduped'] = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
-
-                $duplicate->forceFill([
-                    'merged_into_user_id' => $survivorId,
-                    'deleted_at' => now(),
-                ])->save();
-
-                $aliasAdded = $this->promoteDuplicateEmailToAlias($duplicate, $survivor, $adminId);
-
-                $perDuplicateSnapshots[] = [
-                    'duplicate_id' => $duplicateId,
-                    'snapshot' => $snapshot,
-                    'alias_added' => $aliasAdded,
-                ];
-
-                $totalReassignments = array_merge($totalReassignments, $snapshot['reassignments']);
-                $totalTokensRevoked += $snapshot['tokens_revoked'];
-                $totalRolesDeduped += $snapshot['roles_deduped'];
-                $allCollisions = array_merge($allCollisions, $snapshot['collisions']);
-
-                $outcomes[] = [
-                    'duplicate_id' => $duplicateId,
-                    'status' => 'merged',
-                    'alias_added' => $aliasAdded,
-                ];
-            }
-
-            AdminAuditLog::create([
-                'actor_user_id' => $adminId,
-                'action' => 'users.merged',
-                'severity' => AdminAuditLog::SEVERITY_WARNING,
-                'target_type' => User::class,
-                'target_id' => $survivorId,
-                'meta' => [
-                    'survivor_id' => $survivorId,
-                    'duplicate_ids' => $duplicateIds,
-                    'duplicate_id' => count($duplicateIds) === 1 ? $duplicateIds[0] : null,
-                    'outcomes' => $outcomes,
-                    'batch_snapshot' => [
-                        'reassignments' => $totalReassignments,
-                        'tokens_revoked' => $totalTokensRevoked,
-                        'roles_deduped' => $totalRolesDeduped,
-                        'collisions' => $allCollisions,
-                        'per_duplicate' => $perDuplicateSnapshots,
-                    ],
-                ],
-            ]);
+            $this->recordMergeAuditLog(
+                $adminId,
+                $effectiveSurvivorId,
+                $survivorId,
+                $effectiveDuplicateIds,
+                $outcomes,
+                $batchStats
+            );
         });
 
         return $outcomes;
+    }
+
+    /**
+     * @param  array<int, mixed>  $duplicateIds
+     * @return array<int, int>
+     */
+    private function validateDuplicateIds(int $survivorId, array $duplicateIds): array
+    {
+        $cleaned = array_values(array_unique(array_filter(
+            array_map('intval', $duplicateIds),
+            static fn (int $v): bool => $v > 0
+        )));
+
+        if ($cleaned === []) {
+            throw new RuntimeException('At least one duplicate user id is required.');
+        }
+
+        if (in_array($survivorId, $cleaned, true)) {
+            throw new RuntimeException("Duplicate id {$survivorId} cannot equal survivor id {$survivorId}.");
+        }
+
+        return $cleaned;
+    }
+
+    /**
+     * @param  array<int, int>  $duplicateIds
+     * @return array{0: User, 1: array<int, int>, 2: \Illuminate\Support\Collection<int, User>}
+     */
+    private function lockAndElectOldest(int $survivorId, array $duplicateIds): array
+    {
+        $allIds = array_values(array_unique(array_merge([$survivorId], $duplicateIds)));
+        sort($allIds);
+
+        $lockedUsers = User::withTrashed()
+            ->whereIn('id', $allIds)
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get()
+            ->keyBy(static fn (User $u): int => (int) $u->id);
+
+        $initialSurvivor = $lockedUsers->get($survivorId);
+        if (! $initialSurvivor || $initialSurvivor->trashed()) {
+            throw new RuntimeException("Survivor user #{$survivorId} not found or already soft-deleted.");
+        }
+
+        /** @var User $oldestActive */
+        $oldestActive = $lockedUsers
+            ->filter(static fn (User $u): bool => ! $u->trashed())
+            ->sortBy('id')
+            ->first();
+
+        $effectiveSurvivorId = (int) $oldestActive->id;
+        if ($effectiveSurvivorId === $survivorId) {
+            return [$oldestActive, $duplicateIds, $lockedUsers];
+        }
+
+        $effectiveDuplicateIds = array_values(array_filter(
+            $allIds,
+            static fn (int $id): bool => $id !== $effectiveSurvivorId
+        ));
+
+        return [$oldestActive, $effectiveDuplicateIds, $lockedUsers];
+    }
+
+    /**
+     * @param  array<string, mixed>  $batchStats
+     * @return array{survivor_id:int, duplicate_id:int, status:string, alias_added:bool, error?:string}
+     */
+    private function mergeLockedDuplicate(
+        User $survivor,
+        ?User $duplicate,
+        int $duplicateId,
+        array $resolutions,
+        int $adminId,
+        array &$batchStats
+    ): array {
+        $survivorId = (int) $survivor->id;
+
+        if (! $duplicate || $duplicate->trashed()) {
+            return [
+                'survivor_id' => $survivorId,
+                'duplicate_id' => $duplicateId,
+                'status' => 'skipped',
+                'alias_added' => false,
+                'error' => 'Duplicate not found or already merged.',
+            ];
+        }
+
+        $collisions = [];
+        $snapshot = [
+            'survivor_before' => $survivor->only(self::RESOLVABLE_FIELDS),
+            'duplicate_before' => $duplicate->only(self::RESOLVABLE_FIELDS),
+            'resolutions' => $resolutions,
+            'reassignments' => [],
+            'tokens_revoked' => 0,
+            'roles_deduped' => 0,
+            'collisions' => [],
+        ];
+
+        $this->applyFieldResolutions($survivor, $duplicate, $resolutions);
+
+        $snapshot['reassignments'] = $this->reassignChildRows($duplicateId, $survivorId, $collisions);
+        $snapshot['collisions'] = $collisions;
+        $snapshot['tokens_revoked'] = $this->revokeDuplicateTokens($duplicateId);
+        $snapshot['roles_deduped'] = $this->mergeRolesAndPermissions($duplicateId, $survivorId);
+
+        $duplicate->forceFill([
+            'merged_into_user_id' => $survivorId,
+            'deleted_at' => now(),
+        ])->save();
+
+        $aliasAdded = $this->promoteDuplicateEmailToAlias($duplicate, $survivor, $adminId);
+
+        $batchStats['per_duplicate'][] = [
+            'duplicate_id' => $duplicateId,
+            'snapshot' => $snapshot,
+            'alias_added' => $aliasAdded,
+        ];
+        $batchStats['reassignments'] = array_merge($batchStats['reassignments'], $snapshot['reassignments']);
+        $batchStats['tokens_revoked'] += $snapshot['tokens_revoked'];
+        $batchStats['roles_deduped'] += $snapshot['roles_deduped'];
+        $batchStats['collisions'] = array_merge($batchStats['collisions'], $collisions);
+
+        return [
+            'survivor_id' => $survivorId,
+            'duplicate_id' => $duplicateId,
+            'status' => 'merged',
+            'alias_added' => $aliasAdded,
+        ];
+    }
+
+    /**
+     * @param  array<int, int>  $duplicateIds
+     * @param  array<int, array<string, mixed>>  $outcomes
+     * @param  array<string, mixed>  $batchStats
+     */
+    private function recordMergeAuditLog(
+        int $adminId,
+        int $survivorId,
+        int $requestedSurvivorId,
+        array $duplicateIds,
+        array $outcomes,
+        array $batchStats
+    ): void {
+        AdminAuditLog::create([
+            'actor_user_id' => $adminId,
+            'action' => 'users.merged',
+            'severity' => AdminAuditLog::SEVERITY_WARNING,
+            'target_type' => User::class,
+            'target_id' => $survivorId,
+            'meta' => [
+                'survivor_id' => $survivorId,
+                'requested_survivor_id' => $requestedSurvivorId,
+                'duplicate_ids' => $duplicateIds,
+                'duplicate_id' => count($duplicateIds) === 1 ? $duplicateIds[0] : null,
+                'outcomes' => $outcomes,
+                'batch_snapshot' => $batchStats,
+            ],
+        ]);
     }
 
     /**
@@ -236,6 +368,10 @@ class UserMergeService
         }
         if (! $duplicate || $duplicate->trashed()) {
             throw new RuntimeException("Duplicate user #{$duplicateId} not found or already merged.");
+        }
+
+        if ((int) $duplicate->id < (int) $survivor->id) {
+            return [$duplicate, $survivor];
         }
 
         return [$survivor, $duplicate];
