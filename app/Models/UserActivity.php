@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserActivity extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $guarded = [];
 
@@ -53,7 +54,7 @@ class UserActivity extends Model
 
         $date = date('Y-m-d');
 
-        $old_activities = static::query()
+        $old_activities = static::withoutLegalWindow()
             ->where('activity_date', '<', date('Y-m-d', strtotime('-60 days')))->first();
 
         if ($old_activities != null) {

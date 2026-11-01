@@ -39,7 +39,7 @@ class BalancesHelper
             return 0;
         }
 
-        $commission_amount = $user->withdraw()->whereIn('status', ['pending', 'reviewing'])->sum('amount');
+        $commission_amount = $user->withdraw()->withoutLegalWindow()->whereIn('status', ['pending', 'reviewing'])->sum('amount');
         $user->withdrawing_commission = $commission_amount;
         $user->save();
 
@@ -53,7 +53,7 @@ class BalancesHelper
             return 0;
         }
 
-        $data = $user->withdraw()->groupBy('currency_id')->where('status', 'approved')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
+        $data = $user->withdraw()->withoutLegalWindow()->groupBy('currency_id')->where('status', 'approved')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
             $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
@@ -72,7 +72,7 @@ class BalancesHelper
             return;
         }
 
-        $data = $user->commissions()->groupBy('currency_id')->where('convert_to_balance_on', '>', DB::raw('NOW()'))->select(DB::raw('sum(amount) as amount, currency_id'))->get();
+        $data = $user->commissions()->withoutLegalWindow()->groupBy('currency_id')->where('convert_to_balance_on', '>', DB::raw('NOW()'))->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
             $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, $user->currency_id);
@@ -92,6 +92,7 @@ class BalancesHelper
         $project = \App\Models\Project::resolve($project);
 
         $balance = $user->transactions()
+            ->withoutLegalWindow()
             ->groupBy('currency_id')
             ->when($project != null, function ($q) use ($project) {
                 return $q->where('project_id', $project->id);
@@ -121,6 +122,7 @@ class BalancesHelper
         $project = \App\Models\Project::resolve($project);
 
         $total_paid = $user->transactions()
+            ->withoutLegalWindow()
             ->whereIn('type', ['received', 'sent', 'refunded'])
             ->when($project != null, function ($q) use ($project) {
                 return $q->where('project_id', $project->id);
@@ -152,6 +154,7 @@ class BalancesHelper
         }
 
         $balance = $user->costTransactions()
+            ->withoutLegalWindow()
             ->groupBy('currency_id')
             ->select(DB::raw('sum(amount) as total_amount'), 'currency_id')
             ->get();

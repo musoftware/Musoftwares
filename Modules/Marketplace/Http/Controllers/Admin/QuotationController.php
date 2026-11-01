@@ -56,8 +56,8 @@ class QuotationController extends Controller
         $totalQuotations = Quotation::count();
         $activeQuotations = Quotation::where('status', 'active')->count();
         $totalViews = Quotation::sum('views_count');
-        $totalOrders = DB::table('quotation_orders')->where('status', 'paid')->count();
-        $totalCollected = DB::table('quotation_orders')->where('status', 'paid')->sum('deposit_amount');
+        $totalOrders = \App\Models\QuotationOrder::where('status', 'paid')->count();
+        $totalCollected = \App\Models\QuotationOrder::where('status', 'paid')->sum('deposit_amount');
 
         $currencies = Currency::query()->orderBy('currency')->get(['id', 'currency', 'symbol']);
 

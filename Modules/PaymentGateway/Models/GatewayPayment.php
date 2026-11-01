@@ -3,13 +3,14 @@
 namespace Modules\PaymentGateway\Models;
 
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class GatewayPayment extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $table = 'gateway_payments';
 

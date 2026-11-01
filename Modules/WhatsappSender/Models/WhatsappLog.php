@@ -2,6 +2,7 @@
 
 namespace Modules\WhatsappSender\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WhatsappLog extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopesToLegalWindow;
 
     protected $fillable = [
         'user_id',

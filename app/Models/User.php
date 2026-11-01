@@ -363,6 +363,7 @@ class User extends Authenticatable
     public function hasUnpaidInvoices(): bool
     {
         return $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->exists();
@@ -379,11 +380,12 @@ class User extends Authenticatable
 
         // 1. Pending withdrawals
         if (class_exists(UserReferralRequestWithdraw::class)) {
-            $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
+            $locked += $this->withdraw()->withoutLegalWindow()->where('status', 'pending')->sum('amount');
         }
 
         // 3. Pending invoices
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->get();
@@ -423,6 +425,7 @@ class User extends Authenticatable
         $currentBalance = $this->balance(); // Current Wallet Balance in User Currency
 
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)
@@ -489,6 +492,7 @@ class User extends Authenticatable
     public function unpaid_invoices_amount($include_pending = false)
     {
         $invoices = $this->invoices()
+            ->withoutLegalWindow()
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false);
 
@@ -523,6 +527,18 @@ class User extends Authenticatable
     public function withdraw()
     {
         return $this->hasMany(UserReferralRequestWithdraw::class);
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(Earning::class, 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')
+            ->where('notifications.created_at', '>=', \App\Support\LegalWindow::cutoffDatabase())
+            ->latest();
     }
 
     /**
@@ -601,6 +617,7 @@ class User extends Authenticatable
             $balance = (float) $this->user_balance;
             
             $oldestUnpaid = $this->invoices()
+                ->withoutLegalWindow()
                 ->where('unpaid', '>', 0)
                 ->whereIn('status', ['unpaid', 'partially_paid'])
                 ->where('is_suspended', false)
@@ -969,6 +986,7 @@ class User extends Authenticatable
     public function oldestUnpaidInvoice(): ?Invoice
     {
         return $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)
@@ -982,6 +1000,7 @@ class User extends Authenticatable
     public function totalUnpaidAmount(): float
     {
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)

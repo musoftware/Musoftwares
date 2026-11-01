@@ -2,6 +2,7 @@
 
 namespace Modules\SoftwareStore\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,7 +30,7 @@ use Illuminate\Support\Str;
  */
 class SoftwareOrder extends Model
 {
-    use SoftDeletes;
+    use ScopesToLegalWindow, SoftDeletes;
 
     public const STATUS_PENDING = 'pending_payment';
 

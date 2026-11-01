@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\InvoiceItemTimer;
+use App\Support\LegalWindow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -14,16 +15,20 @@ class HoursCalendarController extends Controller
     {
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
         $yearQuery = $isSqlite ? "strftime('%Y', date_start) as year" : 'YEAR(date_start) as year';
+        $earliestYear = LegalWindow::earliestVisibleYear();
 
         $years_lists = InvoiceItemTimer::select(DB::raw($yearQuery))
             ->whereNotNull('date_start')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->filter(fn (int $year) => $year >= $earliestYear)
+            ->values()
             ->toArray();
 
         if (empty($years_lists)) {
-            $years_lists = [date('Y')];
+            $years_lists = [(int) now('Africa/Cairo')->year];
         }
 
         return Inertia::render('Admin/HoursCalendar', [
@@ -34,7 +39,7 @@ class HoursCalendarController extends Controller
     public function getData(Request $request)
     {
         $invoice_item_timers = InvoiceItemTimer::query();
-        $selected_year = (int) $request->input('year', date('Y'));
+        $selected_year = LegalWindow::clampYear((int) $request->input('year', now('Africa/Cairo')->year));
 
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
 

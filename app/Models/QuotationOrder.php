@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class QuotationOrder extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $guarded = [];
 
@@ -35,7 +36,8 @@ class QuotationOrder extends Model
     public static function generateOrderNumber(): string
     {
         $year = date('Y');
-        $lastOrder = static::withTrashed()
+        $lastOrder = static::withoutLegalWindow()
+            ->withTrashed()
             ->where('order_number', 'LIKE', "QTO-{$year}-%")
             ->orderBy('id', 'desc')
             ->first();

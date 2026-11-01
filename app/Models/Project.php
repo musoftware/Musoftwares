@@ -351,7 +351,7 @@ class Project extends Model
 
     public function dueInvoices($currency)
     {
-        return -1 * abs($this->invoices()->where('currency', $currency)->whereIn('status', ['partially_paid', 'unpaid'])->sum('unpaid'));
+        return -1 * abs($this->invoices()->withoutLegalWindow()->where('currency', $currency)->whereIn('status', ['partially_paid', 'unpaid'])->sum('unpaid'));
     }
 
     /**
@@ -371,7 +371,7 @@ class Project extends Model
     {
         $currencyId = $this->resolveCurrencyId();
         $total = 0;
-        foreach ($this->costTransactions()->groupBy('currency_id')
+        foreach ($this->costTransactions()->withoutLegalWindow()->groupBy('currency_id')
             ->selectRaw('sum(amount) as total_amount, currency_id')
             ->get() as $item) {
             if ($item->total_amount == 0) {
@@ -391,7 +391,7 @@ class Project extends Model
     {
         $currencyId = $this->resolveCurrencyId();
         $total = 0;
-        foreach ($this->invoices()->groupBy('currency_id')
+        foreach ($this->invoices()->withoutLegalWindow()->groupBy('currency_id')
             ->selectRaw('sum(paid) as total_amount, currency_id')
             ->get() as $item) {
             if ($item->total_amount == 0) {
@@ -411,7 +411,7 @@ class Project extends Model
     {
         $currencyId = $this->resolveCurrencyId();
         $total = 0;
-        foreach ($this->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->groupBy('currency_id')
+        foreach ($this->invoices()->withoutLegalWindow()->whereIn('status', ['unpaid', 'partially_paid'])->groupBy('currency_id')
             ->selectRaw('sum(unpaid) as total_amount, currency_id')
             ->get() as $item) {
             if ($item->total_amount == 0) {

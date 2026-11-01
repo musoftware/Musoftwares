@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
+use App\Models\Concerns\ScopesToLegalWindow;
 use App\Observers\TransactionObserver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class Transaction extends Model
 {
     use HasFactory;
+    use ScopesToLegalWindow;
     use SoftDeletes;
 
     /**
@@ -89,7 +91,7 @@ class Transaction extends Model
 
     public static function get_sum_balance($date)
     {
-        $sum = Transaction::query()->where('created_at', '<=', Carbon::parse($date));
+        $sum = Transaction::withoutLegalWindow()->where('created_at', '<=', Carbon::parse($date));
 
         return $sum->sum('business_amount');
     }
@@ -174,7 +176,7 @@ class Transaction extends Model
             return null;
         }
 
-        return Transaction::query()
+        return Transaction::withoutLegalWindow()
             ->where('user_id', $this->user_id)
             ->where(function ($query) {
                 $query->where('created_at', '<', $this->created_at)
@@ -211,7 +213,7 @@ class Transaction extends Model
      */
     public function originalTransaction()
     {
-        return $this->belongsTo(Transaction::class, 'reverse_transaction_id');
+        return $this->belongsTo(Transaction::class, 'reverse_transaction_id')->withoutLegalWindow();
     }
 
     /**
@@ -219,7 +221,7 @@ class Transaction extends Model
      */
     public function reverseTransaction()
     {
-        return $this->hasOne(Transaction::class, 'reverse_transaction_id');
+        return $this->hasOne(Transaction::class, 'reverse_transaction_id')->withoutLegalWindow();
     }
 
     /**

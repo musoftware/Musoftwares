@@ -135,7 +135,7 @@ class DataRetentionService
             ->whereNull('email_verified_at')
             ->whereNull('last_login')
             ->where('created_at', '<', $cutoff)
-            ->whereDoesntHave('invoices')
+            ->whereDoesntHave('invoices', fn ($q) => $q->withoutLegalWindow())
             ->limit(200)
             ->get();
 

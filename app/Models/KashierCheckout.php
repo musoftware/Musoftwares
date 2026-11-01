@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class KashierCheckout extends Model
 {
-    use SoftDeletes;
+    use ScopesToLegalWindow, SoftDeletes;
 
     public const PURPOSE_POINTS = 'points-purchase';
 

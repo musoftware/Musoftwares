@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,7 +14,7 @@ use Throwable;
 
 class AdminAuditLog extends Model
 {
-    use SoftDeletes;
+    use ScopesToLegalWindow, SoftDeletes;
 
     public const SEVERITY_INFO = 'info';
 

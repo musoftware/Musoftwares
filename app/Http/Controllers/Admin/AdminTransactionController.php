@@ -109,7 +109,7 @@ class AdminTransactionController extends Controller
                     'avatar_url' => $u->avatar_url,
                     'balance' => $u->balance(),
                     // the stored balance should equal the sum of the statement; when it does not, the admin recalculates
-                    'ledger_balance' => (float) $u->transactions()->sum('amount'),
+                    'ledger_balance' => (float) $u->transactions()->withoutLegalWindow()->sum('amount'),
                     'available_balance' => $u->available_balance(),
                     'currency' => $u->currency,
                 ];
@@ -354,7 +354,8 @@ class AdminTransactionController extends Controller
                 return response()->json(['status' => false]);
             }
 
-            $amount = Transaction::where('project_id', $project->id)
+            $amount = Transaction::withoutLegalWindow()
+                ->where('project_id', $project->id)
                 ->where('currency_id', $currency)
                 ->sum('amount');
 
@@ -368,7 +369,8 @@ class AdminTransactionController extends Controller
             $proj = [];
 
             foreach ($projects as $project) {
-                $amount = Transaction::where('project_id', $project->id)
+                $amount = Transaction::withoutLegalWindow()
+                    ->where('project_id', $project->id)
                     ->where('currency_id', $currency)
                     ->sum('amount');
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use App\Traits\ChatModelTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,7 @@ class Todo extends Model
 {
     use ChatModelTrait;
     use HasFactory;
+    use ScopesToLegalWindow;
     use SoftDeletes;
 
     public function ChatName()

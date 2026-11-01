@@ -221,6 +221,7 @@ class DashboardService extends BaseService
             // Platform earnings on marketplace orders are the commission kept per completed order.
             $marketplaceRevenue = (float) DB::table('marketplace_orders')
                 ->where('status', 'completed')
+                ->where('created_at', '>=', \App\Support\LegalWindow::cutoffDatabase())
                 ->sum('commission_amount');
             if ($marketplaceRevenue > 0) {
                 $breakdown[] = ['name' => 'Marketplace', 'value' => round($marketplaceRevenue, 2), 'color' => '#06b6d4'];
