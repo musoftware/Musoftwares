@@ -13,7 +13,8 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
-        terms: false,
+        privacy_consent: false,
+        marketing_consent: false,
     });
 
     const [showPassword, setShowPassword] = useState(false);
@@ -190,24 +191,49 @@ export default function Register() {
                         )}
                     </div>
 
-                    <div className="flex items-start space-x-2 pt-1">
-                        <input
-                            type="checkbox"
-                            id="terms"
-                            required
-                            checked={data.terms}
-                            onChange={(e) => setData('terms', e.target.checked)}
-                            className="mt-0.5 h-4 w-4 rounded border-black/20 dark:border-white/20 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
-                        />
-                        <Label
-                            htmlFor="terms"
-                            className="text-xs font-medium text-[#1d1d1f]/70 dark:text-[#f5f5f7]/70 cursor-pointer select-none leading-tight"
-                        >
-                            {__('general.i_agree_to_the')}{' '}
-                            <Link href="/terms-of-service" className="font-semibold text-[#0071e3] hover:underline">{__('general.terms_of_service')}</Link>
-                            {' '}{__('general.and')}{' '}
-                            <Link href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('general.privacy_policy')}</Link>
-                        </Label>
+                    <div className="space-y-3 pt-1">
+                        <div>
+                            <div className="flex items-start gap-2.5">
+                                <input
+                                    type="checkbox"
+                                    id="privacy_consent"
+                                    name="privacy_consent"
+                                    required
+                                    checked={data.privacy_consent}
+                                    onChange={(e) => setData('privacy_consent', e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 dark:border-white/25 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
+                                />
+                                <Label
+                                    htmlFor="privacy_consent"
+                                    className="text-xs font-medium text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 cursor-pointer select-none leading-relaxed"
+                                >
+                                    {__('privacy_compliance.register_privacy_consent_label')}{' '}
+                                    (<Link href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('privacy_compliance.read_privacy_policy')}</Link>
+                                    {' / '}
+                                    <Link href="/terms-of-service" className="font-semibold text-[#0071e3] hover:underline">{__('privacy_compliance.read_terms')}</Link>)
+                                </Label>
+                            </div>
+                            {errors.privacy_consent && (
+                                <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.privacy_consent}</p>
+                            )}
+                        </div>
+
+                        <div className="flex items-start gap-2.5">
+                            <input
+                                type="checkbox"
+                                id="marketing_consent"
+                                name="marketing_consent"
+                                checked={data.marketing_consent}
+                                onChange={(e) => setData('marketing_consent', e.target.checked)}
+                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 dark:border-white/25 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
+                            />
+                            <Label
+                                htmlFor="marketing_consent"
+                                className="text-xs font-normal text-[#1d1d1f]/65 dark:text-[#f5f5f7]/65 cursor-pointer select-none leading-relaxed"
+                            >
+                                {__('privacy_compliance.register_marketing_consent_label')}
+                            </Label>
+                        </div>
                     </div>
 
                     <div className="pt-2">

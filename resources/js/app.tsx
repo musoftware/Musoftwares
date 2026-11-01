@@ -8,6 +8,7 @@ import { Toaster } from '@/Components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
+import { PrivacyConsentGate, type PrivacyComplianceShared } from '@/Components/Privacy/PrivacyConsentGate';
 import { getLoadedLocale, loadTranslations, syncDocumentDirection } from '@/lib/i18n';
 import { initTheme, applyTheme } from '@/lib/theme';
 import { useAppStore } from '@/store/useAppStore';
@@ -18,6 +19,7 @@ type SharedPageProps = {
     currencies?: SharedCurrency[];
     wallet?: { currency?: string };
     settings?: { base_currency?: string };
+    privacyCompliance?: PrivacyComplianceShared;
 };
 
 /** Expose currency data from page props to the money formatting helpers. */
@@ -74,10 +76,10 @@ router.on('navigate', (event) => {
 // This completely prevents Inertia from opening an iframe modal for Blade pages
 router.on('invalid', (event: any) => {
     event.preventDefault();
-    const targetUrl = 
-        event.detail?.response?.request?.responseURL || 
-        event.detail?.response?.config?.url || 
-        event.detail?.visit?.url?.href || 
+    const targetUrl =
+        event.detail?.response?.request?.responseURL ||
+        event.detail?.response?.config?.url ||
+        event.detail?.visit?.url?.href ||
         window.location.href;
     if (targetUrl) {
         window.location.href = targetUrl;
@@ -166,7 +168,7 @@ async function bootInertiaApp(pageData: string): Promise<void> {
             ),
         setup({ el, App, props }) {
             const root = createRoot(el);
-            
+
             const pageProps = props.initialPage.props as SharedPageProps;
             if (pageProps.locale) {
                 syncDocumentDirection(pageProps.locale);
@@ -176,6 +178,7 @@ async function bootInertiaApp(pageData: string): Promise<void> {
             root.render(
                 <MarketplaceModeProvider>
                     <App {...props} />
+                    <PrivacyConsentGate initialCompliance={pageProps.privacyCompliance} />
                     <Toaster />
                     <SonnerToaster position="top-center" richColors />
                     <GlobalErrorHandler />

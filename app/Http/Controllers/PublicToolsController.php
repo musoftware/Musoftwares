@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ConsentAction;
+use App\Enums\ConsentType;
 use App\Models\GuestTicket;
+use App\Services\Privacy\ConsentAuditService;
 use Illuminate\Http\Request;
 
 /**
@@ -44,11 +47,13 @@ class PublicToolsController extends Controller
     /**
      * Subscribe email to newsletter / technical updates.
      */
-    public function subscribeNewsletter(Request $request)
+    public function subscribeNewsletter(Request $request, ConsentAuditService $consentService)
     {
         $request->validate([
             'email' => 'required|email|max:255',
         ]);
+
+        $consentService->record($request->user(), ConsentType::DirectMarketingEmail, ConsentAction::Granted, $request);
 
         $email = $request->input('email');
 

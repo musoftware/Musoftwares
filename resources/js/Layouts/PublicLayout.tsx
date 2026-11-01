@@ -87,6 +87,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
         email: '',
         mobile: '',
         body: '',
+        privacy_consent: false,
+        marketing_consent: false,
     });
 
     const submitGuestTicket = (e: React.FormEvent) => {
@@ -190,6 +192,34 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                         <div className="space-y-1.5">
                             <Label htmlFor="body" className="text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 font-medium">{__('general.message')}</Label>
                             <Textarea id="body" required value={data.body} onChange={e => setData('body', e.target.value)} rows={4} className="bg-[#f5f5f7] dark:bg-black/40 border-black/10 dark:border-white/10 text-[#1d1d1f] dark:text-[#f5f5f7] rounded-xl focus:bg-white dark:focus:bg-black/60" />
+                        </div>
+                        <div className="space-y-2.5 pt-1">
+                            <label htmlFor="guest_privacy_consent" className="flex items-start gap-2.5 cursor-pointer select-none">
+                                <input
+                                    id="guest_privacy_consent"
+                                    type="checkbox"
+                                    required
+                                    checked={data.privacy_consent}
+                                    onChange={e => setData('privacy_consent', e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 text-[#0071e3] focus:ring-[#0071e3]"
+                                />
+                                <span className="text-xs text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 leading-relaxed">
+                                    {__('privacy_compliance.guest_ticket_privacy_consent_label')}{' '}
+                                    (<a href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('privacy_compliance.read_privacy_policy')}</a>)
+                                </span>
+                            </label>
+                            <label htmlFor="guest_marketing_consent" className="flex items-start gap-2.5 cursor-pointer select-none">
+                                <input
+                                    id="guest_marketing_consent"
+                                    type="checkbox"
+                                    checked={data.marketing_consent}
+                                    onChange={e => setData('marketing_consent', e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 text-[#0071e3] focus:ring-[#0071e3]"
+                                />
+                                <span className="text-xs text-[#1d1d1f]/65 dark:text-[#f5f5f7]/65 leading-relaxed">
+                                    {__('privacy_compliance.register_marketing_consent_label')}
+                                </span>
+                            </label>
                         </div>
                         <DialogFooter className="pt-2">
                             <button type="button" onClick={() => setIsGuestTicketOpen(false)} className="px-4 py-2 rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-black/30 text-[#1d1d1f] dark:text-[#f5f5f7] hover:bg-[#f5f5f7] dark:hover:bg-white/10 text-xs font-medium">

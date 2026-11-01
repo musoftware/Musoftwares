@@ -4,6 +4,7 @@ use App\Http\Middleware\AccountantMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AiCrawlerContentNegotiation;
 use App\Http\Middleware\ClientMiddleware;
+use App\Http\Middleware\EnforcePrivacyWallMiddleware;
 use App\Http\Middleware\EnsureOnboardingCompleted;
 use App\Http\Middleware\ForceFullPageRedirect;
 use App\Http\Middleware\ForceJsonRequest;
@@ -49,6 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             'throttle:web',
             SetLocale::class,
+            EnforcePrivacyWallMiddleware::class,
             HandleInertiaRequests::class,
             AiCrawlerContentNegotiation::class,
         ]);

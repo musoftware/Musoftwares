@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\ConsentAction;
+use App\Enums\ConsentType;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\User;
+use App\Services\Privacy\ConsentAuditService;
 use GeoIp2\Database\Reader;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
@@ -38,6 +42,11 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'privacy_consent' => ['required', 'accepted'],
+            'marketing_consent' => ['nullable', 'boolean'],
+        ], [
+            'privacy_consent.required' => __('privacy_compliance.register_privacy_required_error'),
+            'privacy_consent.accepted' => __('privacy_compliance.register_privacy_required_error'),
         ]);
 
         $user = User::create([
@@ -45,6 +54,19 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        /** @var ConsentAuditService $consentService */
+        $consentService = app(ConsentAuditService::class);
+        $policyVersion = $consentService->currentPolicyVersion();
+        $consentService->record($user, ConsentType::PrivacyPolicy, ConsentAction::Granted, $request, $policyVersion);
+        $consentService->record($user, ConsentType::CrossBorderTransfer, ConsentAction::Granted, $request, $policyVersion);
+
+        if ($request->boolean('marketing_consent')) {
+            $consentService->record($user, ConsentType::DirectMarketingEmail, ConsentAction::Granted, $request, $policyVersion);
+            $consentService->record($user, ConsentType::DirectMarketingSms, ConsentAction::Granted, $request, $policyVersion);
+        }
+
+        Cookie::queue(Cookie::make(ConsentAuditService::ESSENTIAL_COOKIE_NAME, $policyVersion, 60 * 24 * 365));
 
         // Auto-assign currency based on GeoIP & DB country mappings
         /** @var \App\Services\IpGeolocationService $geoService */

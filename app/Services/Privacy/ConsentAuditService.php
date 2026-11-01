@@ -124,6 +124,54 @@ class ConsentAuditService
         return $actionValue === ConsentAction::Withdrawn->value;
     }
 
+    /**
+     * Resolve active consent and tracking state for the current HTTP request (user or guest cookie).
+     *
+     * @return array{policyVersion: string, hasEssentialConsent: bool, isBlocked: bool, cookiesTracking: string}
+     */
+    public function resolveRequestConsentState(Request $request): array
+    {
+        $version = $this->currentPolicyVersion();
+        $user = $request->user();
+
+        $hasUserEssential = $user ? $this->hasAcceptedCurrentEssentialPolicies($user) : false;
+        $hasCookieEssential = $request->cookie(self::ESSENTIAL_COOKIE_NAME) === $version;
+        $isBlocked = $request->cookie(self::DECLINED_COOKIE_NAME) === '1'
+            || ($user ? $this->hasExplicitlyWithdrawnEssentialPolicy($user) : false);
+
+        $cookiesTracking = $this->resolveTrackingPreference($request, $user);
+
+        return [
+            'policyVersion' => $version,
+            'hasEssentialConsent' => ! $isBlocked && ($hasUserEssential || $hasCookieEssential),
+            'isBlocked' => $isBlocked,
+            'cookiesTracking' => $isBlocked ? ConsentAction::Withdrawn->value : $cookiesTracking,
+        ];
+    }
+
+    private function resolveTrackingPreference(Request $request, ?User $user): string
+    {
+        if ($user) {
+            $latest = $user->consentLogs()
+                ->where('consent_type', ConsentType::CookiesTracking->value)
+                ->orderByDesc('id')
+                ->first();
+
+            if ($latest) {
+                return $latest->action instanceof ConsentAction
+                    ? $latest->action->value
+                    : (string) $latest->action;
+            }
+        }
+
+        $cookieVal = (string) $request->cookie(self::TRACKING_COOKIE_NAME, '');
+        if (in_array($cookieVal, [ConsentAction::Granted->value, ConsentAction::Withdrawn->value], true)) {
+            return $cookieVal;
+        }
+
+        return 'unset';
+    }
+
     public function canSendMarketingEmail(User $user): bool
     {
         if (empty($user->email) || $user->winback_unsubscribed_at !== null) {
