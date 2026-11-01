@@ -33,6 +33,7 @@ class UserCredential extends Model
         'rotated_at' => 'datetime',
         'expires_at' => 'datetime',
         'last_revealed_at' => 'datetime',
+        'note' => \App\Casts\GracefulEncrypted::class,
     ];
 
     /** Valid active categories (excludes 'archived') */
@@ -43,12 +44,12 @@ class UserCredential extends Model
      */
     public function getContentAttribute()
     {
-        return $this->attributes['note'] ?? '';
+        return $this->getAttributeValue('note') ?? '';
     }
 
     public function setContentAttribute($value)
     {
-        $this->attributes['note'] = $value;
+        $this->setAttribute('note', $value);
     }
 
     public function user(): BelongsTo

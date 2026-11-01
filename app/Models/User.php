@@ -115,6 +115,10 @@ class User extends Authenticatable
             'last_activity_at'              => 'datetime',
             'last_login'                    => 'datetime',
             'winback_unsubscribed_at'       => 'datetime',
+            'openai_api_key'                => \App\Casts\GracefulEncrypted::class,
+            'gemini_api'                    => \App\Casts\GracefulEncrypted::class,
+            'autosms_verification_secret'   => \App\Casts\GracefulEncrypted::class,
+            'kyc_notes'                     => \App\Casts\GracefulEncrypted::class,
         ];
     }
 
@@ -1009,6 +1013,39 @@ class User extends Authenticatable
     public function partnerClient(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(PartnerClient::class, 'user_id')->latestOfMany();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserConsentLog>
+     */
+    public function consentLogs(): HasMany
+    {
+        return $this->hasMany(UserConsentLog::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DataSubjectRequest>
+     */
+    public function dataSubjectRequests(): HasMany
+    {
+        return $this->hasMany(DataSubjectRequest::class, 'user_id');
+    }
+
+    public function hasGrantedConsent(\App\Enums\ConsentType|string $consentType): bool
+    {
+        $type = $consentType instanceof \App\Enums\ConsentType ? $consentType->value : $consentType;
+        $latest = $this->consentLogs()
+            ->where('consent_type', $type)
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $latest) {
+            return false;
+        }
+
+        $action = $latest->action instanceof \App\Enums\ConsentAction ? $latest->action->value : (string) $latest->action;
+
+        return $action === \App\Enums\ConsentAction::Granted->value;
     }
 
     /**

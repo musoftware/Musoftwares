@@ -1,89 +1,82 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
-class AdminAuditLog
+class AdminAuditLog extends Model
 {
+    use SoftDeletes;
+
     public const SEVERITY_INFO = 'info';
 
     public const SEVERITY_WARNING = 'warning';
 
     public const SEVERITY_CRITICAL = 'critical';
 
-    public $id = null;
+    protected $table = 'admin_audit_logs';
 
-    public $actor_user_id;
+    protected $fillable = [
+        'actor_user_id',
+        'actor_ip',
+        'actor_user_agent',
+        'action',
+        'severity',
+        'target_type',
+        'target_id',
+        'meta',
+    ];
 
-    public $actor_ip;
+    protected function casts(): array
+    {
+        return [
+            'meta' => 'array',
+        ];
+    }
 
-    public $actor_user_agent;
-
-    public $action;
-
-    public $severity;
-
-    public $target_type;
-
-    public $target_id;
-
-    public $meta;
-
-    public $created_at;
-
+    /**
+     * In-memory mirror kept for backwards compatibility with existing unit and feature assertions.
+     *
+     * @var list<self>
+     */
     public static array $logs = [];
 
-    public function __construct(array $attributes = [])
+    public static function create(array $attributes = []): self
     {
-        foreach ($attributes as $key => $value) {
-            $this->{$key} = $value;
-        }
-        $this->created_at ??= now();
-    }
+        $payload = array_merge([
+            'severity' => self::SEVERITY_INFO,
+        ], $attributes);
 
-    public static function create(array $attributes)
-    {
-        Log::info("Admin Audit [{$attributes['action']}]: ".json_encode($attributes));
+        Log::info("Admin Audit [{$payload['action']}]: ".json_encode($payload, JSON_UNESCAPED_UNICODE));
 
-        $instance = new self($attributes);
-        self::$logs[] = $instance;
+        try {
+            if (Schema::hasTable('admin_audit_logs')) {
+                /** @var self $persisted */
+                $persisted = static::query()->create($payload);
+                self::$logs[] = $persisted;
 
-        return $instance;
-    }
-
-    public static function where(string $column, $operator = null, $value = null)
-    {
-        if (func_num_args() === 2) {
-            $value = $operator;
-            $operator = '=';
+                return $persisted;
+            }
+        } catch (Throwable $e) {
+            Log::warning('AdminAuditLog DB persistence skipped', ['error' => $e->getMessage()]);
         }
 
-        return new class($column, $operator, $value)
-        {
-            protected array $filtered = [];
+        $fallback = new self($payload);
+        $fallback->created_at = now();
+        self::$logs[] = $fallback;
 
-            public function __construct($column, $operator, $value)
-            {
-                $this->filtered = array_filter(AdminAuditLog::$logs, function ($log) use ($column, $operator, $value) {
-                    $itemVal = $log->{$column} ?? null;
-                    if ($operator === '=') {
-                        return $itemVal == $value;
-                    }
+        return $fallback;
+    }
 
-                    return false;
-                });
-            }
-
-            public function latest($column = 'id')
-            {
-                return $this;
-            }
-
-            public function first()
-            {
-                return reset($this->filtered) ?: null;
-            }
-        };
+    public function actor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'actor_user_id');
     }
 }

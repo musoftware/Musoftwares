@@ -26,6 +26,7 @@ class KycDocument extends Model
 
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'admin_notes' => \App\Casts\GracefulEncrypted::class,
     ];
 
     /**

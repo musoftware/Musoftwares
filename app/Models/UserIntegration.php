@@ -16,6 +16,8 @@ class UserIntegration extends Model
         'expires_at' => 'datetime',
         'scopes' => 'array',
         'settings' => 'array',
+        'access_token' => \App\Casts\GracefulEncrypted::class,
+        'refresh_token' => \App\Casts\GracefulEncrypted::class,
     ];
 
     public function user()

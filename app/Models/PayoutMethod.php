@@ -18,7 +18,7 @@ class PayoutMethod extends Model
     ];
 
     protected $casts = [
-        'details' => 'array',
+        'details' => \App\Casts\GracefulEncryptedArray::class,
         'is_default' => 'boolean',
     ];
 
