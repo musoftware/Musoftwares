@@ -71,6 +71,8 @@ return [
     'dsr_status_in_progress' => 'جارٍ التنفيذ',
     'dsr_status_completed' => 'مكتمل',
     'dsr_status_rejected_with_reason' => 'مرفوض لسبب قانوني',
+    'dsr_history_empty' => 'لا توجد طلبات خصوصية مسجلة حتى الآن.',
+    'export_report_title' => 'تقرير نسخة البيانات الشخصية المسجلة',
 
     // Unsubscribe & Emails
     'unsubscribe_invalid_link' => 'رابط إلغاء الاشتراك غير صالح أو منتهي الصلاحية.',
@@ -98,6 +100,11 @@ return [
     'admin_dsr_reject_with_reason' => 'رفض مع ذكر السبب القانوني',
     'admin_dsr_reason_placeholder' => 'اذكر السبب القانوني (مثال: وجود فواتير مالية يلزم القانون الضريبي الاحتفاظ بها لمدة 5 سنوات)...',
     'admin_dsr_updated_toast' => 'تم تحديث حالة طلب صاحب البيانات وتسجيل العملية في سجل المراجعة.',
+    'admin_dsr_col_user' => 'صاحب البيانات (العميل)',
+    'admin_dsr_col_details' => 'ملاحظات العميل',
+    'admin_dsr_col_completed_at' => 'تاريخ الإتمام الفعلي',
+    'admin_dsr_col_actions' => 'إجراءات التنفيذ والرد',
+    'admin_dsr_empty' => 'لا توجد طلبات واردة من أصحاب البيانات حالياً.',
 
     // Legal Privacy Page Structured Sections (Arabic Mandatory Disclosures)
     'controller_section_title' => 'أولاً: هوية المتحكم في البيانات الشخصية',

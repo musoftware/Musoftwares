@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\DataSubjectRequest;
 use App\Models\User;
 use App\Models\UserEmail;
+use App\Services\Privacy\ConsentAuditService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,14 +21,31 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): Response
+    public function edit(Request $request, ConsentAuditService $consentService): Response
     {
+        $user = $request->user();
+
         return Inertia::render('Client/Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
             'error' => session('error'),
-            'hasUnpaidInvoices' => $request->user()->hasUnpaidInvoices(),
-            'emails' => $request->user()->emails()->get(['id', 'email', 'verified_at', 'source']),
+            'hasUnpaidInvoices' => $user->hasUnpaidInvoices(),
+            'emails' => $user->emails()->get(['id', 'email', 'verified_at', 'source']),
+            'privacyConsents' => $consentService->currentStatesForUser($user),
+            'dataSubjectRequests' => $user->dataSubjectRequests()
+                ->orderByDesc('id')
+                ->limit(20)
+                ->get()
+                ->map(static fn (DataSubjectRequest $r): array => [
+                    'id' => $r->id,
+                    'request_type' => $r->request_type->value,
+                    'status' => $r->status->value,
+                    'requested_at' => $r->requested_at?->timezone('Africa/Cairo')->format('Y-m-d H:i'),
+                    'due_at' => $r->due_at?->timezone('Africa/Cairo')->format('Y-m-d H:i'),
+                    'completed_at' => $r->completed_at?->timezone('Africa/Cairo')->format('Y-m-d H:i'),
+                    'admin_notes' => $r->admin_notes,
+                ])
+                ->all(),
         ]);
     }
 

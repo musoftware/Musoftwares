@@ -71,6 +71,8 @@ return [
     'dsr_status_in_progress' => 'In Progress',
     'dsr_status_completed' => 'Completed',
     'dsr_status_rejected_with_reason' => 'Rejected with Legal Reason',
+    'dsr_history_empty' => 'No official privacy requests submitted yet.',
+    'export_report_title' => 'Personal Data Portability Report',
 
     // Unsubscribe & Emails
     'unsubscribe_invalid_link' => 'This unsubscribe link is invalid or has expired.',
@@ -98,6 +100,11 @@ return [
     'admin_dsr_reject_with_reason' => 'Reject with Legal Reason',
     'admin_dsr_reason_placeholder' => 'Enter the statutory reason (e.g. financial tax invoices retained for 5 years under Egyptian Tax Law)...',
     'admin_dsr_updated_toast' => 'Data subject request updated and recorded in the admin audit log.',
+    'admin_dsr_col_user' => 'Data Subject (User)',
+    'admin_dsr_col_details' => 'Client Context',
+    'admin_dsr_col_completed_at' => 'Completed At',
+    'admin_dsr_col_actions' => 'SLA Resolution Actions',
+    'admin_dsr_empty' => 'No data subject requests found.',
 
     // Legal Privacy Page Structured Sections
     'controller_section_title' => '1. Data Controller Identity',

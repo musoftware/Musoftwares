@@ -334,6 +334,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/emails/{userEmail}', [ProfileController::class, 'updateEmail'])->name('profile.emails.update');
     Route::post('/profile/emails/{userEmail}/make-primary', [ProfileController::class, 'makePrimaryEmail'])->name('profile.emails.make-primary');
 
+    // Privacy & Personal Data Governance (Egyptian PDPL)
+    Route::patch('/profile/privacy/consents', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'updateConsents'])->name('profile.privacy.consents');
+    Route::get('/profile/privacy/export', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'exportData'])->name('profile.privacy.export');
+    Route::post('/profile/privacy/requests', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'storeRequest'])->name('profile.privacy.requests.store');
+
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::match(['get', 'post'], '/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
@@ -605,6 +610,10 @@ Route::post('/guest-tickets/submit', [GuestTicketSubmissionController::class, 's
 
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Data Subject Requests (Egyptian PDPL 6-Business-Day SLA)
+    Route::get('/privacy-requests', [\App\Http\Controllers\Admin\AdminDataSubjectRequestController::class, 'index'])->name('privacy-requests.index');
+    Route::patch('/privacy-requests/{dataSubjectRequest}', [\App\Http\Controllers\Admin\AdminDataSubjectRequestController::class, 'update'])->name('privacy-requests.update');
 
     // Commissions Schedule (Operations)
     Route::get('/commissions', [App\Http\Controllers\Admin\AdminCommissionController::class, 'index'])->name('commissions.index');
