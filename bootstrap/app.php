@@ -69,6 +69,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/serial/device/*', // Serial link and user registration from desktop client dialogs
             'crm/whatsapp/webhook/*', // WhatsApp provider webhooks — external POST requests
             'sms-pay/*/verify', // Hosted checkout embedded via iframe across domains
+            'unsubscribe/marketing/*', // RFC 8058 one-click signed unsubscribe without browser session
         ]);
 
         $middleware->alias([

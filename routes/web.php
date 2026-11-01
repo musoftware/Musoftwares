@@ -1375,19 +1375,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
 Route::get('/sso/redirect/{system}', [SsoController::class, 'redirect']);
 Route::get('/sso/{system}', [SsoController::class, 'redirect'])->name('sso.redirect');
 
-// Win-back unsubscribe — signed URL, no auth required
-Route::get('/winback/unsubscribe/{user}', function (\App\Models\User $user) {
-    if (! request()->hasValidSignature()) {
-        abort(403, 'This unsubscribe link is invalid or has expired.');
-    }
-
-    $user->winback_unsubscribed_at = now();
-    $user->save();
-
-    return response('<html><body style="font-family:sans-serif;text-align:center;padding:60px;color:#1e293b;">
-        <h2>You have been unsubscribed.</h2>
-        <p>You will no longer receive re-engagement reminders from Musoftwares.</p>
-        <a href="' . config('app.url') . '" style="color:#64748b;">Return to Musoftwares</a>
-    </body></html>', 200)->header('Content-Type', 'text/html');
-})->name('winback.unsubscribe');
+// Signed, free, no-login marketing & win-back unsubscribe endpoints (Egyptian PDPL)
+Route::match(['get', 'post'], '/unsubscribe/marketing/{user}', \App\Http\Controllers\Privacy\MarketingUnsubscribeController::class)
+    ->name('marketing.unsubscribe');
+Route::get('/winback/unsubscribe/{user}', \App\Http\Controllers\Privacy\MarketingUnsubscribeController::class)
+    ->name('winback.unsubscribe');
 

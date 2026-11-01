@@ -26,17 +26,20 @@ class DiscountDigestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🔥 عروض وخصومات مميزة اليوم على خدمات المتجر | Exclusive Daily Marketplace Discounts',
+            subject: 'عروض وخصومات مميزة اليوم على خدمات المتجر | Exclusive Daily Marketplace Discounts',
         );
     }
 
     public function content(): Content
     {
+        $unsubscribeUrl = app(\App\Services\Privacy\ConsentAuditService::class)->generateUnsubscribeUrl($this->user);
+
         return new Content(
             view: 'emails.discount_digest',
             with: [
                 'user' => $this->user,
                 'discountedServices' => $this->discountedServices,
+                'unsubscribeUrl' => $unsubscribeUrl,
             ]
         );
     }

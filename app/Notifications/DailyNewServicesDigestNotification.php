@@ -45,12 +45,17 @@ class DailyNewServicesDigestNotification extends Notification implements ShouldQ
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $unsubscribeUrl = $notifiable instanceof \App\Models\User
+            ? app(\App\Services\Privacy\ConsentAuditService::class)->generateUnsubscribeUrl($notifiable)
+            : url('/privacy-policy');
+
         return (new MailMessage)
             ->subject(__('services.daily_digest_subject', [], 'en'))
             ->view('emails.services.digest', [
                 'websiteServices' => $this->websiteServices,
                 'marketplaceServices' => $this->marketplaceServices,
                 'user' => $notifiable,
+                'unsubscribeUrl' => $unsubscribeUrl,
             ]);
     }
 

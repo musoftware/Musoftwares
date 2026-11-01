@@ -112,7 +112,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔥 عروض وخصومات مميزة لك اليوم!</h1>
+            <h1>عروض وخصومات مميزة لك اليوم</h1>
             <p>مرحباً {{ $user->name }}، لقد اخترنا لك أفضل الخدمات ذات الخصومات الحصرية اليوم في متجر Musoftware</p>
         </div>
 
@@ -146,7 +146,12 @@
 
         <div class="footer">
             <p>© {{ date('Y') }} Musoftware Marketplace. جميع الحقوق محفوظة.</p>
-            <p>تصلك هذه الرسالة بصفتك عضواً في منصة Musoftware.</p>
+            <p>تصلك هذه الرسالة بناءً على موافقتك على الرسائل التسويقية.</p>
+            <p>
+                <a href="{{ $unsubscribeUrl ?? url('/privacy-policy') }}" style="color:#2563eb;text-decoration:underline;">
+                    إلغاء الاشتراك فوراً وبشكل مجاني (بدون تسجيل دخول) | Unsubscribe Instantly
+                </a>
+            </p>
         </div>
     </div>
 </body>

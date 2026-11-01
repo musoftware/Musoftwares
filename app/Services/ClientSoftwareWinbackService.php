@@ -160,11 +160,7 @@ class ClientSoftwareWinbackService extends BaseService
      */
     public function shouldSuppress(User $user): bool
     {
-        if (empty($user->email)) {
-            return true;
-        }
-
-        if ($user->winback_unsubscribed_at !== null) {
+        if (! app(\App\Services\Privacy\ConsentAuditService::class)->canSendMarketingEmail($user)) {
             return true;
         }
 
@@ -280,6 +276,6 @@ class ClientSoftwareWinbackService extends BaseService
      */
     public function generateUnsubscribeUrl(User $user): string
     {
-        return URL::signedRoute('winback.unsubscribe', ['user' => $user->id], now()->addDays(90));
+        return app(\App\Services\Privacy\ConsentAuditService::class)->generateUnsubscribeUrl($user);
     }
 }

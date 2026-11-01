@@ -34,6 +34,15 @@ class ClientSoftwareWinbackTest extends TestCase
         $this->winbackService = app(ClientSoftwareWinbackService::class);
     }
 
+    private function grantMarketingConsent(User $user): void
+    {
+        app(\App\Services\Privacy\ConsentAuditService::class)->record(
+            $user,
+            \App\Enums\ConsentType::DirectMarketingEmail,
+            \App\Enums\ConsentAction::Granted
+        );
+    }
+
     public function test_inactive_client_with_past_paid_invoice_gets_first_reminder(): void
     {
         Mail::fake();
@@ -43,6 +52,7 @@ class ClientSoftwareWinbackTest extends TestCase
             'last_activity_at'       => Carbon::now()->subDays(200),
             'winback_unsubscribed_at'=> null,
         ]);
+        $this->grantMarketingConsent($user);
 
         Invoice::create([
             'user_id'    => $user->id,
@@ -168,6 +178,7 @@ class ClientSoftwareWinbackTest extends TestCase
             'last_activity_at'       => Carbon::now()->subDays(250),
             'winback_unsubscribed_at'=> null,
         ]);
+        $this->grantMarketingConsent($user);
 
         Invoice::create([
             'user_id'    => $user->id,
@@ -249,6 +260,7 @@ class ClientSoftwareWinbackTest extends TestCase
             'last_activity_at'       => Carbon::now()->subDays(200),
             'winback_unsubscribed_at'=> null,
         ]);
+        $this->grantMarketingConsent($user);
 
         Invoice::create([
             'user_id'    => $user->id,

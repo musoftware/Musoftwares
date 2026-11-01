@@ -109,6 +109,21 @@ Schedule::command(\App\Console\Commands\ProcessClientSoftwareWinback::class)
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
+// Automated PDPL data retention cleanup (expired OTPs/logs & abandoned account anonymization) daily at 02:30 Cairo Time
+Schedule::command(\App\Console\Commands\EnforceDataRetentionPolicy::class)
+    ->dailyAt('02:30')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(15);
+
+// AES-256 encrypted database backups daily at 04:15 Cairo Time before external storage upload
+Schedule::command(\App\Console\Commands\CreateEncryptedBackupCommand::class, [
+    '--disk' => config('filesystems.disks.s3.key') ? 's3' : 'local',
+])
+    ->dailyAt('04:15')
+    ->timezone('Africa/Cairo')
+    ->when(fn () => \App\Models\AdminSettings::GetValue('encrypted_backups_enabled', '1') === '1')
+    ->withoutOverlapping(30);
+
 
 
 
