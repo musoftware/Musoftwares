@@ -361,4 +361,93 @@ class UserMergeTest extends TestCase
             'model_id' => $duplicate->id,
         ]);
     }
+
+    public function test_merge_keeps_oldest_id_when_initiated_from_newer_user(): void
+    {
+        $olderUser = User::factory()->create(['name' => 'Older Account', 'email' => 'older@example.com']);
+        $newerUser = User::factory()->create(['name' => 'Newer Account', 'email' => 'newer@example.com']);
+
+        $this->assertLessThan($newerUser->id, $olderUser->id);
+
+        $txnId = DB::table('transactions')->insertGetId([
+            'user_id' => $newerUser->id,
+            'amount' => 120.0,
+            'type' => 'received',
+            'currency_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $preview = $this->service->preview($newerUser->id, $olderUser->id);
+        $this->assertSame($olderUser->id, $preview['survivor']['id']);
+        $this->assertSame($newerUser->id, $preview['duplicate']['id']);
+        $this->assertSame(1, $preview['child_counts']['transactions.user_id'] ?? null);
+
+        $this->service->merge($newerUser->id, $olderUser->id, [], 0);
+
+        $this->assertNull($olderUser->fresh()->deleted_at);
+        $trashedNewer = User::withTrashed()->find($newerUser->id);
+        $this->assertNotNull($trashedNewer->deleted_at);
+        $this->assertSame($olderUser->id, $trashedNewer->merged_into_user_id);
+
+        $this->assertDatabaseHas('transactions', ['id' => $txnId, 'user_id' => $olderUser->id]);
+        $this->assertDatabaseHas('user_emails', [
+            'user_id' => $olderUser->id,
+            'email' => 'newer@example.com',
+        ]);
+        $this->assertDatabaseHas('admin_audit_logs', [
+            'action' => 'users.merged',
+            'target_id' => $olderUser->id,
+        ]);
+    }
+
+    public function test_preview_and_confirm_routes_elect_oldest_id_when_called_on_newer_user(): void
+    {
+        $admin = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+
+        $olderUser = User::factory()->create(['name' => 'Original Client', 'email' => 'original@example.com']);
+        $newerUser = User::factory()->create(['name' => 'Recent Duplicate', 'email' => 'recent@example.com']);
+
+        $previewResponse = $this->actingAs($admin)->get(
+            route('admin.users.merge.preview', $newerUser->id).'?duplicate_ids[]='.$olderUser->id
+        );
+
+        $previewResponse->assertOk();
+        $previewResponse->assertInertia(fn ($page) => $page
+            ->component('Admin/Users/Merge')
+            ->where('survivor.id', $olderUser->id)
+            ->where('auto_swapped_from_id', $newerUser->id)
+            ->has('duplicates', 1)
+            ->where('duplicates.0.id', $newerUser->id)
+        );
+
+        $confirmResponse = $this->actingAs($admin)->post(
+            route('admin.users.merge.confirm', $newerUser->id),
+            [
+                'duplicate_ids' => [$olderUser->id],
+                'resolutions' => [],
+            ]
+        );
+
+        $confirmResponse->assertRedirect(route('admin.users.show', $olderUser->id));
+        $this->assertNull($olderUser->fresh()->deleted_at);
+        $this->assertSame($olderUser->id, User::withTrashed()->find($newerUser->id)->merged_into_user_id);
+    }
+
+    public function test_command_keeps_oldest_id_when_newer_passed_as_survivor(): void
+    {
+        $olderUser = User::factory()->create(['email' => 'cli-old@example.com']);
+        $newerUser = User::factory()->create(['email' => 'cli-new@example.com']);
+
+        $exit = Artisan::call('users:merge', [
+            'survivor' => $newerUser->id,
+            'duplicates' => [$olderUser->id],
+            '--yes' => true,
+        ]);
+
+        $this->assertSame(0, $exit);
+        $this->assertNull($olderUser->fresh()->deleted_at);
+        $this->assertSame($olderUser->id, User::withTrashed()->find($newerUser->id)->merged_into_user_id);
+    }
 }

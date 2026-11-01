@@ -81,4 +81,37 @@ class UserMergeMultiTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->service->mergeMany($survivor->id, [], [], 0);
     }
+
+    public function test_merge_many_elects_oldest_active_id_across_batch(): void
+    {
+        $oldest = User::factory()->create(['email' => 'oldest@example.com']);
+        $middle = User::factory()->create(['email' => 'middle@example.com']);
+        $newest = User::factory()->create(['email' => 'newest@example.com']);
+
+        $outcomes = $this->service->mergeMany($newest->id, [$middle->id, $oldest->id], [], 0);
+
+        $this->assertCount(2, $outcomes);
+        $this->assertNull($oldest->fresh()->deleted_at);
+        $this->assertSame($oldest->id, User::withTrashed()->find($middle->id)->merged_into_user_id);
+        $this->assertSame($oldest->id, User::withTrashed()->find($newest->id)->merged_into_user_id);
+    }
+
+    public function test_merge_many_does_not_elect_trashed_older_user_as_survivor(): void
+    {
+        $trashedOldest = User::factory()->create([
+            'email' => 'trashed-old@example.com',
+            'deleted_at' => now(),
+        ]);
+        $activeOlder = User::factory()->create(['email' => 'active-older@example.com']);
+        $activeNewer = User::factory()->create(['email' => 'active-newer@example.com']);
+
+        $outcomes = $this->service->mergeMany($activeNewer->id, [$trashedOldest->id, $activeOlder->id], [], 0);
+
+        $this->assertNull($activeOlder->fresh()->deleted_at);
+        $this->assertSame($activeOlder->id, User::withTrashed()->find($activeNewer->id)->merged_into_user_id);
+
+        $byDup = collect($outcomes)->keyBy('duplicate_id');
+        $this->assertSame('skipped', $byDup[$trashedOldest->id]['status']);
+        $this->assertSame('merged', $byDup[$activeNewer->id]['status']);
+    }
 }
