@@ -22,11 +22,18 @@ class SoftwareOrderService
     public function __construct(private readonly SoftwareActivationService $activation, private readonly WhiteLabelService $whiteLabel) {}
 
     /** With a partner, the customer pays the partner's price and the partner's share is fixed now. */
-    public function createPendingOrder(SoftwareProduct $product, array $client, ?WhiteLabelPartner $partner = null): SoftwareOrder
-    {
+    public function createPendingOrder(
+        SoftwareProduct $product,
+        array $client,
+        ?WhiteLabelPartner $partner = null,
+        ?\App\Models\Coupon $coupon = null,
+        float $discountAmount = 0.0,
+        ?float $overrideAmount = null
+    ): SoftwareOrder {
         $plan = $product->planByKey($client['plan_key'] ?? null);
         $base = $product->salePrice($plan['key'] ?? null);
-        $amount = $partner ? $this->whiteLabel->partnerPrice($partner, $product, $plan['key'] ?? null) : $base;
+        $standardAmount = $partner ? $this->whiteLabel->partnerPrice($partner, $product, $plan['key'] ?? null) : $base;
+        $amount = $overrideAmount !== null ? $overrideAmount : $standardAmount;
 
         return $product->orders()->create([
             'plan_key' => $plan['key'] ?? null,
@@ -38,6 +45,11 @@ class SoftwareOrderService
             'client_whatsapp' => $client['client_whatsapp'],
             'device_id' => $client['device_id'] ?? null,
             'amount' => $amount,
+            ...(Schema::hasColumn('software_orders', 'coupon_id') ? [
+                'coupon_id' => $coupon?->id,
+                'discount_amount' => $discountAmount,
+                'coupon_code' => $coupon?->code,
+            ] : []),
             ...($partner ? [
                 'white_label_partner_id' => $partner->id,
                 'base_amount' => $base,
@@ -75,10 +87,12 @@ class SoftwareOrderService
             return;
         }
 
+        $gateway = str_starts_with((string) $transactionId, 'coupon:') ? 'coupon' : 'kashier';
+
         $order->update([
             'status' => SoftwareOrder::STATUS_PAID,
             'paid_at' => now(),
-            'payment_gateway' => 'kashier',
+            'payment_gateway' => $gateway,
             'payment_reference' => $transactionId,
         ]);
 

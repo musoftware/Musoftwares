@@ -17,6 +17,7 @@ class CouponRedemption extends Model
         'transaction_id',
         'discount_amount',
         'currency',
+        'currency_id',
     ];
 
     protected $casts = [

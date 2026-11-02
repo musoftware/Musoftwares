@@ -5,6 +5,12 @@
         ['client_email', 'email', 'email', 'email'],
         ['client_whatsapp', 'whatsapp', 'tel', 'tel'],
     ];
+    $authUser = auth()->user();
+    $fieldDefaults = [
+        'client_name' => $authUser?->name,
+        'client_email' => $authUser?->email,
+        'client_whatsapp' => $authUser?->whatsapp_number,
+    ];
 @endphp
 <section id="order" class="bg-[var(--sw-ink)] text-white scroll-mt-4">
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
@@ -56,11 +62,36 @@
                 <div>
                     <label for="{{ $field }}" class="block text-sm font-medium mb-1">{{ __('software.'.$label) }}</label>
                     <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" autocomplete="{{ $autocomplete }}"
-                           value="{{ old($field) }}" required dir="ltr"
+                           value="{{ old($field, $fieldDefaults[$field] ?? null) }}" required dir="ltr"
                            class="w-full h-12 px-4 rounded-xl border border-black/15 text-base focus:outline-none focus:ring-2 focus:ring-[var(--sw-accent)]">
                     @error($field)<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
             @endforeach
+
+            <div>
+                <label for="coupon_code" class="block text-sm font-medium mb-1">{{ __('software.coupon_code') }}</label>
+                <input id="coupon_code" name="coupon_code" type="text" autocomplete="off" dir="ltr"
+                       value="{{ old('coupon_code') }}"
+                       placeholder="{{ __('software.coupon_placeholder') }}"
+                       class="w-full h-12 px-4 rounded-xl border border-black/15 text-base uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-[var(--sw-accent)]">
+                @error('coupon_code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                @auth
+                    @if (auth()->user()->hasRole('client') || auth()->user()->isAdmin())
+                        <p class="mt-1.5 text-xs text-green-700 font-medium">
+                            {{ __('software.logged_in_as_client_ready', ['name' => auth()->user()->name]) }}
+                        </p>
+                    @else
+                        <p class="mt-1.5 text-xs text-amber-700">
+                            {{ __('software.coupon_must_be_client') }}
+                        </p>
+                    @endif
+                @else
+                    <p class="mt-1.5 text-xs text-black/60">
+                        {{ __('software.coupon_note_for_guests') }}
+                        <a href="{{ route('login', ['redirect' => request()->fullUrl().'#order']) }}" class="text-[var(--sw-accent)] font-semibold underline">{{ __('software.login_here') }}</a>
+                    </p>
+                @endauth
+            </div>
 
             @if (! empty($copy['terms']))
                 <p class="text-xs text-black/60 leading-relaxed">{{ $copy['terms'] }}</p>
