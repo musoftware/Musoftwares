@@ -58,15 +58,32 @@
                 <p class="text-sm text-red-600" role="alert">{{ session('error') }}</p>
             @endif
 
-            @foreach ($fields as [$field, $label, $type, $autocomplete])
-                <div>
-                    <label for="{{ $field }}" class="block text-sm font-medium mb-1">{{ __('software.'.$label) }}</label>
-                    <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" autocomplete="{{ $autocomplete }}"
-                           value="{{ old($field, $fieldDefaults[$field] ?? null) }}" required dir="ltr"
-                           class="w-full h-12 px-4 rounded-xl border border-black/15 text-base focus:outline-none focus:ring-2 focus:ring-[var(--sw-accent)]">
-                    @error($field)<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            @auth
+                <input type="hidden" name="client_name" value="{{ $authUser->name }}">
+                <input type="hidden" name="client_email" value="{{ $authUser->email }}">
+                <input type="hidden" name="client_whatsapp" value="{{ $fieldDefaults['client_whatsapp'] ?? '00000000000' }}">
+
+                <div class="rounded-xl border border-black/10 bg-black/[0.03] p-4 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-black/50 block">{{ __('software.logged_in_account') }}</span>
+                        <span class="font-bold text-base text-black truncate block">{{ $authUser->name }}</span>
+                        <span class="text-xs text-black/60 truncate block" dir="ltr">{{ $authUser->email }}</span>
+                    </div>
+                    <div class="shrink-0 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1">
+                        {{ __('software.account_verified') }}
+                    </div>
                 </div>
-            @endforeach
+            @else
+                @foreach ($fields as [$field, $label, $type, $autocomplete])
+                    <div>
+                        <label for="{{ $field }}" class="block text-sm font-medium mb-1">{{ __('software.'.$label) }}</label>
+                        <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" autocomplete="{{ $autocomplete }}"
+                               value="{{ old($field, $fieldDefaults[$field] ?? null) }}" required dir="ltr"
+                               class="w-full h-12 px-4 rounded-xl border border-black/15 text-base focus:outline-none focus:ring-2 focus:ring-[var(--sw-accent)]">
+                        @error($field)<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                @endforeach
+            @endauth
 
             <div>
                 <label for="coupon_code" class="block text-sm font-medium mb-1">{{ __('software.coupon_code') }}</label>
@@ -76,15 +93,9 @@
                        class="w-full h-12 px-4 rounded-xl border border-black/15 text-base uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-[var(--sw-accent)]">
                 @error('coupon_code')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 @auth
-                    @if (auth()->user()->hasRole('client') || auth()->user()->isAdmin())
-                        <p class="mt-1.5 text-xs text-green-700 font-medium">
-                            {{ __('software.logged_in_as_client_ready', ['name' => auth()->user()->name]) }}
-                        </p>
-                    @else
-                        <p class="mt-1.5 text-xs text-amber-700">
-                            {{ __('software.coupon_must_be_client') }}
-                        </p>
-                    @endif
+                    <p class="mt-1.5 text-xs text-black/60 font-medium">
+                        {{ __('software.logged_in_as_client_ready', ['name' => $authUser->name]) }}
+                    </p>
                 @else
                     <p class="mt-1.5 text-xs text-black/60">
                         {{ __('software.coupon_note_for_guests') }}
@@ -97,7 +108,7 @@
                 <p class="text-xs text-black/60 leading-relaxed">{{ $copy['terms'] }}</p>
             @endif
 
-            <button type="submit" class="w-full h-12 rounded-xl bg-[var(--sw-accent)] text-white font-semibold">
+            <button id="order-submit-btn" type="submit" class="w-full h-12 rounded-xl bg-[var(--sw-accent)] text-white font-semibold transition hover:brightness-105 active:scale-[0.99] flex items-center justify-center gap-2">
                 @if ($product->hasPlans())
                     {{ $cta['button'] ?? __('software.continue_to_payment') }}
                 @else
@@ -105,6 +116,24 @@
                     &middot; {{ $product->money($product->salePrice()) }} {{ $product->saleCurrency() }} {{ $product->approxUsdLabel($product->salePrice()) }} {{ $product->periodLabel() }}
                 @endif
             </button>
+            <script>
+                (function() {
+                    var input = document.getElementById('coupon_code');
+                    var btn = document.getElementById('order-submit-btn');
+                    if (!input || !btn) return;
+                    var originalHtml = btn.innerHTML;
+                    var applyText = @json(__('software.apply_coupon_and_proceed'));
+                    function updateBtn() {
+                        if (input.value.trim().length > 0) {
+                            btn.textContent = applyText;
+                        } else {
+                            btn.innerHTML = originalHtml;
+                        }
+                    }
+                    input.addEventListener('input', updateBtn);
+                    updateBtn();
+                })();
+            </script>
             @if ($usdNote = $product->approxUsdNote())
                 <p class="text-xs text-black/50 text-center">{{ $usdNote }}</p>
             @endif

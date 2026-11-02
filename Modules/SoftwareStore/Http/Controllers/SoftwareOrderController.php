@@ -27,14 +27,24 @@ class SoftwareOrderController extends Controller
         $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
         abort_unless($product->canBeOrdered(), 404);
 
+        $authUser = auth()->user();
+
         $client = $request->validate([
-            'client_name' => 'required|string|max:255',
-            'client_email' => 'required|email|max:255',
-            'client_whatsapp' => 'required|string|max:50',
+            'client_name' => $authUser ? ['nullable', 'string', 'max:255'] : ['required', 'string', 'max:255'],
+            'client_email' => $authUser ? ['nullable', 'email', 'max:255'] : ['required', 'email', 'max:255'],
+            'client_whatsapp' => $authUser ? ['nullable', 'string', 'max:50'] : ['required', 'string', 'max:50'],
             'plan_key' => $product->hasPlans() ? ['required', Rule::in(array_column($product->planList(), 'key'))] : 'nullable',
             'device_id' => ['nullable', 'string', 'max:128', 'regex:/^[A-Za-z0-9_\- ]+$/'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
         ]);
+
+        if ($authUser) {
+            $client['client_name'] = ! empty($client['client_name']) ? $client['client_name'] : $authUser->name;
+            $client['client_email'] = ! empty($client['client_email']) ? $client['client_email'] : $authUser->email;
+            $client['client_whatsapp'] = ! empty($client['client_whatsapp'])
+                ? $client['client_whatsapp']
+                : ($authUser->whatsapp_number ?: ($authUser->phone ?: ($authUser->mobile_1 ?: '00000000000')));
+        }
         $client['device_id'] = isset($client['device_id']) ? preg_replace('/\s+/', '', $client['device_id']) : null;
 
         $basePrice = (float) $product->salePrice($client['plan_key'] ?? null);
@@ -92,9 +102,6 @@ class SoftwareOrderController extends Controller
         }
 
         $user = auth()->user();
-        if (! ($user->hasRole('client') || $user->isAdmin())) {
-            return ['error' => __('software.coupon_must_be_client')];
-        }
 
         $code = strtoupper(trim($rawCode));
         $coupon = Coupon::where('code', $code)->first();

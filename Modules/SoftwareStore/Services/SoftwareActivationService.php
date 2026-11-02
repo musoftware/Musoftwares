@@ -45,6 +45,8 @@ class SoftwareActivationService
     {
         $user = User::whereRaw('LOWER(email) = ?', [strtolower($order->client_email)])->first();
         if ($user) {
+            $this->assignClientRole($user);
+
             return $user;
         }
 

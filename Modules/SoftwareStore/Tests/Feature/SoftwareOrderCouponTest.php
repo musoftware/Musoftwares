@@ -85,15 +85,17 @@ class SoftwareOrderCouponTest extends TestCase
         $this->assertTrue((bool) $coupon->fresh()->is_active);
     }
 
-    public function test_non_client_cannot_use_coupon(): void
+    public function test_logged_in_user_can_use_coupon_without_refilling_form(): void
     {
-        $nonClient = User::factory()->create([
-            'name' => 'Random User',
-            'email' => 'random@example.com',
-        ]); // has no 'client' role
+        $resellerUser = User::factory()->create([
+            'name' => 'Mohamed Hamed',
+            'email' => 'mbestwaytravel@gmail.com',
+            'whatsapp_number' => '201008833487',
+        ]);
+        $resellerUser->assignRole('software_reseller'); // does not have 'client' role
 
         $coupon = Coupon::create([
-            'code' => 'FREE100',
+            'code' => 'FREESOFT',
             'name' => '100% Off',
             'type' => 'percentage',
             'discount_percentage' => 100,
@@ -102,15 +104,21 @@ class SoftwareOrderCouponTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($nonClient)->post('/services/gridreader/order', [
-            'client_name' => $nonClient->name,
-            'client_email' => $nonClient->email,
-            'client_whatsapp' => '201000000000',
-            'coupon_code' => 'FREE100',
+        // Logged-in user submits ONLY coupon_code
+        $response = $this->actingAs($resellerUser)->post('/services/gridreader/order', [
+            'coupon_code' => 'FREESOFT',
         ]);
 
-        $response->assertSessionHasErrors('coupon_code');
-        $this->assertSame(0, (int) $coupon->fresh()->current_uses);
+        $order = SoftwareOrder::where('client_email', $resellerUser->email)->latest('id')->firstOrFail();
+        $response->assertRedirect(route('software.orders.success', $order->uuid));
+        $this->assertTrue($order->isPaid());
+        $this->assertSame('0.00', (string) $order->amount);
+        $this->assertSame('FREESOFT', $order->coupon_code);
+        $this->assertSame($resellerUser->name, $order->client_name);
+        $this->assertSame($resellerUser->email, $order->client_email);
+        $this->assertSame('201008833487', $order->client_whatsapp);
+        $this->assertSame(1, (int) $coupon->fresh()->current_uses);
+        $this->assertFalse((bool) $coupon->fresh()->is_active);
     }
 
     public function test_client_cannot_use_invalid_or_expired_coupon(): void
@@ -277,5 +285,15 @@ class SoftwareOrderCouponTest extends TestCase
         $this->assertTrue((bool) $coupon->fresh()->is_active);
 
         $response->assertRedirectContains('payments.kashier.io');
+    }
+
+    public function test_order_form_displays_logged_in_card_and_omits_text_inputs_for_auth_user(): void
+    {
+        $response = $this->actingAs($this->client)->get('/services/gridreader');
+        $response->assertOk();
+        $response->assertSee($this->client->name);
+        $response->assertSee($this->client->email);
+        $response->assertSee('type="hidden" name="client_name"', false);
+        $response->assertSee('id="coupon_code"', false);
     }
 }
