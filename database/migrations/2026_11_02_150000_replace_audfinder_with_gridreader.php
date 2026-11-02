@@ -45,11 +45,79 @@ return new class extends Migration
     private function repointSerialRelationships(int $oldId, int $newId): void
     {
         if (Schema::hasTable('serial_devices')) {
+            $existingDevicesOnNew = DB::table('serial_devices')
+                ->where('serial_software_id', $newId)
+                ->pluck('device_id')
+                ->all();
+
+            if (! empty($existingDevicesOnNew)) {
+                $activeOldDeviceIds = DB::table('serial_devices')
+                    ->where('serial_software_id', $oldId)
+                    ->whereIn('device_id', $existingDevicesOnNew)
+                    ->where('status', 'active')
+                    ->pluck('device_id')
+                    ->all();
+
+                if (! empty($activeOldDeviceIds)) {
+                    DB::table('serial_devices')
+                        ->where('serial_software_id', $newId)
+                        ->whereIn('device_id', $activeOldDeviceIds)
+                        ->update(['status' => 'active', 'updated_at' => now()]);
+                }
+
+                DB::table('serial_devices')
+                    ->where('serial_software_id', $oldId)
+                    ->whereIn('device_id', $existingDevicesOnNew)
+                    ->delete();
+            }
+
             DB::table('serial_devices')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
         }
+
+        if (Schema::hasTable('serial_device_trial_logs')) {
+            $existingTrialDevices = DB::table('serial_device_trial_logs')
+                ->where('serial_software_id', $newId)
+                ->pluck('device_id')
+                ->all();
+
+            if (! empty($existingTrialDevices)) {
+                DB::table('serial_device_trial_logs')
+                    ->where('serial_software_id', $oldId)
+                    ->whereIn('device_id', $existingTrialDevices)
+                    ->delete();
+            }
+
+            DB::table('serial_device_trial_logs')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
+        }
+
+        if (Schema::hasTable('serial_software_resellers')) {
+            $existingResellers = DB::table('serial_software_resellers')
+                ->where('serial_software_id', $newId)
+                ->pluck('user_id')
+                ->all();
+
+            if (! empty($existingResellers)) {
+                DB::table('serial_software_resellers')
+                    ->where('serial_software_id', $oldId)
+                    ->whereIn('user_id', $existingResellers)
+                    ->delete();
+            }
+
+            DB::table('serial_software_resellers')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
+        }
+
         if (Schema::hasTable('serial_software_licenses')) {
             DB::table('serial_software_licenses')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
         }
+
+        if (Schema::hasTable('store_tools')) {
+            DB::table('store_tools')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
+        }
+
+        if (Schema::hasTable('serial_software_packages')) {
+            DB::table('serial_software_packages')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
+        }
+
         if (Schema::hasTable('software_products')) {
             DB::table('software_products')->where('serial_software_id', $oldId)->update(['serial_software_id' => $newId]);
         }
@@ -74,6 +142,9 @@ return new class extends Migration
                 'name_en' => 'GridReader',
                 'name_ar' => 'جريد ريدر',
                 'image_path' => 'images/software/gridreader.png',
+                'gallery' => null,
+                'poster_path' => null,
+                'video_path' => null,
                 'tagline_en' => 'Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.',
                 'tagline_ar' => 'مستعرض ومحرك استعلام فائق السرعة لملفات CSV و Excel و JSON وقواعد بيانات SQLite و PostgreSQL و MySQL.',
                 'description_en' => 'Open massive tabular datasets in milliseconds. Instant virtual scrolling, multi-column search, SQLite index acceleration, list matching, and direct SQL querying with zero lag.',

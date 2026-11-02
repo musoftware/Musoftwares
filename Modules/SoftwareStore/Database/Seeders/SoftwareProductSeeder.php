@@ -43,14 +43,24 @@ class SoftwareProductSeeder extends Seeder
             $product->exists ? $this->addMissing($product, $program) : $this->createFrom($product, $program);
 
             $serialName = self::SERIAL_NAMES[$program['slug']] ?? null;
-            $product->serial_software_id ??= $serialName ? SerialSoftware::where('name', $serialName)->value('id') : null;
+            if ($serialName) {
+                $targetSerial = SerialSoftware::where('name', $serialName)->first();
+                if ($targetSerial) {
+                    $product->serial_software_id = $targetSerial->id;
+                }
+            }
             $product->save();
         }
     }
 
     private function renameLegacyProducts(): void
     {
-        SerialSoftware::where('name', 'AudFinder')->update(['name' => 'GridReader']);
+        if (! SerialSoftware::where('name', 'GridReader')->exists()) {
+            SerialSoftware::where('name', 'AudFinder')->update(['name' => 'GridReader']);
+        } else {
+            SerialSoftware::where('name', 'AudFinder')->delete();
+        }
+
         foreach (self::RENAMED as $oldSlug => $new) {
             $old = SoftwareProduct::where('slug', $oldSlug)->first();
             if ($old && ! SoftwareProduct::where('slug', $new['slug'])->exists()) {
@@ -58,6 +68,9 @@ class SoftwareProductSeeder extends Seeder
                 if ($oldSlug === 'audfinder') {
                     $old->update([
                         'image_path' => 'images/software/gridreader.png',
+                        'gallery' => null,
+                        'poster_path' => null,
+                        'video_path' => null,
                         'landing' => null,
                         'tagline_en' => null,
                         'tagline_ar' => null,
