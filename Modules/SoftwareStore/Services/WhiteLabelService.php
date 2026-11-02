@@ -122,7 +122,7 @@ class WhiteLabelService
 
     /**
      * The setup file a partner's customer downloads carries the partner in its name
-     * ("audfinder-setup-1.4.0.wl-nile-soft.exe"). The installed program sends that name back on its
+     * ("gridreader-setup-1.0.0.wl-nile-soft.exe"). The installed program sends that name back on its
      * first start, so it shows the partner's brand before anything is bought.
      */
     public function setupFileName(SoftwareRelease $release, WhiteLabelPartner $partner): string

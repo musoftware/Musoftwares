@@ -28,11 +28,11 @@
 
 كل صفحة ليها نسخة Markdown كاملة بنفس الرابط وفي آخره .md
 
-### أود فايندر
-- الصفحة: https://www.musoftwares.com/services/audfinder?lang=ar
-- Markdown: https://www.musoftwares.com/services/audfinder.md?lang=ar
+### جريد ريدر
+- الصفحة: https://www.musoftwares.com/services/gridreader?lang=ar
+- Markdown: https://www.musoftwares.com/services/gridreader.md?lang=ar
 - السعر: 0 EGP في السنة
-- الوصف: حوّل قوائم بروفايلات فيسبوك إلى أرقام تليفون وبيانات جمهور.
+- الوصف: مستعرض ومحرك استعلام فائق السرعة لملفات CSV و Excel و JSON وقواعد بيانات SQLite و PostgreSQL و MySQL.
 
 ### إيميل سيندر برو
 - الصفحة: https://www.musoftwares.com/services/email-sender-pro?lang=ar

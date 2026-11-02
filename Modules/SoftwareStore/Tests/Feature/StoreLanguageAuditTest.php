@@ -20,7 +20,7 @@ class StoreLanguageAuditTest extends TestCase
 
     /** Words that stay in Latin letters on an Arabic page. */
     private const LATIN_OK = [
-        'Musoftware', 'Musoftwares', 'Kashier', 'WhatsApp', 'Windows', 'Mac', 'macOS', 'Laravel', 'PHP', 'MySQL', 'SQLite', 'cPanel', 'Redis',
+        'Musoftware', 'Musoftwares', 'Kashier', 'WhatsApp', 'Windows', 'Mac', 'macOS', 'Laravel', 'PHP', 'MySQL', 'SQLite', 'PostgreSQL', 'Postgres', 'cPanel', 'Redis', 'TSV',
         'Facebook', 'Google', 'Maps', 'Telegram', 'Excel', 'CSV', 'PDF', 'API', 'ETA', 'SEO', 'POS', 'QR', 'URL', 'USB', 'AI', 'ERP', 'CRM',
         'Salla', 'Zid', 'Shopify', 'WooCommerce', 'WordPress', 'Elementor', 'Meta', 'Instagram', 'TikTok', 'LinkedIn', 'GitHub', 'Gmail', 'Outlook',
         'Chrome', 'Edge', 'Android', 'iOS', 'EGP', 'USD', 'SAR', 'AED', 'OMR', 'EN', 'AR', 'SMS', 'FEFO', 'KDS', 'RTL', 'LTR', 'VAT', 'GS1',

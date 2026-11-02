@@ -27,11 +27,11 @@ All endpoints automatically negotiate content and deliver pure JSON payload cont
 
 Every page has a full Markdown copy at the same address ending in .md
 
-### AudFinder
-- Page: https://www.musoftwares.com/services/audfinder?lang=en
-- Markdown: https://www.musoftwares.com/services/audfinder.md?lang=en
+### GridReader
+- Page: https://www.musoftwares.com/services/gridreader?lang=en
+- Markdown: https://www.musoftwares.com/services/gridreader.md?lang=en
 - Price: 0 EGP / year
-- Summary: Turn Facebook profile lists into phone numbers and audience data.
+- Summary: Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.
 
 ### Email Sender Pro
 - Page: https://www.musoftwares.com/services/email-sender-pro?lang=en

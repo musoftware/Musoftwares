@@ -33,12 +33,12 @@ class WhiteLabelTest extends TestCase
     private function program(): SoftwareProduct
     {
         $software = SerialSoftware::create([
-            'name' => 'AudFinder', 'requires_payment' => true, 'pricing_type' => 'single', 'price' => 1000,
+            'name' => 'GridReader', 'requires_payment' => true, 'pricing_type' => 'single', 'price' => 1000,
             'currency' => 'EGP', 'billing_cycle' => 'annual', 'whatsapp_number' => '201015218548', 'default_status' => 'inactive',
         ]);
 
         return SoftwareProduct::create([
-            'slug' => 'audfinder', 'name_en' => 'AudFinder', 'name_ar' => 'اود فايندر', 'price' => 1,
+            'slug' => 'gridreader', 'name_en' => 'GridReader', 'name_ar' => 'جريد ريدر', 'price' => 1,
             'currency' => 'EGP', 'is_active' => true, 'serial_software_id' => $software->id,
         ]);
     }
@@ -134,7 +134,7 @@ class WhiteLabelTest extends TestCase
         $this->partner(['subscription_expires_at' => now()->subDay()]);
 
         $this->get('/shop/nile-soft')->assertNotFound();
-        $this->get('/shop/nile-soft/audfinder')->assertNotFound();
+        $this->get('/shop/nile-soft/gridreader')->assertNotFound();
     }
 
     public function test_store_shows_the_partner_brand_and_price_and_can_be_framed(): void
@@ -146,9 +146,9 @@ class WhiteLabelTest extends TestCase
         $response = $this->get('/shop/nile-soft?embed=1')->assertOk();
 
         $response->assertSee('1,300 EGP')->assertDontSee('Musoftware');
-        $response->assertSee(route('white-label.product', [$partner, 'audfinder']), false);
+        $response->assertSee(route('white-label.product', [$partner, 'gridreader']), false);
         $this->assertFalse($response->headers->has('X-Frame-Options'));
-        $this->get('/shop/nile-soft/audfinder')->assertOk()->assertSee('Nile Soft')->assertDontSee('Musoftware');
+        $this->get('/shop/nile-soft/gridreader')->assertOk()->assertSee('Nile Soft')->assertDontSee('Musoftware');
     }
 
     public function test_order_charges_the_partner_price_and_fixes_their_share(): void
@@ -157,7 +157,7 @@ class WhiteLabelTest extends TestCase
         $partner = $this->partner();
         $partner->update(['prices' => [$product->id => 1300]]);
 
-        $this->post('/shop/nile-soft/audfinder/order', $this->clientData())->assertRedirectContains('payments.kashier.io');
+        $this->post('/shop/nile-soft/gridreader/order', $this->clientData())->assertRedirectContains('payments.kashier.io');
 
         $order = SoftwareOrder::firstOrFail();
         $this->assertSame($partner->id, $order->white_label_partner_id);
@@ -171,7 +171,7 @@ class WhiteLabelTest extends TestCase
         $this->program();
         $this->partner();
 
-        $this->post('/shop/nile-soft/audfinder/order', $this->clientData());
+        $this->post('/shop/nile-soft/gridreader/order', $this->clientData());
 
         $order = SoftwareOrder::firstOrFail();
         $this->assertSame('1000.00', $order->amount);
@@ -182,7 +182,7 @@ class WhiteLabelTest extends TestCase
     {
         $this->program();
         $partner = $this->partner();
-        $this->post('/shop/nile-soft/audfinder/order', $this->clientData() + ['device_id' => 'ABCD1234ABCD1234']);
+        $this->post('/shop/nile-soft/gridreader/order', $this->clientData() + ['device_id' => 'ABCD1234ABCD1234']);
         $order = SoftwareOrder::firstOrFail();
 
         app(SoftwareOrderService::class)->markPaid($order, 'TX-1');
@@ -194,12 +194,12 @@ class WhiteLabelTest extends TestCase
         $this->assertNull($earning->transaction_id);
         $this->assertSame($partner->id, SerialSoftwareLicense::firstOrFail()->white_label_partner_id);
 
-        $checkIn = $this->postJson('/api/serial/device', ['program_name' => 'AudFinder', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
+        $checkIn = $this->postJson('/api/serial/device', ['program_name' => 'GridReader', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
         $this->assertSame('Nile Soft', $checkIn->json('brand.name'));
         $this->assertSame('201112223333', $checkIn->json('whatsapp_number'));
 
         $partner->update(['subscription_expires_at' => now()->subDay()]);
-        $checkIn = $this->postJson('/api/serial/device', ['program_name' => 'AudFinder', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
+        $checkIn = $this->postJson('/api/serial/device', ['program_name' => 'GridReader', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
         $this->assertNull($checkIn->json('brand'));
         $this->assertSame('201015218548', $checkIn->json('whatsapp_number'));
     }
@@ -208,7 +208,7 @@ class WhiteLabelTest extends TestCase
     {
         $this->program();
         $this->partner();
-        $this->post('/shop/nile-soft/audfinder/order', $this->clientData());
+        $this->post('/shop/nile-soft/gridreader/order', $this->clientData());
         $order = SoftwareOrder::firstOrFail();
         app(SoftwareOrderService::class)->markPaid($order, 'TX-1');
 
@@ -223,7 +223,7 @@ class WhiteLabelTest extends TestCase
     {
         $this->program();
         $this->partner();
-        $this->post('/shop/nile-soft/audfinder/order', $this->clientData());
+        $this->post('/shop/nile-soft/gridreader/order', $this->clientData());
         $order = SoftwareOrder::firstOrFail();
         $order->forceFill(['reminder_sent_at' => now()])->save();
 

@@ -23,53 +23,55 @@ Base URL: https://www.musoftwares.com
 
 Every page has a full Markdown copy at the same address ending in .md
 
-### AudFinder
-- Page: https://www.musoftwares.com/services/audfinder?lang=en
-- Markdown: https://www.musoftwares.com/services/audfinder.md?lang=en
+### GridReader
+- Page: https://www.musoftwares.com/services/gridreader?lang=en
+- Markdown: https://www.musoftwares.com/services/gridreader.md?lang=en
 - Price: 0 EGP / year
-- Summary: Turn Facebook profile lists into phone numbers and audience data.
+- Summary: Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.
 
-# AudFinder
+# GridReader
 
-> Turn Facebook profile lists into phone numbers and audience data.
+> Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.
 
-Upload an Excel sheet of Facebook profile links or IDs. AudFinder matches them and returns phone numbers and data in minutes. Everything stays on your compute
+View and query CSV, Excel, JSON, SQLite, PostgreSQL and MySQL datasets with millions of rows without lag or memory exhaustion. Everything stays safely on your
 
-- Page: http://www.musoftwares.com/services/audfinder
+- Page: http://www.musoftwares.com/services/gridreader
 - Price: 0 EGP / year
-- Who is it for?: Marketers and business owners who have lists of Facebook profiles and need contact numbers.
-- What do you need?: A Windows 10 or 11 (64-bit) computer, or a Mac. Nothing else.
+- Who is it for?: Data analysts, developers, marketers, and anyone working with large datasets or databases who needs fast, lag-free viewing and searching.
+- What do you need?: A 64-bit Windows 10/11 computer or a Mac. No additional software required.
 - What happens after payment?: After payment your account and license are created automatically, and if you opened the buy page from the program window your device is activated right away. You also get a ready WhatsApp message with your order number.
 
 ## Program details
 
-AudFinder is a program for Windows and Mac that turns lists of Facebook profiles into phone numbers and audience data. You load an Excel, CSV or text file of profile links or IDs, and the program matches them against a local encrypted database on your computer.
+GridReader is a high-performance viewer and query engine purpose-built for effortlessly exploring large tabular datasets and database tables. It opens CSV, TSV, Excel, JSON, and SQLite files locally, and connects read-only to PostgreSQL and MySQL databases.
 
-All processing happens on your computer. Your lists are never uploaded to a server, so your leads stay with you.
+Built with advanced virtual scrolling and a native query engine, GridReader lets you scroll, filter, and search across millions of records in milliseconds with zero memory bloat or UI lag. All processing is 100% private and runs entirely on your local machine.
 
-- Import from Excel, CSV and text files
-- Direct search for a single profile with no file
-- Audience analysis by country
-- Export in a format ready for your campaigns, including export to WhatsApp Bulk Sender
-- AES-256 encrypted database on your computer
-- Automatic updates, no need to download again
+- Instant loading of huge CSV, TSV, Excel, JSON, and SQLite files
+- Secure read-only connections to remote PostgreSQL and MySQL databases
+- Ultra-smooth virtualized scrolling for millions of rows
+- Instant multi-column search with on-the-fly SQLite index acceleration
+- List matching tool to cross-reference external datasets in one click
+- Integrated SQL console with query execution metrics
+- Flexible exports to CSV, XLSX, and JSON
+- Automatic updates with no manual reinstall needed
 
 ## Common questions
 
-**Which computers does it run on?**
-It runs on Windows 10 or 11 (64-bit) and on Mac.
+**Which operating systems are supported?**
+GridReader runs smoothly on 64-bit Windows 10 and 11, as well as macOS.
 
-**What is the license tied to?**
-A yearly license for one device. After payment the device is activated automatically if you opened the buy page from the program window, or you can link your account by email.
+**Are my files or queries sent to external servers?**
+Never. All data parsing, searching, and caching happens 100% locally on your computer.
 
-**Is my data sent to a server?**
-No. Matching runs on your computer against a local encrypted database.
+**Can GridReader modify my PostgreSQL or MySQL databases?**
+No. Server connections are strictly read-only to ensure absolute data safety.
 
-**How do updates arrive?**
-The program checks for a new version, downloads it by itself and asks you to restart.
+**How does licensing and activation work?**
+Licenses are annual per device. Opening the checkout flow from the application activates your installation automatically upon payment.
 
-**What if I need help?**
-Message us on WhatsApp with your order number and we will help.
+**How do updates work?**
+GridReader automatically checks for updates in the background and prompts you to restart when an update is ready.
 
 ### Email Sender Pro
 - Page: https://www.musoftwares.com/services/email-sender-pro?lang=en
