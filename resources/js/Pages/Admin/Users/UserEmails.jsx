@@ -91,7 +91,10 @@ export default function UserEmails({ user, primary, emails = [], suggestions = [
             toast.error(__('general.select_at_least_one_duplicate'));
             return;
         }
-        const url = `/admin/users/${user.id}/merge?` + selectedDuplicates
+        const allIds = [user.id, ...selectedDuplicates];
+        const effectiveSurvivorId = Math.min(...allIds);
+        const effectiveDuplicates = allIds.filter((id) => id !== effectiveSurvivorId);
+        const url = `/admin/users/${effectiveSurvivorId}/merge?` + effectiveDuplicates
             .map((id) => `duplicate_ids[]=${id}`)
             .join('&');
         router.get(url);
@@ -104,7 +107,7 @@ export default function UserEmails({ user, primary, emails = [], suggestions = [
     ];
 
     return (
-        <AdminSidebarLayout auth={{ user }}>
+        <AdminSidebarLayout>
             <Head title={__('admin.user_email_aliases_title', { id: user.id })} />
             {confirmDialog}
             <div className="p-6 space-y-6 max-w-4xl">

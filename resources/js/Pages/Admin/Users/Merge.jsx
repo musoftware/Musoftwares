@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import { Info } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
@@ -19,7 +20,7 @@ function previewToConflicts(report) {
     return { conflicts, counts };
 }
 
-export default function Merge({ survivor, duplicates = [], reports = [] }) {
+export default function Merge({ survivor, duplicates = [], reports = [], auto_swapped_from_id = null }) {
     const { confirm, confirmDialog } = useConfirm();
     const [resolutions, setResolutions] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -61,31 +62,43 @@ export default function Merge({ survivor, duplicates = [], reports = [] }) {
     };
 
     return (
-        <AdminSidebarLayout auth={{ user: survivor }}>
+        <AdminSidebarLayout>
             <Head title={__('admin.merge_accounts_into', { id: survivor.id })} />
             {confirmDialog}
-            <div className="p-6 space-y-6 max-w-5xl">
-                <div className="flex items-center justify-between">
+            <div className="p-4 sm:p-6 space-y-6 max-w-5xl overflow-x-clip">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <h1 className="text-2xl font-semibold">{__('admin.merge_accounts')}</h1>
                     <Button asChild variant="outline">
                         <Link href={`/admin/users/${survivor.id}`}>{__('admin.merge_back_to_survivor')}</Link>
                     </Button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded border bg-green-50 p-4">
-                        <div className="text-xs uppercase tracking-wide text-green-700">{__('admin.merge_primary_survivor')}</div>
-                        <div className="font-mono">#{survivor.id}</div>
-                        <div className="text-lg">{survivor.name}</div>
-                        <div className="text-sm text-muted-foreground">{survivor.email}</div>
+                {auto_swapped_from_id && (
+                    <div className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                        <Info className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>
+                            {__('admin.merge_oldest_id_auto_selected', {
+                                oldest: survivor.id,
+                                newer: auto_swapped_from_id,
+                            })}
+                        </span>
                     </div>
-                    <div className="rounded border bg-red-50 p-4">
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="rounded-lg border bg-green-50 p-4 min-w-0">
+                        <div className="text-xs uppercase tracking-wide text-green-700">{__('admin.merge_primary_survivor')}</div>
+                        <div className="font-mono font-semibold">#{survivor.id}</div>
+                        <div className="text-lg truncate">{survivor.name}</div>
+                        <div className="text-sm text-muted-foreground truncate">{survivor.email}</div>
+                    </div>
+                    <div className="rounded-lg border bg-red-50 p-4 min-w-0">
                         <div className="text-xs uppercase tracking-wide text-red-700">{__('admin.merge_duplicates_to_merge', { count: duplicates.length })}</div>
                         <ul className="mt-2 space-y-1">
                             {duplicates.map((d) => (
-                                <li key={d.id} className="flex items-center justify-between gap-3">
+                                <li key={d.id} className="flex flex-wrap items-center justify-between gap-2 min-w-0">
                                     <span className="font-mono text-sm">#{d.id}</span>
-                                    <span className="text-sm">{d.name || '—'}</span>
+                                    <span className="text-sm truncate">{d.name || '—'}</span>
                                     <span className="font-mono text-xs text-muted-foreground truncate">{d.email}</span>
                                 </li>
                             ))}
@@ -105,18 +118,18 @@ export default function Merge({ survivor, duplicates = [], reports = [] }) {
                         {fields.map((field) => {
                             const v = aggregate.conflicts[field];
                             return (
-                                <div key={field} className="rounded border p-4 space-y-2">
+                                <div key={field} className="rounded-lg border p-4 space-y-2">
                                     <div className="font-medium">{field}</div>
-                                    <div className="grid grid-cols-3 gap-2 text-sm">
-                                        <div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                                        <div className="min-w-0">
                                             <Label className="text-xs">{__('admin.merge_survivor')}</Label>
-                                            <div className="rounded bg-muted px-2 py-1 font-mono">{String(v.survivor ?? '∅')}</div>
+                                            <div className="rounded bg-muted px-2 py-1 font-mono truncate">{String(v.survivor ?? '—')}</div>
                                         </div>
-                                        <div>
+                                        <div className="min-w-0">
                                             <Label className="text-xs">{__('admin.merge_first_duplicate')}</Label>
-                                            <div className="rounded bg-muted px-2 py-1 font-mono">{String(v.duplicate ?? '∅')}</div>
+                                            <div className="rounded bg-muted px-2 py-1 font-mono truncate">{String(v.duplicate ?? '—')}</div>
                                         </div>
-                                        <div className="space-y-1">
+                                        <div className="space-y-1 min-w-0">
                                             <Label className="text-xs" htmlFor={`resolution-${field}`}>{__('admin.merge_resolution')}</Label>
                                             <select
                                                 id={`resolution-${field}`}
@@ -134,7 +147,7 @@ export default function Merge({ survivor, duplicates = [], reports = [] }) {
                         })}
 
                         {Object.keys(aggregate.counts).length > 0 && (
-                            <div className="rounded border p-4">
+                            <div className="rounded-lg border p-4">
                                 <div className="font-medium mb-2">{__('admin.merge_child_rows_reassigned')}</div>
                                 <ul className="text-sm space-y-1 font-mono">
                                     {Object.entries(aggregate.counts).map(([k, n]) => (
@@ -144,7 +157,7 @@ export default function Merge({ survivor, duplicates = [], reports = [] }) {
                             </div>
                         )}
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             <Button type="submit" disabled={submitting || duplicates.length === 0}>
                                 {submitting
                                     ? __('admin.merging')

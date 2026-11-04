@@ -83,19 +83,22 @@ class UserMergeController extends Controller
             'duplicate_ids.*' => ['integer', 'distinct', 'different:'.$user->id, 'exists:users,id'],
         ]);
 
-        $duplicateIds = array_values(array_unique(array_map('intval', $request->input('duplicate_ids'))));
+        $rawDuplicateIds = array_values(array_unique(array_map('intval', $request->input('duplicate_ids'))));
+        [$survivorId, $duplicateIds] = $this->mergeService->resolveOldestSurvivor((int) $user->id, $rawDuplicateIds);
+        $survivor = $survivorId === (int) $user->id ? $user : User::findOrFail($survivorId);
 
         $duplicates = User::withTrashed()
             ->whereIn('id', $duplicateIds)
+            ->orderBy('id')
             ->get(['id', 'name', 'email', 'deleted_at']);
 
         $report = [];
         foreach ($duplicates as $dup) {
-            $report[] = $this->mergeService->preview($user->id, $dup->id);
+            $report[] = $this->mergeService->preview($survivor->id, $dup->id);
         }
 
         return Inertia::render('Admin/Users/Merge', [
-            'survivor' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            'survivor' => ['id' => $survivor->id, 'name' => $survivor->name, 'email' => $survivor->email],
             'duplicates' => $duplicates->map(fn (User $d) => [
                 'id' => $d->id,
                 'name' => $d->name,
@@ -103,6 +106,7 @@ class UserMergeController extends Controller
                 'merged' => (bool) $d->deleted_at,
             ])->values()->all(),
             'reports' => $report,
+            'auto_swapped_from_id' => $survivor->id !== $user->id ? $user->id : null,
         ]);
     }
 
@@ -129,7 +133,9 @@ class UserMergeController extends Controller
             return redirect()->back()->with('error', __('admin.merge_failed', ['error' => $e->getMessage()]));
         }
 
-        $aliases = UserEmail::where('user_id', $user->id)
+        $effectiveSurvivorId = (int) ($outcomes[0]['survivor_id'] ?? $user->id);
+
+        $aliases = UserEmail::where('user_id', $effectiveSurvivorId)
             ->where('source', UserEmail::SOURCE_MERGE)
             ->orderByDesc('id')
             ->limit(count($duplicateIds))
@@ -140,6 +146,7 @@ class UserMergeController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => __('admin.accounts_merged'),
+                'survivor_id' => $effectiveSurvivorId,
                 'outcomes' => $outcomes,
                 'aliases' => $aliases,
             ]);
@@ -148,8 +155,8 @@ class UserMergeController extends Controller
         $count = count($duplicateIds);
 
         return redirect()
-            ->route('admin.users.show', $user->id)
-            ->with('success', __('admin.accounts_merged_count', ['count' => $count, 'id' => $user->id]));
+            ->route('admin.users.show', $effectiveSurvivorId)
+            ->with('success', __('admin.accounts_merged_count', ['count' => $count, 'id' => $effectiveSurvivorId]));
     }
 
 }
