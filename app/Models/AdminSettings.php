@@ -16,15 +16,42 @@ class AdminSettings extends Model
     /** Cache TTL for settings (seconds). */
     const SETTINGS_CACHE_TTL = 300;
 
+    /** Cached in place of a setting that has no row, so empty settings are not queried on every request. */
+    private const MISSING = '__admin_setting_missing__';
+
     public static function GetValue($key, $default = null)
     {
-        $cacheKey = 'admin_settings_'.$key;
+        return static::GetValues([$key => $default])[$key];
+    }
 
-        return Cache::remember($cacheKey, self::SETTINGS_CACHE_TTL, function () use ($key, $default) {
-            $find = AdminSettings::where('setting_key', $key)->first();
+    /**
+     * Read several settings at once. Keys missing from the cache load in one query.
+     *
+     * @param  array<string, mixed>  $defaults  setting key => default value
+     * @return array<string, mixed>
+     */
+    public static function GetValues(array $defaults): array
+    {
+        $cached = [];
+        foreach (array_keys($defaults) as $key) {
+            $cached[$key] = Cache::get('admin_settings_'.$key);
+        }
 
-            return $find === null ? $default : $find->setting_value;
-        });
+        $missingKeys = array_keys(array_filter($cached, fn ($value) => $value === null));
+        if ($missingKeys !== []) {
+            $rows = AdminSettings::whereIn('setting_key', $missingKeys)->pluck('setting_value', 'setting_key');
+            foreach ($missingKeys as $key) {
+                $cached[$key] = $rows[$key] ?? self::MISSING;
+                Cache::put('admin_settings_'.$key, $cached[$key], self::SETTINGS_CACHE_TTL);
+            }
+        }
+
+        $values = [];
+        foreach ($defaults as $key => $default) {
+            $values[$key] = $cached[$key] === self::MISSING ? $default : $cached[$key];
+        }
+
+        return $values;
     }
 
     public static function SetValue($key, $value)

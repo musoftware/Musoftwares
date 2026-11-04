@@ -53,6 +53,8 @@ class ConsentAuditService
             'user_agent' => $request?->userAgent(),
         ]);
 
+        $user?->unsetRelation('consentLogs');
+
         if ($user && $consentType === ConsentType::PrivacyPolicy && $action === ConsentAction::Granted) {
             $this->syncLegacyAgreementTables($user, $version, $request);
         }
@@ -67,17 +69,10 @@ class ConsentAuditService
     {
         $states = [];
         foreach (ConsentType::cases() as $case) {
-            $latest = $user->consentLogs()
-                ->where('consent_type', $case->value)
-                ->orderByDesc('id')
-                ->first();
-
-            $actionValue = $latest?->action instanceof ConsentAction
-                ? $latest->action->value
-                : (string) ($latest?->action ?? '');
+            $latest = $this->latestConsent($user, $case);
 
             $states[$case->value] = [
-                'granted' => $actionValue === ConsentAction::Granted->value,
+                'granted' => $this->actionValue($latest) === ConsentAction::Granted->value,
                 'policy_version' => $latest?->policy_version,
                 'updated_at' => $latest?->created_at?->timezone('Africa/Cairo')->toIso8601String(),
             ];
@@ -90,38 +85,44 @@ class ConsentAuditService
     {
         $version = $this->currentPolicyVersion();
 
-        $privacyLatest = $user->consentLogs()
-            ->where('consent_type', ConsentType::PrivacyPolicy->value)
-            ->orderByDesc('id')
-            ->first();
+        $privacyLatest = $this->latestConsent($user, ConsentType::PrivacyPolicy);
 
         if (! $privacyLatest || $privacyLatest->policy_version !== $version) {
             return false;
         }
 
-        $actionValue = $privacyLatest->action instanceof ConsentAction
-            ? $privacyLatest->action->value
-            : (string) $privacyLatest->action;
-
-        return $actionValue === ConsentAction::Granted->value;
+        return $this->actionValue($privacyLatest) === ConsentAction::Granted->value;
     }
 
     public function hasExplicitlyWithdrawnEssentialPolicy(User $user): bool
     {
-        $latest = $user->consentLogs()
-            ->where('consent_type', ConsentType::PrivacyPolicy->value)
-            ->orderByDesc('id')
-            ->first();
+        $latest = $this->latestConsent($user, ConsentType::PrivacyPolicy);
 
-        if (! $latest) {
-            return false;
+        return $this->actionValue($latest) === ConsentAction::Withdrawn->value;
+    }
+
+    /**
+     * Latest log entry of one consent type. All of the user's logs load once per request
+     * (record() clears the cache), so several checks share one query.
+     */
+    private function latestConsent(User $user, ConsentType $type): ?UserConsentLog
+    {
+        $user->loadMissing(['consentLogs' => fn ($query) => $query->orderByDesc('id')]);
+
+        return $user->consentLogs->first(function (UserConsentLog $log) use ($type): bool {
+            $logType = $log->consent_type instanceof ConsentType ? $log->consent_type : ConsentType::tryFrom((string) $log->consent_type);
+
+            return $logType === $type;
+        });
+    }
+
+    private function actionValue(?UserConsentLog $log): string
+    {
+        if (! $log) {
+            return '';
         }
 
-        $actionValue = $latest->action instanceof ConsentAction
-            ? $latest->action->value
-            : (string) $latest->action;
-
-        return $actionValue === ConsentAction::Withdrawn->value;
+        return $log->action instanceof ConsentAction ? $log->action->value : (string) $log->action;
     }
 
     /**
@@ -151,17 +152,9 @@ class ConsentAuditService
 
     private function resolveTrackingPreference(Request $request, ?User $user): string
     {
-        if ($user) {
-            $latest = $user->consentLogs()
-                ->where('consent_type', ConsentType::CookiesTracking->value)
-                ->orderByDesc('id')
-                ->first();
-
-            if ($latest) {
-                return $latest->action instanceof ConsentAction
-                    ? $latest->action->value
-                    : (string) $latest->action;
-            }
+        $latest = $user ? $this->latestConsent($user, ConsentType::CookiesTracking) : null;
+        if ($latest) {
+            return $this->actionValue($latest);
         }
 
         $cookieVal = (string) $request->cookie(self::TRACKING_COOKIE_NAME, '');

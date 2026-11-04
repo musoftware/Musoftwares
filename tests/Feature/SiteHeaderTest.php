@@ -49,7 +49,7 @@ class SiteHeaderTest extends TestCase
 
         $this->assertStringContainsString('سياسة الخصوصية', $arabic);
         $this->assertStringNotContainsString('Sovereignty', $arabic);
-        $this->assertStringContainsString('Privacy policy', $english);
+        $this->assertStringContainsString('Data Protection Officer', $english);
     }
 
     public function test_react_public_pages_get_the_same_menu_links_from_the_server(): void

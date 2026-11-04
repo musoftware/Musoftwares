@@ -55,6 +55,11 @@ class AdminAuditLog extends Model
             'severity' => self::SEVERITY_INFO,
         ], $attributes);
 
+        // System actions (CLI, jobs) pass 0; store null so the users foreign key accepts the row.
+        if (empty($payload['actor_user_id'])) {
+            $payload['actor_user_id'] = null;
+        }
+
         Log::info("Admin Audit [{$payload['action']}]: ".json_encode($payload, JSON_UNESCAPED_UNICODE));
 
         try {

@@ -157,8 +157,10 @@ class AdminCostsFilterTest extends TestCase
 
     public function test_costs_page_available_years_include_all_years_with_transactions(): void
     {
+        // February: the legal window still shows last year (see App\Support\LegalWindow).
+        $this->travelTo(now()->setDate(now()->year, 2, 15));
         $this->makeCost('Hosting', 100.00, now());
-        $this->makeCost('Hosting', 200.00, now()->subYears(2));
+        $this->makeCost('Hosting', 200.00, now()->subMonths(12));
 
         $response = $this->actingAs($this->admin)->get(route('admin.costs.index'));
 
@@ -168,7 +170,7 @@ class AdminCostsFilterTest extends TestCase
         $availableYears = $props['filters']['available_years'] ?? [];
 
         $this->assertContains(now()->year, $availableYears);
-        $this->assertContains(now()->subYears(2)->year, $availableYears);
+        $this->assertContains(now()->subMonths(12)->year, $availableYears);
     }
 
     public function test_costs_page_exposes_options_for_filters(): void
