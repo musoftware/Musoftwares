@@ -30,10 +30,23 @@
             </a>
 
             @if ($downloadLink)
-                <a href="{{ $downloadLink }}"
+                <a id="download-link" href="{{ $downloadLink }}"
                    class="flex items-center justify-center w-full h-12 rounded-[980px] border border-black/15 bg-white font-semibold hover:bg-[#f5f5f7] transition-colors">
                     {{ __('software.download') }}
                 </a>
+                <p id="download-note" class="text-xs text-[#1d1d1f]/50">{{ __('software.download_starting_automatically') }}</p>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        setTimeout(function () {
+                            var link = document.createElement('a');
+                            link.href = '{{ $downloadLink }}';
+                            link.setAttribute('download', '');
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }, 700);
+                    });
+                </script>
             @endif
         @else
             <h1 class="text-3xl font-bold tracking-tight">{{ __('software.failed_title') }}</h1>

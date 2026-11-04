@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import SafeLink from '@/Components/SafeLink';
+import { __ } from '@/lib/i18n';
 
 type FooterLink = { url: string; label: string; external: boolean };
 export type SiteFooterData = {
@@ -60,8 +61,17 @@ export default function SiteFooter() {
 
                 <div className="mt-10 pt-6 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-3 text-[13px] text-[#86868b]">
                     <p>{footer.copyright}</p>
-                    {/* Full page load: the locale is resolved server-side from ?lang. */}
-                    <p><a href={footer.language_switch.url} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a></p>
+                    <div className="flex flex-wrap items-center gap-4">
+                        <button
+                            type="button"
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-privacy-consent-gate'))}
+                            className="hover:text-[#1d1d1f] transition-colors cursor-pointer"
+                        >
+                            {__('privacy_compliance.manage_cookie_preferences')}
+                        </button>
+                        {/* Full page load: the locale is resolved server-side from ?lang. */}
+                        <a href={footer.language_switch.url} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -115,6 +115,10 @@ class User extends Authenticatable
             'last_activity_at'              => 'datetime',
             'last_login'                    => 'datetime',
             'winback_unsubscribed_at'       => 'datetime',
+            'openai_api_key'                => \App\Casts\GracefulEncrypted::class,
+            'gemini_api'                    => \App\Casts\GracefulEncrypted::class,
+            'autosms_verification_secret'   => \App\Casts\GracefulEncrypted::class,
+            'kyc_notes'                     => \App\Casts\GracefulEncrypted::class,
         ];
     }
 
@@ -359,6 +363,7 @@ class User extends Authenticatable
     public function hasUnpaidInvoices(): bool
     {
         return $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->exists();
@@ -375,11 +380,12 @@ class User extends Authenticatable
 
         // 1. Pending withdrawals
         if (class_exists(UserReferralRequestWithdraw::class)) {
-            $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
+            $locked += $this->withdraw()->withoutLegalWindow()->where('status', 'pending')->sum('amount');
         }
 
         // 3. Pending invoices
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->get();
@@ -419,6 +425,7 @@ class User extends Authenticatable
         $currentBalance = $this->balance(); // Current Wallet Balance in User Currency
 
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)
@@ -485,6 +492,7 @@ class User extends Authenticatable
     public function unpaid_invoices_amount($include_pending = false)
     {
         $invoices = $this->invoices()
+            ->withoutLegalWindow()
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false);
 
@@ -519,6 +527,18 @@ class User extends Authenticatable
     public function withdraw()
     {
         return $this->hasMany(UserReferralRequestWithdraw::class);
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(Earning::class, 'user_id');
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')
+            ->where('notifications.created_at', '>=', \App\Support\LegalWindow::cutoffDatabase())
+            ->latest();
     }
 
     /**
@@ -597,6 +617,7 @@ class User extends Authenticatable
             $balance = (float) $this->user_balance;
             
             $oldestUnpaid = $this->invoices()
+                ->withoutLegalWindow()
                 ->where('unpaid', '>', 0)
                 ->whereIn('status', ['unpaid', 'partially_paid'])
                 ->where('is_suspended', false)
@@ -965,6 +986,7 @@ class User extends Authenticatable
     public function oldestUnpaidInvoice(): ?Invoice
     {
         return $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)
@@ -978,6 +1000,7 @@ class User extends Authenticatable
     public function totalUnpaidAmount(): float
     {
         $unpaidInvoices = $this->invoices()
+            ->withoutLegalWindow()
             ->where('unpaid', '>', 0)
             ->whereIn('status', ['unpaid', 'partially_paid'])
             ->where('is_suspended', false)
@@ -1009,6 +1032,39 @@ class User extends Authenticatable
     public function partnerClient(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(PartnerClient::class, 'user_id')->latestOfMany();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserConsentLog>
+     */
+    public function consentLogs(): HasMany
+    {
+        return $this->hasMany(UserConsentLog::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DataSubjectRequest>
+     */
+    public function dataSubjectRequests(): HasMany
+    {
+        return $this->hasMany(DataSubjectRequest::class, 'user_id');
+    }
+
+    public function hasGrantedConsent(\App\Enums\ConsentType|string $consentType): bool
+    {
+        $type = $consentType instanceof \App\Enums\ConsentType ? $consentType->value : $consentType;
+        $latest = $this->consentLogs()
+            ->where('consent_type', $type)
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $latest) {
+            return false;
+        }
+
+        $action = $latest->action instanceof \App\Enums\ConsentAction ? $latest->action->value : (string) $latest->action;
+
+        return $action === \App\Enums\ConsentAction::Granted->value;
     }
 
     /**

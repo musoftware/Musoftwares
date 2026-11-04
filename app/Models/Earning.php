@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 class Earning extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -104,7 +105,7 @@ class Earning extends Model
 
     public static function clearing_balance()
     {
-        $query = Earning::query()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'));
+        $query = Earning::withoutLegalWindow()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'));
         if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
@@ -120,7 +121,7 @@ class Earning extends Model
 
     public static function clearing_start_date()
     {
-        $query = Earning::query()->select(DB::raw('min(convert_to_balance_on) as ctb_date'));
+        $query = Earning::withoutLegalWindow()->select(DB::raw('min(convert_to_balance_on) as ctb_date'));
         if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
@@ -134,7 +135,7 @@ class Earning extends Model
 
     public static function clearing_last_date()
     {
-        $query = Earning::query()->select(DB::raw('max(convert_to_balance_on) as ctb_date'));
+        $query = Earning::withoutLegalWindow()->select(DB::raw('max(convert_to_balance_on) as ctb_date'));
         if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
@@ -148,7 +149,7 @@ class Earning extends Model
 
     public static function total_balance()
     {
-        $data = Earning::query()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'))->groupBy('currency_id')->get();
+        $data = Earning::withoutLegalWindow()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'))->groupBy('currency_id')->get();
 
         $amount = 0;
         foreach ($data as $commission) {

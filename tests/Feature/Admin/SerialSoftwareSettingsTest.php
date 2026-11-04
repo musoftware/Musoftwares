@@ -102,14 +102,14 @@ class SerialSoftwareSettingsTest extends TestCase
     public function test_update_settings_with_free_pricing_and_null_billing_cycle(): void
     {
         $software = SerialSoftware::factory()->create([
-            'name' => 'AudFinder',
+            'name' => 'GridReader',
             'is_active' => true,
             'pricing_type' => 'free',
             'billing_cycle' => 'lifetime',
         ]);
 
         $response = $this->actingAs($this->admin)->put(route('admin.serial-softwares.settings.update', $software->id), [
-            'name' => 'AudFinder Updated',
+            'name' => 'GridReader Updated',
             'is_active' => true,
             'default_status' => 'active',
             'pricing_type' => 'free',
@@ -127,7 +127,7 @@ class SerialSoftwareSettingsTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseHas('serial_softwares', [
             'id' => $software->id,
-            'name' => 'AudFinder Updated',
+            'name' => 'GridReader Updated',
             'pricing_type' => 'free',
             'requires_payment' => false,
             'billing_cycle' => 'lifetime',

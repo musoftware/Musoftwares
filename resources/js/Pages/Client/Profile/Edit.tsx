@@ -5,6 +5,10 @@ import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import UserEmailsForm from './Partials/UserEmailsForm';
 import SystemPreferencesForm from './Partials/SystemPreferencesForm';
+import PrivacyGovernanceForm, {
+    type ConsentStateEntry,
+    type DataSubjectRequestRow,
+} from './Partials/PrivacyGovernanceForm';
 import { __ } from '@/lib/i18n';
 
 interface SecondaryEmail {
@@ -20,11 +24,15 @@ export default function Edit({
     status,
     hasUnpaidInvoices = false,
     emails = [],
+    privacyConsents = {},
+    dataSubjectRequests = [],
 }: PageProps<{
     mustVerifyEmail: boolean;
     status?: string;
     hasUnpaidInvoices?: boolean;
     emails?: SecondaryEmail[];
+    privacyConsents?: Record<string, ConsentStateEntry>;
+    dataSubjectRequests?: DataSubjectRequestRow[];
 }>) {
     return (
         <ClientPage
@@ -47,6 +55,14 @@ export default function Edit({
 
             <div id="preferences" className="scroll-mt-24"><Card>
                 <SystemPreferencesForm className="w-full" />
+            </Card></div>
+
+            <div id="privacy" className="scroll-mt-24"><Card>
+                <PrivacyGovernanceForm
+                    consents={privacyConsents}
+                    requests={dataSubjectRequests}
+                    className="w-full"
+                />
             </Card></div>
 
             <div id="delete" className="scroll-mt-24"><Card className="border-rose-200/70 dark:border-rose-900/50">

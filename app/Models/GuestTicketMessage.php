@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GuestTicketMessage extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopesToLegalWindow;
 
     protected $fillable = [
         'guest_ticket_id',

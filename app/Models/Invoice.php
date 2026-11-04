@@ -11,6 +11,7 @@ use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
 use App\Helpers\TextHelper;
 use App\Helpers\TimezoneHelper;
+use App\Models\Concerns\ScopesToLegalWindow;
 use App\Services\VoucherService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -27,6 +28,7 @@ use Illuminate\Support\Str;
 class Invoice extends Model
 {
     use HasFactory;
+    use ScopesToLegalWindow;
     use SoftDeletes;
 
     protected $guarded = [];
@@ -143,7 +145,7 @@ class Invoice extends Model
 
     public function transactions()
     {
-        return $this->belongsToMany(Transaction::class);
+        return $this->belongsToMany(Transaction::class)->withoutLegalWindow();
     }
 
     /**
@@ -156,7 +158,7 @@ class Invoice extends Model
 
     public function cost_transactions()
     {
-        return $this->belongsToMany(CostTransaction::class);
+        return $this->belongsToMany(CostTransaction::class)->withoutLegalWindow();
     }
 
     protected function invoiceStatus(): Attribute
@@ -229,7 +231,7 @@ class Invoice extends Model
 
     public static function UnpaidInvoicesBusiness()
     {
-        $invoices = static::query()->where(function ($query) {
+        $invoices = static::withoutLegalWindow()->where(function ($query) {
             $query->where('status', 'unpaid');
             $query->orWhere('status', 'partially_paid');
         })->where('is_suspended', false)->get();
@@ -349,7 +351,7 @@ class Invoice extends Model
         }
 
         DB::transaction(function () {
-            $locked = static::where('id', $this->id)->lockForUpdate()->first();
+            $locked = static::withoutLegalWindow()->where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {
                 return;
@@ -857,7 +859,7 @@ class Invoice extends Model
         $requireSufficientBalance ??= $autoPaid;
 
         DB::transaction(function () use ($autoPaid, $requireSufficientBalance) {
-            $locked = static::where('id', $this->id)->lockForUpdate()->first();
+            $locked = static::withoutLegalWindow()->where('id', $this->id)->lockForUpdate()->first();
 
             if (! $locked || $locked->status === 'paid') {
                 return;

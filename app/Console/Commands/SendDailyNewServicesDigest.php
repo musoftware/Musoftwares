@@ -53,16 +53,20 @@ class SendDailyNewServicesDigest extends Command
             return Command::SUCCESS;
         }
 
-        // Send notifications to all active users with a valid email
+        // Send notifications only to users who have explicitly granted direct_marketing_email consent
+        $consentService = app(\App\Services\Privacy\ConsentAuditService::class);
         $userCount = 0;
-        User::whereNotNull('email')
-            ->where('email', '!=', '')
-            ->chunk(100, function ($users) use ($newWebsiteServices, $newMarketplaceServices, &$userCount) {
-                foreach ($users as $user) {
-                    $user->notify(new DailyNewServicesDigestNotification($newWebsiteServices, $newMarketplaceServices));
-                    $userCount++;
+        $consentService->scopeGrantedMarketingEmail(
+            User::whereNotNull('email')->where('email', '!=', '')
+        )->chunk(100, function ($users) use ($newWebsiteServices, $newMarketplaceServices, $consentService, &$userCount) {
+            foreach ($users as $user) {
+                if (! $consentService->canSendMarketingEmail($user)) {
+                    continue;
                 }
-            });
+                $user->notify(new DailyNewServicesDigestNotification($newWebsiteServices, $newMarketplaceServices));
+                $userCount++;
+            }
+        });
 
         $this->info("Dispatched daily new services digest to {$userCount} users.");
 

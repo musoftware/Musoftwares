@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
+
 class OutgoingEmail extends BaseModel
 {
+    use ScopesToLegalWindow;
+
     protected $table = 'outgoing_emails';
 
     protected $fillable = [

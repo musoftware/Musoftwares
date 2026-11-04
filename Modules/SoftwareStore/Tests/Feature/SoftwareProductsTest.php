@@ -26,9 +26,9 @@ class SoftwareProductsTest extends TestCase
     private function product(array $overrides = []): SoftwareProduct
     {
         return SoftwareProduct::create($overrides + [
-            'slug' => 'audfinder',
-            'name_en' => 'AudFinder',
-            'name_ar' => 'اود فايندر',
+            'slug' => 'gridreader',
+            'name_en' => 'GridReader',
+            'name_ar' => 'جريد ريدر',
             'price' => 500,
             'currency' => 'EGP',
             'is_active' => true,
@@ -63,7 +63,7 @@ class SoftwareProductsTest extends TestCase
         $this->product();
         $this->product(['slug' => 'hidden-one', 'name_en' => 'Hidden One', 'is_active' => false]);
 
-        $this->get('/services')->assertOk()->assertSee('AudFinder')->assertDontSee('Hidden One');
+        $this->get('/services')->assertOk()->assertSee('GridReader')->assertDontSee('Hidden One');
     }
 
     public function test_each_seeded_program_has_its_own_landing_page(): void
@@ -72,7 +72,7 @@ class SoftwareProductsTest extends TestCase
         SoftwareProduct::query()->update(['is_active' => true, 'price' => 300]);
 
         $themes = [];
-        foreach (['audfinder', 'email-sender-pro', 'whatsapp-bulk-sender'] as $slug) {
+        foreach (['gridreader', 'email-sender-pro', 'whatsapp-bulk-sender'] as $slug) {
             $html = $this->get("/services/{$slug}")->assertOk()->assertSee('id="order"', false)->getContent();
             $themes[] = SoftwareProduct::where('slug', $slug)->first()->themeColors()['accent'];
             $this->assertStringContainsString($themes[count($themes) - 1], $html);
@@ -84,11 +84,11 @@ class SoftwareProductsTest extends TestCase
     public function test_landing_page_renders_arabic_copy_and_gallery(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        SoftwareProduct::where('slug', 'audfinder')->update([
-            'is_active' => true, 'price' => 300, 'gallery' => ['images/software/audfinder.png', 'images/software/audfinder.png'],
+        SoftwareProduct::where('slug', 'gridreader')->update([
+            'is_active' => true, 'price' => 300, 'gallery' => ['images/software/gridreader.png', 'images/software/gridreader.png'],
         ]);
 
-        $this->withSession(['locale' => 'ar'])->get('/services/audfinder?lang=ar')
+        $this->withSession(['locale' => 'ar'])->get('/services/gridreader?lang=ar')
             ->assertOk()
             ->assertSee('data-lightbox', false);
     }
@@ -97,14 +97,14 @@ class SoftwareProductsTest extends TestCase
     {
         $this->product();
 
-        $this->get('/services/audfinder')->assertOk()->assertSee('client_whatsapp', false);
+        $this->get('/services/gridreader')->assertOk()->assertSee('client_whatsapp', false);
     }
 
     public function test_order_requires_client_details(): void
     {
         $this->product();
 
-        $this->post('/services/audfinder/order', [])->assertSessionHasErrors(['client_name', 'client_email', 'client_whatsapp']);
+        $this->post('/services/gridreader/order', [])->assertSessionHasErrors(['client_name', 'client_email', 'client_whatsapp']);
         $this->assertSame(0, SoftwareOrder::count());
     }
 
@@ -113,7 +113,7 @@ class SoftwareProductsTest extends TestCase
         config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
         $this->product();
 
-        $response = $this->post('/services/audfinder/order', $this->clientData());
+        $response = $this->post('/services/gridreader/order', $this->clientData());
 
         $order = SoftwareOrder::firstOrFail();
         $this->assertSame('pending_payment', $order->status);
@@ -125,7 +125,7 @@ class SoftwareProductsTest extends TestCase
     {
         $this->product(['price' => 0]);
 
-        $this->post('/services/audfinder/order', $this->clientData())->assertSessionHas('error');
+        $this->post('/services/gridreader/order', $this->clientData())->assertSessionHas('error');
         $this->assertSame(0, SoftwareOrder::count());
     }
 
@@ -150,9 +150,9 @@ class SoftwareProductsTest extends TestCase
     {
         Storage::fake('local');
         $product = $this->product();
-        Storage::disk('local')->put('software-releases/audfinder/a.exe', 'binary');
+        Storage::disk('local')->put('software-releases/gridreader/a.exe', 'binary');
         $product->releases()->create([
-            'version' => '1.0.0', 'file_path' => 'software-releases/audfinder/a.exe', 'file_name' => 'a.exe',
+            'version' => '1.0.0', 'file_path' => 'software-releases/gridreader/a.exe', 'file_name' => 'a.exe',
             'sha512' => 'x', 'size' => 6, 'is_published' => true, 'released_at' => now(),
         ]);
         $order = $product->orders()->create($this->clientData() + ['amount' => 500, 'currency' => 'EGP']);
@@ -178,11 +178,11 @@ class SoftwareProductsTest extends TestCase
         $expectedHash = base64_encode(hash('sha512', 'installer-bytes', true));
         $this->assertSame($expectedHash, $release->sha512);
 
-        $yaml = $this->get('/updates/audfinder/latest.yml')->assertOk()->getContent();
+        $yaml = $this->get('/updates/gridreader/latest.yml')->assertOk()->getContent();
         $this->assertStringContainsString('version: 1.2.0', $yaml);
         $this->assertStringContainsString("sha512: {$expectedHash}", $yaml);
 
-        $this->get('/updates/audfinder/'.$release->file_name)->assertOk();
+        $this->get('/updates/gridreader/'.$release->file_name)->assertOk();
     }
 
     public function test_feed_returns_latest_published_version_and_hides_unpublished(): void
@@ -192,7 +192,7 @@ class SoftwareProductsTest extends TestCase
         $product->releases()->create($base + ['version' => '1.0.0', 'is_published' => true, 'released_at' => now()->subDay()]);
         $product->releases()->create($base + ['version' => '1.1.0', 'is_published' => false, 'released_at' => now()]);
 
-        $this->get('/updates/audfinder/latest.yml')->assertOk()->assertSee('version: 1.0.0', false);
+        $this->get('/updates/gridreader/latest.yml')->assertOk()->assertSee('version: 1.0.0', false);
     }
 
     public function test_duplicate_version_is_refused(): void
@@ -228,13 +228,13 @@ class SoftwareProductsTest extends TestCase
 
         $release = $product->releases()->firstOrFail();
         $this->assertNotNull($release->blockmap_path);
-        $this->get('/updates/audfinder/'.$release->file_name.'.blockmap')->assertOk();
+        $this->get('/updates/gridreader/'.$release->file_name.'.blockmap')->assertOk();
     }
 
     private function licensedProduct(): SoftwareProduct
     {
         $software = SerialSoftware::create([
-            'name' => 'AudFinder', 'requires_payment' => true, 'pricing_type' => 'single', 'price' => 1000,
+            'name' => 'GridReader', 'requires_payment' => true, 'pricing_type' => 'single', 'price' => 1000,
             'currency' => 'EGP', 'billing_cycle' => 'annual', 'whatsapp_number' => '201015218548',
             'default_status' => 'inactive',
         ]);
@@ -292,7 +292,7 @@ class SoftwareProductsTest extends TestCase
     {
         $product = $this->licensedProduct();
 
-        $response = $this->postJson('/api/serial/device', ['program_name' => 'AudFinder', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
+        $response = $this->postJson('/api/serial/device', ['program_name' => 'GridReader', 'device_id' => 'ABCD1234ABCD1234'])->assertOk();
 
         $this->assertSame($product->purchaseUrl('ABCD1234ABCD1234'), $response->json('purchase_url'));
         $this->assertStringContainsString('device=ABCD1234ABCD1234', $response->json('purchase_url'));
@@ -302,8 +302,8 @@ class SoftwareProductsTest extends TestCase
     {
         $this->licensedProduct();
 
-        $this->get('/services/audfinder?device=ABCD1234ABCD1234')->assertOk()->assertSee('name="device_id"', false);
-        $this->get('/services/audfinder')->assertOk()->assertDontSee('name="device_id"', false);
+        $this->get('/services/gridreader?device=ABCD1234ABCD1234')->assertOk()->assertSee('name="device_id"', false);
+        $this->get('/services/gridreader')->assertOk()->assertDontSee('name="device_id"', false);
     }
 
     private function bundleProduct(): SoftwareProduct
@@ -378,7 +378,7 @@ class SoftwareProductsTest extends TestCase
     {
         $this->seed(SoftwareProductSeeder::class);
         $admin = $this->admin();
-        $product = SoftwareProduct::where('slug', 'audfinder')->firstOrFail();
+        $product = SoftwareProduct::where('slug', 'gridreader')->firstOrFail();
 
         $this->actingAs($admin)->get('/admin/software-products')->assertOk();
         $this->actingAs($admin)->get("/admin/software-products/{$product->id}/edit")->assertOk();
@@ -392,10 +392,10 @@ class SoftwareProductsTest extends TestCase
     public function test_admin_saves_text_plans_colors_and_sections_without_json(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        $product = SoftwareProduct::where('slug', 'audfinder')->firstOrFail();
+        $product = SoftwareProduct::where('slug', 'gridreader')->firstOrFail();
 
         $this->actingAs($this->admin())->post("/admin/software-products/{$product->id}", [
-            'name_en' => 'AudFinder', 'name_ar' => 'اود فايندر', 'price' => 1200, 'currency' => 'egp', 'is_active' => 1,
+            'name_en' => 'GridReader', 'name_ar' => 'جريد ريدر', 'price' => 1200, 'currency' => 'egp', 'is_active' => 1,
             'plans' => [
                 ['key' => 'solo', 'name' => 'Solo', 'price' => 1200, 'points' => 5],
                 ['key' => 'team', 'name' => 'Team', 'price' => 2400],
@@ -413,7 +413,7 @@ class SoftwareProductsTest extends TestCase
         $this->assertSame(['pillars', 'problems'], $product->sectionOrder());
 
         $this->actingAs($this->admin())->post("/admin/software-products/{$product->id}", [
-            'name_en' => 'AudFinder', 'name_ar' => 'اود فايندر', 'price' => 1200, 'currency' => 'EGP', 'is_active' => 1,
+            'name_en' => 'GridReader', 'name_ar' => 'جريد ريدر', 'price' => 1200, 'currency' => 'EGP', 'is_active' => 1,
         ])->assertSessionHasNoErrors();
         $this->assertFalse($product->fresh()->hasPlans());
     }
@@ -421,7 +421,7 @@ class SoftwareProductsTest extends TestCase
     public function test_admin_rejects_a_plan_without_a_price_and_a_bad_color(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        $product = SoftwareProduct::where('slug', 'audfinder')->firstOrFail();
+        $product = SoftwareProduct::where('slug', 'gridreader')->firstOrFail();
 
         $this->actingAs($this->admin())->post("/admin/software-products/{$product->id}", [
             'name_en' => 'A', 'name_ar' => 'ا', 'price' => 10, 'currency' => 'EGP', 'is_active' => 1,
@@ -485,20 +485,20 @@ class SoftwareProductsTest extends TestCase
     public function test_reseeding_adds_new_blocks_but_keeps_admin_edits_and_renames_old_address(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        $audfinder = SoftwareProduct::where('slug', 'audfinder')->firstOrFail();
-        $landing = $audfinder->landing;
+        $gridreader = SoftwareProduct::where('slug', 'gridreader')->firstOrFail();
+        $landing = $gridreader->landing;
         $landing['en']['headline'] = 'My own headline';
         unset($landing['en']['faq']);
-        $audfinder->update(['landing' => $landing, 'name_en' => 'Renamed by admin']);
+        $gridreader->update(['landing' => $landing, 'name_en' => 'Renamed by admin']);
 
         SoftwareProduct::where('slug', 'marketing-suite')->update(['slug' => 'amc-tasks', 'name_en' => 'Old name']);
         $this->seed(SoftwareProductSeeder::class);
 
-        $audfinder->refresh();
-        $this->assertSame('My own headline', $audfinder->landing['en']['headline']);
-        $this->assertSame('Renamed by admin', $audfinder->name_en);
-        $this->assertNotEmpty($audfinder->landing['en']['faq']['items']);
-        $this->assertSame('overview', $audfinder->sectionOrder()[0]);
+        $gridreader->refresh();
+        $this->assertSame('My own headline', $gridreader->landing['en']['headline']);
+        $this->assertSame('Renamed by admin', $gridreader->name_en);
+        $this->assertNotEmpty($gridreader->landing['en']['faq']['items']);
+        $this->assertSame('overview', $gridreader->sectionOrder()[0]);
 
         $this->assertNull(SoftwareProduct::where('slug', 'amc-tasks')->first());
         $this->assertSame('Musoftware Marketing Suite', SoftwareProduct::where('slug', 'marketing-suite')->value('name_en'));
@@ -509,7 +509,7 @@ class SoftwareProductsTest extends TestCase
         config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
         $product = $this->product(['currency' => 'OMR']);
 
-        $this->post('/services/audfinder/order', $this->clientData())->assertSessionHas('error');
+        $this->post('/services/gridreader/order', $this->clientData())->assertSessionHas('error');
         $this->assertSame('OMR', $product->saleCurrency());
         $this->assertSame(1, SoftwareOrder::count());
         $this->assertNull(Currency::where('currency', 'OMR')->first());
@@ -565,7 +565,7 @@ class SoftwareProductsTest extends TestCase
     {
         $this->seed(SoftwareProductSeeder::class);
         SoftwareProduct::query()->update(['is_active' => true]);
-        SoftwareProduct::where('slug', 'audfinder')->update(['price' => 1000]);
+        SoftwareProduct::where('slug', 'gridreader')->update(['price' => 1000]);
 
         $graph = $this->schemaOf($this->get('/services/marketing-suite?lang=en')->getContent());
         $service = collect($graph)->firstWhere('@type', 'Service');
@@ -578,10 +578,10 @@ class SoftwareProductsTest extends TestCase
         $this->assertSame('USD', $official['offers']['priceCurrency']);
         $this->assertArrayNotHasKey('priceSpecification', $official['offers']['offers'][0]);
 
-        SoftwareProduct::where('slug', 'audfinder')->first()->releases()->create([
+        SoftwareProduct::where('slug', 'gridreader')->first()->releases()->create([
             'version' => '2.0.2', 'file_path' => 'x', 'file_name' => 'x.exe', 'sha512' => 'h', 'size' => 1, 'is_published' => true, 'released_at' => now(),
         ]);
-        $html = $this->get('/services/audfinder?lang=en')->getContent();
+        $html = $this->get('/services/gridreader?lang=en')->getContent();
         $app = collect($this->schemaOf($html))->firstWhere('@type', 'SoftwareApplication');
         $this->assertSame('P1Y', $app['offers']['priceSpecification']['billingDuration']);
         $this->assertSame('Windows 10, Windows 11, macOS', $app['operatingSystem']);
@@ -592,13 +592,13 @@ class SoftwareProductsTest extends TestCase
     public function test_script_closing_text_in_content_cannot_break_out_of_json_ld(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        $product = SoftwareProduct::where('slug', 'audfinder')->firstOrFail();
+        $product = SoftwareProduct::where('slug', 'gridreader')->firstOrFail();
         $product->update(['is_active' => true, 'price' => 1000, 'tagline_en' => 'Bad </script><script>alert(1)</script>']);
         $landing = $product->landing;
         $landing['en']['subheadline'] = 'Bad </script><script>alert(1)</script>';
         $product->update(['landing' => $landing]);
 
-        $html = $this->get('/services/audfinder?lang=en')->getContent();
+        $html = $this->get('/services/gridreader?lang=en')->getContent();
 
         $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
         $this->assertNotEmpty($this->schemaOf($html));
@@ -617,19 +617,19 @@ class SoftwareProductsTest extends TestCase
         $this->assertStringContainsString('4,924 EGP', $body);
         $this->assertStringContainsString('Common questions', $body);
 
-        $this->get('/services/audfinder.md')->assertNotFound();
+        $this->get('/services/gridreader.md')->assertNotFound();
     }
 
     public function test_sitemap_lists_the_store_with_both_languages(): void
     {
         $this->seed(SoftwareProductSeeder::class);
-        SoftwareProduct::where('slug', 'audfinder')->update(['is_active' => true]);
+        SoftwareProduct::where('slug', 'gridreader')->update(['is_active' => true]);
 
         $xml = $this->sitemapXml();
 
         $this->assertStringContainsString('<loc>'.route('services.index').'</loc>', $xml);
-        $this->assertStringContainsString('<loc>'.route('website-services.show', 'audfinder').'</loc>', $xml);
-        $this->assertStringContainsString('hreflang="ar" href="'.route('website-services.show', 'audfinder').'?lang=ar"', $xml);
+        $this->assertStringContainsString('<loc>'.route('website-services.show', 'gridreader').'</loc>', $xml);
+        $this->assertStringContainsString('hreflang="ar" href="'.route('website-services.show', 'gridreader').'?lang=ar"', $xml);
         $this->assertStringNotContainsString(route('website-services.show', 'marketing-suite').'</loc>', $xml);
     }
 
@@ -644,7 +644,7 @@ class SoftwareProductsTest extends TestCase
         $this->assertSame('https://www.musoftwares.com', $call('publicBaseUrl'));
 
         $english = $call('storeSection', 'https://www.musoftwares.com', 'en', true);
-        $this->assertStringContainsString('https://www.musoftwares.com/services/audfinder.md?lang=en', $english);
+        $this->assertStringContainsString('https://www.musoftwares.com/services/gridreader.md?lang=en', $english);
         $this->assertStringContainsString('Common questions', $english);
         $this->assertStringNotContainsString('localhost', $english);
 

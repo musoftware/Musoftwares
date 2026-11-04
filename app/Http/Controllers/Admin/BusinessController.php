@@ -16,6 +16,7 @@ use App\Models\RecurringCost;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\CostTransactionAuditService;
+use App\Support\LegalWindow;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,9 +34,9 @@ class BusinessController extends Controller
 
     public function income(Request $request)
     {
-        $currentYear = (int) now()->year;
-        $year = (int) $request->query('year', $currentYear);
-        $month = (int) $request->query('month', now()->month);
+        $currentYear = (int) now('Africa/Cairo')->year;
+        $year = LegalWindow::clampYear((int) $request->query('year', $currentYear));
+        $month = (int) $request->query('month', now('Africa/Cairo')->month);
         $search = trim((string) $request->query('search', ''));
         $projectId = $request->query('project_id');
         $userId = $request->query('user_id');
@@ -55,8 +56,9 @@ class BusinessController extends Controller
 
         $txMin = Transaction::min('created_at');
         $txMax = Transaction::max('created_at');
-        $earliestYear = $txMin ? (int) Carbon::parse($txMin)->year : $currentYear;
-        $latestYear = $txMax ? (int) Carbon::parse($txMax)->year : $currentYear;
+        $earliestYear = $txMin ? (int) Carbon::parse($txMin)->setTimezone('Africa/Cairo')->year : $currentYear;
+        $latestYear = $txMax ? (int) Carbon::parse($txMax)->setTimezone('Africa/Cairo')->year : $currentYear;
+        $earliestYear = max($earliestYear, LegalWindow::earliestVisibleYear());
         if ($earliestYear > $currentYear) {
             $earliestYear = $currentYear;
         }
@@ -198,8 +200,12 @@ class BusinessController extends Controller
             $costByMonth[$ym] = ($costByMonth[$ym] ?? 0.0) + (float) $cost->business_amount;
         }
 
+        $cutoffStart = LegalWindow::cutoffCairo();
         for ($i = 5; $i >= 0; $i--) {
-            $m = now()->subMonths($i);
+            $m = now('Africa/Cairo')->subMonths($i);
+            if ($m->copy()->endOfMonth()->lt($cutoffStart)) {
+                continue;
+            }
             $ym = $m->format('Y-m');
             $mReceived = (float) ($txData[$ym]['received'] ?? 0);
             $mRefunded = (float) ($txData[$ym]['refunded'] ?? 0);
@@ -298,9 +304,9 @@ class BusinessController extends Controller
 
     public function costs(Request $request)
     {
-        $currentYear = (int) now()->year;
-        $year = (int) $request->query('year', $currentYear);
-        $month = (int) $request->query('month', now()->month);
+        $currentYear = (int) now('Africa/Cairo')->year;
+        $year = LegalWindow::clampYear((int) $request->query('year', $currentYear));
+        $month = (int) $request->query('month', now('Africa/Cairo')->month);
         $search = trim((string) $request->query('search', ''));
         $projectId = $request->query('project_id');
         $userId = $request->query('user_id');
@@ -321,8 +327,9 @@ class BusinessController extends Controller
 
         $minDate = CostTransaction::min('created_at');
         $maxDate = CostTransaction::max('created_at');
-        $earliestYear = $minDate ? (int) Carbon::parse($minDate)->year : $currentYear;
-        $latestYear = $maxDate ? (int) Carbon::parse($maxDate)->year : $currentYear;
+        $earliestYear = $minDate ? (int) Carbon::parse($minDate)->setTimezone('Africa/Cairo')->year : $currentYear;
+        $latestYear = $maxDate ? (int) Carbon::parse($maxDate)->setTimezone('Africa/Cairo')->year : $currentYear;
+        $earliestYear = max($earliestYear, LegalWindow::earliestVisibleYear());
         if ($earliestYear > $currentYear) {
             $earliestYear = $currentYear;
         }
@@ -444,8 +451,12 @@ class BusinessController extends Controller
 
         // Monthly chart trends (last 12 months)
         $monthlyTrends = [];
+        $cutoffStart = LegalWindow::cutoffCairo();
         for ($i = 11; $i >= 0; $i--) {
-            $m = now()->subMonths($i);
+            $m = now('Africa/Cairo')->subMonths($i);
+            if ($m->copy()->endOfMonth()->lt($cutoffStart)) {
+                continue;
+            }
             $mCosts = CostTransaction::excludingSalaries()
                 ->inYearMonth($m->year, $m->month)
                 ->sum('business_amount') ?? 0;
@@ -1091,7 +1102,7 @@ class BusinessController extends Controller
 
         // Apply Cairo timezone boundaries flexibly
         if (!empty($from)) {
-            $startUtc = Carbon::parse($from, 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
+            $startUtc = LegalWindow::clampFromDate($from)->setTimezone('UTC');
         }
         if (!empty($to)) {
             $endUtc = Carbon::parse($to, 'Africa/Cairo')->endOfDay()->setTimezone('UTC');
@@ -1227,7 +1238,9 @@ class BusinessController extends Controller
             ->toArray();
 
         // ── Monthly Trends (Optimized into 2 Grouped Aggregations) ────────────
-        $startTrend = $from ? Carbon::parse($from, 'Africa/Cairo')->startOfMonth() : now('Africa/Cairo')->subMonths(11)->startOfMonth();
+        $cutoffMonthStart = LegalWindow::cutoffCairo()->startOfMonth();
+        $rawStartTrend = $from ? Carbon::parse($from, 'Africa/Cairo')->startOfMonth() : now('Africa/Cairo')->subMonths(11)->startOfMonth();
+        $startTrend = $rawStartTrend->lt($cutoffMonthStart) ? $cutoffMonthStart : $rawStartTrend;
         $endTrend   = $to ? Carbon::parse($to, 'Africa/Cairo')->endOfMonth() : now('Africa/Cairo')->endOfMonth();
 
         $trendStartUtc = $startTrend->copy()->startOfMonth()->setTimezone('UTC');
@@ -1604,7 +1617,7 @@ class BusinessController extends Controller
     public function balance(Request $request)
     {
         $currentYear = (int) now('Africa/Cairo')->year;
-        $year = (int) $request->query('year', $currentYear);
+        $year = LegalWindow::clampYear((int) $request->query('year', $currentYear));
 
         $txnMin = Transaction::min('created_at');
         $txnMax = Transaction::max('created_at');
@@ -1619,6 +1632,13 @@ class BusinessController extends Controller
             $latestYear = (int) Carbon::parse(max($maxes))->setTimezone('Africa/Cairo')->year;
         } else {
             $earliestYear = $currentYear;
+            $latestYear = $currentYear;
+        }
+        $earliestYear = max($earliestYear, LegalWindow::earliestVisibleYear());
+        if ($earliestYear > $currentYear) {
+            $earliestYear = $currentYear;
+        }
+        if ($latestYear < $currentYear) {
             $latestYear = $currentYear;
         }
 

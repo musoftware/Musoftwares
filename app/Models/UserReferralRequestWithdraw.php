@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\BalancesHelper;
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserReferralRequestWithdraw extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $guarded = [];
 
@@ -33,12 +34,12 @@ class UserReferralRequestWithdraw extends Model
 
     public function cost_transaction()
     {
-        return $this->belongsTo(CostTransaction::class);
+        return $this->belongsTo(CostTransaction::class)->withoutLegalWindow();
     }
 
     public function transaction()
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->belongsTo(Transaction::class)->withoutLegalWindow();
     }
 
     public function getCurrencyAttribute()
@@ -73,7 +74,7 @@ class UserReferralRequestWithdraw extends Model
 
     public static function withdrawed_balance()
     {
-        $data = static::query()->where('status', 'approved')->groupBy('currency_id')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
+        $data = static::withoutLegalWindow()->where('status', 'approved')->groupBy('currency_id')->select(DB::raw('sum(amount) as amount, currency_id'))->get();
         $amount = 0;
         foreach ($data as $commission) {
             $user_amount = CurrenciesExchange::RateByDateNoRound($commission->created_at, $commission->amount, $commission->currency_id, CurrenciesExchange::BusinessCurrency());

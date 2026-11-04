@@ -180,6 +180,7 @@ const items: MenuItem[] = [
         
         { title: "admin.sidebar_partner_gateway_b2b_api", url: "/admin/partner-gateway" },
         { title: "admin.sidebar_settings", url: "/admin/settings" },
+        { title: "privacy_compliance.admin_dsr_page_title", url: "/admin/privacy-requests" },
         { title: "admin.sidebar_security_rate_limits", url: "/admin/settings/security" },
         { title: "admin.sidebar_migrations", url: "/admin/system/migrations" },
     ]

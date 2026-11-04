@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class VoucherRedemption extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $fillable = [
         'voucher_id',

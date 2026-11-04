@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Helpers\BalancesHelper;
 use App\Helpers\FinanceHelper;
+use App\Models\Concerns\ScopesToLegalWindow;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class CostTransaction extends Model
 {
     use HasFactory;
+    use ScopesToLegalWindow;
     use SoftDeletes;
 
     protected static function booted(): void

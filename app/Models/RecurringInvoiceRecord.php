@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RecurringInvoiceRecord extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopesToLegalWindow;
 
     protected $guarded = [];
 

@@ -132,6 +132,7 @@ Route::permanentRedirect('/portfolio/forex-bot', '/portfolio/chartcash');
 Route::permanentRedirect('/portfolio/forex-app', '/portfolio/chartcash');
 Route::permanentRedirect('/portfolio/wallet-app', '/portfolio/qcoin-wallet');
 Route::permanentRedirect('/portfolio/telecom-system', '/portfolio/vodafone-crm');
+Route::permanentRedirect('/portfolio/zeina-arena', '/portfolio/zain-arena');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
 
 // Public Contract Links
@@ -168,6 +169,8 @@ Route::get('/company/contact', [HomeController::class, 'companyContact'])->name(
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('legal.privacy');
 Route::get('/terms-of-service', [HomeController::class, 'termsOfService'])->name('legal.terms');
 Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('legal.cookies');
+Route::post('/privacy/consent/gate', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'storeGateConsent'])->name('privacy.consent.gate');
+Route::post('/privacy/consent/decline', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'declineEssential'])->name('privacy.consent.decline');
 
 // Estimator & Custom Solutions
 Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
@@ -331,6 +334,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/emails/{userEmail}', [ProfileController::class, 'destroyEmail'])->name('profile.emails.destroy');
     Route::patch('/profile/emails/{userEmail}', [ProfileController::class, 'updateEmail'])->name('profile.emails.update');
     Route::post('/profile/emails/{userEmail}/make-primary', [ProfileController::class, 'makePrimaryEmail'])->name('profile.emails.make-primary');
+
+    // Privacy & Personal Data Governance (Egyptian PDPL)
+    Route::patch('/profile/privacy/consents', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'updateConsents'])->name('profile.privacy.consents');
+    Route::get('/profile/privacy/export', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'exportData'])->name('profile.privacy.export');
+    Route::post('/profile/privacy/requests', [\App\Http\Controllers\Privacy\DataSubjectRequestController::class, 'storeRequest'])->name('profile.privacy.requests.store');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -603,6 +611,10 @@ Route::post('/guest-tickets/submit', [GuestTicketSubmissionController::class, 's
 
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Data Subject Requests (Egyptian PDPL 6-Business-Day SLA)
+    Route::get('/privacy-requests', [\App\Http\Controllers\Admin\AdminDataSubjectRequestController::class, 'index'])->name('privacy-requests.index');
+    Route::patch('/privacy-requests/{dataSubjectRequest}', [\App\Http\Controllers\Admin\AdminDataSubjectRequestController::class, 'update'])->name('privacy-requests.update');
 
     // Commissions Schedule (Operations)
     Route::get('/commissions', [App\Http\Controllers\Admin\AdminCommissionController::class, 'index'])->name('commissions.index');
@@ -1375,19 +1387,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
 Route::get('/sso/redirect/{system}', [SsoController::class, 'redirect']);
 Route::get('/sso/{system}', [SsoController::class, 'redirect'])->name('sso.redirect');
 
-// Win-back unsubscribe — signed URL, no auth required
-Route::get('/winback/unsubscribe/{user}', function (\App\Models\User $user) {
-    if (! request()->hasValidSignature()) {
-        abort(403, 'This unsubscribe link is invalid or has expired.');
-    }
-
-    $user->winback_unsubscribed_at = now();
-    $user->save();
-
-    return response('<html><body style="font-family:sans-serif;text-align:center;padding:60px;color:#1e293b;">
-        <h2>You have been unsubscribed.</h2>
-        <p>You will no longer receive re-engagement reminders from Musoftwares.</p>
-        <a href="' . config('app.url') . '" style="color:#64748b;">Return to Musoftwares</a>
-    </body></html>', 200)->header('Content-Type', 'text/html');
-})->name('winback.unsubscribe');
+// Signed, free, no-login marketing & win-back unsubscribe endpoints (Egyptian PDPL)
+Route::match(['get', 'post'], '/unsubscribe/marketing/{user}', \App\Http\Controllers\Privacy\MarketingUnsubscribeController::class)
+    ->name('marketing.unsubscribe');
+Route::get('/winback/unsubscribe/{user}', \App\Http\Controllers\Privacy\MarketingUnsubscribeController::class)
+    ->name('winback.unsubscribe');
 

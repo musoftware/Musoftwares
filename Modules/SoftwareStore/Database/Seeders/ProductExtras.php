@@ -27,15 +27,15 @@ class ProductExtras
         ];
 
         return [
-            'audfinder' => [
+            'gridreader' => [
                 'ar' => ['title' => 'اعرف كل حاجة في دقيقة', 'items' => [
-                    ['title' => 'مناسب لمين؟', 'body' => 'المسوقين وأصحاب الشغل اللي عندهم قوائم بروفايلات فيسبوك ومحتاجين أرقام التواصل.'],
-                    ['title' => 'محتاج إيه؟', 'body' => 'جهاز ويندوز 10 أو 11 (64 بت) أو ماك. مفيش حاجة تانية.'],
+                    ['title' => 'مناسب لمين؟', 'body' => 'محللي البيانات، المطورين، المسوقين، وأي شخص يتعامل مع ملفات بيانات ضخمة أو قواعد بيانات ومحتاج يفتحها ويبحث فيها بسرعة وبدون تعليق.'],
+                    ['title' => 'محتاج إيه؟', 'body' => 'جهاز كمبيوتر يعمل بنظام ويندوز 10 أو 11 (64 بت) أو ماك. مفيش أي برامج إضافية مطلوبة.'],
                     ['title' => 'بعد الدفع إيه اللي بيحصل؟', 'body' => $after['ar']],
                 ]],
                 'en' => ['title' => 'Understand everything in one minute', 'items' => [
-                    ['title' => 'Who is it for?', 'body' => 'Marketers and business owners who have lists of Facebook profiles and need contact numbers.'],
-                    ['title' => 'What do you need?', 'body' => 'A Windows 10 or 11 (64-bit) computer, or a Mac. Nothing else.'],
+                    ['title' => 'Who is it for?', 'body' => 'Data analysts, developers, marketers, and anyone working with large datasets or databases who needs fast, lag-free viewing and searching.'],
+                    ['title' => 'What do you need?', 'body' => 'A 64-bit Windows 10/11 computer or a Mac. No additional software required.'],
                     ['title' => 'What happens after payment?', 'body' => $after['en']],
                 ]],
             ],
@@ -93,55 +93,59 @@ class ProductExtras
     private static function all(): array
     {
         return [
-            'audfinder' => [
+            'gridreader' => [
                 'ar' => [
                     'details' => [
                         'title' => 'تفاصيل البرنامج',
                         'paragraphs' => [
-                            'أود فايندر برنامج لويندوز وماك بيحوّل قوائم بروفايلات فيسبوك لأرقام تليفون وبيانات جمهور. بترفع ملف إكسل أو CSV أو نص فيه روابط أو أرقام البروفايلات، والبرنامج يطابقها مع قاعدة بيانات محلية مشفرة على جهازك ويطلعلك الأرقام.',
-                            'كل المعالجة بتحصل على جهازك. مفيش رفع للقوائم على أي سيرفر، فبياناتك وعملاءك المحتملين مش بيخرجوا برا.',
+                            'جريد ريدر هو مستعرض ومحرك استعلام عالي الأداء مصمم خصيصاً للتعامل مع ملفات البيانات الضخمة وجداول قواعد البيانات بكل سلاسة. يدعم فتح ملفات CSV و TSV و Excel و JSON وقواعد بيانات SQLite مباشرة، والاتصال بخوادم PostgreSQL و MySQL للقراءة فقط.',
+                            'يعتمد البرنامج على تقنية التمرير الافتراضي الفائق  ومحرك استعلام مخصص، مما يمكنك من تصفح وبحث ملايين السجلات في أجزاء من الثانية دون استهلاك موارد الجهاز أو تهنيج النظام. جميع العمليات تتم محلياً 100% على جهازك الشخصي.',
                         ],
-                        'list_title' => 'اللي هتحصل عليه',
+                        'list_title' => 'أبرز الإمكانيات والمميزات',
                         'list' => [
-                            'استيراد من إكسل و CSV وملفات نصية',
-                            'بحث مباشر عن بروفايل واحد بدون ملف',
-                            'تحليل ديموغرافي للجمهور حسب الدولة',
-                            'تصدير النتيجة بصيغة جاهزة لحملاتك، ومنها تصدير لبرنامج واتساب بلك سيندر',
-                            'قاعدة بيانات مشفرة AES-256 على جهازك',
-                            'تحديثات تلقائية بدون ما تنزل البرنامج من جديد',
+                            'فتح فوري لملفات CSV و Excel و JSON وقواعد بيانات SQLite الضخمة',
+                            'الاتصال الآمن بخوادم PostgreSQL و MySQL للاستعراض والاستعلام',
+                            'تصفح ناعم وسلس لملايين الصفوف عبر تقنية التمرير الافتراضي',
+                            'بحث فوري متعدد الأعمدة مع إمكانية إنشاء فهارس على أعمدة SQLite',
+                            'أداة مطابقة القوائم لمقارنة قوائم خارجية ضد الجدول بضغطة واحدة',
+                            'محرر ومحرك استعلامات SQL مباشر مع إحصائيات زمن التنفيذ',
+                            'تصدير مرن للنتائج المفلترة إلى CSV و Excel و JSON',
+                            'تحديثات تلقائية مجانية بدون الحاجة لإعادة تنزيل البرنامج',
                         ],
                     ],
                     'faq' => ['title' => 'أسئلة شائعة', 'items' => [
-                        ['q' => 'البرنامج بيشتغل على أنهي جهاز؟', 'a' => 'بيشتغل على ويندوز 10 أو 11 (64 بت) وعلى ماك.'],
-                        ['q' => 'الترخيص مرتبط بإيه؟', 'a' => 'ترخيص سنوي على جهاز واحد. بعد الدفع بيتفعل الجهاز تلقائي لو فتحت صفحة الشراء من نافذة البرنامج، أو تربط حسابك بالإيميل.'],
-                        ['q' => 'بياناتي بتتبعت لسيرفر؟', 'a' => 'لا. المطابقة بتحصل على جهازك على قاعدة بيانات محلية مشفرة.'],
-                        ['q' => 'التحديثات بتيجي إزاي؟', 'a' => 'البرنامج بيتحقق من وجود نسخة جديدة وينزلها لوحده ويطلب منك إعادة التشغيل.'],
-                        ['q' => 'لو احتجت مساعدة؟', 'a' => 'كلمنا على الواتساب برقم طلبك وهنساعدك.'],
+                        ['q' => 'البرنامج بيشتغل على أنهي أجهزة؟', 'a' => 'بيشتغل بسلاسة على أجهزة ويندوز 10 و 11 (64-بت) وعلى أجهزة ماك.'],
+                        ['q' => 'هل بياناتي بتتبعت لأي خادم أو سيرفر؟', 'a' => 'نهائياً. كل الملفات وقواعد البيانات بتتم معالجتها محلياً بالكامل داخل جهازك دون أي اتصال خارجي.'],
+                        ['q' => 'هل البرنامج يقدر يعدل على قاعدة بيانات PostgreSQL أو MySQL؟', 'a' => 'الاتصال بالقواعد السحابية بيكون للقراءة والاستعلام الآمن فقط  لحماية بياناتك من أي تعديل غير مقصود.'],
+                        ['q' => 'إزاي الترخيص والتفعيل بيشتغلوا؟', 'a' => 'الترخيص سنوي لجهازك. بعد الدفع بيتفعل جهازك تلقائياً وبشكل فوري بمجرد تشغيل البرنامج.'],
+                        ['q' => 'التحديثات بتوصل إزاي؟', 'a' => 'البرنامج بيتحقق من التحديثات تلقائياً وينزل النسخ الجديدة ويطلب منك إعادة التشغيل لتطبيقها بضغطة زر.'],
                     ]],
                 ],
                 'en' => [
                     'details' => [
                         'title' => 'Program details',
                         'paragraphs' => [
-                            'AudFinder is a program for Windows and Mac that turns lists of Facebook profiles into phone numbers and audience data. You load an Excel, CSV or text file of profile links or IDs, and the program matches them against a local encrypted database on your computer.',
-                            'All processing happens on your computer. Your lists are never uploaded to a server, so your leads stay with you.',
+                            'GridReader is a high-performance viewer and query engine purpose-built for effortlessly exploring large tabular datasets and database tables. It opens CSV, TSV, Excel, JSON, and SQLite files locally, and connects read-only to PostgreSQL and MySQL databases.',
+                            'Built with advanced virtual scrolling and a native query engine, GridReader lets you scroll, filter, and search across millions of records in milliseconds with zero memory bloat or UI lag. All processing is 100% private and runs entirely on your local machine.',
                         ],
                         'list_title' => 'What you get',
                         'list' => [
-                            'Import from Excel, CSV and text files',
-                            'Direct search for a single profile with no file',
-                            'Audience analysis by country',
-                            'Export in a format ready for your campaigns, including export to WhatsApp Bulk Sender',
-                            'AES-256 encrypted database on your computer',
-                            'Automatic updates, no need to download again',
+                            'Instant loading of huge CSV, TSV, Excel, JSON, and SQLite files',
+                            'Secure read-only connections to remote PostgreSQL and MySQL databases',
+                            'Ultra-smooth virtualized scrolling for millions of rows',
+                            'Instant multi-column search with on-the-fly SQLite index acceleration',
+                            'List matching tool to cross-reference external datasets in one click',
+                            'Integrated SQL console with query execution metrics',
+                            'Flexible exports to CSV, XLSX, and JSON',
+                            'Automatic updates with no manual reinstall needed',
                         ],
                     ],
                     'faq' => ['title' => 'Common questions', 'items' => [
-                        ['q' => 'Which computers does it run on?', 'a' => 'It runs on Windows 10 or 11 (64-bit) and on Mac.'],
-                        ['q' => 'What is the license tied to?', 'a' => 'A yearly license for one device. After payment the device is activated automatically if you opened the buy page from the program window, or you can link your account by email.'],
-                        ['q' => 'Is my data sent to a server?', 'a' => 'No. Matching runs on your computer against a local encrypted database.'],
-                        ['q' => 'How do updates arrive?', 'a' => 'The program checks for a new version, downloads it by itself and asks you to restart.'],
-                        ['q' => 'What if I need help?', 'a' => 'Message us on WhatsApp with your order number and we will help.'],
+                        ['q' => 'Which operating systems are supported?', 'a' => 'GridReader runs smoothly on 64-bit Windows 10 and 11, as well as macOS.'],
+                        ['q' => 'Are my files or queries sent to external servers?', 'a' => 'Never. All data parsing, searching, and caching happens 100% locally on your computer.'],
+                        ['q' => 'Can GridReader modify my PostgreSQL or MySQL databases?', 'a' => 'No. Server connections are strictly read-only to ensure absolute data safety.'],
+                        ['q' => 'How does licensing and activation work?', 'a' => 'Licenses are annual per device. Opening the checkout flow from the application activates your installation automatically upon payment.'],
+                        ['q' => 'How do updates work?', 'a' => 'GridReader automatically checks for updates in the background and prompts you to restart when an update is ready.'],
                     ]],
                 ],
             ],

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\BalancesHelper;
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class InvoiceCostAccrual extends Model
 {
+    use ScopesToLegalWindow;
     use SoftDeletes;
 
     protected $guarded = [];
@@ -40,7 +42,7 @@ class InvoiceCostAccrual extends Model
     public static function pendingTotalInUserCurrency(User $user): float
     {
         $total = 0.0;
-        $rows = static::query()
+        $rows = static::withoutLegalWindow()
             ->where('user_id', $user->id)
             ->where('status', 'pending')
             ->get(['amount', 'currency']);
@@ -58,6 +60,7 @@ class InvoiceCostAccrual extends Model
     public static function transactionBalanceInUserCurrency(User $user): float
     {
         $balance = $user->transactions()
+            ->withoutLegalWindow()
             ->groupBy('currency')
             ->selectRaw('sum(amount) as total_amount, currency')
             ->get();
@@ -83,7 +86,7 @@ class InvoiceCostAccrual extends Model
         $credited = 0.0;
 
         DB::transaction(function () use ($user, $needInUserCurrency, $withdraw, &$credited) {
-            $accruals = static::query()
+            $accruals = static::withoutLegalWindow()
                 ->where('user_id', $user->id)
                 ->where('status', 'pending')
                 ->orderBy('id')

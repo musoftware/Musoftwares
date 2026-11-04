@@ -70,7 +70,15 @@ class MarketplaceDiscountAndNotificationTest extends TestCase
             'delivery_days' => 1,
         ]);
 
-        User::factory()->count(10)->create();
+        $recipients = User::factory()->count(10)->create();
+        $consentService = app(\App\Services\Privacy\ConsentAuditService::class);
+        foreach ($recipients as $recipient) {
+            $consentService->record(
+                $recipient,
+                \App\Enums\ConsentType::DirectMarketingEmail,
+                \App\Enums\ConsentAction::Granted
+            );
+        }
 
         $exitCode = $this->artisan('marketplace:send-daily-discounts', ['--limit' => 5]);
         $this->assertEquals(0, $exitCode);

@@ -8,6 +8,7 @@
 #   .\deploy\fast.ps1 -PHPOnly        # Only uploads changed PHP/Blade files (skips public/build)
 #   .\deploy\fast.ps1 -AssetsOnly     # Only uploads public/build folder
 #   .\deploy\fast.ps1 -Commit HEAD    # Uploads files modified in latest git commit
+#   .\deploy\fast.ps1 -Since main     # Uploads every file changed on this branch since main
 #   .\deploy\fast.ps1 -DryRun         # Lists files that would be uploaded without uploading
 #   .\deploy\fast.ps1 -AllowDirty     # Also deploys uncommitted working-tree changes
 #   .\deploy\fast.ps1 -SkipTests      # Skips the local Pest run (asks you to type a confirmation)
@@ -22,6 +23,7 @@ param(
     [switch]$PHPOnly,
     [switch]$AssetsOnly,
     [string]$Commit = "",
+    [string]$Since = "",
     [switch]$DryRun,
     [switch]$NoPassword,
     [switch]$AllowDirty,
@@ -99,7 +101,9 @@ if ($AssetsOnly) {
     Step "Scanning for modified files..."
     
     $rawGitFiles = @()
-    if ($Commit) {
+    if ($Since) {
+        $rawGitFiles = & git diff --name-only --diff-filter=d "$Since...HEAD" 2>$null
+    } elseif ($Commit) {
         $rawGitFiles = & git diff --name-only "$Commit^" "$Commit" 2>$null
     } else {
         # Unstaged + staged changes (empty unless -AllowDirty was passed)

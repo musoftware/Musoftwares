@@ -25,9 +25,12 @@ class SellerPortalController extends Controller
             ->where('status', 'active')
             ->count();
 
-        $pendingPayouts = MarketplaceEscrow::whereHas('order', function($q) use ($sellerId) {
-            $q->where('seller_id', $sellerId);
-        })->where('status', EscrowStatus::HELD)->sum('amount');
+        $pendingPayouts = MarketplaceEscrow::withoutLegalWindow()
+            ->whereHas('order', function ($q) use ($sellerId) {
+                $q->withoutLegalWindow()->where('seller_id', $sellerId);
+            })
+            ->where('status', EscrowStatus::HELD)
+            ->sum('amount');
 
         $recentOrders = ServiceOrder::with(['buyer', 'package.service'])
             ->where('seller_id', $sellerId)

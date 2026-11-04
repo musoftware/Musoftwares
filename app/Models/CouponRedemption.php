@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CouponRedemption extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $fillable = [
         'coupon_id',
@@ -16,6 +17,7 @@ class CouponRedemption extends Model
         'transaction_id',
         'discount_amount',
         'currency',
+        'currency_id',
     ];
 
     protected $casts = [

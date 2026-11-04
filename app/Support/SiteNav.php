@@ -49,9 +49,10 @@ class SiteNav
             ['url' => '/start-project', 'ar' => 'ابدأ مشروع مخصص', 'en' => 'Start a custom project'],
         ]],
         ['ar' => 'قانوني', 'en' => 'Legal', 'links' => [
-            ['url' => '/privacy-policy', 'ar' => 'سياسة الخصوصية', 'en' => 'Privacy policy'],
-            ['url' => '/terms-of-service', 'ar' => 'شروط الخدمة', 'en' => 'Terms of service'],
+            ['url' => '/privacy-policy', 'ar' => 'سياسة الخصوصية وحماية البيانات', 'en' => 'Privacy & Data Protection'],
+            ['url' => '/terms-of-service', 'ar' => 'شروط الاستخدام', 'en' => 'Terms of service'],
             ['url' => '/cookie-policy', 'ar' => 'سياسة ملفات الارتباط', 'en' => 'Cookie policy'],
+            ['url' => '/privacy-policy#dpo', 'ar' => 'مسؤول حماية البيانات (DPO)', 'en' => 'Data Protection Officer (DPO)'],
         ]],
     ];
 

@@ -47,6 +47,7 @@ const FEATURED_HERO_SLIDES = [
 const GALLERY_TABS = [
     { id: 'all', label: 'All Projects' },
     { id: 'web', label: 'Web Apps' },
+    { id: 'mobile', label: 'Mobile Apps' },
     { id: 'erp', label: 'Enterprise ERP & Ledgers' },
     { id: 'meta', label: 'Meta & WhatsApp Cloud' },
     { id: 'automation', label: 'Desktop RPA & Tools' },
@@ -54,6 +55,17 @@ const GALLERY_TABS = [
 ];
 
 const GALLERY_ITEMS = [
+    {
+        id: 'zain-arena',
+        categoryKey: 'mobile',
+        category: 'Mobile App & Sports',
+        badge: 'Production Flutter',
+        title: 'Zain Arena — Sports Hub & Match Predictions App',
+        description: 'Bilingual Android app for live football scores, WWE/AEW wrestling hub, AI spoken news briefs, and dialect-based player comparisons.',
+        image: '/images/portfolio/zain-arena-1.png',
+        link: '/portfolio/zain-arena',
+        cardType: 'sage'
+    },
     {
         id: 'acelbay',
         categoryKey: 'web',
@@ -63,6 +75,18 @@ const GALLERY_ITEMS = [
         description: 'Bespoke beachfront luxury platform showcasing coastal resorts, residential units, dining, and online reservations.',
         image: '/images/portfolio/acelbay.png',
         link: 'https://acelbay.com/',
+        isExternal: true,
+        cardType: 'sage'
+    },
+    {
+        id: 'alsawan-foods',
+        categoryKey: 'web',
+        category: 'Food Industries & B2B',
+        badge: 'Live Website',
+        title: 'Al Sawan Foods — Factory & Wholesale Portal',
+        description: 'Bespoke corporate website and wholesale merchant ordering platform for tahini, halawa, and sesame manufacturing.',
+        image: '/images/portfolio/alsawanfoods.png',
+        link: 'https://alsawanfoods.com/',
         isExternal: true,
         cardType: 'sage'
     },

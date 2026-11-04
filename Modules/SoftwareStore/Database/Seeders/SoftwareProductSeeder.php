@@ -10,7 +10,7 @@ class SoftwareProductSeeder extends Seeder
 {
     /** Name each desktop program sends as program_name when it checks in. */
     private const SERIAL_NAMES = [
-        'audfinder' => 'AudFinder',
+        'gridreader' => 'GridReader',
         'email-sender-pro' => 'Email Sender Pro',
         'whatsapp-bulk-sender' => 'WhatsApp Bulker',
         'inbox-sender-pro' => 'Inbox Sender Pro',
@@ -23,6 +23,7 @@ class SoftwareProductSeeder extends Seeder
     /** Addresses that were renamed. The old row is renamed in place so orders and media stay linked. */
     private const RENAMED = [
         'amc-tasks' => ['slug' => 'marketing-suite', 'name_en' => 'Musoftware Marketing Suite', 'name_ar' => 'حزمة موسوفت للتسويق'],
+        'audfinder' => ['slug' => 'gridreader', 'name_en' => 'GridReader', 'name_ar' => 'جريد ريدر'],
     ];
 
     /**
@@ -42,17 +43,41 @@ class SoftwareProductSeeder extends Seeder
             $product->exists ? $this->addMissing($product, $program) : $this->createFrom($product, $program);
 
             $serialName = self::SERIAL_NAMES[$program['slug']] ?? null;
-            $product->serial_software_id ??= $serialName ? SerialSoftware::where('name', $serialName)->value('id') : null;
+            if ($serialName) {
+                $targetSerial = SerialSoftware::where('name', $serialName)->first();
+                if ($targetSerial) {
+                    $product->serial_software_id = $targetSerial->id;
+                }
+            }
             $product->save();
         }
     }
 
     private function renameLegacyProducts(): void
     {
+        if (! SerialSoftware::where('name', 'GridReader')->exists()) {
+            SerialSoftware::where('name', 'AudFinder')->update(['name' => 'GridReader']);
+        } else {
+            SerialSoftware::where('name', 'AudFinder')->delete();
+        }
+
         foreach (self::RENAMED as $oldSlug => $new) {
             $old = SoftwareProduct::where('slug', $oldSlug)->first();
             if ($old && ! SoftwareProduct::where('slug', $new['slug'])->exists()) {
                 $old->update($new);
+                if ($oldSlug === 'audfinder') {
+                    $old->update([
+                        'image_path' => 'images/software/gridreader.png',
+                        'gallery' => null,
+                        'poster_path' => null,
+                        'video_path' => null,
+                        'landing' => null,
+                        'tagline_en' => null,
+                        'tagline_ar' => null,
+                        'description_en' => null,
+                        'description_ar' => null,
+                    ]);
+                }
             }
         }
     }
@@ -103,95 +128,95 @@ class SoftwareProductSeeder extends Seeder
 
     private function programs(): array
     {
-        return [$this->audFinder(), $this->emailSender(), $this->whatsappSender(), $this->marketingSuite(), $this->whatsappOfficial(), InboxSenderCatalog::program(), MapsLeadsCatalog::program(), EmailFinderCatalog::program(), TelegramSenderCatalog::program(), ShopManagerCatalog::program(), ...SystemsCatalog::programs(), ...GeneralServicesCatalog::programs()];
+        return [$this->gridReader(), $this->emailSender(), $this->whatsappSender(), $this->marketingSuite(), $this->whatsappOfficial(), InboxSenderCatalog::program(), MapsLeadsCatalog::program(), EmailFinderCatalog::program(), TelegramSenderCatalog::program(), ShopManagerCatalog::program(), ...SystemsCatalog::programs(), ...GeneralServicesCatalog::programs()];
     }
 
-    private function audFinder(): array
+    private function gridReader(): array
     {
         return [
-            'slug' => 'audfinder',
+            'slug' => 'gridreader',
             'sort_order' => 1,
-            'image_path' => 'images/software/audfinder.png',
-            'name_en' => 'AudFinder',
-            'name_ar' => 'أود فايندر',
-            'tagline_en' => 'Turn Facebook profile lists into phone numbers and audience data.',
-            'tagline_ar' => 'حوّل قوائم بروفايلات فيسبوك إلى أرقام تليفون وبيانات جمهور.',
-            'description_en' => 'Match Facebook profiles against a local encrypted database and export phone numbers.',
-            'description_ar' => 'طابق بروفايلات فيسبوك مع قاعدة بيانات مشفرة على جهازك وصدّر أرقام التليفون.',
+            'image_path' => 'images/software/gridreader.png',
+            'name_en' => 'GridReader',
+            'name_ar' => 'جريد ريدر',
+            'tagline_en' => 'Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.',
+            'tagline_ar' => 'مستعرض ومحرك استعلام فائق السرعة لملفات CSV و Excel و JSON وقواعد بيانات SQLite و PostgreSQL و MySQL.',
+            'description_en' => 'Open massive tabular datasets in milliseconds. Instant virtual scrolling, multi-column search, SQLite index acceleration, list matching, and direct SQL querying with zero lag.',
+            'description_ar' => 'افتح أضخم ملفات البيانات والجداول في أجزاء من الثانية. تصفح افتراضي فائق السرعة، بحث متعدد الأعمدة، تسريع بالفهارس، مطابقة قوائم، واستعلام SQL مباشر بدون أي تهنيج.',
             'theme' => [
-                'colors' => ['accent' => '#0891b2', 'ink' => '#0b1f2a'],
+                'colors' => ['accent' => '#0f6cbd', 'ink' => '#0f172a'],
                 'sections' => ['problems', 'showcase', 'stat', 'steps', 'video', 'pillars', 'before_after', 'metrics', 'gallery'],
             ],
             'landing' => [
                 'ar' => [
-                    'kicker' => 'أدوات الجمهور والتسويق',
-                    'headline' => 'عندك آلاف البروفايلات. دلوقتي كمان عندك أرقامهم.',
-                    'subheadline' => 'ارفع ملف إكسل بروابط أو أرقام بروفايلات فيسبوك، والبرنامج يطابقها ويطلعلك رقم التليفون والبيانات في دقايق. كله على جهازك.',
-                    'problems' => ['kicker' => 'مشكلة كل مسوّق', 'title' => 'ليه جمهورك ضايع منك؟', 'items' => [
-                        ['icon' => 'search', 'title' => 'بروفايلات من غير وسيلة تواصل', 'body' => 'عندك قائمة عملاء محتملين، لكن مفيش رقم تقدر تكلمهم عليه.'],
-                        ['icon' => 'clock', 'title' => 'بحث يدوي بياخد أيام', 'body' => 'تدوّر على كل بروفايل لوحده وتضيّع ساعات من غير نتيجة.'],
-                        ['icon' => 'shield', 'title' => 'خوف على خصوصية البيانات', 'body' => 'رفع القوائم على مواقع غريبة معناه إن بياناتك تتسرّب.'],
+                    'kicker' => 'أدوات إدارة وتحليل البيانات الضخمة',
+                    'headline' => 'الملفات الضخمة اللي بتعلّق برامج الجداول؟ افتحها وتصفحها في لحظة.',
+                    'subheadline' => 'استعرض وابحث في ملفات CSV و Excel و JSON وقواعد بيانات SQLite و PostgreSQL و MySQL بملايين الصفوف بدون بطء ولا استهلاك للذاكرة. كل البيانات بتفضل على جهازك.',
+                    'problems' => ['kicker' => 'المعاناة مع البيانات الضخمة', 'title' => 'ليه التعامل مع الجداول الكبيرة متعب؟', 'items' => [
+                        ['icon' => 'alert-triangle', 'title' => 'تهنيج برامج الجداول التقليدية', 'body' => 'الملفات اللي حجمها مئات الميجابايت بتعلق الإكسل وتجبرك تقفل البرنامج.'],
+                        ['icon' => 'clock', 'title' => 'بطء شديد في البحث والفلترة', 'body' => 'البحث عن سجل وسط ملايين الصفوف بياخد دقايق طويلة وبيضيع وقتك.'],
+                        ['icon' => 'database', 'title' => 'صعوبة استعراض قواعد البيانات الكبيرة', 'body' => 'تحتاج برامج إدارة قواعد بيانات معقدة بس عشان تبص على جدول أو تراجع بيانات.'],
                     ]],
-                    'showcase' => ['kicker' => 'واجهة بسيطة', 'title' => 'ارفع الملف واضغط زر واحد', 'items' => [
-                        ['title' => 'استيراد من إكسل و CSV', 'body' => 'اسحب الملف وسيبه. البرنامج يفهم الأعمدة لوحده.'],
-                        ['title' => 'مطابقة سريعة', 'body' => 'البحث في قاعدة بيانات محلية بدل ما تستنى سيرفر.'],
-                        ['title' => 'تصدير جاهز', 'body' => 'ملف نظيف فيه الرقم والبيانات الديموغرافية.'],
+                    'showcase' => ['kicker' => 'سرعة استثنائية', 'title' => 'اسحب الملف وتصفح ملايين السجلات فورا', 'items' => [
+                        ['title' => 'نافذة افتراضية فائقة السرعة', 'body' => 'البرنامج بيحمّل بس الصفوف اللي بتشوفها على الشاشة، فالتصفح بيفضل ناعم وسلس مهما كبر حجم الملف.'],
+                        ['title' => 'فهارس ذكية وبحث فوري', 'body' => 'ابحث في أي عمود أو عبر كل الأعمدة بضغطة زر وبسرعة فائقة باستخدام محرك الفهرسة.'],
+                        ['title' => 'مطابقة قوائم واستعلام SQL', 'body' => 'طابق قائمة خارجية ضد جدولك بضغطة واحدة، أو اكتب استعلام SQL مخصص وصدّر النتيجة.'],
                     ]],
-                    'stat' => ['kicker' => 'سرعة العمل', 'value' => '100%', 'title' => 'بياناتك على جهازك', 'body' => 'المطابقة بتتم على قاعدة بيانات محلية مشفرة، ومفيش حاجة بتتبعت لأي سيرفر.'],
-                    'steps' => ['kicker' => 'خطوات العمل', 'title' => 'من الملف للأرقام في 4 خطوات', 'items' => [
-                        ['title' => 'ارفع الملف', 'body' => 'روابط أو أرقام البروفايلات.'],
-                        ['title' => 'اختار الأعمدة', 'body' => 'حدد عمود البروفايل.'],
-                        ['title' => 'ابدأ المطابقة', 'body' => 'البرنامج يطابق على قاعدة البيانات.'],
-                        ['title' => 'صدّر النتيجة', 'body' => 'ملف جاهز للحملة.'],
+                    'stat' => ['kicker' => 'الأداء الفعلي', 'value' => '0s', 'title' => 'صفر ثواني انتظار للتمرير', 'body' => 'التمرير الافتراضي بيخلي تصفح ملف 5 مليون صف بنفس سرعة وسلاسة ملف فيه 10 صفوف.'],
+                    'steps' => ['kicker' => 'طريقة الاستخدام', 'title' => 'من الملف للرؤية الكاملة في ثوانٍ', 'items' => [
+                        ['title' => 'افتح الملف أو اتصل بالقاعدة', 'body' => 'اسحب ملف CSV أو Excel أو SQLite أو اتصل بـ Postgres/MySQL للقراءة فقط.'],
+                        ['title' => 'استعرض وابحث في الجداول', 'body' => 'فلتر الأعمدة وابحث في السجلات بسرعة متناهية.'],
+                        ['title' => 'طابق القوائم أو شغل SQL', 'body' => 'افحص وجود عناصر قائمة خارجية واعرف مين موجود ومين مش موجود.'],
+                        ['title' => 'صدّر النتائج النظيفة', 'body' => 'صدّر البيانات المفلترة إلى CSV أو Excel أو JSON بضغطة زر.'],
                     ]],
-                    'video' => ['kicker' => 'شوف بنفسك', 'title' => 'البرنامج شغال في دقيقتين'],
-                    'pillars' => ['kicker' => 'قدرات البرنامج', 'title' => 'أربع حاجات تخليه مختلف', 'items' => [
-                        ['icon' => 'database', 'title' => 'قاعدة بيانات محلية', 'body' => 'البيانات على جهازك، من غير إنترنت.'],
-                        ['icon' => 'lock', 'title' => 'تشفير AES-256', 'body' => 'قاعدة البيانات مشفرة بالكامل.'],
-                        ['icon' => 'file', 'title' => 'إكسل و CSV', 'body' => 'استيراد وتصدير بصيغ مألوفة.'],
-                        ['icon' => 'refresh', 'title' => 'تحديث تلقائي', 'body' => 'النسخة الجديدة توصلك لوحدها.'],
+                    'video' => ['kicker' => 'تجربة حية', 'title' => 'شاهد فتح واستعراض ملايين الصفوف في ثوانٍ'],
+                    'pillars' => ['kicker' => 'أهم المميزات', 'title' => 'أربع ركائز تجعل جريد ريدر استثنائيا', 'items' => [
+                        ['icon' => 'zap', 'title' => 'سرعة خارقة واستهلاك ذاكرة قليل', 'body' => 'معمارية متطورة مصممة خصيصا للتعامل مع البيانات الضخمة بدون استنزاف الرام.'],
+                        ['icon' => 'database', 'title' => 'دعم الملفات وقواعد البيانات', 'body' => 'CSV, TSV, Excel, JSON, SQLite بالإضافة إلى PostgreSQL و MySQL.'],
+                        ['icon' => 'shield', 'title' => 'خصوصية وأمان 100%', 'body' => 'كل المعالجة بتتم محليا على جهازك، مفيش أي بيانات بتترفع على أي سيرفر خارجي.'],
+                        ['icon' => 'refresh-cw', 'title' => 'تحديثات تلقائية مجانية', 'body' => 'البرنامج بيتحدث باستمرار وبيوصلك أحدث إصدار وتطويرات بشكل فوري.'],
                     ]],
-                    'before_after' => ['kicker' => 'الفرق العملي', 'title' => 'قبل وبعد أود فايندر', 'before_title' => 'الطريقة التقليدية', 'after_title' => 'مع أود فايندر',
-                        'before' => [['b' => 'بحث يدوي', 't' => 'ساعات لكل مئة بروفايل.'], ['b' => 'ملفات مبعثرة', 't' => 'أرقام في أكتر من مكان.'], ['b' => 'قلق', 't' => 'مفيش أمان على البيانات.']],
-                        'after' => [['b' => 'مطابقة جماعية', 't' => 'آلاف البروفايلات في مرة.'], ['b' => 'ملف واحد', 't' => 'نتيجة نظيفة جاهزة.'], ['b' => 'خصوصية', 't' => 'كل شيء على جهازك.']]],
-                    'metrics' => ['kicker' => 'مؤشرات', 'title' => 'أرقام تهمك', 'items' => [['value' => '256-bit', 'label' => 'تشفير قاعدة البيانات'], ['value' => '0', 'label' => 'بيانات بتترفع لأي سيرفر'], ['value' => 'CSV', 'label' => 'استيراد وتصدير بصيغ مألوفة']]],
-                    'gallery' => ['title' => 'صور من البرنامج'],
-                    'cta' => ['kicker' => 'ابدأ النهارده', 'title' => 'جاهز تعرف أرقام جمهورك؟', 'body' => 'اشترك سنة كاملة واستلم البرنامج. بعد الدفع هنكلمك على الواتساب نفعّل معاك النسخة.', 'button' => 'اشتري أود فايندر'],
+                    'before_after' => ['kicker' => 'المقارنة العملية', 'title' => 'قبل وبعد جريد ريدر', 'before_title' => 'البرامج التقليدية', 'after_title' => 'مع جريد ريدر',
+                        'before' => [['b' => 'تهنيج وتوقف كامل', 't' => 'عند فتح ملفات تتجاوز 100 ألف صف.'], ['b' => 'بحث بطيء وممل', 't' => 'انتظار طويل لكل عملية فلترة أو فرز.'], ['b' => 'أدوات معقدة', 't' => 'صعوبة الربط مع قواعد بيانات SQLite أو خوادم SQL.']],
+                        'after' => [['b' => 'تصفح فوري وسلس', 't' => 'حتى مع ملايين الصفوف بدون أي بطء.'], ['b' => 'بحث وفهرسة فورية', 't' => 'نتائج فورية بفضل محرك الفهرسة والبحث المتقدم.'], ['b' => 'أداة واحدة شاملة', 't' => 'استعراض كل صيغ البيانات وقواعد البيانات في واجهة نظيفة وبسيطة.']]],
+                    'metrics' => ['kicker' => 'أرقام ومواصفات', 'title' => 'إمكانيات تلبي متطلباتك', 'items' => [['value' => '6+', 'label' => 'صيغ وأنواع بيانات مدعومة'], ['value' => '10M+', 'label' => 'جاهز لملايين السجلات'], ['value' => '100%', 'label' => 'أمان ومعالجة محلية بالكامل']]],
+                    'gallery' => ['title' => 'لقطات من واجهة البرنامج'],
+                    'cta' => ['kicker' => 'ابدأ اليوم', 'title' => 'جاهز لتصفح وتحليل بياناتك بدون عناء؟', 'body' => 'اشترك واحصل على البرنامج فوراً مع ترخيص سنوي كامل وتحديثات مستمرة.', 'button' => 'اشتري جريد ريدر'],
                 ],
                 'en' => [
-                    'kicker' => 'Audience and marketing tools',
-                    'headline' => 'You have thousands of profiles. Now you also have their numbers.',
-                    'subheadline' => 'Upload an Excel sheet of Facebook profile links or IDs. AudFinder matches them and returns phone numbers and data in minutes. Everything stays on your computer.',
-                    'problems' => ['kicker' => 'Every marketer knows this', 'title' => 'Why is your audience out of reach?', 'items' => [
-                        ['icon' => 'search', 'title' => 'Profiles with no way to contact', 'body' => 'You have a list of leads, but no number to call.'],
-                        ['icon' => 'clock', 'title' => 'Manual search takes days', 'body' => 'Looking up each profile alone burns hours for nothing.'],
-                        ['icon' => 'shield', 'title' => 'Fear for data privacy', 'body' => 'Uploading lists to unknown sites can leak your data.'],
+                    'kicker' => 'Data and Table Productivity Tools',
+                    'headline' => 'Large files crashing your spreadsheet software? Open and explore them instantly.',
+                    'subheadline' => 'View and query CSV, Excel, JSON, SQLite, PostgreSQL and MySQL datasets with millions of rows without lag or memory exhaustion. Everything stays safely on your computer.',
+                    'problems' => ['kicker' => 'The Big Data Headache', 'title' => 'Why is working with large tables so frustrating?', 'items' => [
+                        ['icon' => 'alert-triangle', 'title' => 'Frozen spreadsheet tools', 'body' => 'Files over a few hundred megabytes crash standard office software and lose your work.'],
+                        ['icon' => 'clock', 'title' => 'Painfully slow searching', 'body' => 'Searching for a single record across millions of rows takes minutes of frozen UI.'],
+                        ['icon' => 'database', 'title' => 'Bulky database managers', 'body' => 'Heavy tools require complicated setups just to inspect a table or run a simple filter.'],
                     ]],
-                    'showcase' => ['kicker' => 'Simple screen', 'title' => 'Upload the file and press one button', 'items' => [
-                        ['title' => 'Excel and CSV import', 'body' => 'Drop the file. The columns are detected for you.'],
-                        ['title' => 'Fast matching', 'body' => 'Search a local database instead of waiting for a server.'],
-                        ['title' => 'Ready export', 'body' => 'A clean file with the number and demographics.'],
+                    'showcase' => ['kicker' => 'Peak Performance', 'title' => 'Drop any file and navigate millions of rows right away', 'items' => [
+                        ['title' => 'Ultra-fast virtual scrolling', 'body' => 'Only visible rows are rendered, keeping navigation fluid and responsive at any scale.'],
+                        ['title' => 'Instant search and indexing', 'body' => 'Search across any column or all columns at once with smart index acceleration.'],
+                        ['title' => 'List matching and SQL console', 'body' => 'Match external lists against your dataset or execute custom SQL queries with live execution times.'],
                     ]],
-                    'stat' => ['kicker' => 'Speed', 'value' => '100%', 'title' => 'Your data stays on your PC', 'body' => 'Matching runs on a local encrypted database. Nothing is sent to any server.'],
-                    'steps' => ['kicker' => 'How it works', 'title' => 'From file to numbers in 4 steps', 'items' => [
-                        ['title' => 'Upload the file', 'body' => 'Profile links or IDs.'],
-                        ['title' => 'Pick the column', 'body' => 'Choose the profile column.'],
-                        ['title' => 'Start matching', 'body' => 'It matches against the database.'],
-                        ['title' => 'Export the result', 'body' => 'A file ready for your campaign.'],
+                    'stat' => ['kicker' => 'Real Performance', 'value' => '0s', 'title' => 'Zero lag scrolling', 'body' => 'Virtualized rendering handles a 5-million row dataset with the exact same speed and responsiveness as a 10-row file.'],
+                    'steps' => ['kicker' => 'How It Works', 'title' => 'From raw file to complete clarity in seconds', 'items' => [
+                        ['title' => 'Open a file or connect', 'body' => 'Drag-and-drop CSV, Excel, JSON, SQLite or connect read-only to PostgreSQL/MySQL.'],
+                        ['title' => 'Filter and inspect', 'body' => 'Navigate columns, inspect detailed row views, and filter on any criteria.'],
+                        ['title' => 'Match lists or run SQL', 'body' => 'Cross-reference external lists to spot matches and missing entries instantly.'],
+                        ['title' => 'Export clean data', 'body' => 'Export results cleanly to CSV, Excel (XLSX), or JSON with a single click.'],
                     ]],
-                    'video' => ['kicker' => 'See it yourself', 'title' => 'The program in two minutes'],
-                    'pillars' => ['kicker' => 'Capabilities', 'title' => 'Four things that set it apart', 'items' => [
-                        ['icon' => 'database', 'title' => 'Local database', 'body' => 'Data stays on your PC, no internet needed.'],
-                        ['icon' => 'lock', 'title' => 'AES-256 encryption', 'body' => 'The whole database is encrypted.'],
-                        ['icon' => 'file', 'title' => 'Excel and CSV', 'body' => 'Import and export in familiar formats.'],
-                        ['icon' => 'refresh', 'title' => 'Auto update', 'body' => 'New versions reach you by themselves.'],
+                    'video' => ['kicker' => 'See It in Action', 'title' => 'Watch GridReader load and navigate massive tables in seconds'],
+                    'pillars' => ['kicker' => 'Core Strengths', 'title' => 'Four pillars that set GridReader apart', 'items' => [
+                        ['icon' => 'zap', 'title' => 'Blazing speed & low memory', 'body' => 'Engineered specifically for massive tabular data without draining your RAM.'],
+                        ['icon' => 'database', 'title' => 'Universal format support', 'body' => 'CSV, TSV, Excel, JSON, SQLite databases, plus PostgreSQL and MySQL connections.'],
+                        ['icon' => 'shield', 'title' => '100% privacy & local execution', 'body' => 'All processing happens locally on your computer. Zero data is ever sent to any server.'],
+                        ['icon' => 'refresh-cw', 'title' => 'Seamless automatic updates', 'body' => 'New improvements and format updates are delivered automatically on startup.'],
                     ]],
-                    'before_after' => ['kicker' => 'The practical difference', 'title' => 'Before and after AudFinder', 'before_title' => 'The old way', 'after_title' => 'With AudFinder',
-                        'before' => [['b' => 'Manual search', 't' => 'Hours for every hundred profiles.'], ['b' => 'Scattered files', 't' => 'Numbers in many places.'], ['b' => 'Worry', 't' => 'No safety for your data.']],
-                        'after' => [['b' => 'Bulk matching', 't' => 'Thousands of profiles at once.'], ['b' => 'One file', 't' => 'A clean, ready result.'], ['b' => 'Privacy', 't' => 'Everything stays on your PC.']]],
-                    'metrics' => ['kicker' => 'Numbers that matter', 'title' => 'The facts', 'items' => [['value' => '256-bit', 'label' => 'Database encryption'], ['value' => '0', 'label' => 'Data uploaded to any server'], ['value' => 'CSV', 'label' => 'Import and export in familiar formats']]],
-                    'gallery' => ['title' => 'Inside the program'],
-                    'cta' => ['kicker' => 'Start today', 'title' => 'Ready to reach your audience?', 'body' => 'Subscribe for a year and get the program. After payment we message you on WhatsApp to activate your copy.', 'button' => 'Buy AudFinder'],
+                    'before_after' => ['kicker' => 'The Practical Difference', 'title' => 'Before and after GridReader', 'before_title' => 'Standard tools', 'after_title' => 'With GridReader',
+                        'before' => [['b' => 'Software freeze', 't' => 'Crashes on files exceeding 100k rows.'], ['b' => 'Sluggish searches', 't' => 'Long waiting times for simple column filtering.'], ['b' => 'Fragmented tools', 't' => 'Switching between multiple heavy database clients.']],
+                        'after' => [['b' => 'Instant opening', 't' => 'Smooth scrolling across millions of rows with zero freeze.'], ['b' => 'Instant search', 't' => 'Fast indexed searches and column-level filters.'], ['b' => 'Unified viewer', 't' => 'One clean, focused tool for files and database engines.']]],
+                    'metrics' => ['kicker' => 'At a Glance', 'title' => 'Built for demanding workflows', 'items' => [['value' => '6+', 'label' => 'Supported data formats'], ['value' => '10M+', 'label' => 'Ready for millions of records'], ['value' => '100%', 'label' => 'Private & local execution']]],
+                    'gallery' => ['title' => 'Inside GridReader'],
+                    'cta' => ['kicker' => 'Get Started', 'title' => 'Ready for painless data exploration?', 'body' => 'Subscribe today and get instant access to GridReader with automatic updates and full support.', 'button' => 'Buy GridReader'],
                 ],
             ],
         ];

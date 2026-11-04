@@ -200,7 +200,9 @@ class HomeController extends Controller
 
     public function privacyPolicy()
     {
-        return view('public.legal.privacy', PageSeo::for('privacy'));
+        return view('public.legal.privacy', array_merge(PageSeo::for('privacy'), [
+            'legalInfo' => \App\Support\PrivacySettings::legalInfo(),
+        ]));
     }
 
     public function termsOfService()

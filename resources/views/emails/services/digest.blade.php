@@ -185,8 +185,9 @@
         <div class="footer">
             <p>&copy; {{ date('Y') }} Musoftware. All rights reserved.</p>
             <p>
-                You are receiving this because you registered on our platform. 
-                If you wish to change your notification preferences, please visit your <a href="https://www.musoftwares.com/app/profile">Profile Settings</a>.
+                {{ __('privacy_compliance.email_marketing_footer_reason') }}
+                <br>
+                <a href="{{ $unsubscribeUrl ?? url('/privacy-policy') }}">{{ __('privacy_compliance.email_unsubscribe_now') }}</a>
             </p>
         </div>
     </div>

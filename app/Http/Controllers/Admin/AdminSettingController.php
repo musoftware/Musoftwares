@@ -86,6 +86,7 @@ class AdminSettingController extends Controller
             'enable_dso_decrement' => AdminSettings::GetValue('enable_dso_decrement') === '1',
             'global_dso_limit' => (int) AdminSettings::GetValue('global_dso_limit', 30),
             'enable_dso_system' => AdminSettings::GetValue('enable_dso_system', '1') === '1',
+            ...\App\Support\PrivacySettings::legalInfo(),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -164,6 +165,16 @@ class AdminSettingController extends Controller
             }],
             'market_hourly_rate' => 'nullable|numeric|min:0',
             'auto_pay_after_days' => 'nullable|integer|min:0',
+            'legal_company_name' => 'nullable|string|max:255',
+            'legal_commercial_registry' => 'nullable|string|max:255',
+            'legal_headquarters_address' => 'nullable|string|max:500',
+            'dpo_email' => 'nullable|email|max:255',
+            'dpo_phone' => 'nullable|string|max:80',
+            'hosting_regions_disclosure' => 'nullable|string|max:500',
+            'privacy_policy_version' => 'nullable|string|max:32',
+            'data_retention_unverified_days' => 'nullable|integer|min:7|max:365',
+            'data_retention_inactive_months' => 'nullable|integer|min:6|max:120',
+            'encrypted_backups_enabled' => 'boolean',
         ]);
 
         $this->configService->updateSettings($validated);

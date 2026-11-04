@@ -3,6 +3,7 @@
 namespace Modules\SmsPaymentGateway\Models;
 
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use App\Models\User;
 
 class SmsPaymentGatewayTransaction extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected static function newFactory()
     {

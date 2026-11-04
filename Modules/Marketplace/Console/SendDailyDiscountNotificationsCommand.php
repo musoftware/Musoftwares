@@ -54,8 +54,10 @@ class SendDailyDiscountNotificationsCommand extends Command
             return self::SUCCESS;
         }
 
-        $users = User::whereNotNull('email')
-            ->where('email', '!=', '')
+        $consentService = app(\App\Services\Privacy\ConsentAuditService::class);
+        $users = $consentService->scopeGrantedMarketingEmail(
+            User::whereNotNull('email')->where('email', '!=', '')
+        )
             ->inRandomOrder()
             ->limit($limit)
             ->get();

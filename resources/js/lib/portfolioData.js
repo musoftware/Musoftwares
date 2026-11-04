@@ -9,6 +9,36 @@ export const portfolioItems = [
         live_url: 'https://acelbay.com/',
         techs: ['React', 'Tailwind CSS', 'High-End Animations', 'Luxury UI/UX']
     },
+    { 
+        slug: 'alsawan-foods', 
+        img: '/images/portfolio/alsawanfoods.png', 
+        titleKey: 'portfolio_alsawan_foods_title', 
+        descKey: 'portfolio_alsawan_foods_desc', 
+        contentKey: 'portfolio_alsawan_foods_content', 
+        cat: 'Web App',
+        live_url: 'https://alsawanfoods.com/',
+        techs: ['WordPress', 'PHP', 'Tailwind CSS', 'Alpine.js', 'Wholesale B2B']
+    },
+    { 
+        slug: 'zain-arena', 
+        img: '/images/portfolio/zain-arena-1.png', 
+        gallery: [
+            '/images/portfolio/zain-arena-1.png',
+            '/images/portfolio/zain-arena-2.png',
+            '/images/portfolio/zain-arena-3.png',
+            '/images/portfolio/zain-arena-4.png',
+            '/images/portfolio/zain-arena-5.png',
+            '/images/portfolio/zain-arena-6.png',
+            '/images/portfolio/zain-arena-7.png',
+            '/images/portfolio/zain-arena-8.png',
+            '/images/portfolio/zain-arena-9.png',
+        ],
+        titleKey: 'portfolio_zain_arena_title', 
+        descKey: 'portfolio_zain_arena_desc', 
+        contentKey: 'portfolio_zain_arena_content', 
+        cat: 'Mobile App',
+        techs: ['Flutter', 'Laravel 12', 'Reverb WebSockets', 'Android', 'REST API']
+    },
     { slug: 'trenz-whatscrm', img: '/images/portfolio/trenz-whatscrm.png', titleKey: 'portfolio_trenz_whatscrm_title', descKey: 'portfolio_trenz_whatscrm_desc', contentKey: 'portfolio_trenz_whatscrm_content', cat: 'SaaS' },
     { slug: 'trenz-agency', img: '/images/portfolio/trenz-agency.png', titleKey: 'portfolio_trenz_agency_title', descKey: 'portfolio_trenz_agency_desc', contentKey: 'portfolio_trenz_agency_content', cat: 'Agency & Web' },
     { slug: 'kbdny', img: '/images/portfolio/kbdny.png', titleKey: 'portfolio_kbdny_title', descKey: 'portfolio_kbdny_desc', contentKey: 'portfolio_kbdny_content', cat: 'Platform' },

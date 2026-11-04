@@ -3,6 +3,7 @@
 namespace Modules\Marketplace\Models;
 
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use App\Models\WalletTransaction;
 
 class MarketplaceEscrow extends Model
 {
-    use SoftDeletes;
+    use ScopesToLegalWindow, SoftDeletes;
 
     protected $fillable = [
         'order_id',

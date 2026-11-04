@@ -46,6 +46,37 @@ class PortfolioData
                 ],
             ],
 
+            'alsawan-foods' => [
+                'slug' => 'alsawan-foods',
+                'title_en' => 'Al Sawan Foods Factory Website',
+                'title_ar' => 'موقع مصنع الصوان للصناعات الغذائية',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'Corporate website and wholesale ordering platform for Al Sawan Foods, an Egyptian food manufacturer producing tahini, halawa, and sesame products. It features product showcases, wholesale merchant registration, and export inquiries.',
+                'desc_ar' => 'الموقع الرسمي وبوابة التوريد لمصنع الصوان للصناعات الغذائية في مصر، المتخصص في إنتاج الطحينة والحلاوة الطحينية ومنتجات السمسم. يضم استعراض المنتجات، وتسجيل التجار، وطلبات التصدير.',
+                'img' => '/images/portfolio/alsawanfoods.png',
+                'techs' => ['WordPress', 'PHP', 'Tailwind CSS', 'Alpine.js'],
+                'live_url' => 'https://alsawanfoods.com/',
+                'metrics' => [
+                    'Type' => 'Food factory and wholesale portal',
+                    'Products' => 'Tahini, halawa, and sesame',
+                    'Clients' => 'Wholesalers, distributors, and exporters',
+                    'Mobile' => 'Fully responsive layout',
+                ],
+                'highlights_en' => [
+                    'Full showcase of tahini, halawa, and sesame product lines.',
+                    'Merchant registration modal for wholesale buyers and distributors.',
+                    'Dedicated export section for international shipping and inquiries.',
+                    'Direct order requests and contact routing.',
+                ],
+                'highlights_ar' => [
+                    'استعراض متكامل لخطوط إنتاج الطحينة والحلاوة ومنتجات السمسم.',
+                    'نافذة تسجيل مباشرة لتجار الجملة والموزعين والمصانع.',
+                    'قسم مخصص للتصدير والاشتراطات والمواصفات للأسواق الخارجية.',
+                    'ربط مباشر للطلبات والتواصل وتصميم متجاوب بالكامل.',
+                ],
+            ],
+
             'kbdny' => [
                 'slug' => 'kbdny',
                 'title_en' => 'Kbdny: Affiliate Selling Platform',
@@ -699,6 +730,48 @@ class PortfolioData
             // ==========================================
             // 2. Mobile Apps (تطبيقات الموبايل)
             // ==========================================
+            'zain-arena' => [
+                'slug' => 'zain-arena',
+                'title_en' => 'Zain Arena: Sports Hub and Live Matches App',
+                'title_ar' => 'زين أرينا: منصة وتطبيق المباريات والرياضات',
+                'category' => 'Mobile Apps',
+                'category_ar' => 'تطبيقات الموبايل',
+                'desc_en' => 'A bilingual Android app and sports platform for football, international sports, and wrestling (WWE and AEW). It includes live match scores, standings, audio summaries, head-to-head comparisons in Egyptian, Saudi, and formal Arabic dialects, and an official sports store.',
+                'desc_ar' => 'تطبيق أندرويد ومنصة رياضية متكاملة ثنائية اللغة لكرة القدم والرياضات العالمية وعالم المصارعة (WWE وAEW). يشمل نتائج المباريات المباشرة والترتيب، ملخصات صوتية للأخبار، مقارنات رأس برأس باللهجات المصرية والسعودية والفصحى، ومتجر للمنتجات الرياضية.',
+                'img' => '/images/portfolio/zain-arena-1.png',
+                'gallery' => [
+                    '/images/portfolio/zain-arena-1.png',
+                    '/images/portfolio/zain-arena-2.png',
+                    '/images/portfolio/zain-arena-3.png',
+                    '/images/portfolio/zain-arena-4.png',
+                    '/images/portfolio/zain-arena-5.png',
+                    '/images/portfolio/zain-arena-6.png',
+                    '/images/portfolio/zain-arena-7.png',
+                    '/images/portfolio/zain-arena-8.png',
+                    '/images/portfolio/zain-arena-9.png',
+                ],
+                'techs' => ['Flutter', 'Laravel', 'Reverb WebSockets', 'MySQL', 'Redis'],
+                'live_url' => null,
+                'metrics' => [
+                    'Sports' => 'Football, wrestling, and basketball',
+                    'Audio' => 'Spoken article summaries',
+                    'Compare' => 'Head-to-head stats by dialect',
+                    'Store' => 'Official team jerseys and gear',
+                ],
+                'highlights_en' => [
+                    'Live match scores with date filters, standings, and season predictions.',
+                    'Dedicated wrestling hub for WWE and AEW weekly shows, champions, and countdowns.',
+                    'Spoken audio news briefs and match recaps generated with artificial intelligence.',
+                    'Head-to-head player comparisons delivered in Egyptian, Saudi, or Modern Standard Arabic.',
+                ],
+                'highlights_ar' => [
+                    'متابعة حية للمباريات مع فلاتر الدوريات والتواريخ وجدول الترتيب والتوقعات.',
+                    'قسم مخصص لعالم المصارعة WWE وAEW مع العروض الأسبوعية والأبطال الحاليين.',
+                    'ملخصات صوتية سريعة للأخبار وقراءة تفاعلية للمباريات.',
+                    'مقارنة مباشرة بين اللاعبين بثلاث لهجات: المصرية والسعودية والعربية الفصحى.',
+                ],
+            ],
+
             'nokhpa' => [
                 'slug' => 'nokhpa',
                 'title_en' => 'Nokhpa Doctor Booking App',

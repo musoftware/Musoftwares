@@ -284,6 +284,16 @@ class HandleInertiaRequests extends Middleware
                 'ios_shortcut_token' => fn () => $request->session()->get('ios_shortcut_token'),
             ],
             'locale' => app()->getLocale(),
+            'privacyCompliance' => function () use ($request) {
+                $consentState = app(\App\Services\Privacy\ConsentAuditService::class)
+                    ->resolveRequestConsentState($request);
+
+                return [
+                    ...$consentState,
+                    'trackingConfig' => \App\Support\PrivacySettings::trackingConfig(),
+                    'legalInfo' => \App\Support\PrivacySettings::legalInfo(),
+                ];
+            },
             'recurring_notices_today' => function () use ($user) {
                 if (! $user || ! class_exists(RecurringNotice::class)) {
                     return [];

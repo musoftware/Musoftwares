@@ -71,6 +71,11 @@ class AdminClientSoftwareWinbackControllerTest extends TestCase
             'email'            => 'client2@example.com',
             'last_activity_at' => Carbon::now()->subDays(200),
         ]);
+        app(\App\Services\Privacy\ConsentAuditService::class)->record(
+            $inactiveClient,
+            \App\Enums\ConsentType::DirectMarketingEmail,
+            \App\Enums\ConsentAction::Granted
+        );
 
         Invoice::create([
             'user_id'    => $inactiveClient->id,
@@ -95,6 +100,11 @@ class AdminClientSoftwareWinbackControllerTest extends TestCase
             'email'            => 'client3@example.com',
             'last_activity_at' => Carbon::now()->subDays(200),
         ]);
+        app(\App\Services\Privacy\ConsentAuditService::class)->record(
+            $inactiveClient,
+            \App\Enums\ConsentType::DirectMarketingEmail,
+            \App\Enums\ConsentAction::Granted
+        );
 
         Invoice::create([
             'user_id'    => $inactiveClient->id,

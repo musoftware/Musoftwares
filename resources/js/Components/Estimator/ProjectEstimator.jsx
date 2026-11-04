@@ -1,6 +1,6 @@
 import { __ } from '@/lib/i18n';
 import { useState, useMemo } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useToast } from '@/Components/ui/use-toast';
 import { 
     Globe, 
@@ -17,7 +17,6 @@ import {
     Cpu, 
     Send, 
     Calculator,
-    CheckCircle2,
     BellRing,
     UploadCloud,
     MapPin,
@@ -40,13 +39,59 @@ import {
     ArrowUpRight,
     FileText,
     Download,
-    Loader2
+    Loader2,
+    Wrench
 } from 'lucide-react';
-import axios from 'axios';
 import { downloadProposalPdf } from '@/Utils/proposalPdfExport';
+import ModificationEstimator from './ModificationEstimator';
+import EstimatorLeadForm from './EstimatorLeadForm';
+import CurrencySwitch from './CurrencySwitch';
+import { formatMoney } from './modificationPricing';
+import { STUDIO_PHONE } from '@/lib/whatsapp';
+
+const UNSURE_WHATSAPP_LINK = `https://wa.me/${STUDIO_PHONE}?text=${encodeURIComponent('Hello! I am not sure what I need yet. Can we talk about my project?')}`;
+
+const MODES = [
+    { id: 'new', icon: Sparkles },
+    { id: 'modify', icon: Wrench },
+];
+
+function ModeSwitch({ mode, onChange }) {
+    return (
+        <div className="max-w-2xl mx-auto space-y-3">
+            <p className="text-center text-sm font-semibold text-[#1d1d1f]">{__('frontend.estimator_mode_label')}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="group" aria-label={__('frontend.estimator_mode_label')}>
+                {MODES.map(({ id, icon: Icon }) => {
+                    const active = mode === id;
+                    return (
+                        <button key={id} type="button" aria-pressed={active} onClick={() => onChange(id)}
+                            className={`p-4 rounded-[20px] border text-start transition-all cursor-pointer flex items-start gap-3 ${
+                                active ? 'border-2 border-[#0071e3] bg-[#0071e3]/5' : 'border-black/10 bg-white hover:border-black/30'
+                            }`}>
+                            <div className={`p-2 rounded-xl shrink-0 ${active ? 'bg-[#0071e3] text-white' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`}>
+                                <Icon className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                                <span className="block font-semibold text-sm text-[#1d1d1f]">{__(`frontend.estimator_mode_${id}`)}</span>
+                                <span className="block text-xs text-[#1d1d1f]/60 mt-0.5">{__(`frontend.estimator_mode_${id}_desc`)}</span>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+            <p className="text-center text-xs text-[#1d1d1f]/60">
+                {__('frontend.estimator_mode_unsure')}{' '}
+                <a href={UNSURE_WHATSAPP_LINK} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center min-h-9 font-semibold text-[#0071e3] hover:underline">
+                    {__('frontend.estimator_mode_unsure_link')}
+                </a>
+            </p>
+        </div>
+    );
+}
 
 export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = true, title = "Calculate Your Project Investment", subtitle = "Combine platforms and in-demand modules to calculate your transparent development estimate." }) {
-    const { auth } = usePage().props || {};
+    const [mode, setMode] = useState('new');
 
     const phoneNumber = "201015218548";
     const { toast } = useToast();
@@ -71,13 +116,6 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
     // 5. Currency: true for USD ($), false for EGP
     const [isUsd, setIsUsd] = useState(false);
 
-    // 6. Lead capture form
-    const [leadName, setLeadName] = useState('');
-    const [leadEmail, setLeadEmail] = useState('');
-    const [leadMobile, setLeadMobile] = useState('');
-    const [leadBusiness, setLeadBusiness] = useState('');
-    const [leadSaved, setLeadSaved] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(null); // 'ar' | 'en' | null
 
     // Rates config
@@ -705,12 +743,7 @@ export default function ProjectEstimator({ exchangeRate = 50.0, showHeader = tru
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlatforms, platformScreens, selectedOptions, availableOptions, exchangeRate]);
 
-    const formatPrice = (usdAmount) => {
-        if (isUsd) {
-            return `$${usdAmount.toLocaleString()}`;
-        }
-        return `${Math.round(usdAmount * exchangeRate).toLocaleString()} EGP`;
-    };
+    const formatPrice = (usdAmount) => formatMoney(usdAmount, isUsd, exchangeRate);
 
     // Prefilled WhatsApp Message Builder
     const whatsappLink = useMemo(() => {
@@ -734,57 +767,16 @@ Please let me know when we can review the technical specification!`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPlatforms, platformScreens, costBreakdown, isUsd, phoneNumber]);
 
-    // Handle Proposal Form Submission
-    const handleLeadSubmit = async (e) => {
-        e.preventDefault();
-        if (!leadName || !leadMobile) {
-            toast({
-                title: __('frontend.estimator_incomplete_details'),
-                description: __('frontend.estimator_name_phone_required'),
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        setSubmitting(true);
-        try {
-            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const res = await axios.post('/tools/lead-capture', {
-                name: leadName,
-                email: leadEmail,
-                mobile: leadMobile,
-                business: leadBusiness,
-                scope: {
-                    platforms: selectedPlatforms,
-                    screens: platformScreens,
-                    options: costBreakdown.itemizedAddons.map(i => i.title),
-                    total_usd: costBreakdown.finalTotalUsd,
-                    total_egp: costBreakdown.finalTotalEgp,
-                    estimated_days: costBreakdown.estimatedDays,
-                }
-            }, {
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                }
-            });
-
-            if (res.data.success) {
-                setLeadSaved(true);
-                toast({
-                    title: __('frontend.estimator_request_received'),
-                    description: __('frontend.estimator_request_received_desc'),
-                });
-            }
-        } catch (error) {
-            toast({
-                title: __('frontend.estimator_submission_failed'),
-                description: __('frontend.estimator_submission_failed_desc'),
-                variant: 'destructive',
-            });
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    // Scope sent with the proposal request form
+    const getLeadScope = () => ({
+        request_type: 'New project',
+        platforms: selectedPlatforms,
+        screens: Object.fromEntries(selectedPlatforms.map(p => [p, platformScreens[p]])),
+        options: costBreakdown.itemizedAddons.map(i => i.title),
+        total_usd: costBreakdown.finalTotalUsd,
+        total_egp: costBreakdown.finalTotalEgp,
+        estimated_days: costBreakdown.estimatedDays,
+    });
 
     // Handle Direct Kraft-Paper Proposal PDF Download
     const handleDownloadPdf = async (lang) => {
@@ -842,7 +834,11 @@ Please let me know when we can review the technical specification!`;
                     </div>
                 )}
 
-                {/* Main Calculator Grid */}
+                <ModeSwitch mode={mode} onChange={setMode} />
+
+                {mode === 'modify' ? (
+                    <ModificationEstimator exchangeRate={exchangeRate} />
+                ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     {/* Left Configuration Panel (8 Cols) */}
@@ -1147,27 +1143,7 @@ Please let me know when we can review the technical specification!`;
                                     <h3 className="font-semibold text-sm tracking-tight text-[#1d1d1f]">{__('frontend.estimator_budget_title')}</h3>
                                 </div>
                                 
-                                {/* Currency Switcher */}
-                                <div className="flex items-center rounded-full bg-[#f5f5f7] p-1 border border-black/5">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsUsd(true)}
-                                        className={`px-3 py-0.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
-                                            isUsd ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'
-                                        }`}
-                                    >
-                                        USD
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsUsd(false)}
-                                        className={`px-3 py-0.5 text-xs font-semibold rounded-full transition-all cursor-pointer ${
-                                            !isUsd ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#1d1d1f]/60 hover:text-[#1d1d1f]'
-                                        }`}
-                                    >
-                                        EGP
-                                    </button>
-                                </div>
+                                <CurrencySwitch isUsd={isUsd} onChange={setIsUsd} />
                             </div>
 
                             {/* Total Display */}
@@ -1285,64 +1261,12 @@ Please let me know when we can review the technical specification!`;
                             </div>
                         </div>
 
-                        {/* Direct Lead Capture Proposal Form */}
-                        <div className="bg-[#f5f5f7] p-6 rounded-[24px] border border-black/5 space-y-4">
-                            <div className="space-y-0.5">
-                                <h4 className="font-semibold text-xs text-[#1d1d1f]">
-                                    {__('frontend.estimator_request_title')}
-                                </h4>
-                                <p className="text-[11px] text-[#1d1d1f]/60">
-                                    {__('frontend.estimator_request_desc')}
-                                </p>
-                            </div>
-
-                            {leadSaved ? (
-                                <div className="p-3.5 rounded-xl bg-white border border-green-500/30 text-green-700 text-xs flex items-center gap-2">
-                                    <CheckCircle2 className="h-4 w-4 shrink-0 text-green-600" />
-                                    <span>{__('frontend.estimator_request_sent')}</span>
-                                </div>
-                            ) : (
-                                <form onSubmit={handleLeadSubmit} className="space-y-2.5 text-xs">
-                                    <input
-                                        type="text"
-                                        placeholder={__('frontend.estimator_full_name')}
-                                        aria-label={__('frontend.estimator_full_name')}
-                                        required
-                                        value={leadName}
-                                        onChange={(e) => setLeadName(e.target.value)}
-                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
-                                    />
-                                    <input
-                                        type="tel"
-                                        placeholder={__('frontend.estimator_phone')}
-                                        aria-label={__('frontend.estimator_phone')}
-                                        required
-                                        value={leadMobile}
-                                        onChange={(e) => setLeadMobile(e.target.value)}
-                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
-                                    />
-                                    <input
-                                        type="email"
-                                        placeholder={__('frontend.estimator_email_optional')}
-                                        aria-label={__('frontend.estimator_email_optional')}
-                                        value={leadEmail}
-                                        onChange={(e) => setLeadEmail(e.target.value)}
-                                        className="w-full px-3 py-2 bg-white rounded-xl border border-black/10 text-[#1d1d1f] focus:ring-2 focus:ring-[#0071e3] focus:outline-none"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={submitting}
-                                        className="w-full py-2.5 rounded-[980px] bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all cursor-pointer disabled:opacity-50 shadow-sm"
-                                    >
-                                        {submitting ? __('frontend.estimator_submitting') : __('frontend.estimator_submit')}
-                                    </button>
-                                </form>
-                            )}
-                        </div>
+                        <EstimatorLeadForm toolName="Estimator - new project" getScope={getLeadScope} />
 
                     </div>
 
                 </div>
+                )}
 
             </div>
         </div>

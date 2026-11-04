@@ -4,22 +4,230 @@
 
 ## Platform Overview
 Musoftwares provides professional web development, automation playbooks, SaaS plugins, and custom software services.
-Base URL: http://localhost
-Full Comprehensive Index: http://localhost/llms-full.txt
+Base URL: https://www.musoftwares.com
+Full Comprehensive Index: https://www.musoftwares.com/llms-full.txt
 
 ## Machine Readable Endpoints
-- Services API: http://localhost/marketplace/api/v1/services
-- Categories API: http://localhost/marketplace/api/v1/categories
-- Search API: http://localhost/marketplace/api/v1/search
-- OpenAPI Spec: http://localhost/marketplace/api/v1/openapi.json
+- Services API: https://www.musoftwares.com/marketplace/api/v1/services
+- Categories API: https://www.musoftwares.com/marketplace/api/v1/categories
+- Search API: https://www.musoftwares.com/marketplace/api/v1/search
+- OpenAPI Spec: https://www.musoftwares.com/marketplace/api/v1/openapi.json
 
 ## Developer Note for Crawlers
 All endpoints automatically negotiate content and deliver pure JSON payload containing the full page props when accessed by AI user-agents or with `?format=json`.
 
 ## Service Categories
-- [Web Dev](http://localhost/marketplace/categories/web-dev): Discover services in this category.
 
 ## Featured Services
 
 ## Recent Blog Insights
+
+
+## Programs and Services
+
+Every page has a full Markdown copy at the same address ending in .md
+
+### GridReader
+- Page: https://www.musoftwares.com/services/gridreader?lang=en
+- Markdown: https://www.musoftwares.com/services/gridreader.md?lang=en
+- Price: 0 EGP / year
+- Summary: Lightning-fast viewer and query engine for CSV, Excel, JSON, SQLite, PostgreSQL and MySQL.
+
+### Email Sender Pro
+- Page: https://www.musoftwares.com/services/email-sender-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/email-sender-pro.md?lang=en
+- Price: 0 EGP / year
+- Summary: Send bulk email campaigns with smart SMTP rotation.
+
+### WhatsApp Bulk Sender
+- Page: https://www.musoftwares.com/services/whatsapp-bulk-sender?lang=en
+- Markdown: https://www.musoftwares.com/services/whatsapp-bulk-sender.md?lang=en
+- Price: 0 EGP / year
+- Summary: Send WhatsApp messages in bulk from several accounts.
+
+### Musoftware Marketing Suite
+- Page: https://www.musoftwares.com/services/marketing-suite?lang=en
+- Markdown: https://www.musoftwares.com/services/marketing-suite.md?lang=en
+- Price: from 4,924 EGP / year
+- Summary: Fifteen marketing tools in one yearly membership.
+
+### Inbox Sender Pro
+- Page: https://www.musoftwares.com/services/inbox-sender-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/inbox-sender-pro.md?lang=en
+- Price: 2,000 EGP / year
+- Summary: Send rotated messages and pictures to the inbox of your Facebook page, with safe random delays.
+
+### Musoftware Official WhatsApp Service
+- Page: https://www.musoftwares.com/services/whatsapp-official?lang=en
+- Markdown: https://www.musoftwares.com/services/whatsapp-official.md?lang=en
+- Price: from 46.80 USD one payment
+- Summary: Official WhatsApp Business setup and campaigns through the Meta Cloud API.
+
+### Maps Leads Pro
+- Page: https://www.musoftwares.com/services/maps-leads-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/maps-leads-pro.md?lang=en
+- Price: 1,500 EGP / year
+- Summary: Turn a Google Maps search into a clean list of businesses with phone, website and address.
+
+### Email Finder Pro
+- Page: https://www.musoftwares.com/services/email-finder-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/email-finder-pro.md?lang=en
+- Price: 1,500 EGP / year
+- Summary: Find the public business emails on company websites, then check every address before you send.
+
+### Car Workshop System
+- Page: https://www.musoftwares.com/services/workshop-system?lang=en
+- Markdown: https://www.musoftwares.com/services/workshop-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Website, online booking and workshop management for a car workshop or car wash.
+
+### Telegram Sender Pro
+- Page: https://www.musoftwares.com/services/telegram-sender-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/telegram-sender-pro.md?lang=en
+- Price: 1,000 EGP / year
+- Summary: Send rotated messages to Telegram users who agreed to hear from you, with a daily cap and random delays.
+
+### Clinic Booking System
+- Page: https://www.musoftwares.com/services/clinic-system?lang=en
+- Markdown: https://www.musoftwares.com/services/clinic-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Website, appointment booking and patient management for a private clinic.
+
+### Shop Manager Pro
+- Page: https://www.musoftwares.com/services/shop-manager-pro?lang=en
+- Markdown: https://www.musoftwares.com/services/shop-manager-pro.md?lang=en
+- Price: 1,500 EGP / year
+- Summary: Simple invoices and stock for a small shop. Sell, buy, return, print and back up, on your own computer.
+
+### Coffee Shop Ordering System
+- Page: https://www.musoftwares.com/services/coffee-shop-system?lang=en
+- Markdown: https://www.musoftwares.com/services/coffee-shop-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: An animated website and ordering system for a coffee shop: dine-in, take-away and delivery.
+
+### Gym Management System
+- Page: https://www.musoftwares.com/services/gym-system?lang=en
+- Markdown: https://www.musoftwares.com/services/gym-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Membership management, check-in and a public website for a gym or fitness club.
+
+### Mobile Shop Management System
+- Page: https://www.musoftwares.com/services/mobile-shop-system?lang=en
+- Markdown: https://www.musoftwares.com/services/mobile-shop-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Point of sale and back office for mobile phone shops, with IMEI tracking and branches.
+
+### Salon Booking System
+- Page: https://www.musoftwares.com/services/salon-system?lang=en
+- Markdown: https://www.musoftwares.com/services/salon-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: A booking website and staff dashboard for a salon, barber shop or spa.
+
+### Pharmacy Management System
+- Page: https://www.musoftwares.com/services/pharmacy-system?lang=en
+- Markdown: https://www.musoftwares.com/services/pharmacy-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Point of sale, batches and expiry alerts for a pharmacy, with first-expiry-first-out selling.
+
+### Restaurant POS System
+- Page: https://www.musoftwares.com/services/restaurant-pos-system?lang=en
+- Markdown: https://www.musoftwares.com/services/restaurant-pos-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Table tabs, a kitchen display, split bills and an end-of-day report for a restaurant.
+
+### Dental Clinic System
+- Page: https://www.musoftwares.com/services/dental-clinic-system?lang=en
+- Markdown: https://www.musoftwares.com/services/dental-clinic-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: A tooth chart, treatment plans, instalments and X-ray images for a dental clinic.
+
+### Education Center System
+- Page: https://www.musoftwares.com/services/education-center-system?lang=en
+- Markdown: https://www.musoftwares.com/services/education-center-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Students, groups, attendance, monthly fees and parent reminders for a tutoring center.
+
+### Medical Lab and Radiology System
+- Page: https://www.musoftwares.com/services/lab-system?lang=en
+- Markdown: https://www.musoftwares.com/services/lab-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Orders, sample barcodes, results with automatic high and low flags, radiology reports and a private results link for a lab or scan centre.
+
+### Real Estate Office System
+- Page: https://www.musoftwares.com/services/real-estate-system?lang=en
+- Markdown: https://www.musoftwares.com/services/real-estate-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Properties, clients, viewings, deals, rental contracts, monthly rent and commissions for a real estate office.
+
+### Wholesale and Distribution System
+- Page: https://www.musoftwares.com/services/wholesale-system?lang=en
+- Markdown: https://www.musoftwares.com/services/wholesale-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Quotes, orders, invoices, customer accounts, cheques, sales reps and stock in many warehouses.
+
+### Supermarket Management System
+- Page: https://www.musoftwares.com/services/supermarket-system?lang=en
+- Markdown: https://www.musoftwares.com/services/supermarket-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Barcode point of sale, weighed goods, cashier shifts and stock for a supermarket or grocery shop.
+
+### Nursery and Kids Club System
+- Page: https://www.musoftwares.com/services/nursery-system?lang=en
+- Markdown: https://www.musoftwares.com/services/nursery-system.md?lang=en
+- Price: from 5,000 EGP one payment
+- Summary: Safe pickup, daily reports for parents, attendance, and fees with sibling discounts for a nursery.
+
+### Company Website Design
+- Page: https://www.musoftwares.com/services/company-website-design?lang=en
+- Markdown: https://www.musoftwares.com/services/company-website-design.md?lang=en
+- Price: from 9,000 EGP one payment
+- Summary: A fast company website in Arabic and English, built on WordPress, with a fixed price.
+
+### Landing Page Design
+- Page: https://www.musoftwares.com/services/landing-page-design?lang=en
+- Markdown: https://www.musoftwares.com/services/landing-page-design.md?lang=en
+- Price: from 4,000 EGP one payment
+- Summary: One focused page that turns a visit into a message, a call or an order.
+
+### Online Store Development
+- Page: https://www.musoftwares.com/services/online-store-development?lang=en
+- Markdown: https://www.musoftwares.com/services/online-store-development.md?lang=en
+- Price: from 15,000 EGP one payment
+- Summary: A ready-to-sell online store on Salla, Zid or WooCommerce, with payment and shipping set up.
+
+### Custom Web App and Dashboard
+- Page: https://www.musoftwares.com/services/custom-web-app-development?lang=en
+- Markdown: https://www.musoftwares.com/services/custom-web-app-development.md?lang=en
+- Price: from 7,500 EGP first payment
+- Summary: A web application or admin dashboard built for your business with Laravel and React.
+
+### Website Care Plan
+- Page: https://www.musoftwares.com/services/website-care-plans?lang=en
+- Markdown: https://www.musoftwares.com/services/website-care-plans.md?lang=en
+- Price: from 1,000 EGP per month
+- Summary: Monthly updates, backups and monitoring so your website stays safe and online.
+
+### Social Media Management
+- Page: https://www.musoftwares.com/services/social-media-management?lang=en
+- Markdown: https://www.musoftwares.com/services/social-media-management.md?lang=en
+- Price: from 5,000 EGP per month
+- Summary: Monthly content, posting and replies for your Facebook, Instagram and TikTok pages.
+
+### Paid Ads Management
+- Page: https://www.musoftwares.com/services/paid-ads-management?lang=en
+- Markdown: https://www.musoftwares.com/services/paid-ads-management.md?lang=en
+- Price: from 5,500 EGP per month
+- Summary: We set up and run your Meta and Google ads for a fixed monthly fee. Ad spend is paid to the platform.
+
+### Logo and Brand Identity
+- Page: https://www.musoftwares.com/services/logo-and-brand-identity?lang=en
+- Markdown: https://www.musoftwares.com/services/logo-and-brand-identity.md?lang=en
+- Price: from 3,500 EGP one payment
+- Summary: A logo, colors and fonts, from a simple logo to a full brand guide.
+
+### AI Chatbot and WhatsApp Automation
+- Page: https://www.musoftwares.com/services/ai-chatbot-whatsapp-automation?lang=en
+- Markdown: https://www.musoftwares.com/services/ai-chatbot-whatsapp-automation.md?lang=en
+- Price: from 9,000 EGP setup, one payment
+- Summary: A chatbot that answers your customers on your website and on WhatsApp, with a handoff to your team.
 

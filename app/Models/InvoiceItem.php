@@ -41,7 +41,7 @@ class InvoiceItem extends Model
 
     public function timers()
     {
-        return $this->hasMany(InvoiceItemTimer::class);
+        return $this->hasMany(InvoiceItemTimer::class)->withoutLegalWindow();
     }
 
     public function total_str()

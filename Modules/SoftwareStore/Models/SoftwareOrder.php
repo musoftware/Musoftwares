@@ -2,6 +2,7 @@
 
 namespace Modules\SoftwareStore\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,10 +27,13 @@ use Illuminate\Support\Str;
  * @property string|null $payment_gateway
  * @property string|null $payment_reference
  * @property int|null $white_label_partner_id
+ * @property int|null $coupon_id
+ * @property float $discount_amount
+ * @property string|null $coupon_code
  */
 class SoftwareOrder extends Model
 {
-    use SoftDeletes;
+    use ScopesToLegalWindow, SoftDeletes;
 
     public const STATUS_PENDING = 'pending_payment';
 
@@ -39,6 +43,7 @@ class SoftwareOrder extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'base_amount' => 'decimal:2',
         'partner_commission' => 'decimal:2',
         'paid_at' => 'datetime',
@@ -63,6 +68,11 @@ class SoftwareOrder extends Model
     public function partner(): BelongsTo
     {
         return $this->belongsTo(WhiteLabelPartner::class, 'white_label_partner_id');
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Coupon::class, 'coupon_id');
     }
 
     public function isPaid(): bool

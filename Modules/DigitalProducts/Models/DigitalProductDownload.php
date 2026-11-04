@@ -2,6 +2,7 @@
 
 namespace Modules\DigitalProducts\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +28,7 @@ use Illuminate\Support\Str;
  */
 class DigitalProductDownload extends Model
 {
-    use HasFactory;
+    use HasFactory, ScopesToLegalWindow;
 
     protected $table = 'digital_product_downloads';
 

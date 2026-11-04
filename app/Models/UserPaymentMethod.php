@@ -12,6 +12,11 @@ class UserPaymentMethod extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'id_number' => \App\Casts\GracefulEncrypted::class,
+        'bank_number' => \App\Casts\GracefulEncrypted::class,
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

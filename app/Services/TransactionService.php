@@ -8,6 +8,7 @@ use App\Models\CostTransaction;
 use App\Models\Project;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\LegalWindow;
 use Illuminate\Http\Request;
 
 use Carbon\Carbon;
@@ -65,12 +66,24 @@ class TransactionService extends BaseService
         $this->applyFilters($q, $filters);
 
         $totalCount = (clone $q)->count();
-        $totalBusinessAmount = (clone $q)->sum('business_amount');
-
         $positiveBusinessAmount = (clone $q)->where('business_amount', '>', 0)->sum('business_amount');
         $negativeBusinessAmount = (clone $q)->where('business_amount', '<', 0)->sum('business_amount');
 
-        $avgBusinessAmount = $totalCount > 0 ? ($totalBusinessAmount / $totalCount) : 0;
+        $hasDateFilter = ! empty($filters['from_date'])
+            || ! empty($filters['to_date'])
+            || ! empty($filters['month'])
+            || ! empty($filters['year']);
+
+        if ($type === 'income' && ! $hasDateFilter) {
+            $netQuery = $model::withoutLegalWindow();
+            $this->applyFilters($netQuery, $filters);
+            $totalBusinessAmount = $netQuery->sum('business_amount');
+        } else {
+            $totalBusinessAmount = (clone $q)->sum('business_amount');
+        }
+
+        $windowNetAmount = (float) $positiveBusinessAmount + (float) $negativeBusinessAmount;
+        $avgBusinessAmount = $totalCount > 0 ? ($windowNetAmount / $totalCount) : 0;
 
         return [
             'total_count' => (int) $totalCount,
@@ -123,7 +136,7 @@ class TransactionService extends BaseService
         // Dates are validated by the caller; an invalid date must fail loudly instead of
         // silently returning unfiltered money totals.
         if (! empty($filters['from_date'])) {
-            $from = Carbon::parse($filters['from_date'], 'Africa/Cairo')->startOfDay()->setTimezone('UTC');
+            $from = LegalWindow::clampFromDate($filters['from_date'])->setTimezone('UTC');
             $query->where('created_at', '>=', $from);
         }
 
@@ -137,7 +150,7 @@ class TransactionService extends BaseService
         }
 
         if (! empty($filters['year'])) {
-            $query->whereYear('created_at', $filters['year']);
+            $query->whereYear('created_at', LegalWindow::clampYear((int) $filters['year']));
         }
 
         $hasMin = isset($filters['min_amount']) && is_numeric($filters['min_amount']);

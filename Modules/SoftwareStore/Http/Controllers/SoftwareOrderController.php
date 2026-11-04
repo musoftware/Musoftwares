@@ -4,12 +4,16 @@ namespace Modules\SoftwareStore\Http\Controllers;
 
 use App\Helpers\KashierHelper;
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
+use App\Models\CouponRedemption;
+use App\Models\Currency;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\RecoveryDiscount;
 use Modules\SoftwareStore\Services\SoftwareOrderService;
 use Modules\SoftwareStore\Services\WhiteLabelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -23,20 +27,60 @@ class SoftwareOrderController extends Controller
         $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
         abort_unless($product->canBeOrdered(), 404);
 
+        $authUser = auth()->user();
+
         $client = $request->validate([
-            'client_name' => 'required|string|max:255',
-            'client_email' => 'required|email|max:255',
-            'client_whatsapp' => 'required|string|max:50',
+            'client_name' => $authUser ? ['nullable', 'string', 'max:255'] : ['required', 'string', 'max:255'],
+            'client_email' => $authUser ? ['nullable', 'email', 'max:255'] : ['required', 'email', 'max:255'],
+            'client_whatsapp' => $authUser ? ['nullable', 'string', 'max:50'] : ['required', 'string', 'max:50'],
             'plan_key' => $product->hasPlans() ? ['required', Rule::in(array_column($product->planList(), 'key'))] : 'nullable',
             'device_id' => ['nullable', 'string', 'max:128', 'regex:/^[A-Za-z0-9_\- ]+$/'],
+            'coupon_code' => ['nullable', 'string', 'max:50'],
         ]);
+
+        if ($authUser) {
+            $client['client_name'] = ! empty($client['client_name']) ? $client['client_name'] : $authUser->name;
+            $client['client_email'] = ! empty($client['client_email']) ? $client['client_email'] : $authUser->email;
+            $client['client_whatsapp'] = ! empty($client['client_whatsapp'])
+                ? $client['client_whatsapp']
+                : ($authUser->whatsapp_number ?: ($authUser->phone ?: ($authUser->mobile_1 ?: '00000000000')));
+        }
         $client['device_id'] = isset($client['device_id']) ? preg_replace('/\s+/', '', $client['device_id']) : null;
 
-        if ($product->salePrice($client['plan_key'] ?? null) <= 0) {
+        $basePrice = (float) $product->salePrice($client['plan_key'] ?? null);
+        if ($basePrice <= 0) {
             return back()->with('error', __('software.price_not_set'));
         }
 
-        $order = $this->orders->createPendingOrder($product, $client);
+        $couponResult = $this->resolveCoupon($client['coupon_code'] ?? null, $basePrice);
+        if (isset($couponResult['error'])) {
+            return back()->withInput()->withErrors(['coupon_code' => $couponResult['error']]);
+        }
+
+        $coupon = $couponResult['coupon'] ?? null;
+        $discountAmount = $couponResult['discount'] ?? 0.0;
+        $finalAmount = max(0.0, round($basePrice - $discountAmount, 2));
+
+        $order = DB::transaction(function () use ($product, $client, $coupon, $discountAmount, $finalAmount) {
+            if ($coupon) {
+                $this->consumeCoupon($coupon, $discountAmount, $product->saleCurrency());
+            }
+
+            return $this->orders->createPendingOrder(
+                $product,
+                $client,
+                partner: null,
+                coupon: $coupon,
+                discountAmount: $discountAmount,
+                overrideAmount: $finalAmount
+            );
+        });
+
+        if ($order->amount <= 0) {
+            $this->orders->markPaid($order, 'coupon:'.($coupon ? $coupon->code : 'free'));
+
+            return redirect()->route('software.orders.success', $order->uuid);
+        }
 
         try {
             return redirect()->away($this->orders->paymentUrl($order));
@@ -45,6 +89,71 @@ class SoftwareOrderController extends Controller
 
             return back()->withInput()->with('error', __('software.payment_start_failed'));
         }
+    }
+
+    private function resolveCoupon(?string $rawCode, float $basePrice): array
+    {
+        if (empty($rawCode)) {
+            return ['coupon' => null, 'discount' => 0.0];
+        }
+
+        if (! auth()->check()) {
+            return ['error' => __('software.coupon_requires_client_login')];
+        }
+
+        $user = auth()->user();
+
+        $code = strtoupper(trim($rawCode));
+        $coupon = Coupon::where('code', $code)->first();
+
+        if (! $coupon || ! $coupon->is_active) {
+            return ['error' => __('software.coupon_invalid_or_inactive')];
+        }
+
+        $now = now('Africa/Cairo');
+        if ($coupon->starts_at && $now->lt($coupon->starts_at)) {
+            return ['error' => __('software.coupon_invalid_or_inactive')];
+        }
+
+        if ($coupon->expires_at && $now->gt($coupon->expires_at)) {
+            return ['error' => __('software.coupon_expired')];
+        }
+
+        if ($coupon->max_total_uses && $coupon->current_uses >= $coupon->max_total_uses) {
+            return ['error' => __('software.coupon_exhausted')];
+        }
+
+        if ($coupon->max_uses_per_user) {
+            $userUses = CouponRedemption::where('coupon_id', $coupon->id)->where('user_id', $user->id)->count();
+            if ($userUses >= $coupon->max_uses_per_user) {
+                return ['error' => __('software.coupon_user_limit_reached')];
+            }
+        }
+
+        if ($coupon->min_purchase_amount && $basePrice < (float) $coupon->min_purchase_amount) {
+            return ['error' => __('software.coupon_invalid_or_inactive')];
+        }
+
+        $discount = (float) $coupon->calculateDiscount($basePrice);
+
+        return ['coupon' => $coupon, 'discount' => $discount];
+    }
+
+    private function consumeCoupon(Coupon $coupon, float $discountAmount, string $saleCurrency): void
+    {
+        $coupon->increment('current_uses');
+        if ($coupon->max_total_uses && $coupon->current_uses >= $coupon->max_total_uses) {
+            $coupon->update(['is_active' => false]);
+        }
+
+        $currencyId = $coupon->currency_id ?? Currency::where('currency', $saleCurrency)->value('id') ?? 1;
+
+        CouponRedemption::create([
+            'coupon_id' => $coupon->id,
+            'user_id' => auth()->id(),
+            'discount_amount' => $discountAmount,
+            'currency_id' => $currencyId,
+        ]);
     }
 
     public function success(string $uuid)

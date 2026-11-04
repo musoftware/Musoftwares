@@ -21,6 +21,7 @@ export default function SettingsIndex({ currentLang, whatsappUrl }: { currentLan
             rows: [
                 { href: '/profile', icon: UserRound, label: __('client_home.settings.profile'), hint: __('client_home.settings.profile_hint') },
                 { href: '/profile#security', icon: Shield, label: __('client_home.settings.security') },
+                { href: '/profile#privacy', icon: ShieldCheck, label: __('privacy_compliance.profile_section_title') },
                 { href: '/kyc', icon: ShieldCheck, label: __('client_home.settings.kyc') },
             ],
         },

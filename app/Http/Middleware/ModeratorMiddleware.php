@@ -26,6 +26,9 @@ class ModeratorMiddleware
             abort(403, __('general.unauthorized_access'));
         }
 
-        return $next($request);
+        $response = $next($request);
+        \App\Services\Privacy\AdminDataAccessLogger::observeResponse($request, $response);
+
+        return $response;
     }
 }

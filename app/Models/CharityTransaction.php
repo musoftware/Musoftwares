@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CharityTransaction extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
     protected $fillable = [
         'user_id',

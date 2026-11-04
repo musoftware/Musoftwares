@@ -30,11 +30,13 @@ class BalanceService extends BaseService
      */
     public function recalculateUserBalance(User $user): float
     {
-        $credits = Transaction::where('user_id', $user->id)
+        $credits = Transaction::withoutLegalWindow()
+            ->where('user_id', $user->id)
             ->whereIn('type', ['received', 'earned'])
             ->sum('amount');
 
-        $debits = Transaction::where('user_id', $user->id)
+        $debits = Transaction::withoutLegalWindow()
+            ->where('user_id', $user->id)
             ->whereIn('type', ['paid', 'used', 'withdrawn', 'sent'])
             ->sum('amount');
 
@@ -54,7 +56,8 @@ class BalanceService extends BaseService
      */
     public function pendingWithdrawalAmount(User $user): float
     {
-        return (float) UserReferralRequestWithdraw::where('user_id', $user->id)
+        return (float) UserReferralRequestWithdraw::withoutLegalWindow()
+            ->where('user_id', $user->id)
             ->whereIn('status', ['pending', 'processing'])
             ->sum('amount');
     }
@@ -65,7 +68,8 @@ class BalanceService extends BaseService
      */
     public function totalWithdrawn(User $user): float
     {
-        return (float) UserReferralRequestWithdraw::where('user_id', $user->id)
+        return (float) UserReferralRequestWithdraw::withoutLegalWindow()
+            ->where('user_id', $user->id)
             ->where('status', 'approved')
             ->sum('amount');
     }

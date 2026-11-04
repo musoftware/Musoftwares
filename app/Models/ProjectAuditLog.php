@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopesToLegalWindow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectAuditLog extends Model
 {
+    use ScopesToLegalWindow;
+
     public const UPDATED_AT = null;
 
     public const ACTION_CREATED = 'created';

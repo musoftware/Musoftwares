@@ -46,6 +46,21 @@ class SendGroupCampaignJob implements ShouldQueue
         Log::info("[SendGroupCampaignJob] Starting bulk send to group '{$this->group->name}' ({$contacts->count()} contacts) over channel '{$this->channel}'");
 
         foreach ($contacts as $contact) {
+            if (! empty($contact->custom_fields['opted_out'])) {
+                continue;
+            }
+
+            if (! empty($contact->phone)) {
+                $platformUser = \App\Models\User::where('phone', $contact->phone)
+                    ->orWhere('mobile_1', $contact->phone)
+                    ->orWhere('whatsapp_number', $contact->phone)
+                    ->first();
+
+                if ($platformUser && ! $platformUser->hasGrantedConsent(\App\Enums\ConsentType::DirectMarketingSms)) {
+                    continue;
+                }
+            }
+
             // Check balance before sending each message
             if ($business) {
                 $business->refresh();

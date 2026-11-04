@@ -52,8 +52,9 @@ class SendCampaignBroadcastJob implements ShouldQueue
                 $message = $this->configureMessageData($message, $trackingUrl);
                 $messaging->send($message);
             } else {
-                // Personal targeting
-                $query = User::query();
+                // Personal targeting — filter by granted marketing consent
+                $consentService = app(\App\Services\Privacy\ConsentAuditService::class);
+                $query = $consentService->scopeGrantedMarketingEmail(User::query());
 
                 if ($this->validated['personal_target'] === 'roles') {
                     $query->role($this->validated['roles']);
