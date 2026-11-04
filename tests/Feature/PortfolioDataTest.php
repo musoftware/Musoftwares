@@ -46,6 +46,7 @@ class PortfolioDataTest extends TestCase
         $this->get('/portfolio/forex-app')->assertRedirect('/portfolio/chartcash');
         $this->get('/portfolio/wallet-app')->assertRedirect('/portfolio/qcoin-wallet');
         $this->get('/portfolio/telecom-system')->assertRedirect('/portfolio/vodafone-crm');
+        $this->get('/portfolio/zeina-arena')->assertRedirect('/portfolio/zain-arena');
     }
 
     public function test_project_page_shows_the_corrected_text(): void

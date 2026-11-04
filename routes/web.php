@@ -132,6 +132,7 @@ Route::permanentRedirect('/portfolio/forex-bot', '/portfolio/chartcash');
 Route::permanentRedirect('/portfolio/forex-app', '/portfolio/chartcash');
 Route::permanentRedirect('/portfolio/wallet-app', '/portfolio/qcoin-wallet');
 Route::permanentRedirect('/portfolio/telecom-system', '/portfolio/vodafone-crm');
+Route::permanentRedirect('/portfolio/zeina-arena', '/portfolio/zain-arena');
 Route::get('/portfolio/{slug}', [HomeController::class, 'portfolioShow'])->name('portfolio.show');
 
 // Public Contract Links
