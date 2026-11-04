@@ -48,6 +48,14 @@ return [
             'currency' => 'USD',
             'days' => 30,
         ],
+        'gold-saver-pro-yearly' => [
+            'system' => 'goldsaversys',
+            'object' => 'gold-saver',
+            'title' => 'GoldSaver Pro - 1 year',
+            'amount' => (float) env('GOLD_PRO_YEARLY_PRICE', 10),
+            'currency' => 'USD',
+            'days' => 365,
+        ],
     ],
 
     // Owner (merchant) recorded on system-created payment links; falls back to the first admin.

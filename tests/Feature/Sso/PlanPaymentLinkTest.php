@@ -124,6 +124,20 @@ class PlanPaymentLinkTest extends TestCase
         $this->assertEqualsWithDelta(now()->addDays(30)->timestamp, $sub->expires_at->timestamp, 5);
     }
 
+    public function test_yearly_plan_charges_its_own_price_and_adds_a_year(): void
+    {
+        config(['saas.external_plans.gold-saver-pro-yearly.amount' => 10.0]);
+        $user = User::factory()->create();
+
+        $this->postSigned(['plan' => 'gold-saver-pro-yearly', 'user_id' => $user->id])->assertCreated();
+        $link = PaymentLink::sole();
+        $this->assertSame('10.00', $link->amount);
+
+        $this->payViaWebhook($link);
+
+        $this->assertEqualsWithDelta(now()->addDays(365)->timestamp, $this->goldSubscription($user)->expires_at->timestamp, 5);
+    }
+
     public function test_guest_payment_opens_an_account_and_emails_a_set_password_link(): void
     {
         Mail::fake();
