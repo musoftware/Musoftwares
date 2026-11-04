@@ -1,4 +1,4 @@
-# Fast Deploy Script - PowerShell
+﻿# Fast Deploy Script - PowerShell
 # Bundles changed backend files + compiled frontend build into a single archive
 # and uploads in one rapid transfer (~5 to 10 seconds total).
 #
@@ -102,9 +102,9 @@ if ($AssetsOnly) {
     
     $rawGitFiles = @()
     if ($Since) {
-        $rawGitFiles = & git diff --name-only --diff-filter=d "$Since...HEAD" 2>$null
+        $rawGitFiles = & git -c core.quotePath=false diff --name-only --diff-filter=d "$Since...HEAD" 2>$null
     } elseif ($Commit) {
-        $rawGitFiles = & git diff --name-only "$Commit^" "$Commit" 2>$null
+        $rawGitFiles = & git -c core.quotePath=false diff --name-only "$Commit^" "$Commit" 2>$null
     } else {
         # Unstaged + staged changes (empty unless -AllowDirty was passed)
         foreach ($line in $dirtyLines) {
@@ -117,7 +117,7 @@ if ($AssetsOnly) {
             }
         }
         # Also include files from recent commits to ensure newly committed assets are deployed
-        $recentCommitFiles = & git diff --name-only HEAD~2 HEAD 2>$null
+        $recentCommitFiles = & git -c core.quotePath=false diff --name-only HEAD~2 HEAD 2>$null
         if ($recentCommitFiles) {
             $rawGitFiles += $recentCommitFiles
         }
@@ -133,6 +133,7 @@ if ($AssetsOnly) {
         "^deploy/",
         "^\.env",
         "\.bat$",
+        "^[^/]+\.pdf$",
         "\.ps1$",
         "^storage/logs/",
         "^storage/framework/",
