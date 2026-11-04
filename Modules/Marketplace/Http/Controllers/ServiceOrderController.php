@@ -82,7 +82,10 @@ class ServiceOrderController extends Controller
             return redirect()->back()->withErrors(['error' => 'You cannot purchase your own service.']);
         }
 
-        if ($buyer->available_balance() < $package->price) {
+        // The balance is in the buyer's currency; compare it with the price in that same currency.
+        $priceInBuyerCurrency = $this->priceInCurrency($package, $buyer->currency_id);
+
+        if ($buyer->available_balance() < $priceInBuyerCurrency) {
             return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
@@ -95,7 +98,7 @@ class ServiceOrderController extends Controller
         try {
             // Lock buyer to prevent concurrent balance deductions
             $lockedBuyer = \App\Models\User::where('id', $buyer->id)->lockForUpdate()->first();
-            if ($lockedBuyer->available_balance() < $package->price) {
+            if ($lockedBuyer->available_balance() < $priceInBuyerCurrency) {
                 DB::rollBack();
                 return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
             }
@@ -170,6 +173,15 @@ class ServiceOrderController extends Controller
             DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Order failed: ' . $e->getMessage()]);
         }
+    }
+
+    private function priceInCurrency(ServicePackage $package, $currencyId): float
+    {
+        if (! $package->currency_id || ! $currencyId || (int) $package->currency_id === (int) $currencyId) {
+            return (float) $package->price;
+        }
+
+        return (float) \App\Models\CurrenciesExchange::RateToday($package->price, $package->currency_id, $currencyId);
     }
 
     public function deliver(Request $request, ServiceOrder $order)

@@ -209,13 +209,9 @@ class ServiceController extends Controller
         $user = auth()->user();
         $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin) || ($user->role ?? null) === 'admin');
 
-        if ($service->status !== 'active') {
-            if ($isAdmin) {
-                $service->status = 'active';
-                $service->approved_at = $service->approved_at ?: now();
-                $service->approved_by = $service->approved_by ?: $user->id;
-                $service->save();
-            } elseif (! $user || $user->id !== $service->seller_id) {
+        // Admins and the owner may preview an unpublished service. Viewing never changes its status.
+        if ($service->status !== 'active' && ! $isAdmin) {
+            if (! $user || $user->id !== $service->seller_id) {
                 return Inertia::render('Marketplace/Services/ExclusiveService', [
                     'serviceSlug' => $service->title ?? str_replace('-', ' ', $id),
                 ]);
@@ -227,19 +223,6 @@ class ServiceController extends Controller
         $service->is_favorited = auth()->check()
             ? Favorite::where('user_id', auth()->id())->where('favoritable_type', Service::class)->where('favoritable_id', $service->id)->exists()
             : false;
-
-        if ($service->packages->isEmpty()) {
-            ServicePackage::create([
-                'service_id' => $service->id,
-                'name' => 'Standard',
-                'description' => $service->description ?: 'Standard package deliverable.',
-                'price' => $service->is_free ? 0 : 5,
-                'currency_id' => 1,
-                'delivery_days' => 3,
-                'revisions' => 2,
-            ]);
-            $service->load('packages.currency');
-        }
 
         $service->packages->transform(function ($package) use ($viewerCurrency) {
             if ($package->currency_id && $package->currency_id != $viewerCurrency->id) {

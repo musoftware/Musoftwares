@@ -71,7 +71,12 @@ class Service extends Model
 
         return ($this->tagline_translations[$locale] ?? null)
             ?: $this->tagline
-            ?: (\Illuminate\Support\Str::limit(strip_tags((string) (($this->description_translations[$locale] ?? null) ?: $this->description)), 110) ?: null);
+            ?: (\Illuminate\Support\Str::limit(strip_tags((string) $this->localizedDescription($locale)), 110) ?: null);
+    }
+
+    public function localizedDescription(?string $locale = null): string
+    {
+        return (string) (($this->description_translations[$locale ?? app()->getLocale()] ?? null) ?: $this->description);
     }
 
     public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -131,7 +136,8 @@ class Service extends Model
             }
             return Storage::disk('public_uploads')->url($cleanPath);
         }
-        return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
+        // No stock photo: pages show their own placeholder when a service has no image.
+        return null;
     }
 
     public function getThumbnailAttribute()

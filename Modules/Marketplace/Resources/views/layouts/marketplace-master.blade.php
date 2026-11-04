@@ -209,7 +209,7 @@
     <!-- Structured Data (JSON-LD) for Search Engines -->
     @if(!empty($meta['schema_json']))
         <script type="application/ld+json">
-            {!! is_string($meta['schema_json']) ? $meta['schema_json'] : json_encode($meta['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+            {!! json_encode(is_string($meta['schema_json']) ? json_decode($meta['schema_json'], true) : $meta['schema_json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_PRETTY_PRINT) !!}
         </script>
     @endif
     @stack('schema')

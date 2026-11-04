@@ -1763,6 +1763,7 @@
         "merge_first_duplicate": "أول حساب مكرر",
         "merge_keep_survivor": "الإبقاء على قيمة الحساب الأساسي",
         "merge_no_conflicts": "لا توجد حقول متعارضة بين الحسابات المكررة المحددة.",
+        "merge_oldest_id_auto_selected": "سيتم الإبقاء على الحساب الأقدم (#:oldest) تلقائياً ودمج الحساب الأحدث (#:newer) فيه.",
         "merge_primary_survivor": "الحساب الأساسي (الباقي)",
         "merge_resolution": "طريقة الحل",
         "merge_selected_duplicates": "دمج الحسابات المكررة المحددة",

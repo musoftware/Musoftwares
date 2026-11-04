@@ -21,7 +21,7 @@
             </a>
         @endif
         <span>›</span>
-        <span class="text-[#1d1d1f] font-medium truncate max-w-xs">{{ $service->title }}</span>
+        <span class="text-[#1d1d1f] font-medium truncate max-w-xs">{{ $service->localizedTitle() }}</span>
     </nav>
 
     <!-- ══════════════════════════════════════════════════════════════════════ -->
@@ -44,12 +44,12 @@
         </div>
 
         <h1 class="text-2xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-[-0.025em] mb-3 leading-tight">
-            {{ $service->title }}
+            {{ $service->localizedTitle() }}
         </h1>
 
-        @if($service->tagline)
+        @if($service->localizedTagline())
             <p class="text-sm sm:text-base text-[#86868b] mb-6 leading-relaxed max-w-3xl">
-                {{ $service->tagline }}
+                {{ $service->localizedTagline() }}
             </p>
         @endif
 
@@ -62,32 +62,23 @@
                 </div>
                 <div>
                     <span class="font-semibold text-[#1d1d1f] flex items-center gap-1">
-                        {{ $service->seller->name ?? 'Verified Seller' }}
-                        <i class="ri-verified-badge-fill text-[#0071e3] text-xs" title="Verified Expert"></i>
-                    </span>
-                    <span class="text-[10px] text-[#86868b] block">
-                        {{ app()->getLocale() === 'ar' ? 'مطور معتمد' : 'Verified Software Engineer' }}
+                        {{ $service->seller->name ?? 'Musoftware' }}
                     </span>
                 </div>
             </div>
 
             <div class="h-5 w-px bg-black/10 hidden sm:block"></div>
 
-            <!-- Rating Summary -->
-            <div class="flex items-center gap-1.5 font-semibold text-[#1d1d1f]">
-                <i class="ri-star-fill text-amber-500 text-sm"></i>
-                <span>5.0</span>
-                <span class="text-[#86868b] font-normal">({{ $service->reviews ? $service->reviews->count() : 18 }} {{ app()->getLocale() === 'ar' ? 'تقييم' : 'reviews' }})</span>
-            </div>
-
-            <div class="h-5 w-px bg-black/10 hidden sm:block"></div>
-
-            <!-- Orders count -->
-            <div class="flex items-center gap-1.5 text-[#86868b]">
-                <i class="ri-shopping-bag-3-line text-[#0071e3]"></i>
-                <span class="text-[#1d1d1f] font-medium">{{ $service->completed_orders_count ?? 12 }}</span>
-                <span>{{ app()->getLocale() === 'ar' ? 'طلب مكتمل' : 'orders completed' }}</span>
-            </div>
+            <!-- Rating Summary: real reviews only -->
+            @if((int) $service->review_count > 0)
+                <div class="flex items-center gap-1.5 font-semibold text-[#1d1d1f]">
+                    <i class="ri-star-fill text-amber-500 text-sm"></i>
+                    <span>{{ number_format((float) $service->avg_rating, 1) }}</span>
+                    <span class="text-[#86868b] font-normal">({{ (int) $service->review_count }} {{ app()->getLocale() === 'ar' ? 'تقييم' : 'reviews' }})</span>
+                </div>
+            @else
+                <span class="text-[#86868b]">{{ app()->getLocale() === 'ar' ? 'خدمة جديدة' : 'New service' }}</span>
+            @endif
 
             <!-- Favorite & Share Button -->
             <div class="ms-auto flex items-center gap-2">
@@ -174,7 +165,7 @@
                             <img 
                                 id="activeImage"
                                 src="{{ $mediaList[0]['url'] }}" 
-                                alt="{{ $service->title }}" 
+                                alt="{{ $service->localizedTitle() }}" 
                                 class="w-full h-full object-contain cursor-zoom-in"
                                 onclick="openFullscreenImage(this.src)"
                             >
@@ -182,7 +173,7 @@
                     @else
                         <div class="w-full h-full bg-[#1d1d1f] flex flex-col items-center justify-center text-[#86868b]">
                             <i class="ri-code-s-slash-line text-5xl text-[#0071e3]/60 mb-2"></i>
-                            <span class="text-sm font-semibold text-white">{{ $service->title }}</span>
+                            <span class="text-sm font-semibold text-white">{{ $service->localizedTitle() }}</span>
                         </div>
                     @endif
                 </div>
@@ -193,7 +184,7 @@
                         @foreach($mediaList as $index => $item)
                             <button 
                                 type="button" 
-                                onclick="switchMedia({{ $index }}, '{{ $item['type'] }}', '{{ $item['url'] }}')" 
+                                onclick="switchMedia(this)" data-index="{{ $index }}" data-type="{{ $item['type'] }}" data-url="{{ $item['url'] }}" 
                                 class="thumb-btn relative flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 {{ $index === 0 ? 'border-[#0071e3] shadow-sm' : 'border-black/10 hover:border-[#0071e3]' }} bg-white transition-all"
                                 id="thumb-{{ $index }}"
                             >
@@ -218,7 +209,7 @@
                 </h2>
 
                 <div class="text-[#1d1d1f]/85 text-sm sm:text-base leading-relaxed space-y-4 font-normal">
-                    {!! nl2br(e($service->description)) !!}
+                    {!! nl2br(e($service->localizedDescription())) !!}
                 </div>
 
                 <!-- Requirements & Deliverable Highlights -->
@@ -266,6 +257,18 @@
                 </h2>
 
                 <div class="space-y-3">
+                    @foreach(collect($service->faq ?? [])->filter(fn ($item) => is_array($item) && ! empty($item['question']))->values() as $faqIndex => $faqItem)
+                        <div class="rounded-2xl bg-[#f5f5f7] border border-black/5 p-4">
+                            <button type="button" onclick="toggleFaq('s{{ $faqIndex }}')" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none">
+                                <span>{{ $faqItem['question_'.app()->getLocale()] ?? $faqItem['question'] }}</span>
+                                <i id="faq-icon-s{{ $faqIndex }}" class="ri-arrow-down-s-line text-[#86868b] text-lg transition-transform"></i>
+                            </button>
+                            <div id="faq-body-s{{ $faqIndex }}" class="mt-2.5 text-xs text-[#86868b] leading-relaxed hidden">
+                                {!! nl2br(e($faqItem['answer_'.app()->getLocale()] ?? $faqItem['answer'] ?? '')) !!}
+                            </div>
+                        </div>
+                    @endforeach
+
                     <div class="rounded-2xl bg-[#f5f5f7] border border-black/5 p-4">
                         <button type="button" onclick="toggleFaq(1)" class="w-full flex items-center justify-between text-start text-xs sm:text-sm font-semibold text-[#1d1d1f] focus:outline-none">
                             <span>{{ app()->getLocale() === 'ar' ? 'كيف يحميني نظام الضمان المالي (Escrow)؟' : 'How does Escrow Buyer Protection work?' }}</span>
@@ -295,22 +298,16 @@
             
             @php
                 $currencySymbol = $viewerCurrency->symbol ?? $viewerCurrency->currency ?? '$';
-                $packages = $service->packages && $service->packages->count() > 0 
-                    ? $service->packages 
-                    : collect([
-                        (object)[
-                            'id' => 0,
-                            'name' => 'Standard',
-                            'description' => $service->description ?: 'Standard package deliverables.',
-                            'price' => $service->is_free ? 0 : 5,
-                            'delivery_days' => 3,
-                            'revisions' => 2,
-                            'currency' => $viewerCurrency ?? (object)['symbol' => '$', 'currency' => 'USD']
-                        ]
-                    ]);
+                $packages = $service->packages ?? collect();
                 $firstPkg = $packages->first();
-                $firstPkgSymbol = $firstPkg->currency->symbol ?? $firstPkg->currency->currency ?? $currencySymbol;
+                $firstPkgSymbol = $firstPkg ? ($firstPkg->currency->symbol ?? $firstPkg->currency->currency ?? $currencySymbol) : $currencySymbol;
             @endphp
+
+            @if(! $firstPkg)
+                <div class="rounded-[18px] bg-white border border-black/10 p-6 text-sm text-[#86868b]">
+                    {{ app()->getLocale() === 'ar' ? 'هذه الخدمة غير متاحة للطلب حاليًا.' : 'This service is not available to order right now.' }}
+                </div>
+            @else
 
             <!-- Package Selection Bento Card -->
             <div class="rounded-[18px] bg-white border border-black/10 p-6 shadow-sm relative overflow-hidden">
@@ -324,7 +321,14 @@
                             @endphp
                             <button 
                                 type="button" 
-                                onclick="selectPackage({{ $pkg->id }}, {{ $pkg->price }}, '{{ addslashes($pkg->name) }}', '{{ addslashes($pkg->description ?? '') }}', {{ $pkg->delivery_days ?? 3 }}, {{ $pkg->revisions ?? 1 }}, '{{ $pkgSymbol }}')" 
+                                onclick="selectPackage(this)"
+                                data-id="{{ $pkg->id }}"
+                                data-price="{{ $pkg->price }}"
+                                data-name="{{ $pkg->name }}"
+                                data-desc="{{ $pkg->description }}"
+                                data-delivery="{{ $pkg->delivery_days ?? 3 }}"
+                                data-revisions="{{ $pkg->revisions ?? 1 }}"
+                                data-symbol="{{ $pkgSymbol }}"
                                 class="pkg-tab-btn flex-1 py-1.5 px-3 rounded-full text-xs font-semibold transition-all truncate text-center {{ $pIdx === 0 ? 'bg-[#1d1d1f] text-white shadow-xs' : 'text-[#86868b] hover:text-[#1d1d1f]' }}"
                                 id="pkg-tab-{{ $pkg->id }}"
                                 title="{{ $pkg->name }}"
@@ -345,8 +349,7 @@
                             {{ $firstPkgSymbol }}{{ number_format($firstPkg->price, 2) }}
                         </div>
                     </div>
-                    <p class="text-xs text-[#86868b] leading-relaxed min-h-[32px]" id="pkgDisplayDesc">
-                        {{ $firstPkg->description ?: 'Full package deliverables and source files.' }}
+                    <p class="text-xs text-[#86868b] leading-relaxed min-h-[32px] whitespace-pre-line" id="pkgDisplayDesc">{{ $firstPkg->description }}
                     </p>
                 </div>
 
@@ -390,7 +393,7 @@
                                 <i class="ri-wallet-3-line text-emerald-600"></i>
                                 <span>{{ app()->getLocale() === 'ar' ? 'رصيد محفظتك المتاح:' : 'Available Balance:' }}</span>
                             </span>
-                            <span class="font-bold text-[#1d1d1f] font-mono">${{ number_format($userAvail, 2) }}</span>
+                            <span class="font-bold text-[#1d1d1f] font-mono">{{ number_format($userAvail, 2) }} {{ \App\Models\Currency::find(auth()->user()->currency_id)?->currency }}</span>
                         </div>
 
                         <button 
@@ -417,6 +420,7 @@
                 </p>
 
             </div>
+            @endif
 
         </div>
 
@@ -438,12 +442,13 @@
 <script>
     const defaultCurrencySymbol = @json($currencySymbol);
 
-    function selectPackage(id, price, name, desc, delivery, revisions, pkgSymbol) {
-        const symbol = pkgSymbol || defaultCurrencySymbol;
+    function selectPackage(btn) {
+        const { id, price, name, desc, delivery, revisions } = btn.dataset;
+        const symbol = btn.dataset.symbol || defaultCurrencySymbol;
         document.getElementById('selectedPackageIdInput').value = id;
         document.getElementById('pkgDisplayTitle').innerText = name;
-        document.getElementById('pkgDisplayPrice').innerHTML = symbol + Number(price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('pkgDisplayDesc').innerText = desc || 'Full package deliverables and source files.';
+        document.getElementById('pkgDisplayPrice').textContent = symbol + Number(price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('pkgDisplayDesc').innerText = desc || '';
         document.getElementById('pkgDisplayDelivery').innerText = delivery + ' ' + (document.documentElement.lang === 'ar' ? 'أيام' : 'Days');
         document.getElementById('pkgDisplayRevisions').innerText = revisions + ' ' + (document.documentElement.lang === 'ar' ? 'تعديلات' : 'Rounds');
 
@@ -458,13 +463,22 @@
         }
     }
 
-    function switchMedia(index, type, url) {
+    function switchMedia(btn) {
+        const { index, type, url } = btn.dataset;
         const container = document.getElementById('mainMediaContainer');
+        const media = document.createElement(type === 'video' ? 'iframe' : 'img');
+        media.src = url;
         if (type === 'video') {
-            container.innerHTML = `<iframe src="${url}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            media.className = 'w-full h-full border-0';
+            media.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            media.allowFullscreen = true;
         } else {
-            container.innerHTML = `<img id="activeImage" src="${url}" alt="Service Image" class="w-full h-full object-contain cursor-zoom-in" onclick="openFullscreenImage(this.src)">`;
+            media.id = 'activeImage';
+            media.alt = '';
+            media.className = 'w-full h-full object-contain cursor-zoom-in';
+            media.addEventListener('click', () => openFullscreenImage(media.src));
         }
+        container.replaceChildren(media);
 
         document.querySelectorAll('.thumb-btn').forEach(btn => {
             btn.classList.remove('border-[#0071e3]', 'shadow-sm');
