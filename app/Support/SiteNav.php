@@ -4,21 +4,16 @@ namespace App\Support;
 
 /**
  * The public site menu, defined once. The Blade header and the React public layout both read it,
- * so every public page shows the same links. Less important links live in the "more" group.
+ * so every public page shows the same links. The "mega" groups list everything the site offers.
  */
 class SiteNav
 {
     private const MAIN = [
-        ['url' => '/services', 'match' => ['services', 'services/*'], 'ar' => 'الخدمات', 'en' => 'Services'],
-        ['url' => '/how-we-work', 'match' => ['how-we-work'], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
+        ['url' => '/marketplace/catalog', 'match' => ['marketplace', 'marketplace/*'], 'ar' => 'سوق الخدمات', 'en' => 'Marketplace'],
         ['url' => '/portfolio', 'match' => ['portfolio', 'portfolio/*'], 'ar' => 'أعمالنا', 'en' => 'Our work'],
+        ['url' => '/how-we-work', 'match' => ['how-we-work'], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
         ['url' => '/estimator', 'match' => ['estimator', 'pricing'], 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
         ['url' => '/about/mahmoud-amin', 'match' => ['about/*'], 'ar' => 'من نحن', 'en' => 'About us'],
-    ];
-
-    private const MORE = [
-        ['url' => '/library', 'match' => ['library', 'library/*'], 'ar' => 'المكتبة الرقمية', 'en' => 'Digital library'],
-        ['url' => '/compare/laravel-vs-nodejs', 'match' => ['compare/*'], 'ar' => 'المقارنات والمقالات', 'en' => 'Comparisons and articles'],
     ];
 
     public const BRAND = 'Musoftware';
@@ -102,16 +97,16 @@ class SiteNav
         ];
     }
 
-    /** @return array{main: list<array{url: string, label: string, active: bool}>, more: list<array{url: string, label: string, active: bool}>} */
+    /** @return array{all_url: string, main: list<array{url: string, label: string, active: bool}>, mega: list<array<string, mixed>>} */
     public static function links(): array
     {
         $lang = app()->getLocale() === 'ar' ? 'ar' : 'en';
         $shape = fn (array $link) => [
             'url' => $link['url'],
             'label' => $link[$lang],
-            'active' => $link['match'] !== [] && request()->is(...$link['match']),
+            'active' => request()->is(...$link['match']),
         ];
 
-        return ['main' => array_map($shape, self::MAIN), 'more' => array_map($shape, self::MORE)];
+        return ['all_url' => '/services', 'main' => array_map($shape, self::MAIN), 'mega' => SiteMegaMenu::groups($lang)];
     }
 }

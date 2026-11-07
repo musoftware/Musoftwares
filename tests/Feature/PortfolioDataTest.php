@@ -51,8 +51,10 @@ class PortfolioDataTest extends TestCase
 
     public function test_project_page_shows_the_corrected_text(): void
     {
-        $this->get('/portfolio/mini-fatora?lang=en')->assertOk()
-            ->assertSee('affiliate platform')
-            ->assertDontSee('invoice', false);
+        $response = $this->get('/portfolio/mini-fatora?lang=en')->assertOk()->assertSee('affiliate platform');
+
+        // The site menu links to the free invoice tool on every page, so only the page text is checked.
+        $pageWithoutMenu = preg_replace('~<header[ >].*?</header>~s', '', $response->getContent());
+        $this->assertStringNotContainsString('invoice', $pageWithoutMenu);
     }
 }

@@ -164,6 +164,20 @@ return [
         ]
     ],
     'attributes' => [
-
+        'packages.*.name' => 'package :position name',
+        'packages.*.description' => 'package :position description',
+        'packages.*.price' => 'package :position price',
+        'packages.*.old_price' => 'package :position old price',
+        'packages.*.currency_id' => 'package :position currency',
+        'packages.*.delivery_days' => 'package :position delivery days',
+        'packages.*.revisions' => 'package :position revisions',
+        'packages.*.features.*' => 'package :position features',
+        'extras.*.title' => 'extra :position name',
+        'extras.*.price' => 'extra :position price',
+        'extras.*.duration_days' => 'extra :position duration',
+        'faq.*.question' => 'question :position',
+        'faq.*.answer' => 'answer :position',
+        'requirements.*' => 'buyer requirement :position',
+        'gallery.*' => 'image :position',
     ]
 ];

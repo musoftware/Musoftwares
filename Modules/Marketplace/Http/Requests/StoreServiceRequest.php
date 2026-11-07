@@ -3,11 +3,21 @@
 namespace Modules\Marketplace\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Marketplace\Http\Requests\Concerns\FillsPackageDetails;
 use Modules\Marketplace\Http\Requests\Concerns\NormalizesRequirements;
 
 class StoreServiceRequest extends FormRequest
 {
-    use NormalizesRequirements;
+    use FillsPackageDetails;
+    use NormalizesRequirements {
+        prepareForValidation as normalizeRequirements;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalizeRequirements();
+        $this->fillPackageDetails();
+    }
 
     public function authorize(): bool
     {
