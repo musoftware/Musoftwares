@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Services\DeliverableService;
+use Modules\Marketplace\Services\OrderChat;
 
 class DeliverableController extends Controller
 {
@@ -50,11 +51,12 @@ class DeliverableController extends Controller
         }
 
         $validated = $request->validate([
-            'revision_note' => 'required|string',
+            'revision_note' => 'required|string|max:2000',
         ]);
 
         try {
             $updatedOrder = $this->deliverableService->requestRevision($order, $validated['revision_note']);
+            app(OrderChat::class)->post($order, (int) $order->buyer_id, $validated['revision_note']);
 
             return $this->respondSuccess($request, __('general.revision_requested_successfully'), ['order' => $updatedOrder]);
         } catch (\Exception $e) {

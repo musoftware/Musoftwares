@@ -14,6 +14,8 @@ use App\Events\MarketplaceOrderPlaced;
 use App\Events\MarketplaceOrderCompleted;
 use Modules\Marketplace\Enums\ServiceOrderStatus;
 use Modules\Marketplace\Services\EscrowService;
+use Modules\Marketplace\Services\OrderCancellation;
+use Modules\Marketplace\Services\ServiceAutoReply;
 
 class ServiceOrderController extends Controller
 {
@@ -60,7 +62,9 @@ class ServiceOrderController extends Controller
 
         $conversation->load(['messages.sender', 'participants.user']);
 
-        return view('marketplace::orders.show', compact('order', 'conversation'));
+        $cancelRequest = app(OrderCancellation::class)->pendingRequest($order);
+
+        return view('marketplace::orders.show', compact('order', 'conversation', 'cancelRequest'));
     }
 
     public function store(Request $request, FinancialTransactionService $financialService, EscrowService $escrowService, \Modules\Marketplace\Services\SoftwareLicenseService $digitalKeyService)
@@ -168,6 +172,8 @@ class ServiceOrderController extends Controller
 
             event(new MarketplaceOrderPlaced($order));
 
+            app(ServiceAutoReply::class)->handle($order);
+
             return redirect()->route('marketplace.orders.show', $order->id)->with('success', __('general.order_placed_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
@@ -239,9 +245,47 @@ class ServiceOrderController extends Controller
         return redirect()->back()->with('success', __('general.order_completed'));
     }
 
+    /** Either side can ask. The other side accepts or declines from the order page. */
+    public function requestCancellation(Request $request, ServiceOrder $order, OrderCancellation $cancellation)
+    {
+        $this->authorize('requestCancellation', $order);
+
+        $validated = $request->validate(['reason' => 'required|string|max:1000']);
+
+        if (! $cancellation->canRequest($order)) {
+            return redirect()->back()->withErrors(['error' => __('marketplace.order_cannot_request_cancel')]);
+        }
+
+        $cancellation->request($order, $request->user(), $validated['reason']);
+
+        return redirect()->back()->with('success', __('marketplace.order_cancel_requested', ['days' => OrderCancellation::RESPONSE_DAYS]));
+    }
+
+    public function acceptCancellation(Request $request, ServiceOrder $order, OrderCancellation $cancellation)
+    {
+        abort_unless($cancellation->canRespond($order, $request->user()), 403);
+
+        $cancellation->accept($order, $request->user()->id);
+
+        return redirect()->back()->with('success', __('marketplace.order_cancel_accepted'));
+    }
+
+    public function declineCancellation(Request $request, ServiceOrder $order, OrderCancellation $cancellation)
+    {
+        abort_unless($cancellation->canRespond($order, $request->user()), 403);
+
+        $cancellation->decline($order, $request->user());
+
+        return redirect()->back()->with('success', __('marketplace.order_cancel_declined'));
+    }
+
     public function dispute(ServiceOrder $order, EscrowService $escrowService)
     {
         $this->authorize('dispute', $order);
+
+        if (in_array($order->status, [ServiceOrderStatus::DISPUTED, ServiceOrderStatus::CANCELLATION_REQUESTED], true)) {
+            return redirect()->back()->withErrors(['error' => __('marketplace.order_already_with_admin')]);
+        }
 
         $order->update([
             'status' => ServiceOrderStatus::DISPUTED,

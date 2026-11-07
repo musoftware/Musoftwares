@@ -33,6 +33,9 @@ Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->every
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 
+// Cancel and refund marketplace orders whose cancellation request got no answer
+Schedule::command(\App\Console\Commands\AcceptExpiredCancellationRequests::class)->hourly()->withoutOverlapping(10);
+
 // Background translation of untranslated marketplace services hourly
 Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
 

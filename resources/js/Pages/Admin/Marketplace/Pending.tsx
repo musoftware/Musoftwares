@@ -20,6 +20,28 @@ export default function Pending({ auth, services, filters }: any) {
     const [rejectingServiceId, setRejectingServiceId] = useState<number | null>(null);
     const [pendingApprove, setPendingApprove] = useState<number | null>(null);
     const [rejectionNote, setRejectionNote] = useState('');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [bulkApproveOpen, setBulkApproveOpen] = useState(false);
+    const [bulkRejectOpen, setBulkRejectOpen] = useState(false);
+    const pageIds: number[] = (services.data ?? []).map((service: any) => service.id);
+    const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
+
+    const toggleSelected = (id: number) => {
+        setSelectedIds((ids) => (ids.includes(id) ? ids.filter((other) => other !== id) : [...ids, id]));
+    };
+
+    const submitBulk = (action: 'approve' | 'reject', note?: string) => {
+        router.post(route('admin.marketplace.services.bulk'), { ids: selectedIds, action, note }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setSelectedIds([]);
+                setBulkApproveOpen(false);
+                setBulkRejectOpen(false);
+                setRejectionNote('');
+            },
+            onError: () => toast.error(__('general.error_occurred')),
+        });
+    };
 
     const applySearch = () => {
         const query = { search };
@@ -55,7 +77,12 @@ export default function Pending({ auth, services, filters }: any) {
 
     const submitReject = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!rejectingServiceId || !rejectionNote.trim()) return;
+        if (!rejectionNote.trim()) return;
+        if (bulkRejectOpen) {
+            submitBulk('reject', rejectionNote);
+            return;
+        }
+        if (!rejectingServiceId) return;
         router.post(
             route('admin.marketplace.services.reject', rejectingServiceId),
             { note: rejectionNote },
@@ -104,6 +131,29 @@ export default function Pending({ auth, services, filters }: any) {
                         </Badge>
                     </div>
 
+                    {pageIds.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-slate-300"
+                                    checked={allSelected}
+                                    onChange={() => setSelectedIds(allSelected ? [] : pageIds)}
+                                />
+                                {__('admin.marketplace_select_all')}
+                            </label>
+                            <span className="text-sm text-slate-500">{__('admin.marketplace_selected_count', { count: selectedIds.length })}</span>
+                            <div className="ms-auto flex flex-wrap gap-2">
+                                <Button disabled={selectedIds.length === 0} onClick={() => setBulkApproveOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+                                    <Check className="h-4 w-4" /> {__('admin.marketplace_approve_selected')}
+                                </Button>
+                                <Button variant="outline" disabled={selectedIds.length === 0} onClick={() => { setRejectionNote(''); setBulkRejectOpen(true); }} className="border-red-200 text-red-600 hover:bg-red-50 gap-2">
+                                    <X className="h-4 w-4" /> {__('admin.marketplace_reject_selected')}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
                     {services.data && (services.data as any).length > 0 ? (
                         <div className="grid gap-6">
                             {(services.data as any).map((service: any) => (
@@ -123,9 +173,15 @@ export default function Pending({ auth, services, filters }: any) {
                                                 <FileWarning className="h-12 w-12" />
                                             </div>
                                         )}
-                                        <div className="absolute top-3 start-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
+                                        <label className="absolute top-3 start-3 flex cursor-pointer items-center gap-2 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
+                                            <input
+                                                type="checkbox"
+                                                className="h-4 w-4 rounded border-slate-300"
+                                                checked={selectedIds.includes(service.id)}
+                                                onChange={() => toggleSelected(service.id)}
+                                            />
                                             {__('general.id')}: {service.id}
-                                        </div>
+                                        </label>
                                     </div>
 
                                     <div className="flex flex-1 flex-col justify-between p-6">
@@ -225,7 +281,17 @@ export default function Pending({ auth, services, filters }: any) {
                 onCancel={() => setPendingApprove(null)}
             />
 
-            <Modal show={rejectingServiceId !== null} onClose={() => setRejectingServiceId(null)}>
+            <ConfirmModal
+                isOpen={bulkApproveOpen}
+                title={__('admin.marketplace_approve_selected')}
+                description={__('admin.marketplace_selected_count', { count: selectedIds.length })}
+                confirmLabel={__('general.approve')}
+                cancelLabel={__('general.cancel')}
+                onConfirm={() => submitBulk('approve')}
+                onCancel={() => setBulkApproveOpen(false)}
+            />
+
+            <Modal show={rejectingServiceId !== null || bulkRejectOpen} onClose={() => { setRejectingServiceId(null); setBulkRejectOpen(false); }}>
                 <form onSubmit={submitReject} className="p-6">
                     <h2 className="mb-4 flex items-center gap-2 text-lg font-medium text-slate-900">
                         <X className="h-6 w-6 text-red-500" />{__('general.reject_service')}
@@ -249,7 +315,7 @@ export default function Pending({ auth, services, filters }: any) {
                     </div>
 
                     <div className="mt-6 flex justify-end gap-3">
-                        <Button type="button" variant="outline" onClick={() => setRejectingServiceId(null)}>
+                        <Button type="button" variant="outline" onClick={() => { setRejectingServiceId(null); setBulkRejectOpen(false); }}>
                             {__('general.cancel')}
                         </Button>
                         <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">

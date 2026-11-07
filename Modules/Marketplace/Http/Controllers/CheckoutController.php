@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Services\CheckoutService;
+use Modules\Marketplace\Services\ServiceAutoReply;
 
 class CheckoutController extends Controller
 {
@@ -28,6 +29,8 @@ class CheckoutController extends Controller
                 $validated['coupon_code'] ?? null,
                 $validated['extra_ids'] ?? []
             );
+
+            app(ServiceAutoReply::class)->handle($order);
 
             if ($request->header('X-Inertia') || ! $request->wantsJson()) {
                 return redirect()->route('marketplace.orders.show', $order->id)

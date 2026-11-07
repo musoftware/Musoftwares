@@ -57,6 +57,19 @@ class FreeToolsTest extends TestCase
         $this->get('/services?lang=ar')->assertSee('2 مشاهدة');
     }
 
+    public function test_money_tracker_page_shows_its_periods_and_totals(): void
+    {
+        $this->get('/services/tools/income-expense-tracker?lang=ar')
+            ->assertOk()
+            ->assertSee('يومي')
+            ->assertSee('شهري')
+            ->assertSee('سنوي')
+            ->assertSee('إجمالي الإيرادات')
+            ->assertSee('إجمالي المصروفات');
+
+        $this->get('/services?lang=en')->assertSee('/services/tools/income-expense-tracker', false);
+    }
+
     public function test_unknown_tool_is_not_found(): void
     {
         $this->get('/services/tools/nope')->assertNotFound();

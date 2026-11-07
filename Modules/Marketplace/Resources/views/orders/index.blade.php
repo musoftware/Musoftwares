@@ -155,6 +155,11 @@
                                             <i class="ri-error-warning-fill text-rose-500"></i>
                                             {{ app()->getLocale() === 'ar' ? 'نزاع مفتوح' : 'Disputed' }}
                                         </span>
+                                    @elseif($statusVal === 'cancellation_requested')
+                                        <span class="px-2.5 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800/60 font-bold text-xs inline-flex items-center gap-1">
+                                            <i class="ri-close-circle-fill text-rose-500"></i>
+                                            {{ app()->getLocale() === 'ar' ? 'طلب إلغاء' : 'Cancellation Requested' }}
+                                        </span>
                                     @elseif($statusVal === 'cancelled')
                                         <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border border-slate-300 dark:border-zinc-700 font-bold text-[11px] inline-flex items-center gap-1">
                                             <i class="ri-close-circle-line"></i>

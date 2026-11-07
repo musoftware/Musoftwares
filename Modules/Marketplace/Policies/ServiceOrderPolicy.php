@@ -27,6 +27,11 @@ class ServiceOrderPolicy
         return $user->id === $order->buyer_id || $user->id === $order->seller_id;
     }
 
+    public function requestCancellation(User $user, ServiceOrder $order): bool
+    {
+        return $user->id === $order->buyer_id || $user->id === $order->seller_id;
+    }
+
     public function message(User $user, ServiceOrder $order): bool
     {
         return $user->id === $order->buyer_id || $user->id === $order->seller_id;

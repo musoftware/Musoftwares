@@ -3,9 +3,12 @@
 namespace Modules\Marketplace\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\Marketplace\Http\Requests\Concerns\NormalizesRequirements;
 
 class UpdateServiceRequest extends FormRequest
 {
+    use NormalizesRequirements;
+
     public function authorize(): bool
     {
         return true; // We will use policy in controller instead.

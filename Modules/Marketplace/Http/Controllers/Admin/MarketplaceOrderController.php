@@ -17,13 +17,18 @@ class MarketplaceOrderController extends Controller
     ) {}
     public function index(Request $request)
     {
+        $status = $request->input('status');
+
         $orders = ServiceOrder::with(['buyer:id,name,email', 'seller:id,name,email', 'package.service'])
+            ->when($status && $status !== 'all', fn ($query) => $query->where('status', $status))
             ->latest()
             ->paginate(20)
+            ->withQueryString()
             ->through(fn($o) => (new MarketplaceOrderResource($o))->resolve());
 
         return Inertia::render('Admin/Marketplace/Orders/Index', [
-            'orders' => $orders
+            'orders' => $orders,
+            'filters' => ['status' => $status ?: 'all'],
         ]);
     }
 

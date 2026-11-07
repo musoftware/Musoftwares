@@ -34,7 +34,7 @@ class Service extends Model
         'approved_at', 'approved_by', 'rejected_at', 'rejection_reason',
         'suspended_at', 'suspended_by', 'is_featured',
         'service_link', 'generate_serials', 'allow_random_serial', 'validity_days',
-        'referral_commission_from', 'referral_commission_percentage', 'is_free'
+        'referral_commission_from', 'referral_commission_percentage', 'is_free', 'auto_complete'
     ];
 
     protected $appends = ['cover_image', 'thumbnail', 'slug', 'url'];
@@ -44,6 +44,7 @@ class Service extends Model
         'is_free'      => 'boolean',
         'generate_serials' => 'boolean',
         'allow_random_serial' => 'boolean',
+        'auto_complete' => 'boolean',
         'tags'         => 'array',
         'faq'          => 'array',
         'requirements' => 'array',

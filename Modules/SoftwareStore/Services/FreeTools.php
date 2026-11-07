@@ -17,6 +17,7 @@ class FreeTools
         'whatsapp-link-generator' => ['ri-whatsapp-line', ['whatsapp-bulk-sender', 'ai-chatbot-whatsapp-automation', 'whatsapp-official']],
         'phone-number-cleaner' => ['ri-contacts-book-line', ['whatsapp-bulk-sender', 'maps-leads-pro', 'telegram-sender-pro']],
         'invoice-generator' => ['ri-file-list-3-line', ['shop-manager-pro', 'supermarket-system', 'wholesale-system']],
+        'income-expense-tracker' => ['ri-wallet-3-line', ['shop-manager-pro', 'wholesale-system', 'custom-web-app-development']],
         'qr-menu-maker' => ['ri-qr-code-line', ['restaurant-pos-system', 'coffee-shop-system', 'company-website-design']],
         'vat-calculator' => ['ri-percent-line', ['shop-manager-pro', 'wholesale-system', 'pharmacy-system']],
         'salary-tax-calculator' => ['ri-money-dollar-circle-line', ['clinic-system', 'workshop-system', 'education-center-system']],

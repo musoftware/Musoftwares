@@ -109,6 +109,7 @@ class MarketplaceServiceControllerTest extends TestCase
     public function test_admin_can_update_service(): void
     {
         $response = $this->actingAs($this->admin)->put("/admin/marketplace/services/{$this->service->id}", [
+            'seller_id' => $this->service->seller_id,
             'title' => 'Updated Title',
             'description' => 'Updated Desc',
             'category_id' => $this->category->id,
@@ -119,6 +120,7 @@ class MarketplaceServiceControllerTest extends TestCase
                     'description' => 'Pack desc',
                     'price' => 10,
                     'delivery_days' => 2,
+                    'currency_id' => \App\Models\Currency::firstOrCreate(['currency' => 'USD', 'symbol' => '$'], ['exchange_rate' => 1.0])->id,
                 ],
             ],
         ]);
