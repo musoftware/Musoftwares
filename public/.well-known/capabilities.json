@@ -1,5 +1,5 @@
 {
-    "updated_at": "2026-11-07T22:32:58+00:00",
+    "updated_at": "2026-11-07T22:50:17+00:00",
     "platform": "Musoftwares Marketplace Engine",
     "version": "1.0.0",
     "capabilities": [
@@ -26,20 +26,6 @@
                 "package_id",
                 "requirements_data"
             ]
-        },
-        {
-            "capability_id": "service_1",
-            "name": "Mine",
-            "description": "Mine",
-            "endpoint": "https://www.musoftwares.com/marketplace/api/v1/services/1",
-            "method": "GET"
-        },
-        {
-            "capability_id": "service_2",
-            "name": "Theirs",
-            "description": "Theirs",
-            "endpoint": "https://www.musoftwares.com/marketplace/api/v1/services/2",
-            "method": "GET"
         }
     ]
 }

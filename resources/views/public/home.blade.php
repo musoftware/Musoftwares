@@ -107,7 +107,7 @@
                                     <span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span>
                                 </div>
                                 @if (! empty($shots))
-                                    <img src="{{ $shots[min(1, count($shots) - 1)] }}" alt="{{ $product->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" loading="lazy">
+                                    <img src="{{ $shots[0] }}" alt="{{ $product->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" loading="lazy">
                                 @endif
                             </div>
                             <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
