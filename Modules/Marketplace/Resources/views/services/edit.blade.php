@@ -86,63 +86,64 @@
 
         <!-- 2. Pricing & Delivery Package -->
         @php
-            $firstPkg = $service->packages->first();
+            $isAr = app()->getLocale() === 'ar';
+            $packageRows = $service->packages->isEmpty() ? collect([null]) : $service->packages->values();
+            $hasManyPackages = $packageRows->count() > 1;
         @endphp
         <div class="rounded-3xl glass-card border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 space-y-6 shadow-sm">
             <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-zinc-800">
                 <i class="ri-price-tag-3-line text-emerald-600 dark:text-emerald-400 text-lg"></i>
-                <span>{{ app()->getLocale() === 'ar' ? '٢. باقة التسعير ومدة التنفيذ' : '2. Package & Pricing' }}</span>
+                <span>{{ $isAr ? '٢. باقة التسعير ومدة التنفيذ' : '2. Package & Pricing' }}</span>
             </h3>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
-                        {{ app()->getLocale() === 'ar' ? 'سعر الخدمة ($ USD)' : 'Price ($ USD)' }} <span class="text-rose-500">*</span>
-                    </label>
-                    <input 
-                        type="number" 
-                        step="0.01" 
-                        min="5" 
-                        name="packages[0][price]" 
-                        value="{{ old('packages.0.price', $firstPkg?->price ?? 25) }}" 
-                        required 
-                        class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500"
-                    >
-                </div>
+            @foreach ($packageRows as $index => $package)
+                <div class="space-y-4 {{ $index > 0 ? 'pt-6 border-t border-slate-100 dark:border-zinc-800' : '' }}">
+                    @if ($hasManyPackages)
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label for="package-{{ $index }}-name" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                                    {{ $isAr ? 'اسم الباقة' : 'Package name' }} {{ $index + 1 }} <span class="text-rose-500">*</span>
+                                </label>
+                                <input id="package-{{ $index }}-name" type="text" maxlength="80" name="packages[{{ $index }}][name]" value="{{ old("packages.$index.name", $package?->name) }}" required class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white  text-sm focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label for="package-{{ $index }}-description" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                                    {{ $isAr ? 'وصف الباقة' : 'Package description' }}
+                                </label>
+                                <textarea id="package-{{ $index }}-description" rows="2" maxlength="500" name="packages[{{ $index }}][description]" class="w-full px-4 py-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-brand-500">{{ old("packages.$index.description", $package?->description) }}</textarea>
+                            </div>
+                        </div>
+                    @else
+                        <input type="hidden" name="packages[{{ $index }}][name]" value="{{ $package?->name ?? 'Standard Package' }}">
+                    @endif
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
-                        {{ app()->getLocale() === 'ar' ? 'مدة التسليم (بالأيام)' : 'Delivery Days' }} <span class="text-rose-500">*</span>
-                    </label>
-                    <input 
-                        type="number" 
-                        min="1" 
-                        max="60" 
-                        name="packages[0][delivery_days]" 
-                        value="{{ old('packages.0.delivery_days', $firstPkg?->delivery_days ?? 3) }}" 
-                        required 
-                        class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500"
-                    >
-                </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label for="package-{{ $index }}-price" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                                {{ $isAr ? 'سعر الخدمة' : 'Price' }} ({{ $package?->currency?->currency ?? 'USD' }}) <span class="text-rose-500">*</span>
+                            </label>
+                            <input id="package-{{ $index }}-price" type="number" step="0.01" min="1" name="packages[{{ $index }}][price]" value="{{ old("packages.$index.price", $package?->price ?? 25) }}" required class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500">
+                        </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
-                        {{ app()->getLocale() === 'ar' ? 'عدد جولات التعديل' : 'Revisions Included' }}
-                    </label>
-                    <input 
-                        type="number" 
-                        min="0" 
-                        max="10" 
-                        name="packages[0][revisions]" 
-                        value="{{ old('packages.0.revisions', $firstPkg?->revisions ?? 2) }}" 
-                        class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500"
-                    >
-                </div>
-            </div>
+                        <div>
+                            <label for="package-{{ $index }}-days" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                                {{ $isAr ? 'مدة التسليم (بالأيام)' : 'Delivery Days' }} <span class="text-rose-500">*</span>
+                            </label>
+                            <input id="package-{{ $index }}-days" type="number" min="1" max="365" name="packages[{{ $index }}][delivery_days]" value="{{ old("packages.$index.delivery_days", $package?->delivery_days ?? 3) }}" required class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500">
+                        </div>
 
-            <input type="hidden" name="packages[0][id]" value="{{ $firstPkg?->id }}">
-            <input type="hidden" name="packages[0][name]" value="Standard Package">
-            <input type="hidden" name="packages[0][tier]" value="standard">
+                        <div>
+                            <label for="package-{{ $index }}-revisions" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                                {{ $isAr ? 'عدد جولات التعديل' : 'Revisions Included' }}
+                            </label>
+                            <input id="package-{{ $index }}-revisions" type="number" min="-1" name="packages[{{ $index }}][revisions]" value="{{ old("packages.$index.revisions", $package?->revisions ?? 2) }}" class="w-full h-12 px-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white font-mono text-sm focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="packages[{{ $index }}][id]" value="{{ $package?->id }}">
+                    <input type="hidden" name="packages[{{ $index }}][tier]" value="standard">
+                </div>
+            @endforeach
         </div>
 
         <!-- 3. Detailed Description -->

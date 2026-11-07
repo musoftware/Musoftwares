@@ -131,6 +131,40 @@ class MarketplaceServiceControllerTest extends TestCase
         $this->assertCount(1, $this->service->packages);
     }
 
+    public function test_admin_can_save_a_service_whose_package_has_no_description(): void
+    {
+        $currency = \App\Models\Currency::firstOrCreate(['currency' => 'USD', 'symbol' => '$'], ['exchange_rate' => 1.0]);
+
+        $this->actingAs($this->admin)->put("/admin/marketplace/services/{$this->service->id}", [
+            'seller_id' => $this->service->seller_id,
+            'title' => 'Updated Title',
+            'tagline' => 'Short line',
+            'description' => 'Updated description text',
+            'category_id' => $this->category->id,
+            'status' => 'active',
+            'packages' => [['name' => 'Package 1', 'description' => '', 'price' => 10, 'delivery_days' => 2, 'currency_id' => $currency->id]],
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $this->assertSame('Short line', $this->service->fresh()->packages()->first()->description);
+    }
+
+    public function test_admin_clearing_a_saved_package_price_gets_an_error_and_can_clear_the_old_price(): void
+    {
+        $currency = \App\Models\Currency::firstOrCreate(['currency' => 'USD', 'symbol' => '$'], ['exchange_rate' => 1.0]);
+        $package = $this->service->packages()->create(['name' => 'Saved', 'description' => 'Saved text', 'price' => 30, 'old_price' => 50, 'currency_id' => $currency->id, 'delivery_days' => 2]);
+        $form = ['seller_id' => $this->service->seller_id, 'title' => 'Updated Title', 'description' => 'Updated description text', 'category_id' => $this->category->id, 'status' => 'active'];
+        $row = ['id' => $package->id, 'name' => 'Saved', 'description' => 'Saved text', 'currency_id' => $currency->id, 'delivery_days' => 2];
+
+        $this->actingAs($this->admin)
+            ->put("/admin/marketplace/services/{$this->service->id}", [...$form, 'packages' => [[...$row, 'price' => '', 'old_price' => 50]]])
+            ->assertSessionHasErrors('packages.0.price');
+        $this->assertSame(30.0, $package->fresh()->price);
+
+        $this->put("/admin/marketplace/services/{$this->service->id}", [...$form, 'packages' => [[...$row, 'price' => 30, 'old_price' => '']]])
+            ->assertSessionHasNoErrors();
+        $this->assertNull($package->fresh()->old_price);
+    }
+
     public function test_admin_can_delete_service(): void
     {
         $response = $this->actingAs($this->admin)->delete("/admin/marketplace/services/{$this->service->id}");

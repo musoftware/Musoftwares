@@ -24,6 +24,7 @@ class AdminServiceRequest extends UpdateServiceRequest
         }
 
         $this->merge($plain);
+        $this->fillPackageDetails();
     }
 
     public function rules(): array

@@ -164,5 +164,20 @@ return [
         ]
     ],
     'attributes' => [
+        'packages.*.name' => 'اسم الباقة :position',
+        'packages.*.description' => 'وصف الباقة :position',
+        'packages.*.price' => 'سعر الباقة :position',
+        'packages.*.old_price' => 'السعر القديم للباقة :position',
+        'packages.*.currency_id' => 'عملة الباقة :position',
+        'packages.*.delivery_days' => 'مدة تسليم الباقة :position',
+        'packages.*.revisions' => 'عدد تعديلات الباقة :position',
+        'packages.*.features.*' => 'مميزات الباقة :position',
+        'extras.*.title' => 'اسم الإضافة :position',
+        'extras.*.price' => 'سعر الإضافة :position',
+        'extras.*.duration_days' => 'مدة الإضافة :position',
+        'faq.*.question' => 'السؤال :position',
+        'faq.*.answer' => 'إجابة السؤال :position',
+        'requirements.*' => 'المطلوب من المشتري :position',
+        'gallery.*' => 'الصورة :position',
     ]
 ];

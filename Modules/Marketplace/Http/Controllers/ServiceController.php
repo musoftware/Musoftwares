@@ -542,7 +542,7 @@ class ServiceController extends Controller
         }
 
         $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $service->load(['packages', 'extras']);
+        $service->load(['packages.currency', 'extras']);
 
         return view('marketplace::services.edit', compact('categories', 'service'));
     }
