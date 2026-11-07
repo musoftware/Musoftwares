@@ -13,6 +13,17 @@ import MouseScrollContainer from '@/Components/ui/MouseScrollContainer';
 
 const FEATURED_HERO_SLIDES = [
     {
+        id: 'tech-stack-3d',
+        category: 'Technology & Architecture',
+        title: 'Bespoke Software Engineering Powered by Modern Stacks',
+        description: 'Full-cycle engineering studio building resilient platforms with Laravel, React, Python, Go, Node.js, and cloud ecosystems.',
+        image: '/images/hero/hero_tech_stack_3d.jpg',
+        linkText: 'Explore Stack',
+        link: '/portfolio',
+        slideNum: '1 / 4',
+        isLight: true
+    },
+    {
         id: 'erp-core',
         category: 'Architecture Case Study',
         title: 'The Future of Cloud ERP: 2026 Core Architecture',
@@ -20,7 +31,7 @@ const FEATURED_HERO_SLIDES = [
         image: '/images/hero/hero_erp.jpg',
         linkText: 'Read Case Study',
         link: '/portfolio/revflow',
-        slideNum: '1 / 3'
+        slideNum: '2 / 4'
     },
     {
         id: 'meta-cloud',
@@ -30,7 +41,7 @@ const FEATURED_HERO_SLIDES = [
         image: '/images/hero/hero_meta.jpg',
         linkText: 'Explore Platform',
         link: '/platforms/crm',
-        slideNum: '2 / 3'
+        slideNum: '3 / 4'
     },
     {
         id: 'fintech-pos',
@@ -40,7 +51,7 @@ const FEATURED_HERO_SLIDES = [
         image: '/images/hero/hero_fintech.jpg',
         linkText: 'Explore Marketplace',
         link: '/marketplace/catalog',
-        slideNum: '3 / 3'
+        slideNum: '4 / 4'
     }
 ];
 
@@ -245,7 +256,7 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                 {/* 1. HERO SHOWCASE SECTION (PANORAMIC ARTWORK + STUDIO LOWER BAR - DYNAMIC NEWS ENGINE) */}
                 <section id="hero" className="w-full">
                     {/* Top Panoramic Visual Artwork Container */}
-                    <div className="w-full h-[380px] sm:h-[480px] lg:h-[540px] bg-black overflow-hidden relative">
+                    <div className={`w-full h-[380px] sm:h-[480px] lg:h-[540px] overflow-hidden relative transition-colors duration-500 ${slide.isLight ? 'bg-[#e2e3e5]' : 'bg-black'}`}>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={slide.id || currentSlide}
@@ -258,9 +269,11 @@ export default function Home({ dbProjects = [], newsFeed = [] }) {
                                 <img 
                                     src={slide.image} 
                                     alt={slide.title} 
-                                    className="w-full h-full object-cover object-center filter brightness-[0.95] contrast-[1.02]"
+                                    className={`w-full h-full object-cover object-center ${slide.isLight ? '' : 'filter brightness-[0.95] contrast-[1.02]'}`}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
+                                {!slide.isLight && (
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none" />
+                                )}
                             </motion.div>
                         </AnimatePresence>
                     </div>

@@ -2324,7 +2324,9 @@
             "used": "Charge",
             "refunded": "Refund",
             "sent": "Withdrawal"
-        }
+        },
+        "marketplace_package_features": "Package features",
+        "marketplace_package_features_hint": "One feature on each line."
     },
     "auth": {
         "actions": "Actions",
@@ -13152,7 +13154,7 @@
         "service_submitted_for_review_it_will_be_visible_once_approved": "Service submitted for review. It will be visible once approved.",
         "service_suspended_successfully": "Service suspended successfully.",
         "service_tags": "Tag service",
-        "service_title": "Address service",
+        "service_title": "Service title",
         "service_title_1": "Title service...",
         "service_type": "Service type",
         "service_unavailable": "Unavailable service",
@@ -16356,7 +16358,11 @@
         "fav_browse_catalog": "Browse Catalog Services",
         "fav_verified_creator": "Verified Creator",
         "seller_nav_label": "Seller sections",
-        "category_nav_label": "Service categories"
+        "category_nav_label": "Service categories",
+        "service_create_hint": "Add your service step by step. You can change it later.",
+        "service_create_review_hint": "After you save, the service goes to review and appears in the marketplace once an admin approves it.",
+        "service_edit_review_hint": "After you save, the service goes to review and leaves the marketplace until an admin approves it.",
+        "service_edit_admin_link": "Open the full settings in the admin panel"
     },
     "marketplace_ui": {
         "title": "Services marketplace",

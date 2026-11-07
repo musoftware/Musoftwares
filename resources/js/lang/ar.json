@@ -2324,7 +2324,9 @@
             "used": "خصم",
             "refunded": "استرداد",
             "sent": "سحب"
-        }
+        },
+        "marketplace_package_features": "مميزات الباقة",
+        "marketplace_package_features_hint": "ميزة في كل سطر."
     },
     "auth": {
         "actions": "الإجراءات",
@@ -13152,7 +13154,7 @@
         "service_submitted_for_review_it_will_be_visible_once_approved": "تم إرسال الخدمة للمراجعة. ستظهر بمجرد اعتمادها.",
         "service_suspended_successfully": "تم تعليق الخدمة بنجاح.",
         "service_tags": "خدمة وسوم",
-        "service_title": "خدمة العنوان",
+        "service_title": "عنوان الخدمة",
         "service_title_1": "خدمة Title...",
         "service_type": "نوع الخدمة",
         "service_unavailable": "الخدمة غير متاحة",
@@ -16318,7 +16320,11 @@
         "fav_browse_catalog": "تصفح خدمات الكتالوج",
         "fav_verified_creator": "بائع موثق",
         "seller_nav_label": "أقسام البائع",
-        "category_nav_label": "تصنيفات الخدمات"
+        "category_nav_label": "تصنيفات الخدمات",
+        "service_create_hint": "أضف خدمتك خطوة بخطوة، وتقدر تعدلها بعد كده.",
+        "service_create_review_hint": "بعد الحفظ، الخدمة بتروح للمراجعة وبتظهر في السوق لما الإدارة توافق عليها.",
+        "service_edit_review_hint": "بعد الحفظ، الخدمة بتروح للمراجعة وبتختفي من السوق لحد ما الإدارة توافق عليها.",
+        "service_edit_admin_link": "افتح الإعدادات الكاملة في لوحة الأدمن"
     },
     "marketplace_ui": {
         "title": "سوق الخدمات",
