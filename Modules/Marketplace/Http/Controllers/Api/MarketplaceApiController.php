@@ -11,6 +11,8 @@ use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Models\ServicePackage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Modules\Marketplace\Services\CheckoutService;
+use Modules\Marketplace\Services\ServiceAutoReply;
 
 class MarketplaceApiController extends Controller
 {
@@ -173,11 +175,11 @@ class MarketplaceApiController extends Controller
     /**
      * Create an order via API (Authenticated).
      */
-    public function createOrder(Request $request): JsonResponse
+    public function createOrder(Request $request, CheckoutService $checkout, ServiceAutoReply $autoReply): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'service_id' => 'required|exists:marketplace_services,id',
-            'package_id' => 'required|exists:marketplace_service_packages,id',
+            'package_id' => 'required|exists:marketplace_packages,id',
             'requirements' => 'nullable|array',
         ]);
 
@@ -190,39 +192,28 @@ class MarketplaceApiController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
         }
 
-        $package = ServicePackage::findOrFail($request->package_id);
+        $package = ServicePackage::where('service_id', $request->service_id)->findOrFail($request->package_id);
 
         try {
-            DB::beginTransaction();
-
-            $order = ServiceOrder::create([
-                'buyer_id' => $user->id,
-                'package_id' => $package->id,
-                'price' => $package->price,
-                'amount' => $package->price,
-                'delivery_days' => $package->delivery_days ?? 1,
-                'status' => 'pending',
-                'requirements_submitted' => !empty($request->requirements),
-                'requirements_data' => $request->requirements ?? [],
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Order created successfully.',
-                'order' => [
-                    'id' => $order->id,
-                    'price' => $order->price,
-                    'status' => $order->status,
-                    'created_at' => $order->created_at->toIso8601String(),
-                ]
-            ], 201);
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Failed to create order: ' . $e->getMessage()], 500);
+            // The real checkout: checks the balance, sets the seller and holds the money.
+            $order = $checkout->processCheckout($user, (int) $package->id);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
         }
+
+        $autoReply->handle($order);
+        $order->refresh();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order created successfully.',
+            'order' => [
+                'id' => $order->id,
+                'price' => $order->amount,
+                'status' => $order->status,
+                'created_at' => $order->created_at->toIso8601String(),
+            ],
+        ], 201);
     }
 
     /**

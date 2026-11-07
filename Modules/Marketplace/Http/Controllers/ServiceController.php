@@ -631,8 +631,9 @@ class ServiceController extends Controller
                 'tagline_translations' => $validated['tagline_translations'] ?? null,
                 'description' => $validated['description'] ?? null,
                 'description_translations' => $validated['description_translations'] ?? null,
-                'auto_reply' => $validated['auto_reply'] ?? null,
-                'auto_reply_translations' => $validated['auto_reply_translations'] ?? null,
+                // A form without the field keeps the reply. New text replaces the older translated copies.
+                'auto_reply' => array_key_exists('auto_reply', $validated) ? $validated['auto_reply'] : $service->auto_reply,
+                'auto_reply_translations' => array_key_exists('auto_reply', $validated) ? ($validated['auto_reply_translations'] ?? null) : $service->auto_reply_translations,
                 'category_id' => $validated['category_id'],
                 'tags' => $validated['tags'] ?? [],
                 'faq' => $validated['faq'] ?? [],

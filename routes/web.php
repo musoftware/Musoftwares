@@ -565,6 +565,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     // Services Admin Actions
     Route::get('/all-services', [MarketplaceServiceController::class, 'allServices'])->name('services.all');
     Route::get('/pending-services', [MarketplaceServiceController::class, 'pendingServices'])->name('services.pending');
+    Route::get('/services/create', [MarketplaceServiceController::class, 'create'])->name('services.create');
+    Route::post('/services', [MarketplaceServiceController::class, 'store'])->name('services.store');
+    Route::post('/services/bulk', [MarketplaceServiceController::class, 'bulkModerate'])->name('services.bulk');
     Route::get('/services/{service}/edit', [MarketplaceServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services/{service}', [MarketplaceServiceController::class, 'update'])->name('services.update');
     Route::post('/services/{service}/approve', [MarketplaceServiceController::class, 'approve'])->name('services.approve');

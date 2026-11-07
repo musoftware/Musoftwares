@@ -22,9 +22,13 @@ import { MetricCard } from '@/Components/ui/MetricCard';
 import { ShoppingBag, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-export default function Index({ orders, stats }) {
+export default function Index({ orders, stats, filters }) {
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
+    const statusFilter = filters?.status ?? 'all';
+
+    const changeStatus = (status: string) => {
+        router.get(route('admin.marketplace.orders.index'), status === 'all' ? {} : { status }, { preserveState: true, preserveScroll: true });
+    };
 
     const filtered = (orders.data ?? []).filter((o: any) => {
         const q = search.toLowerCase().trim();
@@ -33,8 +37,7 @@ export default function Index({ orders, stats }) {
             o.package?.service?.title?.toLowerCase().includes(q) ||
             o.buyer?.name?.toLowerCase().includes(q) ||
             o.seller?.name?.toLowerCase().includes(q);
-        const matchStatus = statusFilter === 'all' || o.status === statusFilter;
-        return matchSearch && matchStatus;
+        return matchSearch;
     });
 
     const paginationLinks = orders.meta?.links || orders.links;
@@ -66,18 +69,19 @@ export default function Index({ orders, stats }) {
 
                     <select
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        onChange={(e) => changeStatus(e.target.value)}
                         className="h-9 rounded-md border border-gray-300 px-2 text-sm bg-white"
                     >
                         <option value="all">{__('general.all_statuses')}</option>
                         <option value="completed">{__('general.completed')}</option>
                         <option value="in_progress">{__('general.in_progress')}</option>
                         <option value="disputed">{__('general.disputed')}</option>
+                        <option value="cancellation_requested">{__('admin.marketplace_cancellation_requested')}</option>
                         <option value="cancelled">{__('general.cancelled')}</option>
                     </select>
 
                     {(search || statusFilter !== 'all') && (
-                        <Button variant="ghost" size="sm" onClick={() => { setSearch(''); setStatusFilter('all'); }} className="h-9">
+                        <Button variant="ghost" size="sm" onClick={() => { setSearch(''); changeStatus('all'); }} className="h-9">
                             <FilterX className="w-4 h-4 me-1" />{__('general.clear')}
                         </Button>
                     )}

@@ -3,16 +3,20 @@
 namespace Modules\Marketplace\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use Illuminate\Http\Request;
+use Modules\Marketplace\Http\Requests\AdminServiceRequest;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
+use Modules\Marketplace\Services\AdminServiceWriter;
+use Modules\Marketplace\Services\ServiceModeration;
 use Inertia\Inertia;
 
 class MarketplaceServiceController extends Controller
 {
     public function allServices(Request $request)
     {
-        $query = Service::with(['seller', 'category'])->withCount(['packages', 'orders']);
+        $query = Service::with(['seller', 'category', 'packages'])->withCount(['packages', 'orders']);
 
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -92,16 +96,38 @@ class MarketplaceServiceController extends Controller
         ]);
     }
 
-    public function approve(Service $service)
+    public function approve(Request $request, Service $service, ServiceModeration $moderation)
     {
-        $service->update(['status' => 'active']);
+        $moderation->approve($service, $request->user());
+
         return back()->with('success', __('general.service_approved_successfully'));
     }
 
-    public function reject(Service $service)
+    public function reject(Request $request, Service $service, ServiceModeration $moderation)
     {
-        $service->update(['status' => 'rejected']);
+        $validated = $request->validate(['note' => 'nullable|string|max:1000']);
+        $moderation->reject($service, $validated['note'] ?? null);
+
         return back()->with('success', __('general.service_rejected_successfully'));
+    }
+
+    public function bulkModerate(Request $request, ServiceModeration $moderation)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:100',
+            'ids.*' => 'integer',
+            'action' => 'required|in:approve,reject',
+            'note' => 'nullable|required_if:action,reject|string|max:1000',
+        ]);
+
+        $services = Service::whereIn('id', $validated['ids'])->get();
+        foreach ($services as $service) {
+            $validated['action'] === 'approve'
+                ? $moderation->approve($service, $request->user())
+                : $moderation->reject($service, $validated['note']);
+        }
+
+        return back()->with('success', __('admin.marketplace_bulk_done', ['count' => $services->count()]));
     }
 
     public function suspend(Service $service)
@@ -116,42 +142,37 @@ class MarketplaceServiceController extends Controller
         return back()->with('success', __('general.service_featured_status_updated'));
     }
 
-    public function edit(Service $service)
+    public function create()
     {
-        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $service->load('packages');
-
-        return Inertia::render('Admin/Marketplace/Edit', [
-            'categories' => $categories,
-            'service' => $service,
-        ]);
+        return Inertia::render('Admin/Marketplace/Edit', $this->formProps(null));
     }
 
-    public function update(Request $request, Service $service)
+    public function store(AdminServiceRequest $request, AdminServiceWriter $writer)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:marketplace_service_categories,id',
-            'status' => 'required|in:active,draft,suspended,rejected',
-            'packages' => 'required|array|min:1|max:3',
-            'packages.*.name' => 'required|string|max:255',
-            'packages.*.description' => 'required|string',
-            'packages.*.price' => 'required|numeric|min:1',
-            'packages.*.delivery_days' => 'required|integer|min:1',
-        ]);
+        $writer->create($request->validated(), $request->file('gallery', []), $request->user());
 
-        $service->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'category_id' => $validated['category_id'],
-            'status' => $validated['status'],
-        ]);
+        return redirect()->route('admin.marketplace.services.all')->with('success', __('admin.marketplace_service_created'));
+    }
 
-        $service->packages()->delete();
-        $service->packages()->createMany($validated['packages']);
+    public function edit(Service $service)
+    {
+        return Inertia::render('Admin/Marketplace/Edit', $this->formProps($service->load(['packages', 'extras'])));
+    }
+
+    public function update(AdminServiceRequest $request, Service $service, AdminServiceWriter $writer)
+    {
+        $writer->update($service, $request->validated(), $request->file('gallery', []), $request->user());
 
         return redirect()->route('admin.marketplace.services.all')->with('success', __('general.service_updated_successfully'));
+    }
+
+    private function formProps(?Service $service): array
+    {
+        return [
+            'categories' => ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']),
+            'currencies' => Currency::orderBy('id')->get(['id', 'currency', 'symbol']),
+            'service' => $service,
+        ];
     }
 
     public function destroy(Service $service)

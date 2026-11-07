@@ -33,7 +33,7 @@ import {
     Eye, Check, X, Search, FilterX, Trash2, Star, StarOff,
     Ban, ChevronUp, ChevronDown, MoreVertical, ShoppingBag,
     Activity, Clock, FileWarning, Package, CheckCircle2,
-    AlertCircle, XCircle, Pencil
+    AlertCircle, XCircle, Pencil, Plus, UserCog
 } from 'lucide-react';
 import Pagination from '@/Components/Pagination';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
@@ -256,9 +256,14 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                 {__('admin.manage_approve_moderate_services')}
                             </p>
                         </div>
-                        <Badge variant="secondary" className="bg-slate-200 text-slate-800 text-sm px-3 py-1.5 shrink-0">
-                            {services.total ?? 0} {__('admin.total')}
-                        </Badge>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="secondary" className="bg-slate-200 text-slate-800 text-sm px-3 py-1.5 shrink-0">
+                                {services.total ?? 0} {__('admin.total')}
+                            </Badge>
+                            <Button onClick={() => router.get(route('admin.marketplace.services.create'))} className="gap-2">
+                                <Plus className="h-4 w-4" /> {__('admin.marketplace_create_service')}
+                            </Button>
+                        </div>
                     </div>
 
                     {/* ── Stats Cards ──────────────────────────────────────── */}
@@ -534,6 +539,12 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             onClick={() => router.get(route('admin.marketplace.services.edit', service.id))}
                                                             className="gap-2 cursor-pointer"
                                                         ><Pencil className="h-4 w-4" /> {__('admin.edit_service')}</DropdownMenuItem>
+
+                                                        {/* Change owner: the owner picker is the first field of the edit page */}
+                                                        <DropdownMenuItem
+                                                            onClick={() => router.get(route('admin.marketplace.services.edit', service.id))}
+                                                            className="gap-2 cursor-pointer"
+                                                        ><UserCog className="h-4 w-4" /> {__('admin.marketplace_change_owner')}</DropdownMenuItem>
 
                                                         {/* Feature toggle */}
                                                         <DropdownMenuItem

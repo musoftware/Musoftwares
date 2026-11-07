@@ -172,7 +172,21 @@
                     name="requirements" 
                     rows="3" 
                     class="w-full p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-brand-500 leading-relaxed"
-                >{{ old('requirements', $service->requirements) }}</textarea>
+                >{{ implode("\n", (array) old('requirements', $service->requirements)) }}</textarea>
+            </div>
+
+            <div>
+                <label for="auto_reply" class="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
+                    {{ app()->getLocale() === 'ar' ? 'رسالة الرد التلقائي (اختياري)' : 'Auto reply message (optional)' }}
+                </label>
+                <textarea
+                    id="auto_reply"
+                    name="auto_reply"
+                    rows="3"
+                    maxlength="5000"
+                    placeholder="{{ app()->getLocale() === 'ar' ? 'بتتبعت للمشتري في محادثة الطلب أول ما يشتري.' : 'Sent to the buyer in the order chat right after purchase.' }}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm"
+                >{{ old('auto_reply', $service->auto_reply) }}</textarea>
             </div>
         </div>
 

@@ -80,6 +80,9 @@ Route::middleware('web')
             Route::post('/orders',          [ServiceOrderController::class, 'store'])->name('orders.store');
             Route::post('/orders/{order}/complete', [ServiceOrderController::class, 'complete'])->name('orders.complete');
             Route::post('/orders/{order}/dispute',  [ServiceOrderController::class, 'dispute'])->name('orders.dispute');
+            Route::post('/orders/{order}/cancel-request', [ServiceOrderController::class, 'requestCancellation'])->name('orders.cancel-request');
+            Route::post('/orders/{order}/cancel-accept', [ServiceOrderController::class, 'acceptCancellation'])->name('orders.cancel-accept');
+            Route::post('/orders/{order}/cancel-decline', [ServiceOrderController::class, 'declineCancellation'])->name('orders.cancel-decline');
 
             // Work Deliverables & Revisions
             Route::post('/orders/{order}/deliver', [DeliverableController::class, 'submitWork'])->name('orders.deliver');

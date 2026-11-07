@@ -12,7 +12,7 @@
     $steps = ['pending', 'in_progress', 'delivered', 'completed'];
     $currentStepIndex = array_search($statusVal === 'active' ? 'in_progress' : ($statusVal === 'processing' ? 'in_progress' : ($statusVal === 'auto_completed' ? 'completed' : $statusVal)), $steps);
     if ($currentStepIndex === false) {
-        $currentStepIndex = ($statusVal === 'disputed' || $statusVal === 'revision') ? 1 : 0;
+        $currentStepIndex = in_array($statusVal, ['disputed', 'revision', 'cancellation_requested'], true) ? 1 : 0;
     }
 @endphp
 
@@ -71,6 +71,11 @@
                     <span class="px-3.5 py-1.5 rounded-xl bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 font-bold text-xs inline-flex items-center gap-1.5 shadow-sm">
                         <i class="ri-error-warning-fill text-rose-500 text-sm"></i>
                         {{ app()->getLocale() === 'ar' ? 'نزاع مفتوح ومحال للإدارة' : 'Order in Dispute' }}
+                    </span>
+                @elseif($statusVal === 'cancellation_requested')
+                    <span class="px-3.5 py-1.5 rounded-xl bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 font-bold text-xs inline-flex items-center gap-1.5 shadow-sm">
+                        <i class="ri-close-circle-fill text-rose-500 text-sm"></i>
+                        {{ app()->getLocale() === 'ar' ? 'طلب إلغاء بانتظار الرد' : 'Cancellation Requested' }}
                     </span>
                 @else
                     <span class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-300 dark:border-zinc-700 font-bold text-xs inline-flex items-center gap-1.5">
@@ -160,6 +165,33 @@
             @endif
 
             <!-- Seller Delivery Submission Box -->
+            <!-- Order conversation -->
+            <div class="rounded-3xl glass-card border border-slate-200 dark:border-zinc-800 p-6 space-y-4 shadow-sm" id="order-chat">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="ri-chat-3-line"></i>
+                    {{ app()->getLocale() === 'ar' ? 'محادثة الطلب' : 'Order Conversation' }}
+                </h3>
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    @forelse($conversation->messages->sortBy('id') as $chatMessage)
+                        <div class="rounded-2xl p-3 text-sm min-w-0 {{ (int) $chatMessage->sender_id === (int) auth()->id() ? 'bg-brand-600/10 ms-6' : 'bg-slate-100 dark:bg-zinc-800 me-6' }}">
+                            <span class="block text-xs font-bold text-slate-600 dark:text-zinc-400 mb-1">{{ $chatMessage->sender?->name }}</span>
+                            <p class="whitespace-pre-line break-words text-slate-900 dark:text-white">{{ $chatMessage->body }}</p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-slate-500 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'لسه مفيش رسايل.' : 'No messages yet.' }}</p>
+                    @endforelse
+                </div>
+                <form action="{{ route('marketplace.orders.messages.store', $order->id) }}" method="POST" class="space-y-2">
+                    @csrf
+                    <label for="chat-body" class="block text-xs font-bold text-slate-700 dark:text-zinc-300">{{ app()->getLocale() === 'ar' ? 'اكتب رسالة' : 'Write a message' }}</label>
+                    <textarea id="chat-body" name="body" rows="2" required maxlength="2000" class="w-full p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm"></textarea>
+                    <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5">
+                        <i class="ri-send-plane-line"></i>
+                        <span>{{ app()->getLocale() === 'ar' ? 'إرسال' : 'Send' }}</span>
+                    </button>
+                </form>
+            </div>
+
             @if($isSeller && in_array($statusVal, ['pending', 'processing', 'in_progress', 'active', 'revision']))
                 <div class="rounded-3xl glass-card border border-brand-300 dark:border-brand-500/30 p-6 sm:p-8 shadow-sm">
                     <div class="flex items-center gap-3 mb-6">
@@ -284,7 +316,7 @@
             </div>
 
             <!-- Buyer Action Controls (Accept / Revision / Dispute) -->
-            @if($isBuyer && $statusVal !== 'completed' && $statusVal !== 'cancelled')
+            @if($isBuyer && ! in_array($statusVal, ['completed', 'cancelled', 'cancellation_requested'], true))
                 <div class="rounded-3xl glass-card border border-slate-200 dark:border-zinc-800 p-6 space-y-3 shadow-sm">
                     <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">
                         {{ app()->getLocale() === 'ar' ? 'إجراءات المشتري' : 'Buyer Actions' }}
@@ -301,16 +333,18 @@
                         </form>
 
                         <!-- Request Revision -->
-                        <form action="{{ route('marketplace.orders.revision', $order->id) }}" method="POST">
+                        <form action="{{ route('marketplace.orders.revision', $order->id) }}" method="POST" class="space-y-2">
                             @csrf
-                            <button type="submit" onclick="return confirm('{{ app()->getLocale() === 'ar' ? 'هل تريد طلب تعديل على العمل المسلم؟' : 'Request revision for this deliverable?' }}')" class="w-full py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                            <label for="revision-note" class="block text-xs font-bold text-slate-700 dark:text-zinc-300">{{ app()->getLocale() === 'ar' ? 'عايز تعدل إيه؟' : 'What should change?' }}</label>
+                            <textarea id="revision-note" name="revision_note" rows="3" required maxlength="2000" class="w-full p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm"></textarea>
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
                                 <i class="ri-refresh-line"></i>
                                 <span>{{ app()->getLocale() === 'ar' ? 'طلب تعديل ومراجعة' : 'Request Revision' }}</span>
                             </button>
                         </form>
                     @endif
 
-                    @if($statusVal !== 'disputed')
+                    @if(! in_array($statusVal, ['disputed', 'cancellation_requested'], true))
                         <!-- Dispute Order -->
                         <form action="{{ route('marketplace.orders.dispute', $order->id) }}" method="POST">
                             @csrf
@@ -319,6 +353,40 @@
                                 <span>{{ app()->getLocale() === 'ar' ? 'فتح نزاع / مشكلة بالطلب' : 'Dispute Order' }}</span>
                             </button>
                         </form>
+                    @endif
+                </div>
+            @endif
+
+            <!-- Cancellation between buyer and seller -->
+            @if(in_array($statusVal, ['pending', 'processing', 'in_progress', 'delivered', 'revision'], true))
+                <form action="{{ route('marketplace.orders.cancel-request', $order->id) }}" method="POST" class="rounded-3xl glass-card border border-slate-200 dark:border-zinc-800 p-6 space-y-2 shadow-sm">
+                    @csrf
+                    <label for="cancel-reason" class="block text-xs font-bold text-slate-700 dark:text-zinc-300">{{ app()->getLocale() === 'ar' ? 'عايز تلغي الطلب؟ اكتب السبب' : 'Want to cancel? Tell the other side why' }}</label>
+                    <textarea id="cancel-reason" name="reason" rows="2" required maxlength="1000" class="w-full p-3 rounded-xl bg-white dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white text-sm"></textarea>
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 border border-slate-300 dark:border-zinc-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                        <i class="ri-close-circle-line"></i>
+                        <span>{{ app()->getLocale() === 'ar' ? 'طلب إلغاء' : 'Request Cancellation' }}</span>
+                    </button>
+                    <p class="text-[11px] text-slate-500 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'الطرف التاني يوافق أو يرفض. لو مردش خلال ٣ أيام الطلب بيتلغي والفلوس بترجع للمشتري.' : 'The other side accepts or declines. With no answer in 3 days the order is cancelled and the buyer is refunded.' }}</p>
+                </form>
+            @elseif($cancelRequest)
+                <div class="rounded-3xl glass-card border border-rose-200 dark:border-rose-900 p-6 space-y-3 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white">{{ app()->getLocale() === 'ar' ? 'طلب إلغاء' : 'Cancellation Request' }}</h4>
+                    <p class="text-sm text-slate-700 dark:text-zinc-300 whitespace-pre-line break-words">{{ $cancelRequest->note }}</p>
+                    @if((int) $cancelRequest->changed_by === (int) auth()->id())
+                        <p class="text-xs text-slate-500 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'مستنيين رد الطرف التاني. لو مردش خلال ٣ أيام الطلب بيتلغي والفلوس بترجع للمشتري.' : 'Waiting for the other side. With no answer in 3 days the order is cancelled and the buyer is refunded.' }}</p>
+                    @else
+                        <p class="text-xs text-slate-500 dark:text-zinc-400">{{ app()->getLocale() === 'ar' ? 'لو مردتش خلال ٣ أيام الطلب هيتلغي والفلوس هترجع للمشتري.' : 'With no answer in 3 days the order is cancelled and the buyer is refunded.' }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            <form action="{{ route('marketplace.orders.cancel-accept', $order->id) }}" method="POST" class="flex-1 min-w-[120px]">
+                                @csrf
+                                <button type="submit" onclick="return confirm('{{ app()->getLocale() === 'ar' ? 'توافق على الإلغاء؟ الفلوس هترجع للمشتري.' : 'Accept? The buyer will be refunded.' }}')" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all">{{ app()->getLocale() === 'ar' ? 'موافقة على الإلغاء' : 'Accept' }}</button>
+                            </form>
+                            <form action="{{ route('marketplace.orders.cancel-decline', $order->id) }}" method="POST" class="flex-1 min-w-[120px]">
+                                @csrf
+                                <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 border border-slate-300 dark:border-zinc-700 text-xs font-bold transition-all">{{ app()->getLocale() === 'ar' ? 'رفض' : 'Decline' }}</button>
+                            </form>
+                        </div>
                     @endif
                 </div>
             @endif
