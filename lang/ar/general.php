@@ -6406,7 +6406,7 @@ return array (
   'service_submitted_for_review_it_will_be_visible_once_approved' => 'تم إرسال الخدمة للمراجعة. ستظهر بمجرد اعتمادها.',
   'service_suspended_successfully' => 'تم تعليق الخدمة بنجاح.',
   'service_tags' => 'خدمة وسوم',
-  'service_title' => 'خدمة العنوان',
+  'service_title' => 'عنوان الخدمة',
   'service_title_1' => 'خدمة Title...',
   'service_type' => 'نوع الخدمة',
   'service_unavailable' => 'الخدمة غير متاحة',

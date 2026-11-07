@@ -217,15 +217,12 @@ class BuyerOrderActionsAndModerationTest extends TestCase
         $this->assertSame(['Your name', 'Your logo'], $service->requirements);
 
         $this->actingAs($this->seller)->get(route('marketplace.services.edit', $service))
-            ->assertOk()->assertSee('name="auto_reply"', false)->assertSee('Your name');
+            ->assertOk()->assertInertia(fn ($page) => $page
+                ->where('service.auto_reply', 'New text')
+                ->where('service.requirements', ['Your name', 'Your logo']));
 
         $this->actingAs($this->seller)->put(route('marketplace.services.update', $service), $payload(['auto_reply' => '']))->assertSessionHasNoErrors();
         $this->assertNull($service->fresh()->auto_reply);
-    }
-
-    public function test_seller_create_page_has_the_auto_reply_field(): void
-    {
-        $this->actingAs($this->seller)->get(route('marketplace.services.create'))->assertOk()->assertSee('name="auto_reply"', false);
     }
 
     public function test_api_order_holds_the_money_and_sends_the_auto_reply(): void

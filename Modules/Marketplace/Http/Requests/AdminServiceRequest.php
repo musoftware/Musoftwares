@@ -10,23 +10,6 @@ use Illuminate\Validation\Rule;
  */
 class AdminServiceRequest extends UpdateServiceRequest
 {
-    private const TRANSLATED_FIELDS = ['title', 'tagline', 'description', 'auto_reply'];
-
-    /** The plain column holds the English text, or the Arabic text when there is no English. */
-    protected function prepareForValidation(): void
-    {
-        $plain = [];
-        foreach (self::TRANSLATED_FIELDS as $field) {
-            $translations = $this->input("{$field}_translations");
-            if (is_array($translations)) {
-                $plain[$field] = ($translations['en'] ?? null) ?: (($translations['ar'] ?? null) ?: null);
-            }
-        }
-
-        $this->merge($plain);
-        $this->fillPackageDetails();
-    }
-
     public function rules(): array
     {
         return [

@@ -317,4 +317,8 @@ return [
   'fav_verified_creator' => 'Verified Creator',
   'seller_nav_label' => 'Seller sections',
   'category_nav_label' => 'Service categories',
+    'service_create_hint' => 'Add your service step by step. You can change it later.',
+    'service_create_review_hint' => 'After you save, the service goes to review and appears in the marketplace once an admin approves it.',
+    'service_edit_review_hint' => 'After you save, the service goes to review and leaves the marketplace until an admin approves it.',
+    'service_edit_admin_link' => 'Open the full settings in the admin panel',
 ];

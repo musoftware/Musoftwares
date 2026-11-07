@@ -47,6 +47,11 @@ trait FillsPackageDetails
         $base = $saved?->only(['name', 'description', 'price', 'old_price', 'currency_id', 'delivery_days', 'revisions', 'features']) ?? [];
         $package = [...$base, ...$row];
 
+        // The full form sends every package field. An empty list is dropped from a file upload, so no list means empty.
+        if ($this->boolean('full_form')) {
+            $package['features'] = $row['features'] ?? [];
+        }
+
         $package['description'] = ($package['description'] ?? null) ?: $this->defaultPackageDescription($package);
         $package['currency_id'] = ($package['currency_id'] ?? null) ?: Currency::where('currency', self::$sellerFormCurrency)->value('id');
 

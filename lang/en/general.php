@@ -6406,7 +6406,7 @@ return array (
   'service_submitted_for_review_it_will_be_visible_once_approved' => 'Service submitted for review. It will be visible once approved.',
   'service_suspended_successfully' => 'Service suspended successfully.',
   'service_tags' => 'Tag service',
-  'service_title' => 'Address service',
+  'service_title' => 'Service title',
   'service_title_1' => 'Title service...',
   'service_type' => 'Service type',
   'service_unavailable' => 'Unavailable service',

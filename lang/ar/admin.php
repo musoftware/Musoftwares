@@ -2304,4 +2304,6 @@ return [
         'refunded' => 'استرداد',
         'sent' => 'سحب',
     ],
+    'marketplace_package_features' => 'مميزات الباقة',
+    'marketplace_package_features_hint' => 'ميزة في كل سطر.',
 ];

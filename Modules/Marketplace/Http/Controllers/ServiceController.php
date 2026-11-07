@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Models\Currency;
 use Inertia\Inertia;
 use Modules\Marketplace\Http\Requests\StoreServiceRequest;
 use Modules\Marketplace\Http\Requests\UpdateServiceRequest;
@@ -384,10 +385,7 @@ class ServiceController extends Controller
 
     public function create()
     {
-        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $seller = auth()->user();
-
-        return view('marketplace::services.create', compact('categories', 'seller'));
+        return Inertia::render('Marketplace/Services/Create', $this->sellerFormProps(route('admin.marketplace.services.create')));
     }
 
     public function store(StoreServiceRequest $request)
@@ -541,10 +539,28 @@ class ServiceController extends Controller
             abort(403);
         }
 
-        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
-        $service->load(['packages.currency', 'extras']);
+        return Inertia::render('Marketplace/Services/Edit', [
+            ...$this->sellerFormProps(route('admin.marketplace.services.edit', $service)),
+            'service' => $service->load(['packages', 'extras']),
+        ]);
+    }
 
-        return view('marketplace::services.edit', compact('categories', 'service'));
+    /**
+     * What the seller create and edit pages share. Only admins get the link to the admin page.
+     *
+     * @return array<string, mixed>
+     */
+    private function sellerFormProps(string $adminUrl): array
+    {
+        $user = auth()->user();
+        $isAdmin = $user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin);
+
+        return [
+            'categories' => ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']),
+            'currencies' => Currency::orderBy('id')->get(['id', 'currency', 'symbol']),
+            'needsReview' => ! $isAdmin,
+            'adminUrl' => $isAdmin ? $adminUrl : null,
+        ];
     }
 
     public function update(UpdateServiceRequest $request, Service $service)
@@ -553,8 +569,14 @@ class ServiceController extends Controller
 
         $validated = $request->validated();
 
+        // The full form sends every list, but a file upload drops the empty ones. There, no list means empty.
+        if ($request->boolean('full_form')) {
+            $validated += ['tags' => [], 'faq' => [], 'requirements' => [], 'extras' => [], 'kept_gallery' => []];
+        }
+
         DB::transaction(function () use ($validated, $request, $service) {
-            $keptPaths = array_values($validated['kept_gallery'] ?? []);
+            // A form without this field adds new images to the saved ones and removes nothing.
+            $keptPaths = array_values($validated['kept_gallery'] ?? ($service->gallery ?? []));
             $uploadedPaths = [];
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $image) {
@@ -605,8 +627,8 @@ class ServiceController extends Controller
                 $galleryPaths = array_merge($keptPaths, $uploadedPaths);
             }
 
-            $thumbnailPath = $service->thumbnail;
-            if (! empty($galleryPaths[0])) {
+            $thumbnailPath = $service->getRawOriginal('thumbnail');
+            if (! empty($galleryPaths[0]) && $galleryPaths[0] !== ($service->gallery[0] ?? null)) {
                 $firstImagePath = $galleryPaths[0];
                 $fullPath = public_path('uploads/'.ltrim($firstImagePath, '/'));
                 $thumbRelative = 'services/'.auth()->id().'/thumb_'.basename($firstImagePath);
@@ -623,39 +645,24 @@ class ServiceController extends Controller
             $isAdmin = $user && ($user->hasRole('admin') || $user->hasRole('super_admin') || $user->hasRole('Admin') || ! empty($user->is_admin));
 
             $service->update([
-                'title' => $validated['title'] ?? null,
-                'slug' => ! empty($validated['title']) ? Str::slug($validated['title']) : $service->slug,
+                ...$this->savedTextUnlessChanged($service, $validated),
+                ...$this->savedValuesUnlessSent($service, $validated),
+                'slug' => $this->slugForTitle($service, $validated['title'] ?? null),
                 'thumbnail' => $thumbnailPath,
-                'title_translations' => $validated['title_translations'] ?? null,
-                'tagline' => $validated['tagline'] ?? null,
-                'tagline_translations' => $validated['tagline_translations'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'description_translations' => $validated['description_translations'] ?? null,
                 // A form without the field keeps the reply. New text replaces the older translated copies.
                 'auto_reply' => array_key_exists('auto_reply', $validated) ? $validated['auto_reply'] : $service->auto_reply,
                 'auto_reply_translations' => array_key_exists('auto_reply', $validated) ? ($validated['auto_reply_translations'] ?? null) : $service->auto_reply_translations,
                 'category_id' => $validated['category_id'],
-                'tags' => $validated['tags'] ?? [],
-                'faq' => $validated['faq'] ?? [],
-                'requirements' => $validated['requirements'] ?? [],
                 'gallery' => $galleryPaths,
-                'video_url' => $validated['video_url'] ?? null,
-                'service_link' => $validated['service_link'] ?? null,
-                'is_free' => $validated['is_free'] ?? false,
-                'generate_serials' => $validated['generate_serials'] ?? false,
-                'allow_random_serial' => $validated['allow_random_serial'] ?? false,
-                'validity_days' => $validated['validity_days'] ?? null,
-                'referral_commission_from' => $validated['referral_commission_from'] ?? 'fee',
-                'referral_commission_percentage' => $validated['referral_commission_percentage'] ?? null,
                 'status' => $isAdmin ? 'active' : 'draft',
                 'approved_at' => $isAdmin ? ($service->approved_at ?? now()) : $service->approved_at,
                 'approved_by' => $isAdmin ? ($service->approved_by ?? $user->id) : $service->approved_by,
             ]);
 
-            $submittedExtraIds = collect($validated['extras'] ?? [])->pluck('id')->filter()->toArray();
-            $service->extras()->whereNotIn('id', $submittedExtraIds)->delete();
-
             if (isset($validated['extras'])) {
+                $submittedExtraIds = collect($validated['extras'])->pluck('id')->filter()->toArray();
+                $service->extras()->whereNotIn('id', $submittedExtraIds)->delete();
+
                 foreach ($validated['extras'] as $extra) {
                     if (! empty($extra['id'])) {
                         $service->extras()->where('id', $extra['id'])->update([
@@ -711,6 +718,70 @@ class ServiceController extends Controller
 
         return redirect()->route('marketplace.services.show', $service->id)
             ->with('success', __('general.service_updated_successfully_and_submitted_for_re_approval'));
+    }
+
+    /** The address changes only with the title, and stays unique when another service has the same title. */
+    private function slugForTitle(Service $service, ?string $title): string
+    {
+        $slug = $title === null || $title === $service->title ? '' : Str::slug($title);
+        if ($slug === '') {
+            return $service->slug;
+        }
+
+        return Service::where('slug', $slug)->whereKeyNot($service->id)->exists() ? "{$slug}-{$service->id}" : $slug;
+    }
+
+    /**
+     * Title, tagline and description. Unchanged text keeps its translations. Changed text replaces
+     * them, because they would still show the old wording.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function savedTextUnlessChanged(Service $service, array $validated): array
+    {
+        $fields = [];
+        foreach (['title', 'tagline', 'description'] as $field) {
+            $translations = "{$field}_translations";
+            $text = array_key_exists($field, $validated) ? $validated[$field] : $service->{$field};
+
+            $fields[$field] = $text;
+            $fields[$translations] = array_key_exists($translations, $validated)
+                ? $validated[$translations]
+                : ($text === $service->{$field} ? $service->{$translations} : null);
+        }
+
+        return $fields;
+    }
+
+    /**
+     * The seller form does not show every field. Anything it does not send keeps its saved value.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function savedValuesUnlessSent(Service $service, array $validated): array
+    {
+        $emptyValues = [
+            'tags' => [],
+            'faq' => [],
+            'requirements' => [],
+            'video_url' => null,
+            'service_link' => null,
+            'is_free' => false,
+            'generate_serials' => false,
+            'allow_random_serial' => false,
+            'validity_days' => null,
+            'referral_commission_from' => 'fee',
+            'referral_commission_percentage' => null,
+        ];
+
+        $values = [];
+        foreach ($emptyValues as $field => $empty) {
+            $values[$field] = array_key_exists($field, $validated) ? ($validated[$field] ?? $empty) : $service->{$field};
+        }
+
+        return $values;
     }
 
     public function createAi()

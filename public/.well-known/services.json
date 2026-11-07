@@ -1,5 +1,34 @@
 {
-    "updated_at": "2026-11-04T18:11:06+00:00",
-    "total_services": 0,
-    "services": []
+    "updated_at": "2026-11-07T22:32:58+00:00",
+    "total_services": 2,
+    "services": [
+        {
+            "id": 1,
+            "title": "Mine",
+            "slug": "mine",
+            "category": "Web",
+            "url": "http://localhost/marketplace/services/1/mine",
+            "tagline": null,
+            "starting_price": 10,
+            "packages": [
+                {
+                    "name": "Own",
+                    "price": 10,
+                    "delivery_days": 4
+                }
+            ],
+            "tags": []
+        },
+        {
+            "id": 2,
+            "title": "Theirs",
+            "slug": "theirs",
+            "category": "Web",
+            "url": "http://localhost/marketplace/services/2/theirs",
+            "tagline": null,
+            "starting_price": 0,
+            "packages": [],
+            "tags": []
+        }
+    ]
 }

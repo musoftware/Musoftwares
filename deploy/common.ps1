@@ -118,7 +118,8 @@ function Invoke-LocalTests([string]$projectRoot) {
     $php = Get-LocalPhp
     Push-Location $projectRoot
     try {
-        & $php -d memory_limit=2G vendor\bin\pest --parallel
+        # Out-Host keeps the test output out of the return value, so only the boolean below is returned.
+        & $php -d memory_limit=2G vendor\bin\pest --parallel | Out-Host
         return ($LASTEXITCODE -eq 0)
     } finally {
         Pop-Location

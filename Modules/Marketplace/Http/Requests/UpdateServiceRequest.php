@@ -4,11 +4,13 @@ namespace Modules\Marketplace\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Modules\Marketplace\Http\Requests\Concerns\FillsPackageDetails;
+use Modules\Marketplace\Http\Requests\Concerns\FillsPlainTextFromTranslations;
 use Modules\Marketplace\Http\Requests\Concerns\NormalizesRequirements;
 
 class UpdateServiceRequest extends FormRequest
 {
     use FillsPackageDetails;
+    use FillsPlainTextFromTranslations;
     use NormalizesRequirements {
         prepareForValidation as normalizeRequirements;
     }
@@ -16,6 +18,7 @@ class UpdateServiceRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->normalizeRequirements();
+        $this->fillPlainTextFromTranslations();
         $this->fillPackageDetails();
     }
 
@@ -27,11 +30,12 @@ class UpdateServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'                    => 'nullable|string|max:255',
+            'full_form'                => 'nullable|boolean',
+            'title'                    => 'required|string|max:255',
             'title_translations'       => 'nullable|array',
             'tagline'                  => 'nullable|string|max:255',
             'tagline_translations'     => 'nullable|array',
-            'description'              => 'nullable|string|min:10',
+            'description'              => 'required|string|min:10',
             'description_translations' => 'nullable|array',
             'auto_reply'               => 'nullable|string',
             'auto_reply_translations'  => 'nullable|array',

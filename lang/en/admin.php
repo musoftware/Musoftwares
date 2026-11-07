@@ -2304,4 +2304,6 @@ Task B: 10 points',
         'refunded' => 'Refund',
         'sent' => 'Withdrawal',
     ],
+    'marketplace_package_features' => 'Package features',
+    'marketplace_package_features_hint' => 'One feature on each line.',
 ];
