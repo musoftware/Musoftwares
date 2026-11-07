@@ -1,9 +1,11 @@
-{{-- One header for every public page. Main links first, less important links inside "More". --}}
+{{-- One header for every public page. "All services" opens a panel with everything the site offers. --}}
 @php
     $isAr = app()->getLocale() === 'ar';
     $nav = \App\Support\SiteNav::links();
     $linkClass = fn (array $link) => $link['active'] ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]';
-    $moreActive = collect($nav['more'])->contains('active', true);
+    $megaActive = request()->is('services', 'services/*') || collect($nav['mega'])->contains('active', true);
+    $megaLabel = $isAr ? 'كل الخدمات' : 'All services';
+    $megaAllLabel = $isAr ? 'شوف كل البرامج والأنظمة والأدوات' : 'See all programs, systems and tools';
 @endphp
 <header class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-black/5">
     <div class="max-w-[1240px] mx-auto flex items-center justify-between gap-4 px-4 sm:px-8 h-16">
@@ -13,21 +15,35 @@
             <span class="text-[20px] font-bold tracking-tight text-[#1d1d1f]">Musoftware</span>
         </a>
 
-        <nav class="hidden lg:flex items-center gap-7 text-[14px] font-medium" aria-label="{{ $isAr ? 'القائمة الرئيسية' : 'Main menu' }}">
+        <nav class="hidden lg:flex items-center gap-4 xl:gap-7 whitespace-nowrap text-[14px] font-medium" aria-label="{{ $isAr ? 'القائمة الرئيسية' : 'Main menu' }}">
+            <details id="mega-menu" class="group">
+                <summary class="list-none cursor-pointer flex items-center gap-1 transition-colors {{ $megaActive ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]' }} [&::-webkit-details-marker]:hidden">
+                    {{ $megaLabel }}
+                    <svg class="w-3.5 h-3.5 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </summary>
+                <div class="absolute inset-x-0 top-full bg-white border-b border-black/10 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+                    <div class="max-w-[1240px] mx-auto px-8 py-7">
+                        <div class="columns-4 xl:columns-5 gap-8">
+                            @foreach ($nav['mega'] as $group)
+                                <div class="break-inside-avoid pb-6 whitespace-normal">
+                                    @if ($group['url'])
+                                        <a href="{{ $group['url'] }}" class="block pb-1.5 text-[13px] font-semibold text-[#1d1d1f] hover:text-[#0071e3]">{{ $group['title'] }}</a>
+                                    @else
+                                        <p class="pb-1.5 text-[13px] font-semibold text-[#1d1d1f]">{{ $group['title'] }}</p>
+                                    @endif
+                                    @foreach ($group['links'] as $link)
+                                        <a href="{{ $link['url'] }}" class="block py-1 text-[13px] font-normal leading-snug transition-colors {{ $linkClass($link) }}">{{ $link['label'] }}</a>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        </div>
+                        <a href="{{ $nav['all_url'] }}" class="inline-block border-t border-black/5 pt-4 w-full text-[14px] font-semibold text-[#0071e3] hover:underline">{{ $megaAllLabel }}</a>
+                    </div>
+                </div>
+            </details>
             @foreach ($nav['main'] as $link)
                 <a href="{{ $link['url'] }}" class="transition-colors {{ $linkClass($link) }}">{{ $link['label'] }}</a>
             @endforeach
-            <details id="more-menu" class="relative group">
-                <summary class="list-none cursor-pointer flex items-center gap-1 transition-colors {{ $moreActive ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]' }} [&::-webkit-details-marker]:hidden">
-                    {{ $isAr ? 'المزيد' : 'More' }}
-                    <svg class="w-3.5 h-3.5 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </summary>
-                <div class="absolute top-full mt-3 start-0 min-w-[220px] bg-white border border-black/10 rounded-xl shadow-lg py-2">
-                    @foreach ($nav['more'] as $link)
-                        <a href="{{ $link['url'] }}" class="block px-4 py-2.5 text-[14px] transition-colors hover:bg-[#f5f5f7] {{ $linkClass($link) }}">{{ $link['label'] }}</a>
-                    @endforeach
-                </div>
-            </details>
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -51,7 +67,7 @@
                 <a href="/login" class="hidden lg:inline-flex text-[14px] font-medium text-[#1d1d1f]/75 hover:text-[#0071e3] transition-colors">{{ $isAr ? 'تسجيل الدخول' : 'Sign in' }}</a>
             @endauth
 
-            <a href="/company/contact" style="background-color: #0071e3; color: #ffffff;" class="hidden sm:inline-flex items-center justify-center px-5 py-2 rounded-lg text-[14px] font-medium shadow-sm hover:bg-[#0077ed] transition-colors">{{ $isAr ? 'تواصل معنا' : 'Contact us' }}</a>
+            <a href="/company/contact" style="background-color: #0071e3; color: #ffffff;" class="hidden sm:inline-flex lg:hidden xl:inline-flex items-center justify-center px-5 py-2 rounded-lg text-[14px] font-medium shadow-sm hover:bg-[#0077ed] transition-colors">{{ $isAr ? 'تواصل معنا' : 'Contact us' }}</a>
 
             <button type="button" onclick="document.getElementById('site-mobile-menu').classList.toggle('hidden')" class="lg:hidden p-2 text-[#1d1d1f] hover:text-[#0071e3] transition-colors" aria-label="{{ $isAr ? 'فتح القائمة' : 'Open menu' }}">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -63,17 +79,20 @@
         @foreach ($nav['main'] as $link)
             <a href="{{ $link['url'] }}" class="block py-3 border-b border-black/5 {{ $linkClass($link) }}">{{ $link['label'] }}</a>
         @endforeach
-        <details class="border-b border-black/5" @if ($moreActive) open @endif>
-            <summary class="py-3 cursor-pointer list-none flex items-center justify-between [&::-webkit-details-marker]:hidden">
-                {{ $isAr ? 'المزيد' : 'More' }}
-                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </summary>
-            <div class="pb-2 ps-3">
-                @foreach ($nav['more'] as $link)
-                    <a href="{{ $link['url'] }}" class="block py-2.5 text-[14px] {{ $linkClass($link) }}">{{ $link['label'] }}</a>
-                @endforeach
-            </div>
-        </details>
+        <a href="{{ $nav['all_url'] }}" class="block pt-5 pb-2 text-[13px] font-semibold text-[#1d1d1f]/60">{{ $megaLabel }}</a>
+        @foreach ($nav['mega'] as $group)
+            <details class="border-b border-black/5" @if ($group['active']) open @endif>
+                <summary class="py-3 cursor-pointer list-none flex items-center justify-between [&::-webkit-details-marker]:hidden">
+                    {{ $group['title'] }}
+                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </summary>
+                <div class="pb-2 ps-3">
+                    @foreach ($group['links'] as $link)
+                        <a href="{{ $link['url'] }}" class="block py-2.5 text-[14px] {{ $linkClass($link) }}">{{ $link['label'] }}</a>
+                    @endforeach
+                </div>
+            </details>
+        @endforeach
         <div class="pt-4 flex items-center gap-3">
             @auth
                 <a href="/dashboard" class="flex-1 text-center py-2.5 rounded-lg border border-black/10 text-sm font-semibold hover:bg-[#f5f5f7] transition-colors">{{ $isAr ? 'لوحة التحكم' : 'Dashboard' }}</a>
@@ -85,9 +104,16 @@
     </div>
 
     <script>
-        document.addEventListener('click', function (event) {
-            var menu = document.getElementById('more-menu');
-            if (menu && menu.open && !menu.contains(event.target)) menu.open = false;
-        });
+        (function () {
+            var menu = document.getElementById('mega-menu');
+            document.addEventListener('click', function (event) {
+                if (menu && menu.open && !menu.contains(event.target)) menu.open = false;
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key !== 'Escape' || !menu || !menu.open) return;
+                menu.open = false;
+                menu.querySelector('summary').focus();
+            });
+        })();
     </script>
 </header>
