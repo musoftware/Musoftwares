@@ -62,24 +62,14 @@
                 </div>
             </div>
 
-            @if ($heroShots->isNotEmpty())
-                @php $mainShot = $heroShots->first(); $sideShots = $heroShots->slice(1); @endphp
-                <div class="lg:col-span-6">
-                    <a href="{{ route('website-services.show', $mainShot['product']->slug) }}" class="block rounded-xl border border-black/10 bg-white shadow-xl overflow-hidden" aria-label="{{ $mainShot['product']->localized('name') }}">
-                        <div class="flex items-center gap-1.5 px-4 h-8 bg-[#f5f5f7] border-b border-black/10" aria-hidden="true">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span><span class="w-2.5 h-2.5 rounded-full bg-[#d2d2d7]"></span>
-                        </div>
-                        <img src="{{ $mainShot['image'] }}" alt="{{ $mainShot['product']->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" fetchpriority="high">
-                    </a>
-                    <div class="mt-4 grid grid-cols-2 gap-4">
-                        @foreach ($sideShots as $shot)
-                            <a href="{{ route('website-services.show', $shot['product']->slug) }}" class="block rounded-lg border border-black/10 bg-white shadow-md overflow-hidden" aria-label="{{ $shot['product']->localized('name') }}">
-                                <img src="{{ $shot['image'] }}" alt="{{ $shot['product']->localized('name') }}" class="w-full aspect-[16/10] object-cover object-top bg-[#f5f5f7]" loading="lazy">
-                            </a>
-                        @endforeach
-                    </div>
+            <div class="lg:col-span-6 flex items-center justify-center">
+                <div class="relative w-full max-w-[540px]">
+                    <img src="{{ asset('images/hero/hero_tech_stack_3d_square.jpg') }}" 
+                         alt="{{ $t('استوديو موسوفت للبرمجيات', 'Musoftware Engineering Studio') }}" 
+                         class="w-full h-auto object-contain mx-auto" 
+                         fetchpriority="high">
                 </div>
-            @endif
+            </div>
         </div>
 
         <div class="max-w-[1180px] mx-auto mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-4 border-t border-black/10">
