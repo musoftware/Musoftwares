@@ -633,6 +633,17 @@ class SoftwareProductsTest extends TestCase
         $this->assertStringNotContainsString(route('website-services.show', 'marketing-suite').'</loc>', $xml);
     }
 
+    public function test_ai_files_generated_during_tests_stay_out_of_the_public_folder(): void
+    {
+        $publicRobots = public_path('robots.txt');
+        $before = md5_file($publicRobots);
+
+        $this->assertSame(0, $this->artisan('marketplace:generate-ai-files'));
+
+        $this->assertSame($before, md5_file($publicRobots));
+        $this->assertFileExists(base_path(config('filesystems.ai_files_path').'/robots.txt'));
+    }
+
     public function test_ai_files_use_the_public_address_and_describe_the_store(): void
     {
         config(['app.url' => 'http://localhost']);

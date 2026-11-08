@@ -36,7 +36,7 @@ class GenerateAiFilesCommand extends Command
         $this->info('Generating Marketplace AI & SEO static files...');
 
         $baseUrl = $this->publicBaseUrl();
-        $wellKnownDir = public_path('.well-known');
+        $wellKnownDir = $this->outputPath('.well-known');
 
         if (!File::exists($wellKnownDir)) {
             File::makeDirectory($wellKnownDir, 0755, true);
@@ -148,7 +148,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put(public_path('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false));
+        File::put($this->outputPath('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false));
         $this->info('Created public/llms.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullContent .= "- **Content**:\n{$cleanBody}\n\n";
         }
 
-        File::put(public_path('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true));
+        File::put($this->outputPath('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true));
         $this->info('Created public/llms-full.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put(public_path('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false));
+        File::put($this->outputPath('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false));
         $this->info('Created public/llms-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -332,7 +332,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullArContent .= "- **محتوى المقال**:\n{$cleanBody}\n\n";
         }
 
-        File::put(public_path('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true));
+        File::put($this->outputPath('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true));
         $this->info('Created public/llms-full-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -401,7 +401,7 @@ class GenerateAiFilesCommand extends Command
         // ─────────────────────────────────────────────────────────────────────
         // 5. Delete static public/sitemap.xml if existing to avoid blocking dynamic SitemapController
         // ─────────────────────────────────────────────────────────────────────
-        $staticSitemap = public_path('sitemap.xml');
+        $staticSitemap = $this->outputPath('sitemap.xml');
         if (File::exists($staticSitemap)) {
             File::delete($staticSitemap);
             $this->info('Deleted public/sitemap.xml to allow dynamic sitemap routing.');
@@ -447,7 +447,7 @@ class GenerateAiFilesCommand extends Command
         $robotsContent .= "Disallow: /seller/\n\n";
 
         $robotsContent .= "Sitemap: {$baseUrl}/sitemap.xml\n";
-        File::put(public_path('robots.txt'), $robotsContent);
+        File::put($this->outputPath('robots.txt'), $robotsContent);
         $this->info('Created public/robots.txt');
 
         $this->info('All Marketplace AI & SEO static files generated successfully!');
@@ -455,6 +455,14 @@ class GenerateAiFilesCommand extends Command
     }
 
     /** Settings can say "localhost" on a developer PC. Search engines and AI assistants must never read that. */
+    /** The public folder in real use. Tests set filesystems.ai_files_path so they never touch it. */
+    private function outputPath(string $file): string
+    {
+        $override = config('filesystems.ai_files_path');
+
+        return ($override ? base_path($override) : public_path()).'/'.$file;
+    }
+
     private function publicBaseUrl(): string
     {
         $url = rtrim((string) config('app.url'), '/');

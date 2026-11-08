@@ -4,6 +4,9 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    // Where marketplace:generate-ai-files writes, relative to the project. Empty means the public folder.
+    'ai_files_path' => env('AI_FILES_PATH'),
+
     'disks' => [
 
         'local' => [

@@ -79,5 +79,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="APP_BUSINESS_TIMEZONE" value="UTC"/>
+        <env name="AI_FILES_PATH" value="storage/framework/testing/ai-files"/>
     </php>
 </phpunit>
