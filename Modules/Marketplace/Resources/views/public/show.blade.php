@@ -379,7 +379,7 @@
                 </div>
 
                 <!-- Order Now Form Submission -->
-                <form action="{{ route('marketplace.orders.store') }}" method="POST" id="orderForm">
+                <form action="{{ auth()->check() ? route('marketplace.orders.store') : route('marketplace.orders.guest') }}" method="POST" id="orderForm">
                     @csrf
                     <input type="hidden" name="package_id" id="selectedPackageIdInput" value="{{ $firstPkg->id }}">
                     <input type="hidden" name="service_id" value="{{ $service->id }}">
@@ -404,13 +404,33 @@
                             <span>{{ app()->getLocale() === 'ar' ? 'شراء وتفعيل فوري بالرصيد' : 'Instant 1-Click Purchase' }}</span>
                         </button>
                     @else
-                        <a 
-                            href="{{ route('login') }}" 
-                            class="w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium text-xs transition-all shadow-xs flex items-center justify-center gap-1.5"
-                        >
-                            <i class="ri-login-box-line text-sm"></i>
-                            <span>{{ app()->getLocale() === 'ar' ? 'سجل دخول للمتابعة والشراء' : 'Sign In to Order' }}</span>
-                        </a>
+                        @php $guestIsAr = app()->getLocale() === 'ar'; @endphp
+                        <div class="space-y-3">
+                            <div>
+                                <label for="guest-name" class="block mb-1 text-[13px] font-semibold text-[#1d1d1f]">{{ $guestIsAr ? 'اسمك' : 'Your name' }}</label>
+                                <input id="guest-name" name="name" type="text" required maxlength="255" autocomplete="name" value="{{ old('name') }}" class="w-full h-11 rounded-xl border border-black/15 px-3 text-[16px] bg-white text-[#1d1d1f] focus:border-[#0071e3] focus:ring-0">
+                            </div>
+                            <div>
+                                <label for="guest-email" class="block mb-1 text-[13px] font-semibold text-[#1d1d1f]">{{ $guestIsAr ? 'إيميلك' : 'Your email' }}</label>
+                                <input id="guest-email" name="email" type="email" required maxlength="255" autocomplete="email" dir="ltr" value="{{ old('email') }}" class="w-full h-11 rounded-xl border border-black/15 px-3 text-[16px] bg-white text-[#1d1d1f] focus:border-[#0071e3] focus:ring-0">
+                            </div>
+                            <div>
+                                <label for="guest-phone" class="block mb-1 text-[13px] font-semibold text-[#1d1d1f]">{{ $guestIsAr ? 'رقم الواتساب (لو حابب)' : 'WhatsApp number (optional)' }}</label>
+                                <input id="guest-phone" name="phone" type="tel" maxlength="50" autocomplete="tel" dir="ltr" value="{{ old('phone') }}" class="w-full h-11 rounded-xl border border-black/15 px-3 text-[16px] bg-white text-[#1d1d1f] focus:border-[#0071e3] focus:ring-0">
+                            </div>
+                            <label class="flex items-start gap-2 text-[13px] leading-[1.6] text-[#515154]">
+                                <input type="checkbox" name="privacy_consent" value="1" required class="mt-1 rounded border-black/20">
+                                <span>{{ $guestIsAr ? 'موافق على' : 'I agree to the' }} <a href="/privacy-policy" target="_blank" class="text-[#0071e3] underline">{{ $guestIsAr ? 'سياسة الخصوصية' : 'privacy policy' }}</a></span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="mt-4 w-full h-11 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-[15px] transition-all shadow-xs flex items-center justify-center">
+                            {{ $guestIsAr ? 'اطلب دلوقتي' : 'Order now' }}
+                        </button>
+                        <p class="mt-2 text-[12px] text-center text-[#515154]">
+                            {{ $guestIsAr ? 'هنعملك حساب بالإيميل ده لوحده.' : 'We will open an account for you with this email.' }}
+                            <a href="{{ route('login') }}" class="text-[#0071e3] underline">{{ $guestIsAr ? 'عندك حساب؟' : 'Have an account?' }}</a>
+                        </p>
                     @endauth
                 </form>
 
@@ -418,6 +438,26 @@
                     <i class="ri-lock-line text-emerald-600"></i>
                     <span>{{ app()->getLocale() === 'ar' ? 'دفع آمن بالضمان المالي الكامل (Escrow)' : '100% Escrow-Protected Transaction' }}</span>
                 </p>
+
+                @auth
+                    @php
+                        $marketerIsAr = app()->getLocale() === 'ar';
+                        $marketerReferral = auth()->user()->referrals()->first();
+                        $marketerLink = $marketerReferral ? route('ref', $marketerReferral->key).'?to=marketplace/services/'.$service->id : null;
+                    @endphp
+                    <div class="mt-5 pt-4 border-t border-black/5" data-marketer-box>
+                        <p class="text-[14px] font-semibold text-[#1d1d1f]">{{ $marketerIsAr ? 'سوّق الخدمة دي واكسب' : 'Promote this service and earn' }}</p>
+                        @if ($marketerLink)
+                            <p class="mt-1 text-[13px] text-[#515154]">{{ $marketerIsAr ? 'ابعت اللينك ده، ولما حد يشتري عن طريقه وطلبه يكمل، عمولتك بتنزل في رصيدك.' : 'Share this link. When someone buys through it and the order is completed, your commission goes to your balance.' }}</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <input type="text" readonly value="{{ $marketerLink }}" dir="ltr" aria-label="{{ $marketerIsAr ? 'لينك التسويق' : 'Marketing link' }}" class="flex-1 min-w-0 h-11 rounded-xl border border-black/15 px-3 text-[13px] bg-[#f5f5f7] text-[#1d1d1f]">
+                                <button type="button" data-copied="{{ $marketerIsAr ? 'اتنسخ' : 'Copied' }}" onclick="navigator.clipboard.writeText(this.previousElementSibling.value); this.textContent = this.dataset.copied;" class="h-11 shrink-0 px-4 rounded-xl bg-[#1d1d1f] text-white text-[13px] font-semibold">{{ $marketerIsAr ? 'انسخ' : 'Copy' }}</button>
+                            </div>
+                        @else
+                            <a href="{{ route('referrals.index') }}" class="mt-1 inline-flex min-h-11 items-center text-[14px] font-semibold text-[#0071e3] underline">{{ $marketerIsAr ? 'فعّل حساب التسويق الأول' : 'Activate your marketing account first' }}</a>
+                        @endif
+                    </div>
+                @endauth
 
             </div>
             @endif

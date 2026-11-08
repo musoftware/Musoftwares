@@ -5,11 +5,10 @@
 
 @theme {
     --font-sora: "Sora", sans-serif;
-    /* One stack site-wide (same as the marketplace /services pages): Apple system font, then Inter (Latin) + Cairo (Arabic). */
-    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo",
-        system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
-    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Cairo", "Inter", sans-serif;
+    /* One stack site-wide: IBM Plex Sans Arabic for text and Baloo Bhaijaan 2 for headings. */
+    --font-sans: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", system-ui, sans-serif, "Apple Color Emoji",
+        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-display: "Baloo Bhaijaan 2", "IBM Plex Sans Arabic", Tahoma, sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
     --color-background: var(--background);
@@ -171,6 +170,12 @@
     background-color: var(--background);
     color: var(--text-primary);
     font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
   }
 
   /* ==========================================================================

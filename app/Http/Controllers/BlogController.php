@@ -55,6 +55,11 @@ class BlogController extends Controller
 
         $currentLocale = app()->getLocale();
 
+        $arabicUrl = $this->arabicVersionForLockedVisitor($article);
+        if ($arabicUrl) {
+            return redirect($arabicUrl);
+        }
+
         // Each language version has its own URL and is linked by hreflang, so an
         // existing article is always shown as is. Redirecting by the visitor's
         // language hid the Arabic articles from Google (it crawls in English).
@@ -116,6 +121,16 @@ class BlogController extends Controller
             'articleJson' => $seo->toJson($seo->articleGraph($article, $imageUrl)),
             'readingMinutes' => $seo->readingMinutes($article),
         ]);
+    }
+
+    /** The Arabic address of an English article, for visitors who can only see Arabic. */
+    private function arabicVersionForLockedVisitor(?BlogArticle $article): ?string
+    {
+        if (! $article || $article->language === 'ar' || ! request()->attributes->getBoolean('locale_locked')) {
+            return null;
+        }
+
+        return app(BlogSeo::class)->alternates($article)->get('ar');
     }
 
     /**

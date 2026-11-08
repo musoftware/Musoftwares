@@ -33,7 +33,9 @@
                 <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-privacy-consent-gate'))" class="hover:text-[#1d1d1f] transition-colors cursor-pointer">
                     {{ __('privacy_compliance.manage_cookie_preferences') }}
                 </button>
-                <a href="{{ $footer['language_switch']['url'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a>
+                @if ($footer['language_switch'])
+                    <a href="{{ $footer['language_switch']['url'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a>
+                @endif
             </div>
         </div>
     </div>

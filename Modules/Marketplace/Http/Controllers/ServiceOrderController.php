@@ -17,6 +17,9 @@ use Modules\Marketplace\Services\EscrowService;
 use Modules\Marketplace\Services\OrderCancellation;
 use Modules\Marketplace\Services\ServiceAutoReply;
 
+use App\Services\Auth\NewAccountService;
+use Modules\Marketplace\Services\MarketplaceOrderPayment;
+
 class ServiceOrderController extends Controller
 {
     public function index(Request $request)
@@ -90,7 +93,7 @@ class ServiceOrderController extends Controller
         $priceInBuyerCurrency = $this->priceInCurrency($package, $buyer->currency_id);
 
         if ($buyer->available_balance() < $priceInBuyerCurrency) {
-            return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
+            return redirect()->away(app(MarketplaceOrderPayment::class)->startCheckout($buyer, $package));
         }
 
         // Commission logic (BC math for financial precision)
@@ -170,6 +173,9 @@ class ServiceOrderController extends Controller
 
             DB::commit();
 
+            app(MarketplaceOrderPayment::class)->forgetPending();
+            app(NewAccountService::class)->linkReferrer($buyer, $request);
+
             event(new MarketplaceOrderPlaced($order));
 
             app(ServiceAutoReply::class)->handle($order);
@@ -183,11 +189,7 @@ class ServiceOrderController extends Controller
 
     private function priceInCurrency(ServicePackage $package, $currencyId): float
     {
-        if (! $package->currency_id || ! $currencyId || (int) $package->currency_id === (int) $currencyId) {
-            return (float) $package->price;
-        }
-
-        return (float) \App\Models\CurrenciesExchange::RateToday($package->price, $package->currency_id, $currencyId);
+        return app(MarketplaceOrderPayment::class)->priceIn($package, $currencyId);
     }
 
     public function deliver(Request $request, ServiceOrder $order)

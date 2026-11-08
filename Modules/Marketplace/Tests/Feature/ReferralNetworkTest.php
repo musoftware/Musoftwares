@@ -26,7 +26,7 @@ class ReferralNetworkTest extends TestCase
     public function test_referral_commission_calculation_and_crediting()
     {
         $referrer = User::factory()->create(['user_balance' => 0]);
-        $buyer = User::factory()->create(['user_balance' => 500]);
+        $buyer = User::factory()->create(['user_balance' => 500, 'ref_user_id' => $referrer->id]);
         $seller = User::factory()->create(['user_balance' => 0]);
 
         UserReferral::create([

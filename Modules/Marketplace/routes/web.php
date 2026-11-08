@@ -55,6 +55,9 @@ Route::middleware('web')
         Route::get('/downloads/claim/{token}', [FreeDownloadController::class, 'claimDownload'])->name('downloads.claim');
 
 
+        // Ordering without an account: opens one and goes to payment
+        Route::post('/orders/guest', [\Modules\Marketplace\Http\Controllers\OrderCheckoutController::class, 'guest'])->name('orders.guest');
+
         // ── Auth-only ─────────────────────────────────────────────────────
         Route::middleware('auth')->group(function () {
 
@@ -65,10 +68,10 @@ Route::middleware('web')
             // Services CRUD
             Route::get('/services/create',        [ServiceController::class, 'create'])->name('services.create');
             Route::get('/services/create-ai',     [ServiceController::class, 'createAi'])->name('services.create_ai');
-            Route::post('/services/store-ai',    [ServiceController::class, 'storeAi'])->name('services.store_ai');
+            Route::post('/services/store-ai',    [ServiceController::class, 'storeAi'])->middleware('throttle:30,60')->name('services.store_ai');
             Route::post('/services',              [ServiceController::class, 'store'])->name('services.store');
-            Route::post('/services/generate-ai-image', [ServiceController::class, 'generateAiImage'])->name('services.generate-ai-image');
-            Route::post('/services/get-ai-image-prompt', [ServiceController::class, 'getAiImagePrompt'])->name('services.get-ai-image-prompt');
+            Route::post('/services/generate-ai-image', [ServiceController::class, 'generateAiImage'])->middleware('throttle:30,60')->name('services.generate-ai-image');
+            Route::post('/services/get-ai-image-prompt', [ServiceController::class, 'getAiImagePrompt'])->middleware('throttle:30,60')->name('services.get-ai-image-prompt');
             Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('services.edit');
             Route::put('/services/{service}',     [ServiceController::class, 'update'])->name('services.update');
             Route::delete('/services/{service}',  [ServiceController::class, 'destroy'])->name('services.destroy');
@@ -76,6 +79,8 @@ Route::middleware('web')
 
             // Orders Lifecycle
             Route::get('/orders',           [ServiceOrderController::class, 'index'])->name('orders.index');
+            Route::get('/orders/resume',    [\Modules\Marketplace\Http\Controllers\OrderCheckoutController::class, 'resume'])->name('orders.resume');
+            Route::get('/orders/resume/failed', [\Modules\Marketplace\Http\Controllers\OrderCheckoutController::class, 'resumeFailed'])->name('orders.resume-failed');
             Route::get('/orders/{order}',   [ServiceOrderController::class, 'show'])->name('orders.show');
             Route::post('/orders',          [ServiceOrderController::class, 'store'])->name('orders.store');
             Route::post('/orders/{order}/complete', [ServiceOrderController::class, 'complete'])->name('orders.complete');
@@ -131,10 +136,10 @@ Route::middleware(['web', 'auth'])
         Route::get('/landing-pages/{service}/analytics', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'analytics'])->name('landing-pages.analytics');
 
         // AI Generation
-        Route::post('/landing-pages/{service}/generate-questions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateQuestions'])->name('landing-pages.generate-questions');
-        Route::post('/landing-pages/{service}/generate-faqs', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateFAQs'])->name('landing-pages.generate-faqs');
-        Route::post('/landing-pages/{service}/generate-pricing', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generatePricingTables'])->name('landing-pages.generate-pricing');
-        Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
+        Route::post('/landing-pages/{service}/generate-questions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateQuestions'])->middleware('throttle:30,60')->name('landing-pages.generate-questions');
+        Route::post('/landing-pages/{service}/generate-faqs', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateFAQs'])->middleware('throttle:30,60')->name('landing-pages.generate-faqs');
+        Route::post('/landing-pages/{service}/generate-pricing', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generatePricingTables'])->middleware('throttle:30,60')->name('landing-pages.generate-pricing');
+        Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->middleware('throttle:30,60')->name('landing-pages.generate-content');
     });
 
         // ── Seller Portal ─────────────────────────────────────────────────

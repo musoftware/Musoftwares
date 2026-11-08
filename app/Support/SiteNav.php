@@ -22,7 +22,7 @@ class SiteNav
 
     private const FOOTER_COLUMNS = [
         ['ar' => 'المنتجات', 'en' => 'Products', 'links' => [
-            ['url' => '/services#programs', 'ar' => 'برامج سطح المكتب', 'en' => 'Desktop programs'],
+            ['url' => '/services#programs', 'ar' => 'برامج للكمبيوتر', 'en' => 'Computer programs'],
             ['url' => '/services#systems', 'ar' => 'أنظمة إدارة الأعمال', 'en' => 'Business systems'],
             ['url' => '/how-we-work', 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
             ['url' => '/services#services', 'ar' => 'خدمات مواقع وتسويق', 'en' => 'Websites and marketing services'],
@@ -71,8 +71,8 @@ class SiteNav
         return [
             'brand' => self::BRAND,
             'tagline' => $isAr
-                ? 'استوديو برمجيات مستقل في السويس، مصر. يديره ويبرمجه محمود أمين. أنظمة وبرامج جاهزة بسعر معلن، وبتستلم الكود.'
-                : 'An independent software studio in Suez, Egypt, run and programmed by Mahmoud Amin. Ready-made systems and programs with public prices, and you receive the code.',
+                ? 'شركة برمجة في السويس، مصر، بيديرها محمود أمين. هنعملك أي برنامج أو موقع أو SaaS أو RaaS، وبنحاول قدر الإمكان إن مشروعك يكبر وينجح.'
+                : 'A software company in Suez, Egypt, run by Mahmoud Amin. We build you any program, website, SaaS or RaaS, and do everything we can to help your project grow and succeed.',
             'columns' => array_map(fn (array $column) => [
                 'title' => $column[$lang],
                 'links' => array_map(fn (array $link) => [
@@ -83,7 +83,7 @@ class SiteNav
             ], self::FOOTER_COLUMNS),
             'social' => self::SOCIAL,
             'copyright' => '© '.date('Y').' '.self::BRAND.'. '.($isAr ? 'جميع الحقوق محفوظة. صُنع في السويس، مصر.' : 'All rights reserved. Made in Suez, Egypt.'),
-            'language_switch' => [
+            'language_switch' => request()->attributes->getBoolean('locale_locked') ? null : [
                 'label' => $isAr ? 'English' : 'العربية',
                 'url' => request()->fullUrlWithQuery(['lang' => $isAr ? 'en' : 'ar']),
             ],

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CurrenciesExchange;
-use App\Models\Currency;
 use App\Models\WebsiteService;
 use App\Services\IpGeolocationService;
 use App\Services\PricingService;
@@ -34,11 +32,11 @@ class HomeController extends Controller
             'featuredProducts' => $store->featured(),
             'heroShots' => $store->heroShots(),
             'title' => $isAr
-                ? 'موسوفت | أنظمة وبرامج جاهزة بسعر معلن، بتستلم الكود وبتملكه'
-                : 'Musoftware | Ready-made systems and programs with public prices, you own the code',
+                ? 'موسوفت | هنعملك أي برنامج أو موقع أو SaaS أو RaaS'
+                : 'Musoftware | We build you any program, website, SaaS or RaaS',
             'description' => $isAr
-                ? 'استوديو برمجيات مصري في السويس. أنظمة للصيدليات والمطاعم والعيادات والمراكز، وبرامج سطح مكتب، وخدمات مواقع ومتاجر. أسعار معلنة ودفع أونلاين وتواصل مباشر مع المبرمج.'
-                : 'An Egyptian software studio in Suez. Systems for pharmacies, restaurants, clinics and centers, desktop programs, and website and store services. Public prices, online payment and direct contact with the programmer.',
+                ? 'شركة برمجة مصرية في السويس. هنعملك أي برنامج أو موقع أو SaaS أو RaaS، بنبنيه معاك خطوة بخطوة وبنحاول قدر الإمكان إن مشروعك يكبر وينجح.'
+                : 'An Egyptian software company in Suez. We build you any program, website, SaaS or RaaS, step by step with you, and do everything we can to help your project grow and succeed.',
         ]);
     }
 
@@ -227,19 +225,9 @@ class HomeController extends Controller
 
     public function estimator(Request $request)
     {
-        $rate = 50.0;
-        try {
-            $usd = Currency::where('currency', 'USD')->first();
-            $egp = Currency::where('currency', 'EGP')->first();
-            if ($usd && $egp) {
-                $rate = CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id) ?: 50.0;
-            }
-        } catch (\Throwable $e) {
-            // Keep default 50.0 fallback on connection/lookup failure
-            $rate = 50.0;
-        }
-
-        $estimatorData = (new ProjectEstimatorDataService())->getEstimatorData((float)$rate);
+        $estimator = new ProjectEstimatorDataService();
+        $rate = $estimator->usdToEgpRate();
+        $estimatorData = $estimator->getEstimatorData($rate);
 
         if ($request->query('format') === 'json' || $request->wantsJson()) {
             return response()->json($estimatorData, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

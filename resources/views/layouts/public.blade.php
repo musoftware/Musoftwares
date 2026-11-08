@@ -47,10 +47,9 @@
     <meta name="twitter:description" content="{{ $description ?? 'Custom Web Apps, Mobile Apps & Enterprise Platforms' }}">
     <meta name="twitter:image" content="{{ $ogImage }}">
 
-    <!-- Apple SF Pro Font Fallbacks + Cairo & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Schema.org JSON-LD: who the site belongs to (the same on every public page) -->
     <script type="application/ld+json">{!! \App\Support\SiteSchema::json() !!}</script>
@@ -82,7 +81,7 @@
             color-scheme: light !important;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo", sans-serif;
+            font-family: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
             background-color: var(--apple-bg);
             color: var(--apple-text);
             -webkit-font-smoothing: antialiased;

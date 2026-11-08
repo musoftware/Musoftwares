@@ -2,6 +2,8 @@
      (FloatingWhatsAppButton + MobileBottomActionBar). Items come from SiteNav::footer()['mobile_bar']. --}}
 @php($bar = \App\Support\SiteNav::footer()['mobile_bar'])
 
+@include('layouts.ai-assistant')
+
 {{-- Keeps the last footer line visible above the phone bar. --}}
 <div class="h-20 lg:hidden" aria-hidden="true"></div>
 

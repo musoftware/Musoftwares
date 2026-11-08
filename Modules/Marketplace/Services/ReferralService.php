@@ -16,18 +16,10 @@ class ReferralService
      */
     public function processOrderReferralCommission(ServiceOrder $order): ?float
     {
-        $buyer = $order->buyer;
-        $referral = UserReferral::first();
-
-        if (!$referral || !$referral->user_id) {
-            return null;
-        }
-
-        $referrer = User::find($referral->user_id);
+        $referrer = User::find($order->buyer?->ref_user_id);
         if (!$referrer) {
             return null;
         }
-
 
         $service = $order->package->service ?? null;
         $commissionFrom = $service->referral_commission_from ?? 'fee';

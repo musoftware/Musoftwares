@@ -136,8 +136,26 @@ class ServicePageIntegrityTest extends TestCase
 
         $this->actingAs($buyer)
             ->post(route('marketplace.orders.store'), ['package_id' => $package->id])
-            ->assertSessionHasErrors('error');
+            ->assertRedirectContains('kashier');
 
         $this->assertDatabaseCount('marketplace_orders', 0);
+    }
+
+    public function test_a_wallet_in_another_currency_can_pay_when_its_value_is_enough(): void
+    {
+        $service = $this->makeService();
+        $package = $this->makePackage($service, 1000, self::EGP); // 1000 EGP = 20 USD
+        $buyer = User::factory()->create([
+            'currency_id' => self::USD,
+            'user_balance' => 100,
+            'email_verified_at' => now(),
+            'onboarding_completed' => true,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('marketplace.orders.store'), ['package_id' => $package->id])
+            ->assertRedirect();
+
+        $this->assertDatabaseCount('marketplace_orders', 1);
     }
 }

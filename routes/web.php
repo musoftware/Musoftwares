@@ -172,6 +172,11 @@ Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('leg
 Route::post('/privacy/consent/gate', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'storeGateConsent'])->name('privacy.consent.gate');
 Route::post('/privacy/consent/decline', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'declineEssential'])->name('privacy.consent.decline');
 
+// Site assistant chat
+Route::get('/assistant/history', [\App\Http\Controllers\AiAssistantController::class, 'history'])->name('assistant.history');
+Route::post('/assistant/message', [\App\Http\Controllers\AiAssistantController::class, 'message'])->middleware('throttle:20,1')->name('assistant.message');
+Route::post('/assistant/reset', [\App\Http\Controllers\AiAssistantController::class, 'reset'])->name('assistant.reset');
+
 // Estimator & Custom Solutions
 Route::get('/estimator', [HomeController::class, 'estimator'])->name('estimator');
 Route::post('/estimator/generate-quotation', [HomeController::class, 'generateQuotation'])->name('public.quotation.generate');
@@ -294,8 +299,8 @@ Route::middleware(['auth', 'verified', 'onboarding'])->name('client.projects.')-
 
 // Board mutations (JSON) — both client and admin and guest with write-access use these endpoints.
 Route::middleware([\App\Http\Middleware\VerifyBoardAccess::class])->name('client.projects.')->group(function () {
-    Route::post('/projects/{project}/board/ai-questions', [ClientProjectBoardController::class, 'generateAiQuestions'])->name('board.ai-questions');
-    Route::post('/projects/{project}/board/add-with-ai', [ClientProjectBoardController::class, 'addWithAi'])->name('board.add-with-ai');
+    Route::post('/projects/{project}/board/ai-questions', [ClientProjectBoardController::class, 'generateAiQuestions'])->middleware('throttle:30,60')->name('board.ai-questions');
+    Route::post('/projects/{project}/board/add-with-ai', [ClientProjectBoardController::class, 'addWithAi'])->middleware('throttle:30,60')->name('board.add-with-ai');
     Route::post('/projects/{project}/board/notes', [ClientProjectBoardController::class, 'storeNote'])->name('board.store-note');
     Route::put('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'updateNote'])->name('board.update-note');
     Route::delete('/projects/{project}/board/notes/{note}', [ClientProjectBoardController::class, 'destroyNote'])->name('board.destroy-note');
@@ -535,10 +540,10 @@ Route::middleware(['web', 'auth'])
         Route::get('/landing-pages/{service}/analytics', [ServiceLandingPageAnalyticsController::class, 'analytics'])->name('landing-pages.analytics');
 
         // AI Generation
-        Route::post('/landing-pages/{service}/generate-questions', [ServiceLandingPageAIController::class, 'generateQuestions'])->name('landing-pages.generate-questions');
-        Route::post('/landing-pages/{service}/generate-faqs', [ServiceLandingPageAIController::class, 'generateFAQs'])->name('landing-pages.generate-faqs');
-        Route::post('/landing-pages/{service}/generate-pricing', [ServiceLandingPageAIController::class, 'generatePricingTables'])->name('landing-pages.generate-pricing');
-        Route::post('/landing-pages/{service}/generate-content', [ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
+        Route::post('/landing-pages/{service}/generate-questions', [ServiceLandingPageAIController::class, 'generateQuestions'])->middleware('throttle:30,60')->name('landing-pages.generate-questions');
+        Route::post('/landing-pages/{service}/generate-faqs', [ServiceLandingPageAIController::class, 'generateFAQs'])->middleware('throttle:30,60')->name('landing-pages.generate-faqs');
+        Route::post('/landing-pages/{service}/generate-pricing', [ServiceLandingPageAIController::class, 'generatePricingTables'])->middleware('throttle:30,60')->name('landing-pages.generate-pricing');
+        Route::post('/landing-pages/{service}/generate-content', [ServiceLandingPageAIController::class, 'generateLandingPageContent'])->middleware('throttle:30,60')->name('landing-pages.generate-content');
     });
 
 // -- Public Landing Page Routes ------------------------------------
@@ -1110,8 +1115,8 @@ Route::middleware(['auth', 'verified'])->prefix('isaas')->name('isaas.')->group(
     Route::put('/contracts/{contract}', [ContractController::class, 'update'])->name('contracts.update');
     Route::delete('/contracts/{contract}', [ContractController::class, 'destroy'])->name('contracts.destroy');
     Route::post('/contracts/{contract}/status', [ContractController::class, 'updateStatus'])->name('contracts.update-status');
-    Route::post('/contracts/ai-generate', [ContractController::class, 'aiGenerate'])->name('contracts.ai.generate');
-    Route::post('/contracts/ai-review', [ContractController::class, 'aiReview'])->name('contracts.ai.review');
+    Route::post('/contracts/ai-generate', [ContractController::class, 'aiGenerate'])->middleware('throttle:30,60')->name('contracts.ai.generate');
+    Route::post('/contracts/ai-review', [ContractController::class, 'aiReview'])->middleware('throttle:30,60')->name('contracts.ai.review');
 });
 
 // Chat API Routes

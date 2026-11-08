@@ -9,7 +9,7 @@ export type SiteFooterData = {
     columns: { title: string; links: FooterLink[] }[];
     social: { url: string; label: string }[];
     copyright: string;
-    language_switch: { url: string; label: string };
+    language_switch: { url: string; label: string } | null;
     mobile_bar: Record<'pricing' | 'whatsapp' | 'account', { url: string; label: string }>;
 };
 
@@ -70,7 +70,9 @@ export default function SiteFooter() {
                             {__('privacy_compliance.manage_cookie_preferences')}
                         </button>
                         {/* Full page load: the locale is resolved server-side from ?lang. */}
-                        <a href={footer.language_switch.url} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a>
+                        {footer.language_switch && (
+                            <a href={footer.language_switch.url} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a>
+                        )}
                     </div>
                 </div>
             </div>

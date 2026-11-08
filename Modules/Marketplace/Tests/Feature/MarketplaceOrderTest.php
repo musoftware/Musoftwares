@@ -122,8 +122,8 @@ class MarketplaceOrderTest extends TestCase
             'package_id' => $package->id
         ]);
 
-        $response->assertSessionHasErrors(['error']);
-        
+        $response->assertRedirectContains('kashier');
+
         $this->assertDatabaseMissing('marketplace_orders', [
             'buyer_id' => $buyer->id,
         ]);

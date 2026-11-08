@@ -74,7 +74,7 @@ function AuthenticatedContent({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const { auth, notifications, flash, wallet, locale } = usePage().props as any;
+    const { auth, notifications, flash, wallet, locale, localeLocked } = usePage().props as any;
     const otherLocale = locale === 'ar' ? 'en' : 'ar';
     useInertiaNotifications();
     const { permission, requestPermission } = useFCM();
@@ -601,11 +601,13 @@ function AuthenticatedContent({
                                                 >
                                                     <Settings className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('client_home.nav.settings')}</DropdownMenuItem>
                                                 {/* plain link: a full page load switches language and direction; SetLocale saves the choice */}
-                                                <DropdownMenuItem 
-                                                    className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 mb-1 transition-colors"
-                                                    render={<a href={`${typeof window !== 'undefined' ? window.location.pathname : '/dashboard'}?lang=${otherLocale}`} lang={otherLocale} className="flex items-center w-full" />}
-                                                >
-                                                    <Languages className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('client_home.nav.language')}</DropdownMenuItem>
+                                                {!localeLocked && (
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#1d1d1f] dark:text-zinc-200 hover:bg-[#f5f5f7] dark:hover:bg-zinc-800 p-2 mb-1 transition-colors"
+                                                        render={<a href={`${typeof window !== 'undefined' ? window.location.pathname : '/dashboard'}?lang=${otherLocale}`} lang={otherLocale} className="flex items-center w-full" />}
+                                                    >
+                                                        <Languages className="me-2 h-3.5 w-3.5 text-[#1d1d1f]/60 dark:text-zinc-400" />{__('client_home.nav.language')}</DropdownMenuItem>
+                                                )}
                                                 {user?.role === 'admin' && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-[12px] text-xs font-semibold text-[#0071e3] dark:text-[#3898ec] bg-[#0071e3]/10 dark:bg-[#0071e3]/20 hover:bg-[#0071e3]/20 mb-1 p-2"

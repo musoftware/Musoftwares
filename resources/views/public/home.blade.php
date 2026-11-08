@@ -15,30 +15,30 @@
     ];
 
     $facts = [
-        [$t('سعر معلن', 'Public price'), $t('تشوفه قبل ما تدفع', 'You see it before you pay')],
-        [$t('الكود بتاعك', 'The code is yours'), $t('بتستلمه وبتملكه', 'You receive it and own it')],
+        [$t('بنعمله معاك', 'Built with you'), $t('وبناخد رأيك في كل خطوة', 'With your input at every step')],
+        [$t('سعر واضح', 'Clear price'), $t('تعرفه قبل ما تدفع', 'You know it before you pay')],
         [$t('دفع آمن', 'Safe payment'), $t('عن طريق Kashier', 'Through Kashier')],
-        [$t('مبرمج حقيقي', 'A real programmer'), $t('بتكلمه على واتساب', 'You talk to him on WhatsApp')],
+        [$t('بني آدم بيرد عليك', 'A real person replies'), $t('على واتساب', 'On WhatsApp')],
     ];
 
     $groups = [
-        ['key' => 'programs', 'title' => $t('برامج سطح المكتب', 'Desktop programs'), 'body' => $t('للتسويق وجمع العملاء وإدارة المحل.', 'For marketing, leads and running a shop.')],
-        ['key' => 'systems', 'title' => $t('أنظمة إدارة الأعمال', 'Business systems'), 'body' => $t('كاملة وجاهزة، وبتملك الكود.', 'Complete and ready, and you own the code.')],
-        ['key' => 'services', 'title' => $t('خدمات بنفذها لك', 'Services we do for you'), 'body' => $t('مواقع ومتاجر وهوية وإعلانات.', 'Websites, stores, branding and ads.')],
+        ['key' => 'programs', 'title' => $t('برامج للكمبيوتر', 'Computer programs'), 'body' => $t('للتسويق وجمع العملاء وإدارة المحل.', 'For marketing, finding customers and running a shop.')],
+        ['key' => 'systems', 'title' => $t('أنظمة لإدارة شغلك', 'Systems to run your business'), 'body' => $t('جاهزة تشتغل عليها على طول، وبتبقى ملكك.', 'Ready to use right away, and they become yours.')],
+        ['key' => 'services', 'title' => $t('شغل بنعمله لك', 'Work we do for you'), 'body' => $t('مواقع ومتاجر ولوجو وإعلانات.', 'Websites, online stores, logos and ads.')],
     ];
 
     $steps = [
-        [$t('اختار', 'Choose'), $t('شوف الصور والسعر.', 'See the pictures and the price.')],
-        [$t('ادفع', 'Pay'), $t('أونلاين من غير حساب.', 'Online, no account.')],
-        [$t('كلمنا', 'Message us'), $t('ابعت رقم طلبك على واتساب.', 'Send your order number on WhatsApp.')],
-        [$t('استلم', 'Receive'), $t('وشغّل من أول يوم.', 'And start from day one.')],
+        [$t('احكيلنا', 'Tell us'), $t('قولنا فكرتك وعايز توصل لإيه.', 'Tell us your idea and your goal.')],
+        [$t('اعرف السعر', 'Get the price'), $t('بنقولك هيتكلف كام قبل ما نبدأ.', 'We tell you the cost before we start.')],
+        [$t('نبنيه معاك', 'We build it with you'), $t('خطوة بخطوة، وإنت متابع.', 'Step by step, with you following along.')],
+        [$t('نكبّره', 'We help it grow'), $t('بنحاول قدر الإمكان إن مشروعك ينجح.', 'We do everything we can to help it succeed.')],
     ];
 
     $faq = [
-        [$t('هل بملك الكود فعلًا؟', 'Do I really own the code?'), $t('أيوه. في الأنظمة بتستلم الكود كامل، وفي الخدمات المخصصة الملكية بتنتقل لك بعد الدفع الكامل.', 'Yes. With the systems you receive the full code, and in custom services ownership moves to you after full payment.')],
+        [$t('هل البرنامج هيبقى ملكي؟', 'Will the program really be mine?'), $t('أيوه. في الأنظمة بتاخد ملفات البرنامج كلها (الكود)، وفي الشغل المخصوص بيبقى ملكك بعد ما تدفع المبلغ كله.', 'Yes. With the systems you get all the program files (the code), and custom work becomes yours after full payment.')],
         [$t('الدفع آمن؟', 'Is paying safe?'), $t('بتدفع من صفحة Kashier، وإحنا مش بنشوف بيانات كارتك.', 'You pay on the Kashier page and we never see your card details.')],
-        [$t('لو محتاج تعديلات؟', 'What if I need changes?'), $t('باقة التعديلات في الأنظمة بتشمل أي تعديل برمجي يحتاجه شغلك.', 'The changes plan for systems includes any programming change your business needs.')],
-        [$t('لو حصلت مشكلة بعد الاستلام؟', 'What if something goes wrong after delivery?'), $t('ابعت رقم طلبك على واتساب ونرد عليك.', 'Send your order number on WhatsApp and we reply.')],
+        [$t('لو عايز أغيّر حاجة في البرنامج؟', 'What if I want something changed?'), $t('باقة التعديلات في الأنظمة بتشمل أي تعديل يحتاجه شغلك.', 'The changes plan for systems includes any change your business needs.')],
+        [$t('لو حصلت مشكلة بعد ما استلمت؟', 'What if something goes wrong after I receive it?'), $t('ابعت رقم طلبك على واتساب ونرد عليك.', 'Send your order number on WhatsApp and we reply.')],
     ];
 @endphp
 
@@ -49,17 +49,23 @@
     <section class="px-4 sm:px-8 pt-12 sm:pt-16 bg-white">
         <div class="max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             <div class="lg:col-span-6 text-start">
-                <p class="text-[14px] font-semibold text-[#0071e3] mb-4">{{ $t('موسوفت، استوديو برمجيات مصري في السويس', 'Musoftware, an Egyptian software studio in Suez') }}</p>
+                <p class="text-[14px] font-semibold text-[#0071e3] mb-4">{{ $t('موسوفت، شركة برمجة مصرية في السويس', 'Musoftware, an Egyptian software company in Suez') }}</p>
                 <h1 class="text-[36px] sm:text-[48px] lg:text-[54px] font-bold tracking-tight leading-[1.2]">
-                    {{ $t('برامج وأنظمة جاهزة لشغلك', 'Ready-made programs and systems for your business') }}
+                    {{ $t('هنعملك أي برنامج أو موقع أو SaaS أو RaaS', 'We build you any program, website, SaaS or RaaS') }}
                 </h1>
                 <p class="mt-5 text-[18px] sm:text-[20px] leading-[1.7] text-[#515154] max-w-[520px]">
-                    {{ $t('بسعر معلن من أول يوم. بتستلم الكود وبتملكه.', 'With a price you see on day one. You receive the code and own it.') }}
+                    {{ $t('بنبنيه معاك خطوة بخطوة، وبنحاول قدر الإمكان إن مشروعك يكبر وينجح.', 'We build it with you step by step, and do everything we can to help your project grow and succeed.') }}
                 </p>
-                <div class="mt-8 flex flex-col sm:flex-row gap-3">
-                    <a href="{{ route('services.index') }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('شوف المنتجات والأسعار', 'See products and prices') }}</a>
-                    <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
+                <div class="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                    <a href="/start-project" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('ابدأ مشروعك', 'Start your project') }}</a>
+                    <a href="{{ route('estimator') }}" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">{{ $t('احسب مشروعك هيتكلف كام', 'Work out what your project costs') }}</a>
+                    @if (config('services.anthropic.key'))
+                        <button type="button" data-open-assistant class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors cursor-pointer">{{ $t('اسأل المساعد', 'Ask the assistant') }}</button>
+                    @else
+                        <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-black/15 text-[15px] font-semibold text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
+                    @endif
                 </div>
+                <p class="mt-4 text-[15px]"><a href="{{ route('services.index') }}" class="font-semibold text-[#0071e3] hover:underline">{{ $t('أو شوف البرامج الجاهزة وأسعارها', 'Or see our ready-made programs and prices') }}</a></p>
             </div>
 
             <div class="lg:col-span-6 flex items-center justify-center">
@@ -164,7 +170,7 @@
     {{-- 4. How it works --}}
     <section id="how-it-works" class="px-4 sm:px-8 py-14 sm:py-20 bg-[#f5f5f7]">
         <div class="max-w-[1180px] mx-auto">
-            <h2 class="text-[28px] sm:text-[38px] font-bold tracking-tight text-center">{{ $t('إزاي بنشتغل؟', 'How do we work?') }}</h2>
+            <h2 class="text-[28px] sm:text-[38px] font-bold tracking-tight text-center">{{ $t('تبدأ إزاي؟', 'How do you start?') }}</h2>
             <ol class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-5">
                 @foreach ($steps as $i => [$stepTitle, $stepLine])
                     <li class="rounded-2xl bg-white border border-black/5 p-6">
@@ -210,7 +216,7 @@
         <div class="max-w-[700px] mx-auto">
             <h2 class="text-[28px] sm:text-[38px] font-bold tracking-tight leading-tight">{{ $t('جاهز تبدأ؟', 'Ready to start?') }}</h2>
             <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="{{ route('services.index') }}" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('تصفح المنتجات', 'Browse products') }}</a>
+                <a href="/start-project" style="background-color: #0071e3; color: #ffffff;" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg text-[15px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $t('ابدأ مشروعك', 'Start your project') }}</a>
                 <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-7 py-3.5 rounded-lg border border-white/30 text-[15px] font-semibold text-white hover:bg-white/10 transition-colors">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
             </div>
         </div>

@@ -6,6 +6,7 @@ use Modules\Marketplace\Models\MarketplaceEscrow;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Enums\EscrowStatus;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Exception;
 use App\Models\CurrenciesExchange;
 use App\Models\AdminSettings;
@@ -20,7 +21,8 @@ class EscrowService
         return DB::transaction(function () use ($order) {
             $buyer = $order->buyer;
             
-            if ($buyer->available_balance() < $order->amount) {
+            // The balance is in the buyer's currency, so the price is compared in that same currency.
+            if ($buyer->available_balance() < app(MarketplaceOrderPayment::class)->priceIn($order->package, $buyer->currency_id)) {
                 throw new Exception(__('marketplace.insufficient_balance_for_escrow'));
             }
 
@@ -71,8 +73,8 @@ class EscrowService
             $order = $escrow->order;
             $seller = $order->seller;
             
-            // Re-calculate or use stored commission
-            $sellerEarnings = $order->amount - $order->commission_amount;
+            // The status check above runs once per escrow, so the marketer is paid only once.
+            $sellerEarnings = $order->amount - $order->commission_amount - $this->payMarketer($order);
 
             $transactionId = $seller->add_balance(
                 $sellerEarnings,
@@ -87,6 +89,24 @@ class EscrowService
                 'released_at' => now('Africa/Cairo'),
             ]);
         });
+    }
+
+    /**
+     * Pays the marketer who brought the buyer. Returns what comes out of the seller's share:
+     * the marketer's cut when the service says the seller pays it, otherwise nothing.
+     * A failure here is logged and must not hold back the seller's money.
+     */
+    private function payMarketer(ServiceOrder $order): float
+    {
+        try {
+            $paid = (float) app(ReferralService::class)->processOrderReferralCommission($order);
+        } catch (\Throwable $e) {
+            Log::error('Marketplace referral commission failed', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+
+            return 0.0;
+        }
+
+        return $order->package?->service?->referral_commission_from === 'seller' ? $paid : 0.0;
     }
 
     /**

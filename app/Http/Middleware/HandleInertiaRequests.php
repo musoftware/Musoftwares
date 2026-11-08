@@ -284,6 +284,7 @@ class HandleInertiaRequests extends Middleware
                 'ios_shortcut_token' => fn () => $request->session()->get('ios_shortcut_token'),
             ],
             'locale' => app()->getLocale(),
+            'localeLocked' => $request->attributes->getBoolean('locale_locked'),
             'privacyCompliance' => function () use ($request) {
                 $consentState = app(\App\Services\Privacy\ConsentAuditService::class)
                     ->resolveRequestConsentState($request);

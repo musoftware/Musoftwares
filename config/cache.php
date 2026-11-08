@@ -17,6 +17,9 @@ return [
 
     'default' => env('CACHE_STORE', 'database'),
 
+    // Where request limits are counted. It must keep values between requests, so production sets CACHE_LIMITER=file.
+    'limiter' => env('CACHE_LIMITER'),
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

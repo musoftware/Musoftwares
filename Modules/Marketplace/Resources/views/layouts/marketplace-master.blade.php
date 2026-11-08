@@ -39,10 +39,10 @@
 
     <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Fonts: Apple SF Pro Fallbacks + Cairo & Inter -->
+    <!-- Fonts: IBM Plex Sans Arabic and Baloo Bhaijaan 2 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Remix Icons -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -81,8 +81,8 @@
                         }
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Inter', 'Cairo', 'system-ui', 'sans-serif'],
-                        display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Cairo', 'Inter', 'sans-serif'],
+                        sans: ['IBM Plex Sans Arabic', 'Tahoma', 'Segoe UI', 'sans-serif'],
+                        display: ['Baloo Bhaijaan 2', 'IBM Plex Sans Arabic', 'Tahoma', 'sans-serif'],
                         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
                     }
                 }
@@ -104,7 +104,7 @@
             --apple-border-light: rgba(0, 0, 0, 0.08);
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Cairo", sans-serif;
+            font-family: "IBM Plex Sans Arabic", Tahoma, "Segoe UI", sans-serif;
             background-color: var(--apple-bg);
             color: var(--apple-text);
             -webkit-font-smoothing: antialiased;

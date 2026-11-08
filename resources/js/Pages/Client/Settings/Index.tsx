@@ -12,7 +12,7 @@ type Row = { href: string; icon: typeof UserRound; label: string; hint?: string;
 
 /** All client settings on one screen, grouped like a phone settings app. */
 export default function SettingsIndex({ currentLang, whatsappUrl }: { currentLang: 'ar' | 'en'; whatsappUrl: string }) {
-    const { auth } = usePage().props as any;
+    const { auth, localeLocked } = usePage().props as any;
     const user = auth?.user;
 
     const groups: { title: string; rows: Row[] }[] = [
@@ -61,27 +61,29 @@ export default function SettingsIndex({ currentLang, whatsappUrl }: { currentLan
                     </div>
                 )}
 
-                <section className="mt-6">
-                    <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold text-[#1d1d1f]/60 dark:text-zinc-400">
-                        <Languages className="h-4 w-4" />{__('client_home.settings.language')}
-                    </h2>
-                    <div className="overflow-hidden rounded-[20px] bg-white shadow-sm dark:bg-zinc-900">
-                        {(['ar', 'en'] as const).map((lang) => (
-                            // full page load: the whole interface and its direction switch, and SetLocale saves the choice
-                            <a
-                                key={lang}
-                                href={`/settings?lang=${lang}`}
-                                lang={lang}
-                                aria-current={currentLang === lang ? 'true' : undefined}
-                                className="flex items-center justify-between border-b border-black/5 px-4 py-3.5 text-[15px] last:border-0 hover:bg-[#f5f5f7] dark:border-white/10 dark:hover:bg-zinc-800"
-                            >
-                                <span className={cn(currentLang === lang && 'font-semibold')}>{__(`client_home.settings.${lang === 'ar' ? 'arabic' : 'english'}`)}</span>
-                                {currentLang === lang && <Check className="h-5 w-5 text-[#0071e3]" />}
-                            </a>
-                        ))}
-                    </div>
-                    <p className="mt-2 px-1 text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{__('client_home.settings.language_hint')}</p>
-                </section>
+                {!localeLocked && (
+                    <section className="mt-6">
+                        <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold text-[#1d1d1f]/60 dark:text-zinc-400">
+                            <Languages className="h-4 w-4" />{__('client_home.settings.language')}
+                        </h2>
+                        <div className="overflow-hidden rounded-[20px] bg-white shadow-sm dark:bg-zinc-900">
+                            {(['ar', 'en'] as const).map((lang) => (
+                                // full page load: the whole interface and its direction switch, and SetLocale saves the choice
+                                <a
+                                    key={lang}
+                                    href={`/settings?lang=${lang}`}
+                                    lang={lang}
+                                    aria-current={currentLang === lang ? 'true' : undefined}
+                                    className="flex items-center justify-between border-b border-black/5 px-4 py-3.5 text-[15px] last:border-0 hover:bg-[#f5f5f7] dark:border-white/10 dark:hover:bg-zinc-800"
+                                >
+                                    <span className={cn(currentLang === lang && 'font-semibold')}>{__(`client_home.settings.${lang === 'ar' ? 'arabic' : 'english'}`)}</span>
+                                    {currentLang === lang && <Check className="h-5 w-5 text-[#0071e3]" />}
+                                </a>
+                            ))}
+                        </div>
+                        <p className="mt-2 px-1 text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{__('client_home.settings.language_hint')}</p>
+                    </section>
+                )}
 
                 {groups.map((group) => (
                     <section key={group.title} className="mt-6">

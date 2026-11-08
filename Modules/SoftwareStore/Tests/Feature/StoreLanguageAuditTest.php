@@ -27,7 +27,7 @@ class StoreLanguageAuditTest extends TestCase
         'Flutter', 'React', 'Figma', 'Canva', 'HTML', 'CSS', 'JSON', 'OAuth', 'Cloud', 'SSL', 'DNS', 'MX', 'SMTP', 'IMAP', 'Pro', 'Inbox', 'Sender',
         'Email', 'Finder', 'Leads', 'Shop', 'Manager', 'Systems', 'Smile', 'Dental', 'Center', 'Cairo', 'Grill', 'Care', 'Pharmacy', 'Admin', 'Main', 'Suez',
         // the language switch, the owner's e-mail address, file names and technical terms that are written in Latin letters on purpose
-        'English', 'admin', 'musoftwares', 'com', 'txt', 'csv', 'bit', 'AES', 'Spintax', 'spintax', 'SendGrid', 'Cloudflare', 'WebP', 'robots', 'dot', 'info', 'IDs', 'SaaS', 'cron',
+        'English', 'admin', 'musoftwares', 'com', 'txt', 'csv', 'bit', 'AES', 'Spintax', 'spintax', 'SendGrid', 'Cloudflare', 'WebP', 'robots', 'dot', 'info', 'IDs', 'SaaS', 'RaaS', 'cron',
         'Analytics', 'Search', 'Console', 'Enter', 'Lead', 'Business', 'Suite', 'Lite', 'Basic', 'Personal', 'Company', 'gmial',
         // order number prefix, e-mail and domain examples, and Google's own term
         'SW-', 'AES-', 'sales', 'offer', 'yourbrand', 'Core', 'Web', 'Vitals',

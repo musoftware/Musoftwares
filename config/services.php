@@ -100,6 +100,22 @@ return [
         'key' => env('GEMINI_API_KEY', env('GEMINI_API_KEY_1')),
     ],
 
+    'marketplace_guest_orders' => [
+        'limiter_store' => env('GUEST_ORDER_LIMITER_STORE', 'file'),
+        'per_ip_per_hour' => (int) env('GUEST_ORDER_PER_IP_PER_HOUR', 5),
+    ],
+
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-opus-5-5'),
+        // Saved on disk: production uses the array cache, which forgets every request.
+        'assistant_limiter_store' => env('AI_ASSISTANT_LIMITER_STORE', 'file'),
+        'assistant_visitor_per_minute' => (int) env('AI_ASSISTANT_VISITOR_PER_MINUTE', 6),
+        'assistant_visitor_per_day' => (int) env('AI_ASSISTANT_VISITOR_PER_DAY', 30),
+        'assistant_ip_per_day' => (int) env('AI_ASSISTANT_IP_PER_DAY', 30),
+        'assistant_site_per_day' => (int) env('AI_ASSISTANT_SITE_PER_DAY', 1500),
+    ],
+
     'erp' => [
         'url' => env('ERP_URL', 'http://localhost:8001'),
         'shared_secret' => env('ERP_SHARED_SECRET', env('MONOLITH_SHARED_SECRET')),

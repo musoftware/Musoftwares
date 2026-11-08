@@ -3,9 +3,14 @@
 namespace App\Services;
 
 use App\Models\ContractPriceItem;
+use App\Models\CurrenciesExchange;
+use App\Models\Currency;
+use Illuminate\Support\Facades\Log;
 
 class ProjectEstimatorDataService extends BaseService
 {
+    private const FALLBACK_USD_TO_EGP = 50.0;
+
     /**
      * Get structured estimator configuration and items.
      *
@@ -742,6 +747,21 @@ class ProjectEstimatorDataService extends BaseService
                 'method' => 'POST',
             ],
         ];
+    }
+
+    /** Today's pounds per dollar, or 50 when the rate cannot be read. */
+    public function usdToEgpRate(): float
+    {
+        try {
+            $usd = Currency::where('currency', 'USD')->first();
+            $egp = Currency::where('currency', 'EGP')->first();
+
+            return $usd && $egp ? ((float) CurrenciesExchange::RateToday(1.0, $usd->id, $egp->id) ?: self::FALLBACK_USD_TO_EGP) : self::FALLBACK_USD_TO_EGP;
+        } catch (\Throwable $e) {
+            Log::warning('Estimator could not read the USD to EGP rate', ['error' => $e->getMessage()]);
+
+            return self::FALLBACK_USD_TO_EGP;
+        }
     }
 
     /** @return array<string, array<int, array>> the estimator add-ons per platform, from the price list */

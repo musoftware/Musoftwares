@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(\App\Services\AiAssistant\AssistantModel::class, \App\Services\AiAssistant\ClaudeAssistantModel::class);
         $this->app->register(LaravelModulesServiceProvider::class);
         $this->app->register(EventServiceProvider::class);
         $this->app->register(NotificationServiceProvider::class);

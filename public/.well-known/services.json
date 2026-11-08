@@ -1,5 +1,25 @@
 {
-    "updated_at": "2026-11-07T23:00:36+00:00",
-    "total_services": 0,
-    "services": []
+    "updated_at": "2026-11-08T12:28:31+00:00",
+    "total_services": 1,
+    "services": [
+        {
+            "id": 1,
+            "title": "Logo design",
+            "slug": "logo-design",
+            "category": "Test",
+            "url": "http://localhost/marketplace/services/1/logo-design",
+            "tagline": "A clean logo",
+            "starting_price": 100,
+            "packages": [
+                {
+                    "name": "Basic",
+                    "price": 100,
+                    "delivery_days": 3
+                }
+            ],
+            "tags": [
+                "logo"
+            ]
+        }
+    ]
 }
