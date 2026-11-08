@@ -221,12 +221,20 @@ export default function Costs() {
             title={__('general.business_costs')}
             header={__('general.business_costs')}
             actions={
-                <Link href={route('admin.business.reports')}>
-                    <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
-                        <Activity className="h-4 w-4 text-slate-800" />
-                        <span>{__('general.business_reports')}</span>
-                    </Button>
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Link href={route('admin.recurring_costs.index')}>
+                        <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
+                            <Receipt className="h-4 w-4 text-slate-800" />
+                            <span>{__('admin.sidebar_recurring_costs')}</span>
+                        </Button>
+                    </Link>
+                    <Link href={route('admin.business.reports')}>
+                        <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
+                            <Activity className="h-4 w-4 text-slate-800" />
+                            <span>{__('general.business_reports')}</span>
+                        </Button>
+                    </Link>
+                </div>
             }
         >
             <Head title={__('general.business_costs')} />

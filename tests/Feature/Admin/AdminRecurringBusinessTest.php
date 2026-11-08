@@ -7,6 +7,7 @@ use App\Models\CostTransaction;
 use App\Models\Currency;
 use App\Models\RecurringCost;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\CurrenciesSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -84,6 +85,60 @@ class AdminRecurringBusinessTest extends TestCase
         $response = $this->actingAs($this->admin)->delete(route('admin.recurring_costs.delete', $rCost->id));
         $response->assertRedirect();
         $this->assertSoftDeleted('recurring_costs', ['id' => $rCost->id]);
+    }
+
+    private function monthlyCostOnThe8th(string $startDate): RecurringCost
+    {
+        $rCost = new RecurringCost;
+        $rCost->title = 'Server Sub';
+        $rCost->amount = 50;
+        $rCost->currency_id = $this->currency->id;
+        $rCost->start_date = $startDate;
+        $rCost->current_date = $startDate;
+        $rCost->recurring = 'month';
+        $rCost->recurring_times = 1;
+        $rCost->recurring_times_month = '8';
+        $rCost->reason = 'server';
+        $rCost->is_active = true;
+        $rCost->save();
+
+        return $rCost;
+    }
+
+    /** @return array<string, mixed> */
+    private function costsPageProps(array $query = []): array
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.costs.index', $query))->assertOk();
+
+        return json_decode((string) json_encode($response->viewData('page')['props']), true);
+    }
+
+    public function test_generated_recurring_costs_use_their_reason_as_category_on_the_costs_page(): void
+    {
+        Carbon::setTestNow('2026-11-08 10:00:00');
+        $this->monthlyCostOnThe8th('2026-01-08')->apply();
+
+        $page = $this->costsPageProps();
+        $this->assertSame('server', $page['options']['categories'][0]['value']);
+        $this->assertSame('Server', $page['stats']['category_breakdown'][0]['name']);
+
+        $filtered = $this->costsPageProps(['category' => 'server']);
+        $this->assertCount(1, $filtered['entries']['data']);
+        $this->assertTrue($filtered['entries']['data'][0]['is_recurring']);
+        $this->assertCount(0, $this->costsPageProps(['category' => 'rent'])['entries']['data']);
+    }
+
+    public function test_recurring_cost_is_not_charged_before_its_start_date(): void
+    {
+        Carbon::setTestNow('2026-11-08 10:00:00');
+        $rCost = $this->monthlyCostOnThe8th('2026-12-08');
+
+        $rCost->apply();
+        $this->assertSame(0, CostTransaction::count());
+
+        Carbon::setTestNow('2026-12-08 10:00:00');
+        $rCost->apply();
+        $this->assertSame(1, CostTransaction::count());
     }
 
     // Income

@@ -67,14 +67,19 @@ class RecurringCost extends Model
     public function apply()
     {
         $now = Carbon::now();
-        if ($this->isToday($now)) {
-            if (! $this->createdBefore($now)) {
-                $c_id = CostTransaction::add_cost_balance(null, $this->amount, $this->reason, $this->currency_id, null);
-                $this->transactions()->attach($c_id, [
-                    'unique_id' => $this->unique_id($now),
-                ]);
-            }
+        if ($this->startsAfter($now) || ! $this->isToday($now) || $this->createdBefore($now)) {
+            return;
         }
+
+        $c_id = CostTransaction::add_cost_balance(null, $this->amount, $this->reason, $this->currency_id, null);
+        $this->transactions()->attach($c_id, [
+            'unique_id' => $this->unique_id($now),
+        ]);
+    }
+
+    private function startsAfter(Carbon $date): bool
+    {
+        return ! empty($this->start_date) && Carbon::parse($this->start_date)->startOfDay()->gt($date);
     }
 
     public function generateMissingRuns(?Carbon $until = null): int

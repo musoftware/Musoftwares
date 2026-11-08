@@ -475,15 +475,7 @@ class BusinessController extends Controller
         $bCurrency = CurrencyHelper::getBusinessCurrency();
         $projectsList = Project::orderBy('project_name')->select('id', 'project_name', 'project_name as name')->limit(200)->get();
         $currenciesList = collect($currencies)->map(fn ($c) => ['id' => $c->id, 'code' => $c->currency, 'symbol' => $c->symbol])->values();
-        $categoriesList = CostTransaction::excludingSalaries()
-            ->whereNotNull('category')
-            ->where('category', '!=', '')
-            ->distinct()
-            ->orderBy('category')
-            ->limit(100)
-            ->pluck('category')
-            ->map(fn ($c) => ['value' => $c, 'label' => ucfirst($c)])
-            ->values();
+        $categoriesList = $this->costFilterCategories();
 
         return Inertia::render('Admin/Business/Costs', [
             'entries' => $entries,
@@ -543,13 +535,29 @@ class BusinessController extends Controller
         ['value' => 'other', 'label' => 'Other'],
     ];
 
+    /** Generated recurring costs have no category, so the reason of their source stands in for it. */
+    private const RECURRING_COST_REASON_SQL = '(SELECT rc.reason FROM recurring_cost_transactions rct'
+        .' JOIN recurring_costs rc ON rc.id = rct.recurring_cost_id'
+        .' WHERE rct.cost_transaction_id = cost_transactions.id AND rc.deleted_at IS NULL LIMIT 1)';
+
+    /** @return \Illuminate\Support\Collection<int, array{value: string, label: string}> */
+    private function costFilterCategories()
+    {
+        $saved = CostTransaction::excludingSalaries()->whereNotNull('category')->where('category', '!=', '')->distinct()->pluck('category');
+        $recurring = RecurringCost::where('reason', '!=', 'salary')->where('reason', '!=', '')->distinct()->pluck('reason');
+
+        return $saved->concat($recurring)->unique()->sort()->take(100)
+            ->map(fn ($category) => ['value' => $category, 'label' => ucfirst($category)])
+            ->values();
+    }
+
     private function buildBreakdown($query, string $column, ?string $foreign = null): array
     {
         $clone = clone $query;
         $rows = $clone->selectRaw(
             $foreign
                 ? "$foreign as group_key"
-                : "COALESCE(NULLIF($column, ''), 'uncategorized') as group_key",
+                : "COALESCE(NULLIF($column, ''), ".self::RECURRING_COST_REASON_SQL.", 'uncategorized') as group_key",
             []
         )->selectRaw('SUM(ABS(business_amount)) as total', [])
             ->selectRaw('COUNT(*) as cnt', [])
@@ -757,7 +765,7 @@ class BusinessController extends Controller
                 } elseif ($f === 'currency_id') {
                     $query->where('currency_id', $v);
                 } elseif ($f === 'category') {
-                    $query->where('category', $v);
+                    $query->byCategory($v);
                 } elseif ($f === 'year') {
                     $query->whereYear('created_at', (int) $v);
                 } elseif ($f === 'month') {
