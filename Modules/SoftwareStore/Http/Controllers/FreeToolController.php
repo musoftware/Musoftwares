@@ -15,6 +15,11 @@ use Modules\SoftwareStore\Services\QrMenuKit;
  */
 class FreeToolController extends Controller
 {
+    public function index()
+    {
+        return view('softwarestore::tools.index');
+    }
+
     public function show(Request $request, string $slug)
     {
         abort_unless(FreeTools::exists($slug), 404);

@@ -103,7 +103,33 @@ class StoreSeo
                     'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
                 ], $copy['faq']),
             ],
-            $this->breadcrumb([[__('software.home'), url('/')], [__('software.title'), route('services.index')], [$copy['name'], $url]]),
+            $this->breadcrumb([[__('software.home'), url('/')], [__('free_tools.section.title'), route('services.tools.index')], [$copy['name'], $url]]),
+        ];
+    }
+
+    /** @return array<int, array<string, mixed>> the page that lists every free tool */
+    public function toolsHubGraph(): array
+    {
+        $url = route('services.tools.index');
+
+        return [
+            [
+                '@type' => 'CollectionPage',
+                'name' => __('free_tools.hub.heading'),
+                'description' => __('free_tools.hub.description'),
+                'url' => $url,
+                'inLanguage' => app()->getLocale(),
+                'mainEntity' => [
+                    '@type' => 'ItemList',
+                    'itemListElement' => array_map(fn (string $slug, int $index) => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'name' => __("free_tools.tools.{$slug}.name"),
+                        'url' => FreeTools::url($slug),
+                    ], FreeTools::slugs(), array_keys(FreeTools::slugs())),
+                ],
+            ],
+            $this->breadcrumb([[__('software.home'), url('/')], [__('free_tools.section.title'), $url]]),
         ];
     }
 

@@ -18,7 +18,7 @@
         [$t('بنعمله معاك', 'Built with you'), $t('وبناخد رأيك في كل خطوة', 'With your input at every step')],
         [$t('سعر واضح', 'Clear price'), $t('تعرفه قبل ما تدفع', 'You know it before you pay')],
         [$t('دفع آمن', 'Safe payment'), $t('عن طريق Kashier', 'Through Kashier')],
-        [$t('بني آدم بيرد عليك', 'A real person replies'), $t('على واتساب', 'On WhatsApp')],
+        [$t('بتكلم المبرمج نفسه', 'You talk to the programmer'), $t('على واتساب', 'On WhatsApp')],
     ];
 
     $groups = [

@@ -41,6 +41,15 @@
             const number = parseFloat(digits);
             return Number.isFinite(number) ? number : 0;
         },
+        dateDiff(from, to) {
+            const start = Date.parse(from + 'T00:00:00Z'), end = Date.parse(to + 'T00:00:00Z');
+            if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
+            const a = new Date(start), b = new Date(end);
+            let years = b.getUTCFullYear() - a.getUTCFullYear(), months = b.getUTCMonth() - a.getUTCMonth(), days = b.getUTCDate() - a.getUTCDate();
+            if (days < 0) { months--; days += new Date(Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), 0)).getUTCDate(); }
+            if (months < 0) { years--; months += 12; }
+            return { years, months, days, totalDays: Math.round((end - start) / 86400000) };
+        },
         async copy(text, button) {
             try { await navigator.clipboard.writeText(text); } catch (e) {
                 const area = document.createElement('textarea'); area.value = text; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
@@ -67,7 +76,7 @@
 <div class="w-full overflow-x-clip bg-[#fbfbfd] text-[#1d1d1f] pt-10 sm:pt-16 pb-20">
     <div class="max-w-[960px] mx-auto px-4 sm:px-6">
         <nav class="text-[13px] text-[#1d1d1f]/60 flex flex-wrap items-center gap-1.5" aria-label="breadcrumb">
-            <a href="{{ route('services.index') }}#tools" class="hover:text-[#0071e3]">{{ __('software.title') }}</a>
+            <a href="{{ route('services.tools.index') }}" class="hover:text-[#0071e3]">{{ __('free_tools.section.title') }}</a>
             <span aria-hidden="true">›</span>
             <span class="text-[#1d1d1f]">{{ $copy['name'] }}</span>
         </nav>
@@ -99,6 +108,17 @@
                 @endforeach
             </ol>
         </section>
+
+        @if (! empty($copy['uses']))
+            <section class="mt-14">
+                <h2 class="text-2xl font-bold tracking-tight">{{ __('free_tools.ui.uses_title') }}</h2>
+                <ul class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    @foreach ($copy['uses'] as $use)
+                        <li class="bg-white border border-black/5 rounded-[16px] p-4 text-sm leading-relaxed">{{ $use }}</li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
 
         @if ($related->isNotEmpty())
             <section class="mt-14">

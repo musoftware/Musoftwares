@@ -5090,6 +5090,17 @@
             "free": "Free",
             "open": "Open tool"
         },
+        "hub": {
+            "title": "Free Online Tools for Shops, Companies and Accountants",
+            "description": "Free tools with no sign-up: amount in Arabic words, zakat calculator, end of service, monthly installment, VAT, invoice maker, WhatsApp link, QR code and image compressor.",
+            "heading": "Free tools for your business",
+            "intro": "Calculators and generators that get the job done in seconds, with no sign-up and nothing to pay.",
+            "why_title": "Why these tools?",
+            "why": [
+                "We collected the tools shop owners, accountants and employees need every day in Egypt and the Arab world: from writing amounts in words and making invoices and receipts, to working out zakat, tax, installments and end of service pay.",
+                "Most tools run inside your browser, so your data stays with you. When your business grows and needs a full system, we build it with you."
+            ]
+        },
         "ui": {
             "free_badge": "Free tool · no sign-up",
             "privacy": "Runs in your browser. Nothing you type is sent to our servers.",
@@ -5109,7 +5120,17 @@
             "remove": "Remove",
             "currency": "Currency",
             "details": "Details",
-            "views": ":count views"
+            "views": ":count views",
+            "uses_title": "What you can use it for",
+            "arab_currencies": {
+                "EGP": "Egyptian pound",
+                "SAR": "Saudi riyal",
+                "AED": "UAE dirham",
+                "KWD": "Kuwaiti dinar",
+                "QAR": "Qatari riyal",
+                "JOD": "Jordanian dinar",
+                "USD": "US dollar"
+            }
         },
         "tools": {
             "whatsapp-link-generator": {
@@ -5118,6 +5139,12 @@
                 "title": "Free WhatsApp Link Generator with QR Code (wa.me)",
                 "description": "Create a free WhatsApp click-to-chat link and QR code in seconds. Add a ready message, copy the wa.me link or download the QR for your page, menu or shop window.",
                 "intro": "Put this link on your Facebook page, Instagram bio or website, or print the QR code. Customers tap it and a WhatsApp chat with you opens, with your message already written.",
+                "uses": [
+                    "A direct WhatsApp link for a Facebook or Instagram page.",
+                    "A WhatsApp button on your site or store.",
+                    "A QR code on a shop front or business card.",
+                    "A ready message sent when a customer taps the link."
+                ],
                 "steps": [
                     "Choose the country and type your WhatsApp number.",
                     "Write the message customers will send you (optional).",
@@ -5154,6 +5181,12 @@
                 "title": "Free Egyptian Phone Number Cleaner & Formatter for WhatsApp",
                 "description": "Paste or upload a list of Egyptian mobile numbers. Fix them to +20 format, remove duplicates and invalid numbers, then download a clean CSV ready for WhatsApp or SMS.",
                 "intro": "Contact lists collected from forms, Excel sheets and groups come in many shapes: with spaces, without zero, with 0020, in Arabic digits. This tool turns them into one clean format.",
+                "uses": [
+                    "Cleaning customer numbers from an Excel file.",
+                    "Removing duplicate numbers from a list.",
+                    "Adding the +20 code to every number.",
+                    "Preparing a list for a WhatsApp or SMS campaign."
+                ],
                 "steps": [
                     "Paste your numbers, or upload a CSV, TXT or Excel file.",
                     "Choose the format you need.",
@@ -5196,6 +5229,12 @@
                 "title": "Free Invoice Generator Egypt: Invoice & Quotation PDF with VAT 14%",
                 "description": "Make a professional invoice or quotation for free. Add items, 14% VAT and discount, then print or save it as PDF. Works in Arabic and English, no sign-up.",
                 "intro": "For freelancers, shops and small companies that need a proper invoice or price quote now. Your details are saved in this browser so the next invoice is faster.",
+                "uses": [
+                    "Making and printing a free sales invoice.",
+                    "An invoice saved as a PDF for a customer.",
+                    "Invoices for a shop or freelance work.",
+                    "A quick quotation in the same format."
+                ],
                 "steps": [
                     "Fill in your details and the customer’s.",
                     "Add the items, quantities and prices. VAT and totals are calculated for you.",
@@ -5248,6 +5287,12 @@
                 "title": "Free Income and Expense Tracker: Daily, Monthly and Yearly",
                 "description": "Track your income and expenses for free with no sign-up. See total income, total expenses and net for every day, month and year, with a chart and a spreadsheet download.",
                 "intro": "All your money in one place. Record what comes in and what goes out in seconds, and see your net day by day, month by month and year by year.",
+                "uses": [
+                    "Tracking daily shop income and expenses.",
+                    "Working out monthly net profit.",
+                    "Recording household spending.",
+                    "Seeing revenue and costs across the year."
+                ],
                 "steps": [
                     "Pick income or expense, then enter the amount and date.",
                     "Switch between daily, monthly and yearly to see your totals and net.",
@@ -5329,6 +5374,12 @@
                 "title": "Free QR Code Menu Maker for Restaurants & Cafés",
                 "description": "Create a free digital menu with a QR code for your restaurant or café. Add sections, items and prices, print the QR for your tables and update prices anytime.",
                 "intro": "Customers scan the code on the table and see your menu on their phone. When prices change you edit the menu and the same printed QR shows the new prices.",
+                "uses": [
+                    "A QR menu for a restaurant or cafe.",
+                    "Changing prices without reprinting.",
+                    "A digital menu with photos and prices.",
+                    "Sharing the menu on WhatsApp and Facebook."
+                ],
                 "steps": [
                     "Write your restaurant name and add sections and items with prices and photos, or start from the ready example.",
                     "Press “Save menu” to get your menu link and QR code.",
@@ -5432,6 +5483,12 @@
                 "title": "VAT Calculator Egypt 14%: Add or Remove VAT",
                 "description": "Free VAT calculator for Egypt. Add 14% VAT to a net price or extract VAT from a gross price in one step. Change the rate for Saudi Arabia, UAE or any country.",
                 "intro": "Enter an amount and choose whether VAT is added to it or already included. The net amount, VAT and total update as you type.",
+                "uses": [
+                    "Working out 14% VAT in Egypt.",
+                    "Working out 15% VAT in Saudi Arabia.",
+                    "Finding the price before tax.",
+                    "Preparing invoice prices with tax."
+                ],
                 "steps": [
                     "Type the amount.",
                     "Choose “Add VAT” or “Remove VAT”.",
@@ -5470,6 +5527,12 @@
                 "title": "Egypt Salary Tax Calculator 2026: Net Salary After Tax & Insurance",
                 "description": "Calculate your net monthly salary in Egypt for 2026: income tax brackets, EGP 20,000 personal exemption and 11% social insurance. Free, instant and in Arabic and English.",
                 "intro": "Enter the gross monthly salary. The calculator deducts employee social insurance (11% of the insured wage), the personal exemption, and income tax by the 2026 brackets.",
+                "uses": [
+                    "Net salary after tax.",
+                    "Monthly payroll tax.",
+                    "Comparing a new job offer.",
+                    "Preparing an estimated payroll."
+                ],
                 "steps": [
                     "Type your gross monthly salary.",
                     "Adjust the insured wage if it differs from your salary.",
@@ -5512,6 +5575,12 @@
                 "title": "Profit Margin Calculator: Margin, Markup & Selling Price",
                 "description": "Free profit margin calculator for shops and small businesses. Get profit, margin and markup from cost and price, or the right selling price for a target margin.",
                 "intro": "Many shops confuse margin and markup and lose money on pricing. Enter your cost and price, or your cost and the margin you want, and see the numbers side by side.",
+                "uses": [
+                    "Profit margin on a product.",
+                    "Setting the right selling price.",
+                    "Markup on cost.",
+                    "Pricing shop or store goods."
+                ],
                 "steps": [
                     "Choose what you know: the selling price, or the margin you want.",
                     "Enter the cost and the second value.",
@@ -5554,6 +5623,12 @@
                 "title": "Free QR Code Generator: Link, Wi-Fi, Contact Card (No Sign-Up)",
                 "description": "Create a free QR code for a website link, Wi-Fi password, contact card (vCard), email, SMS or text. Pick a color, download PNG. No sign-up and the code never expires.",
                 "intro": "Choose what the code should do, fill in the details and download it. These are static codes: they work forever and nothing passes through our servers.",
+                "uses": [
+                    "A QR code for your website.",
+                    "A QR code for a business card.",
+                    "A QR code for Wi-Fi or a phone number.",
+                    "Printing QR codes on products and ads."
+                ],
                 "steps": [
                     "Choose the type: link, Wi-Fi, contact, email, SMS or text.",
                     "Fill in the details and pick a color.",
@@ -5606,6 +5681,12 @@
                 "title": "Free Email Signature Generator for Gmail, Outlook & Apple Mail",
                 "description": "Make a professional HTML email signature for free. Add your name, title, company, phone, website and photo, pick a color, then copy it into Gmail, Outlook or Apple Mail.",
                 "intro": "Fill in your details and watch the signature update. Copy it and paste it into your email settings: it keeps its look in Gmail, Outlook and Apple Mail.",
+                "uses": [
+                    "A professional email signature.",
+                    "One signature for all company staff.",
+                    "Adding a logo, phone and website.",
+                    "A signature ready for Gmail and Outlook."
+                ],
                 "steps": [
                     "Type your details and pick a color.",
                     "Press “Copy signature”.",
@@ -5647,6 +5728,12 @@
                 "title": "Free UTM Link Builder (Campaign URL Builder for Google Analytics)",
                 "description": "Build campaign links with UTM source, medium and campaign tags for Google Analytics 4. Copy the tracked link or get a QR code. Free and no sign-up.",
                 "intro": "Paste your link and describe where it will be shared. The tool adds the UTM tags so Google Analytics shows which campaign brought each visitor.",
+                "uses": [
+                    "Tracking Facebook ads in Google Analytics.",
+                    "Seeing which campaign brought more visitors.",
+                    "Preparing links for messages and emails.",
+                    "Comparing marketing channels."
+                ],
                 "steps": [
                     "Paste the page link.",
                     "Fill in source, medium and campaign.",
@@ -5686,6 +5773,12 @@
                 "title": "Free Meta Tag Generator with Google Search Preview (SERP Snippet)",
                 "description": "Write your page title and meta description, preview how they appear in Google search, then copy the meta tags and social sharing tags. Free tool.",
                 "intro": "Type the title and description of your page. The preview shows how Google may display it, warns when text is too long, and builds the tags for your website.",
+                "uses": [
+                    "Writing a page title and description for Google.",
+                    "Preparing your pages for search engines.",
+                    "Previewing your page in search results.",
+                    "Improving how your store appears."
+                ],
                 "steps": [
                     "Type the page title, description and link.",
                     "Check the preview and the length warnings.",
@@ -5724,6 +5817,12 @@
                 "title": "Free Break-Even Calculator: Units & Sales to Cover Your Costs",
                 "description": "Find your break-even point in units and sales. Enter fixed costs, price and variable cost per unit, and see how many sales you need to cover costs and hit a profit target.",
                 "intro": "Enter your monthly fixed costs (rent, salaries, subscriptions), your selling price and what each unit costs you. The calculator shows the sales you need to stop losing money.",
+                "uses": [
+                    "How many units you must sell to avoid a loss.",
+                    "A simple feasibility check for a small project.",
+                    "Sales a restaurant or shop needs.",
+                    "The effect of higher rent on profit."
+                ],
                 "steps": [
                     "Enter monthly fixed costs.",
                     "Enter the price and variable cost per unit.",
@@ -5761,6 +5860,12 @@
                 "title": "Freelance Hourly Rate Calculator: What Should I Charge?",
                 "description": "Calculate your freelance hourly and day rate from your income goal, business costs, taxes, vacation and billable hours. Free rate calculator for designers, developers and writers.",
                 "intro": "Most freelancers charge too little because not every hour is billable. Enter the income you want and your real working time, and see the rate that gets you there.",
+                "uses": [
+                    "Setting an hourly freelance rate.",
+                    "Pricing a design or coding project.",
+                    "Income needed from freelancing.",
+                    "A fair price on freelance platforms."
+                ],
                 "steps": [
                     "Enter the yearly income you want to take home.",
                     "Add your yearly costs, tax and time off.",
@@ -5791,6 +5896,818 @@
                     "monthly": "Monthly revenue needed",
                     "yearly": "Yearly revenue needed",
                     "billable": ":hours billable hours a year"
+                }
+            },
+            "arabic-amount-in-words": {
+                "name": "Arabic Amount in Words",
+                "tagline": "Type any amount and get it written in Arabic words for invoices and cheques.",
+                "title": "Convert Numbers to Arabic Words (Tafqeet) for Invoices and Cheques",
+                "description": "Free tafqeet tool that writes amounts in Arabic words in Egyptian pounds, Saudi riyals, dirhams, dinars and dollars. Copy the text for an invoice, cheque or receipt.",
+                "intro": "Type the number, pick the currency, and get the standard wording used in Arabic accounting documents.",
+                "steps": [
+                    "Type the amount in numbers.",
+                    "Choose the currency.",
+                    "Copy the amount written in Arabic."
+                ],
+                "uses": [
+                    "Writing the amount in words on an invoice.",
+                    "Checking the wording before you write a cheque.",
+                    "Filling in a cash receipt or voucher.",
+                    "Writing amounts in contracts and quotations."
+                ],
+                "faq": [
+                    {
+                        "q": "What is tafqeet?",
+                        "a": "It is writing an amount in words next to the number, so the number cannot be changed later."
+                    },
+                    {
+                        "q": "How are fractions written?",
+                        "a": "As a fraction such as 50\/100, which is common in financial documents."
+                    },
+                    {
+                        "q": "What is the largest amount?",
+                        "a": "Hundreds of trillions, which is more than any invoice or cheque needs."
+                    }
+                ],
+                "form": {
+                    "amount": "Amount in numbers",
+                    "result": "Amount in Arabic words"
+                }
+            },
+            "receipt-voucher-generator": {
+                "name": "Cash Receipt Voucher",
+                "tagline": "Make a printable receipt with the amount written in words for you.",
+                "title": "Free Printable Cash Receipt Voucher Generator",
+                "description": "Create a cash receipt voucher in seconds. Fill in the details, the amount is written in Arabic words for you, then print or save as PDF. Free, no sign-up.",
+                "intro": "When a customer pays you and needs proof, fill in the details and print the receipt.",
+                "steps": [
+                    "Type who paid, the amount and the reason.",
+                    "Check the receipt shown next to the form.",
+                    "Print it or save it as a PDF."
+                ],
+                "uses": [
+                    "A receipt for a cash payment.",
+                    "Proof of a deposit or an installment.",
+                    "Proof of monthly rent received.",
+                    "Receipts for a shop, workshop or training center."
+                ],
+                "faq": [
+                    {
+                        "q": "What is the difference between a receipt and a payment voucher?",
+                        "a": "A receipt proves you received money. A payment voucher proves you paid money."
+                    },
+                    {
+                        "q": "Can it replace an invoice?",
+                        "a": "No. It only proves the money was received. If your business must issue tax invoices, use the approved system in your country."
+                    },
+                    {
+                        "q": "Do you store the details?",
+                        "a": "No. Everything happens in your browser and nothing is sent to us."
+                    }
+                ],
+                "form": {
+                    "title": "Cash Receipt",
+                    "number": "Receipt no.",
+                    "date": "Date",
+                    "company": "Company or shop name",
+                    "from": "Paid by",
+                    "amount": "Amount",
+                    "for": "Reason for payment",
+                    "method": "Payment method",
+                    "methods": [
+                        "Cash",
+                        "Bank transfer",
+                        "Cheque",
+                        "Mobile wallet"
+                    ],
+                    "received_from": "Received from",
+                    "sum_of": "The sum of",
+                    "for_label": "For",
+                    "receiver": "Received by",
+                    "signature": "Signature"
+                }
+            },
+            "zakat-calculator": {
+                "name": "Zakat Calculator",
+                "tagline": "See whether zakat is due and how much, using the gold price today.",
+                "title": "Zakat Calculator: Nisab and 2.5% Zakat on Money and Gold",
+                "description": "Free zakat calculator. Enter your money, gold, goods and the price of a gram of gold to see the nisab of 85 grams of gold and the 2.5% zakat due, in any currency.",
+                "intro": "Zakat is due when your wealth reaches the nisab and a full lunar year passes. Enter what you have and the gold price.",
+                "steps": [
+                    "Enter your money, gold, goods and debts.",
+                    "Enter the price of a gram of gold today.",
+                    "Read the nisab and the zakat due."
+                ],
+                "uses": [
+                    "Zakat on savings.",
+                    "Zakat on gold at the price today.",
+                    "Zakat on trade goods in a shop.",
+                    "Finding the nisab in your currency."
+                ],
+                "faq": [
+                    {
+                        "q": "What is the nisab?",
+                        "a": "The value of 85 grams of gold. Dar al-Ifta in Egypt uses 21 karat, and another view uses 24 karat. Its value changes with the gold price."
+                    },
+                    {
+                        "q": "What is the zakat rate?",
+                        "a": "A quarter of a tenth, which is 2.5% of wealth that reached the nisab and was held for a full lunar year."
+                    },
+                    {
+                        "q": "Are debts deducted?",
+                        "a": "The calculator deducts your debts before comparing with the nisab. For special cases, ask a trusted fatwa authority."
+                    },
+                    {
+                        "q": "Where do I find the gold price?",
+                        "a": "From a jeweller or a trusted website on the day you pay, and choose the karat of the price you entered."
+                    }
+                ],
+                "form": {
+                    "cash": "Money at home and in the bank",
+                    "gold_value": "Value of saved gold and silver",
+                    "goods": "Value of goods for sale",
+                    "receivables": "Money owed to you and expected back",
+                    "debts": "Debts you owe",
+                    "gram": "Price of a gram of gold today",
+                    "karat": "Karat of that price",
+                    "karats": {
+                        "21": "21 karat",
+                        "24": "24 karat"
+                    },
+                    "zakat": "Zakat due",
+                    "net": "Your net wealth",
+                    "nisab": "Nisab",
+                    "due": "Your wealth reached the nisab. Zakat is due if a full lunar year has passed.",
+                    "below": "Your wealth is below the nisab, so no zakat is due.",
+                    "need_gram": "Enter the price of a gram of gold to work out the nisab.",
+                    "note": "An estimate using a nisab of 85 grams of gold and a 2.5% rate. For special cases, ask a trusted fatwa authority in your country."
+                }
+            },
+            "end-of-service-calculator": {
+                "name": "Saudi End of Service Calculator",
+                "tagline": "Work out end of service pay under Saudi Labor Law on resignation or contract end.",
+                "title": "Saudi End of Service Calculator for Resignation and Contract End",
+                "description": "Free end of service calculator based on articles 84 and 85 of the Saudi Labor Law. Enter the wage and dates to see what is due on resignation or contract end.",
+                "intro": "Half a monthly wage for each of the first 5 years, then a full wage for each later year. Resigning changes the share you keep.",
+                "steps": [
+                    "Enter your last monthly wage.",
+                    "Enter the start and end dates.",
+                    "Choose the reason and read the amount due."
+                ],
+                "uses": [
+                    "Checking what you get before resigning.",
+                    "Working out pay when a contract ends.",
+                    "Estimating staff dues for your company.",
+                    "Seeing the share after 2, 5 or 10 years."
+                ],
+                "faq": [
+                    {
+                        "q": "How is it calculated?",
+                        "a": "Half a monthly wage for each of the first 5 years and a full wage for each later year, with parts of a year counted in proportion, on the last wage."
+                    },
+                    {
+                        "q": "What do I get if I resign?",
+                        "a": "Under 2 years nothing, 2 to under 5 years a third, 5 to under 10 years two thirds, and 10 years or more the full amount."
+                    },
+                    {
+                        "q": "Does it cover every case?",
+                        "a": "No. Some cases have special rules, such as dismissal under article 80 or the cases in article 87. Check with the ministry or a lawyer."
+                    }
+                ],
+                "form": {
+                    "wage": "Last monthly wage",
+                    "start": "Service start date",
+                    "end": "Service end date",
+                    "reason": "Reason service ended",
+                    "reasons": {
+                        "contract": "Contract ended or ended by employer",
+                        "resignation": "Resignation"
+                    },
+                    "payable": "Amount due",
+                    "service": "Length of service",
+                    "full": "Full award",
+                    "share": "Share due",
+                    "years": "years",
+                    "months": "months",
+                    "days": "days",
+                    "note": "An estimate based on articles 84 and 85 of the Saudi Labor Law. It does not replace official sources or legal advice."
+                }
+            },
+            "loan-installment-calculator": {
+                "name": "Monthly Installment Calculator",
+                "tagline": "See your monthly payment and total interest before you sign.",
+                "title": "Monthly Installment Calculator for Loans and Payment Plans",
+                "description": "Free calculator for loans and installment plans on cars, devices and property. Enter the price, down payment, rate and months to see the monthly payment and total interest.",
+                "intro": "A flat rate and a reducing rate can differ by a lot. Enter the numbers and compare before you decide.",
+                "steps": [
+                    "Enter the price and down payment.",
+                    "Enter the yearly rate and months.",
+                    "Compare a flat rate with a reducing rate."
+                ],
+                "uses": [
+                    "A personal bank loan.",
+                    "A car with a down payment.",
+                    "An apartment or land plan.",
+                    "Comparing a device installment offer."
+                ],
+                "faq": [
+                    {
+                        "q": "What is the difference between flat and reducing rates?",
+                        "a": "A flat rate is charged on the original amount the whole time. A reducing rate is charged only on what is left, so it costs less at the same percentage."
+                    },
+                    {
+                        "q": "Is this the exact bank figure?",
+                        "a": "It is an estimate. Banks may add fees and insurance, so ask for the total cost before you sign."
+                    },
+                    {
+                        "q": "Does it work with no interest?",
+                        "a": "Yes. Enter a rate of zero and the amount is divided by the months."
+                    }
+                ],
+                "form": {
+                    "price": "Total price",
+                    "down": "Down payment",
+                    "rate": "Yearly interest rate %",
+                    "months": "Months",
+                    "type": "Interest type",
+                    "types": {
+                        "reducing": "Reducing (on the balance)",
+                        "flat": "Flat (on the original amount)"
+                    },
+                    "monthly": "Monthly payment",
+                    "interest": "Total interest",
+                    "total": "Total of payments",
+                    "note": "An estimate without admin fees or insurance."
+                }
+            },
+            "percentage-calculator": {
+                "name": "Percentage and Discount Calculator",
+                "tagline": "Work out percentages, increases and sale prices in a second.",
+                "title": "Percentage Calculator: Discount, Increase and Decrease",
+                "description": "Free percentage calculator: a percent of a number, what percent one number is of another, percent change, and the price after a discount.",
+                "intro": "Four everyday calculations in one place, with no formulas to remember.",
+                "steps": [
+                    "Pick the calculation you need.",
+                    "Enter the two numbers.",
+                    "The result appears as you type."
+                ],
+                "uses": [
+                    "The price after a discount.",
+                    "A salary or rent increase.",
+                    "An exam score percentage.",
+                    "Sales growth between two months."
+                ],
+                "faq": [
+                    {
+                        "q": "How do I find a percent of a number?",
+                        "a": "Multiply the number by the percent and divide by 100. For example, 20% of 500 is 100."
+                    },
+                    {
+                        "q": "How do I work out a percent increase?",
+                        "a": "Subtract the old value from the new one, divide by the old value, and multiply by 100."
+                    },
+                    {
+                        "q": "How do I work out a sale price?",
+                        "a": "Subtract the discount from the price. A 15% discount on 1000 gives 850."
+                    }
+                ],
+                "form": {
+                    "of_title": "What is a percent of a number?",
+                    "percent": "Percent %",
+                    "of_number": "Of the number",
+                    "what_title": "What percent is this?",
+                    "part": "Part",
+                    "whole": "Whole",
+                    "change_title": "Percent increase or decrease",
+                    "old": "Old value",
+                    "new": "New value",
+                    "discount_title": "Price after discount",
+                    "price": "Price",
+                    "discount": "Discount %",
+                    "result": "Result"
+                }
+            },
+            "hijri-date-converter": {
+                "name": "Hijri and Gregorian Date Converter",
+                "tagline": "Convert any date between Gregorian and Hijri.",
+                "title": "Hijri to Gregorian and Gregorian to Hijri Date Converter",
+                "description": "Free date converter between Gregorian and Hijri using the Umm al-Qura calendar. See the Hijri date today and the matching day of any date.",
+                "intro": "Enter a date in either box and the conversion appears right away, using the Umm al-Qura calendar.",
+                "steps": [
+                    "Pick the conversion you need.",
+                    "Enter the date.",
+                    "Read the matching date."
+                ],
+                "uses": [
+                    "The Hijri date today.",
+                    "Converting a birth date.",
+                    "Converting dates on contracts and official papers.",
+                    "Finding the day of a Hijri occasion."
+                ],
+                "faq": [
+                    {
+                        "q": "Is it accurate?",
+                        "a": "It uses the Umm al-Qura calendar. Countries that follow moon sighting, such as Egypt, may differ by one day."
+                    },
+                    {
+                        "q": "Why is the Hijri year shorter?",
+                        "a": "It is lunar, about 354 days, which is around 11 days shorter than the Gregorian year."
+                    },
+                    {
+                        "q": "Why does it say the date is not valid?",
+                        "a": "A Hijri month has 29 or 30 days, so day 30 does not exist in a 29-day month."
+                    }
+                ],
+                "form": {
+                    "to_hijri": "Gregorian to Hijri",
+                    "gregorian_date": "Gregorian date",
+                    "result_hijri": "Hijri date",
+                    "to_gregorian": "Hijri to Gregorian",
+                    "day": "Day",
+                    "month": "Month",
+                    "year": "Year",
+                    "result_gregorian": "Gregorian date",
+                    "hijri_months": [
+                        "Muharram",
+                        "Safar",
+                        "Rabi al-Awwal",
+                        "Rabi al-Akhir",
+                        "Jumada al-Ula",
+                        "Jumada al-Akhirah",
+                        "Rajab",
+                        "Shaban",
+                        "Ramadan",
+                        "Shawwal",
+                        "Dhu al-Qadah",
+                        "Dhu al-Hijjah"
+                    ],
+                    "invalid": "This date does not exist in the Hijri calendar.",
+                    "note": "Conversion uses the Umm al-Qura calendar and may differ by one day with moon sighting in your country."
+                }
+            },
+            "age-calculator": {
+                "name": "Age Calculator",
+                "tagline": "See your age in years, months and days, and the days left to your birthday.",
+                "title": "Age Calculator in Years, Months and Days from a Birth Date",
+                "description": "Free age calculator. Enter your birth date to see your age in years, months and days, the days you have lived, and the days left to your birthday.",
+                "intro": "Enter a birth date. If you need the age on a certain day, change the second date.",
+                "steps": [
+                    "Enter the birth date.",
+                    "Keep today or pick another day.",
+                    "Read the age in detail."
+                ],
+                "uses": [
+                    "Age for school applications.",
+                    "Age on a date for a job or competition.",
+                    "Working out retirement age.",
+                    "Days left to a birthday."
+                ],
+                "faq": [
+                    {
+                        "q": "How do I find my age on a certain date?",
+                        "a": "Change the second date to the day you need, such as October 1 for school applications."
+                    },
+                    {
+                        "q": "Does it use the Gregorian calendar?",
+                        "a": "Yes. If your date is Hijri, convert it first with our date converter."
+                    },
+                    {
+                        "q": "Do you store my birth date?",
+                        "a": "No. It is worked out in your browser and nothing is sent to us."
+                    }
+                ],
+                "form": {
+                    "birth": "Birth date",
+                    "on_date": "Age on date",
+                    "years": "Years",
+                    "months": "Months",
+                    "days": "Days",
+                    "total_days": "Total days",
+                    "next": "Days to birthday"
+                }
+            },
+            "image-compressor": {
+                "name": "Image Compressor",
+                "tagline": "Make an image smaller without uploading it anywhere.",
+                "title": "Free Online Image Compressor and Resizer",
+                "description": "Free tool to compress images, reduce file size and convert to JPG or WebP. Your images are processed in your browser and never uploaded to a server.",
+                "intro": "Application sites and online stores ask for small images. Pick an image, set the quality and download it.",
+                "steps": [
+                    "Choose an image from your device.",
+                    "Set the quality and maximum width.",
+                    "See the new size and download."
+                ],
+                "uses": [
+                    "A small photo for application websites.",
+                    "Product photos for a faster store.",
+                    "Phone photos before emailing them.",
+                    "Converting images to WebP for site speed."
+                ],
+                "faq": [
+                    {
+                        "q": "Are my images uploaded?",
+                        "a": "No. Compression happens in your browser and the image stays on your device."
+                    },
+                    {
+                        "q": "What quality should I use?",
+                        "a": "Between 70 and 80 suits most photos and cuts the size a lot with no clear difference."
+                    },
+                    {
+                        "q": "Is transparency kept?",
+                        "a": "A transparent background becomes white, because the tool fills the background before compressing."
+                    }
+                ],
+                "form": {
+                    "file": "Choose an image",
+                    "quality": "Quality",
+                    "max_width": "Maximum width in pixels",
+                    "format": "Format",
+                    "before": "Before",
+                    "after": "After",
+                    "saved": "Saved",
+                    "download": "Download image",
+                    "error": "We could not read this image. Try another one."
+                }
+            },
+            "arabic-word-counter": {
+                "name": "Word Counter and Arabic Diacritics Remover",
+                "tagline": "Count words and characters in any text and remove Arabic diacritics.",
+                "title": "Word and Character Counter with Arabic Diacritics Remover",
+                "description": "Free word counter for Arabic and English text: words, characters, sentences, paragraphs and reading time, with one-click removal of Arabic diacritics.",
+                "intro": "Paste your text and the numbers update as you type. Remove diacritics with one click.",
+                "steps": [
+                    "Type or paste the text.",
+                    "Read the word and character counts.",
+                    "Remove diacritics and copy if needed."
+                ],
+                "uses": [
+                    "Counting words in an article or paper.",
+                    "Checking the length of a post or ad.",
+                    "Removing diacritics from copied text.",
+                    "Estimating reading time before publishing."
+                ],
+                "faq": [
+                    {
+                        "q": "Are diacritics counted as characters?",
+                        "a": "Yes, while they are in the text. To count without them, remove them first."
+                    },
+                    {
+                        "q": "How is reading time worked out?",
+                        "a": "At about 180 words a minute."
+                    },
+                    {
+                        "q": "Is my text stored?",
+                        "a": "No. Your text stays in your browser."
+                    }
+                ],
+                "form": {
+                    "text": "Text",
+                    "placeholder": "Type or paste your text here",
+                    "remove_marks": "Remove diacritics",
+                    "words": "Words",
+                    "chars": "Characters with spaces",
+                    "chars_no_spaces": "Characters without spaces",
+                    "sentences": "Sentences",
+                    "paragraphs": "Paragraphs",
+                    "minutes": "Minutes to read"
+                }
+            },
+            "keyboard-language-fixer": {
+                "name": "Wrong Keyboard Language Fixer",
+                "tagline": "Typed with the wrong keyboard language? Fix the text in one click.",
+                "title": "Fix Text Typed in the Wrong Keyboard Language: Arabic and English",
+                "description": "Free tool that fixes text typed with the wrong keyboard language, from English to Arabic and back. For example, hgsghl ugd;l becomes the Arabic greeting.",
+                "intro": "Paste the text that came out as strange symbols and get back what you meant to type.",
+                "steps": [
+                    "Paste the wrong text.",
+                    "Let the tool detect the direction, or choose it.",
+                    "Copy the fixed text."
+                ],
+                "uses": [
+                    "Fixing a message typed on the wrong layout.",
+                    "Turning hgsghl ugd;l into Arabic.",
+                    "Recovering an email typed on the Arabic layout.",
+                    "Saving the time of retyping a long paragraph."
+                ],
+                "faq": [
+                    {
+                        "q": "Which keyboard does it use?",
+                        "a": "The standard Arabic and English layouts on Windows, which are the most common."
+                    },
+                    {
+                        "q": "What if the direction is wrong?",
+                        "a": "Choose the direction yourself from the list."
+                    },
+                    {
+                        "q": "Is my text sent anywhere?",
+                        "a": "No. The conversion runs in your browser."
+                    }
+                ],
+                "form": {
+                    "input": "Wrong text",
+                    "placeholder": "Example: hgsghl ugd;l",
+                    "direction": "Direction",
+                    "auto": "Automatic",
+                    "to_arabic": "To Arabic",
+                    "to_english": "To English",
+                    "output": "Fixed text"
+                }
+            },
+            "franco-to-arabic": {
+                "name": "Franco to Arabic Converter",
+                "tagline": "Type Franco Arabic and get Arabic letters.",
+                "title": "Franco to Arabic Converter: Free Arabizi Tool for Egyptian Arabic",
+                "description": "Convert Franco Arabic (Arabizi) to Arabic letters for free. Understands numbers like 3, 7, 5 and 2 and common Egyptian words, and you can edit the result.",
+                "intro": "Type Franco the way you do on WhatsApp, get Arabic letters, and fix any word by hand.",
+                "steps": [
+                    "Type or paste Franco text.",
+                    "Review the result and edit any word.",
+                    "Copy the Arabic text."
+                ],
+                "uses": [
+                    "Turning a Franco message into clear Arabic.",
+                    "Writing Arabic on a phone with no Arabic keyboard.",
+                    "Learning what 3, 7 and 5 mean in Franco.",
+                    "Preparing Arabic text for an ad or a comment."
+                ],
+                "faq": [
+                    {
+                        "q": "What do the numbers mean?",
+                        "a": "3 stands for the letter ayn, 7 for haa, 5 for khaa, 8 for ghayn, 2 for hamza, 6 for taa and 9 for qaf."
+                    },
+                    {
+                        "q": "Is the conversion exact?",
+                        "a": "No. Franco has no fixed spelling, so the result is approximate. The box is editable so you can fix any word."
+                    },
+                    {
+                        "q": "Does it understand Egyptian Arabic?",
+                        "a": "Yes. Many Egyptian words are built in, and the rest are converted sound by sound."
+                    }
+                ],
+                "form": {
+                    "input": "Franco text",
+                    "placeholder": "Example: ezayak 3amel eh",
+                    "output": "In Arabic (editable)",
+                    "hint": "The result is approximate because Franco has no fixed spelling. Review it before you use it."
+                }
+            },
+            "arabic-text-decorator": {
+                "name": "Arabic and English Text Decorator",
+                "tagline": "Decorate your name in Arabic or English and copy it anywhere.",
+                "title": "Fancy Text Generator for Arabic and English Names",
+                "description": "Free fancy text generator for Arabic and English: 12 ready styles to copy to Facebook, Instagram, TikTok and game nicknames.",
+                "intro": "Type your name, pick one of 12 styles and paste it anywhere.",
+                "steps": [
+                    "Type a name or a sentence.",
+                    "Pick a style you like.",
+                    "Copy and paste it."
+                ],
+                "uses": [
+                    "Styling your name on Facebook and Instagram.",
+                    "Making a game nickname.",
+                    "Decorating a TikTok bio.",
+                    "Writing a title for a group or a channel."
+                ],
+                "faq": [
+                    {
+                        "q": "Do the styles show in every app?",
+                        "a": "Most do, but some devices and apps do not show every symbol. Try the style first."
+                    },
+                    {
+                        "q": "Does it work with English?",
+                        "a": "Yes. It decorates Arabic and English letters in the same sentence."
+                    },
+                    {
+                        "q": "Is it free?",
+                        "a": "Yes, with no sign-up and no limit."
+                    }
+                ],
+                "form": {
+                    "input": "Name or sentence",
+                    "placeholder": "Example: Mahmoud",
+                    "sample": "Mahmoud"
+                }
+            },
+            "egyptian-national-id-decoder": {
+                "name": "Egyptian National ID Decoder",
+                "tagline": "Read the birth date, governorate and gender from a national ID.",
+                "title": "Egyptian National ID Decoder: Birth Date, Governorate, Gender and Age",
+                "description": "Enter a 14-digit Egyptian national ID to read the birth date, age, governorate and gender. It runs in your browser and the number is never sent to a server.",
+                "intro": "A national ID stores some details in a fixed order. This tool reads them in your browser without sending the number anywhere.",
+                "steps": [
+                    "Enter the 14 digits.",
+                    "Read the birth date and age.",
+                    "See the governorate and gender."
+                ],
+                "uses": [
+                    "Checking staff or customer details before data entry.",
+                    "Checking that a number on a form has the right format.",
+                    "Finding the governorate code in an ID.",
+                    "Working out age from a national ID."
+                ],
+                "faq": [
+                    {
+                        "q": "Does it check that the ID is real?",
+                        "a": "No. It only reads the format and is not connected to any government system. A number can look valid and not be registered."
+                    },
+                    {
+                        "q": "Is the governorate where the person lives?",
+                        "a": "No. It is the governorate of birth registration, which may differ from where the person lives now."
+                    },
+                    {
+                        "q": "Is the number stored?",
+                        "a": "No. It stays in your browser and is never sent to a server. Do not share your ID with anyone you do not trust."
+                    }
+                ],
+                "form": {
+                    "number": "National ID",
+                    "placeholder": "14 digits",
+                    "birth": "Birth date",
+                    "age": "Age",
+                    "governorate": "Governorate of birth",
+                    "gender": "Gender",
+                    "messages": {
+                        "length": "The national ID must have 14 digits.",
+                        "date": "The birth date in this number is not valid.",
+                        "governorate": "The governorate code in this number is not known.",
+                        "years": "years",
+                        "months": "months",
+                        "male": "Male",
+                        "female": "Female"
+                    },
+                    "governorates": {
+                        "01": "Cairo",
+                        "02": "Alexandria",
+                        "03": "Port Said",
+                        "04": "Suez",
+                        "11": "Damietta",
+                        "12": "Dakahlia",
+                        "13": "Sharqia",
+                        "14": "Qalyubia",
+                        "15": "Kafr El Sheikh",
+                        "16": "Gharbia",
+                        "17": "Monufia",
+                        "18": "Beheira",
+                        "19": "Ismailia",
+                        "21": "Giza",
+                        "22": "Beni Suef",
+                        "23": "Fayoum",
+                        "24": "Minya",
+                        "25": "Assiut",
+                        "26": "Sohag",
+                        "27": "Qena",
+                        "28": "Aswan",
+                        "29": "Luxor",
+                        "31": "Red Sea",
+                        "32": "New Valley",
+                        "33": "Matrouh",
+                        "34": "North Sinai",
+                        "35": "South Sinai",
+                        "88": "Outside Egypt"
+                    }
+                }
+            },
+            "gold-price-calculator": {
+                "name": "Gold Price Calculator with Making Charges",
+                "tagline": "Know the price of a gold piece before you pay.",
+                "title": "Gold Price Calculator with Making Charges: 18K, 21K, 22K and 24K",
+                "description": "Work out the price of a gold piece with making charges and fees for 18K, 21K, 22K and 24K. Enter the weight and today's 21K price to see the total and final price per gram.",
+                "intro": "Enter the weight, the jeweler's price per gram and the making charge to see exactly what you will pay.",
+                "steps": [
+                    "Enter the weight and karat.",
+                    "Enter today's 21K price and the making charge.",
+                    "Read the total and final price per gram."
+                ],
+                "uses": [
+                    "Pricing a wedding gift before buying.",
+                    "Comparing making charges between two shops.",
+                    "Converting a 21K price to 18K or 24K.",
+                    "Knowing the gold value without making charges when selling."
+                ],
+                "faq": [
+                    {
+                        "q": "Does the gold price update by itself?",
+                        "a": "No. Enter today's price from your jeweler, because it changes and differs between shops."
+                    },
+                    {
+                        "q": "How are other karats priced?",
+                        "a": "We multiply the 21K price by the chosen karat and divide by 21. The jeweler's price may differ a little."
+                    },
+                    {
+                        "q": "Do I get making charges back when I sell?",
+                        "a": "Usually not. When you sell, the gold itself is priced, and the jeweler may deduct an amount per gram."
+                    }
+                ],
+                "form": {
+                    "weight": "Weight in grams",
+                    "karat": "Karat",
+                    "price": "Today's 21K price per gram",
+                    "price_hint": "Enter today's price",
+                    "making": "Making charge per gram",
+                    "fees": "Stamp and fees (total)",
+                    "total": "Total to pay",
+                    "gold_value": "Gold value",
+                    "making_total": "Total making charge",
+                    "karat_price": "Price per gram of karat",
+                    "gram_final": "Final price per gram",
+                    "note": "This is an estimate. Ask your jeweler for the final price before paying."
+                }
+            },
+            "images-to-pdf": {
+                "name": "Images to PDF",
+                "tagline": "Combine your images into one PDF with no upload.",
+                "title": "Images to PDF: Combine JPG and PNG into One File with No Upload",
+                "description": "Convert JPG and PNG images to one PDF for free and put the pages in any order. Your images are processed on your device with no upload to a server.",
+                "intro": "Choose photos of documents or paper, order them and download one PDF. Your images never leave your device.",
+                "steps": [
+                    "Choose your images.",
+                    "Order them and pick a page size.",
+                    "Create and download the file."
+                ],
+                "uses": [
+                    "Combining ID and document photos into one file.",
+                    "Turning homework or notes into a PDF.",
+                    "Sending invoice photos to an accountant in one file.",
+                    "Making a PDF from phone photos with no app."
+                ],
+                "faq": [
+                    {
+                        "q": "Are my images uploaded?",
+                        "a": "No. The file is created in your browser and your images never leave your device."
+                    },
+                    {
+                        "q": "Is there a limit on images?",
+                        "a": "There is no fixed limit, but very large sets need a device with more memory."
+                    },
+                    {
+                        "q": "Will quality drop?",
+                        "a": "Large images are reduced to 2000 pixels to keep the file a sensible size, which is enough to print documents."
+                    }
+                ],
+                "form": {
+                    "files": "Choose images",
+                    "page": "Page size",
+                    "a4": "A4 paper",
+                    "fit": "Same as the image",
+                    "make": "Create PDF",
+                    "working": "Preparing the file...",
+                    "up": "Up",
+                    "remove": "Remove",
+                    "error": "We could not prepare the file. Try other images.",
+                    "file_name": "images.pdf"
+                }
+            },
+            "date-difference-calculator": {
+                "name": "Date Difference Calculator",
+                "tagline": "See the days, weeks and months between any two dates.",
+                "title": "Date Difference Calculator: Days, Months, Years and Working Days",
+                "description": "Free calculator for the time between two dates in years, months, days and weeks, the working days after removing the weekend, and the date after a number of days.",
+                "intro": "Pick two dates to see the duration and working days. You can also find the date after any number of days.",
+                "steps": [
+                    "Pick the start and end dates.",
+                    "Choose your weekend.",
+                    "Read the duration and working days."
+                ],
+                "uses": [
+                    "Working out a contract or probation period.",
+                    "Counting working days in a month.",
+                    "Finding a delivery date after some days.",
+                    "Counting down to an exam or a trip."
+                ],
+                "faq": [
+                    {
+                        "q": "Is the end date counted?",
+                        "a": "No, unless you tick the option to count the end date."
+                    },
+                    {
+                        "q": "Are public holidays removed from working days?",
+                        "a": "No. Only the weekly days off are removed, because public holidays change every year."
+                    },
+                    {
+                        "q": "Are the dates Gregorian or Hijri?",
+                        "a": "Gregorian. To convert, use our Hijri date tool."
+                    }
+                ],
+                "form": {
+                    "from": "Start date",
+                    "to": "End date",
+                    "weekend": "Weekend",
+                    "fri_sat": "Friday and Saturday",
+                    "sat_sun": "Saturday and Sunday",
+                    "fri_only": "Friday only",
+                    "include_end": "Count the end date",
+                    "duration": "Duration",
+                    "total_days": "Total days",
+                    "weeks": "Weeks",
+                    "working_days": "Working days",
+                    "error": "The end date must be after the start date.",
+                    "add_title": "What is the date after some days?",
+                    "base": "From date",
+                    "add_days": "Number of days",
+                    "result_date": "Date",
+                    "years": "years",
+                    "months": "months",
+                    "days": "days"
                 }
             }
         }

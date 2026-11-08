@@ -16,7 +16,7 @@ Route::middleware('web')->group(function () {
     Route::get('/services', [SoftwareProductController::class, 'index'])->name('services.index');
 
     // ── Free tools (listed in /services) ────────────────────────────
-    Route::redirect('/services/tools', '/services#tools', 301);
+    Route::get('/services/tools', [FreeToolController::class, 'index'])->name('services.tools.index');
     Route::get('/services/tools/{slug}', [FreeToolController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('services.tools.show');
     Route::post('/services/tools/qr-menu', [FreeToolController::class, 'storeMenu'])->middleware('throttle:5,10')->name('services.tools.menu.store');
     Route::put('/services/tools/qr-menu/{code}', [FreeToolController::class, 'updateMenu'])->middleware('throttle:30,10')->name('services.tools.menu.update');

@@ -98,6 +98,8 @@ class SitemapController extends Controller
         }
 
         if (Route::has('services.tools.show')) {
+            $urls[] = $this->url(route('services.tools.index'), $today, 'weekly', '0.9');
+
             foreach (FreeTools::slugs() as $slug) {
                 $urls[] = $this->url(FreeTools::url($slug), $today, 'monthly', '0.8');
             }

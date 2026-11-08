@@ -77,7 +77,7 @@ class SiteMegaMenu
         return [
             self::shapeGroup(self::MARKETPLACE, $lang),
             ...array_values(array_filter($storeGroups, fn (array $group) => $group['links'] !== [])),
-            self::shapeGroup(['url' => '/services#tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools', 'links' => self::toolLinks()], $lang),
+            self::shapeGroup(['url' => '/services/tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools', 'links' => self::toolLinks()], $lang),
             ...array_map(fn (array $group) => self::shapeGroup($group, $lang), self::STATIC_GROUPS),
         ];
     }

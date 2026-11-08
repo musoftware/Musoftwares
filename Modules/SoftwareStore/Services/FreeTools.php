@@ -28,6 +28,23 @@ class FreeTools
         'meta-tag-generator' => ['ri-google-line', ['company-website-design', 'website-care-plans', 'online-store-development']],
         'break-even-calculator' => ['ri-scales-3-line', ['shop-manager-pro', 'restaurant-pos-system', 'supermarket-system']],
         'freelance-rate-calculator' => ['ri-time-line', ['custom-web-app-development', 'company-website-design', 'logo-and-brand-identity']],
+        'arabic-amount-in-words' => ['ri-text', ['shop-manager-pro', 'wholesale-system', 'custom-web-app-development']],
+        'receipt-voucher-generator' => ['ri-receipt-line', ['shop-manager-pro', 'wholesale-system', 'supermarket-system']],
+        'zakat-calculator' => ['ri-hand-coin-line', ['shop-manager-pro', 'wholesale-system', 'custom-web-app-development']],
+        'end-of-service-calculator' => ['ri-briefcase-4-line', ['custom-web-app-development', 'clinic-system', 'workshop-system']],
+        'loan-installment-calculator' => ['ri-bank-line', ['shop-manager-pro', 'wholesale-system', 'custom-web-app-development']],
+        'percentage-calculator' => ['ri-percent-fill', ['shop-manager-pro', 'supermarket-system', 'paid-ads-management']],
+        'hijri-date-converter' => ['ri-calendar-2-line', ['company-website-design', 'custom-web-app-development', 'education-center-system']],
+        'age-calculator' => ['ri-cake-2-line', ['education-center-system', 'clinic-system', 'custom-web-app-development']],
+        'image-compressor' => ['ri-image-edit-line', ['company-website-design', 'online-store-development', 'website-care-plans']],
+        'arabic-word-counter' => ['ri-file-word-2-line', ['company-website-design', 'social-media-management', 'landing-page-design']],
+        'keyboard-language-fixer' => ['ri-keyboard-line', ['custom-web-app-development', 'company-website-design', 'social-media-management']],
+        'franco-to-arabic' => ['ri-translate-2', ['social-media-management', 'ai-chatbot-whatsapp-automation', 'custom-web-app-development']],
+        'arabic-text-decorator' => ['ri-quill-pen-line', ['social-media-management', 'logo-and-brand-identity', 'landing-page-design']],
+        'egyptian-national-id-decoder' => ['ri-profile-line', ['clinic-system', 'education-center-system', 'custom-web-app-development']],
+        'gold-price-calculator' => ['ri-copper-coin-line', ['shop-manager-pro', 'online-store-development', 'custom-web-app-development']],
+        'images-to-pdf' => ['ri-file-pdf-line', ['company-website-design', 'online-store-development', 'custom-web-app-development']],
+        'date-difference-calculator' => ['ri-calendar-event-line', ['custom-web-app-development', 'workshop-system', 'education-center-system']],
     ];
 
     public static function exists(string $slug): bool

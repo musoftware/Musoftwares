@@ -235,9 +235,9 @@ Route::get('/{locale}/{path?}', [LocaleRedirectController::class, 'redirect'])
 Route::post('/tools/lead-capture', [PublicToolsController::class, 'captureLead'])->name('public.tools.lead-capture');
 Route::post('/newsletter/subscribe', [PublicToolsController::class, 'subscribeNewsletter'])->name('newsletter.subscribe');
 // Registered after the lead form so its POST is not caught by the redirect.
-Route::redirect('/tools', '/services#tools', 301);
+Route::redirect('/tools', '/services/tools', 301);
 Route::redirect('/tools/invoice-generator', '/services/tools/invoice-generator', 301);
-Route::permanentRedirect('/tools/{any}', '/services#tools')->where('any', '.*');
+Route::permanentRedirect('/tools/{any}', '/services/tools')->where('any', '.*');
 
 // Shared project board (public guest view)
 Route::get('/shared-board/{token}/{date}', [\App\Http\Controllers\PublicProjectBoardController::class, 'show'])

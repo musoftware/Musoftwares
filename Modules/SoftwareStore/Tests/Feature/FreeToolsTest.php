@@ -101,9 +101,27 @@ class FreeToolsTest extends TestCase
 
     public function test_old_tool_addresses_redirect_to_the_new_tools(): void
     {
-        $this->get('/tools')->assertStatus(301)->assertRedirect('/services#tools');
+        $this->get('/tools')->assertStatus(301)->assertRedirect('/services/tools');
         $this->get('/tools/invoice-generator')->assertStatus(301)->assertRedirect('/services/tools/invoice-generator');
-        $this->get('/services/tools')->assertStatus(301)->assertRedirect('/services#tools');
+    }
+
+    public function test_the_tools_page_lists_every_tool_for_search_engines(): void
+    {
+        $html = $this->get('/services/tools?lang=ar')->assertOk()->assertSee('"@type":"CollectionPage"', false)->getContent();
+
+        foreach (FreeTools::slugs() as $slug) {
+            $this->assertStringContainsString('/services/tools/'.$slug, $html, $slug);
+        }
+        $this->assertStringContainsString(url('/services/tools'), $this->get('/sitemaps/pages.xml')->getContent());
+    }
+
+    public function test_every_tool_explains_what_it_is_used_for(): void
+    {
+        foreach (FreeTools::slugs() as $slug) {
+            $this->assertNotEmpty(__("free_tools.tools.{$slug}.uses", [], 'ar'), $slug);
+            $this->assertNotEmpty(__("free_tools.tools.{$slug}.uses", [], 'en'), $slug);
+            $this->get("/services/tools/{$slug}?lang=ar")->assertOk()->assertSee('بتستخدمها في إيه؟');
+        }
     }
 
     public function test_a_menu_is_created_shown_and_counted(): void
