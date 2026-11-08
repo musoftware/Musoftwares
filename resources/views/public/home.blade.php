@@ -64,10 +64,13 @@
 
             <div class="lg:col-span-6 flex items-center justify-center">
                 <div class="relative w-full max-w-[540px]">
-                    <img src="{{ asset('images/hero/hero_tech_stack_3d_square.jpg') }}" 
-                         alt="{{ $t('استوديو موسوفت للبرمجيات', 'Musoftware Engineering Studio') }}" 
-                         class="w-full h-auto object-contain mx-auto" 
-                         fetchpriority="high">
+                    <picture>
+                        <source srcset="{{ asset('images/hero/hero_tech_stack_3d_square.png') }}" type="image/png">
+                        <img src="{{ asset('images/hero/hero_tech_stack_3d_square.jpg') }}" 
+                             alt="{{ $t('استوديو موسوفت للبرمجيات', 'Musoftware Engineering Studio') }}" 
+                             class="w-full h-auto object-contain mx-auto mix-blend-multiply" 
+                             fetchpriority="high">
+                    </picture>
                 </div>
             </div>
         </div>
