@@ -142,6 +142,7 @@ class AiAssistantTest extends TestCase
     {
         config(['services.anthropic.assistant_ip_per_day' => 1]);
         $this->model->replies = [['text' => 'One', 'tool_calls' => [], 'content' => []]];
+        $this->withCredentials(); // JSON test requests send cookies only with this
 
         $this->withServerVariables(['REMOTE_ADDR' => '41.32.0.5'])->ask('first')->assertOk();
         $this->withServerVariables(['REMOTE_ADDR' => '41.32.0.5'])->withCookie('ai_assistant_device', 'c56a4180-65aa-42ec-a945-5fd21dec0538')->ask('second')->assertStatus(429);
@@ -154,6 +155,7 @@ class AiAssistantTest extends TestCase
         config(['services.anthropic.assistant_visitor_per_day' => 1]);
         $this->model->replies = [['text' => 'One', 'tool_calls' => [], 'content' => []]];
         $device = 'c56a4180-65aa-42ec-a945-5fd21dec0538';
+        $this->withCredentials(); // JSON test requests send cookies only with this
 
         $this->withServerVariables(['REMOTE_ADDR' => '41.32.0.6'])->withCookie('ai_assistant_device', $device)->ask('first')->assertOk();
         $this->withServerVariables(['REMOTE_ADDR' => '197.32.0.6'])->withCookie('ai_assistant_device', $device)->ask('second')->assertStatus(429);
