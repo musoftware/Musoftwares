@@ -11,5 +11,6 @@
     "Listing": true,
     "Series": true,
     "DigitalProducts": true,
-    "SoftwareStore": true
+    "SoftwareStore": true,
+    "Shop": true
 }

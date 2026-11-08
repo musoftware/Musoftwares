@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop, ShoppingBag } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -124,6 +124,16 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_serial_devices", url: "/admin/serial-devices" },
         { title: "admin.sidebar_user_assignments", url: "/admin/serial-user-devices" },
         { title: "admin.sidebar_quick_activate", url: "/admin/serial-devices-quick-activate" },
+    ]
+  },
+  {
+    title: "admin.sidebar_shop",
+    url: "/admin/shop/products",
+    icon: ShoppingBag,
+    subItems: [
+        { title: "admin.sidebar_shop_products", url: "/admin/shop/products" },
+        { title: "admin.sidebar_shop_categories", url: "/admin/shop/categories" },
+        { title: "admin.sidebar_shop_orders", url: "/admin/shop/orders" },
     ]
   },
   { 

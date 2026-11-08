@@ -58,6 +58,9 @@
         <testsuite name="SoftwareStore">
             <directory>Modules/SoftwareStore/Tests/Feature</directory>
         </testsuite>
+        <testsuite name="Shop">
+            <directory>Modules/Shop/Tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

@@ -1,0 +1,11 @@
+{
+    "name": "Shop",
+    "alias": "shop",
+    "description": "Online store for physical products: Blade storefront, session cart and cash on delivery orders.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Shop\\Providers\\ShopServiceProvider"
+    ],
+    "files": []
+}
