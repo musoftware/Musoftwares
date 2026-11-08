@@ -81,15 +81,15 @@ class HomeController extends Controller
                 'metrics' => [
                     'Architecture' => 'Custom Production Platform',
                     'Latency' => '< 10ms',
-                    'Ownership' => '100% Full Source Code',
+                    'Ownership' => 'Source code included with websites',
                 ],
                 'highlights_en' => [
                     'Bespoke software architecture tailored to operational workflows.',
-                    'Zero lock-in with direct client source code deployment.',
+                    'Source code is included with websites and web systems.',
                 ],
                 'highlights_ar' => [
                     'بنية برمجية مخصصة بالكامل لمتطلبات ودورة عمل العميل.',
-                    'ملكية كاملة للكود المصدري دون أي قيود.',
+                    'الكود المصدري بييجي مع المواقع وأنظمة الويب.',
                 ],
             ];
         }

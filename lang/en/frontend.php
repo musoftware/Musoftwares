@@ -41,7 +41,7 @@ return [
         's2' => 'Build',
         's2_desc' => 'Execution begins. You receive weekly builds and live progress updates directly via WhatsApp.',
         's3' => 'Ship',
-        's3_desc' => 'We deploy the system, hand over the full source code, and provide 30 days of free support.'
+        's3_desc' => 'We deploy the system, hand it over ready to use, and provide 30 days of free support.'
     ],
     'cost' => 'Cost',
     'costs' => 'Costs',
@@ -205,7 +205,7 @@ return [
             'q2' => 'Are there any hidden fees?',
             'a2' => 'No. You pay only for the engineering blocks you consume. There are no surprise retainers, mandatory monthly fees, or hidden costs.',
             'q3' => 'Who owns the code?',
-            'a3' => 'You do. Upon project completion, we hand over the full source code and all assets. You own every line of code we write for you.',
+            'a3' => 'Websites and web systems come with their code after full payment. For mobile and desktop apps the price is for the program itself, and the code costs 10 times the program price if you want it.',
             'q4' => 'What about maintenance?',
             'a4' => 'We offer a 30-day free support period after delivery. After that, you can request a Maintenance Block (5 hrs) for updates, patches, or small features.'
         ]

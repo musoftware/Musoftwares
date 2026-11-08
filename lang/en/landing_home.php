@@ -47,7 +47,7 @@ return [
 
     'comparison_badge' => 'Engineering First • Zero Lock-in',
     'comparison_title' => 'Why Partner with Musoftwares Studio?',
-    'comparison_desc' => 'Direct technical leadership, 100% source code ownership, and high-performance architecture without corporate bureaucracy.',
+    'comparison_desc' => 'Direct technical leadership, full ownership of your data, and high-performance architecture without corporate bureaucracy.',
     'comp_col_metric' => 'Key Metric',
     'comp_col_musoftware' => 'Musoftwares (Mahmoud Amin)',
     'comp_col_agency' => 'Traditional Software Houses',
@@ -57,7 +57,7 @@ return [
     'comp_row_comm_agency' => 'Filtered via Junior Account Managers',
     'comp_row_comm_freelance' => 'Unreliable / Timezone Mismatches',
     'comp_row_code_title' => 'Code & Data Ownership',
-    'comp_row_code_musoftware' => '100% Source Code & DB Handover (Day 1)',
+    'comp_row_code_musoftware' => 'Your data is yours, code included with websites',
     'comp_row_code_agency' => 'Vendor Lock-in / Monthly Extortion',
     'comp_row_code_freelance' => 'Undocumented / Lost Git History',
     'comp_row_quality_title' => 'Architecture Standard',

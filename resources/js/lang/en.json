@@ -6753,7 +6753,7 @@
             "s2": "Build",
             "s2_desc": "Execution begins. You receive weekly builds and live progress updates directly via WhatsApp.",
             "s3": "Ship",
-            "s3_desc": "We deploy the system, hand over the full source code, and provide 30 days of free support."
+            "s3_desc": "We deploy the system, hand it over ready to use, and provide 30 days of free support."
         },
         "cost": "Cost",
         "costs": "Costs",
@@ -6917,7 +6917,7 @@
                 "q2": "Are there any hidden fees?",
                 "a2": "No. You pay only for the engineering blocks you consume. There are no surprise retainers, mandatory monthly fees, or hidden costs.",
                 "q3": "Who owns the code?",
-                "a3": "You do. Upon project completion, we hand over the full source code and all assets. You own every line of code we write for you.",
+                "a3": "Websites and web systems come with their code after full payment. For mobile and desktop apps the price is for the program itself, and the code costs 10 times the program price if you want it.",
                 "q4": "What about maintenance?",
                 "a4": "We offer a 30-day free support period after delivery. After that, you can request a Maintenance Block (5 hrs) for updates, patches, or small features."
             }
@@ -16543,7 +16543,7 @@
             },
             {
                 "q": "Do I own the code?",
-                "a": "Yes. With ready systems you receive the full code, and in custom projects ownership moves to you after full payment."
+                "a": "Websites and web systems come with their code after full payment. For mobile and desktop apps the price is for the program itself, and the code costs 10 times the program price if you want it."
             }
         ],
         "cta_title": "Ready to start?",
@@ -16715,7 +16715,7 @@
         "portfolio_view_all": "View Full Archive (30+) ➔",
         "comparison_badge": "Engineering First • Zero Lock-in",
         "comparison_title": "Why Partner with Musoftwares Studio?",
-        "comparison_desc": "Direct technical leadership, 100% source code ownership, and high-performance architecture without corporate bureaucracy.",
+        "comparison_desc": "Direct technical leadership, full ownership of your data, and high-performance architecture without corporate bureaucracy.",
         "comp_col_metric": "Key Metric",
         "comp_col_musoftware": "Musoftwares (Mahmoud Amin)",
         "comp_col_agency": "Traditional Software Houses",
@@ -16725,7 +16725,7 @@
         "comp_row_comm_agency": "Filtered via Junior Account Managers",
         "comp_row_comm_freelance": "Unreliable \/ Timezone Mismatches",
         "comp_row_code_title": "Code & Data Ownership",
-        "comp_row_code_musoftware": "100% Source Code & DB Handover (Day 1)",
+        "comp_row_code_musoftware": "Your data is yours, code included with websites",
         "comp_row_code_agency": "Vendor Lock-in \/ Monthly Extortion",
         "comp_row_code_freelance": "Undocumented \/ Lost Git History",
         "comp_row_quality_title": "Architecture Standard",

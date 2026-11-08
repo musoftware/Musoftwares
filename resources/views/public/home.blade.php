@@ -35,7 +35,7 @@
     ];
 
     $faq = [
-        [$t('هل البرنامج هيبقى ملكي؟', 'Will the program really be mine?'), $t('أيوه. في الأنظمة بتاخد ملفات البرنامج كلها (الكود)، وفي الشغل المخصوص بيبقى ملكك بعد ما تدفع المبلغ كله.', 'Yes. With the systems you get all the program files (the code), and custom work becomes yours after full payment.')],
+        [$t('هل البرنامج هيبقى ملكي؟', 'Will the program really be mine?'), $t('السعر بتدفعه مقابل البرنامج نفسه، مش الكود. في المواقع وأنظمة الويب الكود بييجي معاك. في تطبيقات الموبايل والكمبيوتر الكود مش بيتسلم، ولو عايزه سعره 10 أضعاف سعر البرنامج.', 'The price pays for the program itself, not its code. Websites and web systems come with their code. Mobile and desktop apps do not, and if you want an app\'s code it costs 10 times the program price.')],
         [$t('الدفع آمن؟', 'Is paying safe?'), $t('بتدفع من صفحة Kashier، وإحنا مش بنشوف بيانات كارتك.', 'You pay on the Kashier page and we never see your card details.')],
         [$t('لو عايز أغيّر حاجة في البرنامج؟', 'What if I want something changed?'), $t('باقة التعديلات في الأنظمة بتشمل أي تعديل يحتاجه شغلك.', 'The changes plan for systems includes any change your business needs.')],
         [$t('لو حصلت مشكلة بعد ما استلمت؟', 'What if something goes wrong after I receive it?'), $t('ابعت رقم طلبك على واتساب ونرد عليك.', 'Send your order number on WhatsApp and we reply.')],

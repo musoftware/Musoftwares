@@ -42,7 +42,7 @@ return [
         ['q' => 'How do I know the price of my project?', 'a' => 'Use the cost estimator. It shows the price and what it includes, and you can download it as a quotation.'],
         ['q' => 'What is included in the free month?', 'a' => 'Technical support for one month after delivery, plus two free changes during that month.'],
         ['q' => 'How much is support after the first month?', 'a' => '10% of the project price per month if you want ongoing changes. If not, you pay only for each change you ask for.'],
-        ['q' => 'Do I own the code?', 'a' => 'Yes. With ready systems you receive the full code, and in custom projects ownership moves to you after full payment.'],
+        ['q' => 'Do I own the code?', 'a' => 'Websites and web systems come with their code after full payment. For mobile and desktop apps the price is for the program itself, and the code costs 10 times the program price if you want it.'],
     ],
 
     'cta_title' => 'Ready to start?',

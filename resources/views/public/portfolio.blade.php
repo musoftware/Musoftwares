@@ -169,8 +169,8 @@
             </h3>
             <p class="text-sm text-[#86868b] max-w-xl mx-auto">
                 {{ $locale === 'ar' 
-                    ? 'من تطبيقات الويب والموبايل المخصصة إلى محركات محادثات واتساب وأنظمة المدفوعات، نضمن لك ملكية الكود 100% بدون أي قيود.'
-                    : 'From custom web and mobile apps to multi-agent WhatsApp automation and FinTech systems, get 100% full source code ownership.' }}
+                    ? 'من تطبيقات الويب والموبايل المخصصة إلى محركات محادثات واتساب وأنظمة المدفوعات، بنسلمك برنامج جاهز تشتغل عليه، والكود بييجي مع المواقع وأنظمة الويب.'
+                    : 'From custom web and mobile apps to multi-agent WhatsApp automation and FinTech systems, get a finished program. Source code comes with websites and web systems.' }}
             </p>
             <div class="flex items-center justify-center gap-4 pt-2">
                 <a href="/start-project" class="apple-pill-btn apple-pill-primary text-[14px] px-6 py-2.5 shadow-sm">

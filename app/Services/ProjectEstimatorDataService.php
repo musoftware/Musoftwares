@@ -721,7 +721,7 @@ class ProjectEstimatorDataService extends BaseService
         $discountPolicy = [
             'bundle_discount_percentage' => 20,
             'bundle_condition' => 'Applies automatically when Web + Mobile + Desktop platforms are all selected.',
-            'guarantee' => '100% transparent pricing, source code delivery, and 30-day post-delivery technical warranty.',
+            'guarantee' => '100% transparent pricing, source code delivery for websites, and 30-day post-delivery technical warranty.',
         ];
 
         if ($fromPriceList) {
