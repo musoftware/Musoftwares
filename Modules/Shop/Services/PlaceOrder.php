@@ -14,14 +14,16 @@ class PlaceOrder
     public function handle(array $customer, Collection $lines): ShopOrder
     {
         $subtotal = $this->cart->subtotal($lines);
-        $shipping = (float) config('shop.shipping_cost');
+        $shipping = $this->cart->shipping($lines);
+        $angaznyStatus = $this->cart->hasAngaznyProduct($lines) ? ShopOrder::ANGAZNY_PENDING : null;
 
-        $order = DB::transaction(function () use ($customer, $lines, $subtotal, $shipping): ShopOrder {
+        $order = DB::transaction(function () use ($customer, $lines, $subtotal, $shipping, $angaznyStatus): ShopOrder {
             $order = ShopOrder::create($customer + [
                 'subtotal' => $subtotal,
                 'shipping' => $shipping,
                 'total' => $subtotal + $shipping,
                 'status' => 'new',
+                'angazny_status' => $angaznyStatus,
             ]);
             $order->items()->createMany($lines->map(fn (array $line) => $this->itemData($line))->all());
 
@@ -43,6 +45,8 @@ class PlaceOrder
             'unit_price' => $line['unit_price'],
             'quantity' => $line['quantity'],
             'line_total' => $line['line_total'],
+            'angazny_stock_id' => $line['angazny_stock_id'],
+            'angazny_price_effect' => $line['angazny_price_effect'],
         ];
     }
 }

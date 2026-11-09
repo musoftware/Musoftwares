@@ -14,6 +14,7 @@ class ShopProduct extends Model
     protected $fillable = [
         'category_id', 'name', 'slug', 'description', 'price', 'compare_at_price', 'images',
         'sizes', 'colors', 'in_stock', 'is_active', 'sort_order', 'seo_title', 'seo_description',
+        'angazny_id', 'angazny_price', 'angazny_commission', 'angazny_depot', 'angazny_variants', 'angazny_needs_price',
     ];
 
     protected $casts = [
@@ -25,6 +26,10 @@ class ShopProduct extends Model
         'in_stock' => 'boolean',
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'angazny_price' => 'decimal:2',
+        'angazny_commission' => 'decimal:2',
+        'angazny_variants' => 'array',
+        'angazny_needs_price' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -69,6 +74,29 @@ class ShopProduct extends Model
 
     public function canBeOrdered(): bool
     {
-        return $this->is_active && $this->in_stock;
+        return $this->is_active && $this->in_stock && ! $this->angazny_needs_price;
+    }
+
+    public function isFromAngazny(): bool
+    {
+        return $this->angazny_id !== null;
+    }
+
+    /** @return array{size: ?string, color: ?string, stock_id: int, stock: int}|null */
+    public function angaznyVariant(?string $size, ?string $color): ?array
+    {
+        return collect($this->angazny_variants ?? [])
+            ->first(fn (array $variant) => $variant['size'] === $size && $variant['color'] === $color);
+    }
+
+    /** Angazny stock is counted per colour and size, so the exact choice must be available. */
+    public function canSupply(?string $size, ?string $color): bool
+    {
+        return ! $this->isFromAngazny() || ($this->angaznyVariant($size, $color)['stock'] ?? 0) > 0;
+    }
+
+    public function angaznyProfit(): float
+    {
+        return round((float) $this->price - ((float) $this->angazny_price - (float) $this->angazny_commission), 2);
     }
 }

@@ -17,7 +17,7 @@
                 <label for="governorate">المحافظة</label>
                 <select id="governorate" name="governorate" autocomplete="address-level1" required>
                     <option value="">اختار المحافظة</option>
-                    @foreach (config('shop.governorates') as $governorate)
+                    @foreach ($governorates as $governorate)
                         <option value="{{ $governorate }}" @selected(old('governorate') === $governorate)>{{ $governorate }}</option>
                     @endforeach
                 </select>

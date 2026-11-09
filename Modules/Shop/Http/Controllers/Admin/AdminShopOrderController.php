@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Shop\Models\ShopOrder;
+use Modules\Shop\Services\Angazny\AngaznyOrderSender;
 
 class AdminShopOrderController extends Controller
 {
@@ -34,6 +35,13 @@ class AdminShopOrderController extends Controller
     {
         $data = $request->validate(['status' => ['required', Rule::in(ShopOrder::STATUSES)]]);
         $order->update($data);
+
+        return back();
+    }
+
+    public function sendToAngazny(ShopOrder $order, AngaznyOrderSender $sender): RedirectResponse
+    {
+        $sender->send($order->load('items'));
 
         return back();
     }

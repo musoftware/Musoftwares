@@ -24,6 +24,9 @@ interface Order {
     status: string;
     created_at: string;
     items: Item[];
+    angazny_status: string | null;
+    angazny_order_code: string | null;
+    angazny_error: string | null;
 }
 
 const STATUS_LABELS: Record<string, [string, string]> = {
@@ -33,6 +36,37 @@ const STATUS_LABELS: Record<string, [string, string]> = {
     delivered: ['Delivered', 'تم التسليم'],
     cancelled: ['Cancelled', 'ملغي'],
 };
+
+const ANGAZNY_LABELS: Record<string, [string, string]> = {
+    pending: ['Not sent to Angazny yet', 'لسه ما اتبعتش لانجزني'],
+    sending: ['Sending to Angazny', 'جاري الإرسال لانجزني'],
+    sent: ['Sent to Angazny', 'اتبعت لانجزني'],
+    failed: ['Angazny send failed', 'فشل الإرسال لانجزني'],
+    unknown: ['Check Angazny before resending', 'راجع انجزني قبل أي إرسال تاني'],
+};
+
+const SENDABLE_TO_ANGAZNY = ['pending', 'failed'];
+
+function AngaznyState({ order }: { order: Order }) {
+    if (!order.angazny_status) return null;
+    const [en, ar] = ANGAZNY_LABELS[order.angazny_status];
+
+    return (
+        <div className="text-sm space-y-1">
+            <p>{t(en, ar)}{order.angazny_order_code && ` · ${order.angazny_order_code}`}</p>
+            {order.angazny_error && <p className="text-red-700 break-words">{order.angazny_error}</p>}
+            {SENDABLE_TO_ANGAZNY.includes(order.angazny_status) && order.status !== 'cancelled' && (
+                <button
+                    type="button"
+                    className="inline-flex items-center min-h-11 text-blue-600 underline"
+                    onClick={() => router.post(`/admin/shop/orders/${order.id}/angazny`, {}, { preserveScroll: true })}
+                >
+                    {t('Send to Angazny', 'إرسال لانجزني')}
+                </button>
+            )}
+        </div>
+    );
+}
 
 const statusLabel = (status: string) => t(STATUS_LABELS[status][0], STATUS_LABELS[status][1]);
 
@@ -69,6 +103,7 @@ function OrderRow({ order, statuses, currency }: { order: Order; statuses: strin
                 >
                     {statuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
                 </select>
+                <AngaznyState order={order} />
             </div>
         </li>
     );

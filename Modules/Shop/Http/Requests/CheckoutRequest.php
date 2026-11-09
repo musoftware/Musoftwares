@@ -4,6 +4,7 @@ namespace Modules\Shop\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Modules\Shop\Services\Cart;
 
 class CheckoutRequest extends FormRequest
 {
@@ -16,10 +17,12 @@ class CheckoutRequest extends FormRequest
 
     public function rules(): array
     {
+        $cart = app(Cart::class);
+
         return [
             'customer_name' => ['required', 'string', 'min:3', 'max:120'],
             'phone' => ['required', 'regex:/^01[0125][0-9]{8}$/'],
-            'governorate' => ['required', Rule::in(config('shop.governorates'))],
+            'governorate' => ['required', Rule::in($cart->governorates($cart->lines()))],
             'address' => ['required', 'string', 'min:8', 'max:500'],
             'notes' => ['nullable', 'string', 'max:500'],
             'website' => ['prohibited'],

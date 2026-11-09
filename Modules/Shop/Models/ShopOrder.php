@@ -13,9 +13,22 @@ class ShopOrder extends Model
 
     public const STATUSES = ['new', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
+    public const ANGAZNY_PENDING = 'pending';
+
+    public const ANGAZNY_SENDING = 'sending';
+
+    public const ANGAZNY_SENT = 'sent';
+
+    public const ANGAZNY_FAILED = 'failed';
+
+    public const ANGAZNY_UNKNOWN = 'unknown';
+
+    public const ANGAZNY_SENDABLE = [self::ANGAZNY_PENDING, self::ANGAZNY_FAILED];
+
     protected $fillable = [
         'customer_name', 'phone', 'governorate', 'address', 'notes',
         'subtotal', 'shipping', 'total', 'status',
+        'angazny_status', 'angazny_order_code', 'angazny_error',
     ];
 
     protected $casts = [

@@ -65,7 +65,7 @@ class Cart
         $products = ShopProduct::whereIn('id', $entries->pluck('product_id'))->get()->keyBy('id');
 
         return $entries
-            ->filter(fn (array $entry) => $products->get($entry['product_id'])?->canBeOrdered())
+            ->filter(fn (array $entry) => $this->isOrderable($entry, $products->get($entry['product_id'])))
             ->map(fn (array $entry, string $key) => $this->line($key, $entry, $products->get($entry['product_id'])))
             ->values();
     }
@@ -73,6 +73,29 @@ class Cart
     public function subtotal(Collection $lines): float
     {
         return round((float) $lines->sum('line_total'), 2);
+    }
+
+    public function hasAngaznyProduct(Collection $lines): bool
+    {
+        return $lines->contains(fn (array $line) => $line['product']->isFromAngazny());
+    }
+
+    public function shipping(Collection $lines): float
+    {
+        return (float) config($this->hasAngaznyProduct($lines) ? 'shop.angazny.shipping' : 'shop.shipping_cost');
+    }
+
+    /** @return list<string> */
+    public function governorates(Collection $lines): array
+    {
+        return $this->hasAngaznyProduct($lines)
+            ? array_keys(config('shop.angazny.cities'))
+            : config('shop.governorates');
+    }
+
+    private function isOrderable(array $entry, ?ShopProduct $product): bool
+    {
+        return $product !== null && $product->canBeOrdered() && $product->canSupply($entry['size'], $entry['color']);
     }
 
     private function line(string $key, array $entry, ShopProduct $product): array
@@ -85,6 +108,8 @@ class Cart
             'quantity' => $entry['quantity'],
             'unit_price' => (float) $product->price,
             'line_total' => round((float) $product->price * $entry['quantity'], 2),
+            'angazny_stock_id' => $product->angaznyVariant($entry['size'], $entry['color'])['stock_id'] ?? null,
+            'angazny_price_effect' => $product->isFromAngazny() ? (float) $product->price - (float) $product->angazny_price : null,
         ];
     }
 

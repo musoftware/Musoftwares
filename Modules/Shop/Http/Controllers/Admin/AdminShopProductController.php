@@ -20,9 +20,11 @@ class AdminShopProductController extends Controller
     public function index(Request $request): Response
     {
         $search = trim((string) $request->query('search'));
+        $needsPrice = $request->boolean('needs_price');
 
         $products = ShopProduct::with('category:id,name')
             ->when($search !== '', fn ($query) => $query->where('name', 'like', '%'.addcslashes($search, '%_\\').'%'))
+            ->when($needsPrice, fn ($query) => $query->where('angazny_needs_price', true))
             ->latest('id')
             ->paginate(30)
             ->withQueryString()
@@ -31,6 +33,8 @@ class AdminShopProductController extends Controller
         return Inertia::render('Admin/Shop/Products', [
             'products' => $products,
             'search' => $search,
+            'needsPrice' => $needsPrice,
+            'needsPriceCount' => ShopProduct::where('angazny_needs_price', true)->count(),
             'importReport' => session('shop_import'),
         ]);
     }
@@ -65,6 +69,10 @@ class AdminShopProductController extends Controller
             return back()->withErrors(['images_add' => 'أضف صورة للمنتج الأول عشان يظهر في المتجر']);
         }
 
+        if (! $product->is_active && $product->angazny_needs_price) {
+            return back()->withErrors(['images_add' => 'حدد سعر البيع للمنتج الأول عشان يظهر في المتجر']);
+        }
+
         $product->update(['is_active' => ! $product->is_active]);
 
         return back();
@@ -82,6 +90,8 @@ class AdminShopProductController extends Controller
         $data = $request->safe()->except(['images_add', 'images_remove', 'slug']);
 
         $product->fill($data);
+        $product->angazny_needs_price = $product->angazny_needs_price && ! $product->isDirty('price');
+        $product->is_active = $product->is_active && ! $product->angazny_needs_price;
         $product->slug = UniqueSlug::make(ShopProduct::class, $request->input('slug') ?: $data['name'], $product->id);
         $product->images = $this->images->update(
             $product->images ?? [],
@@ -110,6 +120,12 @@ class AdminShopProductController extends Controller
             'in_stock' => $product->in_stock,
             'is_active' => $product->is_active,
             'url' => $product->url(),
+            'angazny' => $product->isFromAngazny() ? [
+                'price' => $product->angazny_price,
+                'profit' => $product->angaznyProfit(),
+                'depot' => $product->angazny_depot,
+                'needs_price' => $product->angazny_needs_price,
+            ] : null,
         ];
     }
 }

@@ -16,6 +16,7 @@ interface Row {
     in_stock: boolean;
     is_active: boolean;
     url: string;
+    angazny: { price: string; profit: number; depot: string | null; needs_price: boolean } | null;
 }
 
 interface ImportReport {
@@ -77,7 +78,17 @@ function ProductRow({ row }: { row: Row }) {
                     {row.image_url
                         ? <img src={row.image_url} alt="" className="w-12 h-12 object-cover shrink-0" />
                         : <span className="w-12 h-12 shrink-0 bg-muted" aria-hidden="true" />}
-                    <span className="font-medium break-words min-w-0">{row.name}</span>
+                    <div className="min-w-0">
+                        <span className="font-medium break-words">{row.name}</span>
+                        {row.angazny && (
+                            <p className="text-xs text-muted-foreground">
+                                {t('Angazny', 'انجزني')}: {Number(row.angazny.price).toLocaleString('en-US')}
+                                {row.angazny.needs_price
+                                    ? <span className="text-red-700"> · {t('Set a price', 'حدد السعر')}</span>
+                                    : ` · ${t('Profit', 'الربح')}: ${row.angazny.profit.toLocaleString('en-US')}`}
+                            </p>
+                        )}
+                    </div>
                 </div>
             </TableCell>
             <TableCell>{row.category ?? '-'}</TableCell>
@@ -99,7 +110,7 @@ function ProductRow({ row }: { row: Row }) {
     );
 }
 
-export default function Products({ products, search, importReport }: { products: Paginated<Row>; search: string; importReport: ImportReport | null }) {
+export default function Products({ products, search, importReport, needsPrice, needsPriceCount }: { products: Paginated<Row>; search: string; importReport: ImportReport | null; needsPrice: boolean; needsPriceCount: number }) {
     const { errors } = usePage().props as unknown as { errors: Record<string, string> };
     const [term, setTerm] = useState(search);
 
@@ -124,6 +135,12 @@ export default function Products({ products, search, importReport }: { products:
                     <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder={t('Search by name', 'بحث بالاسم')} aria-label={t('Search by name', 'بحث بالاسم')} />
                     <Button type="submit" variant="outline">{t('Search', 'بحث')}</Button>
                 </form>
+
+                {(needsPrice || needsPriceCount > 0) && (
+                    <Link className="inline-flex items-center min-h-11 text-blue-600 underline" href={needsPrice ? '/admin/shop/products' : '/admin/shop/products?needs_price=1'}>
+                        {needsPrice ? t('Show all products', 'عرض كل المنتجات') : t(`${needsPriceCount} products need a price`, `${needsPriceCount} منتج محتاج سعر`)}
+                    </Link>
+                )}
 
                 {errors.images_add && <p className="text-sm text-red-700" role="alert">{errors.images_add}</p>}
 

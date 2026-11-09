@@ -4,6 +4,8 @@ namespace Modules\Shop\Providers;
 
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Modules\Shop\Console\SendOrdersToAngazny;
+use Modules\Shop\Console\SyncAngaznyCatalogue;
 use Modules\Shop\Models\ShopCategory;
 use Modules\Shop\Services\Cart;
 
@@ -12,6 +14,7 @@ class ShopServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(module_path('Shop', 'config/shop.php'), 'shop');
+        $this->commands([SyncAngaznyCatalogue::class, SendOrdersToAngazny::class]);
     }
 
     public function boot(): void

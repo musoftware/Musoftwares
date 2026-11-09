@@ -44,5 +44,6 @@ Route::middleware('web')->group(function () {
 
         Route::get('/orders', [AdminShopOrderController::class, 'index'])->name('orders.index');
         Route::post('/orders/{order}/status', [AdminShopOrderController::class, 'updateStatus'])->name('orders.status');
+        Route::post('/orders/{order}/angazny', [AdminShopOrderController::class, 'sendToAngazny'])->name('orders.angazny');
     });
 });

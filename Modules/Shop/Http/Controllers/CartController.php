@@ -34,6 +34,11 @@ class CartController extends Controller
             'size.required' => 'اختار المقاس الأول',
             'color.required' => 'اختار اللون الأول',
         ]);
+
+        if (! $product->canSupply($data['size'] ?? null, $data['color'] ?? null)) {
+            return back()->withInput()->withErrors([($product->sizes ?? []) === [] ? 'color' : 'size' => 'الاختيار ده خلص، جرب مقاس أو لون تاني']);
+        }
+
         $this->cart->add($product, (int) $data['quantity'], $data['size'] ?? null, $data['color'] ?? null);
 
         return $request->boolean('buy_now')

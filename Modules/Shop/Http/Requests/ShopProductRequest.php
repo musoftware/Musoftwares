@@ -40,7 +40,10 @@ class ShopProductRequest extends FormRequest
 
     public function after(): array
     {
-        return [fn (Validator $validator) => $this->requireImageWhenVisible($validator)];
+        return [
+            fn (Validator $validator) => $this->requireImageWhenVisible($validator),
+            fn (Validator $validator) => $this->keepPriceAboveAngazny($validator),
+        ];
     }
 
     protected function prepareForValidation(): void
@@ -50,6 +53,16 @@ class ShopProductRequest extends FormRequest
             'colors' => OptionList::parse($this->input('colors')),
             'sort_order' => (int) $this->input('sort_order'),
         ]);
+    }
+
+    /** Selling under Angazny's price would make the order lose money. */
+    private function keepPriceAboveAngazny(Validator $validator): void
+    {
+        $floor = $this->route('product')?->angazny_price;
+
+        if ($floor !== null && (float) $this->input('price') < (float) $floor) {
+            $validator->errors()->add('price', 'السعر لازم يكون '.$floor.' جنيه أو أكتر، ده سعر انجزني');
+        }
     }
 
     /** A product with no picture can stay saved, but it can't be shown in the store. */

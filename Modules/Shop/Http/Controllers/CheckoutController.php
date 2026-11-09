@@ -23,7 +23,7 @@ class CheckoutController extends Controller
         }
 
         $subtotal = $this->cart->subtotal($lines);
-        $shipping = (float) config('shop.shipping_cost');
+        $shipping = $this->cart->shipping($lines);
 
         return view('shop::checkout', [
             'seo' => $seo->privatePage('إتمام الطلب'),
@@ -31,6 +31,7 @@ class CheckoutController extends Controller
             'subtotal' => $subtotal,
             'shipping' => $shipping,
             'total' => $subtotal + $shipping,
+            'governorates' => $this->cart->governorates($lines),
         ]);
     }
 

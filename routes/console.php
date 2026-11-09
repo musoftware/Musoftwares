@@ -58,6 +58,10 @@ Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dail
 // Auto-pay unpaid invoices daily at 04:30 Cairo Time
 Schedule::command(\App\Console\Commands\AutoPayInvoices::class)->dailyAt('04:30')->timezone('Africa/Cairo');
 
+// Store: refresh Angazny products hourly and send waiting orders
+Schedule::command('shop:angazny-sync')->hourly()->withoutOverlapping(30);
+Schedule::command('shop:angazny-send-orders')->everyMinute()->withoutOverlapping(10);
+
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);
 
