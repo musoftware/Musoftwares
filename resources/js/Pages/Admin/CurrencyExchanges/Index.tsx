@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
@@ -83,6 +84,8 @@ export default function Index({ exchanges, currencies, filters }: Props) {
             header={__('admin.currency_exchanges')}
         >
             <Head title={__('admin.currency_exchanges')} />
+
+            <FinanceSectionTabs section="currencies" active="exchanges" />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-end gap-4">

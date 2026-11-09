@@ -79,6 +79,7 @@ import {
 const PIE_COLORS = ['#0f172a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'];
 
 const ALL_VALUE = '__all__';
+const ENTRY_STATUSES = ['completed', 'pending', 'overdue'];
 
 export default function Costs() {
     const { entries, stats, filters, options } = usePage<any>().props;
@@ -95,7 +96,7 @@ export default function Costs() {
         const allowedKeys = [
             'year', 'month', 'search', 'preset', 'project_id', 'user_id',
             'currency_id', 'category', 'min_amount', 'max_amount',
-            'recurring_only', 'with_trashed', 'sort_by', 'sort_dir'
+            'recurring_only', 'with_trashed', 'sort_by', 'sort_dir', 'status'
         ];
         for (const key of allowedKeys) {
             const val = source[key];
@@ -212,6 +213,7 @@ export default function Costs() {
     if (filters?.recurring_only) activeFilterPills.push({ key: 'recurring_only', label: __('general.type'), value: __('general.recurring') });
     if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: __('general.min'), value: filters.min_amount });
     if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: __('general.max'), value: filters.max_amount });
+    if (filters?.status) activeFilterPills.push({ key: 'status', label: __('general.status'), value: __(`general.${filters.status}`) });
     if (filters?.with_trashed) activeFilterPills.push({ key: 'with_trashed', label: __('general.view'), value: __('admin.ledger_with_deleted') });
 
     const allSelected = entries?.data?.length > 0 && selected.length === entries.data.length;
@@ -374,6 +376,13 @@ export default function Costs() {
                         >
                             {__('general.recurring')}
                         </Button>
+                        <PremiumCombobox
+                            className="w-full sm:w-48"
+                            value={filters?.status ? String(filters.status) : ''}
+                            onChange={(val) => handleFilterChange('status', (val as string) || '')}
+                            options={ENTRY_STATUSES.map((status) => ({ value: status, label: __(`general.${status}`) }))}
+                            placeholder={__('general.status')}
+                        />
                         <div className="flex items-center gap-1">
                             <Input
                                 type="number"
@@ -620,6 +629,9 @@ export default function Costs() {
                                         <div className="font-medium text-slate-900 truncate max-w-[260px]" title={entry.reason}>
                                             {entry.title}
                                         </div>
+                                        {entry.status !== 'completed' && (
+                                            <div className="text-xs font-medium text-amber-700 mt-0.5">{__(`general.${entry.status}`)}</div>
+                                        )}
                                         <div className="flex items-center gap-1 mt-1">
                                             {entry.is_recurring && (
                                                 entry.recurring_cost_id ? (
@@ -695,6 +707,14 @@ export default function Costs() {
                                                         {__('general.edit')}
                                                     </Link>
                                                 </DropdownMenuItem>
+                                                {!entry.deleted_at && entry.status !== 'completed' && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => router.post(route('admin.finance.mark-paid', { entry: entry.id, type: 'expense' }), {}, { preserveScroll: true })}
+                                                        className="focus:bg-slate-50"
+                                                    >
+                                                        {__('general.mark_as_paid')}
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem
                                                     onClick={() => router.post(route('admin.costs.duplicate', entry.id))}
                                                     className="flex items-center gap-2 cursor-pointer"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { Button } from '@/Components/ui/button';
 import { Switch } from '@/Components/ui/switch';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye, Power } from 'lucide-react';
@@ -55,6 +56,8 @@ export default function Index({ costs, currencies, categories, stats }) {
     return (
         <AdminSidebarLayout title={__('general.recurring_costs')} header={__('admin.business_operations')}>
             <Head title={__('general.admin_recurring_costs')} />
+
+            <FinanceSectionTabs section="recurring" active="costs" />
 
             <div className="mb-4">
                 <Link href={route('admin.finance.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">

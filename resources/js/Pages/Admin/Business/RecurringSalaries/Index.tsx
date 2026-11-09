@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import {
     Dialog,
     DialogContent,
@@ -60,6 +61,8 @@ export default function Index({ salaries, currencies }) {
     return (
         <AdminSidebarLayout title={__('general.recurring_salaries')} header={__('admin.business_operations')}>
             <Head title={__('general.admin_recurring_salaries')} />
+
+            <FinanceSectionTabs section="recurring" active="salaries" />
 
             <div className="mb-4">
                 <Link href={route('admin.finance.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">

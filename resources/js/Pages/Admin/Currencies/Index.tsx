@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import {
@@ -65,6 +66,8 @@ export default function Index({ currencies, search }: Props) {
     return (
         <AdminSidebarLayout title={__('admin.currencies')} header={__('admin.currencies')}>
             <Head title={__('admin.currencies')} />
+
+            <FinanceSectionTabs section="currencies" active="currencies" />
 
             <div className="space-y-6">
                 <div className="flex items-center justify-end gap-4">

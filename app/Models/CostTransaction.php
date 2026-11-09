@@ -86,6 +86,7 @@ class CostTransaction extends Model
         // Generated recurring costs have no category of their own, so they use the reason of their source.
         return $query->where(fn (Builder $matches) => $matches
             ->where('category', $category)
+            ->orWhere(fn (Builder $uncategorized) => $uncategorized->where('reason', $category)->where(fn (Builder $empty) => $empty->whereNull('category')->orWhere('category', '')))
             ->orWhereHas('recurringSources', fn (Builder $source) => $source->where('recurring_costs.reason', $category)));
     }
 

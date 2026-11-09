@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import IncomeEntryDialog from '@/Components/Admin/Finance/IncomeEntryDialog';
 import { Head, router, usePage, Link } from '@inertiajs/react';
 import {
     Card,
@@ -72,6 +73,7 @@ import {
 const PIE_COLORS = ['#0f172a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b'];
 
 const ALL_VALUE = '__all__';
+const ENTRY_STATUSES = ['completed', 'pending', 'overdue'];
 
 export default function Income() {
     const { entries, stats, filters, options } = usePage<any>().props;
@@ -81,6 +83,7 @@ export default function Income() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [reverseId, setReverseId] = useState<number | null>(null);
     const [isReversing, setIsReversing] = useState(false);
+    const [entryDialog, setEntryDialog] = useState<{ entry: any | null } | null>(null);
 
     const buildCleanQuery = (overrides: Record<string, any> = {}) => {
         const query: Record<string, any> = {};
@@ -88,7 +91,7 @@ export default function Income() {
         const allowedKeys = [
             'year', 'month', 'search', 'preset', 'project_id', 'user_id',
             'currency_id', 'category', 'min_amount', 'max_amount',
-            'with_trashed', 'sort_by', 'sort_dir'
+            'with_trashed', 'sort_by', 'sort_dir', 'status'
         ];
         for (const key of allowedKeys) {
             const val = source[key];
@@ -178,21 +181,34 @@ export default function Income() {
     if (filters?.category) activeFilterPills.push({ key: 'category', label: __('general.category'), value: filters.category });
     if (filters?.min_amount) activeFilterPills.push({ key: 'min_amount', label: __('general.min'), value: filters.min_amount });
     if (filters?.max_amount) activeFilterPills.push({ key: 'max_amount', label: __('general.max'), value: filters.max_amount });
+    if (filters?.status) activeFilterPills.push({ key: 'status', label: __('general.status'), value: __(`general.${filters.status}`) });
 
     return (
         <AdminSidebarLayout
             title={__('general.business_income')}
             header={__('general.business_income')}
-            actions={
+        >
+            <Head title={__('general.business_income')} />
+            <div className="flex flex-wrap justify-end gap-2 mb-4">
+                <Button className="min-h-11" onClick={() => setEntryDialog({ entry: null })}>{__('general.add_income')}</Button>
+                <Button variant="outline" className="min-h-11" asChild>
+                    <a href={route('admin.finance.report.export', { type: 'ledger' })} target="_blank" rel="noreferrer">{__('general.export_csv')}</a>
+                </Button>
                 <Link href={route('admin.business.reports')}>
-                    <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
+                    <Button variant="outline" className="min-h-11 gap-2 hover:bg-slate-50 hover:text-black">
                         <Activity className="h-4 w-4 text-slate-800" />
                         <span>{__('general.business_reports')}</span>
                     </Button>
                 </Link>
-            }
-        >
-            <Head title={__('general.business_income')} />
+            </div>
+            {entryDialog && (
+                <IncomeEntryDialog
+                    entry={entryDialog.entry}
+                    currencies={options?.currencies || []}
+                    defaultCurrencyCode={stats.business_currency_code}
+                    onClose={() => setEntryDialog(null)}
+                />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
@@ -309,6 +325,13 @@ export default function Income() {
                             onChange={(val) => handleFilterChange('category', (val as string) || '')}
                             options={(options?.categories || []).map((c: any) => ({ value: String(c.value), label: c.label }))}
                             placeholder={__('general.category')}
+                        />
+                        <PremiumCombobox
+                            className="w-full sm:w-48"
+                            value={filters?.status ? String(filters.status) : ''}
+                            onChange={(val) => handleFilterChange('status', (val as string) || '')}
+                            options={ENTRY_STATUSES.map((status) => ({ value: status, label: __(`general.${status}`) }))}
+                            placeholder={__('general.status')}
                         />
                         <div className="flex items-center gap-1">
                             <Input
@@ -491,6 +514,9 @@ export default function Income() {
                                         <div className="font-medium text-slate-900 truncate max-w-[260px]" title={entry.reason}>
                                             {entry.title}
                                         </div>
+                                        {entry.status !== 'completed' && (
+                                            <div className="text-xs font-medium text-amber-700 mt-0.5">{__(`general.${entry.status}`)}</div>
+                                        )}
                                         <div className="flex items-center gap-1 mt-1">
                                             {entry.is_recurring && (
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
@@ -541,6 +567,19 @@ export default function Income() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-[180px]">
+                                                {!entry.deleted_at && entry.type === 'received' && (
+                                                    <DropdownMenuItem onClick={() => setEntryDialog({ entry })} className="focus:bg-slate-50">
+                                                        {__('general.edit')}
+                                                    </DropdownMenuItem>
+                                                )}
+                                                {!entry.deleted_at && entry.status !== 'completed' && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => router.post(route('admin.finance.mark-paid', { entry: entry.id, type: 'income' }), {}, { preserveScroll: true })}
+                                                        className="focus:bg-slate-50"
+                                                    >
+                                                        {__('general.mark_as_paid')}
+                                                    </DropdownMenuItem>
+                                                )}
                                                 {!entry.deleted_at && entry.type !== 'refunded' && entry.type !== 'sent' && (
                                                     <DropdownMenuItem
                                                         onClick={() => setReverseId(entry.id)}

@@ -44,6 +44,7 @@ class BusinessController extends Controller
         $category = $request->query('category');
         $minAmount = $request->query('min_amount');
         $maxAmount = $request->query('max_amount');
+        $status = $request->query('status');
         $preset = $request->query('preset');
         $withTrashed = filter_var($request->query('with_trashed', false), FILTER_VALIDATE_BOOLEAN);
         $sortBy = $request->query('sort_by', 'created_at');
@@ -82,6 +83,7 @@ class BusinessController extends Controller
         }
 
         $incomeQuery = $incomeQuery->with(['user', 'project'])
+            ->when($status, fn ($q) => $this->filterByStatus($q, $status))
             ->when($category, function ($q) use ($category) {
                 $q->where('category', $category);
             })
@@ -274,6 +276,7 @@ class BusinessController extends Controller
                 'category' => $category,
                 'min_amount' => $minAmount,
                 'max_amount' => $maxAmount,
+                'status' => $status,
                 'with_trashed' => $withTrashed,
                 'sort_by' => $sortBy,
                 'sort_dir' => $sortDir,
@@ -314,6 +317,7 @@ class BusinessController extends Controller
         $category = $request->query('category');
         $minAmount = $request->query('min_amount');
         $maxAmount = $request->query('max_amount');
+        $status = $request->query('status');
         $recurringOnly = filter_var($request->query('recurring_only', false), FILTER_VALIDATE_BOOLEAN);
         $preset = $request->query('preset');
         $withTrashed = filter_var($request->query('with_trashed', false), FILTER_VALIDATE_BOOLEAN);
@@ -339,7 +343,7 @@ class BusinessController extends Controller
         $availableYears = range($latestYear, $earliestYear);
         $availableMonths = range(1, 12);
 
-        $baseQuery = CostTransaction::excludingSalaries();
+        $baseQuery = CostTransaction::query();
         if ($preset === 'all') {
             $costsQuery = (clone $baseQuery);
         } elseif ($preset === 'last_30') {
@@ -348,11 +352,17 @@ class BusinessController extends Controller
             $costsQuery = (clone $baseQuery)->where('created_at', '>=', now()->subDays(90));
         } elseif ($preset === 'ytd') {
             $costsQuery = (clone $baseQuery)->whereYear('created_at', $currentYear);
+        } elseif ($request->filled('from') && $request->filled('to')) {
+            $costsQuery = (clone $baseQuery)->whereBetween('created_at', [
+                Carbon::parse($request->query('from'), 'Africa/Cairo')->startOfDay()->setTimezone('UTC'),
+                Carbon::parse($request->query('to'), 'Africa/Cairo')->endOfDay()->setTimezone('UTC'),
+            ]);
         } else {
             $costsQuery = (clone $baseQuery)->inYearMonth($year, $month);
         }
 
         $costsQuery = $costsQuery->with(['user', 'project', 'recurringSources'])
+            ->when($status, fn ($q) => $this->filterByStatus($q, $status))
             ->byCategory($category)
             ->forUser($userId)
             ->forProject($projectId)
@@ -434,7 +444,7 @@ class BusinessController extends Controller
 
         // Comparison vs previous month
         $prevMonth = Carbon::createFromDate($year, $month)->subMonth();
-        $prevTotal = CostTransaction::excludingSalaries()
+        $prevTotal = CostTransaction::query()
             ->inYearMonth($prevMonth->year, $prevMonth->month)
             ->sum('business_amount') ?? 0;
         $changePercent = 0;
@@ -445,7 +455,7 @@ class BusinessController extends Controller
         }
 
         // Year-to-date
-        $ytdTotal = CostTransaction::excludingSalaries()
+        $ytdTotal = CostTransaction::query()
             ->whereYear('created_at', $year)
             ->sum('business_amount') ?? 0;
 
@@ -457,7 +467,7 @@ class BusinessController extends Controller
             if ($m->copy()->endOfMonth()->lt($cutoffStart)) {
                 continue;
             }
-            $mCosts = CostTransaction::excludingSalaries()
+            $mCosts = CostTransaction::query()
                 ->inYearMonth($m->year, $m->month)
                 ->sum('business_amount') ?? 0;
 
@@ -490,6 +500,7 @@ class BusinessController extends Controller
                 'category' => $category,
                 'min_amount' => $minAmount,
                 'max_amount' => $maxAmount,
+                'status' => $status,
                 'recurring_only' => $recurringOnly,
                 'with_trashed' => $withTrashed,
                 'sort_by' => $sortBy,
@@ -543,12 +554,20 @@ class BusinessController extends Controller
     /** @return \Illuminate\Support\Collection<int, array{value: string, label: string}> */
     private function costFilterCategories()
     {
-        $saved = CostTransaction::excludingSalaries()->whereNotNull('category')->where('category', '!=', '')->distinct()->pluck('category');
-        $recurring = RecurringCost::where('reason', '!=', 'salary')->where('reason', '!=', '')->distinct()->pluck('reason');
+        $saved = CostTransaction::whereNotNull('category')->where('category', '!=', '')->distinct()->pluck('category');
+        $recurring = RecurringCost::where('reason', '!=', '')->distinct()->pluck('reason');
 
         return $saved->concat($recurring)->unique()->sort()->take(100)
-            ->map(fn ($category) => ['value' => $category, 'label' => ucfirst($category)])
+            ->map(fn ($category) => ['value' => $category, 'label' => $category === 'salary' ? __('general.employee_payroll') : ucfirst($category)])
             ->values();
+    }
+
+    /** Old rows may have no status; they count as completed, the same way the tables show them. */
+    private function filterByStatus($query, string $status)
+    {
+        return $status === 'completed'
+            ? $query->where(fn ($q) => $q->where('status', 'completed')->orWhereNull('status'))
+            : $query->where('status', $status);
     }
 
     private function buildBreakdown($query, string $column, ?string $foreign = null): array
@@ -753,7 +772,7 @@ class BusinessController extends Controller
 
     public function export_costs(Request $request)
     {
-        $query = CostTransaction::excludingSalaries()->with(['user', 'project']);
+        $query = CostTransaction::query()->with(['user', 'project']);
 
         foreach (['year', 'month', 'project_id', 'user_id', 'currency_id', 'category'] as $f) {
             if ($request->filled($f)) {

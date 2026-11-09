@@ -219,7 +219,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                 <StickyNote className="h-4 w-4 me-2" />{__('general.user_notes')}</a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">
-                            <a href={route('admin.finance.index', { user_id: user.id })} target="_blank" rel="noopener noreferrer">
+                            <a href={route('admin.costs.index', { user_id: user.id, preset: 'all' })} target="_blank" rel="noopener noreferrer">
                                 <Coins className="h-4 w-4 me-2" /> {__('general.transactions')}</a>
                         </Button>
                         <Button variant="secondary" asChild className="rounded-full">

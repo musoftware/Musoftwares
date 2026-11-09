@@ -2,6 +2,7 @@ import Pagination from '@/Components/Pagination';
 import React, { useState, useMemo } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { Button } from '@/Components/ui/button';
 import { Switch } from '@/Components/ui/switch';
 import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye, MoreHorizontal } from 'lucide-react';
@@ -150,6 +151,8 @@ export function RecurringSchedulesIndex({
     return (
         <AdminSidebarLayout title={__(pageTitleKey)} header={pageHeader}>
             <Head title={__(pageTitleKey)} />
+
+            <FinanceSectionTabs section="recurring" active="invoices" />
 
             <div className="mb-4">
                 <Link href={backHref} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">

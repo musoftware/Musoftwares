@@ -25,7 +25,7 @@ type MenuItem = {
   title: string;
   url: string;
   icon: any;
-  subItems?: { title: string; url: string; fullReload?: boolean; badgeCountKey?: string }[];
+  subItems?: { title: string; url: string; fullReload?: boolean; badgeCountKey?: string; alsoActiveOn?: string[] }[];
 };
 
 const items: MenuItem[] = [
@@ -74,20 +74,14 @@ const items: MenuItem[] = [
     url: "/admin/finance", 
     icon: DollarSign,
     subItems: [
+        { title: "admin.sidebar_finance_overview", url: "/admin/finance" },
         { title: "admin.sidebar_costs", url: "/admin/business/costs" },
-        { title: "admin.sidebar_recurring_costs", url: "/admin/business/recurring/costs" },
         { title: "admin.sidebar_income", url: "/admin/business/income" },
-        { title: "admin.sidebar_recurring_income", url: "/admin/business/recurring/income" },
-        { title: "admin.sidebar_recurring_salaries", url: "/admin/business/recurring/salaries" },
-        { title: "admin.sidebar_recurring_invoices", url: "/admin/business/recurring/invoices" },
-        { title: "admin.sidebar_reports", url: "/admin/business/reports" },
-        { title: "admin.sidebar_balance", url: "/admin/business/balance-report" },
+        { title: "admin.sidebar_recurring", url: "/admin/business/recurring/costs", alsoActiveOn: ["/admin/business/recurring"] },
+        { title: "admin.sidebar_reports", url: "/admin/business/reports", alsoActiveOn: ["/admin/business/balance-report"] },
+        { title: "admin.sidebar_transactions", url: "/admin/transactions" },
         { title: "admin.sidebar_payment_links", url: "/admin/payment-links" },
-        { title: "admin.sidebar_hours_calendar", url: "/admin/hours-calendar" },
-        { title: "admin.sidebar_transactions", url: "/admin/transactions?type=income" },
-        { title: "admin.sidebar_cost_transactions", url: "/admin/transactions?type=cost" },
-        { title: "admin.sidebar_currencies", url: "/admin/currencies" },
-        { title: "admin.sidebar_currency_exchanges", url: "/admin/currency-exchanges" },
+        { title: "admin.sidebar_currencies", url: "/admin/currencies", alsoActiveOn: ["/admin/currency-exchanges"] },
     ]
   },
   { 
@@ -110,6 +104,7 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_contract_price_list", url: "/admin/contract-price-items" },
         { title: "admin.sidebar_project_cost_estimator", url: "/estimator" },
         { title: "admin.sidebar_commissions", url: "/admin/commissions" },
+        { title: "admin.sidebar_hours_calendar", url: "/admin/hours-calendar" },
     ]
   },
   {
@@ -199,11 +194,17 @@ const items: MenuItem[] = [
 
 const ACCOUNTANT_GROUP_URLS = ['/admin/invoices', '/admin/finance', '/admin/seller'];
 const OPERATIONS_URL = '/admin/operations';
+const ACCOUNTANT_OPERATIONS_URLS = ['/admin/hours-calendar'];
 const SUPPORT_AGENT_URLS = ['/admin/tickets', '/admin/guest-tickets'];
 const MODERATOR_URLS = ['/admin/tickets'];
 
+const isUnder = (path: string, base: string) => path === base || path.startsWith(base + '/');
+
 export function AppSidebar() {
   const { url, props } = usePage();
+  const path = url.split('?')[0];
+  const isSubItemActive = (subItem: NonNullable<MenuItem['subItems']>[number]) =>
+      [subItem.url, ...(subItem.alsoActiveOn ?? [])].some(base => isUnder(path, base.split('?')[0]));
   const { auth, admin_counts } = props as any;
   const userRoles = auth?.user?.roles || [];
   
@@ -215,9 +216,11 @@ export function AppSidebar() {
   let visibleItems = items;
 
   if (isAccountant) {
-      visibleItems = items.filter(item => 
-          ACCOUNTANT_GROUP_URLS.includes(item.url)
-      );
+      visibleItems = items
+          .filter(item => ACCOUNTANT_GROUP_URLS.includes(item.url) || item.url === OPERATIONS_URL)
+          .map(item => item.url === OPERATIONS_URL
+              ? { ...item, subItems: item.subItems?.filter(sub => ACCOUNTANT_OPERATIONS_URLS.includes(sub.url)) }
+              : item);
   } else if (isSupportAgent) {
       visibleItems = items.map(item => {
           if (item.url === OPERATIONS_URL) {
@@ -254,9 +257,9 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {visibleItems.map((item) => {
-                const isActive = url === item.url || url.startsWith(item.url + '/');
+                const isActive = isUnder(path, item.url);
                 const hasSubItems = item.subItems && item.subItems.length > 0;
-                const isGroupActive = isActive || (hasSubItems && item.subItems?.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
+                const isGroupActive = isActive || (hasSubItems && item.subItems?.some(isSubItemActive));
 
                 if (hasSubItems) {
                     return (
@@ -278,7 +281,7 @@ export function AppSidebar() {
                                 <CollapsibleContent>
                                     <SidebarMenuSub>
                                         {item.subItems?.map((subItem) => {
-                                            const isSubActive = url === subItem.url || url.startsWith(subItem.url + '/');
+                                            const isSubActive = isSubItemActive(subItem);
                                             const count = subItem.badgeCountKey ? admin_counts?.[subItem.badgeCountKey] : null;
                                             return (
                                                 <SidebarMenuSubItem key={subItem.title}>

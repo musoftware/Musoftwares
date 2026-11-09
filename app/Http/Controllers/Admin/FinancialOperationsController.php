@@ -23,9 +23,20 @@ use Inertia\Inertia;
 
 class FinancialOperationsController extends Controller
 {
+    private const DEFAULT_TAB = 'projects';
+
+    private const TABS = ['projects', 'budgets', 'salaries', 'calendar'];
+
+    /** These tabs repeated full pages, so old links now open those pages. */
+    private const TABS_MOVED_TO_PAGES = ['expenses' => 'admin.costs.index', 'income' => 'admin.income.index'];
+
     public function index(Request $request)
     {
-        $currentTab = $request->query('tab', 'expenses');
+        $tab = (string) $request->query('tab', self::DEFAULT_TAB);
+        if (isset(self::TABS_MOVED_TO_PAGES[$tab])) {
+            return redirect()->route(self::TABS_MOVED_TO_PAGES[$tab], $request->only(['search', 'category', 'status', 'user_id', 'project_id']));
+        }
+        $currentTab = in_array($tab, self::TABS, true) ? $tab : self::DEFAULT_TAB;
         $search = $request->query('search');
         $category = $request->query('category');
         $status = $request->query('status');
@@ -112,19 +123,14 @@ class FinancialOperationsController extends Controller
 
             $entries = new LengthAwarePaginator([], 0, 50);
         } else {
-            if ($currentTab === 'income') {
-                $entriesQuery = Transaction::with(['user', 'project'])->whereIn('type', ['received', 'refunded', 'sent']);
-            } elseif ($currentTab === 'salaries') {
+            if ($currentTab === 'salaries') {
                 $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', 'salary');
             } elseif ($currentTab === 'projects') {
                 $entriesQuery = Project::with(['client', 'client_balance' => function ($q) {
                     $q->whereIn('type', ['received', 'earned']);
                 }, 'cost_transactions']);
-            } elseif ($currentTab === 'budgets') {
-                $entriesQuery = ExpenseBudget::with('currency');
             } else {
-                // Default: expenses (excluding salaries)
-                $entriesQuery = CostTransaction::with(['user', 'project'])->where('reason', '!=', 'salary');
+                $entriesQuery = ExpenseBudget::with('currency');
             }
 
             if ($entriesQuery) {
@@ -136,20 +142,16 @@ class FinancialOperationsController extends Controller
                         });
                     }
                     if ($category) {
-                        if ($currentTab === 'income') {
-                            $entriesQuery->where('reason', $category);
-                        } else {
-                            $entriesQuery->where(function ($q) use ($category) {
-                                $q->where('reason', $category)
-                                    ->orWhereExists(function ($sub) use ($category) {
-                                        $sub->select(DB::raw(1))
-                                            ->from('recurring_cost_transactions')
-                                            ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
-                                            ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
-                                            ->where('recurring_costs.reason', $category);
-                                    });
-                            });
-                        }
+                        $entriesQuery->where(function ($q) use ($category) {
+                            $q->where('reason', $category)
+                                ->orWhereExists(function ($sub) use ($category) {
+                                    $sub->select(DB::raw(1))
+                                        ->from('recurring_cost_transactions')
+                                        ->join('recurring_costs', 'recurring_cost_transactions.recurring_cost_id', '=', 'recurring_costs.id')
+                                        ->whereColumn('recurring_cost_transactions.cost_transaction_id', 'cost_transactions.id')
+                                        ->where('recurring_costs.reason', $category);
+                                });
+                        });
                     }
                     if ($status) {
                         $entriesQuery->where('status', $status);
@@ -184,7 +186,7 @@ class FinancialOperationsController extends Controller
             $currencies = Currency::as_array();
 
             if ($currentTab !== 'projects' && $currentTab !== 'budgets') {
-                $entries->getCollection()->transform(function ($entry) use ($currentTab, $currencies) {
+                $entries->getCollection()->transform(function ($entry) use ($currencies) {
                     $currId = $entry->currency_id ?? $entry->currency;
                     $currRow = isset($currencies[$currId]) ? $currencies[$currId] : null;
                     $currencyCode = $currRow ? $currRow->currency : 'EGP';
@@ -218,13 +220,13 @@ class FinancialOperationsController extends Controller
 
                     return [
                         'id' => $entry->id,
-                        'title' => ucfirst($title ?? ($currentTab === 'income' ? 'Income' : 'Cost')),
+                        'title' => ucfirst($title ?? 'Cost'),
                         'amount' => $entry->amount,
                         'business_amount' => $entry->business_amount,
                         'currency' => $currencyCode,
                         'currency_symbol' => $currencySymbol,
                         'currency_id' => $currId,
-                        'category' => ['name' => ucfirst($categoryName ?? ($currentTab === 'income' ? 'Income' : 'Cost'))],
+                        'category' => ['name' => ucfirst($categoryName ?? 'Cost')],
                         'is_recurring' => $isRecurring,
                         'next_due_date' => $entry->due_date,
                         'status' => $entry->status ?? 'completed',
@@ -232,7 +234,7 @@ class FinancialOperationsController extends Controller
                         'project' => $entry->project ? ['id' => $entry->project->id, 'name' => $entry->project->name] : null,
                         'created_at' => $entry->created_at,
 
-                        'type' => $entry instanceof Transaction ? $entry->type : ($entry->reason === 'salary' ? 'salary' : 'expense'),
+                        'type' => $entry->reason === 'salary' ? 'salary' : 'expense',
                     ];
                 });
             } elseif ($currentTab === 'projects') {
@@ -273,18 +275,12 @@ class FinancialOperationsController extends Controller
             }
         }
 
-        if ($currentTab === 'income') {
-            $categories = Transaction::select('reason')->distinct()->pluck('reason')->filter()->values()->map(function ($item) {
-                return ['id' => $item, 'name' => ucfirst($item)];
-            });
-        } else {
-            $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
-            $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
+        $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
+        $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
 
-            $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values()->map(function ($item) {
-                return ['id' => $item, 'name' => ucfirst($item)];
-            });
-        }
+        $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values()->map(function ($item) {
+            return ['id' => $item, 'name' => ucfirst($item)];
+        });
 
         return Inertia::render('Admin/Finance/Index', [
             'entries' => $entries,
@@ -350,50 +346,22 @@ class FinancialOperationsController extends Controller
                             'value' => (float) $item->total,
                         ];
                     })->values()->all(),
-                'income_categories' => Transaction::whereYear('created_at', now()->year)
-                    ->whereMonth('created_at', now()->month)
-                    ->where('type', 'received')
-                    ->select('reason', DB::raw('SUM(business_amount) as total'))
-                    ->groupBy('reason')
-                    ->orderByDesc('total')
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'name' => ucfirst($item->reason ?: 'Other'),
-                            'value' => (float) $item->total,
-                        ];
-                    })->values()->all(),
                 'status_distribution' => (function () use ($currentTab) {
-                    if ($currentTab === 'income') {
-                        return Transaction::whereYear('created_at', now()->year)
-                            ->whereMonth('created_at', now()->month)
-                            ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(business_amount) as total'))
-                            ->groupBy('status')
-                            ->get()
-                            ->map(function ($item) {
-                                return [
-                                    'status' => ucfirst($item->status ?: 'completed'),
-                                    'count' => (int) $item->count,
-                                    'amount' => (float) $item->total,
-                                ];
-                            })->values()->all();
-                    } else {
-                        $reasonOp = $currentTab === 'salaries' ? '=' : '!=';
+                    $reasonOp = $currentTab === 'salaries' ? '=' : '!=';
 
-                        return CostTransaction::whereYear('created_at', now()->year)
-                            ->whereMonth('created_at', now()->month)
-                            ->where('reason', $reasonOp, 'salary')
-                            ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(business_amount) as total'))
-                            ->groupBy('status')
-                            ->get()
-                            ->map(function ($item) {
-                                return [
-                                    'status' => ucfirst($item->status ?: 'completed'),
-                                    'count' => (int) $item->count,
-                                    'amount' => (float) $item->total,
-                                ];
-                            })->values()->all();
-                    }
+                    return CostTransaction::whereYear('created_at', now()->year)
+                        ->whereMonth('created_at', now()->month)
+                        ->where('reason', $reasonOp, 'salary')
+                        ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(business_amount) as total'))
+                        ->groupBy('status')
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'status' => ucfirst($item->status ?: 'completed'),
+                                'count' => (int) $item->count,
+                                'amount' => (float) $item->total,
+                            ];
+                        })->values()->all();
                 })(),
             ],
             'currentTab' => $currentTab,

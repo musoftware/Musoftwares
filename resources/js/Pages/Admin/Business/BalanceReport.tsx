@@ -1,5 +1,6 @@
 import React from 'react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { usePage, router } from '@inertiajs/react';
 import { 
     Card, 
@@ -121,6 +122,8 @@ export default function BalanceReport() {
                 </div>
             }
         >
+            <FinanceSectionTabs section="reports" active="balance" />
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <Card className="border-none shadow-sm shadow-slate-200/50">
                     <CardHeader className="pb-2">
@@ -271,4 +274,3 @@ export default function BalanceReport() {
         </AdminSidebarLayout>
     );
 }
-

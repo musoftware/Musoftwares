@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import FinanceSectionTabs from '@/Components/Admin/Finance/FinanceSectionTabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import {
     Users,
@@ -255,16 +256,10 @@ export default function Reports({
         <AdminSidebarLayout
             title={__('general.system_reports')}
             header={__('general.system_reports')}
-            actions={
-                <Link href={route('admin.reports.balance')}>
-                    <Button variant="outline" size="sm" className="gap-2 hover:bg-slate-50 hover:text-black">
-                        <Activity className="h-4 w-4 text-slate-800" />
-                        <span>{__('general.balance_report')}</span>
-                    </Button>
-                </Link>
-            }
         >
             <Head title={__('general.system_reports')} />
+
+            <FinanceSectionTabs section="reports" active="reports" />
 
             {/* Filter Bar */}
             <Card className="border-none shadow-sm shadow-slate-200/50 mb-6">
@@ -444,7 +439,7 @@ export default function Reports({
                     title={__('general.total_transactions')}
                     value={stats.total_transactions ?? 0}
                     icon={Activity}
-                    drillTo={route('admin.finance.index', { project_id: projectId || undefined, category: category || undefined, from: from || undefined, to: to || undefined })}
+                    drillTo={route('admin.costs.index', { project_id: projectId || undefined, category: category || undefined, from: from || undefined, to: to || undefined, preset: from && to ? undefined : 'all' })}
                 />
             </div>
 

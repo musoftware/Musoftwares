@@ -85,7 +85,7 @@ export default function Index({
         status: 'completed',
         due_date: '',
         transaction_date: new Date().toISOString().slice(0, 10),
-        type: currentTab === 'salaries' ? 'salary' : currentTab === 'income' ? 'income' : 'expense',
+        type: currentTab === 'salaries' ? 'salary' : 'expense',
     });
 
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -159,7 +159,7 @@ export default function Index({
         e.preventDefault();
         router.post(route('admin.finance.store'), {
             ...newEntry,
-            type: currentTab === 'salaries' ? 'salary' : currentTab === 'income' ? 'income' : 'expense',
+            type: currentTab === 'salaries' ? 'salary' : 'expense',
         }, {
             onSuccess: () => {
                 setIsCreateOpen(false);
@@ -167,7 +167,7 @@ export default function Index({
                     title: '', amount: '', category_id: categoriesList[0]?.id || '', user_id: '',
                     currency_id: defaultCurrencyId, is_recurring: false, recurrence_interval: 'month',
                     status: 'completed', due_date: '', transaction_date: new Date().toISOString().slice(0, 10),
-                    type: currentTab === 'salaries' ? 'salary' : currentTab === 'income' ? 'income' : 'expense',
+                    type: currentTab === 'salaries' ? 'salary' : 'expense',
                 });
                 setCreateCategoryOption(categoriesList[0]?.id || 'custom');
                 toast.success(__('general.created'));
@@ -188,7 +188,7 @@ export default function Index({
             status: entry.status || 'completed',
             due_date: entry.next_due_date || '',
             transaction_date: entry.created_at ? new Date(entry.created_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
-            type: entry.type || (currentTab === 'salaries' ? 'salary' : currentTab === 'income' ? 'income' : 'expense'),
+            type: entry.type || (currentTab === 'salaries' ? 'salary' : 'expense'),
         });
         setIsEditOpen(true);
     };
@@ -206,7 +206,7 @@ export default function Index({
 
     const handleDelete = () => {
         if (!pendingDelete) return;
-        const entryType = currentTab === 'income' ? 'income' : currentTab === 'salaries' ? 'salary' : 'expense';
+        const entryType = currentTab === 'salaries' ? 'salary' : 'expense';
         router.delete(route('admin.finance.destroy', { entry: pendingDelete, type: entryType }), {
             preserveScroll: true,
             onSuccess: () => {
@@ -221,7 +221,7 @@ export default function Index({
     };
 
     const handleMarkPaid = (id: any, fromDetails = false) => {
-        const entryType = currentTab === 'income' ? 'income' : currentTab === 'salaries' ? 'salary' : 'expense';
+        const entryType = currentTab === 'salaries' ? 'salary' : 'expense';
         router.post(route('admin.finance.mark-paid', { entry: id, type: entryType }), {}, {
             onSuccess: () => {
                 if (fromDetails && selectedDetailEntry) {
@@ -234,7 +234,6 @@ export default function Index({
     };
 
     const categoryAllocationData = useMemo(() => {
-        if (currentTab === 'income') return stats.income_categories || [];
         if (currentTab === 'salaries') {
             const map: Record<string, number> = {};
             (entries.data ?? []).forEach((e: any) => {
@@ -313,8 +312,6 @@ export default function Index({
 
             <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 pb-1">
                 {[
-                    { key: 'expenses', label: __('general.costs_expenses') },
-                    { key: 'income', label: __('general.income_streams') },
                     { key: 'projects', label: __('general.project_profitability') },
                     { key: 'budgets', label: __('general.budgets') },
                     { key: 'salaries', label: __('general.employee_payroll') },
@@ -388,7 +385,7 @@ export default function Index({
                         ) : (
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-1">
-                                    {currentTab === 'income' ? __('general.income_stream_breakdown') : __('general.cost_expense_allocation')}
+                                    {__('general.cost_expense_allocation')}
                                 </h3>
                                 <p className="text-xs text-gray-500 mb-4 font-normal">{__('general.highest_spending')} {stats.business_currency_code}</p>
 
@@ -528,21 +525,21 @@ export default function Index({
                         </div>
                     )}
 
-                    <a href={route('admin.finance.report.export', { type: currentTab === 'income' || currentTab === 'expenses' ? 'ledger' : 'pnl' })} target="_blank" rel="noreferrer" className="me-auto">
+                    <a href={route('admin.finance.report.export', { type: 'pnl' })} target="_blank" rel="noreferrer" className="me-auto">
                         <Button variant="outline" className="h-9 me-2 text-slate-700">
                             <Download className="w-4 h-4 me-2" /> {__('general.export_csv')}
                         </Button>
                     </a>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <Button className="bg-black hover:bg-slate-800 text-white h-9" onClick={() => setIsCreateOpen(true)}>
-                            <Plus className="w-4 h-4 me-2" /> {currentTab === 'salaries' ? __('general.add_salary') : currentTab === 'expenses' ? __('general.add_expense') : currentTab === 'calendar' ? __('general.add_record') : __('general.add_income')}
+                            <Plus className="w-4 h-4 me-2" /> {currentTab === 'salaries' ? __('general.add_salary') : currentTab === 'calendar' ? __('general.add_record') : __('general.add_expense')}
                         </Button>
                         <DialogContent className="sm:max-w-[425px]">
                             <form onSubmit={handleCreate}>
                                 <DialogHeader>
                                     <DialogTitle>{__('general.add_new_ledger_record')}</DialogTitle>
                                     <DialogDescription>
-                                        {currentTab === 'income' ? __('general.create_income_stream_desc') : __('general.create_expense_desc')}
+                                        {__('general.create_expense_desc')}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
@@ -602,7 +599,7 @@ export default function Index({
                                     <div className="space-y-2">
                                         <Label htmlFor="create-user">
                                             {currentTab === 'salaries' || newEntry.type === 'salary' ? __('general.employee_required')
-                                                : currentTab === 'income' || newEntry.type === 'income' ? __('general.client_user_optional')
+                                                : newEntry.type === 'income' ? __('general.client_user_optional')
                                                 : __('general.user_vendor_optional')}
                                         </Label>
                                         <UserSearchCombobox
@@ -635,8 +632,7 @@ export default function Index({
                                         {errors.transaction_date && <p className="text-sm text-destructive mt-1">{errors.transaction_date}</p>}
                                     </div>
 
-                                    {currentTab !== 'income' && (
-                                        <div className="pt-2 border-t space-y-3">
+                                    <div className="pt-2 border-t space-y-3">
                                             <label className="flex items-center gap-2 cursor-pointer">
                                                 <input
                                                     type="checkbox"
@@ -658,8 +654,7 @@ export default function Index({
                                                     </select>
                                                 </div>
                                             )}
-                                        </div>
-                                    )}
+                                    </div>
                                 </div>
                                 <DialogFooter>
                                     <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>{__('general.cancel')}</Button>
@@ -984,7 +979,7 @@ export default function Index({
                             <div className="space-y-2">
                                 <Label htmlFor="edit-user">
                                     {currentTab === 'salaries' || editingEntry.type === 'salary' ? __('general.employee_required')
-                                        : currentTab === 'income' || editingEntry.type === 'income' ? __('general.client_user_optional')
+                                        : editingEntry.type === 'income' ? __('general.client_user_optional')
                                         : __('general.user_vendor_optional')}
                                 </Label>
                                 <UserSearchCombobox

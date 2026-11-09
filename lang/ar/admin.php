@@ -2190,6 +2190,8 @@ return [
     'sidebar_shop_products' => 'المنتجات',
     'sidebar_shop_categories' => 'الأقسام',
     'sidebar_shop_orders' => 'الطلبات',
+    'sidebar_finance_overview' => 'نظرة عامة',
+    'sidebar_recurring' => 'المتكرر',
     'sidebar_marketing' => 'أدوات التسويق',
     'sidebar_busy_times' => 'أوقات الانشغال',
     'sidebar_categories' => 'التصنيفات',
