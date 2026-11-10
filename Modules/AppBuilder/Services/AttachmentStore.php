@@ -27,7 +27,7 @@ class AttachmentStore
                 'project_id' => $message->project_id,
                 'original_name' => mb_substr($file->getClientOriginalName(), 0, 200),
                 // the type comes from the file's content, not from what the browser claims
-                'mime' => (string) $file->getMimeType(),
+                'mime' => ChatFileTypes::of($file) ?? (string) $file->getMimeType(),
                 'size' => (int) $file->getSize(),
                 'path' => $file->store($folder, self::DISK),
             ]), $files);
@@ -55,9 +55,10 @@ class AttachmentStore
         $blocks = $message->attachments->reject(fn (BuilderAttachment $file) => $fullPages->contains($file->id))
             ->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()->all();
         $text = trim($message->forModel());
-        $blocks[] = ['type' => 'text', 'text' => $text !== '' ? $text : self::FILES_ONLY];
+        $text = $text !== '' ? $text : self::FILES_ONLY;
 
-        return $blocks;
+        // only spreadsheets or Word files: Claude reads what the worker read from them, as plain text
+        return $blocks === [] ? $text : [...$blocks, ['type' => 'text', 'text' => $text]];
     }
 
     public function contents(BuilderAttachment $attachment): ?string
@@ -66,8 +67,12 @@ class AttachmentStore
     }
 
     /** @return array<string, mixed>|null */
+    /** Images and PDFs go to Claude as they are; spreadsheets and Word files reach it as the worker's reading. */
     private function block(BuilderAttachment $file): ?array
     {
+        if (! $file->isImage() && $file->mime !== BuilderAttachment::PDF) {
+            return null;
+        }
         $data = $this->contents($file);
         if ($data === null) {
             return null;

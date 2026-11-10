@@ -96,6 +96,8 @@ return [
         'files_per_message' => 5,
         // 5 MB is the most Claude accepts for one image
         'file_kb' => 5120,
+        // Excel, Word and CSV files are read by the worker, not sent to Claude as they are
+        'office_file_kb' => 10240,
         'messages_per_project' => 60,
         'projects_per_ip_per_day' => 6,
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb

@@ -484,7 +484,7 @@ class AppBuilderTest extends TestCase
         $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk()->assertJsonPath('looks', []);
 
         // the worker is there, so the chat waits for it instead of answering blind
-        $uuid = $this->postJson('/ai/messages', ['text' => 'تعرف تعمل زي الموقع ده https://quran.example.com/garden ؟'])->assertOk()->assertJsonPath('looking', true)->json('uuid');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'تعرف تعمل زي الموقع ده https://quran.example.com/garden ؟'])->assertOk()->assertJsonPath('looking', 'link')->json('uuid');
         $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'وكمان'])->assertStatus(409);
 
         $looks = $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk()->json('looks');
@@ -498,7 +498,7 @@ class AppBuilderTest extends TestCase
             'full_page' => $this->png(), 'pieces' => [$this->png(), $this->png()],
         ], $this->worker())->assertOk();
 
-        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', false);
+        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', null);
         $customer = $state->json('messages.0');
         $this->assertCount(1, $customer['images']);
         $this->assertSame([], $customer['files']);
@@ -516,7 +516,7 @@ class AppBuilderTest extends TestCase
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>متجر ورد</title><meta name="description" content="ورد طبيعي"><script>x()</script><h1>أجمل باقات الورد</h1>')]);
         $this->answer('شوفت المتجر، بيبيع باقات ورد.');
 
-        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز زي ده https://93.184.215.14/shop'])->assertOk()->assertJsonPath('looking', false)->json('uuid');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز زي ده https://93.184.215.14/shop'])->assertOk()->assertJsonPath('looking', null)->json('uuid');
 
         $text = app(ChatModel::class)->seen[0][0]['content'];
         $this->assertStringContainsString('أجمل باقات الورد', $text);
@@ -540,18 +540,70 @@ class AppBuilderTest extends TestCase
     {
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>عيادة</title><p>احجز موعدك</p>')]);
         $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
-        $uuid = $this->postJson('/ai/messages', ['text' => 'زي ده https://93.184.215.14/clinic'])->assertJsonPath('looking', true)->json('uuid');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'زي ده https://93.184.215.14/clinic'])->assertJsonPath('looking', 'link')->json('uuid');
         $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
 
         $this->answer('شوفت صفحة العيادة.');
         $this->travel(60)->seconds();
-        $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', false)->assertJsonPath('messages.1.text', 'شوفت صفحة العيادة.');
+        $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', null)->assertJsonPath('messages.1.text', 'شوفت صفحة العيادة.');
         $this->assertStringContainsString('احجز موعدك', app(ChatModel::class)->seen[0][0]['content']);
 
         // the late result changes nothing
         $message = BuilderMessage::where('role', BuilderMessage::USER)->firstOrFail();
         $this->post('/api/builder/worker/looks/'.$message->id, ['index' => 0, 'full_page' => $this->png()], $this->worker())->assertOk();
         $this->assertSame(2, BuilderMessage::count());
+    }
+
+    private function xlsx(): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'xl').'.xlsx';
+        $zip = new ZipArchive;
+        $zip->open($path, ZipArchive::CREATE);
+        $zip->addFromString('[Content_Types].xml', '<Types/>');
+        $zip->addFromString('xl/workbook.xml', '<workbook/>');
+        $zip->close();
+
+        return new UploadedFile($path, 'حسابات.xlsx', 'application/octet-stream', null, true);
+    }
+
+    public function test_a_spreadsheet_is_read_by_the_worker_and_claude_gets_its_formulas(): void
+    {
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $response = $this->post('/ai/messages', ['text' => 'عايز الحسابات دي تبقى سيستم', 'files' => [$this->xlsx()]], ['Accept' => 'application/json'])->assertOk()->assertJsonPath('looking', 'file');
+        $uuid = $response->json('uuid');
+
+        $item = $this->getJson('/api/builder/worker/looks', $this->worker())->json('looks.0');
+        $this->assertSame('file', $item['kind']);
+        $this->assertSame($uuid, $item['project']);
+        // the worker downloads the original with its own token
+        $this->get('/api/builder/worker/jobs/'.$uuid.'/attachments/'.$item['attachment_id'], $this->worker())->assertOk();
+
+        $this->answer('فهمت: سعر البيع = التكلفة × 1.3 والإجمالي مجموع الفواتير.');
+        $this->post('/api/builder/worker/looks/'.$item['message_id'], ['index' => $item['index'], 'text' => "Sheet فواتير\nD2 = =B2*C2 -> 150\nD10 = =SUM(D2:D9) -> 900"], $this->worker())->assertOk();
+
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null)->assertJsonPath('messages.0.files.0', 'حسابات.xlsx');
+        $sent = app(ChatModel::class)->seen[0][0]['content'];
+        // the spreadsheet itself is not sent to Claude, only what the worker read from it
+        $this->assertIsString($sent);
+        $this->assertStringContainsString('D10 = =SUM(D2:D9) -> 900', $sent);
+    }
+
+    public function test_a_renamed_file_is_not_taken_as_a_spreadsheet(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'fake');
+        file_put_contents($path, 'MZ this is a program, not a spreadsheet');
+
+        $this->post('/ai/messages', ['files' => [new UploadedFile($path, 'invoice.xlsx', 'application/octet-stream', null, true)]], ['Accept' => 'application/json'])
+            ->assertStatus(422)->assertJsonValidationErrors('files.0');
+    }
+
+    public function test_without_the_worker_the_chat_says_plainly_it_could_not_read_the_file(): void
+    {
+        $this->answer('معلش مقدرتش أقرا الملف دلوقتي، ابعته تاني كمان شوية.');
+
+        $this->post('/ai/messages', ['text' => 'ده ملف الحسابات', 'files' => [$this->xlsx()]], ['Accept' => 'application/json'])->assertOk()->assertJsonPath('looking', null);
+
+        $this->assertStringContainsString('could not be read', app(ChatModel::class)->seen[0][0]['content']);
     }
 
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void

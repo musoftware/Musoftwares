@@ -31,7 +31,8 @@ class ProjectStateResource extends JsonResource
             // the bar shows once the build has said how far it is
             'progress_percent' => $this->status === BuilderProject::BUILDING && ! $this->awaiting_answer ? $this->progress_percent : null,
             'waiting_for_answer' => $this->isWaitingForAnswer(),
-            'looking' => (bool) $this->awaiting_look,
+            // what the customer waits for: a link being opened or a file being read
+            'looking' => $this->awaiting_look ? (app(\Modules\AppBuilder\Services\LinkLooks::class)->isReadingAFile($this->resource) ? 'file' : 'link') : null,
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // offer notifications once there is something to wait for
             'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token && $this->paid_at !== null ? route('builder.push', $this->resource) : null,

@@ -52,15 +52,15 @@ class ProjectChat
         $question = $project->messages()->create(['role' => BuilderMessage::USER, 'content' => $text]);
         $this->attachments->attach($question, $files);
 
-        // a shared link is looked at first, like a real programmer opens an example site before answering
-        $links = $this->looks->linksIn($text);
-        if ($links !== [] && $this->looks->workerIsWatching()) {
-            $this->looks->askWorker($question, $links);
+        // links and spreadsheets are looked at first, like a real programmer opens them before answering
+        $shared = $this->looks->sharedIn($question);
+        if ($shared !== [] && $this->looks->workerIsWatching()) {
+            $this->looks->askWorker($question, $shared);
 
             return $question;
         }
-        if ($links !== []) {
-            $this->looks->readHere($question, $links);
+        if ($shared !== []) {
+            $this->looks->readHere($question, $shared);
         }
 
         return $this->answer($project, $question, forgetOnFailure: true);

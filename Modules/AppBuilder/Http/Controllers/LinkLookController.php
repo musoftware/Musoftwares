@@ -28,7 +28,7 @@ class LinkLookController extends Controller
             'reason' => ['nullable', 'string', 'max:300'],
             'title' => ['nullable', 'string', 'max:300'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'text' => ['nullable', 'string', 'max:20000'],
+            'text' => ['nullable', 'string', 'max:200000'],
             'full_page' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:8192'],
             'pieces' => ['nullable', 'array', 'max:4'],
             'pieces.*' => ['file', 'mimes:jpg,jpeg,png', 'max:4096'],

@@ -90,7 +90,7 @@ class BuilderChatController extends Controller
     public function state(BuilderProject $project, \Modules\AppBuilder\Services\LinkLooks $looks): JsonResponse
     {
         // the browser took too long with a shared link: the chat answers with what this server could read
-        if ($looks->finishLateLooks($project)) {
+        if ($looks->finishLate($project)) {
             $this->chat->continueAfterLook($project);
         }
         $this->speakCustomerLanguage($project);

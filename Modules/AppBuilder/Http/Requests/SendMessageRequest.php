@@ -4,21 +4,27 @@ namespace Modules\AppBuilder\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
-use Modules\AppBuilder\Models\BuilderAttachment;
+use Modules\AppBuilder\Services\ChatFileTypes;
 
-/** A chat line: text, files (images or PDFs), or both. */
+/** A chat line: text, files (images, PDFs, Excel, Word or CSV), or both. */
 class SendMessageRequest extends FormRequest
 {
     public function rules(): array
     {
         $limits = config('builder.limits');
-        $types = implode(',', [...BuilderAttachment::IMAGE_TYPES, BuilderAttachment::PDF]);
 
         return [
             'text' => ['nullable', 'required_without:files', 'string', 'max:'.(int) $limits['message_chars']],
             'files' => ['nullable', 'array', 'max:'.(int) $limits['files_per_message']],
-            // mimetypes reads the file's content, so a renamed file of another kind is refused
-            'files.*' => ['file', 'max:'.(int) $limits['file_kb'], 'mimetypes:'.$types],
+            // the type is read from the file's content, so a renamed file of another kind is refused
+            'files.*' => ['file', 'max:'.max((int) $limits['file_kb'], (int) $limits['office_file_kb']), function (string $attribute, mixed $file, \Closure $fail) use ($limits): void {
+                $type = ChatFileTypes::of($file);
+                if ($type === null) {
+                    $fail(__('builder.file_type'));
+                } elseif (! ChatFileTypes::isReadByWorker($type) && $file->getSize() > (int) $limits['file_kb'] * 1024) {
+                    $fail(__('builder.file_too_big'));
+                }
+            }],
         ];
     }
 

@@ -118,7 +118,7 @@
         <p class="error" id="error" role="alert" hidden></p>
         <div class="chips" id="chips" hidden></div>
         <form id="composer">
-            <input type="file" id="files" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf" multiple hidden>
+            <input type="file" id="files" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,.xlsx,.xls,.csv,.docx" multiple hidden>
             <button class="attach" type="button" id="attach" aria-label="{{ __('builder.attach') }}" title="{{ __('builder.attach') }}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
@@ -151,7 +151,8 @@
     let payOpen = false;
     let picked = [];
     const MAX_FILES = @json((int) config('builder.limits.files_per_message'));
-    const MAX_BYTES = @json((int) config('builder.limits.file_kb') * 1024);
+    // the server checks each kind's own limit; this only stops files that are too big for any kind
+    const MAX_BYTES = @json(max((int) config('builder.limits.file_kb'), (int) config('builder.limits.office_file_kb')) * 1024);
     const fileInput = document.getElementById('files');
     const chips = document.getElementById('chips');
 
@@ -435,7 +436,7 @@
         empty.hidden = messages.length > 0 || waiting;
         messages.forEach((message) => thread.append(messageNode(message)));
         if (waiting) thread.append(statusNode(T.thinking));
-        if (state && state.looking) thread.append(statusNode(T.looking));
+        if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.progress) thread.append(statusNode(state.progress));
         if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));

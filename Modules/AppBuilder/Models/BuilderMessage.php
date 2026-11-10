@@ -53,17 +53,32 @@ class BuilderMessage extends Model
         };
     }
 
-    /** What each link the customer shared showed when it was opened for Claude. */
+    /** What each link or file the customer shared showed when it was looked at for Claude. */
     private function linkNotes(): string
     {
-        return collect($this->payload['looks'] ?? [])->map(function (array $look): string {
-            if (! in_array($look['status'] ?? '', ['seen', 'read'], true)) {
-                return "\n\n[The link {$look['url']} could not be opened: ".($look['reason'] ?? 'no answer in time').'. Ask for screenshots if you need to see it.]';
-            }
-            $how = $look['status'] === 'seen' ? 'in a real browser; screenshots of the whole page are attached, top to bottom' : 'as plain HTML only, so parts drawn by scripts are missing';
+        return collect($this->payload['looks'] ?? [])
+            ->map(fn (array $item) => ($item['kind'] ?? 'link') === 'file' ? $this->fileNote($item) : $this->linkNote($item))
+            ->implode('');
+    }
 
-            return "\n\n[The link {$look['url']} was opened {$how}.\nTitle: {$look['title']}\nDescription: {$look['description']}\nVisible text: {$look['text']}]";
-        })->implode('');
+    private function linkNote(array $look): string
+    {
+        if (! in_array($look['status'] ?? '', ['seen', 'read'], true)) {
+            return "\n\n[The link {$look['url']} could not be opened: ".($look['reason'] ?? 'no answer in time').'. Ask for screenshots if you need to see it.]';
+        }
+        $how = $look['status'] === 'seen' ? 'in a real browser; screenshots of the whole page are attached, top to bottom' : 'as plain HTML only, so parts drawn by scripts are missing';
+
+        return "\n\n[The link {$look['url']} was opened {$how}.\nTitle: {$look['title']}\nDescription: {$look['description']}\nVisible text: {$look['text']}]";
+    }
+
+    private function fileNote(array $item): string
+    {
+        $text = $this->attachments->firstWhere('id', $item['attachment_id'])?->extracted_text;
+        if (($item['status'] ?? '') !== 'seen' || ! $text) {
+            return "\n\n[The file {$item['name']} could not be read: ".($item['reason'] ?? 'no answer in time').'. Tell the customer plainly and ask them to send it again in a little while.]';
+        }
+
+        return "\n\n[The file {$item['name']} was read. Every sheet with its cells, and every formula with the value it gives:\n{$text}]";
     }
 
     /** Claude only knows customer and assistant turns; a team line is read as a note on the customer's side. */

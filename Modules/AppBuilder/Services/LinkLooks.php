@@ -3,15 +3,18 @@
 namespace Modules\AppBuilder\Services;
 
 use Illuminate\Http\UploadedFile;
+use Modules\AppBuilder\Models\BuilderAttachment;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 use RuntimeException;
 
 /**
- * Links the customer shares are opened before the chat answers, like a real programmer would look at an
- * example site. The worker opens each one in a real browser in Docker and sends a full-page screenshot (shown
- * in the chat) with sharp pieces of it and the page text (read by Claude). When no worker is there, or it is
- * too slow, this server reads what it can of the page itself.
+ * What the customer shares is looked at before the chat answers, like a real programmer opens an example
+ * site or a spreadsheet first. The worker does the looking, in Docker on the owner's PC:
+ * - a link: opened in a real browser; a full-page screenshot is shown in the chat, and Claude reads sharp
+ *   pieces of it with the page text;
+ * - an Excel, Word or CSV file: read with its sheets, cells and formulas, and the text goes to Claude.
+ * When no worker is there, or it is too slow, this server reads a link's HTML itself; a file then waits.
  */
 class LinkLooks
 {
@@ -25,15 +28,21 @@ class LinkLooks
 
     public const FAILED = 'failed';
 
+    public const LINK = 'link';
+
+    public const FILE = 'file';
+
     private const MAX_LINKS = 3;
 
     private const HEARTBEAT = 'looks';
 
-    /** The worker asks for links every few seconds; silent longer than this, it is not there. */
+    /** The worker asks every few seconds; silent longer than this, it is not there. */
     private const WORKER_FRESH_SECONDS = 40;
 
-    /** The longest the customer waits for the browser before the chat answers anyway. */
+    /** The longest the customer waits before the chat answers anyway. */
     private const WAIT_SECONDS = 50;
+
+    private const TEXT_CHARS = 80000;
 
     private const FINISHED = [self::SEEN, self::READ, self::FAILED];
 
@@ -43,8 +52,95 @@ class LinkLooks
         private readonly WorkerHeartbeat $heartbeat,
     ) {}
 
+    /** @return list<array<string, mixed>> the links and readable files in a customer's message, still to look at */
+    public function sharedIn(BuilderMessage $question): array
+    {
+        $links = array_map(fn (string $url) => ['kind' => self::LINK, 'url' => $url, 'status' => self::PENDING], $this->linksIn($question->content));
+        $files = $question->attachments()->get()
+            ->filter(fn (BuilderAttachment $file) => ChatFileTypes::isReadByWorker($file->mime))
+            ->map(fn (BuilderAttachment $file) => ['kind' => self::FILE, 'attachment_id' => $file->id, 'name' => $file->original_name, 'status' => self::PENDING])
+            ->values()->all();
+
+        return [...$links, ...$files];
+    }
+
+    public function workerIsWatching(): bool
+    {
+        return $this->heartbeat->seenWithin(self::HEARTBEAT, self::WORKER_FRESH_SECONDS);
+    }
+
+    /** The worker will look; the chat answers once it has. */
+    public function askWorker(BuilderMessage $question, array $shared): void
+    {
+        $this->save($question, $shared);
+        $question->project->update(['awaiting_look' => true, 'look_started_at' => now()]);
+    }
+
+    /** No worker: links are read here (the HTML only); files cannot be read without it. */
+    public function readHere(BuilderMessage $question, array $shared): void
+    {
+        $this->save($question, array_map(fn (array $item) => $this->withoutWorker($item), $shared));
+    }
+
+    /** @return list<array<string, mixed>> what the worker should look at now, marked as taken */
+    public function forWorker(): array
+    {
+        $this->heartbeat->beat(self::HEARTBEAT);
+        $waiting = BuilderProject::where('awaiting_look', true)->where('look_started_at', '>=', now()->subSeconds(self::WAIT_SECONDS))->pluck('uuid', 'id');
+
+        return BuilderMessage::whereIn('project_id', $waiting->keys())->where('role', BuilderMessage::USER)->latest('id')->limit(20)->get()
+            ->flatMap(fn (BuilderMessage $message) => $this->take($message, (string) $waiting[$message->project_id]))->values()->all();
+    }
+
+    /**
+     * The worker's result for one item. True when everything in the message is done, so the chat can answer.
+     *
+     * @param  list<UploadedFile>  $pieces
+     */
+    public function complete(BuilderMessage $message, int $index, array $result, ?UploadedFile $fullPage, array $pieces): bool
+    {
+        $shared = $message->payload['looks'] ?? [];
+        if (! isset($shared[$index]) || in_array($shared[$index]['status'], self::FINISHED, true)) {
+            return false;
+        }
+
+        $shared[$index] = match (true) {
+            ($shared[$index]['kind'] ?? self::LINK) === self::FILE => $this->fileRead($shared[$index], $result),
+            $fullPage !== null => $this->pageSeen($message, $shared[$index], $result, $fullPage, $pieces),
+            default => $this->failed($shared[$index], (string) ($result['reason'] ?? 'The page could not be opened.')),
+        };
+        $this->save($message, $shared);
+
+        return $this->allFinished($shared);
+    }
+
+    /** True when the wait is over: what the worker did not finish is read here or marked as not read. */
+    public function finishLate(BuilderProject $project): bool
+    {
+        if (! $project->awaiting_look || $project->look_started_at?->gt(now()->subSeconds(self::WAIT_SECONDS))) {
+            return false;
+        }
+
+        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->first();
+        if ($question) {
+            $shared = collect($question->payload['looks'] ?? [])
+                ->map(fn (array $item) => in_array($item['status'], self::FINISHED, true) ? $item : $this->withoutWorker($item))->all();
+            $this->save($question, $shared);
+        }
+
+        return true;
+    }
+
+    /** True while the worker is reading a file (rather than opening a link), for the line the customer sees. */
+    public function isReadingAFile(BuilderProject $project): bool
+    {
+        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->first();
+
+        return collect($question?->payload['looks'] ?? [])->contains(fn (array $item) => ($item['kind'] ?? self::LINK) === self::FILE);
+    }
+
     /** @return list<string> */
-    public function linksIn(string $text): array
+    private function linksIn(string $text): array
     {
         preg_match_all('~https?://[^\s<>"\'\x{0600}-\x{06FF}]+~u', $text, $matches);
 
@@ -54,97 +150,43 @@ class LinkLooks
             ->unique()->take(self::MAX_LINKS)->values()->all();
     }
 
-    public function workerIsWatching(): bool
+    /** @return list<array<string, mixed>> */
+    private function take(BuilderMessage $message, string $projectUuid): array
     {
-        return $this->heartbeat->seenWithin(self::HEARTBEAT, self::WORKER_FRESH_SECONDS);
-    }
-
-    /** The worker will open the links; the chat answers once it has seen them. */
-    public function askWorker(BuilderMessage $question, array $links): void
-    {
-        $this->saveLooks($question, array_map(fn (string $url) => ['url' => $url, 'status' => self::PENDING], $links));
-        $question->project->update(['awaiting_look' => true, 'look_started_at' => now()]);
-    }
-
-    /** No worker: what this server can read of each page (the HTML only, not what scripts draw). */
-    public function readHere(BuilderMessage $question, array $links): void
-    {
-        $this->saveLooks($question, array_map(fn (string $url) => $this->readOne($url), $links));
-    }
-
-    /** @return list<array{message_id: int, index: int, url: string}> links for the worker, marked as taken */
-    public function forWorker(): array
-    {
-        $this->heartbeat->beat(self::HEARTBEAT);
-        $waiting = BuilderProject::where('awaiting_look', true)->where('look_started_at', '>=', now()->subSeconds(self::WAIT_SECONDS))->pluck('id');
-
-        return BuilderMessage::whereIn('project_id', $waiting)->where('role', BuilderMessage::USER)->latest('id')->limit(20)->get()
-            ->flatMap(fn (BuilderMessage $message) => $this->take($message))->values()->all();
-    }
-
-    /**
-     * The worker's result for one link: the full page for the customer, the pieces and text for Claude.
-     * True when every link of the message is done, so the chat can answer.
-     *
-     * @param  list<UploadedFile>  $pieces
-     */
-    public function complete(BuilderMessage $message, int $index, array $result, ?UploadedFile $fullPage, array $pieces): bool
-    {
-        $looks = $message->payload['looks'] ?? [];
-        if (! isset($looks[$index]) || in_array($looks[$index]['status'], self::FINISHED, true)) {
-            return false;
-        }
-
-        $looks[$index] = $fullPage === null
-            ? ['url' => $looks[$index]['url'], 'status' => self::FAILED, 'reason' => mb_substr((string) ($result['reason'] ?? 'The page could not be opened.'), 0, 300)]
-            : $this->seen($message, $looks[$index]['url'], $result, $fullPage, $pieces);
-        $this->saveLooks($message, $looks);
-
-        return $this->allFinished($looks);
-    }
-
-    /** True when the wait is over: the links the worker did not finish are read here, so the chat can answer. */
-    public function finishLateLooks(BuilderProject $project): bool
-    {
-        if (! $project->awaiting_look || $project->look_started_at?->gt(now()->subSeconds(self::WAIT_SECONDS))) {
-            return false;
-        }
-
-        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->first();
-        if ($question) {
-            $looks = collect($question->payload['looks'] ?? [])
-                ->map(fn (array $look) => in_array($look['status'], self::FINISHED, true) ? $look : $this->readOne($look['url']))->all();
-            $this->saveLooks($question, $looks);
-        }
-
-        return true;
-    }
-
-    /** @return list<array{message_id: int, index: int, url: string}> */
-    private function take(BuilderMessage $message): array
-    {
-        $looks = $message->payload['looks'] ?? [];
+        $shared = $message->payload['looks'] ?? [];
         $taken = [];
-        foreach ($looks as $index => $look) {
-            if ($look['status'] === self::PENDING) {
-                $looks[$index]['status'] = self::TAKEN;
-                $taken[] = ['message_id' => $message->id, 'index' => $index, 'url' => $look['url']];
+        foreach ($shared as $index => $item) {
+            if ($item['status'] === self::PENDING) {
+                $shared[$index]['status'] = self::TAKEN;
+                $taken[] = ['message_id' => $message->id, 'index' => $index, 'project' => $projectUuid] + array_diff_key($item, ['status' => true]);
             }
         }
         if ($taken !== []) {
-            $this->saveLooks($message, $looks);
+            $this->save($message, $shared);
         }
 
         return $taken;
     }
 
+    private function fileRead(array $item, array $result): array
+    {
+        $text = trim((string) ($result['text'] ?? ''));
+        if ($text === '') {
+            return $this->failed($item, (string) ($result['reason'] ?? 'The file could not be read.'));
+        }
+        BuilderAttachment::whereKey($item['attachment_id'])->update(['extracted_text' => mb_substr($text, 0, self::TEXT_CHARS)]);
+
+        return ['status' => self::SEEN] + $item;
+    }
+
     /** @param  list<UploadedFile>  $pieces */
-    private function seen(BuilderMessage $message, string $url, array $result, UploadedFile $fullPage, array $pieces): array
+    private function pageSeen(BuilderMessage $message, array $item, array $result, UploadedFile $fullPage, array $pieces): array
     {
         $files = $this->attachments->attach($message, [$fullPage, ...$pieces]);
 
         return [
-            'url' => $url,
+            'kind' => self::LINK,
+            'url' => $item['url'],
             'status' => self::SEEN,
             'title' => mb_substr((string) ($result['title'] ?? ''), 0, 300),
             'description' => mb_substr((string) ($result['description'] ?? ''), 0, 1000),
@@ -154,22 +196,31 @@ class LinkLooks
         ];
     }
 
-    private function readOne(string $url): array
+    private function withoutWorker(array $item): array
     {
+        if (($item['kind'] ?? self::LINK) === self::FILE) {
+            return $this->failed($item, 'the file reader on the engineering computer did not answer in time');
+        }
+
         try {
-            return ['url' => $url, 'status' => self::READ] + $this->reader->read($url);
+            return ['kind' => self::LINK, 'url' => $item['url'], 'status' => self::READ] + $this->reader->read($item['url']);
         } catch (RuntimeException $e) {
-            return ['url' => $url, 'status' => self::FAILED, 'reason' => $e->getMessage()];
+            return $this->failed($item, $e->getMessage());
         }
     }
 
-    private function allFinished(array $looks): bool
+    private function failed(array $item, string $reason): array
     {
-        return collect($looks)->every(fn (array $look) => in_array($look['status'], self::FINISHED, true));
+        return ['status' => self::FAILED, 'reason' => mb_substr($reason, 0, 300)] + $item;
     }
 
-    private function saveLooks(BuilderMessage $message, array $looks): void
+    private function allFinished(array $shared): bool
     {
-        $message->update(['payload' => ['looks' => array_values($looks)] + (array) $message->payload]);
+        return collect($shared)->every(fn (array $item) => in_array($item['status'], self::FINISHED, true));
+    }
+
+    private function save(BuilderMessage $message, array $shared): void
+    {
+        $message->update(['payload' => ['looks' => array_values($shared)] + (array) $message->payload]);
     }
 }
