@@ -44,6 +44,7 @@ class BuilderProject extends Model
         'payment_due' => 'decimal:2',
         'design_fee' => 'decimal:2',
         'study_fee' => 'decimal:2',
+        'job_cost_usd' => 'decimal:4',
         'budget_usd' => 'decimal:4',
         'build_cost_usd' => 'decimal:4',
         'paid_at' => 'datetime',

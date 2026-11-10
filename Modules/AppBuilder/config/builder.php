@@ -20,8 +20,15 @@ return [
     // spend up to budget x 1.5 = 3 x the estimate, so even the worst build does not lose money.
     'pricing' => [
         'currency' => 'USD',
-        // an agent that writes N tokens of code also thinks, re-reads files and runs tests; this covers that work
+        // an agent that writes N tokens of code also thinks, re-reads files and runs tests; this covers that work.
+        // It is the starting value: once a kind of project has enough delivered builds, their real cost is used.
         'work_factor' => (float) env('BUILDER_WORK_FACTOR', 4),
+        'learning' => [
+            'samples' => 10,
+            'min_samples' => 5,
+            'min_factor' => 1,
+            'max_factor' => 20,
+        ],
         'markup' => (float) env('BUILDER_MARKUP', 3),
         'minimum' => (float) env('BUILDER_MINIMUM_PRICE', 0),
         // the worker stops spending once real cost passes the estimate times this

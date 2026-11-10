@@ -433,6 +433,52 @@ class AppBuilderTest extends TestCase
         $this->assertSame('200.00', BuilderProject::where('uuid', $uuid)->value('amount'));
     }
 
+    private function pastBuilds(string $type, array $factors): void
+    {
+        $project = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD']);
+        foreach ($factors as $factor) {
+            \Modules\AppBuilder\Models\BuilderBuildCost::create(['project_id' => $project->id, 'project_type' => $type, 'model' => 'claude-opus-5-5', 'estimated_tokens' => 100000, 'cost_usd' => $factor * 2, 'work_factor' => $factor]);
+        }
+    }
+
+    public function test_prices_learn_the_real_cost_of_each_kind_of_project(): void
+    {
+        $history = app(\Modules\AppBuilder\Services\BuildCostHistory::class);
+
+        // too few builds of a kind: the configured factor
+        $this->pastBuilds('system', [9, 9, 9, 9]);
+        $this->assertSame(4.0, $history->workFactor('system'));
+
+        // enough builds: their median, so one very cheap build does not pull the price down
+        $this->pastBuilds('system', [1]);
+        $this->assertSame(9.0, $history->workFactor('system'));
+        $this->assertSame(4.0, $history->workFactor('page'));
+
+        // a broken record cannot make prices absurd
+        $this->pastBuilds('web_app', [500, 500, 500, 500, 500]);
+        $this->assertSame(20.0, $history->workFactor('web_app'));
+
+        // the price uses it: 100k tokens x $20 per million (strong model) x 9 = $18 of real cost
+        $price = app(\Modules\AppBuilder\Services\QuotePricer::class)->price(100000, true, 0, 'system');
+        $this->assertSame(18.0, $price['cost']);
+    }
+
+    public function test_a_delivered_build_records_its_whole_cost_including_failed_tries(): void
+    {
+        $project = $this->buildingProject();
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/fail', ['error' => 'stopped', 'cost_usd' => 3], $this->worker())->assertOk();
+        $project->update(['status' => BuilderProject::QUEUED, 'attempts' => 0]);
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>منيو</h1>']), 'summary' => 'جاهز', 'cost_usd' => 2], $this->worker())->assertOk();
+
+        $record = \Modules\AppBuilder\Models\BuilderBuildCost::where('project_id', $project->id)->sole();
+        $this->assertSame('5.0000', $record->cost_usd);
+        $this->assertSame(0.0, (float) $project->refresh()->job_cost_usd);
+        // 5 USD over 50k estimated tokens at the standard model's $10 per million: a real work factor of 10
+        $this->assertSame('10.000', $record->work_factor);
+    }
+
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void
     {
         $project = $this->buildingProject();

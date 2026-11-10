@@ -15,6 +15,7 @@ class JobQueue
         private readonly DeliveryStore $store,
         private readonly ProjectPayment $payment,
         private readonly LiveTrials $trials,
+        private readonly BuildCostHistory $costs,
     ) {}
 
     public function claim(): ?BuilderProject
@@ -46,6 +47,8 @@ class JobQueue
     public function complete(BuilderProject $project, string $zipPath, string $summary, float $costUsd, string $ideasJson = ''): void
     {
         $version = $this->store->store($project, $zipPath);
+        // this job's whole cost, failed tries included, teaches the next price
+        $this->costs->record($project, (float) $project->job_cost_usd + $costUsd);
 
         DB::transaction(function () use ($project, $version, $summary, $costUsd, $ideasJson): void {
             $project->update([
@@ -58,6 +61,7 @@ class JobQueue
                 'progress_percent' => null,
                 'progress_note' => null,
                 'build_cost_usd' => (float) $project->build_cost_usd + $costUsd,
+                'job_cost_usd' => 0,
             ]);
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
@@ -80,6 +84,8 @@ class JobQueue
             'error' => mb_substr($error, 0, 4000),
             'lease_expires_at' => null,
             'build_cost_usd' => (float) $project->build_cost_usd + $costUsd,
+            // kept for the try that finally delivers it, so the record shows the job's real cost
+            'job_cost_usd' => (float) $project->job_cost_usd + $costUsd,
         ]);
         $this->payment->tellOwner($project, 'Build failed: '.$project->title.' - '.mb_substr($error, 0, 200));
     }

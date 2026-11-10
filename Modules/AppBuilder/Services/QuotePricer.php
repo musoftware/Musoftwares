@@ -4,6 +4,7 @@ namespace Modules\AppBuilder\Services;
 
 /**
  * Turns Claude's token estimate into the customer's price, the build model and the worker's spending cap.
+ * The work factor comes from real builds of the same kind (BuildCostHistory), so prices follow real cost.
  * Price = the larger of the project type's minimum and the estimated cost x markup, plus a design fee.
  * The build may spend up to (price without design) x budget_factor / markup, and the worker stops at 1.5x that,
  * which is the price itself: a build never costs more than the customer paid.
@@ -12,14 +13,17 @@ class QuotePricer
 {
     public const DEFAULT_TYPE = 'other';
 
+    public function __construct(private readonly BuildCostHistory $history) {}
+
     /** @return array{tokens: int, cost: float, amount: float, design_fee: float, budget: float, model: string, project_type: string} */
     public function price(int $estimatedTokens, bool $complex = false, float $designFee = 0, string $projectType = self::DEFAULT_TYPE): array
     {
         $pricing = config('builder.pricing');
         $tokens = (int) min(max($estimatedTokens, $pricing['min_tokens']), $pricing['max_tokens']);
         $model = $this->buildModel($tokens, $complex);
-        $cost = $tokens / 1_000_000 * $model['output_usd_per_mtok'] * $pricing['work_factor'];
         $type = $this->type($projectType);
+        // what builds of this kind really cost per estimated token, learned from delivered work
+        $cost = $tokens / 1_000_000 * $model['output_usd_per_mtok'] * $this->history->workFactor($type);
         $programming = max((float) $pricing['minimum'], $this->minimumFor($type), ceil($cost * $pricing['markup']));
         $design = $this->designFee($designFee);
 

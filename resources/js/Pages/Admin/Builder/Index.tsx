@@ -29,8 +29,39 @@ export const STATUS_LABELS: Record<string, [string, string]> = {
     failed: ['Failed', 'فشل'],
 };
 
+interface Learned {
+    type: string;
+    builds: number;
+    factor: number;
+    learned: boolean;
+}
+
+/** How prices follow real cost: each kind of project uses the median work factor of its latest delivered builds. */
+function PriceLearning({ learning, defaultFactor }: { learning: Learned[]; defaultFactor: number }) {
+    return (
+        <details className="rounded-xl border bg-white p-4">
+            <summary className="cursor-pointer font-semibold">{t('How prices learn from real builds', 'الأسعار بتتعلم إزاي من الشغل الحقيقي')}</summary>
+            <p className="mt-2 text-sm text-slate-500">
+                {t(`Each kind of project uses the real cost of its last delivered builds once it has 5. Until then the factor is ${defaultFactor}.`,
+                    `كل نوع مشروع بيستخدم التكلفة الحقيقية لآخر مشاريعه اللي اتسلّمت لما يبقى عنده 5. لحد كده المعامل ${defaultFactor}.`)}
+            </p>
+            {learning.length === 0 && <p className="mt-2 text-sm">{t('No delivered builds yet.', 'لسه مفيش مشاريع اتسلّمت.')}</p>}
+            {learning.length > 0 && (
+                <ul className="mt-2 divide-y text-sm">
+                    {learning.map((row) => (
+                        <li key={row.type} className="flex flex-wrap justify-between gap-2 py-2">
+                            <span dir="ltr">{row.type}</span>
+                            <span>{t(`${row.builds} builds`, `${row.builds} مشروع`)} · <span dir="ltr">x{row.factor}</span> · {row.learned ? t('learned', 'متعلّم') : t('still the default', 'لسه الافتراضي')}</span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </details>
+    );
+}
+
 /** Every AI builder chat, newest first, with the ones waiting for an answer easy to find. */
-export default function BuilderIndex({ projects, waitingOnly }: { projects: Paginated<Project>; waitingOnly: boolean }) {
+export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor }: { projects: Paginated<Project>; waitingOnly: boolean; learning: Learned[]; defaultFactor: number }) {
     return (
         <AdminSidebarLayout>
             <Head title={t('AI builder', 'منشئ البرامج')} />
@@ -41,6 +72,8 @@ export default function BuilderIndex({ projects, waitingOnly }: { projects: Pagi
                         {waitingOnly ? t('Show all', 'اعرض الكل') : t('Waiting for an answer', 'مستني رد')}
                     </Link>
                 </div>
+
+                <PriceLearning learning={learning} defaultFactor={defaultFactor} />
 
                 {projects.data.length === 0 && <p className="text-slate-500">{t('No chats yet.', 'لسه مفيش محادثات.')}</p>}
 

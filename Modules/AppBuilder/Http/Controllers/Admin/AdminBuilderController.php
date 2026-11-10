@@ -32,7 +32,12 @@ class AdminBuilderController extends Controller
             ->withQueryString()
             ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name', 'updated_at']) + ['chat_cost_usd' => $project->chatCostUsd()]);
 
-        return Inertia::render('Admin/Builder/Index', ['projects' => $projects, 'waitingOnly' => $request->boolean('waiting')]);
+        return Inertia::render('Admin/Builder/Index', [
+            'projects' => $projects,
+            'waitingOnly' => $request->boolean('waiting'),
+            'learning' => app(\Modules\AppBuilder\Services\BuildCostHistory::class)->summary(),
+            'defaultFactor' => (float) config('builder.pricing.work_factor'),
+        ]);
     }
 
     public function show(BuilderProject $project): Response
