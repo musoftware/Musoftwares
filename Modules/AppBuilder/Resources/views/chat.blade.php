@@ -435,7 +435,7 @@
         const messages = state ? state.messages : [];
         empty.hidden = messages.length > 0 || waiting;
         messages.forEach((message) => thread.append(messageNode(message)));
-        if (waiting) thread.append(statusNode(T.thinking));
+        if (waiting || (state && state.answering)) thread.append(statusNode(T.thinking));
         if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.progress) thread.append(statusNode(state.progress));
@@ -448,7 +448,7 @@
             thread.append(el('div', {class: 'msg'}, T.failed));
         }
         if (state && messages.length === 1 && !waiting) thread.append(el('p', {class: 'hint'}, T.copy_link));
-        input.disabled = waiting || (state && (!state.open_for_chat || state.looking));
+        input.disabled = waiting || (state && (!state.open_for_chat || state.looking || state.answering));
         sendBtn.disabled = input.disabled || (!input.value.trim() && picked.length === 0);
         document.getElementById('attach').disabled = input.disabled;
         keepRoomForComposer();
@@ -459,7 +459,7 @@
     function schedulePoll() {
         clearTimeout(pollTimer);
         const studyWriting = state && state.quote && state.quote.study && state.quote.study.status === 'writing';
-        if (!state || (!state.progress && !state.looking && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting)) return;
+        if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }
             render();

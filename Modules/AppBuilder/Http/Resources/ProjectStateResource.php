@@ -19,6 +19,8 @@ class ProjectStateResource extends JsonResource
 {
     public static $wrap = null;
 
+    private const ANSWER_MINUTES = 3;
+
     public function toArray(Request $request): array
     {
         return [
@@ -33,6 +35,8 @@ class ProjectStateResource extends JsonResource
             'waiting_for_answer' => $this->isWaitingForAnswer(),
             // what the customer waits for: a link being opened or a file being read
             'looking' => $this->awaiting_look ? (app(\Modules\AppBuilder\Services\LinkLooks::class)->isReadingAFile($this->resource) ? 'file' : 'link') : null,
+            // the look is done and the answer is being written in another request, so the page keeps asking
+            'answering' => ! $this->awaiting_look && $this->isAnsweringAfterLook(),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // offer notifications once there is something to wait for
             'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token && $this->paid_at !== null ? route('builder.push', $this->resource) : null,
@@ -159,5 +163,16 @@ class ProjectStateResource extends JsonResource
         $entry = collect([DeliveryStore::ENTRY_FILE, DeliveryStore::BUILT_ENTRY_FILE, DeliveryStore::APP_PREVIEW_FILE])->first(fn (string $path) => $store->file($this->resource, $path) !== null);
 
         return $entry ? route('builder.preview', ['project' => $this->resource, 'path' => $entry]) : null;
+    }
+
+    /** The last line is the customer's, sent with a link or a file, and its answer is still on its way (a few minutes at most). */
+    private function isAnsweringAfterLook(): bool
+    {
+        $last = $this->messages->last();
+
+        return $last instanceof BuilderMessage
+            && $last->role === BuilderMessage::USER
+            && ($last->payload['looks'] ?? []) !== []
+            && $last->created_at?->gt(now()->subMinutes(self::ANSWER_MINUTES)) === true;
     }
 }

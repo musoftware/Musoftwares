@@ -498,7 +498,7 @@ class AppBuilderTest extends TestCase
             'full_page' => $this->png(), 'pieces' => [$this->png(), $this->png()],
         ], $this->worker())->assertOk();
 
-        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', null);
+        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', null)->assertJsonPath('answering', false);
         $customer = $state->json('messages.0');
         $this->assertCount(1, $customer['images']);
         $this->assertSame([], $customer['files']);
@@ -509,6 +509,21 @@ class AppBuilderTest extends TestCase
         $this->assertCount(2, collect($blocks)->where('type', 'image'));
         $this->assertStringContainsString('سورة الفاتحة', collect($blocks)->where('type', 'text')->first()['text']);
         $this->assertStringContainsString('real browser', collect($blocks)->where('type', 'text')->first()['text']);
+    }
+
+    public function test_the_page_keeps_waiting_while_the_answer_after_a_look_is_written(): void
+    {
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $uuid = $this->postJson('/ai/messages', ['text' => 'زي ده https://quran.example.com/garden'])->assertOk()->json('uuid');
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+
+        // the worker's request has taken the turn (the look is done) and Claude is still writing
+        $project->update(['awaiting_look' => false]);
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null)->assertJsonPath('answering', true);
+
+        // an answer that never came stops the waiting after a few minutes
+        $this->travel(4)->minutes();
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('answering', false);
     }
 
     public function test_without_the_worker_the_site_reads_the_page_itself(): void
