@@ -44,7 +44,8 @@ class AttachmentStore
     /** @return string|list<array<string, mixed>> plain text, or the files followed by the text */
     public function contentFor(BuilderMessage $message): string|array
     {
-        if ($message->attachments->isEmpty()) {
+        // the chat model reads only the line under a build screenshot; the picture is for the customer
+        if ($message->attachments->isEmpty() || $message->role === BuilderMessage::PROGRESS) {
             return $message->forModel();
         }
 

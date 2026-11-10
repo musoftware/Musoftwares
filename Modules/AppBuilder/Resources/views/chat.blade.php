@@ -57,6 +57,21 @@
         .ideas{margin-top:12px;display:grid;gap:8px}
         .idea{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
         .idea .note{margin:2px 0 0}
+        .msg.progress{border-inline-start:3px solid var(--line);padding-inline-start:12px}
+        .shots{display:grid;gap:8px;margin-top:8px}
+        .shots img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--soft)}
+        .choose{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:24px;text-align:start}
+        .choice{display:grid;gap:4px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit;text-align:start;cursor:pointer;min-height:44px}
+        .choice:hover{border-color:var(--ink)}
+        .choice strong{font-size:18px}
+        .choice span{color:var(--muted);font-size:14px}
+        .login-ask{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
+        .login-ask p{margin:0 0 12px;color:var(--ink)}
+        .projects{margin-top:32px;text-align:start}
+        .projects h2{font-size:16px;margin:0 0 8px}
+        .projects a{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;min-height:44px}
+        .projects a span{color:var(--muted);font-size:14px}
+        body.choosing .composer{display:none}
         .msg .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
         :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
         [hidden]{display:none!important}
@@ -67,6 +82,29 @@
     <section class="empty" id="empty">
         <h1>{{ __('builder.greeting') }}</h1>
         <p>{{ __('builder.greeting_hint') }}</p>
+        @unless ($state)
+            <div class="choose" id="choose">
+                <button type="button" class="choice" data-size="big"><strong>{{ __('builder.start_big') }}</strong><span>{{ __('builder.start_big_note') }}</span></button>
+                <button type="button" class="choice" data-size="small"><strong>{{ __('builder.start_small') }}</strong><span>{{ __('builder.start_small_note') }}</span></button>
+            </div>
+            @if ($loginUrl ?? null)
+                <div class="login-ask" id="login-ask" hidden>
+                    <p>{{ __('builder.start_big_note') }}</p>
+                    <div class="actions">
+                        <a class="btn" href="{{ $loginUrl }}">{{ __('builder.start_login') }}</a>
+                        <button type="button" class="btn ghost" id="guest">{{ __('builder.start_guest') }}</button>
+                    </div>
+                </div>
+            @endif
+            @if (! empty($projects))
+                <nav class="projects" aria-label="{{ __('builder.my_projects') }}">
+                    <h2>{{ __('builder.my_projects') }}</h2>
+                    @foreach ($projects as $own)
+                        <a href="{{ $own['url'] }}"><strong dir="auto">{{ $own['title'] }}</strong><span>{{ $own['status'] }}</span></a>
+                    @endforeach
+                </nav>
+            @endif
+        @endunless
     </section>
 </main>
 
@@ -177,14 +215,19 @@
     function messageNode(message) {
         const node = el('div', {class: 'msg ' + message.role, dir: 'auto'});
         if (message.role === 'team') node.append(el('span', {class: 'who'}, T.team_label));
+        if (message.role === 'progress') node.append(el('span', {class: 'who'}, T.progress_label));
         node.append(document.createTextNode(message.text));
+        if (message.images && message.images.length) {
+            const shots = el('div', {class: 'shots'});
+            message.images.forEach((src) => shots.append(el('img', {src, alt: message.text, loading: 'lazy'})));
+            node.append(shots);
+        }
         if (message.files && message.files.length) {
             const files = el('div', {class: 'files'});
             message.files.forEach((name) => files.append(el('span', {dir: 'auto'}, name)));
             node.append(files);
         }
         const actions = el('div', {class: 'actions'});
-        if (message.needs_team) actions.append(link(state.team_url, T.talk_team, true));
         if (state.delivery && message.delivered_version === state.delivery.version) {
             if (state.delivery.preview_url) actions.append(link(state.delivery.preview_url, T.open_program));
             if (state.delivery.download_url) actions.append(link(state.delivery.download_url, T.download, Boolean(state.delivery.preview_url)));
@@ -382,11 +425,7 @@
         if (state && state.balance) thread.append(balanceNode(state.balance));
         if (state && state.push) { const node = pushNode(state.push); if (node) thread.append(node); }
         if (state && state.failed) {
-            const node = el('div', {class: 'msg'}, T.failed);
-            const actions = el('div', {class: 'actions'});
-            actions.append(link(state.team_url, T.talk_team, true));
-            node.append(actions);
-            thread.append(node);
+            thread.append(el('div', {class: 'msg'}, T.failed));
         }
         if (state && messages.length === 1 && !waiting) thread.append(el('p', {class: 'hint'}, T.copy_link));
         input.disabled = waiting || (state && !state.open_for_chat);
@@ -413,7 +452,7 @@
         waiting = true;
         showError('');
         if (state) state.messages.push({id: 0, role: 'user', text, files: names});
-        else state = {messages: [{id: 0, role: 'user', text, files: names}], open_for_chat: true, uuid: null, quote: null, progress: null, delivery: null, failed: false, team_url: ''};
+        else state = {messages: [{id: 0, role: 'user', text, files: names}], open_for_chat: true, uuid: null, quote: null, progress: null, delivery: null, failed: false};
         const optimistic = state;
         render();
         try {
@@ -454,6 +493,22 @@
         if ((text || picked.length) && !waiting) send(text, [...picked]);
     });
 
+    /** Big or simple: a guest with a big project is asked to sign in first, so the link is never lost. */
+    function startChoice() {
+        const choose = document.getElementById('choose');
+        if (!choose) return;
+        const loginAsk = document.getElementById('login-ask');
+        const openChat = () => { document.body.classList.remove('choosing'); choose.hidden = true; if (loginAsk) loginAsk.hidden = true; keepRoomForComposer(); input.focus(); };
+        if (@json((bool) ($chosen ?? false))) { openChat(); return; }
+        document.body.classList.add('choosing');
+        choose.querySelectorAll('.choice').forEach((button) => button.addEventListener('click', () => {
+            if (button.dataset.size === 'big' && loginAsk) { choose.hidden = true; loginAsk.hidden = false; loginAsk.querySelector('a').focus(); return; }
+            openChat();
+        }));
+        document.getElementById('guest')?.addEventListener('click', openChat);
+    }
+
+    startChoice();
     render();
 })();
 </script>

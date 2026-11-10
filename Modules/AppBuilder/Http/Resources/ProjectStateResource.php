@@ -8,7 +8,6 @@ use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 use Modules\AppBuilder\Services\DeliveryStore;
 use Modules\AppBuilder\Services\LiveTrials;
-use Modules\SoftwareStore\Services\SoftwareOrderService;
 
 /**
  * Everything the chat page draws: the lines, the open quote, the build progress and the delivered program.
@@ -40,7 +39,6 @@ class ProjectStateResource extends JsonResource
             ] : null,
             'delivery' => $this->hasDelivery() ? $this->delivery() : null,
             'failed' => $this->status === BuilderProject::FAILED,
-            'team_url' => $this->teamUrl(),
         ];
     }
 
@@ -50,10 +48,13 @@ class ProjectStateResource extends JsonResource
             'id' => $message->id,
             'role' => $message->role,
             'text' => $message->content,
-            'needs_team' => (bool) ($message->payload['needs_team'] ?? false),
             'delivered_version' => $message->payload['delivered_version'] ?? null,
             'ideas' => $message->payload['ideas'] ?? [],
-            'files' => $message->attachments->pluck('original_name')->values(),
+            // a build screenshot is shown as a picture; a customer's file only by its name
+            'files' => $message->role === BuilderMessage::PROGRESS ? [] : $message->attachments->pluck('original_name')->values(),
+            'images' => $message->role === BuilderMessage::PROGRESS
+                ? $message->attachments->filter->isImage()->map(fn ($file) => route('builder.file', [$this->resource, $file->id]))->values()
+                : [],
         ];
     }
 
@@ -121,12 +122,5 @@ class ProjectStateResource extends JsonResource
         $entry = collect([DeliveryStore::ENTRY_FILE, DeliveryStore::BUILT_ENTRY_FILE])->first(fn (string $path) => $store->file($this->resource, $path) !== null);
 
         return $entry ? route('builder.preview', ['project' => $this->resource, 'path' => $entry]) : null;
-    }
-
-    private function teamUrl(): string
-    {
-        $text = __('builder.team_message', ['link' => route('builder.show', $this->resource)]);
-
-        return 'https://wa.me/'.app(SoftwareOrderService::class)->ownerWhatsappNumber().'?text='.rawurlencode($text);
     }
 }

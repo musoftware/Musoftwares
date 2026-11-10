@@ -22,6 +22,9 @@ class BuilderMessage extends Model
     /** A line from the Musoftware team, written on the admin page. */
     public const TEAM = 'team';
 
+    /** A screenshot the build sent when a big part of the program worked. */
+    public const PROGRESS = 'progress';
+
     protected $guarded = ['id'];
 
     protected $casts = ['payload' => 'array'];
@@ -43,7 +46,11 @@ class BuilderMessage extends Model
             return (string) json_encode($this->payload, JSON_UNESCAPED_UNICODE);
         }
 
-        return $this->role === self::TEAM ? '[Message from the Musoftware team] '.$this->content : $this->content;
+        return match ($this->role) {
+            self::TEAM => '[Message from the Musoftware team] '.$this->content,
+            self::PROGRESS => '[The build showed the customer a screenshot of finished work] '.$this->content,
+            default => $this->content,
+        };
     }
 
     /** Claude only knows customer and assistant turns; a team line is read as a note on the customer's side. */

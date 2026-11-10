@@ -25,18 +25,72 @@ class BuilderChatController extends Controller
         private readonly BuilderReferral $referral,
     ) {}
 
-    public function index(): View
+    /** The start page: big or simple project, and the signed-in customer's own projects. */
+    public function index(\Illuminate\Http\Request $request): View
     {
-        return view('appbuilder::chat', ['state' => null, 'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig()]);
+        return view('appbuilder::chat', [
+            'state' => null,
+            'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig(),
+            // coming back from sign-in, or a customer who already chose, goes straight to the chat
+            'chosen' => $request->query('size') !== null,
+            'loginUrl' => $request->user() ? null : route('login', ['redirect' => '/ai?size=big']),
+            'projects' => $this->ownProjects($request),
+        ]);
     }
 
-    public function show(BuilderProject $project): View
+    public function show(\Illuminate\Http\Request $request, BuilderProject $project): View
     {
+        // whoever has the link and is signed in keeps the project in their account
+        if ($request->user() && $project->user_id === null) {
+            $project->update(['user_id' => $request->user()->id]);
+        }
+
+        $this->speakCustomerLanguage($project);
+
         return view('appbuilder::chat', ['state' => $this->stateOf($project), 'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig()]);
+    }
+
+    /** Buttons and notes follow the language the customer writes in; a chat with no message yet keeps the site's. */
+    private function speakCustomerLanguage(BuilderProject $project): void
+    {
+        if ($project->messages()->where('role', BuilderMessage::USER)->exists()) {
+            app()->setLocale($project->customerLanguage());
+        }
+    }
+
+    /** A screenshot the build sent to this chat; only images that belong to this project. */
+    public function file(BuilderProject $project, \Modules\AppBuilder\Models\BuilderAttachment $attachment): \Illuminate\Http\Response
+    {
+        abort_unless($attachment->project_id === $project->id && $attachment->isImage(), 404);
+        $data = $this->attachments->contents($attachment);
+        abort_if($data === null, 404);
+
+        return response($data, 200, [
+            'Content-Type' => $attachment->mime,
+            'Cache-Control' => 'private, max-age=86400',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    /** @return list<array{title: string, status: string, url: string}> */
+    private function ownProjects(\Illuminate\Http\Request $request): array
+    {
+        if (! $request->user()) {
+            return [];
+        }
+
+        return BuilderProject::where('user_id', $request->user()->id)->latest('updated_at')->limit(30)->get()
+            ->map(fn (BuilderProject $project) => [
+                'title' => $project->title ?: __('builder.untitled'),
+                'status' => __('builder.status_labels.'.$project->status),
+                'url' => route('builder.show', $project),
+            ])->all();
     }
 
     public function state(BuilderProject $project): JsonResponse
     {
+        $this->speakCustomerLanguage($project);
+
         return response()->json($this->stateOf($project));
     }
 
@@ -44,7 +98,7 @@ class BuilderChatController extends Controller
     public function start(SendMessageRequest $request): JsonResponse
     {
         try {
-            $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request));
+            $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }

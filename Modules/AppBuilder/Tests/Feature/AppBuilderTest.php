@@ -296,6 +296,74 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/retry')->assertStatus(409);
     }
 
+    public function test_the_build_shows_the_customer_screenshots_of_finished_parts(): void
+    {
+        config(['builder.limits.snapshots_per_build' => 2]);
+        $project = $this->buildingProject();
+        $url = '/api/builder/worker/jobs/'.$project->uuid.'/snapshot';
+
+        $this->post($url, ['image' => $this->png(), 'caption' => 'لوحة الأدمن خلصت'], $this->worker())->assertCreated();
+        $this->post($url, ['image' => $this->png(), 'caption' => 'صفحة المسوق خلصت'], $this->worker())->assertCreated();
+        // a few per build, never a flood
+        $this->post($url, ['image' => $this->png(), 'caption' => 'كمان واحدة'], $this->worker())->assertStatus(429);
+
+        $line = collect($this->getJson('/ai/'.$project->uuid.'/state')->json('messages'))->firstWhere('role', 'progress');
+        $this->assertSame('لوحة الأدمن خلصت', $line['text']);
+        $this->assertSame([], $line['files']);
+        $this->get($line['images'][0])->assertOk()->assertHeader('Content-Type', 'image/png');
+
+        // the picture is for the customer; the chat model only reads the line under it
+        $message = BuilderMessage::where('role', BuilderMessage::PROGRESS)->firstOrFail();
+        $this->assertIsString(app(\Modules\AppBuilder\Services\AttachmentStore::class)->contentFor($message->load('attachments')));
+
+        // another project's link cannot open this picture
+        $other = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD']);
+        $this->get('/ai/'.$other->uuid.'/files/'.$message->attachments->first()->id)->assertNotFound();
+    }
+
+    public function test_a_signed_in_customer_finds_their_projects_on_the_start_page(): void
+    {
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+
+        $this->answer('تمام، احكيلي أكتر');
+        $uuid = $this->actingAs($customer)->postJson('/ai/messages', ['text' => 'عايز سيستم'])->assertOk()->json('uuid');
+        $this->assertSame($customer->id, BuilderProject::where('uuid', $uuid)->value('user_id'));
+
+        // a chat started as a guest joins the account when its link is opened signed in
+        $guest = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'متجر قديم']);
+        $this->actingAs($customer)->get('/ai/'.$guest->uuid)->assertOk();
+        $this->assertSame($customer->id, $guest->refresh()->user_id);
+
+        $this->actingAs($customer)->get('/ai')->assertOk()
+            ->assertSee(__('builder.my_projects'))->assertSee('متجر قديم')->assertSee('/ai/'.$uuid, false)
+            ->assertSee('data-size="big"', false)->assertDontSee('id="login-ask"', false);
+    }
+
+    public function test_a_guest_choosing_a_big_project_is_asked_to_sign_in_first(): void
+    {
+        $page = $this->get('/ai')->assertOk();
+
+        $page->assertSee(__('builder.start_big'))->assertSee(__('builder.start_small'))->assertSee(__('builder.start_login'));
+        // sign-in brings them back to the chat, past the choice
+        $page->assertSee(e(route('login', ['redirect' => '/ai?size=big'])), false);
+        $page->assertSee('id="login-ask"', false)->assertDontSee('class="projects"', false);
+    }
+
+    public function test_the_chat_speaks_the_customers_language_and_never_sends_them_to_the_team(): void
+    {
+        app()->setLocale('en');
+        $this->answer('تمام، المتجر هيبيع إيه؟', 0, needsTeam: true);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز متجر وتطبيق اندرويد'])->assertOk()->json('uuid');
+
+        // the customer writes Arabic, so the page answers in Arabic even in an English browser
+        $this->get('/ai/'.$uuid)->assertOk()->assertSee('dir="rtl"', false)->assertSee(__('builder.placeholder', [], 'ar'));
+
+        // the customer serves themselves: nothing in the chat points to the team
+        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk();
+        $this->assertArrayNotHasKey('team_url', $state->json());
+        $this->assertArrayNotHasKey('needs_team', $state->json('messages.1'));
+    }
+
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void
     {
         $project = $this->buildingProject();

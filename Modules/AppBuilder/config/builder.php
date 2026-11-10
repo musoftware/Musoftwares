@@ -86,6 +86,9 @@ return [
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb
         'archive_kb' => (int) env('BUILDER_ARCHIVE_KB', 204800),
         'archive_files' => (int) env('BUILDER_ARCHIVE_FILES', 30000),
+        // screenshots the build sends to the chat when a big part works
+        'snapshots_per_build' => 6,
+        'snapshot_kb' => 4096,
         'lease_minutes' => 120,
         'max_attempts' => 3,
     ],
