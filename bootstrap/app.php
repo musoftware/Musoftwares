@@ -19,7 +19,6 @@ use App\Http\Middleware\TenantMiddleware;
 use App\Http\Middleware\VerifyEmbedKey;
 use App\Http\Middleware\VerifySerialDeviceHmac;
 use App\Http\Middleware\VerifySharedBoardAccess;
-use App\Models\BlockedIp;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -27,7 +26,6 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -76,6 +74,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            // each route counts its own requests (see the class)
+            'throttle' => \App\Http\Middleware\ThrottleRequestsPerRoute::class,
             'admin' => AdminMiddleware::class,
             'moderator' => ModeratorMiddleware::class,
             'accountant' => AccountantMiddleware::class,
@@ -115,18 +115,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
 
                 if ($exception instanceof ThrottleRequestsException) {
-                    $ip = $request->ip();
-                    $strikes = Cache::increment("throttle_strikes:{$ip}");
-                    if ($strikes === 1) {
-                        Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
-                    }
-                    if ($strikes > 5) { // 5 rate limit hits in an hour -> block permanently
-                        BlockedIp::firstOrCreate(
-                            ['ip_address' => $ip],
-                            ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
-                        );
-                        Cache::forget("blocked_ip:{$ip}"); // clear cache
-                    }
+                    \App\Support\RateLimitStrikes::record((string) $request->ip());
                 }
 
                 return response()->json([
@@ -144,18 +133,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Web requests - render custom Inertia error page for 404/403/503
             if (in_array($statusCode, [404, 403, 503, 429]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
                 if ($statusCode === 429 || $exception instanceof ThrottleRequestsException) {
-                    $ip = $request->ip();
-                    $strikes = Cache::increment("throttle_strikes:{$ip}");
-                    if ($strikes === 1) {
-                        Cache::put("throttle_strikes:{$ip}", 1, 3600); // 1 hour
-                    }
-                    if ($strikes > 5) {
-                        BlockedIp::firstOrCreate(
-                            ['ip_address' => $ip],
-                            ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => null]
-                        );
-                        Cache::forget("blocked_ip:{$ip}");
-                    }
+                    \App\Support\RateLimitStrikes::record((string) $request->ip());
                 }
 
                 if (class_exists(Inertia::class)) {

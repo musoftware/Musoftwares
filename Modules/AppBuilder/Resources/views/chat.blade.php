@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="{{ $state ? 'noindex,nofollow' : 'index,follow' }}">
     <title>{{ __('builder.page_title') }}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
@@ -191,11 +193,11 @@
         return answerOf(response);
     }
 
-    // the server's own message when it sent one; the rate limiter's English "Too Many Attempts." (the only
-    // answer with Retry-After) is replaced by ours
+    // the chat's own message when it sent one; the rate limiter's English "Too Many Attempts." (which the site's
+    // error handler sends with status: error) is replaced by ours
     async function answerOf(response) {
         const data = await response.json().catch(() => ({}));
-        if (response.status === 429 && response.headers.has('Retry-After')) throw new Error(T.errors.too_fast);
+        if (response.status === 429 && data.status === 'error') throw new Error(T.errors.too_fast);
         if (!response.ok) throw new Error(data.message || T.errors.unavailable);
         return data;
     }

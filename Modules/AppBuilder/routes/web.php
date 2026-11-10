@@ -8,30 +8,28 @@ use Modules\AppBuilder\Http\Controllers\BuilderPaymentController;
 use Modules\AppBuilder\Http\Controllers\WorkerJobController;
 use Modules\AppBuilder\Http\Middleware\AuthenticateBuilderWorker;
 
-// each limit has its own counter (the third throttle value); without it every limit here shares one count per
-// visitor, so the page's polling used up the limit for sending a message or starting a chat
 Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
     Route::get('/', [BuilderChatController::class, 'index'])->name('index');
-    Route::post('/messages', [BuilderChatController::class, 'start'])->middleware('throttle:10,1,builder-start')->name('start');
+    Route::post('/messages', [BuilderChatController::class, 'start'])->middleware('throttle:10,1')->name('start');
     Route::post('/webhook', [BuilderPaymentController::class, 'webhook'])->name('webhook');
 
     Route::whereUuid('project')->group(function () {
         Route::get('/{project}', [BuilderChatController::class, 'show'])->name('show');
-        Route::get('/{project}/state', [BuilderChatController::class, 'state'])->middleware('throttle:60,1,builder-state')->name('state');
-        Route::post('/{project}/messages', [BuilderChatController::class, 'send'])->middleware('throttle:15,1,builder-send')->name('send');
-        Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1,builder-pay')->name('pay');
-        Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1,builder-fix')->name('fix');
-        Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1,builder-file')->name('file');
+        Route::get('/{project}/state', [BuilderChatController::class, 'state'])->middleware('throttle:60,1')->name('state');
+        Route::post('/{project}/messages', [BuilderChatController::class, 'send'])->middleware('throttle:15,1')->name('send');
+        Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1')->name('pay');
+        Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');
+        Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
-        Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60,builder-push')->name('push');
-        Route::post('/{project}/trial', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'request'])->middleware('throttle:6,60,builder-trial')->name('trial');
-        Route::get('/{project}/download', [BuilderDeliveryController::class, 'download'])->middleware('throttle:20,1,builder-download')->name('download');
-        Route::get('/{project}/app/{path?}', [BuilderDeliveryController::class, 'preview'])->where('path', '.*')->middleware('throttle:240,1,builder-preview')->name('preview');
+        Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60')->name('push');
+        Route::post('/{project}/trial', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'request'])->middleware('throttle:6,60')->name('trial');
+        Route::get('/{project}/download', [BuilderDeliveryController::class, 'download'])->middleware('throttle:20,1')->name('download');
+        Route::get('/{project}/app/{path?}', [BuilderDeliveryController::class, 'preview'])->where('path', '.*')->middleware('throttle:240,1')->name('preview');
     });
 });
 
 // The owner's worker: token only, no session, no CSRF. It calls out to here; the site never calls the worker.
-Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 'throttle:120,1,builder-worker'])
+Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 'throttle:120,1'])
     ->prefix('api/builder/worker')->name('builder.worker.')->whereUuid('project')->group(function () {
         Route::post('/claim', [WorkerJobController::class, 'claim'])->name('claim');
         Route::get('/trials', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'pending'])->name('trials');
