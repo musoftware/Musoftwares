@@ -25,6 +25,7 @@ class ProjectChat
         private readonly ProjectSecrets $secrets,
         private readonly BuilderReferral $referral,
         private readonly \Modules\AppBuilder\Services\Study\FeasibilityStudy $study,
+        private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
     ) {}
 
     /** @throws ChatLimitReached */
@@ -50,15 +51,50 @@ class ProjectChat
 
         $question = $project->messages()->create(['role' => BuilderMessage::USER, 'content' => $text]);
         $this->attachments->attach($question, $files);
+
+        // a shared link is looked at first, like a real programmer opens an example site before answering
+        $links = $this->looks->linksIn($text);
+        if ($links !== [] && $this->looks->workerIsWatching()) {
+            $this->looks->askWorker($question, $links);
+
+            return $question;
+        }
+        if ($links !== []) {
+            $this->looks->readHere($question, $links);
+        }
+
+        return $this->answer($project, $question, forgetOnFailure: true);
+    }
+
+    /** The links were looked at (or the wait is over): the chat answers the message that had them, once. */
+    public function continueAfterLook(BuilderProject $project): void
+    {
+        if (BuilderProject::whereKey($project->id)->where('awaiting_look', true)->update(['awaiting_look' => false]) === 0) {
+            return;
+        }
+
+        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->firstOrFail();
+        try {
+            $this->answer($project->refresh(), $question, forgetOnFailure: false);
+        } catch (ChatUnavailable) {
+            // already logged; the customer sees their message without an answer and can write again
+        }
+    }
+
+    /** @throws ChatUnavailable */
+    private function answer(BuilderProject $project, BuilderMessage $question, bool $forgetOnFailure): BuilderMessage
+    {
         set_time_limit(self::SECONDS_FOR_CLAUDE);
 
         try {
             $turn = $this->model->reply($this->systemPrompt(), $this->turns($project));
         } catch (ChatUnavailable $exception) {
-            // drop the unanswered line so the customer can send it again without a duplicate
-            $this->attachments->forget($question);
-            $question->forceDelete();
             Log::warning('App builder: chat turn failed', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
+            if ($forgetOnFailure) {
+                // drop the unanswered line so the customer can send it again without a duplicate
+                $this->attachments->forget($question);
+                $question->forceDelete();
+            }
 
             throw $exception;
         }

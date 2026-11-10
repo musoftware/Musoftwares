@@ -78,6 +78,7 @@ return [
     'status_labels' => ['chatting' => 'Talking', 'quoted' => 'Waiting for payment', 'queued' => 'In the queue', 'designing' => 'Design', 'building' => 'Being built', 'ready' => 'Ready', 'failed' => 'Stopped'],
     'progress_bar' => 'How much of the work is done',
     'download_apk' => 'Download the Android app',
+    'looking' => 'Opening the link in a browser to look at the site...',
     'name' => 'Name',
     'email' => 'Email',
     'whatsapp' => 'WhatsApp number',
@@ -100,6 +101,7 @@ return [
         'packaging' => 'Packing the files for delivery',
     ],
     'errors' => [
+        'looking' => 'One moment, still looking at the link you sent.',
         'unavailable' => 'Sorry, a short problem happened. Please send your message again.',
         'limit' => 'You reached today\'s limit. Talk to the team on WhatsApp and we will continue with you.',
         'busy' => 'Your program is being built now. Please wait until it finishes.',

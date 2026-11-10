@@ -87,8 +87,12 @@ class BuilderChatController extends Controller
             ])->all();
     }
 
-    public function state(BuilderProject $project): JsonResponse
+    public function state(BuilderProject $project, \Modules\AppBuilder\Services\LinkLooks $looks): JsonResponse
     {
+        // the browser took too long with a shared link: the chat answers with what this server could read
+        if ($looks->finishLateLooks($project)) {
+            $this->chat->continueAfterLook($project);
+        }
         $this->speakCustomerLanguage($project);
 
         return response()->json($this->stateOf($project));
@@ -113,6 +117,9 @@ class BuilderChatController extends Controller
         }
         if ($project->isWaitingForAnswer()) {
             return $this->answerTheBuild($request, $project);
+        }
+        if ($project->awaiting_look) {
+            return $this->refuse('builder.errors.looking', 409);
         }
         if ($project->hasBalanceDue() && $project->hasDelivery()) {
             return $this->refuse('builder.errors.balance_due', 409);

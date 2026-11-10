@@ -39,6 +39,8 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
         Route::get('/jobs/{project}/chat', [WorkerJobController::class, 'chat'])->name('chat');
         Route::get('/jobs/{project}/attachments/{attachment}', [WorkerJobController::class, 'attachment'])->whereNumber('attachment')->name('attachment');
         Route::post('/jobs/{project}/progress', [WorkerJobController::class, 'progress'])->name('progress');
+        Route::get('/looks', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'pending'])->name('looks');
+        Route::post('/looks/{message}', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'store'])->whereNumber('message')->name('looks.store');
         Route::post('/jobs/{project}/snapshot', [WorkerJobController::class, 'snapshot'])->name('snapshot');
         Route::post('/jobs/{project}/question', [WorkerJobController::class, 'question'])->name('question');
         Route::get('/jobs/{project}/answers', [WorkerJobController::class, 'answers'])->name('answers');

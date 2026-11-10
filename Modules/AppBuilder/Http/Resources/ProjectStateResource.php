@@ -31,6 +31,7 @@ class ProjectStateResource extends JsonResource
             // the bar shows once the build has said how far it is
             'progress_percent' => $this->status === BuilderProject::BUILDING && ! $this->awaiting_answer ? $this->progress_percent : null,
             'waiting_for_answer' => $this->isWaitingForAnswer(),
+            'looking' => (bool) $this->awaiting_look,
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // offer notifications once there is something to wait for
             'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token && $this->paid_at !== null ? route('builder.push', $this->resource) : null,
@@ -52,12 +53,31 @@ class ProjectStateResource extends JsonResource
             'text' => $message->content,
             'delivered_version' => $message->payload['delivered_version'] ?? null,
             'ideas' => $message->payload['ideas'] ?? [],
-            // a build screenshot is shown as a picture; a customer's file only by its name
-            'files' => $message->role === BuilderMessage::PROGRESS ? [] : $message->attachments->pluck('original_name')->values(),
-            'images' => $message->role === BuilderMessage::PROGRESS
-                ? $message->attachments->filter->isImage()->map(fn ($file) => route('builder.file', [$this->resource, $file->id]))->values()
-                : [],
+            'files' => $this->fileNames($message),
+            'images' => $this->images($message),
         ];
+    }
+
+    /** A customer's own files are shown by name; pictures the build or a shared link made are shown as pictures. */
+    private function fileNames(BuilderMessage $message): array
+    {
+        if ($message->role === BuilderMessage::PROGRESS) {
+            return [];
+        }
+        $looks = collect($message->payload['looks'] ?? []);
+        $madeHere = $looks->pluck('full_id')->merge($looks->pluck('piece_ids')->flatten())->filter();
+
+        return $message->attachments->reject(fn ($file) => $madeHere->contains($file->id))->pluck('original_name')->values()->all();
+    }
+
+    /** @return list<string> */
+    private function images(BuilderMessage $message): array
+    {
+        $shown = $message->role === BuilderMessage::PROGRESS
+            ? $message->attachments->filter->isImage()->pluck('id')
+            : collect($message->payload['looks'] ?? [])->pluck('full_id')->filter();
+
+        return $shown->map(fn ($id) => route('builder.file', [$this->resource, $id]))->values()->all();
     }
 
     private function quote(): array

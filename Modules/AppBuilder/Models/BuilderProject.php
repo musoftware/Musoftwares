@@ -43,6 +43,8 @@ class BuilderProject extends Model
         'quote_paid' => 'decimal:2',
         'payment_due' => 'decimal:2',
         'design_fee' => 'decimal:2',
+        'awaiting_look' => 'boolean',
+        'look_started_at' => 'datetime',
         'study_fee' => 'decimal:2',
         'job_cost_usd' => 'decimal:4',
         'budget_usd' => 'decimal:4',

@@ -479,6 +479,81 @@ class AppBuilderTest extends TestCase
         $this->assertSame('10.000', $record->work_factor);
     }
 
+    public function test_a_shared_link_is_opened_in_the_workers_browser_before_the_chat_answers(): void
+    {
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk()->assertJsonPath('looks', []);
+
+        // the worker is there, so the chat waits for it instead of answering blind
+        $uuid = $this->postJson('/ai/messages', ['text' => 'تعرف تعمل زي الموقع ده https://quran.example.com/garden ؟'])->assertOk()->assertJsonPath('looking', true)->json('uuid');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'وكمان'])->assertStatus(409);
+
+        $looks = $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk()->json('looks');
+        $this->assertSame('https://quran.example.com/garden', $looks[0]['url']);
+        // handed out once
+        $this->assertSame([], $this->getJson('/api/builder/worker/looks', $this->worker())->json('looks'));
+
+        $this->answer('شوفت الموقع: حديقة بتعرض السور بشكل شجر، وفيها تقدم للطفل.');
+        $this->post('/api/builder/worker/looks/'.$looks[0]['message_id'], [
+            'index' => 0, 'title' => 'حديقة القرآن', 'description' => 'تعلم القرآن للأطفال', 'text' => 'سورة الفاتحة سورة الناس',
+            'full_page' => $this->png(), 'pieces' => [$this->png(), $this->png()],
+        ], $this->worker())->assertOk();
+
+        $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', false);
+        $customer = $state->json('messages.0');
+        $this->assertCount(1, $customer['images']);
+        $this->assertSame([], $customer['files']);
+        $this->assertSame('شوفت الموقع: حديقة بتعرض السور بشكل شجر، وفيها تقدم للطفل.', $state->json('messages.1.text'));
+
+        // Claude got the two sharp pieces (not the full page) and the page text
+        $blocks = app(ChatModel::class)->seen[0][0]['content'];
+        $this->assertCount(2, collect($blocks)->where('type', 'image'));
+        $this->assertStringContainsString('سورة الفاتحة', collect($blocks)->where('type', 'text')->first()['text']);
+        $this->assertStringContainsString('real browser', collect($blocks)->where('type', 'text')->first()['text']);
+    }
+
+    public function test_without_the_worker_the_site_reads_the_page_itself(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>متجر ورد</title><meta name="description" content="ورد طبيعي"><script>x()</script><h1>أجمل باقات الورد</h1>')]);
+        $this->answer('شوفت المتجر، بيبيع باقات ورد.');
+
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز زي ده https://93.184.215.14/shop'])->assertOk()->assertJsonPath('looking', false)->json('uuid');
+
+        $text = app(ChatModel::class)->seen[0][0]['content'];
+        $this->assertStringContainsString('أجمل باقات الورد', $text);
+        $this->assertStringContainsString('plain HTML', $text);
+        $this->assertStringNotContainsString('x()', $text);
+        $this->assertSame('شوفت المتجر، بيبيع باقات ورد.', $this->getJson('/ai/'.$uuid.'/state')->json('messages.1.text'));
+    }
+
+    public function test_a_private_address_is_never_opened(): void
+    {
+        \Illuminate\Support\Facades\Http::fake();
+        $this->answer('الرابط ده مش موقع عام.');
+
+        $this->postJson('/ai/messages', ['text' => 'شوف ده http://192.168.1.1/admin'])->assertOk();
+
+        \Illuminate\Support\Facades\Http::assertNothingSent();
+        $this->assertStringContainsString('could not be opened', app(ChatModel::class)->seen[0][0]['content']);
+    }
+
+    public function test_the_chat_answers_anyway_when_the_browser_is_too_slow(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>عيادة</title><p>احجز موعدك</p>')]);
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $uuid = $this->postJson('/ai/messages', ['text' => 'زي ده https://93.184.215.14/clinic'])->assertJsonPath('looking', true)->json('uuid');
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+
+        $this->answer('شوفت صفحة العيادة.');
+        $this->travel(60)->seconds();
+        $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', false)->assertJsonPath('messages.1.text', 'شوفت صفحة العيادة.');
+        $this->assertStringContainsString('احجز موعدك', app(ChatModel::class)->seen[0][0]['content']);
+
+        // the late result changes nothing
+        $message = BuilderMessage::where('role', BuilderMessage::USER)->firstOrFail();
+        $this->post('/api/builder/worker/looks/'.$message->id, ['index' => 0, 'full_page' => $this->png()], $this->worker())->assertOk();
+        $this->assertSame(2, BuilderMessage::count());
+    }
+
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void
     {
         $project = $this->buildingProject();

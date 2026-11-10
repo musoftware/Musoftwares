@@ -15,21 +15,22 @@ class AttachmentStore
     /** Said to Claude when the customer sent files with no text. */
     private const FILES_ONLY = 'The customer sent these files without a message.';
 
-    /** @param list<UploadedFile> $files */
-    public function attach(BuilderMessage $message, array $files): void
+    /**
+     * @param  list<UploadedFile>  $files
+     * @return list<BuilderAttachment>
+     */
+    public function attach(BuilderMessage $message, array $files): array
     {
         $folder = $message->project->storageFolder().'/uploads';
 
-        foreach ($files as $file) {
-            $message->attachments()->create([
+        return array_map(fn (UploadedFile $file) => $message->attachments()->create([
                 'project_id' => $message->project_id,
                 'original_name' => mb_substr($file->getClientOriginalName(), 0, 200),
                 // the type comes from the file's content, not from what the browser claims
                 'mime' => (string) $file->getMimeType(),
                 'size' => (int) $file->getSize(),
                 'path' => $file->store($folder, self::DISK),
-            ]);
-        }
+            ]), $files);
     }
 
     /** A message that never got an answer goes away with its files. */
@@ -49,8 +50,11 @@ class AttachmentStore
             return $message->forModel();
         }
 
-        $blocks = $message->attachments->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()->all();
-        $text = trim($message->content);
+        // a shared link's full-page picture is for the customer; Claude reads the same page as sharp pieces
+        $fullPages = collect($message->payload['looks'] ?? [])->pluck('full_id')->filter();
+        $blocks = $message->attachments->reject(fn (BuilderAttachment $file) => $fullPages->contains($file->id))
+            ->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()->all();
+        $text = trim($message->forModel());
         $blocks[] = ['type' => 'text', 'text' => $text !== '' ? $text : self::FILES_ONLY];
 
         return $blocks;

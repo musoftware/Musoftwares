@@ -49,8 +49,21 @@ class BuilderMessage extends Model
         return match ($this->role) {
             self::TEAM => '[Message from the Musoftware team] '.$this->content,
             self::PROGRESS => '[The build showed the customer a screenshot of finished work] '.$this->content,
-            default => $this->content,
+            default => $this->content.$this->linkNotes(),
         };
+    }
+
+    /** What each link the customer shared showed when it was opened for Claude. */
+    private function linkNotes(): string
+    {
+        return collect($this->payload['looks'] ?? [])->map(function (array $look): string {
+            if (! in_array($look['status'] ?? '', ['seen', 'read'], true)) {
+                return "\n\n[The link {$look['url']} could not be opened: ".($look['reason'] ?? 'no answer in time').'. Ask for screenshots if you need to see it.]';
+            }
+            $how = $look['status'] === 'seen' ? 'in a real browser; screenshots of the whole page are attached, top to bottom' : 'as plain HTML only, so parts drawn by scripts are missing';
+
+            return "\n\n[The link {$look['url']} was opened {$how}.\nTitle: {$look['title']}\nDescription: {$look['description']}\nVisible text: {$look['text']}]";
+        })->implode('');
     }
 
     /** Claude only knows customer and assistant turns; a team line is read as a note on the customer's side. */
