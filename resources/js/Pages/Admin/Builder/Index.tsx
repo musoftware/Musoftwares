@@ -14,6 +14,7 @@ interface Project {
     paid_total: string;
     currency: string;
     build_cost_usd: string;
+    chat_cost_usd: number;
     client_name: string | null;
     updated_at: string;
 }
@@ -54,8 +55,8 @@ export default function BuilderIndex({ projects, waitingOnly }: { projects: Pagi
                                 <div className="flex shrink-0 flex-wrap items-center gap-3 text-sm">
                                     {project.awaiting_answer && <span className="font-semibold text-amber-700">{t('Needs an answer', 'محتاج رد')}</span>}
                                     <span>{t(...(STATUS_LABELS[project.status] || [project.status, project.status]))}</span>
-                                    <span dir="ltr">{project.paid_total} {project.currency}</span>
-                                    <span className="text-slate-500" dir="ltr">{t('cost', 'التكلفة')} ${project.build_cost_usd}</span>
+                                    <span dir="ltr">{t('paid', 'المدفوع')} {project.paid_total} / {project.amount} {project.currency}</span>
+                                    <span className="text-slate-500" dir="ltr">{t('chat', 'الشات')} ${project.chat_cost_usd.toFixed(4)} · {t('build', 'التنفيذ')} ${Number(project.build_cost_usd).toFixed(2)}</span>
                                 </div>
                             </Link>
                         </li>

@@ -29,7 +29,8 @@ class AdminBuilderController extends Controller
             ->when($request->boolean('waiting'), fn ($query) => $query->where('awaiting_answer', true))
             ->latest('updated_at')
             ->paginate(self::PER_PAGE, ['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'updated_at'])
-            ->withQueryString();
+            ->withQueryString()
+            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name', 'updated_at']) + ['chat_cost_usd' => $project->chatCostUsd()]);
 
         return Inertia::render('Admin/Builder/Index', ['projects' => $projects, 'waitingOnly' => $request->boolean('waiting')]);
     }
@@ -39,7 +40,8 @@ class AdminBuilderController extends Controller
         $project->load('messages.attachments');
 
         return Inertia::render('Admin/Builder/Show', [
-            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version']),
+            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
+                + ['chat_cost_usd' => $project->chatCostUsd()],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
                 'role' => $message->role,

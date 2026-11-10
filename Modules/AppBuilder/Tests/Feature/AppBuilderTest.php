@@ -371,6 +371,24 @@ class AppBuilderTest extends TestCase
         $this->assertArrayNotHasKey('needs_team', $state->json('messages.1'));
     }
 
+    public function test_the_owner_sees_the_price_the_payment_and_what_the_chat_and_build_cost(): void
+    {
+        $project = $this->quotedProject();
+        $project->update(['paid_total' => 20, 'build_cost_usd' => 3.5]);
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+
+        // one chat turn: 1200 tokens in x $0.10 + 300 out x $0.50 per million = $0.00027
+        $this->actingAs($admin)->get('/admin/builder/'.$project->uuid)->assertOk()->assertInertia(fn ($page) => $page
+            ->where('project.amount', $project->amount)
+            ->where('project.paid_total', '20.00')
+            ->where('project.build_cost_usd', '3.5000')
+            ->where('project.chat_cost_usd', 0.0003));
+        $this->actingAs($admin)->get('/admin/builder')->assertOk()->assertInertia(fn ($page) => $page->where('projects.data.0.chat_cost_usd', 0.0003));
+    }
+
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void
     {
         $project = $this->buildingProject();

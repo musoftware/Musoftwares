@@ -6,6 +6,11 @@ return [
     'chat_effort' => env('BUILDER_CHAT_EFFORT', 'low'),
     // Server-side refusal fallback. Haiku does not support it, so turn it on only for Opus or Sonnet chat models.
     'chat_fallback' => (bool) env('BUILDER_CHAT_FALLBACK', false),
+    // what the chat model costs, to show the owner what each chat cost (the same prices the worker uses)
+    'chat_prices' => [
+        'input_usd_per_mtok' => (float) env('BUILDER_CHAT_INPUT_USD_PER_MTOK', 0.1),
+        'output_usd_per_mtok' => (float) env('BUILDER_CHAT_OUTPUT_USD_PER_MTOK', 0.5),
+    ],
 
     // Shared secret the worker sends as a Bearer token. Empty means the worker API is closed.
     'worker_token' => env('BUILDER_WORKER_TOKEN', ''),

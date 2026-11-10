@@ -124,6 +124,14 @@ class BuilderProject extends Model
         return preg_match('/\p{Arabic}/u', $written) ? 'ar' : 'en';
     }
 
+    /** What talking with the customer cost on the chat model, in USD. */
+    public function chatCostUsd(): float
+    {
+        $prices = config('builder.chat_prices');
+
+        return round(($this->chat_input_tokens * $prices['input_usd_per_mtok'] + $this->chat_output_tokens * $prices['output_usd_per_mtok']) / 1_000_000, 4);
+    }
+
     public function hasDelivery(): bool
     {
         return $this->version > 0;

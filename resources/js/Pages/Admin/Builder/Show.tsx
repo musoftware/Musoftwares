@@ -32,6 +32,7 @@ interface Project {
     paid_total: string;
     currency: string;
     build_cost_usd: string;
+    chat_cost_usd: number;
     budget_usd: string;
     build_model: string | null;
     client_name: string | null;
@@ -147,6 +148,28 @@ function RetryBuild({ project }: { project: Project }) {
     );
 }
 
+/** The four numbers the owner checks first: what the customer was quoted and paid, and what the chat and the build cost. */
+function Money({ project }: { project: Project }) {
+    const items: [string, string, string][] = [
+        [t('Price quoted', 'السعر المعروض'), `${project.amount} ${project.currency}`, ''],
+        [t('Paid so far', 'المدفوع لحد دلوقتي'), `${project.paid_total} ${project.currency}`, ''],
+        [t('Chat cost', 'تكلفة الشات'), `$${project.chat_cost_usd.toFixed(4)}`, ''],
+        [t('Build cost', 'تكلفة التنفيذ'), `$${Number(project.build_cost_usd).toFixed(2)}`, t(`budget $${project.budget_usd}`, `الميزانية $${project.budget_usd}`)],
+    ];
+
+    return (
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {items.map(([label, value, note]) => (
+                <div key={label} className="rounded-xl border bg-white p-3">
+                    <dt className="text-sm text-slate-500">{label}</dt>
+                    <dd className="text-xl font-bold" dir="ltr">{value}</dd>
+                    {note && <dd className="text-xs text-slate-500" dir="ltr">{note}</dd>}
+                </div>
+            ))}
+        </dl>
+    );
+}
+
 /** The designer's Figma link. Saving it starts the build of a project that waits for its design. */
 function DesignLink({ project }: { project: Project }) {
     const [url, setUrl] = useState(project.design_url || '');
@@ -183,11 +206,10 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
                 <p className="text-sm text-slate-600">
                     {t(...(STATUS_LABELS[project.status] || [project.status, project.status]))}
                     {project.awaiting_answer && <span className="font-semibold text-amber-700"> · {t('waiting for an answer', 'مستني رد')}</span>}
-                    {' · '}<span dir="ltr">{project.paid_total} {project.currency}</span>
-                    {' · '}<span dir="ltr">{t('cost', 'التكلفة')} ${project.build_cost_usd}</span>
                     {project.build_model && <> · <span dir="ltr">{project.build_model}</span></>}
                     {project.client_name && <> · <span dir="auto">{project.client_name}</span> <span dir="ltr">{project.client_whatsapp} {project.client_email}</span></>}
                 </p>
+                <Money project={project} />
                 {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap" dir="ltr">{project.error}</p>}
 
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
