@@ -65,7 +65,7 @@ class ClaudeChatModel implements ChatModel
                 'kind' => ['type' => 'string', 'enum' => ['build', 'fix']],
                 'complex' => ['type' => 'boolean'],
                 'design_fee' => ['type' => 'number'],
-                'project_type' => ['type' => 'string', 'enum' => ['page', 'website', 'web_app', 'system', 'extension', 'desktop', 'other']],
+                'project_type' => ['type' => 'string', 'enum' => ['page', 'website', 'web_app', 'system', 'extension', 'desktop', 'app_simple', 'app_full', 'app_fancy', 'other']],
             ],
             'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type'],
             'additionalProperties' => false,

@@ -2674,6 +2674,7 @@
             "failed": "Stopped"
         },
         "progress_bar": "How much of the work is done",
+        "download_apk": "Download the Android app",
         "name": "Name",
         "email": "Email",
         "whatsapp": "WhatsApp number",

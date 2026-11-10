@@ -77,6 +77,7 @@ return [
     'my_projects' => 'مشاريعك',
     'status_labels' => ['chatting' => 'بنتكلم', 'quoted' => 'مستني الدفع', 'queued' => 'في الطابور', 'designing' => 'التصميم', 'building' => 'بيتنفذ', 'ready' => 'جاهز', 'failed' => 'وقف'],
     'progress_bar' => 'نسبة الشغل اللي خلص',
+    'download_apk' => 'نزّل تطبيق أندرويد',
     'name' => 'الاسم',
     'email' => 'الإيميل',
     'whatsapp' => 'رقم واتساب',

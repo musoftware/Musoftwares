@@ -18,6 +18,12 @@ class BuilderDeliveryController extends Controller
      */
     private const SANDBOX_POLICY = "sandbox allow-scripts allow-forms allow-modals allow-popups allow-downloads; default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; frame-ancestors 'self'";
 
+    /**
+     * An Android app's web build loads its own engine and files with fetch, so it may read files of this delivery
+     * (connect-src 'self'; the sandboxed page has no origin, hence the CORS header). It still has no cookies.
+     */
+    private const APP_PREVIEW_POLICY = "sandbox allow-scripts allow-forms allow-modals allow-popups allow-downloads; default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; connect-src 'self'; frame-ancestors 'self'";
+
     public function __construct(private readonly DeliveryStore $store) {}
 
     public function preview(BuilderProject $project, string $path = ''): BinaryFileResponse|RedirectResponse
@@ -29,14 +35,18 @@ class BuilderDeliveryController extends Controller
 
         $file = $project->hasDelivery() ? $this->store->file($project, $path) : null;
         abort_unless($file, 404);
+        // the app itself and its signing key are the delivery, handed over with the rest of the files
+        abort_if(str_starts_with($path, 'release/') && $project->hasBalanceDue(), 402, __('builder.balance_locked'));
+
+        $appPreview = str_starts_with($path, 'preview/');
 
         return response()->file($file, [
             'Content-Type' => $this->store->mime($file),
-            'Content-Security-Policy' => self::SANDBOX_POLICY,
+            'Content-Security-Policy' => $appPreview ? self::APP_PREVIEW_POLICY : self::SANDBOX_POLICY,
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'private, max-age=60',
             'X-Robots-Tag' => 'noindex',
-        ]);
+        ] + ($appPreview ? ['Access-Control-Allow-Origin' => '*'] : []));
     }
 
     public function download(BuilderProject $project): StreamedResponse

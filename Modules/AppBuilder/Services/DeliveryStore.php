@@ -20,6 +20,12 @@ class DeliveryStore
     /** A React, Vue or Angular build with no backend opens from its built folder. */
     public const BUILT_ENTRY_FILE = 'dist/index.html';
 
+    /** An Android app's web build, opened as the live preview (see the worker's android-apps skill). */
+    public const APP_PREVIEW_FILE = 'preview/index.html';
+
+    /** The signed Android app the customer installs. */
+    public const APK_FILE = 'release/app-release.apk';
+
     /** A server program has no index.html; its SETUP.md says how to run it. */
     private const SETUP_FILE = 'SETUP.md';
 
@@ -33,6 +39,7 @@ class DeliveryStore
         'webp' => 'image/webp', 'ico' => 'image/x-icon', 'woff' => 'font/woff', 'woff2' => 'font/woff2',
         'txt' => 'text/plain; charset=UTF-8', 'md' => 'text/plain; charset=UTF-8', 'csv' => 'text/csv; charset=UTF-8',
         'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', 'mp4' => 'video/mp4', 'webm' => 'video/webm',
+        'wasm' => 'application/wasm', 'apk' => 'application/vnd.android.package-archive',
     ];
 
     /** Unpacks a checked archive as the project's next version and returns that version number. */

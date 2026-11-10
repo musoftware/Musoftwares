@@ -101,6 +101,7 @@ class ProjectStateResource extends JsonResource
             // a server program (Laravel, WordPress) has no page to open here, only files and SETUP.md
             'preview_url' => $this->previewUrl(),
             'download_url' => $this->hasBalanceDue() ? null : route('builder.download', $this->resource),
+            'apk_url' => $this->apkUrl(),
         ];
     }
 
@@ -121,10 +122,20 @@ class ProjectStateResource extends JsonResource
         ];
     }
 
+    /** The Android app to install, once it is fully paid. */
+    private function apkUrl(): ?string
+    {
+        if ($this->hasBalanceDue() || app(DeliveryStore::class)->file($this->resource, DeliveryStore::APK_FILE) === null) {
+            return null;
+        }
+
+        return route('builder.preview', ['project' => $this->resource, 'path' => DeliveryStore::APK_FILE]);
+    }
+
     private function previewUrl(): ?string
     {
         $store = app(DeliveryStore::class);
-        $entry = collect([DeliveryStore::ENTRY_FILE, DeliveryStore::BUILT_ENTRY_FILE])->first(fn (string $path) => $store->file($this->resource, $path) !== null);
+        $entry = collect([DeliveryStore::ENTRY_FILE, DeliveryStore::BUILT_ENTRY_FILE, DeliveryStore::APP_PREVIEW_FILE])->first(fn (string $path) => $store->file($this->resource, $path) !== null);
 
         return $entry ? route('builder.preview', ['project' => $this->resource, 'path' => $entry]) : null;
     }

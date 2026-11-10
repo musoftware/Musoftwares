@@ -77,6 +77,7 @@ return [
     'my_projects' => 'Your projects',
     'status_labels' => ['chatting' => 'Talking', 'quoted' => 'Waiting for payment', 'queued' => 'In the queue', 'designing' => 'Design', 'building' => 'Being built', 'ready' => 'Ready', 'failed' => 'Stopped'],
     'progress_bar' => 'How much of the work is done',
+    'download_apk' => 'Download the Android app',
     'name' => 'Name',
     'email' => 'Email',
     'whatsapp' => 'WhatsApp number',

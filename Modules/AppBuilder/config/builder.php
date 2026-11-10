@@ -39,6 +39,9 @@ return [
         'system' => (float) env('BUILDER_MIN_SYSTEM', 150),
         'extension' => (float) env('BUILDER_MIN_EXTENSION', 25),
         'desktop' => (float) env('BUILDER_MIN_DESKTOP', 80),
+        'app_simple' => (float) env('BUILDER_MIN_APP_SIMPLE', 60),
+        'app_full' => (float) env('BUILDER_MIN_APP_FULL', 200),
+        'app_fancy' => (float) env('BUILDER_MIN_APP_FANCY', 250),
         'other' => (float) env('BUILDER_MIN_OTHER', 20),
     ],
 
@@ -52,7 +55,7 @@ return [
     // A feasibility study for bigger projects, written by the strong model once the scope is agreed;
     // what it costs (times the markup) is added to the price.
     'study' => [
-        'for_types' => ['system', 'web_app', 'desktop'],
+        'for_types' => ['system', 'web_app', 'desktop', 'app_full', 'app_fancy'],
         'model' => env('BUILDER_STUDY_MODEL', 'claude-opus-5-5'),
         'effort' => env('BUILDER_STUDY_EFFORT', 'medium'),
         'input_usd_per_mtok' => (float) env('BUILDER_STUDY_INPUT_USD_PER_MTOK', 4),

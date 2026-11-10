@@ -389,6 +389,50 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->get('/admin/builder')->assertOk()->assertInertia(fn ($page) => $page->where('projects.data.0.chat_cost_usd', 0.0003));
     }
 
+    public function test_an_android_app_is_delivered_with_an_install_button_and_a_working_preview(): void
+    {
+        $project = $this->buildingProject();
+        $apk = "PK\x03\x04 fake apk bytes";
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', [
+            'archive' => $this->zip(['SETUP.md' => '# setup', 'release/app-release.apk' => $apk, 'release/upload-keystore.jks' => 'key', 'preview/index.html' => '<h1>app</h1>', 'preview/main.dart.wasm' => 'wasm']),
+            'summary' => 'تطبيقك جاهز',
+            'cost_usd' => 2,
+        ], $this->worker())->assertOk();
+
+        $delivery = $this->getJson('/ai/'.$project->uuid.'/state')->json('delivery');
+        $this->assertStringEndsWith('/app/release/app-release.apk', $delivery['apk_url']);
+        $this->assertStringEndsWith('/app/preview/index.html', $delivery['preview_url']);
+        $this->get($delivery['apk_url'])->assertOk()->assertHeader('Content-Type', 'application/vnd.android.package-archive');
+
+        // the app's web build may load its own files, still inside the sandbox and without cookies
+        $preview = $this->get('/ai/'.$project->uuid.'/app/preview/main.dart.wasm')->assertOk()->assertHeader('Content-Type', 'application/wasm')->assertHeader('Access-Control-Allow-Origin', '*');
+        $this->assertStringContainsString("connect-src 'self'", $preview->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('sandbox', $preview->headers->get('Content-Security-Policy'));
+        // other delivered pages keep the closed policy
+        $this->assertStringContainsString("connect-src 'none'", $this->get('/ai/'.$project->uuid.'/app/SETUP.md')->headers->get('Content-Security-Policy'));
+
+        // after a deposit the app and its key wait for the rest of the payment, while the preview stays open
+        $project->update(['quote_paid' => $project->amount / 2]);
+        $this->assertNull($this->getJson('/ai/'.$project->uuid.'/state')->json('delivery.apk_url'));
+        $this->get('/ai/'.$project->uuid.'/app/release/app-release.apk')->assertStatus(402);
+        $this->get('/ai/'.$project->uuid.'/app/release/upload-keystore.jks')->assertStatus(402);
+        $this->get('/ai/'.$project->uuid.'/app/preview/index.html')->assertOk();
+    }
+
+    public function test_a_full_android_app_is_priced_at_least_at_its_minimum(): void
+    {
+        // the feasibility study has its own test; here only the price matters
+        config(['builder.study.for_types' => []]);
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'تمام، ده السعر',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'تطبيق توصيل', 'spec' => 'Kind: Android app (full).', 'estimated_output_tokens' => 1000, 'kind' => 'build', 'complex' => true, 'design_fee' => 0, 'project_type' => 'app_full'],
+        ], 1200, 300);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز تطبيق توصيل'])->assertOk()->json('uuid');
+
+        $this->assertSame('200.00', BuilderProject::where('uuid', $uuid)->value('amount'));
+    }
+
     public function test_the_chat_is_closed_while_the_program_is_being_built(): void
     {
         $project = $this->buildingProject();
