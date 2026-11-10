@@ -39,15 +39,38 @@ class SitemapLinksTest extends TestCase
 
         $index = $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml')->getContent();
         $this->assertStringContainsString('<sitemapindex', $index);
-        foreach (['pages', 'marketplace', 'blog-1'] as $part) {
+        foreach (['pages', 'marketplace', 'blog-en-1'] as $part) {
             $this->assertStringContainsString('<loc>'.url("/sitemaps/{$part}.xml").'</loc>', $index);
             $xml = $this->get("/sitemaps/{$part}.xml")->assertOk()->getContent();
             $this->assertNotFalse(simplexml_load_string($xml), "{$part} is not valid XML");
         }
 
-        $this->assertStringContainsString(url('/blog/one'), $this->get('/sitemaps/blog-1.xml')->getContent());
-        $this->assertStringNotContainsString('blog-2', $index);
-        $this->get('/sitemaps/blog-2.xml')->assertNotFound();
+        $this->assertStringContainsString(url('/blog/one'), $this->get('/sitemaps/blog-en-1.xml')->getContent());
+        $this->assertStringNotContainsString('blog-en-2', $index);
+        $this->get('/sitemaps/blog-en-2.xml')->assertNotFound();
         $this->get('/sitemaps/nope.xml')->assertNotFound();
+    }
+
+    public function test_arabic_and_english_articles_have_their_own_sitemap_parts(): void
+    {
+        $article = fn (string $language, string $slug, ?string $group = null) => \App\Models\BlogArticle::create([
+            'language' => $language, 'group_id' => $group, 'title' => $slug, 'slug' => $slug, 'content' => '<p>x</p>', 'is_published' => true, 'published_at' => now()->subDay(),
+        ]);
+        $article('ar', 'arabic-one', 'pair');
+        $article('en', 'english-one', 'pair');
+        $article('en', 'english-two');
+
+        $index = $this->get('/sitemap.xml')->getContent();
+        $this->assertStringContainsString(url('/sitemaps/blog-ar-1.xml'), $index);
+        $this->assertStringContainsString(url('/sitemaps/blog-en-1.xml'), $index);
+
+        $arabic = $this->get('/sitemaps/blog-ar-1.xml')->assertOk()->getContent();
+        $english = $this->get('/sitemaps/blog-en-1.xml')->assertOk()->getContent();
+        $this->assertSame(1, substr_count($arabic, '<loc>'));
+        $this->assertStringContainsString('<loc>'.url('/blog/arabic-one').'</loc>', $arabic);
+        $this->assertSame(2, substr_count($english, '<loc>'));
+        $this->assertStringNotContainsString('<loc>'.url('/blog/arabic-one').'</loc>', $english);
+        // the translation pair still points at each other across the two parts
+        $this->assertStringContainsString(url('/blog/english-one'), $arabic);
     }
 }

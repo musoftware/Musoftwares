@@ -45,11 +45,11 @@ Schedule::command(\App\Console\Commands\IndexNowSubmit::class)->dailyAt('03:30')
 // One reminder for a store order that was started and not paid (2 to 48 hours old)
 Schedule::command(\App\Console\Commands\SendSoftwareOrderReminders::class)->hourly()->withoutOverlapping(10);
 
-// One blog DRAFT a week from the topic queue (never published by itself); only runs when blog_drafts_enabled is on
-Schedule::command(\App\Console\Commands\DraftWeeklyBlogArticle::class)
-    ->weeklyOn(0, '09:00')
+// One blog article a day, Arabic and English in turn, written and published by AI; off with blog_autopilot_enabled = 0
+Schedule::command(\App\Console\Commands\PublishBlogArticle::class)
+    ->dailyAt('10:00')
     ->timezone('Africa/Cairo')
-    ->when(fn () => \App\Console\Commands\DraftWeeklyBlogArticle::enabled())
+    ->when(fn () => \App\Console\Commands\PublishBlogArticle::enabled())
     ->withoutOverlapping(30);
 
 // Send daily new services digest daily at 23:30 Cairo Time

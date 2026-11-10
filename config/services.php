@@ -117,6 +117,8 @@ return [
     'anthropic' => [
         'key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-opus-5-5'),
+        // writes the daily blog article; good Arabic matters more than the small cost of one article a day
+        'blog_model' => env('BLOG_AI_MODEL', 'claude-sonnet-5-5'),
         // Saved on disk: production uses the array cache, which forgets every request.
         'assistant_limiter_store' => env('AI_ASSISTANT_LIMITER_STORE', 'file'),
         'assistant_visitor_per_minute' => (int) env('AI_ASSISTANT_VISITOR_PER_MINUTE', 6),

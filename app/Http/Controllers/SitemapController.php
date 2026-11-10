@@ -17,12 +17,15 @@ use Modules\SoftwareStore\Services\FreeTools;
 
 /**
  * /sitemap.xml is a sitemap index (as large marketplaces do) that points to small parts:
- * pages, marketplace, and the blog in pages of BLOG_PAGE_SIZE articles. Each part stays small and
- * fast, so one slow or broken part never takes the whole sitemap down.
+ * pages, marketplace, and the blog split by language (blog-ar-N, blog-en-N) in pages of BLOG_PAGE_SIZE articles.
+ * Each part stays small and fast, so one slow or broken part never takes the whole sitemap down, and the
+ * Arabic and English articles can be followed apart in Search Console.
  */
 class SitemapController extends Controller
 {
     public const BLOG_PAGE_SIZE = 1000;
+
+    public const BLOG_LANGUAGES = ['ar', 'en'];
 
     public function index(): Response
     {
@@ -32,9 +35,8 @@ class SitemapController extends Controller
             ['url' => route('shop.sitemap'), 'lastmod' => $this->latest(ShopProduct::class)],
         ];
 
-        $blogPages = (int) ceil($this->publishedArticles()->count() / self::BLOG_PAGE_SIZE);
-        for ($page = 1; $page <= $blogPages; $page++) {
-            $parts[] = ['name' => 'blog-'.$page, 'lastmod' => $this->latest(BlogArticle::class)];
+        foreach (self::BLOG_LANGUAGES as $language) {
+            $parts = [...$parts, ...$this->blogParts($language)];
         }
 
         return response()->view('sitemap-index', ['parts' => $parts])->header('Content-Type', 'application/xml');
@@ -46,8 +48,8 @@ class SitemapController extends Controller
             $urls = $this->pageUrls();
         } elseif ($name === 'marketplace') {
             $urls = $this->marketplaceUrls();
-        } elseif (preg_match('/^blog-([1-9]\d*)$/', $name, $m)) {
-            $urls = $this->blogUrls((int) $m[1]);
+        } elseif (preg_match('/^blog-(ar|en)-([1-9]\d*)$/', $name, $m)) {
+            $urls = $this->blogUrls($m[1], (int) $m[2]);
             abort_if($urls === [], 404);
         } else {
             abort(404);
@@ -140,15 +142,26 @@ class SitemapController extends Controller
         return $urls;
     }
 
-    /** One page of published articles, each linked to its language versions. */
-    private function blogUrls(int $page): array
+    /** @return array<int, array{name: string, lastmod: Carbon}> one part per BLOG_PAGE_SIZE articles in this language */
+    private function blogParts(string $language): array
+    {
+        $articles = $this->publishedArticles($language);
+        $pages = (int) ceil((clone $articles)->count() / self::BLOG_PAGE_SIZE);
+        $latest = $articles->max('updated_at');
+        $lastmod = $latest ? Carbon::parse($latest) : now();
+
+        return array_map(fn (int $page) => ['name' => "blog-{$language}-{$page}", 'lastmod' => $lastmod], $pages > 0 ? range(1, $pages) : []);
+    }
+
+    /** One page of published articles in one language, each linked to its versions in the other languages. */
+    private function blogUrls(string $language, int $page): array
     {
         if (! Route::has('blog.show')) {
             return [];
         }
 
         // only the columns needed, never the article bodies
-        $articles = $this->publishedArticles()
+        $articles = $this->publishedArticles($language)
             ->orderBy('id')
             ->forPage($page, self::BLOG_PAGE_SIZE)
             ->get(['id', 'slug', 'language', 'group_id', 'updated_at']);
@@ -171,9 +184,13 @@ class SitemapController extends Controller
         })->all();
     }
 
-    private function publishedArticles(): Builder
+    /** Published articles; with a language, only that language (an article without one counts as English). */
+    private function publishedArticles(?string $language = null): Builder
     {
-        return BlogArticle::published()->whereNotNull('slug')->where('slug', '!=', '');
+        return BlogArticle::published()
+            ->whereNotNull('slug')->where('slug', '!=', '')
+            ->when($language === 'ar', fn (Builder $q) => $q->where('language', 'ar'))
+            ->when($language === 'en', fn (Builder $q) => $q->where(fn (Builder $q) => $q->whereNull('language')->orWhere('language', '!=', 'ar')));
     }
 
     private function latest(string $model): Carbon

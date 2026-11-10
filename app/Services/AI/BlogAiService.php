@@ -56,13 +56,20 @@ You MUST return strictly valid JSON matching this exact structure without markdo
         return $this->callLLM($prompt);
     }
 
+    public function __construct(private readonly ClaudeJsonWriter $claude) {}
+
     /**
-     * Sends a prompt through the central LLM router and returns the decoded JSON answer, or null when it fails.
-     * Callers that write their own prompts (such as the weekly draft) use this instead of the marketplace prompt above.
+     * Sends a prompt and returns the decoded JSON answer, or null when it fails. Claude writes when its key
+     * is set (its Arabic is much better); Gemini otherwise. Callers that write their own prompts (such as the
+     * blog autopilot) use this instead of the marketplace prompt above.
+     *
+     * @param  array<string, mixed>  $schema  the JSON shape of the answer, given to Claude
      */
-    public function generate(string $prompt): ?array
+    public function generate(string $prompt, array $schema): ?array
     {
-        return $this->callLLM($prompt);
+        return ClaudeJsonWriter::available()
+            ? $this->claude->write($prompt, $schema)
+            : $this->callLLM($prompt);
     }
 
     /**
@@ -121,42 +128,6 @@ You MUST return strictly valid JSON matching this exact structure without markdo
             return null;
         } catch (\Exception $e) {
             Log::error('Exception in BlogAiService callGemini: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Call OpenAI API.
-     */
-    private function callOpenAI(string $prompt, string $apiKey): ?array
-    {
-        $model = AdminSettings::GetValue('openai_model') ?: 'gpt-4o-mini';
-
-        try {
-            $response = Http::timeout(60)
-                ->withHeaders([
-                    'Authorization' => 'Bearer ' . trim($apiKey),
-                    'Content-Type'  => 'application/json',
-                ])
-                ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => $model,
-                    'response_format' => ['type' => 'json_object'],
-                    'messages' => [
-                        ['role' => 'system', 'content' => 'You respond strictly in valid JSON format matching the requested schema.'],
-                        ['role' => 'user', 'content' => $prompt],
-                    ],
-                    'temperature' => 0.7,
-                ]);
-
-            if ($response->successful()) {
-                $content = $response->json('choices.0.message.content');
-                return json_decode($content, true);
-            }
-
-            Log::error('OpenAI API error in BlogAiService', ['response' => $response->body()]);
-            return null;
-        } catch (\Exception $e) {
-            Log::error('Exception in BlogAiService callOpenAI: ' . $e->getMessage());
             return null;
         }
     }

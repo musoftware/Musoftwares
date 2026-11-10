@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Topic queue for the weekly blog draft. One topic is used per run, in this order, and a topic is never used twice.
+ * The written topics the daily blog article uses first, in this order, each once in Arabic and once in English.
+ * When they are all used, the writer chooses its own topics from config/blog_angles.php.
  * Every topic is about one of our own products and a question a buyer in Egypt or the Gulf really asks.
  * 'product' is the slug of the /services page the article must link to.
  */
