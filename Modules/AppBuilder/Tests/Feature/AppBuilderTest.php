@@ -526,6 +526,22 @@ class AppBuilderTest extends TestCase
         $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('answering', false);
     }
 
+    public function test_the_page_polling_does_not_use_up_the_limit_for_sending_or_starting(): void
+    {
+        $this->answer('أهلاً، قولي أكتر.');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز برنامج'])->assertOk()->json('uuid');
+
+        // a minute of waiting on the page: more polls than the send and start limits allow
+        foreach (range(1, 20) as $poll) {
+            $this->getJson('/ai/'.$uuid.'/state')->assertOk();
+        }
+
+        $this->answer('تمام.');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'لمحل ملابس'])->assertOk();
+        $this->answer('أهلاً.');
+        $this->postJson('/ai/messages', ['text' => 'مشروع تاني'])->assertOk();
+    }
+
     public function test_without_the_worker_the_site_reads_the_page_itself(): void
     {
         \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>متجر ورد</title><meta name="description" content="ورد طبيعي"><script>x()</script><h1>أجمل باقات الورد</h1>')]);

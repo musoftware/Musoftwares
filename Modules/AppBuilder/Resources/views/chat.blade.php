@@ -180,9 +180,7 @@
             headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF},
             body: body ? JSON.stringify(body) : undefined,
         });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.message || T.errors.unavailable);
-        return data;
+        return answerOf(response);
     }
 
     async function upload(url, text, files) {
@@ -190,7 +188,14 @@
         if (text) body.append('text', text);
         files.forEach((file) => body.append('files[]', file));
         const response = await fetch(url, {method: 'POST', headers: {'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF}, body});
+        return answerOf(response);
+    }
+
+    // the server's own message when it sent one; the rate limiter's English "Too Many Attempts." (the only
+    // answer with Retry-After) is replaced by ours
+    async function answerOf(response) {
         const data = await response.json().catch(() => ({}));
+        if (response.status === 429 && response.headers.has('Retry-After')) throw new Error(T.errors.too_fast);
         if (!response.ok) throw new Error(data.message || T.errors.unavailable);
         return data;
     }

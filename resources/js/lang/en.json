@@ -2702,7 +2702,8 @@
         "errors": {
             "looking": "One moment, still looking at the link you sent.",
             "unavailable": "Sorry, a short problem happened. Please send your message again.",
-            "limit": "You reached today's limit. Talk to the team on WhatsApp and we will continue with you.",
+            "limit": "You reached today's limit of new chats. Continue in one of your chats, or come back tomorrow.",
+            "too_fast": "The messages came too quickly. Wait a minute and send again.",
             "busy": "Your program is being built now. Please wait until it finishes.",
             "trial": "A live trial is not available right now.",
             "balance_due": "Please pay the remaining amount first; then we continue with any change.",
