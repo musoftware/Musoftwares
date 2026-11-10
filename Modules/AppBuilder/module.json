@@ -1,0 +1,11 @@
+{
+    "name": "AppBuilder",
+    "alias": "appbuilder",
+    "description": "A plain chat page where Claude talks with the customer, prices the program in tokens, takes payment and delivers the program built on the owner's sandboxed worker.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AppBuilder\\Providers\\AppBuilderServiceProvider"
+    ],
+    "files": []
+}

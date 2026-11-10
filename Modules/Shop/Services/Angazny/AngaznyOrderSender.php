@@ -56,7 +56,7 @@ class AngaznyOrderSender
             return 'المحافظة دي مش متاحة عند انجزني';
         }
 
-        return $this->areaId($order) === null ? 'لسه مفيش كود منطقة للمحافظة دي' : null;
+        return $order->angazny_area_id === null ? 'الطلب من غير منطقة، لازم يتراجع يدوي' : null;
     }
 
     private function deliver(ShopOrder $order): void
@@ -116,7 +116,7 @@ class AngaznyOrderSender
         return [
             'name' => $order->customer_name,
             'city_id' => $this->cityId($order),
-            'area_id' => $this->areaId($order),
+            'area_id' => $order->angazny_area_id,
             'address' => $order->address,
             'phone' => ['+2'.$order->phone],
             'notes' => $order->notes,
@@ -133,10 +133,5 @@ class AngaznyOrderSender
     private function cityId(ShopOrder $order): ?int
     {
         return config('shop.angazny.cities')[$order->governorate] ?? null;
-    }
-
-    private function areaId(ShopOrder $order): ?int
-    {
-        return config('shop.angazny.area_ids')[$this->cityId($order)] ?? null;
     }
 }

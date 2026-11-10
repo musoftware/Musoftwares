@@ -25,6 +25,7 @@ class CheckoutRequest extends FormRequest
             'governorate' => ['required', Rule::in($cart->governorates($cart->lines()))],
             'address' => ['required', 'string', 'min:8', 'max:500'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'angazny_area_id' => $this->areaRules($cart),
             'website' => ['prohibited'],
         ];
     }
@@ -38,6 +39,8 @@ class CheckoutRequest extends FormRequest
             'phone.regex' => 'رقم الموبايل لازم يكون 11 رقم ويبدأ بـ 010 أو 011 أو 012 أو 015',
             'governorate.required' => 'اختار المحافظة',
             'governorate.in' => 'اختار المحافظة من القائمة',
+            'angazny_area_id.required' => 'اختار المنطقة',
+            'angazny_area_id.in' => 'اختار منطقة من نفس المحافظة',
             'address.required' => 'اكتب العنوان',
             'address.min' => 'اكتب العنوان بالتفصيل',
         ];
@@ -46,7 +49,15 @@ class CheckoutRequest extends FormRequest
     /** @return array<string, string|null> */
     public function customer(): array
     {
-        return $this->safe()->only(['customer_name', 'phone', 'governorate', 'address', 'notes']);
+        return $this->safe()->only(['customer_name', 'phone', 'governorate', 'address', 'notes', 'angazny_area_id']);
+    }
+
+    /** An area is asked for only when the cart ships through Angazny and the governorate has areas. */
+    private function areaRules(Cart $cart): array
+    {
+        $areas = $cart->areas($cart->lines())[(string) $this->input('governorate')] ?? [];
+
+        return $areas === [] ? ['prohibited'] : ['required', 'integer', Rule::in(array_column($areas, 'id'))];
     }
 
     protected function prepareForValidation(): void

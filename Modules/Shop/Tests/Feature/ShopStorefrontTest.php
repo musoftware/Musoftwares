@@ -3,6 +3,8 @@
 namespace Modules\Shop\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Modules\Shop\Models\ShopCategory;
 use Modules\Shop\Models\ShopOrder;
 use Modules\Shop\Models\ShopProduct;
@@ -83,18 +85,6 @@ class ShopStorefrontTest extends TestCase
         $this->get(route('shop.cart'))->assertOk()->assertSee('noindex,nofollow', false);
     }
 
-    public function test_the_sitemap_lists_visible_store_pages_only(): void
-    {
-        $visible = $this->product();
-        $hidden = $this->product(['name' => 'مخفي', 'slug' => 'hidden-product', 'is_active' => false]);
-
-        $this->get('/sitemap.xml')->assertOk()->assertSee('sitemaps/store.xml', false);
-        $this->get('/sitemaps/store.xml')->assertOk()
-            ->assertSee(rawurlencode('حذاء-جلد'), false)
-            ->assertSee($visible->category->url(), false)
-            ->assertDontSee($hidden->slug, false);
-    }
-
     public function test_a_customer_must_choose_a_size_that_exists(): void
     {
         $product = $this->product();
@@ -164,5 +154,102 @@ class ShopStorefrontTest extends TestCase
 
         $this->get(route('shop.search', ['q' => 'جلد']))->assertOk()->assertSee('حذاء جلد')->assertSee('noindex,nofollow', false);
         $this->get(route('shop.search', ['q' => '%']))->assertOk()->assertDontSee('حذاء جلد');
+    }
+
+    public function test_the_header_keeps_extra_categories_in_a_more_menu(): void
+    {
+        foreach (range(1, 7) as $number) {
+            $category = ShopCategory::create(['name' => 'قسم '.$number, 'slug' => 'section-'.$number]);
+            $this->product(['category_id' => $category->id, 'name' => 'منتج '.$number, 'slug' => 'item-'.$number]);
+        }
+
+        $html = $this->get('/store')->assertOk()->getContent();
+        preg_match('~<nav class="nav".*?</nav>~su', $html, $nav);
+
+        $this->assertSame(5, substr_count((string) strstr($nav[0], '<details', true), '<a '));
+        $this->assertSame(2, substr_count((string) strstr($nav[0], '<details'), '<a '));
+    }
+
+    public function test_the_store_has_its_own_sitemap_with_images_and_only_indexable_pages(): void
+    {
+        $visible = $this->product();
+        $hidden = $this->product(['name' => 'مخفي', 'slug' => 'hidden-product', 'is_active' => false]);
+        $empty = ShopCategory::create(['name' => 'فاضي', 'slug' => 'empty-section']);
+
+        $this->get('/store/sitemap.xml')->assertOk()
+            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->assertSee('xmlns:image=', false)
+            ->assertSee('<image:loc>'.$visible->mainImageUrl().'</image:loc>', false)
+            ->assertSee(rawurlencode('حذاء-جلد'), false)
+            ->assertSee($visible->category->url(), false)
+            ->assertDontSee('hreflang', false)
+            ->assertDontSee($hidden->slug, false)
+            ->assertDontSee($empty->slug, false);
+    }
+
+    public function test_the_site_sitemap_points_to_the_store_sitemap_and_the_old_address_redirects(): void
+    {
+        $this->get('/sitemap.xml')->assertOk()->assertSee(route('shop.sitemap'), false);
+        $this->get('/sitemaps/store.xml')->assertRedirect('/store/sitemap.xml')->assertStatus(301);
+    }
+
+    public function test_a_shared_product_has_full_social_details(): void
+    {
+        $product = $this->product();
+
+        $this->get($product->url())->assertOk()
+            ->assertSee('<meta property="og:type" content="product">', false)
+            ->assertSee('<meta property="og:image" content="'.$product->mainImageUrl().'">', false)
+            ->assertSee('<meta property="og:image:alt" content="حذاء جلد">', false)
+            ->assertSee('<meta property="product:price:amount" content="500.00">', false)
+            ->assertSee('<meta property="product:price:currency" content="EGP">', false)
+            ->assertSee('<meta property="product:availability" content="in stock">', false)
+            ->assertSee('<meta name="twitter:card" content="summary_large_image">', false)
+            ->assertSee('<meta name="twitter:site" content="@MusoftwareUno">', false)
+            ->assertSee('<meta name="twitter:title"', false)
+            ->assertSee('<meta name="twitter:label1" content="السعر">', false)
+            ->assertSee('حذاء جلد بسعر 500', false);
+    }
+
+    public function test_a_shared_product_reports_the_real_size_of_its_image(): void
+    {
+        Storage::fake('public_uploads')->putFileAs('shop/products', UploadedFile::fake()->image('a.jpg', 800, 600), 'a.jpg');
+
+        $this->get($this->product()->url())->assertOk()
+            ->assertSee('<meta property="og:image:width" content="800">', false)
+            ->assertSee('<meta property="og:image:height" content="600">', false)
+            ->assertSee('<meta property="og:image:type" content="image/jpeg">', false);
+    }
+
+    public function test_product_data_is_complete_and_makes_no_false_brand_claim(): void
+    {
+        $product = $this->product();
+
+        $this->get($product->url())->assertOk()
+            ->assertDontSee('"brand"', false)
+            ->assertSee('"@type":"OfferShippingDetails"', false)
+            ->assertSee('"addressCountry":"EG"', false)
+            ->assertSee('"seller"', false)
+            ->assertSee('"size":"40، 41"', false);
+    }
+
+    public function test_the_store_home_has_a_share_image_and_store_data(): void
+    {
+        $product = $this->product();
+
+        $this->get('/store')->assertOk()
+            ->assertSee('<meta property="og:image" content="'.$product->mainImageUrl().'">', false)
+            ->assertSee('"@type":"OnlineStore"', false)
+            ->assertSee('"@type":"ItemList"', false)
+            ->assertSee('<meta name="twitter:title"', false);
+    }
+
+    public function test_a_category_with_no_visible_products_is_hidden_from_search_and_the_menu(): void
+    {
+        $this->product();
+        $empty = ShopCategory::create(['name' => 'فاضي', 'slug' => 'empty-section']);
+
+        $this->get($empty->url())->assertOk()->assertSee('content="noindex,follow"', false);
+        $this->get('/store')->assertOk()->assertDontSee($empty->url(), false);
     }
 }

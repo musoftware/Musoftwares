@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LoyaltyPointTransaction;
 use App\Models\User;
 use App\Models\UserReferral;
+use App\Services\BadgeCardService;
 use App\Services\LoyaltyService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ class LoyaltyController extends Controller
                 'points_earned'=> $referralPointsEarned,
             ],
             'pointsConversionRate' => LoyaltyService::POINTS_TO_CURRENCY_RATE,
+            'badgeCardUrl'     => app(BadgeCardService::class)->linkFor($user),
             'monthlyRanking'   => app(\App\Services\Client\MonthlyLeaderboardService::class)->forUser($user, 10),
         ]);
     }

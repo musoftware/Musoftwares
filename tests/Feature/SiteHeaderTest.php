@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\SiteStores;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Modules\SoftwareStore\Models\SoftwareProduct;
@@ -15,14 +16,16 @@ class SiteHeaderTest extends TestCase
 
     private const PAGES = ['/', '/services', '/how-we-work', '/portfolio', '/library'];
 
-    public function test_every_public_page_shows_the_same_header_with_the_all_services_menu(): void
+    public function test_every_public_page_shows_the_same_header_with_the_services_and_stores_menus(): void
     {
         foreach (self::PAGES as $page) {
             $html = $this->get($page.'?lang=ar')->assertOk()->getContent();
 
             $this->assertStringContainsString('id="mega-menu"', $html, $page);
+            $this->assertStringContainsString('id="stores-menu"', $html, $page);
             $this->assertStringContainsString('id="site-mobile-menu"', $html, $page);
-            $this->assertStringContainsString('كل الخدمات', $html, $page);
+            $this->assertStringContainsString('خدماتنا', $html, $page);
+            $this->assertStringContainsString('متاجرنا', $html, $page);
             $this->assertSame(1, substr_count($html, '<header'), $page.' must have one header');
         }
     }
@@ -58,14 +61,38 @@ class SiteHeaderTest extends TestCase
     {
         $this->get('/estimator?lang=ar')->assertOk()->assertInertia(
             fn (AssertableInertia $page) => $page
-                ->has('siteNav.main', 5)
-                ->where('siteNav.main.0.url', '/marketplace/catalog')
-                ->where('siteNav.all_url', '/services')
-                ->where('siteNav.mega.0.links.0.url', '/marketplace/catalog')
+                ->has('siteNav.main', 3)
+                ->where('siteNav.main.0.url', '/portfolio')
+                ->where('siteNav.mega.0.key', 'custom')
+                ->where('siteNav.mega.0.links.0.url', '/start-project')
+                ->where('siteNav.intro.url', '/start-project')
+                ->has('siteNav.stores', 4)
+                ->where('siteNav.stores.0.name', 'شغلانة')
+                ->where('siteNav.stores.1.url', '/store')
         );
     }
 
-    public function test_the_menu_shows_the_marketplace_and_every_active_product_and_free_tool(): void
+    public function test_custom_work_comes_first_and_every_menu_says_what_we_do(): void
+    {
+        $html = $this->get('/?lang=ar')->assertOk()->getContent();
+
+        $this->assertStringContainsString('إحنا شركة برمجة', $html);
+        $this->assertStringContainsString('href="/start-project"', $html);
+        $this->assertLessThan(strpos($html, 'أدوات مجانية'), strpos($html, 'برمجة على مقاس شغلك'));
+    }
+
+    public function test_the_stores_menu_shows_each_store_with_its_picture(): void
+    {
+        $html = $this->get('/?lang=ar')->assertOk()->getContent();
+
+        foreach (SiteStores::cards('ar') as $store) {
+            $this->assertStringContainsString('href="'.$store['url'].'"', $html, $store['key']);
+            $this->assertStringContainsString($store['name'], $html, $store['key']);
+            $this->assertFileExists(public_path(ltrim($store['image'], '/')), $store['key']);
+        }
+    }
+
+    public function test_the_menu_shows_every_active_product_and_links_to_all_free_tools(): void
     {
         $visible = SoftwareProduct::create(['slug' => 'menu-test-system', 'name_en' => 'Menu test system', 'name_ar' => 'نظام اختبار القائمة', 'is_active' => true]);
         $hidden = SoftwareProduct::create(['slug' => 'hidden-test-system', 'name_en' => 'Hidden system', 'name_ar' => 'نظام مخفي', 'is_active' => false]);
@@ -76,8 +103,8 @@ class SiteHeaderTest extends TestCase
         $this->assertStringContainsString('href="/services/'.$visible->slug.'"', $html);
         $this->assertStringNotContainsString('href="/services/'.$hidden->slug.'"', $html);
 
-        foreach (FreeTools::slugs() as $slug) {
-            $this->assertStringContainsString('href="/services/tools/'.$slug.'"', $html, $slug);
-        }
+        $this->assertStringContainsString('href="/services/tools/'.FreeTools::slugs()[0].'"', $html);
+        $this->assertStringContainsString('href="/services/tools"', $html);
+        $this->assertStringContainsString('شوف الكل ('.count(FreeTools::slugs()).')', $html);
     }
 }

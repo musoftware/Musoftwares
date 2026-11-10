@@ -61,6 +61,9 @@ Schedule::command(\App\Console\Commands\AutoPayInvoices::class)->dailyAt('04:30'
 // Store: refresh Angazny products hourly and send waiting orders
 Schedule::command('shop:angazny-sync')->hourly()->withoutOverlapping(30);
 Schedule::command('shop:angazny-send-orders')->everyMinute()->withoutOverlapping(10);
+Schedule::command('shop:angazny-drive-images')->everyTenMinutes()->withoutOverlapping(9);
+Schedule::command('shop:rewrite-content')->everyTenMinutes()->withoutOverlapping(9);
+Schedule::command('shop:arrange-images')->everyTenMinutes()->withoutOverlapping(9);
 
 // Poll IMAP every two minutes for guest ticket replies
 Schedule::command('imap:pull')->everyTwoMinutes()->withoutOverlapping(5);

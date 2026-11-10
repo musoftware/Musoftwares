@@ -218,7 +218,7 @@ Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-Route::get('/sitemaps/{name}.xml', [SitemapController::class, 'part'])->where('name', 'pages|marketplace|store|blog-[1-9][0-9]*')->name('sitemap.part');
+Route::get('/sitemaps/{name}.xml', [SitemapController::class, 'part'])->where('name', 'pages|marketplace|blog-[1-9][0-9]*')->name('sitemap.part');
 
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
@@ -264,6 +264,10 @@ Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
 
 Route::get('/loyalty', [\App\Http\Controllers\Client\LoyaltyController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('loyalty.index');
+
+// Public badge card the client shares. Signed so the link can't be guessed from the user id.
+Route::get('/badge/{user}', [\App\Http\Controllers\BadgeCardController::class, 'show'])
+    ->middleware(['signed', 'throttle:60,1'])->name('badge-card.show');
 
 // ── Client Projects Portal ────────────────────────────────────────
 // Platform users (clients) view the admin-managed projects assigned to them, including a

@@ -24,6 +24,23 @@
                 @error('governorate') <p class="err">{{ $message }}</p> @enderror
             </div>
 
+            @if ($areas !== [])
+                <div class="field">
+                    <label for="area">المنطقة</label>
+                    <select id="area" name="angazny_area_id" required @error('angazny_area_id') aria-invalid="true" aria-describedby="area-error" @enderror>
+                        <option value="">اختار المنطقة</option>
+                        @foreach ($areas as $areaGovernorate => $governorateAreas)
+                            <optgroup label="{{ $areaGovernorate }}">
+                                @foreach ($governorateAreas as $area)
+                                    <option value="{{ $area['id'] }}" @selected((string) old('angazny_area_id') === (string) $area['id'])>{{ $area['name'] }}</option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    @error('angazny_area_id') <p class="err" id="area-error">{{ $message }}</p> @enderror
+                </div>
+            @endif
+
             @include('shop::partials.input', ['name' => 'address', 'label' => 'العنوان بالتفصيل', 'autocomplete' => 'street-address'])
 
             <div class="field">
@@ -39,7 +56,7 @@
             <h2 class="section-title" style="margin-top:0">طلبك</h2>
             @foreach ($lines as $line)
                 <div class="line">
-                    <img src="{{ $line['product']->mainImageUrl() }}" alt="{{ $line['product']->name }}" width="72" height="72" loading="lazy">
+                    <img src="{{ $line['product']->imageUrlFor($line['color']) }}" alt="{{ $line['product']->name }}" width="72" height="72" loading="lazy">
                     <div>
                         <p class="line-name">{{ $line['product']->name }}</p>
                         @include('shop::partials.line-meta', ['line' => $line])
@@ -55,3 +72,32 @@
         </aside>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            var area = document.getElementById('area');
+            if (!area) return;
+
+            var governorate = document.getElementById('governorate');
+            var groups = Array.prototype.slice.call(area.querySelectorAll('optgroup'));
+            var placeholder = area.options[0].cloneNode(true);
+
+            function showAreas() {
+                var chosen = area.value;
+                var group = groups.filter(function (item) { return item.label === governorate.value; })[0];
+
+                area.innerHTML = '';
+                area.appendChild(placeholder.cloneNode(true));
+                Array.prototype.forEach.call(group ? group.children : [], function (option) {
+                    area.appendChild(option.cloneNode(true));
+                });
+                area.value = chosen;
+                if (area.selectedIndex < 0) area.selectedIndex = 0;
+            }
+
+            governorate.addEventListener('change', showAreas);
+            showAreas();
+        })();
+    </script>
+@endpush

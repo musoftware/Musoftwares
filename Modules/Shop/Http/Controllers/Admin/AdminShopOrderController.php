@@ -17,7 +17,7 @@ class AdminShopOrderController extends Controller
     {
         $status = (string) $request->query('status');
 
-        $orders = ShopOrder::with('items')
+        $orders = ShopOrder::with(['items', 'area:angazny_id,name'])
             ->when(in_array($status, ShopOrder::STATUSES, true), fn ($query) => $query->where('status', $status))
             ->latest('id')
             ->paginate(30)

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Modules\Shop\Models\ShopCategory;
 use Modules\Shop\Models\ShopProduct;
 use Modules\Shop\Services\ShopSeo;
@@ -24,16 +25,13 @@ class StorefrontController extends Controller
 
     public function home(): View
     {
-        $seo = $this->seo->page(config('shop.tagline'), [
-            'title' => config('shop.name').' | '.config('shop.tagline'),
-            'canonical' => route('shop.home'),
-            'schemas' => [$this->seo->website()],
-        ]);
+        $categories = ShopCategory::visible()->withVisibleProducts()->get();
+        $products = ShopProduct::visible()->orderBy('sort_order')->latest('id')->limit(12)->get();
 
         return view('shop::home', [
-            'seo' => $seo,
-            'categories' => ShopCategory::visible()->get(),
-            'products' => ShopProduct::visible()->orderBy('sort_order')->latest('id')->limit(12)->get(),
+            'seo' => $this->homeSeo($categories, $products),
+            'categories' => $categories,
+            'products' => $products,
         ]);
     }
 
@@ -96,19 +94,31 @@ class StorefrontController extends Controller
         return $query->paginate((int) config('shop.per_page'))->withQueryString();
     }
 
-    /** A sorted list shows the same products, so only the default order is indexed. */
+    private function homeSeo(Collection $categories, Collection $products): array
+    {
+        $first = $products->first();
+
+        return $this->seo->page(config('shop.tagline'), $this->seo->shareImage($first?->images[0] ?? null, config('shop.name')) + [
+            'title' => config('shop.name').' | '.config('shop.tagline'),
+            'description' => $this->seo->homeDescription($categories),
+            'canonical' => route('shop.home'),
+            'schemas' => [$this->seo->onlineStore(), $this->seo->website(), $this->seo->itemList($products)],
+        ]);
+    }
+
+    /** A sorted list or an empty category adds nothing to search results, so only the rest is indexed. */
     private function collectionSeo(ShopCategory $category, LengthAwarePaginator $products, string $sort): array
     {
         $page = $products->currentPage();
         $canonical = $page > 1 ? $category->url().'?page='.$page : $category->url();
         $suffix = $page > 1 ? ' - صفحة '.$page : '';
-        $robots = $sort === 'featured' ? 'index,follow,max-image-preview:large' : 'noindex,follow';
+        $robots = $sort === 'featured' && $products->isNotEmpty() ? ShopSeo::INDEXABLE : 'noindex,follow';
+        $imagePath = $category->image_path ?? $products->first()?->images[0] ?? null;
 
-        return $this->seo->page($category->name.$suffix, [
+        return $this->seo->page($category->name.$suffix, $this->seo->shareImage($imagePath, $category->name) + [
             'description' => $this->seo->excerpt($category->description) ?: $category->name.' من '.config('shop.name').'. '.config('shop.announcement').'.',
             'canonical' => $canonical,
             'robots' => $robots,
-            'image' => $category->imageUrl() ?? $products->first()?->mainImageUrl(),
             'schemas' => [
                 $this->seo->collection($category, $products->getCollection()),
                 $this->seo->breadcrumbs([config('shop.name') => route('shop.home'), $category->name => $category->url()]),
@@ -124,10 +134,9 @@ class StorefrontController extends Controller
         }
         $trail[$product->name] = $product->url();
 
-        return $this->seo->page($product->seo_title ?: $product->name, [
-            'description' => $product->seo_description ?: ($this->seo->excerpt($product->description) ?: $product->name),
+        return $this->seo->page($product->seo_title ?: $product->name, $this->seo->productCard($product) + $this->seo->shareImage($product->images[0] ?? null, $product->name) + [
+            'description' => $product->seo_description ?: $this->seo->productDescription($product),
             'canonical' => $product->url(),
-            'image' => $product->mainImageUrl(),
             'type' => 'product',
             'schemas' => [$this->seo->product($product), $this->seo->breadcrumbs($trail)],
         ]);

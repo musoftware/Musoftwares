@@ -7,11 +7,15 @@ use Modules\Shop\Http\Controllers\Admin\AdminShopOrderController;
 use Modules\Shop\Http\Controllers\Admin\AdminShopProductController;
 use Modules\Shop\Http\Controllers\CartController;
 use Modules\Shop\Http\Controllers\CheckoutController;
+use Modules\Shop\Http\Controllers\ShopSitemapController;
 use Modules\Shop\Http\Controllers\StorefrontController;
 
 Route::middleware('web')->group(function () {
+    Route::permanentRedirect('/sitemaps/store.xml', '/store/sitemap.xml');
+
     Route::prefix('store')->name('shop.')->group(function () {
         Route::get('/', [StorefrontController::class, 'home'])->name('home');
+        Route::get('/sitemap.xml', [ShopSitemapController::class, 'show'])->name('sitemap');
         Route::get('/search', [StorefrontController::class, 'search'])->middleware('throttle:60,1')->name('search');
         Route::get('/collections/{category:slug}', [StorefrontController::class, 'collection'])->name('collection');
         Route::get('/products/{product:slug}', [StorefrontController::class, 'product'])->name('product');

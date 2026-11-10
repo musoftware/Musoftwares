@@ -3,6 +3,7 @@
 namespace Modules\Shop\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class ShopOrder extends Model
     protected $fillable = [
         'customer_name', 'phone', 'governorate', 'address', 'notes',
         'subtotal', 'shipping', 'total', 'status',
-        'angazny_status', 'angazny_order_code', 'angazny_error',
+        'angazny_status', 'angazny_order_code', 'angazny_error', 'angazny_area_id',
     ];
 
     protected $casts = [
@@ -42,6 +43,11 @@ class ShopOrder extends Model
         static::creating(function (self $order): void {
             $order->uuid = (string) Str::uuid();
         });
+    }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(ShopArea::class, 'angazny_area_id', 'angazny_id')->withTrashed();
     }
 
     public function items(): HasMany

@@ -30,8 +30,9 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { useConfirm } from '@/hooks/useConfirm';
 import UserLoansTab from './UserLoansTab';
+import BadgeCardActions from './BadgeCardActions';
 
-export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [], resellerAllocations = [], allSerialSoftwares = [] }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [], resellerAllocations = [], allSerialSoftwares = [], badgeCardUrl = null }) {
     const { confirm, confirmDialog } = useConfirm();
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
@@ -870,6 +871,7 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                             {__('admin.last_active')}: {client.last_activity_at ? new Date(client.last_activity_at).toLocaleDateString() : __('general.never')}
                         </span>
                     </div>
+                    {badgeCardUrl && <BadgeCardActions url={badgeCardUrl} client={client} />}
                 </div>
             </div>
 

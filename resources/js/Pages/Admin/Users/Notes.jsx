@@ -23,7 +23,6 @@ import {
     List,
     Grid,
     Columns,
-    ExternalLink,
     Lock,
     ChevronLeft,
     ChevronRight,
@@ -418,7 +417,6 @@ export default function Notes({ user, notes, stats }) {
                 ...n,
                 decryptedTitle: decTitle,
                 decryptedContent: decContent,
-                parsed: decContent && !isUndecryptable(decContent) ? parseNoteContent(decContent, n.category) : null,
             };
         });
     }, [items, decryptText]);
@@ -894,13 +892,6 @@ export default function Notes({ user, notes, stats }) {
                     </div>
 
                     <div className="p-6 relative bg-white space-y-4">
-                        {isPasswordSet && selectedNote?.parsed && (
-                            <ParsedCredentials
-                                parsed={selectedNote.parsed}
-                                noteId={selectedNote.id}
-                                onCopyCard={handleCopyCard}
-                            />
-                        )}
                         <div className="relative">
                             <div className="absolute top-2.5 end-2.5 z-10">
                                 <Button
@@ -1016,237 +1007,6 @@ function IconButton({ children, onClick, title, danger, active }) {
     );
 }
 
-// Client-side Credential Parser
-const parseNoteContent = (content, category) => {
-    if (!content || typeof content !== 'string') return null;
-    const lines = content.split('\n');
-    const result = {
-        username: '',
-        password: '',
-        url: '',
-        anydeskId: '',
-        anydeskPassword: '',
-        customFields: [],
-    };
-
-    const usernameRegex = /^(username|user|login|email|اسم\s*المستخدم|اليوزر|الحساب)\s*[:=]\s*(.+)$/i;
-    const passwordRegex = /^(password|pass|pwd|كلمة\s*المرور|الباسورد|الرقم\s*السري)\s*[:=]\s*(.+)$/i;
-    const urlRegex = /^(url|link|website|رابط|الموقع)\s*[:=]\s*(.+)$/i;
-    const anydeskIdRegex = /^(anydesk\s*id|anydesk|id|العنوان|عنوان\s*اني\s*ديسك)\s*[:=]\s*(.+)$/i;
-    const anydeskPasswordRegex = /^(anydesk\s*password|anydesk\s*pass|anydesk\s*pwd)\s*[:=]\s*(.+)$/i;
-    const generalKvRegex = /^\s*([^:=]+)\s*[:=]\s*(.+)$/;
-    const labelRegex = /^(username|user\s*name|user|password|pass|pwd|server\s*\/\s*host|server|host|port|protocol|anydesk|anydesk\s*id|id|url|link|website|اسم\s*المستخدم|اليوزر|كلمة\s*المرور|الباسورد)\s*[:=]?$/i;
-
-    let hasParsedAnything = false;
-
-    for (let i = 0; i < lines.length; i++) {
-        const trimmed = lines[i].trim();
-        if (!trimmed) continue;
-
-        let match;
-        if ((match = trimmed.match(usernameRegex))) {
-            result.username = match[2].trim();
-            hasParsedAnything = true;
-        } else if ((match = trimmed.match(passwordRegex))) {
-            result.password = match[2].trim();
-            hasParsedAnything = true;
-        } else if ((match = trimmed.match(urlRegex))) {
-            result.url = match[2].trim();
-            hasParsedAnything = true;
-        } else if ((match = trimmed.match(anydeskIdRegex))) {
-            result.anydeskId = match[2].trim();
-            hasParsedAnything = true;
-        } else if ((match = trimmed.match(anydeskPasswordRegex))) {
-            result.anydeskPassword = match[2].trim();
-            hasParsedAnything = true;
-        } else if ((match = trimmed.match(generalKvRegex))) {
-            const key = match[1].trim();
-            const val = match[2].trim();
-            
-            // Validate that it's a realistic key-value pair:
-            // 1. Key shouldn't be too long (e.g. > 40 chars)
-            // 2. Key shouldn't contain URL markers like '://' or '//'
-            // 3. Key shouldn't be 'http', 'https', 'ftp'
-            const isInvalidKey = 
-                key.length > 40 || 
-                key.includes('//') || 
-                key.includes(':/') || 
-                ['http', 'https', 'ftp'].includes(key.toLowerCase());
-                
-            if (!isInvalidKey) {
-                result.customFields.push({ key, val });
-                hasParsedAnything = true;
-            }
-        } else if (i < lines.length - 1) {
-            // Check if the current line is a label and the next line contains the value
-            const labelMatch = trimmed.match(labelRegex);
-            if (labelMatch) {
-                const label = labelMatch[1].trim();
-                const nextLineVal = lines[i + 1].trim();
-                
-                if (nextLineVal && !nextLineVal.match(labelRegex)) {
-                    const lowerLabel = label.toLowerCase();
-                    if (lowerLabel.includes('anydesk') && lowerLabel.includes('id')) {
-                        result.anydeskId = nextLineVal;
-                    } else if (lowerLabel.includes('anydesk') && (lowerLabel.includes('pass') || lowerLabel.includes('pwd'))) {
-                        result.anydeskPassword = nextLineVal;
-                    } else if (lowerLabel.includes('user')) {
-                        result.username = nextLineVal;
-                    } else if (lowerLabel.includes('pass') || lowerLabel.includes('pwd')) {
-                        result.password = nextLineVal;
-                    } else if (lowerLabel.includes('url') || lowerLabel.includes('link') || lowerLabel.includes('website')) {
-                        result.url = nextLineVal;
-                    } else {
-                        result.customFields.push({ key: trimmed, val: nextLineVal });
-                    }
-                    
-                    hasParsedAnything = true;
-                    // Skip the next line as it was consumed as a value
-                    i++;
-                }
-            }
-        }
-
-        // Extract URL if the line contains a link and we don't have a URL set yet
-        const currentCheckVal = lines[i] ? lines[i].trim() : '';
-        if (!result.url && currentCheckVal) {
-            const urlMatch = currentCheckVal.match(/((?:https?:)?\/\/[^\s]+|www\.[^\s]+)/i);
-            if (urlMatch) {
-                let parsedUrl = urlMatch[1];
-                if (parsedUrl.startsWith('//')) {
-                    parsedUrl = 'https:' + parsedUrl;
-                } else if (parsedUrl.toLowerCase().startsWith('www.')) {
-                    parsedUrl = 'https://' + parsedUrl;
-                }
-                if (parsedUrl.endsWith(':')) {
-                    parsedUrl = parsedUrl.slice(0, -1);
-                }
-                result.url = parsedUrl;
-                hasParsedAnything = true;
-            } else {
-                // Check if it looks like a raw domain/hostname (e.g. sub.domain.com)
-                const hostMatch = currentCheckVal.match(/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i);
-                if (hostMatch) {
-                    result.url = 'https://' + currentCheckVal;
-                    hasParsedAnything = true;
-                }
-            }
-        }
-    }
-
-    if (!hasParsedAnything && content.trim()) {
-        const nonEmptyLines = lines.map(l => l.trim()).filter(Boolean);
-        if (category === 'password') {
-            if (nonEmptyLines.length === 1) {
-                result.password = nonEmptyLines[0];
-                hasParsedAnything = true;
-            } else if (nonEmptyLines.length === 2) {
-                result.username = nonEmptyLines[0];
-                result.password = nonEmptyLines[1];
-                hasParsedAnything = true;
-            }
-        } else if (category === 'anydesk') {
-            if (nonEmptyLines.length === 1) {
-                result.anydeskId = nonEmptyLines[0];
-                hasParsedAnything = true;
-            } else if (nonEmptyLines.length === 2) {
-                result.anydeskId = nonEmptyLines[0];
-                result.anydeskPassword = nonEmptyLines[1];
-                hasParsedAnything = true;
-            }
-        }
-    }
-
-    return hasParsedAnything ? result : null;
-};
-
-// Parsed Credentials Widget Component
-function ParsedCredentials({ parsed, noteId, onCopyCard, showLabels = true, compact = false }) {
-    const [revealMap, setRevealMap] = useState({});
-
-    if (!parsed) return null;
-
-    const toggleReveal = (field) => {
-        setRevealMap(prev => ({ ...prev, [field]: !prev[field] }));
-    };
-
-    const renderField = (label, val, isSecret = false, isLink = false, fieldKey) => {
-        if (!val) return null;
-        const isRevealed = revealMap[fieldKey];
-
-        return (
-            <div className={`flex items-center justify-between gap-2 border-b border-slate-100 last:border-0 pb-1.5 mb-1.5 last:pb-0 last:mb-0 ${compact ? 'text-xs' : 'text-sm'}`}>
-                <div className="flex-1 min-w-0">
-                    {showLabels && (
-                        <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block mb-0.5">
-                            {label}
-                        </span>
-                    )}
-                    {isSecret ? (
-                        <span className="font-mono text-slate-700 break-all select-all font-semibold">
-                            {isRevealed ? val : '••••••••'}
-                        </span>
-                    ) : isLink ? (
-                        <a
-                            href={val.startsWith('http') ? val : `https://${val}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-slate-900 hover:text-black hover:underline inline-flex items-center gap-1 font-mono font-semibold truncate max-w-full"
-                        >
-                            {val} <ExternalLink size={12} className="inline opacity-60" />
-                        </a>
-                    ) : (
-                        <span className="font-mono text-slate-700 break-all font-semibold select-all">
-                            {val}
-                        </span>
-                    )}
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                    {isSecret && (
-                        <button
-                            type="button"
-                            onClick={() => toggleReveal(fieldKey)}
-                            className="p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition"
-                            title={isRevealed ? __('general.hide') : __('general.show')}
-                            aria-label={isRevealed ? __('general.hide') : __('general.show')}
-                        >
-                            {isRevealed ? <EyeOff size={13} /> : <Eye size={13} />}
-                        </button>
-                    )}
-                    <button
-                        type="button"
-                        onClick={() => onCopyCard(val, `${noteId}-${fieldKey}`)}
-                        className="p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition"
-                        title={__('general.copy_text')}
-                        aria-label={__('general.copy_text')}
-                    >
-                        <Copy size={13} />
-                    </button>
-                </div>
-            </div>
-        );
-    };
-
-    return (
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 w-full text-start">
-            {renderField(__('general.username'), parsed.username, false, false, 'username')}
-            {renderField(__('general.password'), parsed.password, true, false, 'password')}
-            {renderField(__('general.url'), parsed.url, false, true, 'url')}
-            {renderField(__('general.anydesk_id'), parsed.anydeskId, false, false, 'anydeskId')}
-            {renderField(__('general.anydesk_password'), parsed.anydeskPassword, true, false, 'anydeskPassword')}
-            {parsed.customFields && parsed.customFields.map((f, i) =>
-                renderField(
-                    f.key,
-                    f.val,
-                    f.key.toLowerCase().includes('pass') || f.key.toLowerCase().includes('secret') || f.key.toLowerCase().includes('key') || f.key.toLowerCase().includes('token'),
-                    f.val.startsWith('http') || f.val.includes('.com') || f.val.includes('.net'),
-                    `custom-${i}`
-                )
-            )}
-        </div>
-    );
-}
-
 // Layout components
 function CardViewItem({
     note,
@@ -1333,17 +1093,6 @@ function CardViewItem({
                         </IconButton>
                     </div>
                 </div>
-
-                {isPasswordSet && note.parsed ? (
-                    <div className="mb-3">
-                        <ParsedCredentials
-                            parsed={note.parsed}
-                            noteId={note.id}
-                            onCopyCard={handleCopyCard}
-                            compact
-                        />
-                    </div>
-                ) : null}
             </div>
 
             <div className="prose prose-sm max-w-none text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-100 flex justify-between items-center gap-3 mt-auto">
@@ -1720,20 +1469,6 @@ function SplitViewLayout({
                                     </IconButton>
                                 </div>
                             </div>
-
-                            {/* Parsed credentials block if present */}
-                            {isPasswordSet && activeNote.parsed && (
-                                <div className="mb-4">
-                                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                                        {__('general.parsed_credentials')}
-                                    </h4>
-                                    <ParsedCredentials
-                                        parsed={activeNote.parsed}
-                                        noteId={activeNote.id}
-                                        onCopyCard={handleCopyCard}
-                                    />
-                                </div>
-                            )}
 
                             {/* Full Secure Content Textarea */}
                             <div>

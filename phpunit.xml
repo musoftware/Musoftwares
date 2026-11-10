@@ -61,6 +61,9 @@
         <testsuite name="Shop">
             <directory>Modules/Shop/Tests/Feature</directory>
         </testsuite>
+        <testsuite name="AppBuilder">
+            <directory>Modules/AppBuilder/Tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

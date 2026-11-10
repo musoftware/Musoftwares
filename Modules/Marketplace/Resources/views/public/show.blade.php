@@ -12,7 +12,7 @@
         </a>
         <span>›</span>
         <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f] transition-colors">
-            {{ app()->getLocale() === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}
+            {{ \App\Support\SiteStores::name('marketplace') }}
         </a>
         @if($service->category)
             <span>›</span>

@@ -20,100 +20,74 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="pdpl-consent-gate-title"
-    class="fixed inset-0 z-[99990] {{ $shouldAutoOpenGate ? 'flex' : 'hidden' }} items-end justify-center bg-black/45 p-0 sm:p-4 overflow-x-clip"
+    aria-describedby="pdpl-consent-gate-description"
+    class="fixed inset-0 z-[99990] {{ $shouldAutoOpenGate ? 'flex' : 'hidden' }} items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px] p-0 sm:p-6 overflow-x-clip"
 >
-    <style>@keyframes pdpl-sheet-up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}.pdpl-sheet-up{animation:pdpl-sheet-up .28s ease-out}@media (prefers-reduced-motion:reduce){.pdpl-sheet-up{animation:none}}</style>
-    <div class="pdpl-sheet-up w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-black/15 bg-white text-[#1d1d1f] shadow-2xl p-5 sm:p-6">
-        <div class="flex items-start gap-3 mb-4">
-            <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/10 bg-[#f5f5f7] text-[#0071e3]">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                </svg>
-            </div>
-            <div class="min-w-0 flex-1">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-[#0066cc] mb-1">
-                    {{ __('privacy_compliance.gate_badge') }}
-                </p>
-                <h2 id="pdpl-consent-gate-title" class="text-lg sm:text-xl font-bold leading-snug text-[#1d1d1f]">
-                    {{ __('privacy_compliance.gate_title') }}
-                </h2>
-            </div>
+    <style>@keyframes pdpl-sheet-up{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}.pdpl-sheet-up{animation:pdpl-sheet-up .25s ease-out}@media (prefers-reduced-motion:reduce){.pdpl-sheet-up{animation:none}}</style>
+    <div class="pdpl-sheet-up w-full sm:max-w-[440px] max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white text-[#1d1d1f] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.35)] ring-1 ring-black/5 p-6">
+        <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f]">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/>
+                <path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/>
+            </svg>
         </div>
 
-        <p class="text-xs sm:text-sm text-[#515154] leading-relaxed mb-4">
+        <h2 id="pdpl-consent-gate-title" class="text-[17px] font-semibold leading-snug">
+            {{ __('privacy_compliance.gate_title') }}
+        </h2>
+        <p id="pdpl-consent-gate-description" class="mt-2 text-sm leading-relaxed text-[#6e6e73]">
             {{ __('privacy_compliance.gate_description') }}
         </p>
 
-        <div class="rounded-xl border border-black/10 bg-[#f5f5f7]/80 p-3.5 sm:p-4 mb-4">
-            <label for="pdpl-essential-checkbox" class="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                    id="pdpl-essential-checkbox"
-                    type="checkbox"
-                    class="mt-1 h-4 w-4 shrink-0 rounded border-black/30 text-[#0071e3] focus:ring-[#0071e3]"
-                />
-                <span class="text-xs sm:text-sm font-medium text-[#1d1d1f] leading-relaxed">
-                    {{ __('privacy_compliance.gate_essential_checkbox') }}
-                </span>
-            </label>
-            <p id="pdpl-essential-hint" class="mt-2 text-xs font-medium text-[#b45309]">
-                {{ __('privacy_compliance.gate_essential_required_hint') }}
-            </p>
-        </div>
+        <label id="pdpl-essential-label" for="pdpl-essential-checkbox" class="mt-5 flex cursor-pointer select-none items-start gap-3 rounded-xl bg-[#f5f5f7] p-3.5 ring-1 ring-transparent transition">
+            <input
+                id="pdpl-essential-checkbox"
+                type="checkbox"
+                aria-describedby="pdpl-essential-hint"
+                class="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer rounded border-black/25 text-[#1d1d1f] focus:ring-[#1d1d1f]"
+            />
+            <span class="text-[13px] leading-relaxed text-[#1d1d1f]">
+                {{ __('privacy_compliance.gate_essential_checkbox') }}
+            </span>
+        </label>
+        <p id="pdpl-essential-hint" role="alert" class="mt-2 hidden text-xs text-[#d70015]">
+            {{ __('privacy_compliance.gate_essential_required_hint') }}
+        </p>
 
-        <div class="rounded-xl border border-black/10 bg-white p-3.5 sm:p-4 mb-5">
-            <h3 class="text-xs sm:text-sm font-semibold text-[#1d1d1f] mb-1">
-                {{ __('privacy_compliance.gate_cookies_heading') }}
-            </h3>
-            <p class="text-xs text-[#515154] leading-relaxed">
-                {{ __('privacy_compliance.gate_cookies_description') }}
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
-            <button
-                type="button"
-                id="pdpl-btn-accept-all"
-                disabled
-                class="min-h-[44px] w-full rounded-xl bg-[#0071e3] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#0077ed] disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer"
-            >
-                {{ __('privacy_compliance.gate_accept_all_btn') }}
-            </button>
+        <div class="mt-5 grid grid-cols-2 gap-2">
             <button
                 type="button"
                 id="pdpl-btn-reject-tracking"
-                disabled
-                class="min-h-[44px] w-full rounded-xl border-2 border-[#1d1d1f] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer"
+                class="min-h-[44px] rounded-full bg-[#f5f5f7] px-4 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#e8e8ed] disabled:opacity-50 cursor-pointer"
             >
                 {{ __('privacy_compliance.gate_reject_tracking_btn') }}
             </button>
+            <button
+                type="button"
+                id="pdpl-btn-accept-all"
+                class="min-h-[44px] rounded-full bg-[#1d1d1f] px-4 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-50 cursor-pointer"
+            >
+                {{ __('privacy_compliance.gate_accept_all_btn') }}
+            </button>
         </div>
 
-        <form method="POST" action="{{ route('privacy.consent.decline') }}" class="mb-4">
+        <form method="POST" action="{{ route('privacy.consent.decline') }}" class="mt-3">
             @csrf
             <button
                 type="submit"
-                class="min-h-[40px] w-full rounded-xl border border-[#dc2626]/30 bg-[#fef2f2] px-4 py-2 text-xs font-semibold text-[#b91c1c] transition hover:bg-[#fee2e2] cursor-pointer"
+                class="w-full min-h-[36px] text-[13px] text-[#6e6e73] underline-offset-4 transition hover:text-[#1d1d1f] hover:underline cursor-pointer"
             >
                 {{ __('privacy_compliance.gate_decline_essential_btn') }}
             </button>
         </form>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-black/10 text-xs">
-            <div class="flex flex-wrap items-center gap-4">
-                <a href="/privacy-policy" class="font-semibold text-[#0066cc] hover:underline">
-                    {{ __('privacy_compliance.read_privacy_policy') }}
-                </a>
-                <a href="/terms-of-service" class="font-semibold text-[#0066cc] hover:underline">
-                    {{ __('privacy_compliance.read_terms') }}
-                </a>
-                <a href="/cookie-policy" class="font-semibold text-[#0066cc] hover:underline">
-                    {{ __('privacy_compliance.read_cookies') }}
-                </a>
+        <div class="mt-4 border-t border-black/[0.06] pt-4 text-xs text-[#6e6e73]">
+            <div class="flex flex-wrap gap-x-4 gap-y-1">
+                <a href="/privacy-policy" class="hover:text-[#1d1d1f] hover:underline">{{ __('privacy_compliance.read_privacy_policy') }}</a>
+                <a href="/terms-of-service" class="hover:text-[#1d1d1f] hover:underline">{{ __('privacy_compliance.read_terms') }}</a>
+                <a href="/cookie-policy" class="hover:text-[#1d1d1f] hover:underline">{{ __('privacy_compliance.read_cookies') }}</a>
             </div>
-            <span class="text-[11px] text-[#86868b]">
-                {{ $pdplGateState['policyVersion'] ?? 'v2.0-2026' }}
-            </span>
+            <p class="mt-2 text-[11px] text-[#86868b]">{{ __('privacy_compliance.gate_badge') }}</p>
         </div>
     </div>
 </div>
@@ -131,24 +105,34 @@
         document.addEventListener('DOMContentLoaded', function () {
             var backdrop = document.getElementById('pdpl-consent-gate-backdrop');
             var checkbox = document.getElementById('pdpl-essential-checkbox');
+            var label = document.getElementById('pdpl-essential-label');
             var hint = document.getElementById('pdpl-essential-hint');
             var acceptBtn = document.getElementById('pdpl-btn-accept-all');
             var rejectBtn = document.getElementById('pdpl-btn-reject-tracking');
             if (!backdrop || !checkbox || !acceptBtn || !rejectBtn) return;
 
-            function syncButtons() {
-                var checked = Boolean(checkbox.checked);
-                acceptBtn.disabled = !checked;
-                rejectBtn.disabled = !checked;
-                if (hint) hint.style.display = checked ? 'none' : 'block';
+            function setHintVisible(visible) {
+                if (hint) hint.classList.toggle('hidden', !visible);
+                if (label) label.classList.toggle('ring-[#d70015]', visible);
+                if (label) label.classList.toggle('ring-transparent', !visible);
+            }
+
+            function resetButtons() {
+                acceptBtn.disabled = false;
+                rejectBtn.disabled = false;
             }
 
             checkbox.checked = false;
-            syncButtons();
-            checkbox.addEventListener('change', syncButtons);
+            checkbox.addEventListener('change', function () {
+                if (checkbox.checked) setHintVisible(false);
+            });
 
             function submitChoice(enableTracking) {
-                if (!checkbox.checked) return;
+                if (!checkbox.checked) {
+                    setHintVisible(true);
+                    checkbox.focus();
+                    return;
+                }
                 acceptBtn.disabled = true;
                 rejectBtn.disabled = true;
                 var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
@@ -175,7 +159,7 @@
                     backdrop.classList.add('hidden');
                     backdrop.classList.remove('flex');
                 }).catch(function () {
-                    syncButtons();
+                    resetButtons();
                 });
             }
 
@@ -185,7 +169,9 @@
             window.addEventListener('open-privacy-consent-gate', function () {
                 backdrop.classList.remove('hidden');
                 backdrop.classList.add('flex');
-                syncButtons();
+                checkbox.checked = false;
+                setHintVisible(false);
+                resetButtons();
             });
         });
     })();

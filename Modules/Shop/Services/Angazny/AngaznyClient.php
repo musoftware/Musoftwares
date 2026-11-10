@@ -52,6 +52,16 @@ class AngaznyClient
         return array_column($rows, 'category_name', 'id');
     }
 
+    /** @return list<array{id: int, Name: string, price: float}> */
+    public function areas(int $cityId): array
+    {
+        return $this->request()
+            ->retry(self::READ_ATTEMPTS, self::READ_RETRY_MILLISECONDS)
+            ->get('/affiliate/area/list/'.$cityId)
+            ->throw()
+            ->json('data') ?? [];
+    }
+
     /** @return array<string, mixed> */
     public function product(int $id): array
     {

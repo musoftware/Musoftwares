@@ -34,6 +34,8 @@ return [
         'invite' => 'Invite friends',
         'invite_hint' => 'You referred :count people and earned :points points from them.',
         'copy' => 'Copy',
+        'builder_link_title' => 'AI builder link',
+        'builder_link_hint' => 'When someone orders a program from this link, you earn a commission on every payment. It reaches your balance after 14 days.',
         'copied' => 'Copied',
     ],
 

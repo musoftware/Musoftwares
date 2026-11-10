@@ -46,6 +46,38 @@ class PortfolioData
                 ],
             ],
 
+            'umkhalid-mixing' => [
+                'slug' => 'umkhalid-mixing',
+                'title_en' => 'Um Khalid Mixing: Online Store for Omani Sauces',
+                'title_ar' => 'خلطة أم خالد: متجر أونلاين للصوصات العمانية',
+                'category' => 'Web Apps',
+                'category_ar' => 'تطبيقات ومواقع الويب',
+                'desc_en' => 'An Arabic online store for Um Khalid, a home-made sauce and pickle brand in Oman since 2007. Customers browse the sauces, see the ingredients, spice level and nutrition facts of each one, order online, and find the nearest point of sale on a map of Oman.',
+                'desc_ar' => 'متجر أونلاين عربي لأم خالد، علامة صوصات ومخللات منزلية في عُمان من 2007. العميل بيتفرج على الخلطات، ويشوف مكونات كل واحدة ودرجة الحرارة والقيمة الغذائية، ويطلب أونلاين، ويلاقي أقرب نقطة بيع على خريطة عُمان.',
+                'img' => '/images/portfolio/umkhalid-mixing-1.webp',
+                'gallery' => ['/images/portfolio/umkhalid-mixing-1.webp', '/images/portfolio/umkhalid-mixing-2.webp', '/images/portfolio/umkhalid-mixing-3.webp', '/images/portfolio/umkhalid-mixing-4.webp'],
+                'techs' => ['WordPress', 'WooCommerce', 'PHP', 'Custom theme'],
+                'live_url' => 'https://umkhalidmixing.com/',
+                'metrics' => [
+                    'Type' => 'Online store for a food brand',
+                    'Products' => 'Sauces and pickles',
+                    'Prices' => 'Omani rial',
+                    'Mobile' => 'Works on any phone',
+                ],
+                'highlights_en' => [
+                    'A custom Arabic theme built around the brand photos, with best sellers and all sauces on the home page.',
+                    'A page for each sauce with weight, spice level, ingredients and a nutrition facts table.',
+                    'Add to cart or buy now through WooCommerce, with sharing buttons and customer reviews.',
+                    'Points of sale by governorate on a map of Oman, a WhatsApp contact button, and shipping and returns pages.',
+                ],
+                'highlights_ar' => [
+                    'قالب عربي مخصوص مبني على صور العلامة، والأكثر مبيعًا وكل الخلطات في الصفحة الرئيسية.',
+                    'صفحة لكل خلطة فيها الوزن ودرجة الحرارة والمكونات وجدول القيمة الغذائية.',
+                    'إضافة للعربة أو شراء على طول عن طريق WooCommerce، وأزرار مشاركة وتقييمات العملاء.',
+                    'نقاط البيع حسب المحافظة على خريطة عُمان، وزرار تواصل واتساب، وصفحات الشحن والاسترجاع.',
+                ],
+            ],
+
             'alsawan-foods' => [
                 'slug' => 'alsawan-foods',
                 'title_en' => 'Al Sawan Foods Factory Website',

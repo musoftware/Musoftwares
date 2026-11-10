@@ -2189,6 +2189,7 @@ return [
     'sidebar_shop' => 'المتجر',
     'sidebar_shop_products' => 'المنتجات',
     'sidebar_shop_categories' => 'الأقسام',
+    'sidebar_builder' => 'محادثات منشئ البرامج',
     'sidebar_shop_orders' => 'الطلبات',
     'sidebar_finance_overview' => 'نظرة عامة',
     'sidebar_recurring' => 'المتكرر',

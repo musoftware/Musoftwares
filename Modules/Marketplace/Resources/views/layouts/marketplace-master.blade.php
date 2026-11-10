@@ -223,7 +223,7 @@
 
     <nav class="w-full bg-white border-b border-black/[0.06]" aria-label="{{ $locale === 'ar' ? 'قائمة سوق الخدمات' : 'Marketplace menu' }}">
         <div class="max-w-[1240px] mx-auto px-4 sm:px-8 h-12 flex items-center gap-5 overflow-x-auto whitespace-nowrap text-[13px] font-medium">
-            <a href="{{ route('marketplace.services.index') }}" class="shrink-0 font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</a>
+            <a href="{{ route('marketplace.services.index') }}" class="shrink-0 font-semibold text-[#1d1d1f]">{{ \App\Support\SiteStores::name('marketplace') }}</a>
             <span class="shrink-0 h-4 w-px bg-black/10" aria-hidden="true"></span>
             <a href="{{ route('marketplace.services.index') }}" class="shrink-0 {{ request()->routeIs('marketplace.services.index') ? 'text-[#0071e3]' : 'text-[#1d1d1f]/70 hover:text-[#0071e3]' }}">{{ $locale === 'ar' ? 'استكشف الخدمات' : 'Explore' }}</a>
             <a href="{{ route('marketplace.services.create') }}" class="shrink-0 text-[#1d1d1f]/70 hover:text-[#0071e3]">{{ $locale === 'ar' ? 'أضف خدمتك' : 'Sell a service' }}</a>
@@ -289,7 +289,7 @@
                 </a>
                 <span>›</span>
                 <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f]">
-                    <span>{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</span>
+                    <span>{{ \App\Support\SiteStores::name('marketplace') }}</span>
                 </a>
                 @if(isset($title) || isset($meta['title']))
                     <span>›</span>

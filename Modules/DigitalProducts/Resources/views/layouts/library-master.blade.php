@@ -166,7 +166,7 @@
                 <!-- Desktop Navigation Links -->
                 <nav class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse text-[13px] font-normal text-[#1d1d1f]/75">
                     <a href="{{ route('library.index') }}" class="font-medium text-[#0071e3] transition-colors">{{ $locale === 'ar' ? 'المكتبة الرقمية' : 'Digital Library' }}</a>
-                    <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</a>
+                    <a href="{{ route('marketplace.services.index') }}" class="hover:text-[#1d1d1f] transition-colors">{{ \App\Support\SiteStores::name('marketplace') }}</a>
                     <a href="/platforms" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'المنصات' : 'Platforms' }}</a>
                     <a href="/solutions" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'الحلول' : 'Solutions' }}</a>
                     <a href="/portfolio" class="hover:text-[#1d1d1f] transition-colors">{{ $locale === 'ar' ? 'معرض الأعمال' : 'Portfolio' }}</a>
@@ -210,7 +210,7 @@
                             </a>
                             <a href="{{ route('marketplace.services.index') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
                                 <i class="ri-store-2-line text-indigo-500"></i>
-                                <span>{{ $locale === 'ar' ? 'سوق الخدمات' : 'Marketplace' }}</span>
+                                <span>{{ \App\Support\SiteStores::name('marketplace') }}</span>
                             </a>
                             <a href="/dashboard" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-[#1d1d1f] hover:bg-[#f5f5f7] transition-colors">
                                 <i class="ri-apps-2-line text-slate-700"></i>

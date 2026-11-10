@@ -346,6 +346,7 @@ class UsersController extends Controller
 
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
+            'badgeCardUrl' => app(\App\Services\BadgeCardService::class)->linkFor($user),
             'loans' => $user->loans()->with('currency')->latest('date')->get(),
             'currencies' => $currencies,
             'stats' => $stats,

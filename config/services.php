@@ -43,6 +43,15 @@ return [
 
     'fcm' => [
         'project_id' => env('FCM_PROJECT_ID'),
+        // the public web config, for pages that are not built with Vite (the AI builder chat)
+        'web' => [
+            'api_key' => env('VITE_FIREBASE_API_KEY', ''),
+            'auth_domain' => env('VITE_FIREBASE_AUTH_DOMAIN', ''),
+            'project_id' => env('VITE_FIREBASE_PROJECT_ID', ''),
+            'messaging_sender_id' => env('VITE_FIREBASE_MESSAGING_SENDER_ID', ''),
+            'app_id' => env('VITE_FIREBASE_APP_ID', ''),
+            'vapid_key' => env('VITE_FIREBASE_VAPID_KEY', ''),
+        ],
     ],
 
     'recaptcha' => [

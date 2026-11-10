@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
-import { ShieldCheck } from 'lucide-react';
+import { Cookie } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
 export interface TrackingConfig {
@@ -53,6 +53,7 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
     const [manualOpen, setManualOpen] = useState(false);
     const [essentialChecked, setEssentialChecked] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [showRequiredHint, setShowRequiredHint] = useState(false);
     const [pathname, setPathname] = useState(() => (typeof window !== 'undefined' ? window.location.pathname : '/'));
 
     useEffect(() => {
@@ -73,6 +74,7 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
 
         const handleOpenPreferences = () => {
             setEssentialChecked(false);
+            setShowRequiredHint(false);
             setManualOpen(true);
         };
 
@@ -157,78 +159,76 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
         }
     };
 
+    const tryChoice = (enableTracking: boolean) => {
+        if (!essentialChecked) {
+            setShowRequiredHint(true);
+            document.getElementById('pdpl-react-essential-checkbox')?.focus();
+            return;
+        }
+        submitGateChoice(enableTracking);
+    };
+
     return (
         <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="pdpl-react-gate-title"
-            className="fixed inset-0 z-[99990] flex items-end justify-center bg-black/45 p-0 sm:p-4 overflow-x-clip"
+            aria-describedby="pdpl-react-gate-description"
+            className="fixed inset-0 z-[99990] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px] p-0 sm:p-6 overflow-x-clip"
         >
-            <style>{`@keyframes pdpl-sheet-up{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}.pdpl-sheet-up{animation:pdpl-sheet-up .28s ease-out}@media (prefers-reduced-motion:reduce){.pdpl-sheet-up{animation:none}}`}</style>
-            <div className="pdpl-sheet-up w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-black/15 bg-white text-[#1d1d1f] shadow-2xl p-5 sm:p-6">
-                <div className="flex items-start gap-3 mb-4">
-                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/10 bg-[#f5f5f7] text-[#0071e3]">
-                        <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0066cc] mb-1">
-                            {__('privacy_compliance.gate_badge')}
-                        </p>
-                        <h2 id="pdpl-react-gate-title" className="text-lg sm:text-xl font-bold leading-snug text-[#1d1d1f]">
-                            {__('privacy_compliance.gate_title')}
-                        </h2>
-                    </div>
+            <style>{`@keyframes pdpl-sheet-up{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}.pdpl-sheet-up{animation:pdpl-sheet-up .25s ease-out}@media (prefers-reduced-motion:reduce){.pdpl-sheet-up{animation:none}}`}</style>
+            <div className="pdpl-sheet-up w-full sm:max-w-[440px] max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-white text-[#1d1d1f] shadow-[0_24px_64px_-16px_rgba(0,0,0,0.35)] ring-1 ring-black/5 p-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f]">
+                    <Cookie className="h-5 w-5" aria-hidden="true" />
                 </div>
 
-                <p className="text-xs sm:text-sm text-[#515154] leading-relaxed mb-4">
+                <h2 id="pdpl-react-gate-title" className="text-[17px] font-semibold leading-snug">
+                    {__('privacy_compliance.gate_title')}
+                </h2>
+                <p id="pdpl-react-gate-description" className="mt-2 text-sm leading-relaxed text-[#6e6e73]">
                     {__('privacy_compliance.gate_description')}
                 </p>
 
-                <div className="rounded-xl border border-black/10 bg-[#f5f5f7]/80 p-3.5 sm:p-4 mb-4">
-                    <label htmlFor="pdpl-react-essential-checkbox" className="flex items-start gap-3 cursor-pointer select-none">
-                        <input
-                            id="pdpl-react-essential-checkbox"
-                            type="checkbox"
-                            checked={essentialChecked}
-                            onChange={(e) => setEssentialChecked(e.target.checked)}
-                            className="mt-1 h-4 w-4 shrink-0 rounded border-black/30 text-[#0071e3] focus:ring-[#0071e3]"
-                        />
-                        <span className="text-xs sm:text-sm font-medium text-[#1d1d1f] leading-relaxed">
-                            {__('privacy_compliance.gate_essential_checkbox')}
-                        </span>
-                    </label>
-                    {!essentialChecked && (
-                        <p className="mt-2 text-xs font-medium text-[#b45309]">
-                            {__('privacy_compliance.gate_essential_required_hint')}
-                        </p>
-                    )}
-                </div>
+                <label
+                    htmlFor="pdpl-react-essential-checkbox"
+                    className={`mt-5 flex cursor-pointer select-none items-start gap-3 rounded-xl bg-[#f5f5f7] p-3.5 ring-1 transition ${showRequiredHint && !essentialChecked ? 'ring-[#d70015]' : 'ring-transparent'}`}
+                >
+                    <input
+                        id="pdpl-react-essential-checkbox"
+                        type="checkbox"
+                        checked={essentialChecked}
+                        aria-describedby="pdpl-react-essential-hint"
+                        onChange={(e) => setEssentialChecked(e.target.checked)}
+                        className="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer rounded border-black/25 text-[#1d1d1f] focus:ring-[#1d1d1f]"
+                    />
+                    <span className="text-[13px] leading-relaxed text-[#1d1d1f]">
+                        {__('privacy_compliance.gate_essential_checkbox')}
+                    </span>
+                </label>
+                <p
+                    id="pdpl-react-essential-hint"
+                    role="alert"
+                    className={`mt-2 text-xs text-[#d70015] ${showRequiredHint && !essentialChecked ? '' : 'hidden'}`}
+                >
+                    {__('privacy_compliance.gate_essential_required_hint')}
+                </p>
 
-                <div className="rounded-xl border border-black/10 bg-white p-3.5 sm:p-4 mb-5">
-                    <h3 className="text-xs sm:text-sm font-semibold text-[#1d1d1f] mb-1">
-                        {__('privacy_compliance.gate_cookies_heading')}
-                    </h3>
-                    <p className="text-xs text-[#515154] leading-relaxed">
-                        {__('privacy_compliance.gate_cookies_description')}
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+                <div className="mt-5 grid grid-cols-2 gap-2">
                     <button
                         type="button"
-                        disabled={!essentialChecked || submitting}
-                        onClick={() => submitGateChoice(true)}
-                        className="min-h-[44px] w-full rounded-xl bg-[#0071e3] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-[#0077ed] disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer"
+                        disabled={submitting}
+                        onClick={() => tryChoice(false)}
+                        className="min-h-[44px] rounded-full bg-[#f5f5f7] px-4 text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#e8e8ed] disabled:opacity-50 cursor-pointer"
                     >
-                        {__('privacy_compliance.gate_accept_all_btn')}
+                        {__('privacy_compliance.gate_reject_tracking_btn')}
                     </button>
                     <button
                         type="button"
-                        disabled={!essentialChecked || submitting}
-                        onClick={() => submitGateChoice(false)}
-                        className="min-h-[44px] w-full rounded-xl border-2 border-[#1d1d1f] bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#1d1d1f] transition hover:bg-[#f5f5f7] disabled:opacity-45 disabled:cursor-not-allowed cursor-pointer"
+                        disabled={submitting}
+                        onClick={() => tryChoice(true)}
+                        className="min-h-[44px] rounded-full bg-[#1d1d1f] px-4 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-50 cursor-pointer"
                     >
-                        {__('privacy_compliance.gate_reject_tracking_btn')}
+                        {__('privacy_compliance.gate_accept_all_btn')}
                     </button>
                 </div>
 
@@ -236,29 +236,26 @@ export function PrivacyConsentGate({ initialCompliance }: { initialCompliance?: 
                     type="button"
                     disabled={submitting}
                     onClick={submitDeclineEssential}
-                    className="min-h-[40px] w-full rounded-xl border border-[#dc2626]/30 bg-[#fef2f2] px-4 py-2 text-xs font-semibold text-[#b91c1c] transition hover:bg-[#fee2e2] disabled:opacity-50 cursor-pointer mb-4"
+                    className="mt-3 w-full min-h-[36px] text-[13px] text-[#6e6e73] underline-offset-4 transition hover:text-[#1d1d1f] hover:underline disabled:opacity-50 cursor-pointer"
                 >
                     {__('privacy_compliance.gate_decline_essential_btn')}
                 </button>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-black/10 text-xs">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <a href="/privacy-policy" className="font-semibold text-[#0066cc] hover:underline">
+                <div className="mt-4 border-t border-black/[0.06] pt-4 text-xs text-[#6e6e73]">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        <a href="/privacy-policy" className="hover:text-[#1d1d1f] hover:underline">
                             {__('privacy_compliance.read_privacy_policy')}
                         </a>
-                        <a href="/terms-of-service" className="font-semibold text-[#0066cc] hover:underline">
+                        <a href="/terms-of-service" className="hover:text-[#1d1d1f] hover:underline">
                             {__('privacy_compliance.read_terms')}
                         </a>
-                        <a href="/cookie-policy" className="font-semibold text-[#0066cc] hover:underline">
+                        <a href="/cookie-policy" className="hover:text-[#1d1d1f] hover:underline">
                             {__('privacy_compliance.read_cookies')}
                         </a>
                     </div>
-                    <span className="text-[11px] text-[#86868b]">
-                        {compliance?.policyVersion ?? 'v2.0-2026'}
-                    </span>
+                    <p className="mt-2 text-[11px] text-[#86868b]">{__('privacy_compliance.gate_badge')}</p>
                 </div>
             </div>
         </div>
     );
 }
-

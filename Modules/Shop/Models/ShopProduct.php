@@ -15,6 +15,8 @@ class ShopProduct extends Model
         'category_id', 'name', 'slug', 'description', 'price', 'compare_at_price', 'images',
         'sizes', 'colors', 'in_stock', 'is_active', 'sort_order', 'seo_title', 'seo_description',
         'angazny_id', 'angazny_price', 'angazny_commission', 'angazny_depot', 'angazny_variants', 'angazny_needs_price',
+        'angazny_drive_checked_at', 'content_rewritten_at', 'original_name', 'original_description',
+        'color_images', 'images_arranged_at',
     ];
 
     protected $casts = [
@@ -30,6 +32,10 @@ class ShopProduct extends Model
         'angazny_commission' => 'decimal:2',
         'angazny_variants' => 'array',
         'angazny_needs_price' => 'boolean',
+        'angazny_drive_checked_at' => 'datetime',
+        'content_rewritten_at' => 'datetime',
+        'color_images' => 'array',
+        'images_arranged_at' => 'datetime',
     ];
 
     public function category(): BelongsTo
@@ -58,6 +64,20 @@ class ShopProduct extends Model
         return $this->imageUrls()[0] ?? null;
     }
 
+    /** @return array<string, string> colour name => address, leaving out photos that were removed */
+    public function colorImageUrls(): array
+    {
+        return collect($this->color_images ?? [])
+            ->filter(fn (string $path) => in_array($path, $this->images ?? [], true))
+            ->map(fn (string $path) => asset('uploads/'.$path))
+            ->all();
+    }
+
+    public function imageUrlFor(?string $color): ?string
+    {
+        return $this->colorImageUrls()[$color ?? ''] ?? $this->mainImageUrl();
+    }
+
     public function hasDiscount(): bool
     {
         return $this->compare_at_price !== null && (float) $this->compare_at_price > (float) $this->price;
@@ -75,6 +95,11 @@ class ShopProduct extends Model
     public function canBeOrdered(): bool
     {
         return $this->is_active && $this->in_stock && ! $this->angazny_needs_price;
+    }
+
+    public function shippingCost(): float
+    {
+        return (float) config($this->isFromAngazny() ? 'shop.angazny.shipping' : 'shop.shipping_cost');
     }
 
     public function isFromAngazny(): bool

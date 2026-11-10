@@ -11,7 +11,7 @@
     @else
         @foreach ($lines as $line)
             <div class="line">
-                <img src="{{ $line['product']->mainImageUrl() }}" alt="{{ $line['product']->name }}" width="72" height="72" loading="lazy">
+                <img src="{{ $line['product']->imageUrlFor($line['color']) }}" alt="{{ $line['product']->name }}" width="72" height="72" loading="lazy">
                 <div>
                     <a class="line-name" href="{{ $line['product']->url() }}">{{ $line['product']->name }}</a>
                     @include('shop::partials.line-meta', ['line' => $line])

@@ -10,8 +10,10 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Modules\Shop\Models\ShopArea;
 use Modules\Shop\Models\ShopOrder;
 use Modules\Shop\Models\ShopProduct;
+use Modules\Shop\Services\Angazny\AngaznyAreaSync;
 use Modules\Shop\Services\Angazny\AngaznyCatalogueSync;
 use Modules\Shop\Services\Angazny\AngaznyOrderSender;
 use Modules\Shop\Services\Angazny\AngaznyPrice;
@@ -30,7 +32,8 @@ class AngaznyIntegrationTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public_uploads');
-        config(['shop.angazny.token' => 'test-token', 'shop.angazny.area_ids' => [6 => 44]]);
+        config(['shop.angazny.token' => 'test-token']);
+        ShopArea::create(['angazny_id' => 44, 'city_id' => 6, 'name' => 'مدينة نصر']);
     }
 
     /** One Angazny product view: colours red/blue in size L, where blue L is sold out. */
@@ -87,7 +90,7 @@ class AngaznyIntegrationTest extends TestCase
         $product->update(['is_active' => true]);
         $this->post(route('shop.cart.add', $product->id), ['quantity' => 2, 'color' => 'أحمر', 'size' => 'L'])->assertRedirect();
         $this->post(route('shop.checkout.store'), [
-            'customer_name' => 'عميل تجريبي', 'phone' => '01012345678', 'governorate' => $governorate, 'address' => 'شارع النصر عمارة 5',
+            'customer_name' => 'عميل تجريبي', 'phone' => '01012345678', 'governorate' => $governorate, 'address' => 'شارع النصر عمارة 5', 'angazny_area_id' => 44,
         ])->assertRedirect();
 
         return ShopOrder::with('items')->latest('id')->firstOrFail();
@@ -332,8 +335,8 @@ class AngaznyIntegrationTest extends TestCase
 
     public function test_an_order_with_no_area_code_is_not_sent(): void
     {
-        config(['shop.angazny.area_ids' => []]);
         $order = $this->buy($this->importOne());
+        $order->update(['angazny_area_id' => null]);
         Http::fake();
 
         app(AngaznyOrderSender::class)->send($order);
@@ -383,5 +386,82 @@ class AngaznyIntegrationTest extends TestCase
 
         $this->assertSame(0, Artisan::call('shop:angazny-sync'));
         Http::assertNothingSent();
+    }
+
+    public function test_the_checkout_lists_the_areas_of_each_governorate(): void
+    {
+        $product = $this->importOne();
+        $product->update(['is_active' => true]);
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'color' => 'أحمر', 'size' => 'L']);
+
+        $this->get(route('shop.checkout'))->assertOk()
+            ->assertSee('name="angazny_area_id"', false)
+            ->assertSee('<optgroup label="القاهرة">', false)
+            ->assertSee('مدينة نصر');
+    }
+
+    /** @return array<string, array{0: ?int}> */
+    public static function badAreas(): array
+    {
+        return ['none chosen' => [null], 'another governorate' => [77], 'made up' => [999]];
+    }
+
+    /** @dataProvider badAreas */
+    public function test_the_area_must_belong_to_the_chosen_governorate(?int $areaId): void
+    {
+        ShopArea::create(['angazny_id' => 77, 'city_id' => 11, 'name' => 'الدقي']);
+        $product = $this->importOne();
+        $product->update(['is_active' => true]);
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'color' => 'أحمر', 'size' => 'L']);
+
+        $this->post(route('shop.checkout.store'), array_filter([
+            'customer_name' => 'عميل تجريبي', 'phone' => '01012345678', 'governorate' => 'القاهرة', 'address' => 'شارع النصر عمارة 5', 'angazny_area_id' => $areaId,
+        ]))->assertSessionHasErrors('angazny_area_id');
+
+        $this->assertSame(0, ShopOrder::count());
+    }
+
+    public function test_area_sync_adds_renames_removes_and_survives_a_broken_city(): void
+    {
+        config(['shop.angazny.cities' => ['القاهرة' => 6, 'الجيزة' => 11]]);
+        ShopArea::create(['angazny_id' => 500, 'city_id' => 6, 'name' => 'منطقة قديمة']);
+        Http::fake([
+            self::API.'/area/list/6' => Http::response(['data' => [['id' => 44, 'Name' => ' مدينة نصر الجديدة ', 'price' => 80], ['id' => 45, 'Name' => 'المعادي', 'price' => 80]]]),
+            self::API.'/area/list/11' => Http::response([], 500),
+        ]);
+
+        $report = app(AngaznyAreaSync::class)->handle();
+
+        $this->assertSame(['areas' => 2, 'failed_cities' => [11]], $report);
+        $this->assertSame('مدينة نصر الجديدة', ShopArea::where('angazny_id', 44)->value('name'));
+        $this->assertSame(1, ShopArea::where('angazny_id', 45)->count());
+        $this->assertNull(ShopArea::where('angazny_id', 500)->first());
+        $this->assertNotNull(ShopArea::withTrashed()->where('angazny_id', 500)->first(), 'removed areas stay soft deleted');
+    }
+
+    public function test_an_empty_answer_for_a_city_does_not_remove_its_areas(): void
+    {
+        config(['shop.angazny.cities' => ['القاهرة' => 6]]);
+        Http::fake([self::API.'/area/list/6' => Http::response(['data' => []])]);
+
+        app(AngaznyAreaSync::class)->handle();
+
+        $this->assertSame(1, ShopArea::where('angazny_id', 44)->count());
+    }
+
+    public function test_the_sync_command_also_refreshes_areas(): void
+    {
+        config(['shop.angazny.cities' => ['القاهرة' => 6]]);
+        $this->fakeApi([]);
+        Http::swap(new Factory(app('events')));
+        Http::fake([
+            self::API.'/area/list/6' => Http::response(['data' => [['id' => 46, 'Name' => 'شبرا', 'price' => 80]]]),
+            self::API.'/product/category/list' => Http::response(['data' => []]),
+            self::API.'/product/list/all*' => Http::response(['data' => [], 'pagination' => ['total_pages' => 1]]),
+        ]);
+
+        Artisan::call('shop:angazny-sync');
+
+        $this->assertSame(1, ShopArea::where('angazny_id', 46)->count());
     }
 }

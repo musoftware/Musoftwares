@@ -129,6 +129,7 @@ const items: MenuItem[] = [
         { title: "admin.sidebar_shop_products", url: "/admin/shop/products" },
         { title: "admin.sidebar_shop_categories", url: "/admin/shop/categories" },
         { title: "admin.sidebar_shop_orders", url: "/admin/shop/orders" },
+        { title: "admin.sidebar_builder", url: "/admin/builder" },
     ]
   },
   { 

@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { Award, Check, CheckCircle2, Clock, Copy, Gift, MessageSquare, Shield, Users, Zap } from 'lucide-react';
+import { Award, Check, CheckCircle2, Clock, Copy, ExternalLink, Gift, MessageSquare, Share2, Shield, Users, Zap } from 'lucide-react';
 import ClientPage, { Card, EmptyNote, PrimaryAction, Section, TextAction } from '@/Components/Client/ClientPage';
 import MonthlyRanking, { MonthlyRankingData } from '@/Components/Client/MonthlyRanking';
 import { __ } from '@/lib/i18n';
 import { cn, formatMoney } from '@/lib/utils';
+import { whatsAppLink } from '@/lib/whatsapp';
 
 interface LoyaltyTier {
     id: number;
@@ -48,6 +49,7 @@ interface LoyaltyPageProps {
     referral: { url: string; total_users: number; points_earned: number };
     pointsConversionRate: number;
     monthlyRanking?: MonthlyRankingData;
+    badgeCardUrl?: string;
 }
 
 /** Translated level name ("Gold" / "ذهبي"), falling back to the name stored with the level. */
@@ -62,7 +64,7 @@ function tierName(tier: LoyaltyTier | null | undefined, fallbackSlug = 'bronze')
  * Rewards: the badge and points first, then this month's ranking, what the points buy, the points
  * history, the levels, how to earn, and the invite link.
  */
-export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = [], referral, pointsConversionRate = 1 / 30, monthlyRanking }: LoyaltyPageProps) {
+export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = [], referral, pointsConversionRate = 1 / 30, monthlyRanking, badgeCardUrl }: LoyaltyPageProps) {
     const { auth } = usePage().props as any;
     const [balance, setBalance] = useState<number>(summary?.balance || 0);
     const [redeemingId, setRedeemingId] = useState<number | null>(null);
@@ -141,6 +143,8 @@ export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = []
                     </p>
                 </div>
             </Card>
+
+            {badgeCardUrl && <BadgeCardShare url={badgeCardUrl} tier={tierName(summary?.current_tier, tierSlug)} />}
 
             {/* Monthly ranking: other clients are anonymous */}
             {monthlyRanking && (
@@ -306,9 +310,68 @@ export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = []
                                 {copied ? __('client_rewards.loyalty.copied') : __('client_rewards.loyalty.copy')}
                             </button>
                         </div>
+                        <BuilderReferralLink url={`${referral.url}?to=ai`} />
                     </Card>
                 </Section>
             )}
         </ClientPage>
+    );
+}
+
+/** Links to the public badge card the client can share, download as an image, or send on WhatsApp. */
+function BadgeCardShare({ url, tier }: { url: string; tier: string }) {
+    const [copied, setCopied] = useState(false);
+    const shareText = __('badge_card.share_text', { tier, brand: __('badge_card.brand') });
+
+    const copy = async () => {
+        try { await navigator.clipboard.writeText(url); } catch { return; }
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <Section title={__('badge_card.section_title')}>
+            <Card className="space-y-4">
+                <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('badge_card.section_hint')}</p>
+                <div className="flex flex-wrap gap-2">
+                    <PrimaryAction href={url} icon={<ExternalLink className="h-4 w-4" />}>{__('badge_card.open')}</PrimaryAction>
+                    <a href={whatsAppLink(`${shareText} ${url}`)} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold dark:border-white/15">
+                        <Share2 className="h-4 w-4" />{__('badge_card.whatsapp')}
+                    </a>
+                    <button type="button" onClick={copy}
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold dark:border-white/15">
+                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        {copied ? __('badge_card.copied') : __('badge_card.copy')}
+                    </button>
+                </div>
+            </Card>
+        </Section>
+    );
+}
+
+/** The invite link that opens the AI builder chat; the referrer earns a commission on every payment from it. */
+function BuilderReferralLink({ url }: { url: string }) {
+    const [copied, setCopied] = useState(false);
+    const copy = async () => {
+        try { await navigator.clipboard.writeText(url); } catch { return; }
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="space-y-2 border-t border-black/5 pt-3 dark:border-white/10">
+            <p className="text-sm font-semibold">{__('client_rewards.loyalty.builder_link_title')}</p>
+            <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.loyalty.builder_link_hint')}</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+                <input readOnly value={url} dir="ltr" aria-label={__('client_rewards.loyalty.builder_link_title')}
+                    className="w-full rounded-xl border border-black/10 bg-[#f5f5f7] px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
+                <button type="button" onClick={copy}
+                    className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-black/10 px-5 text-sm font-semibold dark:border-white/15">
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied ? __('client_rewards.loyalty.copied') : __('client_rewards.loyalty.copy')}
+                </button>
+            </div>
+        </div>
     );
 }

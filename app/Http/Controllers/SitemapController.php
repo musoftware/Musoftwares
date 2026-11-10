@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Route;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
-use Modules\Shop\Models\ShopCategory;
 use Modules\Shop\Models\ShopProduct;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\FreeTools;
@@ -30,7 +29,7 @@ class SitemapController extends Controller
         $parts = [
             ['name' => 'pages', 'lastmod' => now()->startOfDay()],
             ['name' => 'marketplace', 'lastmod' => $this->latest(MarketplaceService::class)],
-            ['name' => 'store', 'lastmod' => $this->latest(ShopProduct::class)],
+            ['url' => route('shop.sitemap'), 'lastmod' => $this->latest(ShopProduct::class)],
         ];
 
         $blogPages = (int) ceil($this->publishedArticles()->count() / self::BLOG_PAGE_SIZE);
@@ -47,8 +46,6 @@ class SitemapController extends Controller
             $urls = $this->pageUrls();
         } elseif ($name === 'marketplace') {
             $urls = $this->marketplaceUrls();
-        } elseif ($name === 'store') {
-            $urls = $this->storeUrls();
         } elseif (preg_match('/^blog-([1-9]\d*)$/', $name, $m)) {
             $urls = $this->blogUrls((int) $m[1]);
             abort_if($urls === [], 404);
@@ -108,22 +105,6 @@ class SitemapController extends Controller
             foreach (FreeTools::slugs() as $slug) {
                 $urls[] = $this->url(FreeTools::url($slug), $today, 'monthly', '0.8');
             }
-        }
-
-        return $urls;
-    }
-
-    /** The store home, its visible categories and its visible products. */
-    private function storeUrls(): array
-    {
-        $urls = [$this->url(route('shop.home'), now()->startOfDay(), 'daily', '0.9')];
-
-        foreach (ShopCategory::visible()->get(['id', 'slug', 'updated_at']) as $category) {
-            $urls[] = $this->url($category->url(), $category->updated_at, 'daily', '0.8');
-        }
-
-        foreach (ShopProduct::visible()->get(['id', 'slug', 'updated_at']) as $product) {
-            $urls[] = $this->url($product->url(), $product->updated_at, 'weekly', '0.8');
         }
 
         return $urls;

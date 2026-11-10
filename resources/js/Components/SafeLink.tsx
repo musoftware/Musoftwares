@@ -14,6 +14,7 @@ const BLADE_PREFIXES = [
     '/custom-systems',
     '/white-label',
     '/shop',
+    '/badge',
     '/start-project',
     '/legal',
     '/contact',

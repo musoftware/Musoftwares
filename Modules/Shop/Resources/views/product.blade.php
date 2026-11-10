@@ -13,7 +13,7 @@
 
     <div class="pdp">
         <div>
-            <img id="main-image" class="main-img" src="{{ $product->mainImageUrl() }}" alt="{{ $product->name }}" width="800" height="800" fetchpriority="high">
+            <img id="main-image" class="main-img" src="{{ $product->mainImageUrl() }}" alt="{{ $product->name }}" width="800" height="800" fetchpriority="high" data-color-images="{{ json_encode((object) $product->colorImageUrls(), JSON_UNESCAPED_UNICODE) }}">
             @if (count($product->imageUrls()) > 1)
                 <div class="thumbs">
                     @foreach ($product->imageUrls() as $imageUrl)
@@ -59,13 +59,39 @@
 
 @push('scripts')
     <script>
-        document.querySelectorAll('[data-thumb]').forEach(function (thumb, _index, thumbs) {
-            thumb.addEventListener('click', function (event) {
-                event.preventDefault();
-                document.getElementById('main-image').src = thumb.href;
-                thumbs.forEach(function (other) { other.removeAttribute('aria-current'); });
-                thumb.setAttribute('aria-current', 'true');
+        (function () {
+            var mainImage = document.getElementById('main-image');
+            var thumbs = document.querySelectorAll('[data-thumb]');
+            var colorImages = JSON.parse(mainImage.dataset.colorImages || '{}');
+
+            function show(url) {
+                mainImage.src = url;
+                thumbs.forEach(function (thumb) {
+                    if (thumb.href === url) {
+                        thumb.setAttribute('aria-current', 'true');
+                    } else {
+                        thumb.removeAttribute('aria-current');
+                    }
+                });
+            }
+
+            function showColor(input) {
+                if (input.checked && colorImages[input.value]) {
+                    show(colorImages[input.value]);
+                }
+            }
+
+            thumbs.forEach(function (thumb) {
+                thumb.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    show(thumb.href);
+                });
             });
-        });
+
+            document.querySelectorAll('input[name="color"]').forEach(function (input) {
+                input.addEventListener('change', function () { showColor(input); });
+                showColor(input);
+            });
+        })();
     </script>
 @endpush

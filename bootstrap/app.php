@@ -66,6 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest/invoices/payment/webhook',
             'guest/quotations/payment/webhook',
             'software-orders/webhook',
+            'ai/webhook',
             'pay/webhook',
             'api/serial/device',   // Serial license check-in — called by client software, no browser session
             'api/serial/device/*', // Serial link and user registration from desktop client dialogs

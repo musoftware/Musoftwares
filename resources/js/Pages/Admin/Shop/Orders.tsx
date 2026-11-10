@@ -27,6 +27,7 @@ interface Order {
     angazny_status: string | null;
     angazny_order_code: string | null;
     angazny_error: string | null;
+    area: { name: string } | null;
 }
 
 const STATUS_LABELS: Record<string, [string, string]> = {
@@ -80,7 +81,7 @@ function OrderRow({ order, statuses, currency }: { order: Order; statuses: strin
             <div className="min-w-0">
                 <p className="font-semibold">#{String(order.id).padStart(5, '0')} · {order.customer_name}</p>
                 <a className="text-blue-600 inline-flex items-center min-h-11" dir="ltr" href={`tel:${order.phone}`}>{order.phone}</a>
-                <p className="text-sm break-words">{order.governorate}: {order.address}</p>
+                <p className="text-sm break-words">{order.governorate}{order.area && ` - ${order.area.name}`}: {order.address}</p>
                 {order.notes && <p className="text-sm text-muted-foreground break-words">{order.notes}</p>}
                 <p className="text-sm text-muted-foreground">{cairoTime(order.created_at)}</p>
             </div>

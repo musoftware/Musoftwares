@@ -12,5 +12,6 @@
     "Series": true,
     "DigitalProducts": true,
     "SoftwareStore": true,
-    "Shop": true
+    "Shop": true,
+    "AppBuilder": true
 }

@@ -5011,7 +5011,6 @@ return array (
   'paid_to_date' => 'المدفوع حتى الآن',
   'paper_plane' => 'Paper Plane',
   'parent_0_this_parent_1_this' => 'parent, 0: this=parent, -1: this',
-  'parsed_credentials' => 'البيانات المستخرجة',
   'partial_delivery_applied_successfully' => 'Partial delivery applied successfully',
   'partial_pay' => 'Partial Pay',
   'partial_return' => 'Partial Return',

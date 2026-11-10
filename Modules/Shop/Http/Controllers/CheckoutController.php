@@ -32,6 +32,7 @@ class CheckoutController extends Controller
             'shipping' => $shipping,
             'total' => $subtotal + $shipping,
             'governorates' => $this->cart->governorates($lines),
+            'areas' => $this->cart->areas($lines),
         ]);
     }
 

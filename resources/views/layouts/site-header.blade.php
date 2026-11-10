@@ -1,11 +1,13 @@
-{{-- One header for every public page. "All services" opens a panel with everything the site offers. --}}
+{{-- One header for every public page. "Our services" opens a nested menu (groups, then links) and
+     "Our stores" opens picture cards of the stores we built. The data comes from App\Support\SiteNav. --}}
 @php
     $isAr = app()->getLocale() === 'ar';
     $nav = \App\Support\SiteNav::links();
     $linkClass = fn (array $link) => $link['active'] ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]';
-    $megaActive = request()->is('services', 'services/*') || collect($nav['mega'])->contains('active', true);
-    $megaLabel = $isAr ? 'كل الخدمات' : 'All services';
-    $megaAllLabel = $isAr ? 'شوف كل البرامج والأنظمة والأدوات' : 'See all programs, systems and tools';
+    $megaActive = collect($nav['mega'])->contains('active', true);
+    $storesActive = collect($nav['stores'])->contains('active', true);
+    $openGroup = collect($nav['mega'])->firstWhere('active', true)['key'] ?? $nav['mega'][0]['key'];
+    $menuButton = fn (bool $active) => 'list-none cursor-pointer flex items-center gap-1 py-2 transition-colors [&::-webkit-details-marker]:hidden '.($active ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]');
 @endphp
 <header class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-black/5">
     <div class="max-w-[1240px] mx-auto flex items-center justify-between gap-4 px-4 sm:px-8 h-16">
@@ -16,28 +18,65 @@
         </a>
 
         <nav class="hidden lg:flex items-center gap-4 xl:gap-7 whitespace-nowrap text-[14px] font-medium" aria-label="{{ $isAr ? 'القائمة الرئيسية' : 'Main menu' }}">
-            <details id="mega-menu" class="group">
-                <summary class="list-none cursor-pointer flex items-center gap-1 transition-colors {{ $megaActive ? 'text-[#0071e3] font-semibold' : 'text-[#1d1d1f]/75 hover:text-[#0071e3]' }} [&::-webkit-details-marker]:hidden">
-                    {{ $megaLabel }}
+            <details id="mega-menu" class="group" data-site-menu>
+                <summary class="{{ $menuButton($megaActive) }}">
+                    {{ $nav['labels']['services'] }}
                     <svg class="w-3.5 h-3.5 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </summary>
-                <div class="absolute inset-x-0 top-full bg-white border-b border-black/10 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
-                    <div class="max-w-[1240px] mx-auto px-8 py-7">
-                        <div class="columns-4 xl:columns-5 gap-8">
-                            @foreach ($nav['mega'] as $group)
-                                <div class="break-inside-avoid pb-6 whitespace-normal">
-                                    @if ($group['url'])
-                                        <a href="{{ $group['url'] }}" class="block pb-1.5 text-[13px] font-semibold text-[#1d1d1f] hover:text-[#0071e3]">{{ $group['title'] }}</a>
-                                    @else
-                                        <p class="pb-1.5 text-[13px] font-semibold text-[#1d1d1f]">{{ $group['title'] }}</p>
-                                    @endif
-                                    @foreach ($group['links'] as $link)
-                                        <a href="{{ $link['url'] }}" class="block py-1 text-[13px] font-normal leading-snug transition-colors {{ $linkClass($link) }}">{{ $link['label'] }}</a>
-                                    @endforeach
-                                </div>
+                <div class="absolute inset-x-0 top-full bg-white border-b border-black/10 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto whitespace-normal">
+                    <div class="max-w-[1240px] mx-auto px-8 py-6">
+                        <div class="flex items-center justify-between gap-6 rounded-xl bg-[#f5f5f7] px-5 py-4">
+                            <p class="max-w-[760px] text-[14px] font-normal leading-relaxed text-[#1d1d1f]">{{ $nav['intro']['text'] }}</p>
+                            <a href="{{ $nav['intro']['url'] }}" style="background-color: #0071e3; color: #ffffff;" class="shrink-0 inline-flex items-center min-h-[44px] px-5 rounded-lg text-[14px] font-semibold hover:bg-[#0077ed] transition-colors">{{ $nav['intro']['cta'] }}</a>
+                        </div>
+                        <div class="mt-5 grid grid-cols-[250px_1fr] gap-8">
+                            <div role="tablist" aria-orientation="vertical" aria-label="{{ $nav['labels']['services'] }}" class="border-e border-black/5 pe-4">
+                                @foreach ($nav['mega'] as $group)
+                                    <button type="button" role="tab" id="mega-tab-{{ $group['key'] }}" data-mega-tab="{{ $group['key'] }}" aria-controls="mega-panel-{{ $group['key'] }}" aria-selected="{{ $group['key'] === $openGroup ? 'true' : 'false' }}" class="w-full min-h-[44px] flex items-center justify-between gap-2 px-3 rounded-lg text-start text-[14px] font-medium text-[#1d1d1f]/80 hover:bg-[#f5f5f7] aria-selected:bg-[#f5f5f7] aria-selected:text-[#0071e3] aria-selected:font-semibold transition-colors">
+                                        {{ $group['title'] }}
+                                        <svg class="w-4 h-4 shrink-0 rtl:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7.5 5l5 5-5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </button>
+                                @endforeach
+                            </div>
+                            <div>
+                                @foreach ($nav['mega'] as $group)
+                                    <div role="tabpanel" id="mega-panel-{{ $group['key'] }}" data-mega-panel="{{ $group['key'] }}" aria-labelledby="mega-tab-{{ $group['key'] }}" @if ($group['key'] !== $openGroup) hidden @endif>
+                                        <p class="pb-2 text-[13px] font-semibold text-[#1d1d1f]/60">{{ $group['title'] }}</p>
+                                        <div class="columns-2 xl:columns-3 gap-6">
+                                            @foreach ($group['links'] as $link)
+                                                <a href="{{ $link['url'] }}" class="block break-inside-avoid py-2 text-[14px] font-normal leading-snug transition-colors {{ $linkClass($link) }}">{{ $link['label'] }}</a>
+                                            @endforeach
+                                        </div>
+                                        @if ($group['more'])
+                                            <a href="{{ $group['more']['url'] }}" class="inline-block mt-3 text-[14px] font-semibold text-[#0071e3] hover:underline">{{ $group['more']['label'] }}</a>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            <details id="stores-menu" class="group" data-site-menu>
+                <summary class="{{ $menuButton($storesActive) }}">
+                    {{ $nav['labels']['stores'] }}
+                    <svg class="w-3.5 h-3.5 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </summary>
+                <div class="absolute inset-x-0 top-full bg-white border-b border-black/10 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto whitespace-normal">
+                    <div class="max-w-[1240px] mx-auto px-8 py-6">
+                        <div class="grid grid-cols-4 gap-6">
+                            @foreach ($nav['stores'] as $store)
+                                <a href="{{ $store['url'] }}" class="group/store block">
+                                    <img src="{{ $store['image'] }}" alt="" width="640" height="400" loading="lazy" class="w-full aspect-[16/10] object-cover rounded-xl border border-black/5 bg-[#f5f5f7] transition-opacity group-hover/store:opacity-90">
+                                    <span class="block pt-3 text-[16px] font-semibold {{ $store['active'] ? 'text-[#0071e3]' : 'text-[#1d1d1f] group-hover/store:text-[#0071e3]' }}">{{ $store['name'] }}</span>
+                                    <span class="block pt-1 text-[13px] font-normal leading-relaxed text-[#1d1d1f]/65">{{ $store['line'] }}</span>
+                                </a>
                             @endforeach
                         </div>
-                        <a href="{{ $nav['all_url'] }}" class="inline-block border-t border-black/5 pt-4 w-full text-[14px] font-semibold text-[#0071e3] hover:underline">{{ $megaAllLabel }}</a>
+                        <p class="mt-6 border-t border-black/5 pt-4 text-[14px] font-normal text-[#1d1d1f]/75">
+                            {{ $nav['labels']['stores_note'] }}
+                            <a href="{{ $nav['labels']['contact_url'] }}" class="font-semibold text-[#0071e3] hover:underline">{{ $nav['labels']['stores_cta'] }}</a>
+                        </p>
                     </div>
                 </div>
             </details>
@@ -76,23 +115,45 @@
     </div>
 
     <div id="site-mobile-menu" class="hidden lg:hidden border-t border-black/5 bg-white px-5 py-4 text-[15px] font-medium text-[#1d1d1f] max-h-[calc(100vh-4rem)] overflow-y-auto">
-        @foreach ($nav['main'] as $link)
-            <a href="{{ $link['url'] }}" class="block py-3 border-b border-black/5 {{ $linkClass($link) }}">{{ $link['label'] }}</a>
-        @endforeach
-        <a href="{{ $nav['all_url'] }}" class="block pt-5 pb-2 text-[13px] font-semibold text-[#1d1d1f]/60">{{ $megaLabel }}</a>
+        <div class="rounded-xl bg-[#f5f5f7] p-4">
+            <p class="text-[14px] font-normal leading-relaxed">{{ $nav['intro']['text'] }}</p>
+            <a href="{{ $nav['intro']['url'] }}" style="background-color: #0071e3; color: #ffffff;" class="mt-3 flex items-center justify-center min-h-[44px] rounded-lg text-[14px] font-semibold">{{ $nav['intro']['cta'] }}</a>
+        </div>
+
+        <p class="pt-5 pb-1 text-[13px] font-semibold text-[#1d1d1f]/60">{{ $nav['labels']['services'] }}</p>
         @foreach ($nav['mega'] as $group)
-            <details class="border-b border-black/5" @if ($group['active']) open @endif>
-                <summary class="py-3 cursor-pointer list-none flex items-center justify-between [&::-webkit-details-marker]:hidden">
+            <details class="group border-b border-black/5" @if ($group['active']) open @endif>
+                <summary class="min-h-[48px] cursor-pointer list-none flex items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
                     {{ $group['title'] }}
-                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg class="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7.5l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </summary>
                 <div class="pb-2 ps-3">
                     @foreach ($group['links'] as $link)
-                        <a href="{{ $link['url'] }}" class="block py-2.5 text-[14px] {{ $linkClass($link) }}">{{ $link['label'] }}</a>
+                        <a href="{{ $link['url'] }}" class="flex items-center min-h-[44px] text-[14px] {{ $linkClass($link) }}">{{ $link['label'] }}</a>
                     @endforeach
+                    @if ($group['more'])
+                        <a href="{{ $group['more']['url'] }}" class="flex items-center min-h-[44px] text-[14px] font-semibold text-[#0071e3]">{{ $group['more']['label'] }}</a>
+                    @endif
                 </div>
             </details>
         @endforeach
+
+        <p class="pt-5 pb-1 text-[13px] font-semibold text-[#1d1d1f]/60">{{ $nav['labels']['stores'] }}</p>
+        @foreach ($nav['stores'] as $store)
+            <a href="{{ $store['url'] }}" class="flex items-center gap-3 py-2.5 border-b border-black/5">
+                <img src="{{ $store['image'] }}" alt="" width="80" height="50" loading="lazy" class="w-20 h-[50px] shrink-0 object-cover rounded-lg border border-black/5 bg-[#f5f5f7]">
+                <span class="min-w-0">
+                    <span class="block text-[15px] font-semibold {{ $store['active'] ? 'text-[#0071e3]' : 'text-[#1d1d1f]' }}">{{ $store['name'] }}</span>
+                    <span class="block text-[13px] font-normal leading-snug text-[#1d1d1f]/65">{{ $store['line'] }}</span>
+                </span>
+            </a>
+        @endforeach
+
+        <div class="pt-3">
+            @foreach ($nav['main'] as $link)
+                <a href="{{ $link['url'] }}" class="flex items-center min-h-[48px] border-b border-black/5 {{ $linkClass($link) }}">{{ $link['label'] }}</a>
+            @endforeach
+        </div>
         <div class="pt-4 flex items-center gap-3">
             @auth
                 <a href="/dashboard" class="flex-1 text-center py-2.5 rounded-lg border border-black/10 text-sm font-semibold hover:bg-[#f5f5f7] transition-colors">{{ $isAr ? 'لوحة التحكم' : 'Dashboard' }}</a>
@@ -105,14 +166,35 @@
 
     <script>
         (function () {
-            var menu = document.getElementById('mega-menu');
+            var menus = Array.prototype.slice.call(document.querySelectorAll('[data-site-menu]'));
+            var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-mega-tab]'));
+
+            function showGroup(key) {
+                tabs.forEach(function (tab) { tab.setAttribute('aria-selected', tab.dataset.megaTab === key ? 'true' : 'false'); });
+                document.querySelectorAll('[data-mega-panel]').forEach(function (panel) { panel.hidden = panel.dataset.megaPanel !== key; });
+            }
+
+            tabs.forEach(function (tab) {
+                ['click', 'focus', 'mouseenter'].forEach(function (name) {
+                    tab.addEventListener(name, function () { showGroup(tab.dataset.megaTab); });
+                });
+            });
+            menus.forEach(function (menu) {
+                menu.addEventListener('toggle', function () {
+                    if (!menu.open) return;
+                    menus.forEach(function (other) { if (other !== menu) other.open = false; });
+                });
+            });
             document.addEventListener('click', function (event) {
-                if (menu && menu.open && !menu.contains(event.target)) menu.open = false;
+                menus.forEach(function (menu) { if (menu.open && !menu.contains(event.target)) menu.open = false; });
             });
             document.addEventListener('keydown', function (event) {
-                if (event.key !== 'Escape' || !menu || !menu.open) return;
-                menu.open = false;
-                menu.querySelector('summary').focus();
+                if (event.key !== 'Escape') return;
+                menus.forEach(function (menu) {
+                    if (!menu.open) return;
+                    menu.open = false;
+                    menu.querySelector('summary').focus();
+                });
             });
         })();
     </script>

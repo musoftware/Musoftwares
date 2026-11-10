@@ -28,6 +28,13 @@ final class AngaznyProductMapper
         self::UNCLEAR_OPTIONS => 'hasUnclearOptions',
     ];
 
+    public function mentionsBrand(string $text): bool
+    {
+        $words = implode('|', array_map(fn (string $word) => preg_quote($word, '/'), config('shop.angazny.brands')));
+
+        return preg_match('/(?<![\p{L}\p{N}])('.$words.')(?![\p{L}\p{N}])/iu', $text) === 1;
+    }
+
     /** @param  array<string, mixed>  $data  the product view response */
     public function rejectionReason(array $data): ?string
     {
@@ -102,13 +109,10 @@ final class AngaznyProductMapper
             return true;
         }
 
-        $text = strip_tags(implode(' ', array_map(
+        return $this->mentionsBrand(strip_tags(implode(' ', array_map(
             fn (string $field) => (string) ($product[$field] ?? ''),
             ['Name', 'Name_AR', 'Description', 'Description_ad'],
-        )));
-        $words = implode('|', array_map(fn (string $word) => preg_quote($word, '/'), config('shop.angazny.brands')));
-
-        return preg_match('/(?<![\p{L}\p{N}])('.$words.')(?![\p{L}\p{N}])/iu', $text) === 1;
+        ))));
     }
 
     private function hasUnsupportedOptions(array $data): bool

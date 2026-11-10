@@ -17,9 +17,26 @@
     <meta property="og:url" content="{{ $seo['canonical'] }}">
     @if ($seo['image'])
         <meta property="og:image" content="{{ $seo['image'] }}">
+        <meta property="og:image:secure_url" content="{{ $seo['image'] }}">
+        @foreach ($seo['image_meta'] as $key => $value)
+            <meta property="og:image:{{ $key }}" content="{{ $value }}">
+        @endforeach
+        <meta property="og:image:alt" content="{{ $seo['image_alt'] }}">
         <meta name="twitter:image" content="{{ $seo['image'] }}">
+        <meta name="twitter:image:alt" content="{{ $seo['image_alt'] }}">
     @endif
+    @foreach ($seo['og_tags'] as $property => $value)
+        <meta property="{{ $property }}" content="{{ $value }}">
+    @endforeach
     <meta name="twitter:card" content="{{ $seo['image'] ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:site" content="{{ config('shop.twitter_site') }}">
+    <meta name="twitter:title" content="{{ $seo['title'] }}">
+    <meta name="twitter:description" content="{{ $seo['description'] }}">
+    @foreach (array_keys($seo['twitter_labels']) as $index => $label)
+        <meta name="twitter:label{{ $index + 1 }}" content="{{ $label }}">
+        <meta name="twitter:data{{ $index + 1 }}" content="{{ $seo['twitter_labels'][$label] }}">
+    @endforeach
+    <meta name="theme-color" content="#1c1917">
     @foreach ($seo['schemas'] as $schema)
         <script type="application/ld+json">{!! $shopSeo->toJson($schema) !!}</script>
     @endforeach

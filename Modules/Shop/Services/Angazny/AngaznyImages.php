@@ -45,7 +45,7 @@ class AngaznyImages
             return null;
         }
 
-        return $this->store($url, $response);
+        return $this->store('angazny-'.sha1($url), $url, $response);
     }
 
     private function isAllowed(string $url): bool
@@ -55,7 +55,7 @@ class AngaznyImages
             && ! str_contains($url, self::SKIPPED_PATH);
     }
 
-    private function store(string $url, Response $response): ?string
+    public function store(string $fileName, string $url, Response $response): ?string
     {
         $type = strtolower(trim(explode(';', (string) $response->header('Content-Type'))[0]));
         $extension = self::EXTENSIONS[$type] ?? null;
@@ -66,7 +66,7 @@ class AngaznyImages
             return null;
         }
 
-        $path = 'shop/products/angazny-'.sha1($url).'.'.$extension;
+        $path = 'shop/products/'.$fileName.'.'.$extension;
         Storage::disk(self::DISK)->put($path, $response->body());
 
         return $path;

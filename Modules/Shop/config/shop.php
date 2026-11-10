@@ -1,13 +1,16 @@
 <?php
 
 return [
-    'name' => env('SHOP_NAME', 'متجر Musoftware'),
+    'name' => env('SHOP_NAME', 'دكّانة'),
+    'name_en' => env('SHOP_NAME_EN', 'Dokkana'),
     'tagline' => env('SHOP_TAGLINE', 'تسوق أونلاين وادفع عند الاستلام'),
-    'announcement' => env('SHOP_ANNOUNCEMENT', 'الدفع عند الاستلام والتوصيل لكل محافظات مصر'),
+    'announcement' => env('SHOP_ANNOUNCEMENT', 'الدفع عند الاستلام والتوصيل لمعظم محافظات مصر'),
     'currency' => 'EGP',
     'currency_symbol' => 'ج.م',
     'shipping_cost' => (float) env('SHOP_SHIPPING_COST', 0),
+    'twitter_site' => env('SHOP_TWITTER_SITE', '@MusoftwareUno'),
     'per_page' => 24,
+    'nav_items' => 5,
     'max_quantity' => 20,
 
     'governorates' => [
@@ -28,6 +31,7 @@ return [
         'max_profit_ratio' => 0.30,
         'min_profit' => 50,
         'price_ending' => 9,
+        'drive_max_images' => 40,
 
         'brands' => [
             'balenciaga', 'nike', 'adidas', 'puma', 'zara', 'gucci', 'dior', 'louis vuitton', 'hermes', 'lacoste',
@@ -58,8 +62,5 @@ return [
             'المنوفية' => 16, 'بورسعيد' => 19, 'القليوبية' => 20, 'قنا' => 21, 'البحر الأحمر' => 22, 'الشرقية' => 23,
             'سوهاج' => 24, 'السويس' => 26, 'الأقصر' => 27,
         ],
-
-        // Angazny city id => area id. Its API has no area list, so these must come from Angazny.
-        'area_ids' => [],
     ],
 ];

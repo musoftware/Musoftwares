@@ -8,12 +8,22 @@ namespace App\Support;
  */
 class SiteNav
 {
+    /** Plain links after the two menus "Our services" and "Our stores". */
     private const MAIN = [
-        ['url' => '/marketplace/catalog', 'match' => ['marketplace', 'marketplace/*'], 'ar' => 'سوق الخدمات', 'en' => 'Marketplace'],
         ['url' => '/portfolio', 'match' => ['portfolio', 'portfolio/*'], 'ar' => 'أعمالنا', 'en' => 'Our work'],
-        ['url' => '/how-we-work', 'match' => ['how-we-work'], 'ar' => 'كيف نعمل', 'en' => 'How we work'],
         ['url' => '/estimator', 'match' => ['estimator', 'pricing'], 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
         ['url' => '/about/mahmoud-amin', 'match' => ['about/*'], 'ar' => 'من نحن', 'en' => 'About us'],
+    ];
+
+    /** The one answer to "what do you do?", shown at the top of both menus. */
+    private const INTRO = [
+        'ar' => ['text' => 'إحنا شركة برمجة. بنعمل البرنامج أو الموقع أو التطبيق على مقاس شغلك. البرامج والمتاجر اللي هنا نماذج من شغلنا.', 'cta' => 'ابدأ مشروعك'],
+        'en' => ['text' => 'We are a software company. We build the program, website or app that fits your business. The programs and stores here are samples of our work.', 'cta' => 'Start your project'],
+    ];
+
+    private const LABELS = [
+        'ar' => ['services' => 'خدماتنا', 'stores' => 'متاجرنا', 'stores_note' => 'المتاجر دي إحنا اللي عاملينها وشغالة فعلا. عايز متجر زيها لشغلك؟', 'stores_cta' => 'كلمنا'],
+        'en' => ['services' => 'Our services', 'stores' => 'Our stores', 'stores_note' => 'We built these stores and they are live. Want one like them for your business?', 'stores_cta' => 'Talk to us'],
     ];
 
     public const BRAND = 'Musoftware';
@@ -26,7 +36,8 @@ class SiteNav
             ['url' => '/services#systems', 'ar' => 'أنظمة إدارة الأعمال', 'en' => 'Business systems'],
             ['url' => '/how-we-work', 'ar' => 'أنظمة على مقاسك', 'en' => 'Custom systems'],
             ['url' => '/services#services', 'ar' => 'خدمات مواقع وتسويق', 'en' => 'Websites and marketing services'],
-            ['url' => '/marketplace/catalog', 'ar' => 'سوق الخدمات', 'en' => 'Services marketplace'],
+            ['url' => '/marketplace/catalog', 'store' => 'marketplace', 'ar' => 'سوق الخدمات', 'en' => 'services marketplace'],
+            ['url' => '/store', 'store' => 'shop', 'ar' => 'متجر المنتجات', 'en' => 'online shop'],
             ['url' => '/estimator', 'ar' => 'احسب تكلفة مشروعك', 'en' => 'Estimate your project'],
             ['url' => '/services/tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools'],
         ]],
@@ -77,7 +88,7 @@ class SiteNav
                 'title' => $column[$lang],
                 'links' => array_map(fn (array $link) => [
                     'url' => $link['url'],
-                    'label' => $link[$lang],
+                    'label' => isset($link['store']) ? SiteStores::name($link['store'], $lang).': '.$link[$lang] : $link[$lang],
                     'external' => str_starts_with($link['url'], 'http'),
                 ], $column['links']),
             ], self::FOOTER_COLUMNS),
@@ -97,7 +108,7 @@ class SiteNav
         ];
     }
 
-    /** @return array{all_url: string, main: list<array{url: string, label: string, active: bool}>, mega: list<array<string, mixed>>} */
+    /** @return array{all_url: string, labels: array<string, string>, intro: array{text: string, cta: string, url: string}, main: list<array{url: string, label: string, active: bool}>, mega: list<array<string, mixed>>, stores: list<array<string, mixed>>} */
     public static function links(): array
     {
         $lang = app()->getLocale() === 'ar' ? 'ar' : 'en';
@@ -107,6 +118,13 @@ class SiteNav
             'active' => request()->is(...$link['match']),
         ];
 
-        return ['all_url' => '/services', 'main' => array_map($shape, self::MAIN), 'mega' => SiteMegaMenu::groups($lang)];
+        return [
+            'all_url' => '/services',
+            'labels' => self::LABELS[$lang] + ['contact_url' => '/start-project'],
+            'intro' => self::INTRO[$lang] + ['url' => '/start-project'],
+            'main' => array_map($shape, self::MAIN),
+            'mega' => SiteMegaMenu::groups($lang),
+            'stores' => SiteStores::cards($lang),
+        ];
     }
 }

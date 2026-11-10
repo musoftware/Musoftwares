@@ -7,8 +7,9 @@ use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\FreeTools;
 
 /**
- * Everything the site offers, for the "All services" menu. Products and free tools are read from
- * their real source, so a new one shows here without touching this file.
+ * Everything we offer, for the nested "Our services" menu: a short list of groups, each opening its
+ * own links. Custom work comes first because it is the main service; the rest are samples of it.
+ * Products and free tools are read from their real source, so a new one shows without touching this file.
  */
 class SiteMegaMenu
 {
@@ -16,57 +17,65 @@ class SiteMegaMenu
 
     private const PRODUCTS_CACHE_SECONDS = 600;
 
-    private const STORE_GROUPS = [
-        'programs' => ['url' => '/services#programs', 'ar' => 'برامج جاهزة', 'en' => 'Ready programs'],
-        'systems' => ['url' => '/services#systems', 'ar' => 'أنظمة إدارة الأعمال', 'en' => 'Business systems'],
-        'services' => ['url' => '/services#services', 'ar' => 'مواقع وتسويق', 'en' => 'Websites and marketing'],
-    ];
+    /** A group longer than this shows its first links and a "see all" link, so no panel gets too long. */
+    private const MAX_LINKS = 10;
 
-    private const MARKETPLACE = ['url' => '/marketplace/catalog', 'ar' => 'سوق الخدمات', 'en' => 'Services marketplace', 'links' => [
-        ['url' => '/marketplace/catalog', 'ar' => 'تصفح كل الخدمات', 'en' => 'Browse all services'],
-        ['url' => '/marketplace/services/create', 'ar' => 'اعرض خدمتك للبيع', 'en' => 'Sell your service'],
-        ['url' => '/marketplace/orders', 'ar' => 'طلباتي', 'en' => 'My orders'],
-        ['url' => '/marketplace/favorites', 'ar' => 'المفضلة', 'en' => 'Favorites'],
+    private const CUSTOM = ['key' => 'custom', 'ar' => 'برمجة على مقاس شغلك', 'en' => 'Software made for your business', 'links' => [
+        ['url' => '/start-project', 'ar' => 'ابدأ مشروعك خطوة بخطوة', 'en' => 'Start your project step by step'],
+        ['url' => '/estimator', 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
+        ['url' => '/how-we-work', 'ar' => 'إزاي بنشتغل', 'en' => 'How we work'],
+        ['url' => '/portfolio', 'ar' => 'أعمالنا', 'en' => 'Our work'],
+        ['url' => '/white-label', 'ar' => 'بيع برامجنا باسمك', 'en' => 'Sell our programs under your name'],
     ]];
+
+    private const STORE_GROUPS = [
+        'services' => ['url' => '/services#services', 'ar' => 'مواقع وتسويق', 'en' => 'Websites and marketing'],
+        'systems' => ['url' => '/services#systems', 'ar' => 'أنظمة إدارة جاهزة', 'en' => 'Ready business systems'],
+        'programs' => ['url' => '/services#programs', 'ar' => 'برامج للكمبيوتر', 'en' => 'Desktop programs'],
+    ];
 
     /** Groups that come after the products and tools. */
     private const STATIC_GROUPS = [
-        ['ar' => 'ابدأ مشروعك', 'en' => 'Start a project', 'links' => [
-            ['url' => '/start-project', 'ar' => 'كوّن نظامك خطوة بخطوة', 'en' => 'Build your system step by step'],
-            ['url' => '/estimator', 'ar' => 'احسب التكلفة', 'en' => 'Cost estimator'],
-            ['url' => '/white-label', 'ar' => 'بيع برامجنا باسمك', 'en' => 'Sell our programs under your name'],
-        ]],
-        ['ar' => 'تعلّم واقرأ', 'en' => 'Learn', 'links' => [
-            ['url' => '/blog', 'ar' => 'المدونة', 'en' => 'Blog'],
-            ['url' => '/library', 'ar' => 'المكتبة الرقمية', 'en' => 'Digital library'],
-            ['url' => '/compare/laravel-vs-nodejs', 'ar' => 'المقارنات والمقالات', 'en' => 'Comparisons and articles'],
-            ['url' => '/listing', 'ar' => 'لوحة الوظائف', 'en' => 'Job board'],
-        ]],
-        ['ar' => 'موسوفت', 'en' => 'Musoftware', 'links' => [
-            ['url' => '/about/mahmoud-amin', 'ar' => 'من نحن', 'en' => 'About us'],
-            ['url' => '/portfolio', 'ar' => 'أعمالنا', 'en' => 'Our work'],
-            ['url' => '/how-we-work', 'ar' => 'كيف نعمل', 'en' => 'How we work'],
-            ['url' => '/company/careers', 'ar' => 'وظائف في موسوفت', 'en' => 'Careers at Musoftware'],
-            ['url' => '/company/contact', 'ar' => 'تواصل معنا', 'en' => 'Contact us'],
-        ]],
-        ['ar' => 'من داخل حسابك', 'en' => 'In your account', 'links' => [
+        ['key' => 'account', 'ar' => 'من حسابك', 'en' => 'In your account', 'links' => [
+            ['url' => '/marketplace/services/create', 'ar' => 'اعرض خدمتك للبيع', 'en' => 'Sell your service'],
+            ['url' => '/marketplace/orders', 'ar' => 'طلباتي', 'en' => 'My orders'],
             ['url' => '/sms-payment-gateway', 'ar' => 'بوابة الدفع', 'en' => 'Payment gateway'],
             ['url' => '/whatsapp-sender', 'ar' => 'إرسال واتساب', 'en' => 'WhatsApp sender'],
-            ['url' => '/micro-services', 'ar' => 'الخدمات المصغرة', 'en' => 'Micro services'],
             ['url' => '/my-licenses', 'ar' => 'تراخيص برامجي', 'en' => 'My licenses'],
             ['url' => '/subscriptions/plans', 'ar' => 'خطط الاشتراك', 'en' => 'Subscription plans'],
             ['url' => '/referrals', 'ar' => 'اكسب من الإحالات', 'en' => 'Earn from referrals'],
             ['url' => '/tickets', 'ar' => 'الدعم الفني', 'en' => 'Support tickets'],
         ]],
+        ['key' => 'company', 'ar' => 'عن موسوفت', 'en' => 'About Musoftware', 'links' => [
+            ['url' => '/about/mahmoud-amin', 'ar' => 'من نحن', 'en' => 'About us'],
+            ['url' => '/company/contact', 'ar' => 'تواصل معنا', 'en' => 'Contact us'],
+            ['url' => '/blog', 'ar' => 'المدونة', 'en' => 'Blog'],
+            ['url' => '/library', 'ar' => 'المكتبة الرقمية', 'en' => 'Digital library'],
+            ['url' => '/compare/laravel-vs-nodejs', 'ar' => 'المقارنات والمقالات', 'en' => 'Comparisons and articles'],
+            ['url' => '/listing', 'ar' => 'لوحة الوظائف', 'en' => 'Job board'],
+            ['url' => '/company/careers', 'ar' => 'وظائف في موسوفت', 'en' => 'Careers at Musoftware'],
+        ]],
     ];
 
-    /** @return list<array{title: string, url: ?string, active: bool, links: list<array{url: string, label: string, active: bool}>}> */
+    /** @return list<array{key: string, title: string, url: ?string, active: bool, links: list<array{url: string, label: string, active: bool}>, more: ?array{url: string, label: string}}> */
     public static function groups(string $lang): array
+    {
+        return [
+            self::shapeGroup(self::CUSTOM, $lang),
+            ...self::storeGroups($lang),
+            self::shapeGroup(['key' => 'tools', 'url' => '/services/tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools', 'links' => self::toolLinks()], $lang),
+            ...array_map(fn (array $group) => self::shapeGroup($group, $lang), self::STATIC_GROUPS),
+        ];
+    }
+
+    /** @return list<array<string, mixed>> */
+    private static function storeGroups(string $lang): array
     {
         $products = collect(self::products())->groupBy('group');
 
-        $storeGroups = array_map(fn (string $key) => self::shapeGroup([
+        $groups = array_map(fn (string $key) => self::shapeGroup([
             ...self::STORE_GROUPS[$key],
+            'key' => $key,
             'links' => $products->get($key, collect())->map(fn (array $product) => [
                 'url' => '/services/'.$product['slug'],
                 'ar' => $product['ar'],
@@ -74,12 +83,7 @@ class SiteMegaMenu
             ])->all(),
         ], $lang), array_keys(self::STORE_GROUPS));
 
-        return [
-            self::shapeGroup(self::MARKETPLACE, $lang),
-            ...array_values(array_filter($storeGroups, fn (array $group) => $group['links'] !== [])),
-            self::shapeGroup(['url' => '/services/tools', 'ar' => 'أدوات مجانية', 'en' => 'Free tools', 'links' => self::toolLinks()], $lang),
-            ...array_map(fn (array $group) => self::shapeGroup($group, $lang), self::STATIC_GROUPS),
-        ];
+        return array_values(array_filter($groups, fn (array $group) => $group['links'] !== []));
     }
 
     /** @return list<array{url: string, ar: string, en: string}> */
@@ -112,7 +116,7 @@ class SiteMegaMenu
             ->all());
     }
 
-    /** @param array{url?: string, ar: string, en: string, links: array<int, array{url: string, ar: string, en: string}>} $group */
+    /** @param array{key: string, url?: string, ar: string, en: string, links: array<int, array{url: string, ar: string, en: string}>} $group */
     private static function shapeGroup(array $group, string $lang): array
     {
         $links = array_map(fn (array $link) => [
@@ -120,12 +124,16 @@ class SiteMegaMenu
             'label' => $link[$lang],
             'active' => request()->is(ltrim($link['url'], '/')),
         ], $group['links']);
+        $url = $group['url'] ?? null;
+        $isLong = $url !== null && count($links) > self::MAX_LINKS;
 
         return [
+            'key' => $group['key'],
             'title' => $group[$lang],
-            'url' => $group['url'] ?? null,
+            'url' => $url,
             'active' => in_array(true, array_column($links, 'active'), true),
-            'links' => $links,
+            'links' => $isLong ? array_slice($links, 0, self::MAX_LINKS) : $links,
+            'more' => $isLong ? ['url' => $url, 'label' => ($lang === 'ar' ? 'شوف الكل' : 'See all').' ('.count($links).')'] : null,
         ];
     }
 }

@@ -25,6 +25,11 @@ class ShopCategory extends Model
         return $query->where('is_active', true)->orderBy('sort_order')->orderBy('id');
     }
 
+    public function scopeWithVisibleProducts(Builder $query): Builder
+    {
+        return $query->whereHas('products', fn (Builder $products) => $products->where('is_active', true));
+    }
+
     public function url(): string
     {
         return route('shop.collection', $this->slug);

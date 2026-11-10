@@ -12,9 +12,19 @@
         </details>
         <a class="logo" href="{{ route('shop.home') }}">{{ config('shop.name') }}</a>
         <nav class="nav" aria-label="الأقسام">
-            @foreach ($navCategories as $navCategory)
+            @foreach ($navCategories->take(config('shop.nav_items')) as $navCategory)
                 <a href="{{ $navCategory->url() }}">{{ $navCategory->name }}</a>
             @endforeach
+            @if ($navCategories->count() > config('shop.nav_items'))
+                <details class="more">
+                    <summary>المزيد</summary>
+                    <div class="more-panel">
+                        @foreach ($navCategories->skip(config('shop.nav_items')) as $navCategory)
+                            <a href="{{ $navCategory->url() }}">{{ $navCategory->name }}</a>
+                        @endforeach
+                    </div>
+                </details>
+            @endif
         </nav>
         <div class="head-icons">
             <a class="icon-link" href="{{ route('shop.search') }}" aria-label="بحث">@include('shop::partials.icon', ['name' => 'search'])</a>

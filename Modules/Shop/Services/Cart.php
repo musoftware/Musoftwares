@@ -4,6 +4,7 @@ namespace Modules\Shop\Services;
 
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Collection;
+use Modules\Shop\Models\ShopArea;
 use Modules\Shop\Models\ShopProduct;
 
 /**
@@ -82,7 +83,28 @@ class Cart
 
     public function shipping(Collection $lines): float
     {
-        return (float) config($this->hasAngaznyProduct($lines) ? 'shop.angazny.shipping' : 'shop.shipping_cost');
+        return (float) $lines->max(fn (array $line) => $line['product']->shippingCost());
+    }
+
+    /**
+     * Delivery areas of each governorate, for carts that ship through Angazny.
+     *
+     * @return array<string, list<array{id: int, name: string}>>
+     */
+    public function areas(Collection $lines): array
+    {
+        if (! $this->hasAngaznyProduct($lines)) {
+            return [];
+        }
+
+        $names = array_flip(config('shop.angazny.cities'));
+
+        return ShopArea::orderBy('name')->get()->groupBy('city_id')
+            ->filter(fn (Collection $areas, int $cityId) => isset($names[$cityId]))
+            ->mapWithKeys(fn (Collection $areas, int $cityId) => [
+                $names[$cityId] => $areas->map(fn (ShopArea $area) => ['id' => $area->angazny_id, 'name' => $area->name])->values()->all(),
+            ])
+            ->all();
     }
 
     /** @return list<string> */

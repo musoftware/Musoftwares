@@ -9,7 +9,7 @@
 @endphp
 <div class="w-full overflow-x-clip bg-[#fbfbfd] text-[#1d1d1f] pt-12 sm:pt-20 pb-20">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight">{{ __('marketplace_ui.title') }}</h1>
+        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight">{{ \App\Support\SiteStores::name('marketplace') }}</h1>
         <p class="mt-4 text-base text-[#1d1d1f]/60">{{ __('marketplace_ui.subtitle') }}</p>
 
         <form action="{{ route('marketplace.services.index') }}" method="GET" class="mt-8 relative max-w-[560px] mx-auto">
