@@ -55,6 +55,8 @@ class JobQueue
                 'lease_expires_at' => null,
                 'progress_step' => null,
                 'progress_file' => null,
+                'progress_percent' => null,
+                'progress_note' => null,
                 'build_cost_usd' => (float) $project->build_cost_usd + $costUsd,
             ]);
             $project->messages()->create([

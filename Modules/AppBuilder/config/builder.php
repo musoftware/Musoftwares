@@ -87,7 +87,7 @@ return [
         'archive_kb' => (int) env('BUILDER_ARCHIVE_KB', 204800),
         'archive_files' => (int) env('BUILDER_ARCHIVE_FILES', 30000),
         // screenshots the build sends to the chat when a big part works
-        'snapshots_per_build' => 6,
+        'snapshots_per_build' => 20,
         'snapshot_kb' => 4096,
         'lease_minutes' => 120,
         'max_attempts' => 3,

@@ -76,6 +76,7 @@ return [
     'start_guest' => 'كمّل من غير حساب',
     'my_projects' => 'مشاريعك',
     'status_labels' => ['chatting' => 'بنتكلم', 'quoted' => 'مستني الدفع', 'queued' => 'في الطابور', 'designing' => 'التصميم', 'building' => 'بيتنفذ', 'ready' => 'جاهز', 'failed' => 'وقف'],
+    'progress_bar' => 'نسبة الشغل اللي خلص',
     'name' => 'الاسم',
     'email' => 'الإيميل',
     'whatsapp' => 'رقم واتساب',

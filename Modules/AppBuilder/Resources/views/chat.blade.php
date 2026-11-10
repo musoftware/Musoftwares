@@ -72,6 +72,11 @@
         .projects a{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;min-height:44px}
         .projects a span{color:var(--muted);font-size:14px}
         body.choosing .composer{display:none}
+        .bar{margin:-12px 0 24px}
+        .bar .track{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+        .bar .fill{height:100%;border-radius:999px;background:var(--ink);transition:width .6s ease}
+        .bar .pct{display:block;margin-top:6px;font-size:14px;font-weight:600}
+        @media (prefers-reduced-motion:reduce){.bar .fill{transition:none}}
         .msg .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
         :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
         [hidden]{display:none!important}
@@ -406,6 +411,17 @@
         return button;
     }
 
+    /** How much of the build is done; the line above it says what was finished last. */
+    function barNode(percent) {
+        const box = el('div', {class: 'bar'});
+        const track = el('div', {class: 'track', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(percent), 'aria-label': T.progress_bar});
+        const fill = el('div', {class: 'fill'});
+        fill.style.width = percent + '%';
+        track.append(fill);
+        box.append(track, el('span', {class: 'pct', dir: 'ltr'}, percent + '%'));
+        return box;
+    }
+
     function statusNode(text) {
         const node = el('div', {class: 'status'});
         node.append(el('span', {class: 'spin', 'aria-hidden': 'true'}), el('span', {}, text));
@@ -420,6 +436,7 @@
         if (waiting) thread.append(statusNode(T.thinking));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.progress) thread.append(statusNode(state.progress));
+        if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));
         if (state && state.waiting_for_answer) thread.append(el('p', {class: 'hint'}, T.waiting_answer));
         if (state && state.trial) { const node = trialNode(state.trial); if (node) thread.append(node); }
         if (state && state.balance) thread.append(balanceNode(state.balance));

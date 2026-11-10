@@ -91,6 +91,7 @@ class AdminBuilderController extends Controller
             'lease_expires_at' => null,
             'progress_step' => null,
             'progress_file' => null,
+            'progress_note' => null,
         ]);
 
         return back()->with('success', __('builder.admin.retried'));

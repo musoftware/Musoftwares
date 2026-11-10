@@ -110,18 +110,19 @@ class WorkerJobController extends Controller
         ]);
     }
 
-    /** A screenshot of finished work for the customer's chat; refused once the build sent its share. */
+    /** How much is done, one plain line, and a screenshot when there is something new to see. */
     public function snapshot(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\BuildSnapshots $snapshots): JsonResponse
     {
         $this->assertBuilding($project);
         $data = $request->validate([
-            'image' => ['required', 'file', 'mimes:png,jpg,jpeg,webp', 'max:'.(int) config('builder.limits.snapshot_kb')],
+            'percent' => ['required', 'integer', 'min:0', 'max:100'],
             'caption' => ['required', 'string', 'max:300'],
+            'image' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:'.(int) config('builder.limits.snapshot_kb')],
         ]);
 
-        return $snapshots->add($project, $data['image'], strip_tags($data['caption']))
+        return $snapshots->update($project, (int) $data['percent'], strip_tags($data['caption']), $data['image'] ?? null)
             ? response()->json(['status' => 'ok'], 201)
-            : response()->json(['status' => 'enough'], 429);
+            : response()->json(['status' => 'enough pictures'], 429);
     }
 
     public function progress(WorkerReportRequest $request, BuilderProject $project): JsonResponse

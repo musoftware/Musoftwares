@@ -28,6 +28,8 @@ class ProjectStateResource extends JsonResource
             'messages' => $this->messages->map(fn (BuilderMessage $message) => $this->line($message))->values(),
             'quote' => $this->status === BuilderProject::QUOTED ? $this->quote() : null,
             'progress' => in_array($this->status, [BuilderProject::QUEUED, BuilderProject::BUILDING, BuilderProject::DESIGNING], true) && ! $this->awaiting_answer ? $this->progressLine() : null,
+            // the bar shows once the build has said how far it is
+            'progress_percent' => $this->status === BuilderProject::BUILDING && ! $this->awaiting_answer ? $this->progress_percent : null,
             'waiting_for_answer' => $this->isWaitingForAnswer(),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // offer notifications once there is something to wait for
@@ -84,9 +86,12 @@ class ProjectStateResource extends JsonResource
             BuilderProject::DESIGNING => 'designing',
             default => $this->progress_step ?: 'started',
         };
-        $label = __('builder.steps.'.$step);
+        // the engineer's own plain line on the last finished part reads better than a step and a file name
+        if ($this->status === BuilderProject::BUILDING && $this->progress_note) {
+            return $this->progress_note;
+        }
 
-        return $this->progress_file ? $label.' — '.$this->progress_file : $label;
+        return __('builder.steps.'.$step);
     }
 
     private function delivery(): array

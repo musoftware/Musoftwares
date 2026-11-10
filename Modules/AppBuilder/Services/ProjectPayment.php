@@ -133,6 +133,8 @@ class ProjectPayment
             'attempts' => 0,
             'progress_step' => null,
             'progress_file' => null,
+            'progress_percent' => 0,
+            'progress_note' => null,
             'error' => null,
         ]);
     }

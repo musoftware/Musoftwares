@@ -217,7 +217,7 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
 
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/progress', ['step' => 'writing', 'file' => 'index.html'], $this->worker())->assertOk();
-        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.writing').' — index.html');
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.writing'));
 
         $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', [
             'archive' => $this->zip(['index.html' => '<h1>Menu</h1><script src="app.js"></script>', 'app.js' => 'console.log(1)']),
@@ -302,10 +302,17 @@ class AppBuilderTest extends TestCase
         $project = $this->buildingProject();
         $url = '/api/builder/worker/jobs/'.$project->uuid.'/snapshot';
 
-        $this->post($url, ['image' => $this->png(), 'caption' => 'لوحة الأدمن خلصت'], $this->worker())->assertCreated();
-        $this->post($url, ['image' => $this->png(), 'caption' => 'صفحة المسوق خلصت'], $this->worker())->assertCreated();
-        // a few per build, never a flood
-        $this->post($url, ['image' => $this->png(), 'caption' => 'كمان واحدة'], $this->worker())->assertStatus(429);
+        // a line with no picture only moves the bar; nothing is added to the chat
+        $this->post($url, ['percent' => 10, 'caption' => 'قاعدة البيانات جاهزة'], $this->worker())->assertCreated();
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress_percent', 10)->assertJsonPath('progress', 'قاعدة البيانات جاهزة');
+
+        $this->post($url, ['percent' => 35, 'image' => $this->png(), 'caption' => 'لوحة الأدمن خلصت'], $this->worker())->assertCreated();
+        $this->post($url, ['percent' => 60, 'image' => $this->png(), 'caption' => 'صفحة المسوق خلصت'], $this->worker())->assertCreated();
+        // pictures are limited per build, and the bar never goes backwards or shows 100 before delivery
+        $this->post($url, ['percent' => 40, 'image' => $this->png(), 'caption' => 'كمان واحدة'], $this->worker())->assertStatus(429);
+        $this->assertSame(60, $project->refresh()->progress_percent);
+        $this->post($url, ['percent' => 100, 'caption' => 'خلاص تقريباً'], $this->worker())->assertCreated();
+        $this->assertSame(99, $project->refresh()->progress_percent);
 
         $line = collect($this->getJson('/ai/'.$project->uuid.'/state')->json('messages'))->firstWhere('role', 'progress');
         $this->assertSame('لوحة الأدمن خلصت', $line['text']);
