@@ -162,6 +162,10 @@ class ProjectChat
         $price = $free
             ? $this->pricer->freeFix($turn->estimatedTokens, $turn->complex)
             : $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType);
+        // a program we already sold keeps its known price: the same system is never cheaper than it was sold for
+        if (! $free && ! $project->hasDelivery()) {
+            $price['amount'] = max($price['amount'], app(\Modules\AppBuilder\Services\Starters::class)->knownPrice($project->starter));
+        }
         $share = ! $free && $project->referrer_user_id ? $this->referral->addShare($price) : ['amount' => $price['amount'], 'commission' => 0.0];
 
         $project->update([

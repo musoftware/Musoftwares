@@ -1690,4 +1690,56 @@ class AppBuilderTest extends TestCase
         $this->assertSame('claude-sonnet-5-5', $pricer->price(200000, complex: false)['model']);
         $this->assertSame('claude-opus-5-5', $pricer->price(20000, complex: true)['model']);
     }
+
+    /** The card writer is the only outside part replaced: a fixed card, as Claude would write it. */
+    private function learnedCards(): void
+    {
+        $this->app->instance(\Modules\AppBuilder\Services\Starters\StarterCardWriter::class, new class implements \Modules\AppBuilder\Services\Starters\StarterCardWriter
+        {
+            public function write(string $brief): array
+            {
+                return ['title' => 'Restaurant menu page', 'summary' => 'A menu page for a restaurant.', 'features' => ['Menu with prices', 'WhatsApp order button']];
+            }
+        });
+    }
+
+    public function test_a_paid_delivery_becomes_an_internal_ready_program_at_its_price(): void
+    {
+        $this->learnedCards();
+        $paid = $this->deliveredProject();
+        $paid->update(['paid_total' => 120]);
+        $free = $this->deliveredProject();
+        $free->update(['paid_total' => 0]);
+
+        $this->assertSame(1, app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries());
+        $starter = \Modules\AppBuilder\Models\BuilderStarter::sole();
+        $this->assertSame($paid->id, $starter->source_project_id);
+        $this->assertSame('120.00', $starter->price);
+        // learned once per delivered version; a program the owner removed never comes back
+        $this->assertSame(0, app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries());
+        $starter->delete();
+        $paid->update(['version' => 2]);
+        $this->assertSame(0, app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries());
+    }
+
+    public function test_an_internal_ready_program_keeps_its_price_is_never_shown_and_the_build_starts_from_its_code(): void
+    {
+        $this->learnedCards();
+        $source = $this->deliveredProject();
+        $source->update(['paid_total' => 120]);
+        app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries();
+        $slug = \Modules\AppBuilder\Models\BuilderStarter::sole()->slug;
+
+        $this->answerWithStarter($slug, 12000);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز منيو لمطعمي'])->assertOk()->json('uuid');
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+
+        $this->assertStringContainsString("`{$slug}` (other; internal, never mention it; the price starts at 120", app(ChatModel::class)->lastSystem);
+        $this->assertSame('120.00', $project->amount);
+        $this->assertNull(collect($this->getJson('/ai/'.$uuid.'/state')->json('messages'))->last()['starter']);
+
+        $project->update(['status' => BuilderProject::QUEUED, 'paid_at' => now()]);
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()
+            ->assertJsonPath('job.starter', $slug)->assertJsonPath('job.starter_source', $source->uuid);
+    }
 }

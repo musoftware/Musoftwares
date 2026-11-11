@@ -61,7 +61,10 @@ class PriceSettlement
         $work = max($jobCostUsd * (1 + $share), $jobCostUsd + (float) $project->referral_commission);
         $fees = (float) $project->design_fee + ($project->study_status === Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0);
 
-        return min((float) $project->amount, ceil(($work + $fees) * 100) / 100);
+        // a program we already sold keeps its known price, however little this build cost
+        $known = $project->version <= 1 ? app(Starters::class)->knownPrice($project->starter) : 0;
+
+        return min((float) $project->amount, max($known, ceil(($work + $fees) * 100) / 100));
     }
 
     private function currencyId(BuilderProject $project): ?int

@@ -58,6 +58,8 @@ class WorkerJobController extends Controller
             'has_previous_version' => $project->hasDelivery(),
             // the first build copies this ready program from the build machine and develops it into the idea
             'starter' => $project->hasDelivery() ? null : $project->starter,
+            // a program learned from an earlier paid project: the worker copies that project's code, cleaned
+            'starter_source' => $project->hasDelivery() ? null : (app(\Modules\AppBuilder\Services\Starters::class)->find($project->starter)['source_uuid'] ?? null),
         ]]);
     }
 

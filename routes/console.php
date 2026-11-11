@@ -51,6 +51,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ChatFollowUp::class)->s
     ->hourly()
     ->withoutOverlapping(30);
 
+// The AI builder: every paid delivery becomes an internal ready program for the next customer who wants the same
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries())
+    ->name('builder-learned-starters')
+    ->everyThirtyMinutes()
+    ->withoutOverlapping(20);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
