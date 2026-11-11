@@ -179,6 +179,24 @@ class ProjectPayment
         return true;
     }
 
+    /** A signed-in customer's first simple page: no payment, and the build may spend only the free cap. */
+    public function startFreeBuild(BuilderProject $project, \App\Models\User $user): bool
+    {
+        if (! app(FreeBuild::class)->availableTo($project, $user)) {
+            return false;
+        }
+
+        $cap = (float) config('builder.free_build.budget_usd');
+        $this->queue($project, [
+            'free_build' => true,
+            'user_id' => $project->user_id ?? $user->id,
+            'budget_usd' => min((float) $project->budget_usd, $cap),
+        ]);
+        $this->tellOwner($project, 'Free first build started: '.$project->title);
+
+        return true;
+    }
+
     private function queue(BuilderProject $project, array $extra): void
     {
         $project->update($extra + [

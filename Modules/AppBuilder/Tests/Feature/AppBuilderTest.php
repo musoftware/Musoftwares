@@ -229,6 +229,48 @@ class AppBuilderTest extends TestCase
         $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تالت'])->assertForbidden()->assertJsonPath('message', __('builder.errors.sign_in'));
     }
 
+    private function quotePage(): void
+    {
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'تمام',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'صفحة منيو', 'spec' => 'One menu page.', 'estimated_output_tokens' => 25000, 'kind' => 'build', 'complex' => false, 'design_fee' => 0, 'project_type' => 'page'],
+        ]);
+    }
+
+    public function test_a_signed_in_customers_first_simple_page_is_free_once_with_a_capped_budget(): void
+    {
+        // a guest sees the offer as a reason to sign in, not as a button
+        $this->quotePage();
+        $guestChat = $this->postJson('/ai/messages', ['text' => 'صفحة منيو'])->assertOk()->json('uuid');
+        $this->assertNotNull($this->getJson('/ai/'.$guestChat.'/state')->json('quote.free_build.sign_in_url'));
+        $this->postJson('/ai/'.$guestChat.'/free')->assertUnauthorized();
+
+        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
+        $this->quotePage();
+        $uuid = $this->postJson('/ai/messages', ['text' => 'صفحة منيو'])->assertOk()->json('uuid');
+        $url = $this->getJson('/ai/'.$uuid.'/state')->json('quote.free_build.url');
+        $this->postJson($url)->assertOk()->assertJsonPath('status', BuilderProject::QUEUED);
+
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+        $this->assertTrue($project->free_build);
+        $this->assertSame(0.0, (float) $project->paid_total);
+        $this->assertLessThanOrEqual(1.0, (float) $project->budget_usd);
+
+        // one per account: the next page is paid
+        $this->quotePage();
+        $next = $this->postJson('/ai/messages', ['text' => 'صفحة تانية'])->assertOk()->json('uuid');
+        $this->assertNull($this->getJson('/ai/'.$next.'/state')->json('quote.free_build'));
+        $this->postJson('/ai/'.$next.'/free')->assertStatus(409);
+    }
+
+    public function test_a_bigger_project_is_never_free(): void
+    {
+        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
+        $project = $this->quotedProject();
+        $this->assertNull($this->getJson('/ai/'.$project->uuid.'/state')->json('quote.free_build'));
+    }
+
     public function test_a_signed_in_customer_pays_from_the_wallet_only_when_it_covers_the_price(): void
     {
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);

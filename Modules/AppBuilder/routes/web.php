@@ -23,6 +23,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::post('/{project}/discount', [BuilderChatController::class, 'discount'])->middleware('throttle:10,1')->name('discount');
         Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1')->name('pay');
         Route::post('/{project}/pay/wallet', [BuilderPaymentController::class, 'payWithWallet'])->middleware(['auth', 'throttle:10,1'])->name('pay.wallet');
+        Route::post('/{project}/free', [BuilderPaymentController::class, 'freeBuild'])->middleware(['auth', 'throttle:5,1'])->name('free');
         Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');

@@ -122,7 +122,20 @@ class ProjectStateResource extends JsonResource
             ] : null,
             'pay_url' => route('builder.pay', $this->resource),
             'fix_url' => route('builder.fix', $this->resource),
+            // the first simple page is free for a signed-in customer; a guest is asked to sign in for it
+            'free_build' => $this->freeBuild(request()),
         ];
+    }
+
+    /** @return array{url: string}|array{sign_in_url: string}|null */
+    private function freeBuild(Request $request): ?array
+    {
+        $free = app(\Modules\AppBuilder\Services\FreeBuild::class);
+        if ($request->user() === null) {
+            return $free->covers($this->resource) ? ['sign_in_url' => route('login', ['redirect' => route('builder.show', $this->resource, false)])] : null;
+        }
+
+        return $free->availableTo($this->resource, $request->user()) ? ['url' => route('builder.free', $this->resource)] : null;
     }
 
     private function progressLine(): string

@@ -356,20 +356,36 @@
         card.append(el('div', {class: 'title', dir: 'auto'}, quote.title || ''));
         card.append(el('div', {class: 'price'}, T.fix_free));
         card.append(el('p', {class: 'note'}, T.fix_note));
-        const go = el('button', {class: 'btn', type: 'button'}, T.fix_go);
-        go.addEventListener('click', async () => {
-            go.disabled = true;
+        card.append(actionButton(T.fix_go, quote.fix_url));
+        return card;
+    }
+
+    /** One button that sends one request and shows the new state: a free start, a wallet payment, an admin's mark. */
+    function actionButton(label, url, {confirm = '', ghost = false} = {}) {
+        const button = el('button', {class: ghost ? 'btn ghost' : 'btn', type: 'button'}, label);
+        button.addEventListener('click', async () => {
+            if (confirm && !window.confirm(confirm)) return;
+            button.disabled = true;
             showError('');
             try {
-                state = await call(quote.fix_url, {});
+                state = await call(url, {});
                 render();
             } catch (error) {
                 showError(error.message);
-                go.disabled = false;
+                button.disabled = false;
             }
         });
-        card.append(go);
-        return card;
+        return button;
+    }
+
+    /** The first simple page is free: a start button for a signed-in customer, a sign-in link for a guest. */
+    function appendFreeBuild(card, free) {
+        if (!free) return;
+        if (free.url) {
+            card.append(el('p', {class: 'note'}, T.free_build_note), actionButton(T.free_build_go, free.url));
+            return;
+        }
+        card.append(el('p', {class: 'note'}, T.free_build_sign_in), link(free.sign_in_url, T.sign_in, true));
     }
 
     function quoteNode(quote) {
@@ -386,6 +402,7 @@
         if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
         if (quote.study) card.append(studyNode(quote.study, quote.currency));
+        appendFreeBuild(card, quote.free_build);
         card.append(el('p', {class: 'note'}, T.pay_note));
         appendPayForm(card, quote.pay_url, T.pay, quote.shares || []);
         return card;
@@ -452,39 +469,13 @@
             card.append(el('p', {class: 'note'}, T.wallet_short.replace(':balance', wallet.balance)), link(wallet.top_up_url, T.wallet_top_up, true));
             return;
         }
-        const pay = el('button', {class: 'btn ghost', type: 'button'}, T.wallet_pay.replace(':balance', wallet.balance));
-        pay.addEventListener('click', async () => {
-            if (!window.confirm(T.wallet_confirm)) return;
-            pay.disabled = true;
-            showError('');
-            try {
-                state = await call(wallet.url, {});
-                render();
-            } catch (error) {
-                showError(error.message);
-                pay.disabled = false;
-            }
-        });
-        card.append(pay);
+        card.append(actionButton(T.wallet_pay.replace(':balance', wallet.balance), wallet.url, {confirm: T.wallet_confirm, ghost: true}));
     }
 
     /** Admins only: mark the price as paid without the gateway, and the build starts as after a real payment. */
     function appendAdminPaid(card) {
         if (!state.admin_paid_url) return;
-        const mark = el('button', {class: 'btn ghost', type: 'button'}, T.admin_mark_paid);
-        mark.addEventListener('click', async () => {
-            if (!window.confirm(T.admin_mark_paid_confirm)) return;
-            mark.disabled = true;
-            showError('');
-            try {
-                state = await call(state.admin_paid_url, {});
-                render();
-            } catch (error) {
-                showError(error.message);
-                mark.disabled = false;
-            }
-        });
-        card.append(mark);
+        card.append(actionButton(T.admin_mark_paid, state.admin_paid_url, {confirm: T.admin_mark_paid_confirm, ghost: true}));
     }
 
     /** After a deposit: the program is ready to see, and the files come with the rest of the payment. */

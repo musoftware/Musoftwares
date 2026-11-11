@@ -16,6 +16,12 @@ return [
         'url' => env('BUILDER_FREE_CHAT_URL', 'https://generativelanguage.googleapis.com/v1beta/models'),
         'turns' => (int) env('BUILDER_FREE_CHAT_TURNS', 15),
     ],
+    // a signed-in customer's first simple page is built free, once per account, with a hard spending cap
+    'free_build' => [
+        'enabled' => (bool) env('BUILDER_FREE_BUILD', true),
+        'types' => ['page'],
+        'budget_usd' => (float) env('BUILDER_FREE_BUILD_BUDGET', 1.0),
+    ],
     'chat_web_search' => [
         'enabled' => (bool) env('BUILDER_CHAT_WEB_SEARCH', true),
         'tool' => env('BUILDER_CHAT_WEB_SEARCH_TOOL', 'web_search_20250305'),

@@ -42,6 +42,16 @@ class BuilderPaymentController extends Controller
         return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
     }
 
+    /** A signed-in customer's first simple page, free: straight to the worker's queue with a small spending cap. */
+    public function freeBuild(Request $request, BuilderProject $project): JsonResponse
+    {
+        if (! $this->payment->startFreeBuild($project, $request->user())) {
+            return response()->json(['message' => __('builder.errors.no_free_build')], 409);
+        }
+
+        return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
+    }
+
     /** A free bug fix: no payment, straight to the worker's queue. */
     public function fix(BuilderProject $project): JsonResponse
     {

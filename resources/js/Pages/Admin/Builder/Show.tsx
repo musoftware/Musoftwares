@@ -82,10 +82,11 @@ function VisitorCard({ visitor }: { visitor: Visitor }) {
 /** Names the worker knows how to use for a deploy; any other name is passed to the build as it is. */
 const COMMON_SECRETS = ['ssh_host', 'ssh_port', 'ssh_user', 'ssh_password', 'ssh_private_key', 'deploy_path', 'site_url', 'ftp_host', 'ftp_user', 'ftp_password', 'ftp_path'];
 
-const WHO: Record<Message['role'], [string, string]> = {
+const WHO: Record<string, [string, string]> = {
     user: ['Customer', 'العميل'],
     assistant: ['AI', 'الـ AI'],
     team: ['Team', 'الفريق'],
+    progress: ['Build progress', 'تقدّم البناء'],
 };
 
 const onDone = (en: string, ar: string) => ({
@@ -100,7 +101,7 @@ function MessageList({ messages }: { messages: Message[] }) {
             {messages.map((message) => (
                 <li key={message.id} className={`rounded-xl border p-3 ${message.role === 'user' ? 'bg-slate-50' : 'bg-white'} ${message.question ? 'border-amber-400' : ''}`}>
                     <p className="mb-1 text-xs font-semibold text-slate-500">
-                        {t(...WHO[message.role])}{message.question && ` · ${t('question from the build', 'سؤال من البناء')}`} · <span dir="ltr">{message.at}</span>
+                        {t(...(WHO[message.role] ?? [message.role, message.role]))}{message.question && ` · ${t('question from the build', 'سؤال من البناء')}`} · <span dir="ltr">{message.at}</span>
                     </p>
                     <p className="whitespace-pre-wrap break-words" dir="auto">{message.text}</p>
                     {message.files.length > 0 && <p className="mt-1 text-sm text-slate-500" dir="auto">{message.files.join(' · ')}</p>}
