@@ -17,6 +17,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::get('/{project}', [BuilderChatController::class, 'show'])->name('show');
         Route::get('/{project}/state', [BuilderChatController::class, 'state'])->middleware('throttle:60,1')->name('state');
         Route::post('/{project}/messages', [BuilderChatController::class, 'send'])->middleware('throttle:15,1')->name('send');
+        Route::post('/{project}/left', [BuilderChatController::class, 'left'])->middleware('throttle:20,1')->name('left');
         Route::post('/{project}/discount', [BuilderChatController::class, 'discount'])->middleware('throttle:10,1')->name('discount');
         Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1')->name('pay');
         Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');

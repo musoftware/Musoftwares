@@ -571,6 +571,61 @@ class AppBuilderTest extends TestCase
         $this->assertEqualsWithDelta($before * 0.9, (float) $project->refresh()->amount, 0.01);
     }
 
+    public function test_notifications_are_asked_for_from_the_first_message(): void
+    {
+        config(['services.fcm.web.vapid_key' => 'vapid', 'services.fcm.web.api_key' => 'key']);
+        $this->answer('أهلاً، قولي أكتر.');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز برنامج'])->assertOk()->json('uuid');
+
+        // not only after payment: a reply, a discount or a problem must reach them too
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('push', route('builder.push', $uuid));
+    }
+
+    public function test_a_customer_who_closed_the_page_on_a_price_gets_the_discount_as_a_notification_once(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake([\App\Jobs\SendFcmNotificationJob::class]);
+        $leaving = app(\Modules\AppBuilder\Services\LeaveDiscount::class);
+        $project = $this->quotedProject();
+        $project->update(['push_token' => 'device-token']);
+
+        $this->post('/ai/'.$project->uuid.'/left')->assertNoContent();
+        $this->assertNotNull($project->refresh()->left_price_at);
+
+        // not before half an hour
+        $this->assertSame(0, $leaving->sendReminders());
+        $this->travel(31)->minutes();
+        $this->assertSame(1, $leaving->sendReminders());
+        $this->assertSame(0, $leaving->sendReminders());
+        \Illuminate\Support\Facades\Bus::assertDispatchedTimes(\App\Jobs\SendFcmNotificationJob::class, 1);
+
+        // back on the page from the notification, the offer shows at once
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('quote.offer_now', true)->assertJsonPath('quote.leave_offer', 10);
+    }
+
+    public function test_no_discount_reminder_after_the_discount_was_taken_or_payment_started(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake([\App\Jobs\SendFcmNotificationJob::class]);
+        $taken = $this->quotedProject();
+        $taken->update(['push_token' => 'a', 'left_price_at' => now()->subHour()]);
+        $this->postJson('/ai/'.$taken->uuid.'/discount')->assertOk();
+        $paying = $this->quotedProject();
+        $paying->update(['push_token' => 'b', 'left_price_at' => now()->subHour(), 'payment_due' => 10]);
+
+        $this->assertSame(0, app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders());
+        \Illuminate\Support\Facades\Bus::assertNotDispatched(\App\Jobs\SendFcmNotificationJob::class);
+    }
+
+    public function test_a_failed_build_tells_the_customer(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake([\App\Jobs\SendFcmNotificationJob::class]);
+        $project = $this->buildingProject();
+        $project->update(['push_token' => 'device-token']);
+
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/fail', ['error' => 'tests failed', 'cost_usd' => 1], $this->worker())->assertOk();
+
+        \Illuminate\Support\Facades\Bus::assertDispatched(\App\Jobs\SendFcmNotificationJob::class);
+    }
+
     public function test_the_page_polling_does_not_use_up_the_limit_for_sending_or_starting(): void
     {
         $this->answer('أهلاً، قولي أكتر.');

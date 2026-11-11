@@ -2633,7 +2633,8 @@
         "balance_note": "Your program is ready to see and try. Once the rest is paid, the files open for download right away.",
         "balance_pay": "Pay the rest and get the files",
         "balance_locked": "The files open once the rest of the amount is paid.",
-        "push_ask": "Notify me when it is ready",
+        "push_ask": "Turn on notifications",
+        "push_why": "So any news reaches you even when this page is closed: a reply, a discount, a problem, or your program being ready.",
         "push_on": "Done. You will get a notification even with this page closed.",
         "push_failed": "Notifications could not be turned on in this browser.",
         "push": {
@@ -2644,7 +2645,11 @@
             "snapshot_title": "A new part is done",
             "snapshot_body": ":title: a new part is done. See how it looks.",
             "trial_title": "Your live trial is ready",
-            "trial_body": "A browser with :title is ready to try now."
+            "trial_body": "A browser with :title is ready to try now.",
+            "discount_title": ":percent% off is waiting for you",
+            "discount_body": "The price for :title is still open. Start now and get :percent% off the programming.",
+            "failed_title": "A problem stopped the build",
+            "failed_body": "The build of :title stopped because of a problem. Open the page to see the details."
         },
         "study_writing": "Preparing a short feasibility study for your project...",
         "study_open": "Feasibility study (PDF)",

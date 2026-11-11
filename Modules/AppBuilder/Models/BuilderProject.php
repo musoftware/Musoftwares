@@ -45,6 +45,8 @@ class BuilderProject extends Model
         'design_fee' => 'decimal:2',
         'leave_discount_usd' => 'decimal:2',
         'leave_discount_at' => 'datetime',
+        'left_price_at' => 'datetime',
+        'leave_reminder_at' => 'datetime',
         'awaiting_look' => 'boolean',
         'look_started_at' => 'datetime',
         'study_fee' => 'decimal:2',

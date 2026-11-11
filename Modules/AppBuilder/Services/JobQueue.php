@@ -88,6 +88,7 @@ class JobQueue
             'job_cost_usd' => (float) $project->job_cost_usd + $costUsd,
         ]);
         $this->payment->tellOwner($project, 'Build failed: '.$project->title.' - '.mb_substr($error, 0, 200));
+        app(BuilderPush::class)->notify($project, 'failed');
     }
 
     /**

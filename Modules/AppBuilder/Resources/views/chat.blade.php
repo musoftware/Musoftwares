@@ -423,9 +423,11 @@
 
     function pushNode(url) {
         if (!('Notification' in window) || !('serviceWorker' in navigator)) return null;
+        const box = el('div', {class: 'card'});
         const button = el('button', {class: 'btn ghost', type: 'button'}, T.push_ask);
         button.addEventListener('click', () => enablePush(url, button));
-        return button;
+        box.append(el('p', {class: 'note'}, T.push_why), button);
+        return box;
     }
 
     /** How much of the build is done; the line above it says what was finished last. */
@@ -449,6 +451,16 @@
     // back) is offered a discount once. Closing the tab cannot show our own words; browsers do not allow it.
     function watchForLeaving() {
         let away = false;
+        // a customer who closes the page on a price may get the discount as a notification later
+        window.addEventListener('pagehide', () => {
+            const quote = state && state.quote;
+            if (!quote || !quote.leave_offer || !navigator.sendBeacon) return;
+            const body = new FormData();
+            body.append('_token', CSRF);
+            navigator.sendBeacon(quote.left_url, body);
+        });
+        // they came back from that notification: the offer shows at once
+        if (state && state.quote && state.quote.offer_now) setTimeout(offerLeaveDiscount, 600);
         document.documentElement.addEventListener('mouseleave', (event) => {
             if (event.clientY <= 0) offerLeaveDiscount();
         });

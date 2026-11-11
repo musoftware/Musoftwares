@@ -108,6 +108,14 @@ class BuilderChatController extends Controller
         return response()->json($this->stateOf($project->refresh()));
     }
 
+    /** The page was closed with the price open (sent by the browser as it leaves, so no answer is read). */
+    public function left(BuilderProject $project, \Modules\AppBuilder\Services\LeaveDiscount $discount): \Illuminate\Http\Response
+    {
+        $discount->markLeft($project);
+
+        return response()->noContent();
+    }
+
     /** The first message opens the chat, so visitors who only look never create a project. */
     public function start(SendMessageRequest $request): JsonResponse
     {

@@ -13,6 +13,8 @@ use Modules\AppBuilder\Services\Study\FeasibilityStudy;
  */
 class LeaveDiscount
 {
+    public function __construct(private readonly BuilderPush $push) {}
+
     /** The percent to offer now, or null when there is nothing to offer. */
     public function offerFor(BuilderProject $project): ?int
     {
@@ -59,6 +61,37 @@ class LeaveDiscount
             'budget_usd' => round((float) $project->budget_usd * $keep, 4),
             'referral_commission' => round((float) $project->referral_commission * $keep, 2),
         ]);
+    }
+
+    /** The customer closed the page while the price was open; a reminder may follow later. */
+    public function markLeft(BuilderProject $project): void
+    {
+        if ($project->leave_reminder_at === null && $this->offerFor($project) !== null) {
+            $project->update(['left_price_at' => now()]);
+        }
+    }
+
+    /**
+     * Tells customers who closed the page on a price, a while ago and with notifications on, that the discount
+     * waits for them. Once per project.
+     *
+     * @return int how many were told
+     */
+    public function sendReminders(): int
+    {
+        $after = (int) config('builder.leave_discount.remind_after_minutes');
+        $due = BuilderProject::where('status', BuilderProject::QUOTED)
+            ->whereNotNull('push_token')->whereNull('leave_reminder_at')->whereNull('leave_discount_at')
+            ->where('left_price_at', '<=', now()->subMinutes($after))
+            ->get()
+            ->filter(fn (BuilderProject $project) => $this->offerFor($project) !== null);
+
+        $due->each(function (BuilderProject $project) {
+            $project->update(['leave_reminder_at' => now()]);
+            $this->push->notify($project, 'discount', ['percent' => (string) $this->offerFor($project)]);
+        });
+
+        return $due->count();
     }
 
     private function isOpenQuote(BuilderProject $project): bool

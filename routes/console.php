@@ -45,6 +45,12 @@ Schedule::command(\App\Console\Commands\IndexNowSubmit::class)->dailyAt('03:30')
 // One reminder for a store order that was started and not paid (2 to 48 hours old)
 Schedule::command(\App\Console\Commands\SendSoftwareOrderReminders::class)->hourly()->withoutOverlapping(10);
 
+// The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
+    ->name('builder-leave-reminders')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(10);
+
 // One blog article a day, Arabic and English in turn, written and published by AI; off with blog_autopilot_enabled = 0
 Schedule::command(\App\Console\Commands\PublishBlogArticle::class)
     ->dailyAt('10:00')

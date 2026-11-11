@@ -38,8 +38,8 @@ class ProjectStateResource extends JsonResource
             // the look is done and the answer is being written in another request, so the page keeps asking
             'answering' => ! $this->awaiting_look && $this->isAnsweringAfterLook(),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
-            // offer notifications once there is something to wait for
-            'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token && $this->paid_at !== null ? route('builder.push', $this->resource) : null,
+            // asked from the first message: replies, a discount, a problem and the delivery all reach the customer
+            'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token ? route('builder.push', $this->resource) : null,
             'balance' => $this->hasBalanceDue() ? [
                 'due' => number_format($this->balanceDue(), 2),
                 'currency' => $this->currency,
@@ -102,6 +102,9 @@ class ProjectStateResource extends JsonResource
             // offered once if the customer starts to leave; the page asks before it takes it
             'leave_offer' => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->offerFor($this->resource),
             'discount_url' => route('builder.discount', $this->resource),
+            'left_url' => route('builder.left', $this->resource),
+            // the customer came back from the discount notification: show the offer at once
+            'offer_now' => $this->leave_reminder_at !== null,
             'discount' => $this->leave_discount_at && (float) $this->leave_discount_usd > 0 && ! $this->free_fix ? [
                 'percent' => $this->leave_discount_percent,
                 'before' => number_format((float) $this->amount + (float) $this->leave_discount_usd, 2),

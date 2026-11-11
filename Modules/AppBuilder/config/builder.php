@@ -76,6 +76,8 @@ return [
     // only (the designer and the study are real costs), and the build's spending cap goes down with it.
     'leave_discount' => [
         'percent' => (int) env('BUILDER_LEAVE_DISCOUNT_PERCENT', 10),
+        // a customer with notifications on who closed the page on a price hears about the discount this much later
+        'remind_after_minutes' => (int) env('BUILDER_LEAVE_REMIND_AFTER_MINUTES', 30),
     ],
 
     // A professional design by the Musoftware designer is a fixed fee on top of the programming (not multiplied).
