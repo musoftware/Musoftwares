@@ -32,6 +32,16 @@ class BuilderPaymentController extends Controller
         }
     }
 
+    /** A signed-in customer pays from their site wallet; the build starts at once. */
+    public function payWithWallet(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\WalletPayment $wallet): JsonResponse
+    {
+        if (! $wallet->pay($project, $request->user())) {
+            return response()->json(['message' => __('builder.errors.wallet')], 409);
+        }
+
+        return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
+    }
+
     /** A free bug fix: no payment, straight to the worker's queue. */
     public function fix(BuilderProject $project): JsonResponse
     {

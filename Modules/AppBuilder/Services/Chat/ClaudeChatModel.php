@@ -12,9 +12,36 @@ class ClaudeChatModel implements ChatModel
 
     public function reply(string $system, array $turns): ChatTurn
     {
+        if (! config('builder.chat_web_search.enabled')) {
+            return $this->turn($this->ask($system, $turns, false));
+        }
+
+        // the web is a help, never a risk: a search that pauses, fails or breaks the answer means one plain ask instead
         try {
-            $message = (new Client(apiKey: config('services.anthropic.key')))->beta->messages->create(
+            return $this->turn($this->ask($system, $turns, true));
+        } catch (ChatUnavailable $exception) {
+            \Illuminate\Support\Facades\Log::warning('App builder: chat with web search failed, answering without it', ['error' => $exception->getMessage()]);
+
+            return $this->turn($this->ask($system, $turns, false));
+        }
+    }
+
+    private function turn($message): ChatTurn
+    {
+        if ($message->stopReason !== 'end_turn') {
+            throw new ChatUnavailable('Claude stopped early: '.$message->stopReason);
+        }
+
+        return ChatTurn::fromArray($this->json($message->content), (int) $message->usage->inputTokens, (int) $message->usage->outputTokens);
+    }
+
+    /** One call to Claude; with the web on, it may search before it answers (for things the team has not built before). */
+    private function ask(string $system, array $turns, bool $web)
+    {
+        try {
+            return (new Client(apiKey: config('services.anthropic.key')))->beta->messages->create(
                 ...$this->fallbackOptions(),
+                ...($web ? ['tools' => [$this->webSearch()]] : []),
                 model: config('builder.chat_model'),
                 maxTokens: self::MAX_OUTPUT_TOKENS,
                 system: [['type' => 'text', 'text' => $system, 'cacheControl' => ['type' => 'ephemeral']]],
@@ -24,12 +51,11 @@ class ClaudeChatModel implements ChatModel
         } catch (APIException $exception) {
             throw new ChatUnavailable($exception->getMessage(), previous: $exception);
         }
+    }
 
-        if ($message->stopReason !== 'end_turn') {
-            throw new ChatUnavailable('Claude stopped early: '.$message->stopReason);
-        }
-
-        return ChatTurn::fromArray($this->json($message->content), (int) $message->usage->inputTokens, (int) $message->usage->outputTokens);
+    private function webSearch(): array
+    {
+        return ['type' => config('builder.chat_web_search.tool'), 'name' => 'web_search', 'maxUses' => (int) config('builder.chat_web_search.max_uses')];
     }
 
     /** Refusal fallback only works on Opus and Sonnet models, so it is off for the cheap Haiku chat. */
@@ -40,14 +66,17 @@ class ClaudeChatModel implements ChatModel
             : [];
     }
 
+    /** The answer is the text after the last search; search citations can split it into several text blocks. */
     private function json(iterable $content): array
     {
+        $answer = '';
         foreach ($content as $block) {
-            $data = $block->type === 'text' ? json_decode($block->text, true) : null;
+            $answer = $block->type === 'text' ? $answer.$block->text : '';
+        }
 
-            if (is_array($data) && isset($data['reply'], $data['quote'])) {
-                return $data;
-            }
+        $data = json_decode(trim($answer), true);
+        if (is_array($data) && isset($data['reply'], $data['quote'])) {
+            return $data;
         }
 
         throw new ChatUnavailable('Claude gave no usable JSON.');
@@ -65,7 +94,7 @@ class ClaudeChatModel implements ChatModel
                 'kind' => ['type' => 'string', 'enum' => ['build', 'fix']],
                 'complex' => ['type' => 'boolean'],
                 'design_fee' => ['type' => 'number'],
-                'project_type' => ['type' => 'string', 'enum' => ['page', 'website', 'web_app', 'system', 'extension', 'desktop', 'app_simple', 'app_full', 'app_fancy', 'other']],
+                'project_type' => ['type' => 'string', 'enum' => array_keys((array) config('builder.project_types'))],
             ],
             'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type'],
             'additionalProperties' => false,

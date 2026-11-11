@@ -47,6 +47,8 @@ class ProjectStateResource extends JsonResource
                 'currency' => $this->currency,
                 'pay_url' => route('builder.pay', $this->resource),
             ] : null,
+            // a signed-in customer can pay the open price from their site wallet
+            'wallet' => app(\Modules\AppBuilder\Services\WalletPayment::class)->offer($this->resource, $request->user()),
             // only an admin sees the button that marks the open price as paid
             'admin_paid_url' => $request->user()?->isAdmin() ? route('admin.builder.mark-paid', $this->resource) : null,
             'delivery' => $this->hasDelivery() ? $this->delivery() : null,

@@ -85,15 +85,32 @@ class ProjectPayment
      */
     public function markPaidByAdmin(BuilderProject $project, int $adminId): bool
     {
-        $isOpenQuote = $project->status === BuilderProject::QUOTED && ! $project->free_fix;
-        if (! $isOpenQuote && ! $project->hasBalanceDue()) {
+        $due = $this->openAmount($project);
+        if ($due === null) {
             return false;
         }
 
-        $project->update(['payment_due' => $project->hasBalanceDue() ? $project->balanceDue() : (float) $project->amount]);
         Log::info('App builder: marked paid by an admin', ['project_id' => $project->id, 'admin_id' => $adminId]);
 
-        return $this->markPaid($project, $project->quote_version, 'admin-'.$adminId.'-'.now()->timestamp);
+        return $this->payOutsideGateway($project, $due, 'admin-'.$adminId.'-'.now()->timestamp);
+    }
+
+    /** What can be paid now in full: the open quote, or the rest after a deposit. Null when nothing is open. */
+    public function openAmount(BuilderProject $project): ?float
+    {
+        if ($project->hasBalanceDue()) {
+            return $project->balanceDue();
+        }
+
+        return $project->status === BuilderProject::QUOTED && ! $project->free_fix ? (float) $project->amount : null;
+    }
+
+    /** A payment made without the card gateway (the wallet, or the owner by hand) runs the same steps as a card payment. */
+    public function payOutsideGateway(BuilderProject $project, float $due, string $reference): bool
+    {
+        $project->update(['payment_due' => $due]);
+
+        return $this->markPaid($project, $project->quote_version, $reference);
     }
 
     /**

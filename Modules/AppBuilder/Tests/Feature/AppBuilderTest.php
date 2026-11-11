@@ -183,6 +183,40 @@ class AppBuilderTest extends TestCase
         }
     }
 
+    public function test_a_signed_in_customer_pays_from_the_wallet_only_when_it_covers_the_price(): void
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $egp = Currency::firstOrCreate(['currency' => 'EGP'], ['symbol' => 'EGP']);
+        CurrenciesExchange::create(['date_string' => now()->toDateString(), 'currency1' => $usd->id, 'currency2' => $egp->id, 'rate' => 50]);
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $egp->id]);
+        $this->actingAs($customer);
+        $project = $this->quotedProject();
+        $priceInEgp = (float) $project->amount * 50;
+
+        // a guest sees no wallet; a customer whose balance is short sees the top-up link, not the button
+        $this->assertNotNull($this->getJson('/ai/'.$project->uuid.'/state')->json('wallet'));
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('wallet.enough', false);
+        $this->postJson('/ai/'.$project->uuid.'/pay/wallet')->assertStatus(409);
+        $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
+
+        $customer->add_balance($priceInEgp + 100, 'test top-up', 'received');
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('wallet.enough', true);
+        $this->postJson('/ai/'.$project->uuid.'/pay/wallet')->assertOk()->assertJsonPath('status', BuilderProject::QUEUED);
+
+        $project->refresh();
+        $this->assertSame((float) $project->amount, (float) $project->paid_total);
+        $this->assertSame($customer->id, $project->user_id);
+        $this->assertEqualsWithDelta(100, (float) $customer->refresh()->balance(), 0.01);
+        $this->assertSame($project->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
+    }
+
+    public function test_a_guest_cannot_pay_from_a_wallet(): void
+    {
+        $project = $this->quotedProject();
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('wallet', null);
+        $this->postJson('/ai/'.$project->uuid.'/pay/wallet')->assertUnauthorized();
+    }
+
     public function test_paying_the_open_quote_queues_the_build(): void
     {
         config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
@@ -1225,6 +1259,19 @@ class AppBuilderTest extends TestCase
         $this->assertSame('150.00', $project->amount);
         // the build may spend 2/3 of the price, and the worker stops at 1.5x that: the price itself
         $this->assertSame('100.0000', $project->budget_usd);
+    }
+
+    public function test_a_game_is_never_priced_like_a_small_page(): void
+    {
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'تمام',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'لعبة عربيات', 'spec' => 'First playable round of a racing game.', 'estimated_output_tokens' => 25000, 'kind' => 'build', 'complex' => true, 'design_fee' => 0, 'project_type' => 'game'],
+        ]);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز لعبة عربيات'])->json('uuid');
+
+        // the same 25k tokens as a $3 page, but a game is a joint project with design and play-testing rounds
+        $this->assertSame('300.00', BuilderProject::where('uuid', $uuid)->value('amount'));
     }
 
     public function test_a_one_screen_page_is_priced_by_its_real_cost_and_its_build_can_never_spend_more(): void

@@ -6,6 +6,13 @@ return [
     'chat_effort' => env('BUILDER_CHAT_EFFORT', 'low'),
     // Server-side refusal fallback. Haiku does not support it, so turn it on only for Opus or Sonnet chat models.
     'chat_fallback' => (bool) env('BUILDER_CHAT_FALLBACK', false),
+    // the chat may search the web before answering about something the team has not built before (a game, a
+    // new kind of system); Haiku has only the basic search tool. About $0.01 per search.
+    'chat_web_search' => [
+        'enabled' => (bool) env('BUILDER_CHAT_WEB_SEARCH', true),
+        'tool' => env('BUILDER_CHAT_WEB_SEARCH_TOOL', 'web_search_20250305'),
+        'max_uses' => (int) env('BUILDER_CHAT_WEB_SEARCH_MAX', 3),
+    ],
     // what the chat model costs, to show the owner what each chat cost (the same prices the worker uses)
     'chat_prices' => [
         'input_usd_per_mtok' => (float) env('BUILDER_CHAT_INPUT_USD_PER_MTOK', 0.1),
@@ -49,6 +56,8 @@ return [
         'app_simple' => (float) env('BUILDER_MIN_APP_SIMPLE', 60),
         'app_full' => (float) env('BUILDER_MIN_APP_FULL', 200),
         'app_fancy' => (float) env('BUILDER_MIN_APP_FANCY', 250),
+        // a game is a joint project: design, art, sounds and several rounds of play-testing with the customer
+        'game' => (float) env('BUILDER_MIN_GAME', 300),
         'other' => (float) env('BUILDER_MIN_OTHER', 20),
     ],
 

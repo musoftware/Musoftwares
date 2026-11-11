@@ -86,10 +86,20 @@
         .leave::backdrop{background:rgba(0,0,0,.35)}
         .leave h2{margin:0 0 8px;font-size:20px}
         .leave p{margin:0 0 16px;color:var(--muted);line-height:1.8}
+        .viewer{max-width:720px;margin:0 auto;padding:12px 16px 0;display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
+        .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
         .card .before{color:var(--muted);text-decoration:line-through;font-size:16px;font-weight:400;margin-inline-start:8px}
     </style>
 </head>
 <body>
+<div class="viewer">
+    @auth
+        <span dir="auto">{{ auth()->user()->name }}</span>
+    @else
+        <span>{{ __('builder.guest') }}</span>
+        <a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}">{{ __('builder.sign_in') }}</a>
+    @endauth
+</div>
 <main class="wrap" id="thread" aria-live="polite">
     <section class="empty" id="empty">
         <h1>{{ __('builder.greeting') }}</h1>
@@ -432,7 +442,32 @@
             }
         });
         card.append(open, payForm);
+        appendWalletPay(card);
         appendAdminPaid(card);
+    }
+
+    /** A signed-in customer can pay from the site wallet: a button when it covers the price, otherwise a top-up link. */
+    function appendWalletPay(card) {
+        const wallet = state.wallet;
+        if (!wallet) return;
+        if (!wallet.enough) {
+            card.append(el('p', {class: 'note'}, T.wallet_short.replace(':balance', wallet.balance)), link(wallet.top_up_url, T.wallet_top_up, true));
+            return;
+        }
+        const pay = el('button', {class: 'btn ghost', type: 'button'}, T.wallet_pay.replace(':balance', wallet.balance));
+        pay.addEventListener('click', async () => {
+            if (!window.confirm(T.wallet_confirm)) return;
+            pay.disabled = true;
+            showError('');
+            try {
+                state = await call(wallet.url, {});
+                render();
+            } catch (error) {
+                showError(error.message);
+                pay.disabled = false;
+            }
+        });
+        card.append(pay);
     }
 
     /** Admins only: mark the price as paid without the gateway, and the build starts as after a real payment. */
