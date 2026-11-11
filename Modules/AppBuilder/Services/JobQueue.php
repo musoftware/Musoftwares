@@ -3,6 +3,7 @@
 namespace Modules\AppBuilder\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 
@@ -47,8 +48,9 @@ class JobQueue
     public function complete(BuilderProject $project, string $zipPath, string $summary, float $costUsd, string $ideasJson = ''): void
     {
         $version = $this->store->store($project, $zipPath);
-        // this job's whole cost, failed tries included, teaches the next price
-        $this->costs->record($project, (float) $project->job_cost_usd + $costUsd);
+        // this job's whole cost, failed tries included, teaches the next price and settles this one
+        $jobCost = (float) $project->job_cost_usd + $costUsd;
+        $this->costs->record($project, $jobCost);
 
         DB::transaction(function () use ($project, $version, $summary, $costUsd, $ideasJson): void {
             $project->update([
@@ -69,6 +71,12 @@ class JobQueue
                 'payload' => ['reply' => $summary, 'delivered_version' => $version, 'ideas' => $this->ideas($ideasJson), 'needs_team' => false, 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0]],
             ]);
         });
+        // money back is good news, never a reason for a delivery to fail
+        try {
+            app(PriceSettlement::class)->settle($project->refresh(), $jobCost);
+        } catch (\Throwable $e) {
+            Log::error('App builder: price settlement failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
+        }
         app(BuilderPush::class)->notify($project, 'delivered');
         // an extension can only be tried in a browser, so its live trial starts by itself
         if ($this->trials->kind($project->refresh()) === 'extension') {

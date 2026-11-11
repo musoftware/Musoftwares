@@ -152,6 +152,8 @@
 (() => {
     const T = @json(__('builder'));
     const PUSH = @json($push);
+    const SIGNED_IN = @json(auth()->check());
+    const SIGN_IN_URL = @json(route('login', ['redirect' => request()->getRequestUri()]));
     const BASE = @json(route('builder.index'));
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const POLL_MS = 4000;
@@ -404,6 +406,8 @@
         if (quote.study) card.append(studyNode(quote.study, quote.currency));
         appendFreeBuild(card, quote.free_build);
         card.append(el('p', {class: 'note'}, T.pay_note));
+        // a guest is told that signing in first means getting money back when the work costs less
+        if (!SIGNED_IN && !quote.free_build) card.append(el('p', {class: 'note'}, T.refund_sign_in), link(SIGN_IN_URL, T.sign_in, true));
         appendPayForm(card, quote.pay_url, T.pay, quote.shares || []);
         return card;
     }

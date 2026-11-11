@@ -229,6 +229,83 @@ class AppBuilderTest extends TestCase
         $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تالت'])->assertForbidden()->assertJsonPath('message', __('builder.errors.sign_in'));
     }
 
+    /** A paid quote, built and delivered by the worker at this real cost. */
+    private function deliverPaid(float $costUsd, ?\App\Models\User $customer = null): BuilderProject
+    {
+        $this->usdAndEgpRates();
+        if ($customer) $this->actingAs($customer);
+        $project = $this->quotedProject();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-SETTLE');
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => $costUsd], $this->worker())->assertOk();
+
+        return $project->refresh();
+    }
+
+    public function test_a_signed_in_customer_gets_back_what_the_work_did_not_cost(): void
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $paid = (float) $this->quotedProjectPrice();
+        $project = $this->deliverPaid(1.00, $customer);
+
+        // the real cost plus 20%, and the rest back as balance for the next program
+        $this->assertSame(1.20, (float) $project->amount);
+        $this->assertEqualsWithDelta($paid - 1.20, $this->balanceInUsd($customer), 0.05);
+        $this->assertSame(BuilderMessage::TEAM, $project->messages()->reorder('id', 'desc')->value('role'));
+        $this->assertSame($project->quote_version, $project->price_settled_version);
+    }
+
+    public function test_a_guest_keeps_the_price_they_paid_and_a_cost_above_the_price_changes_nothing(): void
+    {
+        $guest = $this->deliverPaid(1.00);
+        $this->assertSame((float) $guest->quote_paid, (float) $guest->amount);
+
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $paid = (float) $this->quotedProjectPrice();
+        $costly = $this->deliverPaid(500.00, $customer);
+        $this->assertSame($paid, (float) $costly->amount);
+        $this->assertEqualsWithDelta(0, $this->balanceInUsd($customer), 0.01);
+    }
+
+    public function test_a_referred_customer_pays_the_cost_plus_half(): void
+    {
+        $referrer = $this->referrer();
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $this->withSession(['referral' => 'ahmed']);
+        $project = $this->deliverPaid(4.00, $customer);
+
+        $this->assertSame($referrer->id, $project->referrer_user_id);
+        // cost plus 50%, but never less than the cost plus the referrer's share
+        $this->assertSame(max(6.00, 4.00 + (float) $project->referral_commission), (float) $project->amount);
+    }
+
+    private function usdAndEgpRates(): void
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $egp = Currency::firstOrCreate(['currency' => 'EGP'], ['symbol' => 'EGP']);
+        CurrenciesExchange::firstOrCreate(['date_string' => now()->toDateString(), 'currency1' => $usd->id, 'currency2' => $egp->id], ['rate' => 50]);
+        CurrenciesExchange::firstOrCreate(['date_string' => now()->toDateString(), 'currency1' => $egp->id, 'currency2' => $usd->id], ['rate' => 0.02]);
+    }
+
+    /** A balance in the customer's own currency, read back in dollars. */
+    private function balanceInUsd(\App\Models\User $customer): float
+    {
+        return (float) CurrenciesExchange::RateToday((float) $customer->refresh()->balance(), $customer->currency_id, Currency::resolve('USD')->id);
+    }
+
+    /** What quotedProject() charges, from the same scripted answer. */
+    private function quotedProjectPrice(): string
+    {
+        $probe = $this->quotedProject();
+        $price = $probe->amount;
+        $probe->delete();
+
+        return $price;
+    }
+
     private function quotePage(): void
     {
         $this->script[] = ChatTurn::fromArray([
@@ -1419,7 +1496,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame(BuilderProject::QUEUED, $project->status);
         $this->assertSame('3.00', $project->paid_total);
         $project->update(['status' => BuilderProject::BUILDING]);
-        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1], $this->worker())->assertOk();
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1000], $this->worker())->assertOk();
 
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('balance.due', '3.00')->assertJsonPath('delivery.download_url', null);
         $this->get('/ai/'.$project->uuid.'/download')->assertStatus(402);

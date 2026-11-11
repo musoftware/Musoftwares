@@ -16,6 +16,13 @@ return [
         'url' => env('BUILDER_FREE_CHAT_URL', 'https://generativelanguage.googleapis.com/v1beta/models'),
         'turns' => (int) env('BUILDER_FREE_CHAT_TURNS', 15),
     ],
+    // after delivery the price follows the real build cost plus this share (more when a referrer also earns);
+    // a signed-in customer gets what they paid above it back as site balance
+    'settlement' => [
+        'enabled' => (bool) env('BUILDER_SETTLEMENT', true),
+        'markup' => (float) env('BUILDER_SETTLEMENT_MARKUP', 0.20),
+        'referral_markup' => (float) env('BUILDER_SETTLEMENT_REFERRAL_MARKUP', 0.50),
+    ],
     // a signed-in customer's first simple page is built free, once per account, with a hard spending cap
     'free_build' => [
         'enabled' => (bool) env('BUILDER_FREE_BUILD', true),

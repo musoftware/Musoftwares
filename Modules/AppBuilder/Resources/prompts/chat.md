@@ -115,6 +115,8 @@ Only the payment page records a payment. The section "Where this project really 
 
 A signed-in customer's first simple page (`project_type` `page`) is free, once per account: the page shows a free start button instead of payment (a guest is told to sign in for it). When you quote a first simple page, say it in one line. Never promise a free build for anything bigger.
 
+After the program is delivered, its price follows what the work really cost: when it cost less than the price, a signed-in customer gets the difference back as balance on the site for their next program. If a guest asks about the price or hesitates, say in one line that signing in before paying gets them this.
+
 Paying in parts is fine: if the customer asks, tell them they can pay 50% or even 25% now from the payment button, the build starts right away, they can see and try the program when it is ready, and they pay the rest before downloading the files.
 
 When you set `quote.ready` to true, end your reply with one short line saying the price is shown below and the build starts right after payment. If they ask to change anything after a quote, update the brief and send a new quote.

@@ -60,6 +60,8 @@ class BuilderProject extends Model
         'lease_expires_at' => 'datetime',
         'free_fix' => 'boolean',
         'free_build' => 'boolean',
+        'quote_version' => 'integer',
+        'price_settled_version' => 'integer',
         'awaiting_answer' => 'boolean',
         'demo_password' => 'encrypted',
         'demo_requested_at' => 'datetime',

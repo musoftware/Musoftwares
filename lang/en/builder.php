@@ -21,6 +21,8 @@ return [
     'wallet_confirm' => 'Pay this price from your balance on the site and start the build now?',
     'wallet_short' => 'Your balance (:balance) does not cover this price yet.',
     'wallet_top_up' => 'Add balance',
+    'price_settled' => 'Good news: the work cost less than its price, so :amount went back to your balance on the site. You can use it for your next program.',
+    'refund_sign_in' => 'Sign in before you pay: if the work costs less than the price, the difference comes back to you as balance for your next program.',
     'free_build_note' => 'Your first simple page is on us: no payment, the build starts now.',
     'free_build_go' => 'Start it free',
     'free_build_sign_in' => 'Your first simple page is free once you sign in.',
