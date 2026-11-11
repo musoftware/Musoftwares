@@ -428,6 +428,26 @@
             }
         });
         card.append(open, payForm);
+        appendAdminPaid(card);
+    }
+
+    /** Admins only: mark the price as paid without the gateway, and the build starts as after a real payment. */
+    function appendAdminPaid(card) {
+        if (!state.admin_paid_url) return;
+        const mark = el('button', {class: 'btn ghost', type: 'button'}, T.admin_mark_paid);
+        mark.addEventListener('click', async () => {
+            if (!window.confirm(T.admin_mark_paid_confirm)) return;
+            mark.disabled = true;
+            showError('');
+            try {
+                state = await call(state.admin_paid_url, {});
+                render();
+            } catch (error) {
+                showError(error.message);
+                mark.disabled = false;
+            }
+        });
+        card.append(mark);
     }
 
     /** After a deposit: the program is ready to see, and the files come with the rest of the payment. */

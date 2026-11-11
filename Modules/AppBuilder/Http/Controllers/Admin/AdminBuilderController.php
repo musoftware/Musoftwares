@@ -3,6 +3,7 @@
 namespace Modules\AppBuilder\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -102,6 +103,16 @@ class AdminBuilderController extends Controller
         ]);
 
         return back()->with('success', __('builder.admin.retried'));
+    }
+
+    /** The owner marks the open price as paid, from the customer's chat page; the build starts as after a real payment. */
+    public function markPaid(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectPayment $payment): JsonResponse
+    {
+        if (! $payment->markPaidByAdmin($project, (int) $request->user()->id)) {
+            return response()->json(['message' => __('builder.errors.no_quote')], 409);
+        }
+
+        return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
     }
 
     public function storeSecret(Request $request, BuilderProject $project): RedirectResponse

@@ -11,6 +11,8 @@ return [
     'pay' => 'Pay and start the build',
     'pay_note' => 'The build starts by itself after payment, and the program appears here on this page.',
     'pay_go' => 'Continue to payment',
+    'admin_mark_paid' => 'Mark as paid (admin)',
+    'admin_mark_paid_confirm' => 'Mark this price as paid and start the build? No money is taken.',
     'fix_free' => 'This fix is free',
     'fix_note' => 'This is a fault in what we delivered, so we fix it at no cost. The fix starts as soon as you press the button.',
     'fix_go' => 'Start the fix',

@@ -789,6 +789,30 @@ class AppBuilderTest extends TestCase
         $this->assertSame($waited->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
     }
 
+    public function test_only_an_admin_can_mark_the_price_as_paid_and_it_starts_the_build(): void
+    {
+        $project = $this->quotedProject();
+        // a customer never gets the button, and cannot call the route
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('admin_paid_url', null);
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $this->actingAs($customer)->postJson('/admin/builder/'.$project->uuid.'/mark-paid')->assertForbidden();
+        $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $url = $this->actingAs($admin)->getJson('/ai/'.$project->uuid.'/state')->json('admin_paid_url');
+        $this->assertNotNull($url);
+
+        $this->postJson($url)->assertOk()->assertJsonPath('status', BuilderProject::QUEUED)->assertJsonPath('quote', null);
+        $project->refresh();
+        $this->assertSame((float) $project->amount, (float) $project->paid_total);
+        $this->assertSame($project->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
+
+        // nothing open to pay any more
+        $this->postJson($url)->assertStatus(409);
+    }
+
     public function test_a_project_without_previews_starts_right_after_payment(): void
     {
         $project = $this->quotedProject();

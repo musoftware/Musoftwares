@@ -79,6 +79,23 @@ class ProjectPayment
         return true;
     }
 
+    /**
+     * The owner marks the open price as paid (paid by hand, or a test): the whole quote, or the rest after a deposit.
+     * It then runs the same steps as a gateway payment.
+     */
+    public function markPaidByAdmin(BuilderProject $project, int $adminId): bool
+    {
+        $isOpenQuote = $project->status === BuilderProject::QUOTED && ! $project->free_fix;
+        if (! $isOpenQuote && ! $project->hasBalanceDue()) {
+            return false;
+        }
+
+        $project->update(['payment_due' => $project->hasBalanceDue() ? $project->balanceDue() : (float) $project->amount]);
+        Log::info('App builder: marked paid by an admin', ['project_id' => $project->id, 'admin_id' => $adminId]);
+
+        return $this->markPaid($project, $project->quote_version, 'admin-'.$adminId.'-'.now()->timestamp);
+    }
+
     /** The rest of a quote after a deposit: the files are handed over once it is paid. */
     private function markBalancePaid(BuilderProject $project, ?string $transactionId): bool
     {
