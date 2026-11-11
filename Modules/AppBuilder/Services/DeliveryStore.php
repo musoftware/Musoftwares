@@ -13,7 +13,8 @@ use ZipArchive;
  */
 class DeliveryStore
 {
-    private const MAX_UNPACKED_BYTES = 400 * 1024 * 1024;
+    /** A Windows program carries its run file and its installer (about 80 MB each with Electron). */
+    private const MAX_UNPACKED_BYTES = 800 * 1024 * 1024;
 
     public const ENTRY_FILE = 'index.html';
 
@@ -25,6 +26,11 @@ class DeliveryStore
 
     /** The signed Android app the customer installs. */
     public const APK_FILE = 'release/app-release.apk';
+
+    /** A Windows program: the file that runs it at once, and its optional installer (see the worker's windows-apps skill). */
+    public const WINDOWS_EXE_FILE = 'release/app-portable.exe';
+
+    public const WINDOWS_SETUP_FILE = 'release/app-setup.exe';
 
     /** A server program has no index.html; its SETUP.md says how to run it. */
     private const SETUP_FILE = 'SETUP.md';
@@ -40,6 +46,7 @@ class DeliveryStore
         'txt' => 'text/plain; charset=UTF-8', 'md' => 'text/plain; charset=UTF-8', 'csv' => 'text/csv; charset=UTF-8',
         'mp3' => 'audio/mpeg', 'wav' => 'audio/wav', 'mp4' => 'video/mp4', 'webm' => 'video/webm',
         'wasm' => 'application/wasm', 'apk' => 'application/vnd.android.package-archive',
+        'exe' => 'application/vnd.microsoft.portable-executable',
     ];
 
     /** Unpacks a checked archive as the project's next version and returns that version number. */

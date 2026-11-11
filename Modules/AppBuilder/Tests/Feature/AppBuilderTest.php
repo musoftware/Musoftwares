@@ -440,6 +440,28 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->get('/admin/builder')->assertOk()->assertInertia(fn ($page) => $page->where('projects.data.0.chat_cost_usd', 0.0003));
     }
 
+    public function test_a_windows_program_gets_run_install_how_to_and_source_buttons(): void
+    {
+        $project = $this->buildingProject();
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', [
+            'archive' => $this->zip(['index.html' => '<h1>How to install</h1>', 'SETUP.md' => '# setup', 'release/app-portable.exe' => "MZ portable", 'release/app-setup.exe' => "MZ setup"]),
+            'summary' => 'برنامجك جاهز',
+            'cost_usd' => 2,
+        ], $this->worker())->assertOk();
+
+        $actions = $this->getJson('/ai/'.$project->uuid.'/state')->json('delivery.actions');
+        $this->assertSame([__('builder.run_exe'), __('builder.installer'), __('builder.how_to_install'), __('builder.source_code')], array_column($actions, 'label'));
+        $this->assertSame([true, false, false, false], array_column($actions, 'main'));
+
+        // the program is saved as a file, never opened in the browser
+        $this->get($actions[0]['url'])->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="app-portable.exe"');
+
+        // after a deposit only the how-to page stays; the program, the installer and the source wait for the rest
+        $project->update(['quote_paid' => $project->amount / 2]);
+        $this->assertSame([__('builder.how_to_install')], array_column($this->getJson('/ai/'.$project->uuid.'/state')->json('delivery.actions'), 'label'));
+        $this->get('/ai/'.$project->uuid.'/app/release/app-setup.exe')->assertStatus(402);
+    }
+
     public function test_an_android_app_is_delivered_with_an_install_button_and_a_working_preview(): void
     {
         $project = $this->buildingProject();

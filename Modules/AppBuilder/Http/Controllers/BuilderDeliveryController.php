@@ -39,8 +39,10 @@ class BuilderDeliveryController extends Controller
         abort_if(str_starts_with($path, 'release/') && $project->hasBalanceDue(), 402, __('builder.balance_locked'));
 
         $appPreview = str_starts_with($path, 'preview/');
+        // the app files (an APK, a Windows program, its installer) are saved, never opened in the browser
+        $saved = str_starts_with($path, 'release/') ? ['Content-Disposition' => 'attachment; filename="'.basename($file).'"'] : [];
 
-        return response()->file($file, [
+        return response()->file($file, $saved + [
             'Content-Type' => $this->store->mime($file),
             'Content-Security-Policy' => $appPreview ? self::APP_PREVIEW_POLICY : self::SANDBOX_POLICY,
             'X-Content-Type-Options' => 'nosniff',

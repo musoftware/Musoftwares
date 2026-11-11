@@ -302,9 +302,7 @@
         }
         const actions = el('div', {class: 'actions'});
         if (state.delivery && message.delivered_version === state.delivery.version) {
-            if (state.delivery.apk_url) actions.append(link(state.delivery.apk_url, T.download_apk));
-            if (state.delivery.preview_url) actions.append(link(state.delivery.preview_url, T.open_program, Boolean(state.delivery.apk_url)));
-            if (state.delivery.download_url) actions.append(link(state.delivery.download_url, T.download, Boolean(state.delivery.preview_url)));
+            (state.delivery.actions || []).forEach((button) => actions.append(link(button.url, button.label, !button.main)));
             if (state.trial && state.trial.can_request) actions.append(trialButton(state.trial));
         }
         if (actions.children.length) node.append(actions);

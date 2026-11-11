@@ -127,7 +127,7 @@ return [
         // many customers on mobile data share one address, so this stays generous; admins have no limit
         'projects_per_ip_per_day' => (int) env('BUILDER_CHATS_PER_IP_PER_DAY', 30),
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb
-        'archive_kb' => (int) env('BUILDER_ARCHIVE_KB', 204800),
+        'archive_kb' => (int) env('BUILDER_ARCHIVE_KB', 409600),
         'archive_files' => (int) env('BUILDER_ARCHIVE_FILES', 30000),
         // screenshots the build sends to the chat when a big part works
         'snapshots_per_build' => 20,

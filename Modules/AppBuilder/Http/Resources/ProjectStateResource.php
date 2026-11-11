@@ -142,13 +142,41 @@ class ProjectStateResource extends JsonResource
 
     private function delivery(): array
     {
+        $preview = $this->previewUrl();
+        $source = $this->hasBalanceDue() ? null : route('builder.download', $this->resource);
+        $apk = $this->releaseUrl(DeliveryStore::APK_FILE);
+
         return [
             'version' => $this->version,
             // a server program (Laravel, WordPress) has no page to open here, only files and SETUP.md
-            'preview_url' => $this->previewUrl(),
-            'download_url' => $this->hasBalanceDue() ? null : route('builder.download', $this->resource),
-            'apk_url' => $this->apkUrl(),
+            'preview_url' => $preview,
+            'download_url' => $source,
+            'apk_url' => $apk,
+            'actions' => $this->deliveryActions($preview, $source, $apk),
         ];
+    }
+
+    /**
+     * The buttons under the delivery, the main one first. A Windows program gets how to install, the file that runs
+     * it at once, the optional installer, and the source code; other programs open, install the app, or download.
+     *
+     * @return list<array{label: string, url: string, main: bool}>
+     */
+    private function deliveryActions(?string $preview, ?string $source, ?string $apk): array
+    {
+        // what kind of program it is comes from its files, whether or not they are open yet
+        $isWindows = app(DeliveryStore::class)->file($this->resource, DeliveryStore::WINDOWS_EXE_FILE) !== null;
+        $buttons = $isWindows
+            ? [
+                'run_exe' => $this->releaseUrl(DeliveryStore::WINDOWS_EXE_FILE),
+                'installer' => $this->releaseUrl(DeliveryStore::WINDOWS_SETUP_FILE),
+                'how_to_install' => $preview,
+                'source_code' => $source,
+            ]
+            : ['download_apk' => $apk, 'open_program' => $preview, 'download' => $source];
+
+        return collect($buttons)->filter()->map(fn (string $url, string $key) => ['label' => __('builder.'.$key), 'url' => $url])
+            ->values()->map(fn (array $button, int $index) => $button + ['main' => $index === 0])->all();
     }
 
     /** The live trial: the link and its password only while it is live, and only on this customer's page. */
@@ -168,14 +196,14 @@ class ProjectStateResource extends JsonResource
         ];
     }
 
-    /** The Android app to install, once it is fully paid. */
-    private function apkUrl(): ?string
+    /** A ready app file (Android app, Windows program or installer), once it is fully paid. */
+    private function releaseUrl(string $path): ?string
     {
-        if ($this->hasBalanceDue() || app(DeliveryStore::class)->file($this->resource, DeliveryStore::APK_FILE) === null) {
+        if ($this->hasBalanceDue() || app(DeliveryStore::class)->file($this->resource, $path) === null) {
             return null;
         }
 
-        return route('builder.preview', ['project' => $this->resource, 'path' => DeliveryStore::APK_FILE]);
+        return route('builder.preview', ['project' => $this->resource, 'path' => $path]);
     }
 
     private function previewUrl(): ?string

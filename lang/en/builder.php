@@ -102,6 +102,10 @@ return [
     'whatsapp' => 'WhatsApp number',
     'open_program' => 'Open the program',
     'download' => 'Download the files',
+    'run_exe' => 'Run the program (.exe)',
+    'installer' => 'Installer (optional)',
+    'how_to_install' => 'How to install and use',
+    'source_code' => 'Source code',
     'failed' => 'Something went wrong during the build. Our team has been told and will contact you.',
     'copy_link' => 'Save the link of this page to come back any time.',
     'steps' => [
