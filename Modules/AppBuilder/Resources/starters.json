@@ -474,5 +474,397 @@
       "تصدير النتائج",
       "آخر الملفات"
     ]
+  },
+  {
+    "slug": "affiliate-store",
+    "type": "web_app",
+    "title_en": "Affiliate store",
+    "title_ar": "متجر المسوقين بالعمولة",
+    "summary_en": "An online store where vendors list products, marketers (affiliates) sell them for a commission, and the admin ships orders and pays out earnings.",
+    "summary_ar": "متجر أونلاين: التجار يرفعوا المنتجات، والمسوقين يبيعوها بعمولة، والإدارة تشحن الطلبات وتصرف الأرباح.",
+    "features_en": [
+      "Shop front with categories, product pages, cart and checkout",
+      "Products with options, sizes and stock per variant",
+      "Vendor panel to add products and see orders",
+      "Affiliate (marketer) panel: make orders, set commission, track earnings",
+      "Moderators under an affiliate",
+      "Orders with statuses, returns and replacements",
+      "Shipping companies and governorates/cities with fees",
+      "Wallet transactions and payout requests"
+    ],
+    "features_ar": [
+      "واجهة متجر بالأقسام والسلة",
+      "منتجات بالمقاسات والمخزون",
+      "لوحة للتاجر",
+      "لوحة للمسوق وعمولته",
+      "مشرفين تحت المسوق",
+      "طلبات ومرتجعات واستبدال",
+      "شركات الشحن والمحافظات",
+      "محفظة وطلبات سحب الأرباح"
+    ]
+  },
+  {
+    "slug": "steel-erp",
+    "type": "system",
+    "title_en": "SteelTrackPro - Steel and Building Materials ERP",
+    "title_ar": "نظام إدارة الحديد ومواد البناء",
+    "summary_en": "A full back-office system for a steel or building-materials trader: stock in many warehouses and branches, sales and purchase invoices, customer reserved stock, cash and bank accounts, and reports.",
+    "summary_ar": "نظام كامل لتاجر الحديد ومواد البناء: مخزون في عدة مخازن وفروع، فواتير بيع وشراء، رصيد محجوز للعملاء، خزنة وبنوك، وتقارير.",
+    "features_en": [
+      "Items with weight, length, diameter, barcode and QR",
+      "Many warehouses and branches with transfers between them",
+      "Sales invoices (cash, credit, partial) with automatic steel weight",
+      "Purchase invoices, purchase and sales returns",
+      "Customer reserved stock (prepaid steel) with ledger",
+      "Customer, supplier and daily price lists and pricing policies",
+      "Receipt and payment vouchers, cash and bank accounts",
+      "Delivery orders, shipments and shipping companies"
+    ],
+    "features_ar": [
+      "أصناف بالوزن والطول والقطر",
+      "مخازن وفروع وتحويلات",
+      "فواتير بيع بالوزن تلقائيًا",
+      "فواتير شراء ومرتجعات",
+      "رصيد محجوز للعملاء",
+      "قوائم أسعار يومية",
+      "سندات قبض وصرف وخزنة وبنوك",
+      "جرد وحركة مخزون"
+    ]
+  },
+  {
+    "slug": "prompt-library",
+    "type": "web_app",
+    "title_en": "AI prompt library",
+    "title_ar": "مكتبة أوامر الذكاء الاصطناعي",
+    "summary_en": "A website where users write, improve with Google Gemini, save and share AI prompts for text, image and video.",
+    "summary_ar": "موقع يكتب فيه المستخدم أوامر الذكاء الاصطناعي ويحسنها بـ Gemini ويحفظها ويشاركها للنص والصور والفيديو.",
+    "features_en": [
+      "Improve a prompt with Google Gemini (text, image, video targets)",
+      "Live test playground",
+      "Ready templates (15 seeded)",
+      "Collections (folders) with colors and icons",
+      "Version history with restore and compare",
+      "Public marketplace with likes and fork (copy)",
+      "Quality check and alternative suggestions",
+      "Export prompt as code in 5 languages"
+    ],
+    "features_ar": [
+      "تحسين الأوامر بالذكاء الاصطناعي",
+      "تجربة الأمر مباشرة",
+      "قوالب جاهزة",
+      "مجموعات بالألوان",
+      "سجل النسخ والرجوع",
+      "سوق عام بالإعجاب والنسخ",
+      "تصدير الأمر ككود",
+      "لوحة إحصائيات لكل مستخدم"
+    ]
+  },
+  {
+    "slug": "project-manager",
+    "type": "system",
+    "title_en": "Projects, clients and invoices",
+    "title_ar": "إدارة المشاريع والعملاء والفواتير",
+    "summary_en": "A system for a freelancer or small agency to track clients, projects, tasks with checklists, hours, invoices in many currencies, and income reports, with share links for clients.",
+    "summary_ar": "نظام للمستقل أو الشركة الصغيرة لمتابعة العملاء والمشاريع والمهام والساعات والفواتير بعدة عملات وتقارير الدخل، مع روابط مشاركة للعميل.",
+    "features_en": [
+      "Clients and projects with hide and percentage",
+      "Tasks with todo items, priority, tags, colors and sorting",
+      "Attach images and voice notes to todos",
+      "Share a task board with a client by secret link",
+      "Client page to see invoices and task status by link",
+      "Invoices with reasons and many currencies",
+      "Currency exchange rates",
+      "Hourly rate schedules per client and per project"
+    ],
+    "features_ar": [
+      "العملاء والمشاريع",
+      "مهام بقوائم وأولوية وألوان",
+      "صور ورسائل صوتية على المهام",
+      "مشاركة المهام مع العميل بلينك",
+      "صفحة للعميل بالفواتير",
+      "فواتير بعدة عملات",
+      "سعر الساعة لكل عميل ومشروع",
+      "ملخص مالي للعميل والمشروع"
+    ]
+  },
+  {
+    "slug": "licence-manager",
+    "type": "desktop",
+    "title_en": "Software licence and serial manager",
+    "title_ar": "نظام سيريالات وتفعيل البرامج",
+    "summary_en": "A Windows control panel plus a PHP API that creates serial keys, activates your software on customers' machines, and tracks sellers and clients.",
+    "summary_ar": "لوحة تحكم ويندوز مع واجهة PHP تنشئ أكواد التفعيل وتفعل برنامجك على أجهزة العملاء وتتابع البائعين والعملاء.",
+    "features_en": [
+      "Generate serial keys with custom pattern and length",
+      "Online activation and validation through a REST API",
+      "Products, clients and sellers management",
+      "Admin accounts with API key",
+      "Seller (reseller) API",
+      "WhatsApp endpoint for sending serials",
+      "C# client library to add activation to any .NET program",
+      "Windows Forms admin panel with HTML editor"
+    ],
+    "features_ar": [
+      "إنشاء أكواد تفعيل بنمط وطول",
+      "تفعيل وتحقق أونلاين",
+      "المنتجات والعملاء والبائعين",
+      "حسابات أدمن بمفتاح API",
+      "واجهة للموزعين",
+      "إرسال السيريال على واتساب",
+      "مكتبة C# لتفعيل أي برنامج",
+      "لوحة تحكم ويندوز"
+    ]
+  },
+  {
+    "slug": "site-directory",
+    "type": "website",
+    "title_en": "Website directory",
+    "title_ar": "دليل المواقع",
+    "summary_en": "A public website directory where sites are listed, grouped by keywords, and searchable, with guests able to add their own site.",
+    "summary_ar": "دليل مواقع عام تظهر فيه المواقع مقسمة حسب الكلمات ويمكن البحث فيها ويضيف الزائر موقعه.",
+    "features_en": [
+      "Public site list and site detail pages",
+      "Keyword pages with SEO-friendly slugs",
+      "Guests add a site",
+      "Owner manages sites (add, edit, delete)",
+      "Search",
+      "Google social login (Socialite)",
+      "Background commands to fetch site title/description and build keywords",
+      "Import from a top-1-million sites list"
+    ],
+    "features_ar": [
+      "قائمة المواقع وصفحة لكل موقع",
+      "صفحات للكلمات المفتاحية",
+      "الزائر يضيف موقعه",
+      "إدارة المواقع",
+      "بحث",
+      "دخول بجوجل",
+      "جلب عنوان ووصف المواقع تلقائيًا",
+      "خريطة الموقع"
+    ]
+  },
+  {
+    "slug": "money-tracker",
+    "type": "web_app",
+    "title_en": "Debts, notes and serials panel",
+    "title_ar": "لوحة الديون والملاحظات والسيريالات",
+    "summary_en": "An old web panel to track money owed between people, keep secure notes, watch store prices, and serve software serial keys.",
+    "summary_ar": "لوحة ويب قديمة لمتابعة الديون والأرصدة بين الأشخاص وحفظ ملاحظات سرية ومتابعة أسعار المنتجات وإصدار سيريالات البرامج.",
+    "features_en": [
+      "People and relations (who owes whom)",
+      "Balances per person",
+      "Secure notes",
+      "User login and groups (Ion Auth)",
+      "Store product list with features",
+      "Product price tracking with cron jobs",
+      "Serial key REST API (admin, client, seller, WhatsApp)",
+      "Downloads page"
+    ],
+    "features_ar": [
+      "الأشخاص ومين مديون لمين",
+      "رصيد كل شخص",
+      "ملاحظات سرية",
+      "دخول ومجموعات المستخدمين",
+      "قائمة منتجات",
+      "متابعة الأسعار",
+      "واجهة سيريالات للبرامج",
+      "صفحة تحميلات"
+    ]
+  },
+  {
+    "slug": "video-site",
+    "type": "website",
+    "title_en": "Netflix-style video site",
+    "title_ar": "موقع أفلام ومسلسلات بشكل نتفليكس",
+    "summary_en": "A Netflix-style site for your own films and series: genres, search, seasons and episodes, and a watch page.",
+    "summary_ar": "موقع بشكل نتفليكس لأفلامك ومسلسلاتك: تصنيفات وبحث ومواسم وحلقات وصفحة مشاهدة.",
+    "features_en": [
+      "Home rows like Netflix",
+      "Films and series lists",
+      "Seasons and episodes",
+      "Genres",
+      "Search and filters",
+      "Watch page with a player",
+      "No sign-up needed",
+      "Admin adds the videos"
+    ],
+    "features_ar": [
+      "صفحة رئيسية بصفوف زي نتفليكس",
+      "قوائم الأفلام والمسلسلات",
+      "المواسم والحلقات",
+      "التصنيفات",
+      "بحث وفلترة",
+      "صفحة مشاهدة بمشغل",
+      "من غير تسجيل",
+      "الأدمن يضيف الفيديوهات"
+    ]
+  },
+  {
+    "slug": "email-campaigns",
+    "type": "desktop",
+    "title_en": "Email campaign sender",
+    "title_ar": "برنامج حملات الإيميل",
+    "summary_en": "A desktop program that sends email campaigns through your own SMTP accounts, with rotation, unsubscribe links and reports.",
+    "summary_ar": "برنامج لإرسال حملات الإيميل من حسابات SMTP الخاصة بك مع التبديل بين الحسابات ورابط إلغاء الاشتراك والتقارير.",
+    "features_en": [
+      "Many SMTP accounts (Gmail Workspace, Outlook, SES, SendGrid, Mailgun, Brevo, custom)",
+      "Round-robin and weighted rotation, failover",
+      "Warm-up schedule and random delays",
+      "SPF, DKIM, DMARC, MX check",
+      "Subject A/B tests and spintax",
+      "Personal tags like first name and company",
+      "HTML and plain text editor",
+      "Suppression list and List-Unsubscribe header"
+    ],
+    "features_ar": [
+      "حسابات SMTP كتير",
+      "التبديل بين الحسابات",
+      "تسخين الحسابات وانتظار عشوائي",
+      "فحص SPF وDKIM وDMARC",
+      "اختبار العناوين",
+      "اسم العميل داخل الرسالة",
+      "محرر HTML",
+      "إلغاء الاشتراك والتقارير"
+    ]
+  },
+  {
+    "slug": "email-finder",
+    "type": "desktop",
+    "title_en": "Business contact finder",
+    "title_ar": "باحث بيانات تواصل الشركات",
+    "summary_en": "A desktop program that reads company websites for public contact emails and phones and checks whether email addresses are valid.",
+    "summary_ar": "برنامج يقرأ مواقع الشركات ليجد إيميلات وأرقام التواصل المنشورة ويتحقق من صحة الإيميلات.",
+    "features_en": [
+      "Paste or load a list of websites",
+      "Reads home and contact pages of the same site only",
+      "Obeys robots.txt and crawl delay",
+      "Finds emails, phones (Arabic digits too) and social links",
+      "Marks shared mailboxes like info@",
+      "Email checker: syntax, typos, throw-away domains, MX",
+      "Optional SMTP check (off by default)",
+      "Export CSV and Excel, split good, bad, review"
+    ],
+    "features_ar": [
+      "قائمة مواقع الشركات",
+      "يقرأ صفحة الموقع والتواصل",
+      "يحترم robots.txt",
+      "إيميلات وأرقام وروابط سوشيال",
+      "يميز الإيميلات العامة",
+      "فحص صحة الإيميل",
+      "تصدير CSV وإكسل",
+      "سجل التشغيل"
+    ]
+  },
+  {
+    "slug": "maps-leads",
+    "type": "desktop",
+    "title_en": "Business leads from maps",
+    "title_ar": "عملاء من الخرائط",
+    "summary_en": "A desktop program that searches Google Maps for a business type in a city and saves names, phones and websites to Excel.",
+    "summary_ar": "برنامج يبحث في جوجل ماب عن نوع نشاط في مدينة ويحفظ الأسماء والأرقام والمواقع في إكسل.",
+    "features_en": [
+      "Search by keyword and place",
+      "Drives a real Chrome or Edge window",
+      "Reads name, category, address, phone, website, rating, reviews, hours",
+      "Removes duplicates",
+      "Marks Egypt, Saudi, UAE mobile number format",
+      "Slow random waits and a cap per search (max 500)",
+      "Stops on CAPTCHA, Stop button",
+      "Filter and search results"
+    ],
+    "features_ar": [
+      "بحث بالنشاط والمكان",
+      "الاسم والعنوان والرقم والموقع",
+      "التقييم والمواعيد",
+      "حذف المكرر",
+      "تمييز أرقام الموبايل",
+      "انتظار عشوائي وحد لكل بحث",
+      "زرار إيقاف",
+      "تصدير إكسل"
+    ]
+  },
+  {
+    "slug": "page-inbox-sender",
+    "type": "desktop",
+    "title_en": "Facebook page inbox sender",
+    "title_ar": "مرسل رسائل صفحة فيسبوك",
+    "summary_en": "A desktop program that reads a Facebook page inbox and sends rotated messages and pictures to those conversations with random waits.",
+    "summary_ar": "برنامج يقرأ رسائل صفحة فيسبوك ويرسل لها رسائل وصورًا متغيرة مع انتظار عشوائي.",
+    "features_en": [
+      "Several Facebook page accounts, each with its own Chrome profile",
+      "Load page inbox up to a limit",
+      "Allow and block words filter",
+      "Load by conversation ids, watch inbox and post new ones to a web address",
+      "Many messages and pictures used in turn, $$NAME$$ tag",
+      "Random waits, checks text and Send result",
+      "Never sends twice to the same chat",
+      "Send all, send selected, stop"
+    ],
+    "features_ar": [
+      "أكثر من صفحة فيسبوك",
+      "تحميل رسائل الصفحة",
+      "فلتر بالكلمات",
+      "رسائل وصور بالتبادل",
+      "اسم العميل في الرسالة",
+      "انتظار عشوائي",
+      "لا يرسل مرتين لنفس الشخص",
+      "حفظ وتحميل القوائم"
+    ]
+  },
+  {
+    "slug": "telegram-sender",
+    "type": "desktop",
+    "title_en": "Telegram sender",
+    "title_ar": "مرسل تيليجرام",
+    "summary_en": "A desktop program to manage Telegram accounts, list groups, save members and send messages to people who agreed, with daily limits.",
+    "summary_ar": "برنامج لإدارة حسابات تيليجرام وعرض الجروبات وحفظ الأعضاء وإرسال رسائل لمن وافق مع حد يومي.",
+    "features_en": [
+      "Several Telegram accounts with code and 2FA login",
+      "Encrypted saved sessions (Electron safeStorage)",
+      "List joined groups and channels",
+      "Extract visible group members to CSV",
+      "Send messages and pictures to usernames",
+      "Message rotation, spintax, $$NAME$$",
+      "Daily cap per account (max 100), random pause",
+      "Stops on FloodWait and PeerFlood"
+    ],
+    "features_ar": [
+      "أكثر من حساب تيليجرام",
+      "جلسات محفوظة ومشفرة",
+      "عرض الجروبات والقنوات",
+      "حفظ الأعضاء",
+      "رسائل وصور",
+      "تبديل الرسائل والاسم",
+      "حد يومي لكل حساب",
+      "يحترم من قال توقف"
+    ]
+  },
+  {
+    "slug": "whatsapp-sender",
+    "type": "desktop",
+    "title_en": "WhatsApp sender",
+    "title_ar": "مرسل واتساب",
+    "summary_en": "A desktop program that links several WhatsApp numbers by QR code and sends bulk messages and files to a contact list.",
+    "summary_ar": "برنامج يربط أكثر من رقم واتساب بالباركود ويرسل رسائل وملفات جماعية لقائمة أرقام.",
+    "features_en": [
+      "Several WhatsApp numbers linked by QR",
+      "Rotation between numbers",
+      "Spintax and name or phone tags",
+      "Random delays, batch size and cool-down",
+      "Images, video, audio and documents",
+      "Check if numbers are on WhatsApp, personal or business",
+      "Import Excel, CSV, text contacts with column mapping",
+      "Saved message templates"
+    ],
+    "features_ar": [
+      "أكثر من رقم واتساب بالباركود",
+      "التبديل بين الأرقام",
+      "اسم العميل في الرسالة",
+      "انتظار عشوائي ودفعات",
+      "صور وفيديو وملفات",
+      "فحص الأرقام على واتساب",
+      "استيراد إكسل",
+      "تقارير الإرسال"
+    ]
   }
 ]
