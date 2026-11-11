@@ -64,6 +64,8 @@ class ProjectStateResource extends JsonResource
             'text' => $message->content,
             'delivered_version' => $message->payload['delivered_version'] ?? null,
             'ideas' => $message->payload['ideas'] ?? [],
+            // the ready program this answer offered as the starting point, with its picture
+            'starter' => app(\Modules\AppBuilder\Services\Starters::class)->card($message->payload['starter'] ?? null, app()->getLocale()),
             'files' => $this->fileNames($message),
             'images' => $this->images($message),
         ];

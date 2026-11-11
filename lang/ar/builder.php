@@ -134,6 +134,7 @@ return [
     'study_title' => 'دراسة جدوى',
     'study_save' => 'حفظ كملف PDF',
     'study_for' => 'أعدّتها Musoftware',
+    'starter_title' => 'برنامج جاهز عندنا نبدأ منه',
     'ideas_title' => 'أفكار تفيد شغلك في النسخة الجاية',
     'idea_ask' => 'عايز دي، بكام؟',
     'idea_message' => 'عايز أضيف: :idea. بكام؟',

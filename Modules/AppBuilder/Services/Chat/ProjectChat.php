@@ -128,6 +128,10 @@ class ProjectChat
 
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
+        // a ready program to start from matters only for the first build; later builds start from the delivered one
+        if (! $project->hasDelivery()) {
+            $project->update(['starter' => app(\Modules\AppBuilder\Services\Starters::class)->find($turn->starter)['slug'] ?? null]);
+        }
 
         $turn->quoteReady ? $this->applyQuote($project, $turn) : $this->withdrawQuote($project);
         if ($turn->quoteReady && $this->study->isDue($project->refresh())) {
@@ -238,7 +242,10 @@ class ProjectChat
         $prompt = (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
         $state = (self::STATE_LINES[$project->status] ?? 'Unknown.').' '.$this->paymentFacts($project);
 
+        $starters = app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
+
         return $prompt
+            .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
             ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }

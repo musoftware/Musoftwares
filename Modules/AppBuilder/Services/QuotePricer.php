@@ -20,7 +20,7 @@ class QuotePricer
     {
         $pricing = config('builder.pricing');
         $tokens = (int) min(max($estimatedTokens, $pricing['min_tokens']), $pricing['max_tokens']);
-        $model = $this->buildModel($tokens, $complex);
+        $model = $this->buildModel($complex);
         $type = $this->type($projectType);
         // what builds of this kind really cost per estimated token, learned from delivered work
         $cost = $tokens / 1_000_000 * $model['output_usd_per_mtok'] * $this->history->workFactor($type);
@@ -64,10 +64,8 @@ class QuotePricer
     }
 
     /** @return array{model: string, output_usd_per_mtok: float} */
-    private function buildModel(int $tokens, bool $complex): array
+    private function buildModel(bool $complex): array
     {
-        $strong = $complex || $tokens >= (int) config('builder.strong_model_from_tokens');
-
-        return config('builder.build_models.'.($strong ? 'strong' : 'standard'));
+        return config('builder.build_models.'.($complex ? 'strong' : 'standard'));
     }
 }

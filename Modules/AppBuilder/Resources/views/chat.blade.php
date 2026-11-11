@@ -57,6 +57,10 @@
         .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
         .chip button{width:32px;height:32px;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--muted);font:inherit}
         .ideas{margin-top:12px;display:grid;gap:8px}
+        .starter{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;max-width:520px}
+        .starter img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
+        .starter div{padding:10px 12px}
+        .starter ul{margin:6px 0 0;padding-inline-start:18px;color:var(--muted);font-size:14px}
         .idea{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
         .idea .note{margin:2px 0 0}
         .msg.progress{border-inline-start:3px solid var(--line);padding-inline-start:12px}
@@ -334,7 +338,23 @@
         }
         if (actions.children.length) node.append(actions);
         if (message.ideas && message.ideas.length && state.open_for_chat) node.append(ideasNode(message.ideas));
+        if (message.starter) node.append(starterNode(message.starter));
         return node;
+    }
+
+    /** A program we already have, offered as the starting point: its picture, what it does and its main parts. */
+    function starterNode(starter) {
+        const box = el('div', {class: 'starter'});
+        if (starter.image) box.append(el('img', {src: starter.image, alt: starter.title, loading: 'lazy'}));
+        const text = el('div', {dir: 'auto'});
+        text.append(el('p', {class: 'who'}, T.starter_title), el('strong', {}, starter.title), el('p', {class: 'note'}, starter.summary));
+        if (starter.features.length) {
+            const list = el('ul');
+            starter.features.forEach((feature) => list.append(el('li', {}, feature)));
+            text.append(list);
+        }
+        box.append(text);
+        return box;
     }
 
     /** The engineer's ideas for the next version; asking about one sends it to the chat, which prices it. */

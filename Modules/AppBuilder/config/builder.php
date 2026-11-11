@@ -45,6 +45,9 @@ return [
         'output_usd_per_mtok' => (float) env('BUILDER_CHAT_OUTPUT_USD_PER_MTOK', 0.5),
     ],
 
+    // the cards of Musoftware's ready programs a new project can start from; empty means Resources/starters.json
+    'starters_file' => env('BUILDER_STARTERS_FILE', ''),
+
     // Shared secret the worker sends as a Bearer token. Empty means the worker API is closed.
     'worker_token' => env('BUILDER_WORKER_TOKEN', ''),
 
@@ -87,12 +90,12 @@ return [
         'other' => (float) env('BUILDER_MIN_OTHER', 20),
     ],
 
-    // The build model is picked per job: complex or large jobs get the strong model, the rest the cheaper one.
+    // The build model is picked per job: Sonnet builds by default; only a job the chat marks as hard (`complex`) gets
+    // Opus. Size alone does not make a job hard: a big but ordinary system is still Sonnet's work.
     'build_models' => [
         'standard' => ['model' => env('BUILDER_STANDARD_MODEL', 'claude-sonnet-5-5'), 'output_usd_per_mtok' => (float) env('BUILDER_STANDARD_USD_PER_MTOK', 10)],
         'strong' => ['model' => env('BUILDER_STRONG_MODEL', 'claude-opus-5-5'), 'output_usd_per_mtok' => (float) env('BUILDER_STRONG_USD_PER_MTOK', 20)],
     ],
-    'strong_model_from_tokens' => (int) env('BUILDER_STRONG_FROM_TOKENS', 60000),
 
     // A feasibility study for bigger projects, written by the strong model once the scope is agreed;
     // what it costs (times the markup) is added to the price.

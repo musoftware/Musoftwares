@@ -29,6 +29,8 @@ final class ChatSchema
                 'reply' => ['type' => 'string'],
                 'needs_team' => ['type' => 'boolean'],
                 'quote' => $quote,
+                // a program Musoftware already has that this idea starts from, '' for none
+                'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
                 'secrets' => ['type' => 'array', 'items' => [
                     'type' => 'object',
                     'properties' => ['name' => ['type' => 'string'], 'value' => ['type' => 'string']],
@@ -36,7 +38,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'starter', 'secrets'],
             'additionalProperties' => false,
         ];
     }

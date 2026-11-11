@@ -1,0 +1,478 @@
+[
+  {
+    "slug": "auto-care",
+    "type": "system",
+    "title_en": "Car workshop system",
+    "title_ar": "نظام ورشة سيارات",
+    "summary_en": "A website with online booking plus job cards, parts stock and reminders for a car workshop or car wash.",
+    "summary_ar": "موقع بحجز أونلاين مع كروت شغل ومخزن قطع غيار وتذكير للعملاء لورشة سيارات أو مغسلة.",
+    "features_en": [
+      "Landing page with prices, map, WhatsApp",
+      "Online booking by service, day, time and free bay",
+      "Customer car tracking page by plate and phone",
+      "Live workshop board by status or bay",
+      "Job cards with services, parts, technician, discount",
+      "Estimate and receipt printing (80 mm or A4)",
+      "Service reminders by days or km with WhatsApp",
+      "Parts stock with low-stock alerts"
+    ],
+    "features_ar": [
+      "صفحة للورشة بالأسعار والخريطة وواتساب",
+      "حجز أونلاين بالخدمة والميعاد",
+      "العميل يتابع عربيته بالنمرة والموبايل",
+      "شاشة الورشة حسب الحالة",
+      "كروت شغل بالخدمات والقطع والفني",
+      "طباعة عرض السعر والإيصال",
+      "تذكير الصيانة على واتساب",
+      "مخزن قطع الغيار وتنبيه النواقص"
+    ]
+  },
+  {
+    "slug": "clinic-book",
+    "type": "system",
+    "title_en": "Clinic booking system",
+    "title_ar": "نظام حجز عيادة",
+    "summary_en": "A clinic website where patients book online, and a system for reception, doctors' visit records, bills and prescriptions.",
+    "summary_ar": "موقع عيادة بالحجز أونلاين، ونظام للاستقبال وكشف الدكتور والفواتير والروشتات.",
+    "features_en": [
+      "Clinic website with doctors, prices, map, WhatsApp",
+      "Online booking with only really free times",
+      "Patient page to cancel or move the booking",
+      "Reception queue and walk-ins",
+      "Patient files",
+      "Doctor's day: visit record, diagnosis, prescription",
+      "Printable A5 prescription",
+      "Bills, cash payments, 80 mm receipt"
+    ],
+    "features_ar": [
+      "موقع العيادة بالدكاترة والأسعار",
+      "حجز أونلاين في المواعيد الفاضية بس",
+      "المريض يلغي أو يغير الحجز",
+      "طابور الاستقبال",
+      "ملفات المرضى",
+      "كشف الدكتور والتشخيص والروشتة",
+      "الفواتير وإيصال 80 مم",
+      "تذكير المتابعة على واتساب"
+    ]
+  },
+  {
+    "slug": "coffee-shop",
+    "type": "system",
+    "title_en": "Coffee shop ordering",
+    "title_ar": "نظام طلبات كافيه",
+    "summary_en": "A coffee shop website with an animated landing page, table QR ordering, delivery and a live order board for staff.",
+    "summary_ar": "موقع كافيه بصفحة متحركة، وطلب من QR على الترابيزة، وتوصيل، وشاشة طلبات للموظفين.",
+    "features_en": [
+      "Animated scroll landing page",
+      "Menu with photos, sizes and extras",
+      "QR code ordering per table",
+      "Dine-in, take-away and delivery",
+      "Delivery areas with fee and minimum",
+      "Order tracking page",
+      "Live orders board with sound",
+      "Cashier screen with 80 mm tickets"
+    ],
+    "features_ar": [
+      "صفحة رئيسية متحركة",
+      "منيو بالصور والأحجام والإضافات",
+      "طلب بالـ QR من الترابيزة",
+      "صالة وتيك أواي وتوصيل",
+      "مناطق التوصيل والرسوم",
+      "العميل يتابع طلبه",
+      "شاشة طلبات للموظفين بصوت",
+      "كاشير وطباعة 80 مم"
+    ]
+  },
+  {
+    "slug": "dental-clinic",
+    "type": "system",
+    "title_en": "Dental clinic system",
+    "title_ar": "نظام عيادة أسنان",
+    "summary_en": "A dental clinic website and system with tooth chart, treatment plans, X-rays, instalments and online booking.",
+    "summary_ar": "موقع ونظام لعيادة أسنان فيه رسم الأسنان وخطط العلاج والأشعة والتقسيط والحجز أونلاين.",
+    "features_en": [
+      "Clinic website and online booking",
+      "Clickable tooth chart with history",
+      "Treatment plans from the price list",
+      "Patient accepts the plan by link",
+      "Visits that move the plan forward",
+      "X-rays and files kept private",
+      "Partial payments and instalments",
+      "Receipts 80 mm and A4"
+    ],
+    "features_ar": [
+      "موقع العيادة والحجز أونلاين",
+      "رسم الأسنان بتاريخ كل سنة",
+      "خطط العلاج من قائمة الأسعار",
+      "المريض يوافق على الخطة بلينك",
+      "الأشعة والملفات محفوظة بأمان",
+      "دفعات وتقسيط",
+      "إيصالات 80 مم و A4",
+      "الروشتات والمتابعة"
+    ]
+  },
+  {
+    "slug": "education-center",
+    "type": "system",
+    "title_en": "Tutoring center system",
+    "title_ar": "نظام سنتر دروس",
+    "summary_en": "A system for a tutoring center: students, groups, attendance, monthly fees, late payers on WhatsApp, exams and teacher share.",
+    "summary_ar": "نظام لسنتر الدروس: الطلبة والمجموعات والغياب والمصاريف الشهرية والمتأخرين على واتساب والامتحانات ونسبة المدرس.",
+    "features_en": [
+      "Students and parents with WhatsApp",
+      "Groups with teacher, days and room",
+      "Fast attendance",
+      "Monthly fees created automatically",
+      "Part payments, discounts, 80 mm receipts",
+      "Late payers list with ready WhatsApp message",
+      "Exams and scores",
+      "Daily cash report"
+    ],
+    "features_ar": [
+      "الطلبة وأولياء الأمور",
+      "المجموعات بالمدرس والمواعيد",
+      "تسجيل غياب سريع",
+      "المصاريف الشهرية تلقائيًا",
+      "دفع جزئي وخصم وإيصال",
+      "المتأخرين برسالة واتساب جاهزة",
+      "الامتحانات والدرجات",
+      "نسبة المدرس وتقرير الخزنة"
+    ]
+  },
+  {
+    "slug": "gym-club",
+    "type": "system",
+    "title_en": "Gym membership system",
+    "title_ar": "نظام جيم",
+    "summary_en": "A gym website and membership system with check-in by QR card, plans, classes, renewals and a member portal.",
+    "summary_ar": "موقع ونظام اشتراكات للجيم فيه دخول بكارت QR وباقات وحصص وتجديدات وبوابة للأعضاء.",
+    "features_en": [
+      "Gym website with plans, classes, coaches",
+      "Free trial / join form (leads)",
+      "Member portal by code and phone",
+      "Check-in with barcode/QR scanner",
+      "Member card with QR",
+      "Sell, renew, upgrade, freeze memberships",
+      "Instalments and receipts",
+      "Class timetable, booking and waitlist"
+    ],
+    "features_ar": [
+      "موقع الجيم بالباقات والحصص",
+      "فورم اشتراك وتجربة مجانية",
+      "بوابة للأعضاء",
+      "دخول بكارت QR",
+      "بيع وتجديد وتجميد الاشتراكات",
+      "تقسيط وإيصالات",
+      "جدول الحصص والحجز",
+      "تذكير التجديد على واتساب"
+    ]
+  },
+  {
+    "slug": "lab-center",
+    "type": "system",
+    "title_en": "Medical lab and radiology system",
+    "title_ar": "نظام معمل تحاليل وأشعة",
+    "summary_en": "A system for a medical lab and scan centre: orders, sample labels, results with normal ranges, radiology reports and patient result links.",
+    "summary_ar": "نظام لمعمل التحاليل والأشعة: الطلبات وملصقات العينات والنتائج بالمعدلات الطبيعية وتقارير الأشعة ولينك النتيجة للمريض.",
+    "features_en": [
+      "Test list with prices and normal ranges by age and sex",
+      "Orders at reception",
+      "Sample barcode labels",
+      "Results flagged high or low",
+      "Radiology reports and images",
+      "A4 report in Arabic or English",
+      "Patient opens results by private link",
+      "Partial payments and receipts"
+    ],
+    "features_ar": [
+      "التحاليل بالأسعار والمعدلات الطبيعية",
+      "الطلبات من الاستقبال",
+      "ملصقات باركود للعينات",
+      "النتائج بعلامة عالي أو واطي",
+      "تقارير الأشعة بالصور",
+      "تقرير A4 عربي أو إنجليزي",
+      "المريض يفتح النتيجة بلينك خاص",
+      "الخزنة ونسبة الدكتور المحوّل"
+    ]
+  },
+  {
+    "slug": "mobile-shop",
+    "type": "system",
+    "title_en": "Mobile shop POS (SaaS)",
+    "title_ar": "نظام محل موبايلات",
+    "summary_en": "A point of sale and back office for mobile phone shops, with IMEI tracking, repairs, branches and credit sales; one install serves many shops.",
+    "summary_ar": "نظام كاشير وإدارة لمحلات الموبايلات بتتبع IMEI والصيانة والفروع والبيع الآجل، ونسخة واحدة تخدم محلات كتير.",
+    "features_en": [
+      "Phones by IMEI with warranty",
+      "Accessories by quantity",
+      "Sell screen with credit sales and debts",
+      "Repairs with deposit and status",
+      "Purchases from suppliers",
+      "Branches and stock transfers",
+      "Roles and permissions builder",
+      "Receipts 80 mm, 58 mm or A4"
+    ],
+    "features_ar": [
+      "الموبايلات بالـ IMEI والضمان",
+      "الإكسسوارات بالكمية",
+      "شاشة بيع بالآجل والديون",
+      "الصيانة بالعربون والحالة",
+      "المشتريات من الموردين",
+      "الفروع وتحويل المخزون",
+      "صلاحيات الموظفين",
+      "محلات كتير على نسخة واحدة"
+    ]
+  },
+  {
+    "slug": "nursery-kids",
+    "type": "system",
+    "title_en": "Nursery management",
+    "title_ar": "نظام حضانة",
+    "summary_en": "A system for a nursery: children, attendance with safe pickup, daily reports to parents on WhatsApp, documents and fees.",
+    "summary_ar": "نظام للحضانة: الأطفال والحضور والاستلام الآمن والتقرير اليومي للأهل على واتساب والأوراق والمصاريف.",
+    "features_en": [
+      "Public page and enrolment request form",
+      "Today dashboard",
+      "Check-in and safe check-out to allowed people",
+      "Children profiles and siblings",
+      "Daily reports (meals, nap, mood) with WhatsApp",
+      "Vaccination and document expiry",
+      "Monthly or term fees with sibling discount",
+      "Part payments and receipts"
+    ],
+    "features_ar": [
+      "صفحة الحضانة وطلب التسجيل",
+      "حضور واستلام آمن للأشخاص المسموح لهم",
+      "ملفات الأطفال والإخوات",
+      "تقرير يومي للأهل على واتساب",
+      "التطعيمات والأوراق",
+      "المصاريف وخصم الإخوات",
+      "المتأخرين في الدفع",
+      "الحساسية والملاحظات الطبية"
+    ]
+  },
+  {
+    "slug": "pharmacy-shop",
+    "type": "system",
+    "title_en": "Pharmacy system (SaaS)",
+    "title_ar": "نظام صيدلية",
+    "summary_en": "A pharmacy point of sale with batches and expiry dates, first-expiry-first selling, alerts, purchases and returns; one install serves many pharmacies.",
+    "summary_ar": "نظام كاشير للصيدلية بالتشغيلات وتواريخ الصلاحية، يبيع الأقرب انتهاءً أولاً، مع تنبيهات ومشتريات ومرتجعات، ونسخة واحدة لصيدليات كتير.",
+    "features_en": [
+      "Medicines with generic name, barcode, box and strip",
+      "Batches with expiry date",
+      "Sells the batch that expires first",
+      "Expiry and low-stock alerts",
+      "POS by box or strip, credit sales",
+      "Prescription-required check",
+      "Purchases and supplier balances",
+      "Customer and supplier returns"
+    ],
+    "features_ar": [
+      "الأدوية بالاسم العلمي والباركود",
+      "التشغيلات وتواريخ الصلاحية",
+      "يبيع الأقرب انتهاءً أولاً",
+      "تنبيه الصلاحية والنواقص",
+      "بيع بالعلبة أو الشريط وبالآجل",
+      "المشتريات وحسابات الموردين",
+      "المرتجعات",
+      "تقارير المبيعات والأرباح"
+    ]
+  },
+  {
+    "slug": "real-estate-office",
+    "type": "system",
+    "title_en": "Real estate office (SaaS)",
+    "title_ar": "نظام مكتب عقارات",
+    "summary_en": "A back office for a real estate office: properties with photos, owners, clients, viewings, deals, rental contracts, rent collection and commissions.",
+    "summary_ar": "نظام لمكتب العقارات: الوحدات بالصور والملاك والعملاء والمعاينات والصفقات وعقود الإيجار وتحصيل الإيجار والعمولات.",
+    "features_en": [
+      "Properties for sale or rent with photos",
+      "Owners and their properties",
+      "Clients and follow-up reminders",
+      "Viewings calendar",
+      "Deals from inquiry to won",
+      "Commissions per deal and agent",
+      "Rental contracts with monthly schedule",
+      "Rent payments and receipts"
+    ],
+    "features_ar": [
+      "الوحدات للبيع والإيجار بالصور",
+      "الملاك ووحداتهم",
+      "العملاء والمتابعة",
+      "نتيجة المعاينات",
+      "الصفقات والعمولات",
+      "عقود الإيجار وجدول الشهور",
+      "تحصيل الإيجار والإيصالات",
+      "المتأخرين على واتساب"
+    ]
+  },
+  {
+    "slug": "restaurant-pos",
+    "type": "system",
+    "title_en": "Restaurant POS and kitchen screen",
+    "title_ar": "نظام كاشير مطعم",
+    "summary_en": "A restaurant system with table map, waiter tabs, kitchen display, split bills, online and QR ordering and an end-of-day report.",
+    "summary_ar": "نظام مطعم فيه خريطة الترابيزات وطلبات الويتر وشاشة المطبخ وتقسيم الفاتورة والطلب أونلاين وبالـ QR وتقرير آخر اليوم.",
+    "features_en": [
+      "Table map with open tabs",
+      "Waiters send rounds to kitchen stations",
+      "Kitchen display screen with timers",
+      "Dish options and notes",
+      "Split bill equally or by items",
+      "Service charge and tax",
+      "Take-away and delivery",
+      "QR table ordering and order tracking"
+    ],
+    "features_ar": [
+      "خريطة الترابيزات",
+      "الويتر يبعت الطلبات للمطبخ",
+      "شاشة المطبخ بالوقت",
+      "تقسيم الفاتورة",
+      "الخدمة والضريبة",
+      "تيك أواي وتوصيل",
+      "طلب بالـ QR من الترابيزة",
+      "تقرير آخر اليوم"
+    ]
+  },
+  {
+    "slug": "salon-shop",
+    "type": "system",
+    "title_en": "Salon booking system",
+    "title_ar": "نظام حجز صالون",
+    "summary_en": "A booking website and staff calendar for a salon, barber shop or spa, with cashier, loyalty and WhatsApp reminders.",
+    "summary_ar": "موقع حجز ونتيجة مواعيد للموظفين لصالون أو حلاق أو سبا، مع كاشير ونقاط ولاء وتذكير على واتساب.",
+    "features_en": [
+      "Salon website with prices and team",
+      "Online booking: service, person, time",
+      "Customer page to move or cancel",
+      "Day calendar per staff member",
+      "Walk-in and phone bookings",
+      "Cashier with tip, discount, loyalty",
+      "80 mm receipt",
+      "Customer history and no-shows"
+    ],
+    "features_ar": [
+      "موقع الصالون بالأسعار والفريق",
+      "حجز أونلاين بالخدمة والشخص والميعاد",
+      "العميل يغير أو يلغي حجزه",
+      "نتيجة اليوم لكل موظف",
+      "كاشير بالبقشيش والخصم والنقاط",
+      "إيصال 80 مم",
+      "سجل العميل",
+      "تذكير مواعيد بكرة على واتساب"
+    ]
+  },
+  {
+    "slug": "supermarket-pos",
+    "type": "system",
+    "title_en": "Supermarket POS (SaaS)",
+    "title_ar": "نظام سوبر ماركت",
+    "summary_en": "A supermarket point of sale with barcode scanning, weighed goods, cashier shifts, stock, suppliers and credit sales; one install serves many shops.",
+    "summary_ar": "نظام كاشير للسوبر ماركت بالباركود والميزان وورديات الكاشير والمخزن والموردين والبيع الآجل، ونسخة واحدة لمحلات كتير.",
+    "features_en": [
+      "Fast POS with barcode",
+      "Goods sold by weight",
+      "Parked (held) sales",
+      "Cashier shifts with cash difference",
+      "Stock per branch",
+      "Low-stock and expiry alerts",
+      "Purchases and supplier balances",
+      "Credit sales and customer debts"
+    ],
+    "features_ar": [
+      "كاشير سريع بالباركود",
+      "البيع بالوزن",
+      "تعليق الفاتورة",
+      "ورديات الكاشير وفرق الخزنة",
+      "المخزون لكل فرع",
+      "تنبيه النواقص والصلاحية",
+      "الموردين والبيع الآجل",
+      "ملصقات أسعار بالباركود"
+    ]
+  },
+  {
+    "slug": "wholesale-distribution",
+    "type": "system",
+    "title_en": "Wholesale distribution (SaaS)",
+    "title_ar": "نظام توزيع جملة",
+    "summary_en": "A system for wholesalers: quotes, orders, invoices, price lists, customer credit limits, collections, cheques, sales reps and warehouses.",
+    "summary_ar": "نظام لتجار الجملة: عروض أسعار وطلبيات وفواتير وقوائم أسعار وحد ائتمان وتحصيل وشيكات ومناديب ومخازن.",
+    "features_en": [
+      "Products by piece or carton",
+      "Price lists per customer tier",
+      "Quote to order to invoice",
+      "Credit limit and credit days",
+      "Customer statement and aging",
+      "Collections to oldest invoice first",
+      "Cheque register (cleared, bounced)",
+      "Customer returns"
+    ],
+    "features_ar": [
+      "الأصناف بالقطعة أو الكرتونة",
+      "قوائم أسعار لكل فئة عملاء",
+      "عرض سعر ثم طلبية ثم فاتورة",
+      "حد الائتمان وأيام السداد",
+      "كشف حساب العميل",
+      "التحصيل والشيكات",
+      "المناديب والأهداف والعمولات",
+      "المخازن والمشتريات"
+    ]
+  },
+  {
+    "slug": "shop-manager",
+    "type": "desktop",
+    "title_en": "Shop Manager Pro",
+    "title_ar": "مدير المحل",
+    "summary_en": "An offline Windows program for a small shop to sell, buy, track stock and customer debts, and print receipts.",
+    "summary_ar": "برنامج ويندوز بدون إنترنت للمحل الصغير: بيع وشراء ومخزون وحسابات العملاء وطباعة الفواتير.",
+    "features_en": [
+      "Products with barcode, units, cost, price, minimum stock",
+      "Sales screen with barcode scan, discount, cash or credit",
+      "Purchases from suppliers (last cost rule)",
+      "Customer and supplier balances, statements, payments",
+      "Sales and purchase returns",
+      "Daily report, gross profit, stock value, low stock",
+      "80 mm receipt and A4 invoice printing with shop logo",
+      "Import products from Excel or CSV (Arabic or English headers)"
+    ],
+    "features_ar": [
+      "يشتغل بدون إنترنت على ويندوز",
+      "الأصناف بالباركود والوحدات",
+      "بيع بالباركود نقدي أو آجل",
+      "المشتريات والموردين",
+      "حسابات العملاء والموردين",
+      "تقرير يومي وأرباح ونواقص",
+      "طباعة إيصال 80 مم وفاتورة A4",
+      "استيراد من إكسل ونسخة احتياطية"
+    ]
+  },
+  {
+    "slug": "grid-reader",
+    "type": "desktop",
+    "title_en": "GridReader",
+    "title_ar": "قارئ الجداول",
+    "summary_en": "A fast desktop viewer that opens very large CSV, Excel, JSON and database tables so you can search, filter and export them.",
+    "summary_ar": "برنامج يفتح ملفات CSV وإكسل وJSON وقواعد البيانات الكبيرة جدًا للبحث والفلترة والتصدير.",
+    "features_en": [
+      "Open CSV, Excel, JSON files",
+      "Open SQLite, PostgreSQL and MySQL tables",
+      "Virtual scrolling grid for millions of rows",
+      "Search and filter, read-only SQL guard",
+      "Row detail view",
+      "Filter by a pasted list of values",
+      "Export results to file",
+      "Recent files list"
+    ],
+    "features_ar": [
+      "يفتح CSV وإكسل وJSON",
+      "يفتح جداول قواعد البيانات",
+      "ملايين الصفوف بدون تهنيج",
+      "بحث وفلترة",
+      "تفاصيل الصف",
+      "فلترة بقائمة قيم",
+      "تصدير النتائج",
+      "آخر الملفات"
+    ]
+  }
+]

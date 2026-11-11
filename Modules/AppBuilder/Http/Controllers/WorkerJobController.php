@@ -56,6 +56,8 @@ class WorkerJobController extends Controller
                 'mime' => $file->mime,
             ])->values(),
             'has_previous_version' => $project->hasDelivery(),
+            // the first build copies this ready program from the build machine and develops it into the idea
+            'starter' => $project->hasDelivery() ? null : $project->starter,
         ]]);
     }
 

@@ -20,6 +20,7 @@ final readonly class ChatTurn
         public array $secrets = [],
         public float $designFee = 0,
         public string $projectType = 'other',
+        public string $starter = '',
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -41,6 +42,7 @@ final readonly class ChatTurn
             secrets: array_values(array_filter((array) ($data['secrets'] ?? []), 'is_array')),
             designFee: max(0, (float) ($quote['design_fee'] ?? 0)),
             projectType: (string) ($quote['project_type'] ?? 'other'),
+            starter: trim((string) ($data['starter'] ?? '')),
         );
     }
 
@@ -60,6 +62,7 @@ final readonly class ChatTurn
                 'design_fee' => $this->designFee,
                 'project_type' => $this->projectType,
             ],
+            'starter' => $this->starter,
         ];
     }
 }

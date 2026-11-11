@@ -1628,4 +1628,66 @@ class AppBuilderTest extends TestCase
         $this->assertSame('حجز أونلاين', $last['ideas'][0]['title']);
         $this->assertSame('زرار واتساب', $last['ideas'][1]['title']);
     }
+
+    /** A real cards file with one ready program, as the chat and the worker read it. */
+    private function oneStarter(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'starters');
+        file_put_contents($file, json_encode([[
+            'slug' => 'clinic-book', 'type' => 'system',
+            'title_en' => 'Clinic system', 'title_ar' => 'نظام عيادة',
+            'summary_en' => 'Bookings, patients and invoices for a clinic.', 'summary_ar' => 'حجوزات ومرضى وفواتير للعيادة.',
+            'features_en' => ['Bookings', 'Patient files'], 'features_ar' => ['الحجوزات', 'ملفات المرضى'],
+        ]]));
+        config(['builder.starters_file' => $file]);
+    }
+
+    private function answerWithStarter(string $starter, int $tokens = 0): void
+    {
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'عندنا نظام عيادة جاهز نطوره لفكرتك',
+            'needs_team' => false,
+            'quote' => ['ready' => $tokens > 0, 'title' => $tokens ? 'نظام عيادة' : '', 'spec' => $tokens ? 'Starts from the ready program clinic-book.' : '', 'estimated_output_tokens' => $tokens],
+            'starter' => $starter,
+        ], 1200, 300);
+    }
+
+    public function test_the_chat_offers_a_ready_program_and_the_first_build_starts_from_it(): void
+    {
+        $this->oneStarter();
+        $this->answerWithStarter('clinic-book', 40000);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز نظام لعيادتي'])->assertOk()->json('uuid');
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+
+        $this->assertSame('clinic-book', $project->starter);
+        $this->assertStringContainsString('`clinic-book` (system)', app(ChatModel::class)->lastSystem);
+        $card = collect($this->getJson('/ai/'.$uuid.'/state')->json('messages'))->last()['starter'];
+        $this->assertSame('clinic-book', $card['slug']);
+        $this->assertNotEmpty($card['features']);
+
+        $project->update(['status' => BuilderProject::QUEUED, 'paid_at' => now()]);
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.starter', 'clinic-book');
+    }
+
+    public function test_an_unknown_or_dropped_ready_program_is_not_kept(): void
+    {
+        $this->oneStarter();
+        $this->answerWithStarter('clinic-book');
+        $this->answerWithStarter('');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز نظام لعيادتي'])->assertOk()->json('uuid');
+        $this->assertSame('clinic-book', BuilderProject::where('uuid', $uuid)->value('starter'));
+
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'لا عايزه من الصفر'])->assertOk();
+        $this->assertNull(BuilderProject::where('uuid', $uuid)->value('starter'));
+
+        $this->assertNull(app(\Modules\AppBuilder\Services\Starters::class)->find('../secret'));
+    }
+
+    public function test_a_big_ordinary_job_builds_on_sonnet_and_only_a_hard_one_on_opus(): void
+    {
+        $pricer = app(\Modules\AppBuilder\Services\QuotePricer::class);
+
+        $this->assertSame('claude-sonnet-5-5', $pricer->price(200000, complex: false)['model']);
+        $this->assertSame('claude-opus-5-5', $pricer->price(20000, complex: true)['model']);
+    }
 }
