@@ -573,7 +573,7 @@ class AppBuilderTest extends TestCase
 
     public function test_notifications_are_asked_for_from_the_first_message(): void
     {
-        config(['services.fcm.web.vapid_key' => 'vapid', 'services.fcm.web.api_key' => 'key']);
+        config(['services.fcm.web' => ['api_key' => 'key', 'project_id' => 'p', 'messaging_sender_id' => '1', 'app_id' => 'app', 'vapid_key' => 'vapid']]);
         $this->answer('أهلاً، قولي أكتر.');
         $uuid = $this->postJson('/ai/messages', ['text' => 'عايز برنامج'])->assertOk()->json('uuid');
 
