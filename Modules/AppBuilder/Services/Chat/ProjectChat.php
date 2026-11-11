@@ -27,6 +27,7 @@ class ProjectChat
         private readonly \Modules\AppBuilder\Services\Study\FeasibilityStudy $study,
         private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
         private readonly \Modules\AppBuilder\Services\LeaveDiscount $leaveDiscount,
+        private readonly FreeChat $freeChat,
     ) {}
 
     /** @throws ChatLimitReached */
@@ -49,6 +50,9 @@ class ProjectChat
     {
         if ($project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
             throw new ChatLimitReached('This chat reached its message limit.');
+        }
+        if ($this->freeChat->mustSignIn($project)) {
+            throw new SignInNeeded('A guest reached the free messages without a price.');
         }
 
         $question = $project->messages()->create(['role' => BuilderMessage::USER, 'content' => $text]);
@@ -83,13 +87,27 @@ class ProjectChat
         }
     }
 
+    /** The free model for a guest's first messages, Claude for everyone else and whenever the free one fails. */
+    private function reply(BuilderProject $project, string $system, array $turns): ChatTurn
+    {
+        if ($this->freeChat->applies($project)) {
+            try {
+                return $this->freeChat->model()->reply($system, $turns);
+            } catch (ChatUnavailable $exception) {
+                Log::info('App builder: free chat unavailable, Claude answers', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
+            }
+        }
+
+        return $this->model->reply($system, $turns);
+    }
+
     /** @throws ChatUnavailable */
     private function answer(BuilderProject $project, BuilderMessage $question, bool $forgetOnFailure): BuilderMessage
     {
         set_time_limit(self::SECONDS_FOR_CLAUDE);
 
         try {
-            $turn = $this->model->reply($this->systemPrompt($project), $this->turns($project));
+            $turn = $this->reply($project, $this->systemPrompt($project), $this->turns($project));
         } catch (ChatUnavailable $exception) {
             Log::warning('App builder: chat turn failed', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
             if ($forgetOnFailure) {

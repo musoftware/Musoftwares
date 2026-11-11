@@ -176,6 +176,9 @@ class BuilderChatController extends Controller
 
         try {
             $this->chat->send($project, $request->text(), $request->uploads(), $request->previewNames());
+        } catch (\Modules\AppBuilder\Services\Chat\SignInNeeded) {
+            // signing in (the link at the top of the page) brings the customer back here, and the chat goes on
+            return $this->refuse('builder.errors.sign_in', 403);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         } catch (ChatUnavailable) {

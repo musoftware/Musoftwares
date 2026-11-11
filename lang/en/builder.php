@@ -151,6 +151,7 @@ return [
         'trial' => 'A live trial is not available right now.',
         'balance_due' => 'Please pay the remaining amount first; then we continue with any change.',
         'no_quote' => 'There is no open price to pay right now.',
+        'sign_in' => 'To go on with this chat, please sign in (the link at the top). Your chat stays as it is.',
         'wallet' => 'Your balance does not cover this price. Add balance or pay by card.',
         'payment' => 'We could not open the payment page. Please try again shortly.',
     ],

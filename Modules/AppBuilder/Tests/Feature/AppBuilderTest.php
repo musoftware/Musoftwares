@@ -183,6 +183,52 @@ class AppBuilderTest extends TestCase
         }
     }
 
+    private function geminiAnswers(string $reply): void
+    {
+        $json = json_encode(['reply' => $reply, 'needs_team' => false, 'secrets' => [], 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0, 'kind' => 'build', 'complex' => false, 'design_fee' => 0, 'project_type' => 'other']], JSON_UNESCAPED_UNICODE);
+        \Illuminate\Support\Facades\Http::fake(['generativelanguage.googleapis.com/*' => \Illuminate\Support\Facades\Http::response(['candidates' => [['content' => ['parts' => [['text' => $json]]]]]])]);
+    }
+
+    public function test_a_guest_before_a_price_talks_with_the_free_model_and_costs_nothing(): void
+    {
+        config(['builder.free_chat.key' => 'test-key']);
+        $this->geminiAnswers('أهلاً، احكيلي عن شغلك');
+
+        $uuid = $this->postJson('/ai/messages', ['text' => 'إزيك'])->assertOk()->json('uuid');
+
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+        $this->assertSame('أهلاً، احكيلي عن شغلك', $project->messages()->reorder('id', 'desc')->value('content'));
+        $this->assertSame(0.0, $project->chatCostUsd());
+        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => $request->hasHeader('x-goog-api-key', 'test-key')
+            && $request['generationConfig']['responseMimeType'] === 'application/json');
+    }
+
+    public function test_when_the_free_model_fails_claude_answers_and_signed_in_customers_always_get_claude(): void
+    {
+        config(['builder.free_chat.key' => 'test-key']);
+        \Illuminate\Support\Facades\Http::fake(['generativelanguage.googleapis.com/*' => \Illuminate\Support\Facades\Http::response(['error' => 'quota'], 429)]);
+        $this->answer('Claude هنا');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'إزيك'])->assertOk()->json('uuid');
+        $this->assertSame('Claude هنا', BuilderProject::where('uuid', $uuid)->firstOrFail()->messages()->reorder('id', 'desc')->value('content'));
+
+        $this->geminiAnswers('مجاني');
+        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
+        $this->answer('Claude للعميل المسجّل');
+        $signed = $this->postJson('/ai/messages', ['text' => 'إزيك'])->assertOk()->json('uuid');
+        $this->assertSame('Claude للعميل المسجّل', BuilderProject::where('uuid', $signed)->firstOrFail()->messages()->reorder('id', 'desc')->value('content'));
+    }
+
+    public function test_a_guest_who_talks_long_without_a_price_is_asked_to_sign_in(): void
+    {
+        config(['builder.limits.guest_messages_before_sign_in' => 2]);
+        $this->answer('تمام');
+        $this->answer('تمام');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'سؤال'])->assertOk()->json('uuid');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تاني'])->assertOk();
+
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تالت'])->assertForbidden()->assertJsonPath('message', __('builder.errors.sign_in'));
+    }
+
     public function test_a_signed_in_customer_pays_from_the_wallet_only_when_it_covers_the_price(): void
     {
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);

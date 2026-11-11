@@ -8,6 +8,14 @@ return [
     'chat_fallback' => (bool) env('BUILDER_CHAT_FALLBACK', false),
     // the chat may search the web before answering about something the team has not built before (a game, a
     // new kind of system); Haiku has only the basic search tool. About $0.01 per search.
+    // a guest's first messages before any price go to Google's free Gemini tier; Claude answers everyone else and
+    // whenever Gemini fails or its free limit is reached. Off while GEMINI_API_KEY is empty.
+    'free_chat' => [
+        'key' => env('GEMINI_API_KEY', ''),
+        'model' => env('BUILDER_FREE_CHAT_MODEL', 'gemini-3.6-flash'),
+        'url' => env('BUILDER_FREE_CHAT_URL', 'https://generativelanguage.googleapis.com/v1beta/models'),
+        'turns' => (int) env('BUILDER_FREE_CHAT_TURNS', 15),
+    ],
     'chat_web_search' => [
         'enabled' => (bool) env('BUILDER_CHAT_WEB_SEARCH', true),
         'tool' => env('BUILDER_CHAT_WEB_SEARCH_TOOL', 'web_search_20250305'),
@@ -124,6 +132,8 @@ return [
         'original_files' => 15,
         'originals_wait_minutes' => 30,
         'messages_per_project' => 60,
+        // a guest who talks this long without a price is asked to sign in to go on
+        'guest_messages_before_sign_in' => (int) env('BUILDER_GUEST_MESSAGES', 15),
         // many customers on mobile data share one address, so this stays generous; admins have no limit
         'projects_per_ip_per_day' => (int) env('BUILDER_CHATS_PER_IP_PER_DAY', 30),
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb
