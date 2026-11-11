@@ -31,6 +31,8 @@ final class ChatSchema
                 'quote' => $quote,
                 // a program Musoftware already has that this idea starts from, '' for none
                 'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
+                // free ready designs to show as pictures under this answer, so the customer picks one
+                'designs' => self::designs(),
                 'secrets' => ['type' => 'array', 'items' => [
                     'type' => 'object',
                     'properties' => ['name' => ['type' => 'string'], 'value' => ['type' => 'string']],
@@ -38,9 +40,16 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'starter', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
+    }
+
+    private static function designs(): array
+    {
+        $slugs = app(\Modules\AppBuilder\Services\Starters::class)->designSlugs();
+
+        return ['type' => 'array', 'items' => $slugs === [] ? ['type' => 'string'] : ['type' => 'string', 'enum' => $slugs]];
     }
 
     /** The decoded answer when it has the parts every turn needs, otherwise null. */

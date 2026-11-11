@@ -247,9 +247,11 @@ class ProjectChat
         $state = (self::STATE_LINES[$project->status] ?? 'Unknown.').' '.$this->paymentFacts($project);
 
         $starters = app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
+        $designs = app(\Modules\AppBuilder\Services\Starters::class)->designsForPrompt();
 
         return $prompt
             .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
+            .($designs !== '' ? "\n\n## Free designs\n\n".$designs : '')
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
             ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }

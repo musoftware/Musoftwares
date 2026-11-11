@@ -61,6 +61,11 @@
         .starter img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
         .starter div{padding:10px 12px}
         .starter ul{margin:6px 0 0;padding-inline-start:18px;color:var(--muted);font-size:14px}
+        .designs{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px}
+        .design{border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+        .design img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
+        .design div{padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
+        .design .btn{margin-top:auto}
         .idea{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
         .idea .note{margin:2px 0 0}
         .msg.progress{border-inline-start:3px solid var(--line);padding-inline-start:12px}
@@ -339,6 +344,7 @@
         if (actions.children.length) node.append(actions);
         if (message.ideas && message.ideas.length && state.open_for_chat) node.append(ideasNode(message.ideas));
         if (message.starter) node.append(starterNode(message.starter));
+        if (message.designs && message.designs.length && state.open_for_chat) node.append(designsNode(message.designs));
         return node;
     }
 
@@ -354,6 +360,23 @@
             text.append(list);
         }
         box.append(text);
+        return box;
+    }
+
+    /** Free ready designs to pick from: a picture, a name and a button that tells the chat which one. */
+    function designsNode(designs) {
+        const box = el('div', {class: 'designs'});
+        designs.forEach((design) => {
+            const card = el('div', {class: 'design'});
+            if (design.image) card.append(el('img', {src: design.image, alt: design.title, loading: 'lazy'}));
+            const text = el('div', {dir: 'auto'});
+            text.append(el('strong', {}, design.title), el('p', {class: 'note'}, design.summary));
+            const pick = el('button', {class: 'btn ghost', type: 'button'}, T.design_pick);
+            pick.addEventListener('click', () => { if (!waiting) send(T.design_message.replace(':design', design.title).replace(':slug', design.slug)); });
+            text.append(pick);
+            card.append(text);
+            box.append(card);
+        });
         return box;
     }
 

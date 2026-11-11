@@ -1742,4 +1742,29 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()
             ->assertJsonPath('job.starter', $slug)->assertJsonPath('job.starter_source', $source->uuid);
     }
+
+    public function test_a_customer_without_a_design_picks_a_free_one_from_pictures_and_the_build_starts_from_it(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'designs');
+        file_put_contents($file, json_encode([
+            ['slug' => 'design-cafe-warm', 'category' => 'restaurant', 'title_en' => 'Warm cafe', 'title_ar' => 'كافيه دافي', 'summary_en' => 'Light, warm browns.', 'summary_ar' => 'فاتح وألوان بني دافية.', 'features_en' => ['hero', 'menu', 'contact'], 'features_ar' => ['الواجهة', 'المنيو', 'التواصل']],
+            ['slug' => 'design-dark-bold', 'category' => 'agency', 'title_en' => 'Dark bold', 'title_ar' => 'داكن جريء', 'summary_en' => 'Dark, bold type.', 'summary_ar' => 'داكن بخط عريض.', 'features_en' => ['hero', 'services'], 'features_ar' => ['الواجهة', 'الخدمات']],
+        ]));
+        config(['builder.designs_file' => $file]);
+
+        $this->script[] = ChatTurn::fromArray(['reply' => 'اختار تصميم يعجبك', 'needs_team' => false, 'quote' => ['ready' => false], 'starter' => '', 'designs' => ['design-cafe-warm', 'design-dark-bold']], 100, 50);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز صفحة لكافيه ومعنديش تصميم'])->assertOk()->json('uuid');
+
+        $this->assertStringContainsString('## Free designs', app(ChatModel::class)->lastSystem);
+        $this->assertStringNotContainsString('`design-cafe-warm` (page', app(ChatModel::class)->lastSystem);
+        $shown = collect($this->getJson('/ai/'.$uuid.'/state')->json('messages'))->last()['designs'];
+        $this->assertSame(['design-cafe-warm', 'design-dark-bold'], array_column($shown, 'slug'));
+        $this->assertSame('كافيه دافي', $shown[0]['title']);
+
+        $this->answerWithStarter('design-cafe-warm', 12000);
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'اخترت التصميم: كافيه دافي (design-cafe-warm)'])->assertOk();
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+        $this->assertSame('design-cafe-warm', $project->starter);
+        $this->assertSame([], collect($this->getJson('/ai/'.$uuid.'/state')->json('messages'))->last()['designs']);
+    }
 }

@@ -21,6 +21,8 @@ final readonly class ChatTurn
         public float $designFee = 0,
         public string $projectType = 'other',
         public string $starter = '',
+        /** @var list<string> free designs shown as pictures under this answer */
+        public array $designs = [],
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -43,6 +45,7 @@ final readonly class ChatTurn
             designFee: max(0, (float) ($quote['design_fee'] ?? 0)),
             projectType: (string) ($quote['project_type'] ?? 'other'),
             starter: trim((string) ($data['starter'] ?? '')),
+            designs: array_values(array_slice(array_filter((array) ($data['designs'] ?? []), 'is_string'), 0, 6)),
         );
     }
 
@@ -63,6 +66,7 @@ final readonly class ChatTurn
                 'project_type' => $this->projectType,
             ],
             'starter' => $this->starter,
+            'designs' => $this->designs,
         ];
     }
 }

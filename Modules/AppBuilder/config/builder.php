@@ -47,6 +47,8 @@ return [
 
     // the cards of Musoftware's ready programs a new project can start from; empty means Resources/starters.json
     'starters_file' => env('BUILDER_STARTERS_FILE', ''),
+    // the free ready designs a customer without a design picks from; empty means Resources/designs.json
+    'designs_file' => env('BUILDER_DESIGNS_FILE', ''),
 
     // Shared secret the worker sends as a Bearer token. Empty means the worker API is closed.
     'worker_token' => env('BUILDER_WORKER_TOKEN', ''),

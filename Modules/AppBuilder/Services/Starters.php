@@ -28,19 +28,33 @@ class Starters
         if ($this->cards !== null) {
             return $this->cards;
         }
-        $file = (string) (config('builder.starters_file') ?: module_path('AppBuilder', 'Resources/starters.json'));
-        $cards = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
-
-        $listed = array_values(array_filter(is_array($cards) ? $cards : [], fn ($card) => is_array($card) && isset($card['slug'])));
+        $listed = $this->read((string) (config('builder.starters_file') ?: module_path('AppBuilder', 'Resources/starters.json')));
+        // free ready designs: a customer without a design picks one from pictures, and the page starts from its files
+        $designs = array_map(fn (array $card) => $card + ['design' => true, 'type' => 'page'],
+            $this->read((string) (config('builder.designs_file') ?: module_path('AppBuilder', 'Resources/designs.json'))));
         $learned = BuilderStarter::with('source')->latest('id')->limit(self::LEARNED_IN_PROMPT)->get()->map->toCard()->all();
 
-        return $this->cards = [...$listed, ...$learned];
+        return $this->cards = [...$listed, ...$designs, ...$learned];
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function read(string $file): array
+    {
+        $cards = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+
+        return array_values(array_filter(is_array($cards) ? $cards : [], fn ($card) => is_array($card) && isset($card['slug'])));
     }
 
     /** @return list<string> */
     public function slugs(): array
     {
         return array_column($this->all(), 'slug');
+    }
+
+    /** @return list<string> */
+    public function designSlugs(): array
+    {
+        return array_column(array_filter($this->all(), fn (array $card) => ! empty($card['design'])), 'slug');
     }
 
     public function find(?string $slug): ?array
@@ -73,10 +87,22 @@ class Starters
         ];
     }
 
-    /** The list the chat model reads, one line each. */
+    /** The free designs the chat model reads, one line each. */
+    public function designsForPrompt(): string
+    {
+        return collect($this->all())->filter(fn (array $card) => ! empty($card['design']))->map(fn (array $design) => sprintf(
+            '- `%s` (%s): %s Sections: %s.',
+            $design['slug'],
+            $design['category'] ?? 'any',
+            $design['summary_en'] ?? '',
+            implode(', ', (array) ($design['features_en'] ?? [])),
+        ))->implode("\n");
+    }
+
+    /** The ready programs the chat model reads, one line each. */
     public function forPrompt(): string
     {
-        return collect($this->all())->map(fn (array $starter) => sprintf(
+        return collect($this->all())->reject(fn (array $card) => ! empty($card['design']))->map(fn (array $starter) => sprintf(
             '- `%s` (%s%s): %s Features: %s.',
             $starter['slug'],
             $starter['type'] ?? 'other',
