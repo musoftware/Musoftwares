@@ -188,11 +188,40 @@ class ProjectChat
         'en' => 'The customer\'s last message is in English: write this whole answer in English, with no Arabic words, even though the examples above are in Arabic.',
     ];
 
-    /** The prompt, and the language this answer must be in (the examples are mostly Arabic, so English is said plainly). */
+    /** The real state from the site's records; what the customer says about paying never changes it. */
+    private const STATE_LINES = [
+        BuilderProject::CHATTING => 'No price is open and nothing is paid.',
+        BuilderProject::QUOTED => 'A price is shown on the page and it is NOT paid. The build has not started.',
+        BuilderProject::DESIGNING => 'Paid. Waiting for the designer before the build starts.',
+        BuilderProject::QUEUED => 'Paid. The build is in the queue and starts soon.',
+        BuilderProject::BUILDING => 'Paid. The engineer is building it now; progress shows on the page.',
+        BuilderProject::READY => 'Paid and delivered; the program is on the page.',
+        BuilderProject::FAILED => 'Paid. The build stopped on a problem and the team was told; it will continue.',
+    ];
+
+    /** Read-only numbers for the chat: it can tell them to the customer but never change them. */
+    private function paymentFacts(BuilderProject $project): string
+    {
+        $money = fn (float $value) => number_format($value, 2).' '.$project->currency;
+        $facts = 'Paid in total on this project: '.$money((float) $project->paid_total).'.';
+        if ($project->status === BuilderProject::QUOTED) {
+            $facts .= ' Open price: '.$money((float) $project->amount).'.';
+        }
+        if ($project->hasBalanceDue()) {
+            $facts .= ' Still to pay before the files are handed over: '.$money($project->balanceDue()).'.';
+        }
+
+        return $facts;
+    }
+
+    /** The prompt, the project's real state, and the language this answer must be in. */
     private function systemPrompt(BuilderProject $project): string
     {
         $prompt = (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
+        $state = (self::STATE_LINES[$project->status] ?? 'Unknown.').' '.$this->paymentFacts($project);
 
-        return $prompt."\n\n## Language of this answer\n\n".self::LANGUAGE_RULES[$project->lastMessageLanguage()];
+        return $prompt
+            ."\n\n## Where this project really is (from the site's records)\n\n".$state
+            ."\n\n## Language of this answer\n\n".self::LANGUAGE_RULES[$project->lastMessageLanguage()];
     }
 }

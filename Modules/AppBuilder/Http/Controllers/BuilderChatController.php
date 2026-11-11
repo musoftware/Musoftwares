@@ -40,8 +40,8 @@ class BuilderChatController extends Controller
 
     public function show(\Illuminate\Http\Request $request, BuilderProject $project): View
     {
-        // whoever has the link and is signed in keeps the project in their account
-        if ($request->user() && $project->user_id === null) {
+        // whoever has the link and is signed in keeps the project in their account; an admin only looks at it
+        if ($request->user() && ! $request->user()->isAdmin() && $project->user_id === null) {
             $project->update(['user_id' => $request->user()->id]);
         }
 

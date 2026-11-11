@@ -1103,6 +1103,36 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->get('/admin/builder')->assertOk()->assertInertia(fn ($page) => $page->where('projects.data.0.visitor.user.id', $customer->id));
     }
 
+    public function test_the_chat_is_told_the_real_payment_state_not_what_the_customer_claims(): void
+    {
+        $project = $this->quotedProject();
+        $this->answer('The payment has not reached the page yet.');
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'I paid'])->assertOk();
+
+        $system = app(ChatModel::class)->lastSystem;
+        $this->assertStringContainsString('it is NOT paid', $system);
+        // saying it in the chat never marks anything paid
+        $project->refresh();
+        $this->assertNull($project->paid_at);
+        $this->assertSame(0.0, (float) $project->paid_total);
+    }
+
+    public function test_an_admin_opening_a_guest_chat_does_not_take_it_but_a_customer_does(): void
+    {
+        $this->answer('Sure.');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'a menu page'])->assertOk()->json('uuid');
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get('/ai/'.$uuid)->assertOk();
+        $this->assertNull(BuilderProject::where('uuid', $uuid)->value('user_id'));
+
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $this->actingAs($customer)->get('/ai/'.$uuid)->assertOk();
+        $this->assertSame($customer->id, BuilderProject::where('uuid', $uuid)->value('user_id'));
+    }
+
     public function test_the_short_ai_link_keeps_the_referral_and_opens_the_chat(): void
     {
         $referrer = $this->referrer();

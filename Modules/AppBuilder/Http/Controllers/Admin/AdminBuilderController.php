@@ -32,8 +32,8 @@ class AdminBuilderController extends Controller
             ->latest('updated_at')
             ->paginate(self::PER_PAGE, ['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'ip', 'user_agent', 'user_id', 'referrer_user_id', 'created_at', 'updated_at'])
             ->withQueryString()
-            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name', 'updated_at'])
-                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)]);
+            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name'])
+                + ['updated_at' => $project->updated_at?->timezone('Africa/Cairo')->toDateTimeString(), 'chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)]);
 
         return Inertia::render('Admin/Builder/Index', [
             'projects' => $projects,
