@@ -26,6 +26,7 @@ class ProjectChat
         private readonly BuilderReferral $referral,
         private readonly \Modules\AppBuilder\Services\Study\FeasibilityStudy $study,
         private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
+        private readonly \Modules\AppBuilder\Services\LeaveDiscount $leaveDiscount,
     ) {}
 
     /** @throws ChatLimitReached */
@@ -158,6 +159,8 @@ class ProjectChat
             'payment_due' => 0,
             'quote_version' => $project->quote_version + 1,
         ]);
+        // a discount the customer already took stays with the project
+        $this->leaveDiscount->applyTo($project);
     }
 
     /** The customer is changing the scope, so the old price must not stay payable. */

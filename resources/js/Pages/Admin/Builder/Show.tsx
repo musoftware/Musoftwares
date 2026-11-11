@@ -29,6 +29,8 @@ interface Project {
     status: string;
     awaiting_answer: boolean;
     amount: string;
+    leave_discount_percent: number;
+    leave_discount_usd: string;
     paid_total: string;
     currency: string;
     build_cost_usd: string;
@@ -148,10 +150,17 @@ function RetryBuild({ project }: { project: Project }) {
     );
 }
 
+/** The discount a customer took when they started to leave the price, if any. */
+function leaveDiscountNote(project: Project): string {
+    if (Number(project.leave_discount_usd) <= 0) return '';
+    const amount = `${project.leave_discount_usd} ${project.currency}`;
+    return t(`after a ${project.leave_discount_percent}% leave discount (-${amount})`, `بعد خصم ${project.leave_discount_percent}% عند المغادرة (-${amount})`);
+}
+
 /** The four numbers the owner checks first: what the customer was quoted and paid, and what the chat and the build cost. */
 function Money({ project }: { project: Project }) {
     const items: [string, string, string][] = [
-        [t('Price quoted', 'السعر المعروض'), `${project.amount} ${project.currency}`, ''],
+        [t('Price quoted', 'السعر المعروض'), `${project.amount} ${project.currency}`, leaveDiscountNote(project)],
         [t('Paid so far', 'المدفوع لحد دلوقتي'), `${project.paid_total} ${project.currency}`, ''],
         [t('Chat cost', 'تكلفة الشات'), `$${project.chat_cost_usd.toFixed(4)}`, ''],
         [t('Build cost', 'تكلفة التنفيذ'), `$${Number(project.build_cost_usd).toFixed(2)}`, t(`budget $${project.budget_usd}`, `الميزانية $${project.budget_usd}`)],

@@ -98,6 +98,16 @@ class BuilderChatController extends Controller
         return response()->json($this->stateOf($project));
     }
 
+    /** The customer took the discount offered as they were leaving the price. */
+    public function discount(BuilderProject $project, \Modules\AppBuilder\Services\LeaveDiscount $discount): JsonResponse
+    {
+        if (! $discount->take($project)) {
+            return $this->refuse('builder.errors.no_discount', 409);
+        }
+
+        return response()->json($this->stateOf($project->refresh()));
+    }
+
     /** The first message opens the chat, so visitors who only look never create a project. */
     public function start(SendMessageRequest $request): JsonResponse
     {

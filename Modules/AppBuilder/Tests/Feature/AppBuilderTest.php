@@ -526,6 +526,51 @@ class AppBuilderTest extends TestCase
         $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('answering', false);
     }
 
+    public function test_a_customer_leaving_the_price_gets_a_discount_once_and_the_build_budget_follows(): void
+    {
+        $project = $this->quotedProject();
+        $project->update(['amount' => 100, 'design_fee' => 20, 'budget_usd' => 40]);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('quote.leave_offer', 10)->assertJsonPath('quote.discount', null);
+
+        $state = $this->postJson('/ai/'.$project->uuid.'/discount')->assertOk();
+
+        // 10% of the programming part (100 - 20 for the designer) comes off; the designer's fee stays whole
+        $project->refresh();
+        $this->assertSame('92.00', $project->amount);
+        $this->assertSame('8.00', $project->leave_discount_usd);
+        $this->assertSame('36.0000', $project->budget_usd);
+        $state->assertJsonPath('quote.amount', '92.00')->assertJsonPath('quote.discount.before', '100.00')->assertJsonPath('quote.leave_offer', null);
+
+        // once only
+        $this->postJson('/ai/'.$project->uuid.'/discount')->assertStatus(409);
+        $this->assertSame('92.00', $project->refresh()->amount);
+    }
+
+    public function test_there_is_no_leave_discount_before_a_price_or_once_payment_started(): void
+    {
+        $this->answer('أهلاً، قولي أكتر.');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز برنامج'])->assertOk()->json('uuid');
+        $this->postJson('/ai/'.$uuid.'/discount')->assertStatus(409);
+
+        $project = $this->quotedProject();
+        $project->update(['payment_due' => 25]);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('quote.leave_offer', null);
+        $this->postJson('/ai/'.$project->uuid.'/discount')->assertStatus(409);
+    }
+
+    public function test_a_new_price_for_the_same_project_keeps_the_discount_taken(): void
+    {
+        $project = $this->quotedProject();
+        $before = (float) $project->amount;
+        $this->postJson('/ai/'.$project->uuid.'/discount')->assertOk();
+
+        // the customer changes the scope and gets a new price of the same size
+        $this->answer('تمام، ده السعر الجديد', 50000);
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'زود صفحة تانية'])->assertOk();
+
+        $this->assertEqualsWithDelta($before * 0.9, (float) $project->refresh()->amount, 0.01);
+    }
+
     public function test_the_page_polling_does_not_use_up_the_limit_for_sending_or_starting(): void
     {
         $this->answer('أهلاً، قولي أكتر.');
@@ -882,6 +927,22 @@ class AppBuilderTest extends TestCase
         $this->assertSame('150.00', $project->amount);
         // the build may spend 2/3 of the price, and the worker stops at 1.5x that: the price itself
         $this->assertSame('100.0000', $project->budget_usd);
+    }
+
+    public function test_a_one_screen_page_is_priced_by_its_real_cost_and_its_build_can_never_spend_more(): void
+    {
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'تمام',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'برنامج فواتير', 'spec' => 'Invoice maker that prints.', 'estimated_output_tokens' => 25000, 'kind' => 'build', 'complex' => false, 'design_fee' => 0, 'project_type' => 'page'],
+        ]);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'برنامج فواتير بيطبع'])->json('uuid');
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+
+        // 25k tokens on Sonnet is about $1 of work, x3 = $3: a cheap first project, not a $60 minimum
+        $this->assertSame('3.00', $project->amount);
+        // and the worker stops at 1.5x this cap: the $3 price itself
+        $this->assertSame('2.0000', $project->budget_usd);
     }
 
     public function test_a_deposit_starts_the_build_and_the_files_open_when_the_rest_is_paid(): void

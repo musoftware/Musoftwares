@@ -99,6 +99,13 @@ class ProjectStateResource extends JsonResource
                 'url' => $this->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? route('builder.study', $this->resource) : null,
                 'fee' => (float) $this->study_fee > 0 ? number_format((float) $this->study_fee, 2) : null,
             ] : null,
+            // offered once if the customer starts to leave; the page asks before it takes it
+            'leave_offer' => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->offerFor($this->resource),
+            'discount_url' => route('builder.discount', $this->resource),
+            'discount' => $this->leave_discount_at && (float) $this->leave_discount_usd > 0 && ! $this->free_fix ? [
+                'percent' => $this->leave_discount_percent,
+                'before' => number_format((float) $this->amount + (float) $this->leave_discount_usd, 2),
+            ] : null,
             'pay_url' => route('builder.pay', $this->resource),
             'fix_url' => route('builder.fix', $this->resource),
         ];

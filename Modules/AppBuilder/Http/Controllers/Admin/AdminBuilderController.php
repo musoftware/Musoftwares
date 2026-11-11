@@ -45,7 +45,7 @@ class AdminBuilderController extends Controller
         $project->load('messages.attachments');
 
         return Inertia::render('Admin/Builder/Show', [
-            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
+            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
                 + ['chat_cost_usd' => $project->chatCostUsd()],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,

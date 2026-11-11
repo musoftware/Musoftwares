@@ -82,6 +82,11 @@
         .msg .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
         :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
         [hidden]{display:none!important}
+        .leave{max-width:min(420px,calc(100vw - 32px));border:1px solid var(--line);border-radius:16px;padding:24px;color:var(--ink)}
+        .leave::backdrop{background:rgba(0,0,0,.35)}
+        .leave h2{margin:0 0 8px;font-size:20px}
+        .leave p{margin:0 0 16px;color:var(--muted);line-height:1.8}
+        .card .before{color:var(--muted);text-decoration:line-through;font-size:16px;font-weight:400;margin-inline-start:8px}
     </style>
 </head>
 <body>
@@ -318,7 +323,10 @@
         if (quote.free) return freeFixNode(quote);
         const card = el('section', {class: 'card'});
         card.append(el('div', {class: 'title', dir: 'auto'}, quote.title || ''));
-        card.append(el('div', {class: 'price'}, quote.amount + ' ' + quote.currency));
+        const price = el('div', {class: 'price'}, quote.amount + ' ' + quote.currency);
+        if (quote.discount) price.append(el('span', {class: 'before'}, quote.discount.before));
+        card.append(price);
+        if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
         if (quote.study) card.append(studyNode(quote.study, quote.currency));
         card.append(el('p', {class: 'note'}, T.pay_note));
@@ -437,6 +445,57 @@
         return node;
     }
 
+    // A customer who saw the price and starts to leave (the mouse heads for the tabs, or they switch away and come
+    // back) is offered a discount once. Closing the tab cannot show our own words; browsers do not allow it.
+    function watchForLeaving() {
+        let away = false;
+        document.documentElement.addEventListener('mouseleave', (event) => {
+            if (event.clientY <= 0) offerLeaveDiscount();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') { away = true; return; }
+            if (away) offerLeaveDiscount();
+            away = false;
+        });
+    }
+
+    function offerLeaveDiscount() {
+        const quote = state && state.quote;
+        if (!quote || !quote.leave_offer || payOpen || waiting || leaveOffered()) return;
+        rememberLeaveOffer();
+        const dialog = el('dialog', {class: 'leave', 'aria-labelledby': 'leave-title'});
+        const take = el('button', {class: 'btn', type: 'button'}, T.leave.take);
+        const no = el('button', {class: 'btn ghost', type: 'button'}, T.leave.no);
+        const actions = el('div', {class: 'actions'});
+        actions.append(take, no);
+        dialog.append(el('h2', {id: 'leave-title'}, T.leave.title), el('p', {}, T.leave.body.replace(':percent', quote.leave_offer)), actions);
+        no.addEventListener('click', () => dialog.close());
+        take.addEventListener('click', () => takeLeaveDiscount(dialog, take, quote.discount_url));
+        dialog.addEventListener('close', () => dialog.remove());
+        document.body.append(dialog);
+        dialog.showModal();
+    }
+
+    async function takeLeaveDiscount(dialog, button, url) {
+        button.disabled = true;
+        try {
+            state = await call(url, {});
+        } catch (error) {
+            showError(error.message);
+        }
+        dialog.close();
+        render();
+    }
+
+    // once per project in this browser; the server also gives it only once
+    function leaveOffered() {
+        try { return sessionStorage.getItem('leave-offer-' + state.uuid) === '1'; } catch (error) { return false; }
+    }
+
+    function rememberLeaveOffer() {
+        try { sessionStorage.setItem('leave-offer-' + state.uuid, '1'); } catch (error) { /* private mode: the server still limits it */ }
+    }
+
     function render() {
         thread.querySelectorAll(':scope > :not(#empty)').forEach((node) => node.remove());
         const messages = state ? state.messages : [];
@@ -536,6 +595,7 @@
     }
 
     startChoice();
+    watchForLeaving();
     render();
 })();
 </script>

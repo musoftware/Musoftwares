@@ -40,7 +40,7 @@ return [
     // The least a project of each type costs, whatever the token estimate says: the price follows what the work
     // is worth, and the build gets enough budget to finish it properly. USD.
     'project_types' => [
-        'page' => (float) env('BUILDER_MIN_PAGE', 15),
+        'page' => (float) env('BUILDER_MIN_PAGE', 1),
         'website' => (float) env('BUILDER_MIN_WEBSITE', 40),
         'web_app' => (float) env('BUILDER_MIN_WEB_APP', 60),
         'system' => (float) env('BUILDER_MIN_SYSTEM', 150),
@@ -71,6 +71,12 @@ return [
 
     // The first payment can be part of the price; the files are handed over when the rest is paid.
     'deposit_shares' => [100, 50, 25],
+
+    // Offered once to a customer who starts to leave after seeing the price. It comes off the programming part
+    // only (the designer and the study are real costs), and the build's spending cap goes down with it.
+    'leave_discount' => [
+        'percent' => (int) env('BUILDER_LEAVE_DISCOUNT_PERCENT', 10),
+    ],
 
     // A professional design by the Musoftware designer is a fixed fee on top of the programming (not multiplied).
     'design' => [
