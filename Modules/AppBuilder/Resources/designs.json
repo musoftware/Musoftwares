@@ -1,0 +1,1108 @@
+[
+  {
+    "slug": "design-agency-1",
+    "category": "agency",
+    "title_en": "Company profile 1",
+    "title_ar": "موقع شركة 1",
+    "summary_en": "Light look: light, bold one-page, dark hero photo, yellow #ffc800 accents",
+    "summary_ar": "تصميم فاتح لموقع شركة، فيه: الواجهة الرئيسية، الخدمات، معرض الأعمال، من نحن.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Portfolio",
+      "About",
+      "Team",
+      "Clients",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "معرض الأعمال",
+      "من نحن",
+      "الفريق",
+      "العملاء",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-agency-2",
+    "category": "agency",
+    "title_en": "Company profile 2",
+    "title_ar": "موقع شركة 2",
+    "summary_en": "Light look: light, full-screen photo hero, orange #f4623a accent",
+    "summary_ar": "تصميم فاتح لموقع شركة، فيه: الواجهة الرئيسية، من نحن، الخدمات، معرض الأعمال.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Services",
+      "Portfolio",
+      "Call to action",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "الخدمات",
+      "معرض الأعمال",
+      "دعوة للتواصل",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-portfolio-1",
+    "category": "portfolio",
+    "title_en": "Portfolio and CV 1",
+    "title_ar": "معرض أعمال وسيرة ذاتية 1",
+    "summary_en": "Light look: light, flat, teal #1abc9c and navy #2c3e50",
+    "summary_ar": "تصميم فاتح لمعرض أعمال وسيرة ذاتية، فيه: الواجهة الرئيسية، معرض الأعمال، من نحن، التواصل.",
+    "features_en": [
+      "Main banner",
+      "Portfolio",
+      "About",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "معرض الأعمال",
+      "من نحن",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-portfolio-2",
+    "category": "portfolio",
+    "title_en": "Portfolio and CV 2",
+    "title_ar": "معرض أعمال وسيرة ذاتية 2",
+    "summary_en": "Light look: light, fixed side nav, orange-brown #bd5d38",
+    "summary_ar": "تصميم فاتح لمعرض أعمال وسيرة ذاتية، فيه: من نحن، الخبرات، التعليم، المهارات.",
+    "features_en": [
+      "About",
+      "Experience",
+      "Education",
+      "Skills"
+    ],
+    "features_ar": [
+      "من نحن",
+      "الخبرات",
+      "التعليم",
+      "المهارات"
+    ]
+  },
+  {
+    "slug": "design-app-1",
+    "category": "app",
+    "title_en": "App or startup 1",
+    "title_ar": "تطبيق أو شركة ناشئة 1",
+    "summary_en": "Light look: light, clean corporate, blue #0d6efd, photo showcase rows",
+    "summary_ar": "تصميم فاتح لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، المميزات، آراء العملاء، التسجيل.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "Reviews",
+      "Sign-up"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "آراء العملاء",
+      "التسجيل"
+    ]
+  },
+  {
+    "slug": "design-coming-soon-1",
+    "category": "coming-soon",
+    "title_en": "Coming soon 1",
+    "title_ar": "قريبًا 1",
+    "summary_en": "Dark look: dark, black and white photo hero, teal #64a19d accent",
+    "summary_ar": "تصميم داكن لقريبًا، فيه: الواجهة الرئيسية، من نحن، المشاريع، التسجيل.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Projects",
+      "Sign-up",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "المشاريع",
+      "التسجيل",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-app-2",
+    "category": "app",
+    "title_en": "App or startup 2",
+    "title_ar": "تطبيق أو شركة ناشئة 2",
+    "summary_en": "Light look: light with purple-blue gradient bands, phone mockup",
+    "summary_ar": "تصميم فاتح لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، المميزات، دعوة للتواصل، تحميل التطبيق.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "Call to action",
+      "App download"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "دعوة للتواصل",
+      "تحميل التطبيق"
+    ]
+  },
+  {
+    "slug": "design-restaurant-1",
+    "category": "restaurant",
+    "title_en": "Restaurant and cafe 1",
+    "title_ar": "مطعم وكافيه 1",
+    "summary_en": "Light look: warm, coffee-shop photo background, cream and brown, serif headings",
+    "summary_ar": "تصميم فاتح لمطعم وكافيه، فيه: الواجهة الرئيسية، من نحن، المنتجات، مواعيد العمل.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Products",
+      "Opening hours",
+      "Call to action"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "المنتجات",
+      "مواعيد العمل",
+      "دعوة للتواصل"
+    ]
+  },
+  {
+    "slug": "design-coming-soon-2",
+    "category": "coming-soon",
+    "title_en": "Coming soon 2",
+    "title_ar": "قريبًا 2",
+    "summary_en": "Dark look: dark, full-screen background video, glass-like form panel",
+    "summary_ar": "تصميم داكن لقريبًا، فيه: الواجهة الرئيسية، التسجيل.",
+    "features_en": [
+      "Main banner",
+      "Sign-up"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "التسجيل"
+    ]
+  },
+  {
+    "slug": "design-portfolio-3",
+    "category": "portfolio",
+    "title_en": "Portfolio and CV 3",
+    "title_ar": "معرض أعمال وسيرة ذاتية 3",
+    "summary_en": "Light look: light, big photo hero, blue and yellow callouts, slide-out menu",
+    "summary_ar": "تصميم فاتح لمعرض أعمال وسيرة ذاتية، فيه: الواجهة الرئيسية، من نحن، الخدمات، معرض الأعمال.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Services",
+      "Portfolio",
+      "Call to action",
+      "Map"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "الخدمات",
+      "معرض الأعمال",
+      "دعوة للتواصل",
+      "الخريطة"
+    ]
+  },
+  {
+    "slug": "design-app-3",
+    "category": "app",
+    "title_en": "App or startup 3",
+    "title_ar": "تطبيق أو شركة ناشئة 3",
+    "summary_en": "Dark look: dark, blurred rainbow background, glassy feel, laptop mockup",
+    "summary_ar": "تصميم داكن لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، التسجيل.",
+    "features_en": [
+      "Main banner",
+      "Sign-up"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "التسجيل"
+    ]
+  },
+  {
+    "slug": "design-clinic-1",
+    "category": "clinic",
+    "title_en": "Clinic and medical 1",
+    "title_ar": "عيادة وطب 1",
+    "summary_en": "Light look: light, navy #223a66 with pink-red #e12454, rounded cards",
+    "summary_ar": "تصميم فاتح لعيادة وطب، فيه: الواجهة الرئيسية، المميزات، من نحن، دعوة للتواصل.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "About",
+      "Call to action",
+      "Services",
+      "Appointments",
+      "Reviews"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "من نحن",
+      "دعوة للتواصل",
+      "الخدمات",
+      "حجز المواعيد",
+      "آراء العملاء"
+    ]
+  },
+  {
+    "slug": "design-education-1",
+    "category": "education",
+    "title_en": "Education and courses 1",
+    "title_ar": "تعليم وكورسات 1",
+    "summary_en": "Light look: light, navy #1a1a37 with warm yellow #ffbc3b",
+    "summary_ar": "تصميم فاتح لتعليم وكورسات، فيه: الواجهة الرئيسية، المميزات، من نحن، الكورسات.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "About",
+      "Courses",
+      "Call to action",
+      "Events",
+      "Blog"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "من نحن",
+      "الكورسات",
+      "دعوة للتواصل",
+      "الفعاليات",
+      "المدونة"
+    ]
+  },
+  {
+    "slug": "design-gym-1",
+    "category": "gym",
+    "title_en": "Gym and fitness 1",
+    "title_ar": "جيم ولياقة 1",
+    "summary_en": "Dark look: dark, charcoal #181a23 with orange #fe9418",
+    "summary_ar": "تصميم داكن لجيم ولياقة، فيه: سلايدر رئيسي، من نحن، دعوة للتواصل، الخدمات.",
+    "features_en": [
+      "Main slider",
+      "About",
+      "Call to action",
+      "Services",
+      "Gallery",
+      "Reviews",
+      "Courses"
+    ],
+    "features_ar": [
+      "سلايدر رئيسي",
+      "من نحن",
+      "دعوة للتواصل",
+      "الخدمات",
+      "معرض الصور",
+      "آراء العملاء",
+      "الكورسات"
+    ]
+  },
+  {
+    "slug": "design-events-1",
+    "category": "events",
+    "title_en": "Events and weddings 1",
+    "title_ar": "مناسبات وأفراح 1",
+    "summary_en": "Light look: light with dark photo bands, orange #ff6600",
+    "summary_ar": "تصميم فاتح لمناسبات وأفراح، فيه: الواجهة الرئيسية، من نحن، المتحدثين، المواعيد.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Speakers",
+      "Schedule",
+      "Registration",
+      "Prices",
+      "News"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "المتحدثين",
+      "المواعيد",
+      "التسجيل",
+      "الأسعار",
+      "الأخبار"
+    ]
+  },
+  {
+    "slug": "design-services-1",
+    "category": "services",
+    "title_en": "Construction and services 1",
+    "title_ar": "مقاولات وخدمات 1",
+    "summary_en": "Light look: light with dark bands, construction yellow #ffb600 and charcoal",
+    "summary_ar": "تصميم فاتح لمقاولات وخدمات، فيه: سلايدر رئيسي، دعوة للتواصل، المميزات، أرقام.",
+    "features_en": [
+      "Main slider",
+      "Call to action",
+      "Features",
+      "Numbers",
+      "Services",
+      "Projects",
+      "Team"
+    ],
+    "features_ar": [
+      "سلايدر رئيسي",
+      "دعوة للتواصل",
+      "المميزات",
+      "أرقام",
+      "الخدمات",
+      "المشاريع",
+      "الفريق"
+    ]
+  },
+  {
+    "slug": "design-portfolio-4",
+    "category": "portfolio",
+    "title_en": "Portfolio and CV 4",
+    "title_ar": "معرض أعمال وسيرة ذاتية 4",
+    "summary_en": "Light look: light, purple #542cb7 accents, creative parallax shapes",
+    "summary_ar": "تصميم فاتح لمعرض أعمال وسيرة ذاتية، فيه: الواجهة الرئيسية، من نحن، الخدمات، المهارات.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Services",
+      "Skills",
+      "Portfolio",
+      "Reviews",
+      "Blog"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "الخدمات",
+      "المهارات",
+      "معرض الأعمال",
+      "آراء العملاء",
+      "المدونة"
+    ]
+  },
+  {
+    "slug": "design-agency-3",
+    "category": "agency",
+    "title_en": "Company profile 3",
+    "title_ar": "موقع شركة 3",
+    "summary_en": "Light look: light, black and white with red accent, bold sans",
+    "summary_ar": "تصميم فاتح لموقع شركة، فيه: سلايدر رئيسي، من نحن، أرقام، الخدمات.",
+    "features_en": [
+      "Main slider",
+      "About",
+      "Numbers",
+      "Services",
+      "Call to action",
+      "Reviews",
+      "Blog"
+    ],
+    "features_ar": [
+      "سلايدر رئيسي",
+      "من نحن",
+      "أرقام",
+      "الخدمات",
+      "دعوة للتواصل",
+      "آراء العملاء",
+      "المدونة"
+    ]
+  },
+  {
+    "slug": "design-app-4",
+    "category": "app",
+    "title_en": "App or startup 4",
+    "title_ar": "تطبيق أو شركة ناشئة 4",
+    "summary_en": "Light look: light, blue #2e7eed with purple gradient hero, phone mockups",
+    "summary_ar": "تصميم فاتح لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، المميزات، الخدمات، فيديو.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "Services",
+      "Video",
+      "Reviews",
+      "Call to action",
+      "Prices"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "الخدمات",
+      "فيديو",
+      "آراء العملاء",
+      "دعوة للتواصل",
+      "الأسعار"
+    ]
+  },
+  {
+    "slug": "design-store-1",
+    "category": "store",
+    "title_en": "Store and product 1",
+    "title_ar": "متجر ومنتج 1",
+    "summary_en": "Light look: light, minimal black and white e-commerce, grey surfaces",
+    "summary_ar": "تصميم فاتح لمتجر ومنتج، فيه: سلايدر رئيسي، المنتجات، دعوة للتواصل، سلة الشراء.",
+    "features_en": [
+      "Main slider",
+      "Products",
+      "Call to action",
+      "Cart",
+      "Shop",
+      "Blog",
+      "Contact"
+    ],
+    "features_ar": [
+      "سلايدر رئيسي",
+      "المنتجات",
+      "دعوة للتواصل",
+      "سلة الشراء",
+      "المتجر",
+      "المدونة",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-agency-4",
+    "category": "agency",
+    "title_en": "Company profile 4",
+    "title_ar": "موقع شركة 4",
+    "summary_en": "Dark look: dark, charcoal #292f36 with teal #57cbcc, parallax photo bands",
+    "summary_ar": "تصميم داكن لموقع شركة، فيه: الواجهة الرئيسية، من نحن، دعوة للتواصل، الخدمات.",
+    "features_en": [
+      "Main banner",
+      "About",
+      "Call to action",
+      "Services",
+      "Numbers",
+      "Portfolio",
+      "Team"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "من نحن",
+      "دعوة للتواصل",
+      "الخدمات",
+      "أرقام",
+      "معرض الأعمال",
+      "الفريق"
+    ]
+  },
+  {
+    "slug": "design-app-5",
+    "category": "app",
+    "title_en": "App or startup 5",
+    "title_ar": "تطبيق أو شركة ناشئة 5",
+    "summary_en": "Light look: light, modern startup, blue #3056d3, rounded cards",
+    "summary_ar": "تصميم فاتح لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، المميزات، من نحن، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "About",
+      "Prices",
+      "FAQ",
+      "Reviews",
+      "Team"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "من نحن",
+      "الأسعار",
+      "الأسئلة الشائعة",
+      "آراء العملاء",
+      "الفريق"
+    ]
+  },
+  {
+    "slug": "design-travel-1",
+    "category": "travel",
+    "title_en": "Travel and hotels 1",
+    "title_ar": "سفر وفنادق 1",
+    "summary_en": "Light look: light, airy travel look, sky blue #3da9fc, rounded photo cards",
+    "summary_ar": "تصميم فاتح لسفر وفنادق، فيه: الواجهة الرئيسية، المميزات، الوجهات، آراء العملاء.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "Destinations",
+      "Reviews",
+      "Blog",
+      "Newsletter"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "الوجهات",
+      "آراء العملاء",
+      "المدونة",
+      "النشرة البريدية"
+    ]
+  },
+  {
+    "slug": "design-real-estate-1",
+    "category": "real-estate",
+    "title_en": "Real estate 1",
+    "title_ar": "عقارات 1",
+    "summary_en": "Light look: light/dark switch, navy #101828 and white, Outfit font, clean property cards",
+    "summary_ar": "تصميم فاتح لعقارات، فيه: الواجهة الرئيسية، البحث، الوحدات، صفحة الوحدة.",
+    "features_en": [
+      "Main banner",
+      "Search",
+      "Listings",
+      "Property page",
+      "About",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "البحث",
+      "الوحدات",
+      "صفحة الوحدة",
+      "من نحن",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-app-6",
+    "category": "app",
+    "title_en": "App or startup 6",
+    "title_ar": "تطبيق أو شركة ناشئة 6",
+    "summary_en": "Dark look: dark cinematic, ember orange glow, Three.js particles, glass panels",
+    "summary_ar": "تصميم داكن لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، شعارات العملاء، المميزات، أرقام.",
+    "features_en": [
+      "Main banner",
+      "Client logos",
+      "Features",
+      "Numbers",
+      "Steps",
+      "Reviews",
+      "Prices"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "شعارات العملاء",
+      "المميزات",
+      "أرقام",
+      "الخطوات",
+      "آراء العملاء",
+      "الأسعار"
+    ]
+  },
+  {
+    "slug": "design-store-2",
+    "category": "store",
+    "title_en": "Store and product 2",
+    "title_ar": "متجر ومنتج 2",
+    "summary_en": "Dark look: dark cinematic product launch, electric accent, big type, scroll scenes",
+    "summary_ar": "تصميم داكن لمتجر ومنتج، فيه: الواجهة الرئيسية، المنتج، معرض الصور، فورم الحجز.",
+    "features_en": [
+      "Main banner",
+      "Product",
+      "Gallery",
+      "Reservation form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المنتج",
+      "معرض الصور",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-agency-5",
+    "category": "agency",
+    "title_en": "Company profile 5",
+    "title_ar": "موقع شركة 5",
+    "summary_en": "Dark look: dark, raymarched liquid-chrome WebGL hero, minimal type",
+    "summary_ar": "تصميم داكن لموقع شركة، فيه: الواجهة الرئيسية، الأعمال.",
+    "features_en": [
+      "Main banner",
+      "Work"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الأعمال"
+    ]
+  },
+  {
+    "slug": "design-beauty-1",
+    "category": "beauty",
+    "title_en": "Beauty and salon 1",
+    "title_ar": "صالون وتجميل 1",
+    "summary_en": "Light look: soft light, gooey animated blobs, calm pastel, breathing guide",
+    "summary_ar": "تصميم فاتح لصالون وتجميل، فيه: الواجهة الرئيسية، المواعيد، دعوة للتواصل.",
+    "features_en": [
+      "Main banner",
+      "Schedule",
+      "Call to action"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المواعيد",
+      "دعوة للتواصل"
+    ]
+  },
+  {
+    "slug": "design-beauty-2",
+    "category": "beauty",
+    "title_en": "Beauty and salon 2",
+    "title_ar": "صالون وتجميل 2",
+    "summary_en": "Light look: light, loud red #d3261e, ink black and cyan, torn-paper edges",
+    "summary_ar": "تصميم فاتح لصالون وتجميل، فيه: الواجهة الرئيسية، الخدمات، الفريق، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Team",
+      "Prices",
+      "Reviews",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "الفريق",
+      "الأسعار",
+      "آراء العملاء",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-beauty-3",
+    "category": "beauty",
+    "title_en": "Beauty and salon 3",
+    "title_ar": "صالون وتجميل 3",
+    "summary_en": "Light look: light, frosted glass panels over orange orbs, playful",
+    "summary_ar": "تصميم فاتح لصالون وتجميل، فيه: الواجهة الرئيسية، الخدمات، الفريق، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Team",
+      "Prices",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "الفريق",
+      "الأسعار",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-beauty-4",
+    "category": "beauty",
+    "title_en": "Beauty and salon 4",
+    "title_ar": "صالون وتجميل 4",
+    "summary_en": "Dark look: dark, near-black with copper and lake blue, light serif, rising fog",
+    "summary_ar": "تصميم داكن لصالون وتجميل، فيه: الواجهة الرئيسية، الخطوات، الغرف، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Steps",
+      "Rooms",
+      "Prices",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخطوات",
+      "الغرف",
+      "الأسعار",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-restaurant-2",
+    "category": "restaurant",
+    "title_en": "Restaurant and cafe 2",
+    "title_ar": "مطعم وكافيه 2",
+    "summary_en": "Light look: light, huge uppercase type, near-white, olive and night grounds",
+    "summary_ar": "تصميم فاتح لمطعم وكافيه، فيه: الواجهة الرئيسية، المنيو، مواعيد العمل، فورم الحجز.",
+    "features_en": [
+      "Main banner",
+      "Menu",
+      "Opening hours",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المنيو",
+      "مواعيد العمل",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-restaurant-3",
+    "category": "restaurant",
+    "title_en": "Restaurant and cafe 3",
+    "title_ar": "مطعم وكافيه 3",
+    "summary_en": "Light look: light, bright yellow, pink and violet cards, handwritten notes",
+    "summary_ar": "تصميم فاتح لمطعم وكافيه، فيه: الواجهة الرئيسية، المنتجات، فورم الطلب.",
+    "features_en": [
+      "Main banner",
+      "Products",
+      "Order form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المنتجات",
+      "فورم الطلب"
+    ]
+  },
+  {
+    "slug": "design-clinic-2",
+    "category": "clinic",
+    "title_en": "Clinic and medical 2",
+    "title_ar": "عيادة وطب 2",
+    "summary_en": "Light look: light, pastel paper folders on grey",
+    "summary_ar": "تصميم فاتح لعيادة وطب، فيه: الواجهة الرئيسية، الخدمات، المتجر.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Shop"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "المتجر"
+    ]
+  },
+  {
+    "slug": "design-gym-2",
+    "category": "gym",
+    "title_en": "Gym and fitness 2",
+    "title_ar": "جيم ولياقة 2",
+    "summary_en": "Light look: light, white and navy framed slides on misty blue-grey",
+    "summary_ar": "تصميم فاتح لجيم ولياقة، فيه: الواجهة الرئيسية، المدربين، المواعيد، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Coaches",
+      "Schedule",
+      "Prices",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المدربين",
+      "المواعيد",
+      "الأسعار",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-app-7",
+    "category": "app",
+    "title_en": "App or startup 7",
+    "title_ar": "تطبيق أو شركة ناشئة 7",
+    "summary_en": "Dark look: dark charcoal frame with rounded light panels, phone mockup that changes on scroll",
+    "summary_ar": "تصميم داكن لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، المدربين، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Coaches",
+      "Prices"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المدربين",
+      "الأسعار"
+    ]
+  },
+  {
+    "slug": "design-education-2",
+    "category": "education",
+    "title_en": "Education and courses 2",
+    "title_ar": "تعليم وكورسات 2",
+    "summary_en": "Light look: light, flat orange, plum and ice colour planes",
+    "summary_ar": "تصميم فاتح لتعليم وكورسات، فيه: الواجهة الرئيسية، الجدول، المدربين، الفعاليات.",
+    "features_en": [
+      "Main banner",
+      "Timetable",
+      "Mentors",
+      "Events",
+      "Prices",
+      "Enquiry form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الجدول",
+      "المدربين",
+      "الفعاليات",
+      "الأسعار",
+      "فورم الاستفسار"
+    ]
+  },
+  {
+    "slug": "design-agency-6",
+    "category": "agency",
+    "title_en": "Company profile 6",
+    "title_ar": "موقع شركة 6",
+    "summary_en": "Light look: light, black and white with one violet, giant type, travelling round photo",
+    "summary_ar": "تصميم فاتح لموقع شركة، فيه: الواجهة الرئيسية، الخدمات، الأعمال، طريقة الشغل.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Work",
+      "How we work",
+      "Team",
+      "Contact form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "الأعمال",
+      "طريقة الشغل",
+      "الفريق",
+      "فورم التواصل"
+    ]
+  },
+  {
+    "slug": "design-store-3",
+    "category": "store",
+    "title_en": "Store and product 3",
+    "title_ar": "متجر ومنتج 3",
+    "summary_en": "Light look: light, soft tactile grey, product drawn in CSS",
+    "summary_ar": "تصميم فاتح لمتجر ومنتج، فيه: الواجهة الرئيسية، المميزات، الأسعار، الأسئلة الشائعة.",
+    "features_en": [
+      "Main banner",
+      "Features",
+      "Prices",
+      "FAQ",
+      "Contact form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المميزات",
+      "الأسعار",
+      "الأسئلة الشائعة",
+      "فورم التواصل"
+    ]
+  },
+  {
+    "slug": "design-services-2",
+    "category": "services",
+    "title_en": "Construction and services 2",
+    "title_ar": "مقاولات وخدمات 2",
+    "summary_en": "Light look: light, flat periwinkle, pink and lime on near-white, tile mosaic",
+    "summary_ar": "تصميم فاتح لمقاولات وخدمات، فيه: الواجهة الرئيسية، المشاريع، الأسعار، فورم التواصل.",
+    "features_en": [
+      "Main banner",
+      "Projects",
+      "Prices",
+      "Contact form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المشاريع",
+      "الأسعار",
+      "فورم التواصل"
+    ]
+  },
+  {
+    "slug": "design-services-3",
+    "category": "services",
+    "title_en": "Construction and services 3",
+    "title_ar": "مقاولات وخدمات 3",
+    "summary_en": "Light look: light, black, white and grey with red measuring marks",
+    "summary_ar": "تصميم فاتح لمقاولات وخدمات، فيه: الواجهة الرئيسية، الخدمات، الأسعار، معرض الصور.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Prices",
+      "Gallery",
+      "Team",
+      "Reviews"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "الأسعار",
+      "معرض الصور",
+      "الفريق",
+      "آراء العملاء"
+    ]
+  },
+  {
+    "slug": "design-consulting-1",
+    "category": "consulting",
+    "title_en": "Law and consulting 1",
+    "title_ar": "محاماة واستشارات 1",
+    "summary_en": "Light look: light, greyscale photos, one red accent, full-screen practice panels",
+    "summary_ar": "تصميم فاتح لمحاماة واستشارات، فيه: الواجهة الرئيسية، مجالات العمل، القضايا، الأتعاب.",
+    "features_en": [
+      "Main banner",
+      "Practice areas",
+      "Cases",
+      "Fees",
+      "Contact form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "مجالات العمل",
+      "القضايا",
+      "الأتعاب",
+      "فورم التواصل"
+    ]
+  },
+  {
+    "slug": "design-consulting-2",
+    "category": "consulting",
+    "title_en": "Law and consulting 2",
+    "title_ar": "محاماة واستشارات 2",
+    "summary_en": "Light look: light Swiss style, black on white, one red accent, hairline rules",
+    "summary_ar": "تصميم فاتح لمحاماة واستشارات، فيه: الواجهة الرئيسية، الخدمات، الأسعار، فورم الحجز.",
+    "features_en": [
+      "Main banner",
+      "Services",
+      "Prices",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الخدمات",
+      "الأسعار",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-consulting-3",
+    "category": "consulting",
+    "title_en": "Law and consulting 3",
+    "title_ar": "محاماة واستشارات 3",
+    "summary_en": "Light look: light, white and zinc with amber glow, chart",
+    "summary_ar": "تصميم فاتح لمحاماة واستشارات، فيه: الواجهة الرئيسية، الأتعاب، الفريق.",
+    "features_en": [
+      "Main banner",
+      "Fees",
+      "Team"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الأتعاب",
+      "الفريق"
+    ]
+  },
+  {
+    "slug": "design-charity-1",
+    "category": "charity",
+    "title_en": "Charity 1",
+    "title_ar": "جمعية خيرية 1",
+    "summary_en": "Light look: light, six colour-coded folders, friendly",
+    "summary_ar": "تصميم فاتح لجمعية خيرية، فيه: الواجهة الرئيسية، التسجيل، التبرعات، التواصل.",
+    "features_en": [
+      "Main banner",
+      "Sign-up",
+      "Donations",
+      "Contact"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "التسجيل",
+      "التبرعات",
+      "التواصل"
+    ]
+  },
+  {
+    "slug": "design-travel-2",
+    "category": "travel",
+    "title_en": "Travel and hotels 2",
+    "title_ar": "سفر وفنادق 2",
+    "summary_en": "Light look: light, off-white and ink with terracotta",
+    "summary_ar": "تصميم فاتح لسفر وفنادق، فيه: الواجهة الرئيسية، الغرف، معرض الصور، فورم الحجز.",
+    "features_en": [
+      "Main banner",
+      "Rooms",
+      "Gallery",
+      "Booking form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الغرف",
+      "معرض الصور",
+      "فورم الحجز"
+    ]
+  },
+  {
+    "slug": "design-travel-3",
+    "category": "travel",
+    "title_en": "Travel and hotels 3",
+    "title_ar": "سفر وفنادق 3",
+    "summary_en": "Light look: light, olive and cream with amber",
+    "summary_ar": "تصميم فاتح لسفر وفنادق، فيه: الواجهة الرئيسية، الرحلات، الأسعار، الأسئلة الشائعة.",
+    "features_en": [
+      "Main banner",
+      "Tours",
+      "Prices",
+      "FAQ",
+      "Enquiry form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الرحلات",
+      "الأسعار",
+      "الأسئلة الشائعة",
+      "فورم الاستفسار"
+    ]
+  },
+  {
+    "slug": "design-events-2",
+    "category": "events",
+    "title_en": "Events and weddings 2",
+    "title_ar": "مناسبات وأفراح 2",
+    "summary_en": "Light look: light, orange colour fields with garden photography",
+    "summary_ar": "تصميم فاتح لمناسبات وأفراح، فيه: الواجهة الرئيسية، الباقات، الأسعار، المراحل.",
+    "features_en": [
+      "Main banner",
+      "Packages",
+      "Prices",
+      "Timeline",
+      "Enquiry form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "الباقات",
+      "الأسعار",
+      "المراحل",
+      "فورم الاستفسار"
+    ]
+  },
+  {
+    "slug": "design-events-3",
+    "category": "events",
+    "title_en": "Events and weddings 3",
+    "title_ar": "مناسبات وأفراح 3",
+    "summary_en": "Dark look: dark-leaning, crimson, red, near-black and white slides, huge capitals",
+    "summary_ar": "تصميم داكن لمناسبات وأفراح، فيه: الواجهة الرئيسية، المواعيد، التذاكر، الأسعار.",
+    "features_en": [
+      "Main banner",
+      "Schedule",
+      "Tickets",
+      "Prices"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "المواعيد",
+      "التذاكر",
+      "الأسعار"
+    ]
+  },
+  {
+    "slug": "design-app-8",
+    "category": "app",
+    "title_en": "App or startup 8",
+    "title_ar": "تطبيق أو شركة ناشئة 8",
+    "summary_en": "Light look: light/warm, maroon, butter and gold, phone mockup",
+    "summary_ar": "تصميم فاتح لتطبيق أو شركة ناشئة، فيه: الواجهة الرئيسية، إزاي بيشتغل، الأسعار، فورم التواصل.",
+    "features_en": [
+      "Main banner",
+      "How it works",
+      "Prices",
+      "Contact form"
+    ],
+    "features_ar": [
+      "الواجهة الرئيسية",
+      "إزاي بيشتغل",
+      "الأسعار",
+      "فورم التواصل"
+    ]
+  }
+]
