@@ -45,6 +45,12 @@ Schedule::command(\App\Console\Commands\IndexNowSubmit::class)->dailyAt('03:30')
 // One reminder for a store order that was started and not paid (2 to 48 hours old)
 Schedule::command(\App\Console\Commands\SendSoftwareOrderReminders::class)->hourly()->withoutOverlapping(10);
 
+// The AI builder: a customer who went quiet before paying gets a reminder email, then the discount by email
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\ChatFollowUp::class)->sendDue())
+    ->name('builder-follow-ups')
+    ->hourly()
+    ->withoutOverlapping(30);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')

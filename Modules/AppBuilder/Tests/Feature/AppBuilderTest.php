@@ -338,6 +338,37 @@ class AppBuilderTest extends TestCase
         $this->assertArrayHasKey(__('builder.mail_ready_subject', [], 'ar'), $this->sentMails());
     }
 
+    public function test_a_quiet_customer_gets_a_reminder_then_the_discount_by_email_once_each(): void
+    {
+        config(['mail.default' => 'array']);
+        $quiet = $this->quotedProject();
+        $quiet->update(['client_email' => 'quiet@example.com']);
+        $paid = $this->quotedProject();
+        $paid->update(['client_email' => 'paid@example.com']);
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($paid, $paid->quote_version, 'TX-PAID');
+        $price = (float) $quiet->amount;
+        $followUp = app(\Modules\AppBuilder\Services\ChatFollowUp::class);
+
+        // a day later nothing goes out; after two days the reminder, only once
+        $this->travel(1)->days();
+        $this->assertSame(0, $followUp->sendDue());
+        $this->travel(2)->days();
+        $this->assertSame(1, $followUp->sendDue());
+        $this->assertSame(0, $followUp->sendDue());
+        $this->assertNotNull($quiet->refresh()->follow_up_at);
+
+        // after a week the discount is taken off the price and announced
+        $this->travel(5)->days();
+        $this->assertSame(1, $followUp->sendDue());
+        $quiet->refresh();
+        $this->assertLessThan($price, (float) $quiet->amount);
+        $this->assertNotNull($quiet->follow_up_offer_at);
+        $this->assertSame(0, $followUp->sendDue());
+
+        // the paid customer was never mailed by the follow-up
+        $this->assertNull($paid->refresh()->follow_up_at);
+    }
+
     private function quotePage(): void
     {
         $this->script[] = ChatTurn::fromArray([

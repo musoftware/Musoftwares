@@ -21,6 +21,35 @@ return [
     'wallet_confirm' => 'Pay this price from your balance on the site and start the build now?',
     'wallet_short' => 'Your balance (:balance) does not cover this price yet.',
     'wallet_top_up' => 'Add balance',
+    'follow_up' => [
+        'your_idea' => 'your idea',
+        'remind_subject' => 'Your project is waiting: :title',
+        'remind_body' => "Hello,
+
+You told us about :title. Everything you said is saved, and we can pick up where you stopped and get it built.
+
+Your chat:
+:link
+
+The Musoftware team",
+        'offer_subject' => ':percent% off :title, for you',
+        'offer_body' => "Hello,
+
+We still have :title ready to build. We took :percent% off for you: it is now :price instead of :before.
+
+Open your chat and start whenever you are ready:
+:link
+
+The Musoftware team",
+        'again_subject' => 'Shall we build :title?',
+        'again_body' => "Hello,
+
+Your chat about :title is still here. Write to us any time and the engineer will pick it up.
+
+:link
+
+The Musoftware team",
+    ],
     'how_title' => 'How it works',
     'how_steps' => ['Tell us your idea here. The engineer asks what it needs and gives you a price.', 'After payment, your program is built on the Musoftware computers, not on this page. You can close the page; nothing stops.', 'We email you and send a notification when it is ready, or if the engineer needs something from you.', 'Open your project link (it is in your email and your account) to see the program, try it and download it.'],
     'close_page_note' => 'After payment you can close this page: the build runs on our computers, and the project link reaches your email.',

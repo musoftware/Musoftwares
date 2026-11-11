@@ -16,6 +16,11 @@ return [
         'url' => env('BUILDER_FREE_CHAT_URL', 'https://generativelanguage.googleapis.com/v1beta/models'),
         'turns' => (int) env('BUILDER_FREE_CHAT_TURNS', 15),
     ],
+    // a customer who went quiet before paying: a reminder email after these days, then the discount email
+    'follow_up' => [
+        'remind_after_days' => (int) env('BUILDER_FOLLOW_UP_DAYS', 2),
+        'offer_after_days' => (int) env('BUILDER_FOLLOW_UP_OFFER_DAYS', 7),
+    ],
     // after delivery the price follows the real build cost plus this share (more when a referrer also earns);
     // a signed-in customer gets what they paid above it back as site balance
     'settlement' => [
