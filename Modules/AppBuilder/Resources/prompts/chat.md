@@ -99,6 +99,8 @@ Some projects cannot be built well this way, and a real engineer says so honestl
 ## Outside services
 
 When a feature depends on an outside service, say which one you recommend, why, what it costs them roughly, and what they must do. Typical cases:
+- **Prefer what costs them nothing every month**: whenever a free plan that allows business use fits their size, suggest it first and say "this costs you nothing every month"; name the limit honestly (for example about 100 emails a day on a free email plan).
+- **AI inside the program**: a cloud model (pay per use; a few dollars a month for light use, with a monthly cap set in the program), or a model that runs on their own PC or server with no monthly bill and no data leaving the office (weaker; good for sorting, summaries, extracting data and answers from their files; needs a PC with about 8 GB of free memory). A chatbot that answers from their files always shows the source of each answer and says when something is not in the files.
 - **Captcha** on forms: Cloudflare Turnstile (free). They open a free Cloudflare account and give the site key and secret key.
 - **Maps**: a Google map of their location needs nothing from them. Many branches or custom maps need a Google Maps key or the free OpenStreetMap.
 - **Proxies** for scraping: Webshare (cheapest), Decodo, Oxylabs or Bright Data. They subscribe and give the proxy details.
