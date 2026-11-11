@@ -96,6 +96,27 @@ class ProjectPayment
         return $this->markPaid($project, $project->quote_version, 'admin-'.$adminId.'-'.now()->timestamp);
     }
 
+    /**
+     * The work turned out bigger than the price: the owner asks for more, up to the top of the range the customer saw.
+     * It becomes the rest to pay, and the files open once it is paid. Returns what was added (0 when nothing can be).
+     */
+    public function askForMore(BuilderProject $project, float $extra): float
+    {
+        $room = round((float) $project->price_max - (float) $project->amount, 2);
+        if ($project->status === BuilderProject::QUOTED || (float) $project->quote_paid <= 0 || $room <= 0 || $extra <= 0) {
+            return 0.0;
+        }
+
+        $added = min($extra, $room);
+        $project->update(['amount' => (float) $project->amount + $added, 'payment_due' => 0]);
+        $project->messages()->create([
+            'role' => \Modules\AppBuilder\Models\BuilderMessage::TEAM,
+            'content' => __('builder.extra_asked', ['amount' => number_format($added, 2).' '.$project->currency], $project->customerLanguage()),
+        ]);
+
+        return $added;
+    }
+
     /** The rest of a quote after a deposit: the files are handed over once it is paid. */
     private function markBalancePaid(BuilderProject $project, ?string $transactionId): bool
     {

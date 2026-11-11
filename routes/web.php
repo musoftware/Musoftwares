@@ -394,6 +394,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/r/{ref}', [ReferralController::class, 'referral_redirect'])
     ->middleware([\App\Http\Middleware\ReferralRedirectHeaders::class, 'throttle:30,1'])
     ->name('ref');
+Route::get('/r/{ref}/ai', [ReferralController::class, 'referral_to_ai'])
+    ->middleware([\App\Http\Middleware\ReferralRedirectHeaders::class, 'throttle:30,1'])
+    ->name('ref.ai');
 
 // Tracking Route for Campaigns
 Route::get('/track/campaign/{id}', [TrackingController::class, 'trackCampaign'])->name('track.campaign');

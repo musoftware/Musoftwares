@@ -59,7 +59,8 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');
     Route::post('/{project}/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markPaid'])->name('mark-paid');
-    Route::post('/{project}/retry',[\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'retry'])->name('retry');
+    Route::post('/{project}/extra', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'extra'])->name('extra');
+    Route::post('/{project}/retry', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'retry'])->name('retry');
     Route::post('/{project}/design', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'design'])->name('design');
     Route::delete('/{project}/secrets/{secret}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'destroySecret'])->whereNumber('secret')->name('secrets.destroy');
 });

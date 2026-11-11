@@ -89,7 +89,7 @@ class ProjectChat
         set_time_limit(self::SECONDS_FOR_CLAUDE);
 
         try {
-            $turn = $this->model->reply($this->systemPrompt(), $this->turns($project));
+            $turn = $this->model->reply($this->systemPrompt($project), $this->turns($project));
         } catch (ChatUnavailable $exception) {
             Log::warning('App builder: chat turn failed', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
             if ($forgetOnFailure) {
@@ -162,6 +162,8 @@ class ProjectChat
         ]);
         // a discount the customer already took stays with the project
         $this->leaveDiscount->applyTo($project);
+        // the top of the range is the most that can be asked for later; a free fix has no range
+        $project->update(['price_max' => $free ? 0 : \Modules\AppBuilder\Services\PriceRange::around((float) $project->amount)['to']]);
     }
 
     /** The customer is changing the scope, so the old price must not stay payable. */
@@ -181,8 +183,16 @@ class ProjectChat
             ->all();
     }
 
-    private function systemPrompt(): string
+    private const LANGUAGE_RULES = [
+        'ar' => 'The customer\'s last message is in Arabic: write this answer in simple Egyptian Arabic.',
+        'en' => 'The customer\'s last message is in English: write this whole answer in English, with no Arabic words, even though the examples above are in Arabic.',
+    ];
+
+    /** The prompt, and the language this answer must be in (the examples are mostly Arabic, so English is said plainly). */
+    private function systemPrompt(BuilderProject $project): string
     {
-        return (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
+        $prompt = (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
+
+        return $prompt."\n\n## Language of this answer\n\n".self::LANGUAGE_RULES[$project->lastMessageLanguage()];
     }
 }

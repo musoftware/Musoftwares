@@ -38,6 +38,7 @@ class BuilderProject extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'price_max' => 'decimal:2',
         'paid_total' => 'decimal:2',
         'referral_commission' => 'decimal:2',
         'quote_paid' => 'decimal:2',
@@ -136,6 +137,14 @@ class BuilderProject extends Model
         $written = $this->messages()->where('role', BuilderMessage::USER)->pluck('content')->implode(' ');
 
         return preg_match('/\p{Arabic}/u', $written) ? 'ar' : 'en';
+    }
+
+    /** The language of the customer's last written line: the chat answers in it, even if they switched. */
+    public function lastMessageLanguage(): string
+    {
+        $last = (string) $this->messages()->where('role', BuilderMessage::USER)->where('content', '!=', '')->reorder('id', 'desc')->value('content');
+
+        return preg_match('/\p{Arabic}/u', $last) ? 'ar' : 'en';
     }
 
     /** What talking with the customer cost on the chat model, in USD. */

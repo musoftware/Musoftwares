@@ -32,6 +32,8 @@ interface Project {
     leave_discount_percent: number;
     leave_discount_usd: string;
     paid_total: string;
+    quote_paid: string;
+    price_max: string;
     currency: string;
     build_cost_usd: string;
     chat_cost_usd: number;
@@ -179,6 +181,29 @@ function Money({ project }: { project: Project }) {
     );
 }
 
+/** The work turned out bigger than the price: ask the customer for more, up to the top of the range they saw. */
+function AskForMore({ project }: { project: Project }) {
+    const room = Math.round((Number(project.price_max) - Number(project.amount)) * 100) / 100;
+    const [amount, setAmount] = useState('');
+    if (project.status === 'quoted' || Number(project.quote_paid) <= 0 || room <= 0) return null;
+    const save = (event: FormEvent) => {
+        event.preventDefault();
+        router.post(`/admin/builder/${project.uuid}/extra`, { amount }, { ...onDone('Added to the price', 'اتضاف على السعر'), onSuccess: () => { setAmount(''); toast.success(t('Added to the price', 'اتضاف على السعر')); } });
+    };
+
+    return (
+        <form onSubmit={save} className="space-y-2 rounded-xl border bg-white p-4">
+            <label htmlFor="extra-amount" className="font-semibold">{t('Ask for more', 'اطلب فرق')}</label>
+            <p className="text-sm text-slate-500">
+                {t(`The work is bigger than the price? Up to ${room} ${project.currency} more (the top of the range the customer saw). The files stay locked until it is paid.`,
+                    `الشغل أكبر من السعر؟ تقدر تطلب لحد ${room} ${project.currency} زيادة (أعلى المدى اللي العميل شافه). الملفات بتفضل مقفولة لحد ما يدفع.`)}
+            </p>
+            <input id="extra-amount" type="number" required min={1} max={room} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} dir="ltr" className="min-h-11 w-full rounded-lg border px-3" />
+            <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-5 font-semibold text-white">{t('Add to the price', 'ضيفه على السعر')}</button>
+        </form>
+    );
+}
+
 /** The designer's Figma link. Saving it starts the build of a project that waits for its design. */
 function DesignLink({ project }: { project: Project }) {
     const [url, setUrl] = useState(project.design_url || '');
@@ -226,6 +251,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
                     <div className="space-y-4">
                         <RetryBuild project={project} />
                         <DesignLink project={project} />
+                        <AskForMore project={project} />
                         <TeamReply project={project} />
                         <Secrets project={project} secrets={secrets} />
                         {project.spec && (

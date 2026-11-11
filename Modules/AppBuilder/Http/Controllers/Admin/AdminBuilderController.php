@@ -46,7 +46,7 @@ class AdminBuilderController extends Controller
         $project->load('messages.attachments');
 
         return Inertia::render('Admin/Builder/Show', [
-            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
+            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
                 + ['chat_cost_usd' => $project->chatCostUsd()],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
@@ -113,6 +113,15 @@ class AdminBuilderController extends Controller
         }
 
         return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
+    }
+
+    /** The work turned out bigger: ask the customer for more, up to the top of the range they saw. */
+    public function extra(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectPayment $payment): RedirectResponse
+    {
+        $extra = (float) $request->validate(['amount' => ['required', 'numeric', 'min:1', 'max:100000']])['amount'];
+        abort_if($payment->askForMore($project, $extra) <= 0, 409);
+
+        return back()->with('success', __('builder.admin.extra_asked'));
     }
 
     public function storeSecret(Request $request, BuilderProject $project): RedirectResponse

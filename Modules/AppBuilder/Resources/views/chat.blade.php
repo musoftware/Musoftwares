@@ -371,6 +371,10 @@
         const price = el('div', {class: 'price'}, quote.amount + ' ' + quote.currency);
         if (quote.discount) price.append(el('span', {class: 'before'}, quote.discount.before));
         card.append(price);
+        if (quote.range) card.append(el('p', {class: 'note'}, T.range_note
+            .replaceAll(':from', quote.range.from + ' ' + quote.currency)
+            .replaceAll(':to', quote.range.to + ' ' + quote.currency)
+            .replaceAll(':price', quote.amount + ' ' + quote.currency)));
         if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
         if (quote.study) card.append(studyNode(quote.study, quote.currency));

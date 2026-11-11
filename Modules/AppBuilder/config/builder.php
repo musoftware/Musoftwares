@@ -72,6 +72,10 @@ return [
     // The first payment can be part of the price; the files are handed over when the rest is paid.
     'deposit_shares' => [100, 50, 25],
 
+    // The page shows the price as an estimate in a range. The customer pays the price; if the work turns out
+    // bigger, the owner can ask for more before the files are handed over, never above the top of the range.
+    'price_range' => ['from' => 0.9, 'to' => 1.5],
+
     // Offered once to a customer who starts to leave after seeing the price. It comes off the programming part
     // only (the designer and the study are real costs), and the build's spending cap goes down with it.
     'leave_discount' => [

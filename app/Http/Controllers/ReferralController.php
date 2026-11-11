@@ -46,6 +46,8 @@ class ReferralController extends Controller
             'referral' => $referral,
             'commission_percentage' => $user->getAffiliateCommissionPercentage(),
             'embedKey' => $embedKey,
+            // a customer from the AI link pays the program price plus this share, and it is the referrer's earning
+            'aiSharePercent' => (int) round((float) config('builder.referral.share') * 100),
         ]);
     }
 
@@ -225,6 +227,14 @@ class ReferralController extends Controller
         }
 
         return redirect()->route('register');
+    }
+
+    /** The short link to the AI program builder: /r/{name}/ai keeps the referral and opens the chat. */
+    public function referral_to_ai(Request $request, string $ref)
+    {
+        $request->query->set('to', 'ai');
+
+        return $this->referral_redirect($request, $ref);
     }
 
     public function activate_ref(Request $request)

@@ -37,11 +37,14 @@ class AppBuilderTest extends TestCase
         {
             public array $seen = [];
 
+            public string $lastSystem = '';
+
             public function __construct(private array &$script) {}
 
             public function reply(string $system, array $turns): ChatTurn
             {
                 $this->seen[] = $turns;
+                $this->lastSystem = $system;
                 $next = array_shift($this->script);
 
                 return $next instanceof ChatUnavailable ? throw $next : $next;
@@ -789,6 +792,50 @@ class AppBuilderTest extends TestCase
         $this->assertSame($waited->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
     }
 
+    public function test_the_price_range_reads_like_a_person_wrote_it(): void
+    {
+        $this->assertSame(['from' => 120.0, 'to' => 200.0], \Modules\AppBuilder\Services\PriceRange::around(135));
+        $this->assertSame(['from' => 1.0, 'to' => 2.0], \Modules\AppBuilder\Services\PriceRange::around(1));
+    }
+
+    public function test_the_quote_shows_a_range_and_the_owner_can_ask_for_more_up_to_its_top(): void
+    {
+        $project = $this->quotedProject();
+        $range = $this->getJson('/ai/'.$project->uuid.'/state')->json('quote.range');
+        $project->refresh();
+        $this->assertSame(number_format((float) $project->price_max, 2), $range['to']);
+        $this->assertGreaterThan((float) $project->amount, (float) $project->price_max);
+
+        // nothing can be asked before the customer paid
+        $payment = app(\Modules\AppBuilder\Services\ProjectPayment::class);
+        $this->assertSame(0.0, $payment->askForMore($project, 10));
+
+        $payment->markPaid($project, $project->quote_version, 'TX-1');
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $room = (float) $project->price_max - (float) $project->amount;
+        // asking for more than the range allows stops at its top
+        $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/extra', ['amount' => $room + 500])->assertRedirect();
+
+        $project->refresh();
+        $this->assertSame((float) $project->price_max, (float) $project->amount);
+        $this->assertEqualsWithDelta($room, $project->balanceDue(), 0.01);
+        $this->assertSame(BuilderMessage::TEAM, $project->messages()->reorder('id', 'desc')->value('role'));
+        $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/extra', ['amount' => 5])->assertStatus(409);
+    }
+
+    public function test_the_chat_answers_in_the_language_of_the_customers_last_message(): void
+    {
+        $this->answer('Sure.');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'a complex system of satellite images'])->assertOk()->json('uuid');
+        $this->assertStringContainsString('is in English', app(ChatModel::class)->lastSystem);
+
+        $this->answer('تمام.');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'ممكن نكمل بالعربي؟'])->assertOk();
+        $this->assertStringContainsString('is in Arabic', app(ChatModel::class)->lastSystem);
+    }
+
     public function test_only_an_admin_can_mark_the_price_as_paid_and_it_starts_the_build(): void
     {
         $project = $this->quotedProject();
@@ -1035,6 +1082,16 @@ class AppBuilderTest extends TestCase
         \App\Models\UserReferral::create(['user_id' => $user->id, 'title' => 'Default', 'key' => 'abc123', 'slug' => 'ahmed']);
 
         return $user;
+    }
+
+    public function test_the_short_ai_link_keeps_the_referral_and_opens_the_chat(): void
+    {
+        $referrer = $this->referrer();
+        $this->get('/r/ahmed/ai')->assertRedirect('/ai');
+
+        $this->answer('تمام، ده السعر', 50000);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز منيو'])->assertOk()->json('uuid');
+        $this->assertSame($referrer->id, BuilderProject::where('uuid', $uuid)->value('referrer_user_id'));
     }
 
     public function test_a_referred_customer_pays_the_share_and_the_referrer_earns_it_after_clearing(): void

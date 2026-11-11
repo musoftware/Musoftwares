@@ -96,6 +96,11 @@ class ProjectStateResource extends JsonResource
             'amount' => number_format((float) $this->amount, 2),
             'currency' => $this->currency,
             'free' => (bool) $this->free_fix,
+            // the estimate around the price; the customer pays the price now
+            'range' => (float) $this->price_max > 0 ? [
+                'from' => number_format(\Modules\AppBuilder\Services\PriceRange::around((float) $this->amount)['from'], 2),
+                'to' => number_format((float) $this->price_max, 2),
+            ] : null,
             'design_fee' => (float) $this->design_fee > 0 ? number_format((float) $this->design_fee, 2) : null,
             'shares' => array_values((array) config('builder.deposit_shares')),
             'study' => $this->study_status ? [

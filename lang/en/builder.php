@@ -12,6 +12,8 @@ return [
     'pay_note' => 'The build starts by itself after payment, and the program appears here on this page.',
     'pay_go' => 'Continue to payment',
     'admin_mark_paid' => 'Mark as paid (admin)',
+    'range_note' => 'Estimated cost: from :from to :to. You pay :price now. If the work turns out bigger, we ask for the difference before handing over the files, and never more than :to.',
+    'extra_asked' => 'The work turned out bigger than first estimated, so :amount is added to the price, still inside the range shown with it. The files open once it is paid.',
     'admin_mark_paid_confirm' => 'Mark this price as paid and start the build? No money is taken.',
     'fix_free' => 'This fix is free',
     'fix_note' => 'This is a fault in what we delivered, so we fix it at no cost. The fix starts as soon as you press the button.',
@@ -25,6 +27,7 @@ return [
     'question_mail_subject' => 'The engineer needs your answer to finish your program',
     'question_mail_body' => "Hello,\n\nThe engineer building your program needs something from you to continue:\n\n:question\n\nAnswer here:\n:link\n\nThe Musoftware team",
     'admin' => [
+    'extra_asked' => 'Added to the price. The customer sees the rest to pay.',
         'retried' => 'The build is queued again and continues from the last saved files.',
         'design_saved' => 'Saved, and the build has started.',
         'sent' => 'Sent.',

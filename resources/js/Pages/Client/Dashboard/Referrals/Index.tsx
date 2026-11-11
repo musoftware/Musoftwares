@@ -5,18 +5,56 @@ import ClientPage, { Card, Section, TextAction } from '@/Components/Client/Clien
 import ReferralTabs from './Partials/ReferralTabs';
 import { __ } from '@/lib/i18n';
 
-/** Invite friends: the link to share first, then the optional short name and the developer key. */
-export default function Index({ referral, commission_percentage, embedKey }: any) {
+const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+/** One link to share: copy it, send it on WhatsApp, or open the phone's share sheet. */
+function ShareLinkCard({ link, label, shareText, note }: { link: string; label: string; shareText: string; note: string }) {
+    const [copied, setCopied] = useState(false);
+    const text = `${shareText} ${link}`;
+    const copy = async () => {
+        try { await navigator.clipboard.writeText(link); } catch { /* the field stays selectable */ }
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <Card className="space-y-4">
+            <div className="flex flex-col gap-2 sm:flex-row">
+                <input value={link} readOnly dir="ltr" aria-label={label}
+                    className="w-full rounded-xl border border-black/10 bg-[#f5f5f7] px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
+                <button type="button" onClick={copy}
+                    className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-6 text-sm font-semibold text-white hover:bg-[#0077ed]">
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied ? __('client_rewards.referrals.copied') : __('client_rewards.referrals.copy')}
+                </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+                <a href={`https://wa.me/?text=${encodeURIComponent(text)}`} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 hover:underline">
+                    <MessageCircle className="h-4 w-4" />{__('client_rewards.referrals.share_whatsapp')}
+                </a>
+                {canShare && (
+                    <button type="button" onClick={() => navigator.share({ text }).catch(() => {})}
+                        className="inline-flex items-center gap-1.5 font-semibold text-[#0071e3] hover:underline">
+                        <Share2 className="h-4 w-4" />{__('client_rewards.referrals.share')}
+                    </button>
+                )}
+            </div>
+            <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{note}</p>
+        </Card>
+    );
+}
+
+/** Invite friends: the links to share first, then the optional short name and the developer key. */
+export default function Index({ referral, commission_percentage, embedKey, aiSharePercent }: any) {
     const referralLink = `${window.location.origin}/r/${referral?.slug || referral?.key || ''}`;
     const percent = `${((Number(commission_percentage) - 1) * 100).toFixed(0)}%`;
-    const [copied, setCopied] = useState<'link' | 'key' | null>(null);
+    const [copied, setCopied] = useState<'key' | null>(null);
     const hasSlug = !!referral?.slug && referral.slug.trim() !== '';
-    const shareText = `${__('client_rewards.referrals.share_text')} ${referralLink}`;
-    const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
     const { data, setData, post, processing, errors } = useForm({ slug: referral?.slug || '' });
 
-    const copy = async (text: string, what: 'link' | 'key') => {
+    const copy = async (text: string, what: 'key') => {
         try { await navigator.clipboard.writeText(text); } catch { /* the field stays selectable */ }
         setCopied(what);
         setTimeout(() => setCopied(null), 2000);
@@ -27,30 +65,13 @@ export default function Index({ referral, commission_percentage, embedKey }: any
             <ReferralTabs active="link" />
 
             <Section title={__('client_rewards.referrals.your_link')}>
-                <Card className="space-y-4">
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                        <input value={referralLink} readOnly dir="ltr" aria-label={__('client_rewards.referrals.your_link')}
-                            className="w-full rounded-xl border border-black/10 bg-[#f5f5f7] px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
-                        <button type="button" onClick={() => copy(referralLink, 'link')}
-                            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-6 text-sm font-semibold text-white hover:bg-[#0077ed]">
-                            {copied === 'link' ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                            {copied === 'link' ? __('client_rewards.referrals.copied') : __('client_rewards.referrals.copy')}
-                        </button>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <a href={`https://wa.me/?text=${encodeURIComponent(shareText)}`} target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 font-semibold text-emerald-700 hover:underline">
-                            <MessageCircle className="h-4 w-4" />{__('client_rewards.referrals.share_whatsapp')}
-                        </a>
-                        {canShare && (
-                            <button type="button" onClick={() => navigator.share({ text: shareText }).catch(() => {})}
-                                className="inline-flex items-center gap-1.5 font-semibold text-[#0071e3] hover:underline">
-                                <Share2 className="h-4 w-4" />{__('client_rewards.referrals.share')}
-                            </button>
-                        )}
-                    </div>
-                    <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.referrals.commission', { percent })}</p>
-                </Card>
+                <ShareLinkCard link={referralLink} label={__('client_rewards.referrals.your_link')} shareText={__('client_rewards.referrals.share_text')}
+                    note={__('client_rewards.referrals.commission', { percent })} />
+            </Section>
+
+            <Section title={__('client_rewards.referrals.ai_link')}>
+                <ShareLinkCard link={`${referralLink}/ai`} label={__('client_rewards.referrals.ai_link')} shareText={__('client_rewards.referrals.ai_share_text')}
+                    note={__('client_rewards.referrals.ai_commission', { percent: `${aiSharePercent}%` })} />
             </Section>
 
             <Section title={__('client_rewards.referrals.short_link')}>
