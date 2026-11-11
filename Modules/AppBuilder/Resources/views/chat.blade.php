@@ -219,9 +219,23 @@
         return answerOf(response);
     }
 
+    // the visitor's country, looked up once from their own browser, so the chat answers in their dialect
+    // (a Saudi customer hears Saudi Arabic); a slow or blocked lookup falls back to the time zone
+    const TIMEZONE = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (error) { return ''; } })();
+    const COUNTRY = state ? Promise.resolve('') : (async () => {
+        try {
+            const response = await fetch('https://api.country.is/', {signal: AbortSignal.timeout(2000)});
+            return response.ok ? String((await response.json()).country || '') : '';
+        } catch (error) {
+            return '';
+        }
+    })();
+
     async function upload(url, text, files) {
         const body = new FormData();
         if (text) body.append('text', text);
+        body.append('timezone', TIMEZONE);
+        body.append('country', await COUNTRY);
         files.forEach((file) => {
             body.append('files[]', file);
             if (file.isPreview) body.append('previews[]', file.name);

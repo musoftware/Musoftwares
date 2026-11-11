@@ -152,6 +152,7 @@ class BuilderChatController extends Controller
             // the owner and the team test as often as they need
             $unlimited = (bool) $request->user()?->isAdmin();
             $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id, $unlimited, $request->userAgent());
+            $project->update(['country' => \Modules\AppBuilder\Services\Chat\Dialect::countryOf($request)]);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }

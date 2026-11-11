@@ -61,7 +61,7 @@ function PersonLine({ person }: { person: Person }) {
 function VisitorCard({ visitor }: { visitor: Visitor }) {
     const rows: [string, React.ReactNode][] = [
         [t('Account', 'الحساب'), visitor.user ? <PersonLine person={visitor.user} /> : t('Guest, not signed in', 'زائر، مش عامل دخول')],
-        [t('IP address', 'الـ IP'), <span dir="ltr">{visitor.ip || '—'}</span>],
+        [t('IP address', 'الـ IP'), <span dir="ltr">{[visitor.country, visitor.ip].filter(Boolean).join(' · ') || '—'}</span>],
         [t('Device', 'الجهاز'), <span dir="ltr" title={visitor.user_agent || ''}>{deviceOf(visitor.user_agent) || '—'}</span>],
         [t('Started', 'بدأ'), <span dir="ltr">{visitor.started_at || '—'}</span>],
         [t('Came from', 'جاي من'), visitor.referrer ? <PersonLine person={visitor.referrer} /> : t('No referral link', 'من غير رابط إحالة')],

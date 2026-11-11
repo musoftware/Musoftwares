@@ -1078,6 +1078,27 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/extra', ['amount' => 5])->assertStatus(409);
     }
 
+    public function test_a_customer_from_saudi_arabia_is_answered_in_saudi_arabic(): void
+    {
+        $this->answer('هلا');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'أبغى موقع لمحلي', 'country' => 'sa', 'timezone' => 'Africa/Cairo'])->assertOk()->json('uuid');
+
+        // the browser's country wins over its time zone, and the chat is told which Arabic to write
+        $this->assertSame('SA', BuilderProject::where('uuid', $uuid)->value('country'));
+        $this->assertStringContainsString('Saudi Arabic', app(ChatModel::class)->lastSystem);
+    }
+
+    public function test_without_a_country_the_time_zone_decides_and_unknown_stays_egyptian(): void
+    {
+        $this->answer('هلا');
+        $kuwait = $this->postJson('/ai/messages', ['text' => 'مرحبا', 'country' => '', 'timezone' => 'Asia/Kuwait'])->assertOk()->json('uuid');
+        $this->assertSame('KW', BuilderProject::where('uuid', $kuwait)->value('country'));
+        $this->assertStringContainsString('Gulf Arabic', app(ChatModel::class)->lastSystem);
+
+        $this->assertSame('simple Egyptian Arabic', \Modules\AppBuilder\Services\Chat\Dialect::arabicFor(null));
+        $this->assertSame('simple Egyptian Arabic', \Modules\AppBuilder\Services\Chat\Dialect::arabicFor('EG'));
+    }
+
     public function test_the_chat_answers_in_the_language_of_the_customers_last_message(): void
     {
         $this->answer('Sure.');

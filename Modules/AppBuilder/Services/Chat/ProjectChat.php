@@ -202,7 +202,7 @@ class ProjectChat
     }
 
     private const LANGUAGE_RULES = [
-        'ar' => 'The customer\'s last message is in Arabic: write this answer in simple Egyptian Arabic.',
+        'ar' => 'The customer\'s last message is in Arabic: write this answer in :dialect, the way people speak where the customer is, even though the examples above are in Egyptian Arabic. If the customer clearly writes in another Arabic dialect, follow theirs.',
         'en' => 'The customer\'s last message is in English: write this whole answer in English, with no Arabic words, even though the examples above are in Arabic.',
     ];
 
@@ -240,6 +240,6 @@ class ProjectChat
 
         return $prompt
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
-            ."\n\n## Language of this answer\n\n".self::LANGUAGE_RULES[$project->lastMessageLanguage()];
+            ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }
 }

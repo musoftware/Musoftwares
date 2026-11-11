@@ -31,6 +31,7 @@ export interface Person {
 /** Who started a chat: the signed-in account if any, the address and device, and whose link they came from. */
 export interface Visitor {
     ip: string | null;
+    country: string | null;
     user_agent: string | null;
     started_at: string | null;
     user: Person | null;
@@ -118,7 +119,7 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                                         {' · '}{project.updated_at}
                                     </p>
                                     <p className="text-xs text-slate-500" dir="ltr">
-                                        {[project.visitor.ip, deviceOf(project.visitor.user_agent), project.visitor.referrer && `ref: ${project.visitor.referrer.name}`].filter(Boolean).join(' · ')}
+                                        {[project.visitor.country, project.visitor.ip, deviceOf(project.visitor.user_agent), project.visitor.referrer && `ref: ${project.visitor.referrer.name}`].filter(Boolean).join(' · ')}
                                     </p>
                                 </div>
                                 <div className="flex shrink-0 flex-wrap items-center gap-3 text-sm">
