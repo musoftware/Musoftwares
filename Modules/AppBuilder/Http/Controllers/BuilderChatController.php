@@ -149,7 +149,9 @@ class BuilderChatController extends Controller
     public function start(SendMessageRequest $request): JsonResponse
     {
         try {
-            $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id);
+            // the owner and the team test as often as they need
+            $unlimited = (bool) $request->user()?->isAdmin();
+            $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id, $unlimited);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }

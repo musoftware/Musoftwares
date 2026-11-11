@@ -166,6 +166,20 @@ class AppBuilderTest extends TestCase
         $this->postJson('/ai/messages', ['text' => 'تاني'])->assertStatus(429);
     }
 
+    public function test_an_admin_can_start_as_many_chats_as_they_need(): void
+    {
+        config(['builder.limits.projects_per_ip_per_day' => 1]);
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin);
+
+        foreach (['أول', 'تاني', 'تالت'] as $text) {
+            $this->answer('أهلاً');
+            $this->postJson('/ai/messages', ['text' => $text])->assertOk();
+        }
+    }
+
     public function test_paying_the_open_quote_queues_the_build(): void
     {
         config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);

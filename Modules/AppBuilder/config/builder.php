@@ -111,7 +111,8 @@ return [
         'original_files' => 15,
         'originals_wait_minutes' => 30,
         'messages_per_project' => 60,
-        'projects_per_ip_per_day' => 6,
+        // many customers on mobile data share one address, so this stays generous; admins have no limit
+        'projects_per_ip_per_day' => (int) env('BUILDER_CHATS_PER_IP_PER_DAY', 30),
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb
         'archive_kb' => (int) env('BUILDER_ARCHIVE_KB', 204800),
         'archive_files' => (int) env('BUILDER_ARCHIVE_FILES', 30000),
