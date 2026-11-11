@@ -3,7 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { toast } from 'sonner';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
-import { STATUS_LABELS } from './Index';
+import { STATUS_LABELS, Person, Visitor, deviceOf } from './Index';
 
 interface Message {
     id: number;
@@ -45,6 +45,38 @@ interface Project {
     spec: string | null;
     error: string | null;
     version: number;
+    visitor: Visitor;
+}
+
+function PersonLine({ person }: { person: Person }) {
+    return (
+        <>
+            <a href={person.url} className="font-semibold text-blue-700" dir="auto">{person.name}</a>
+            <span className="block text-slate-600" dir="ltr">{[person.email, person.phone].filter(Boolean).join(' · ')}</span>
+        </>
+    );
+}
+
+/** Who started this chat: the account, the address and device, the time, and whose link they came from. */
+function VisitorCard({ visitor }: { visitor: Visitor }) {
+    const rows: [string, React.ReactNode][] = [
+        [t('Account', 'الحساب'), visitor.user ? <PersonLine person={visitor.user} /> : t('Guest, not signed in', 'زائر، مش عامل دخول')],
+        [t('IP address', 'الـ IP'), <span dir="ltr">{visitor.ip || '—'}</span>],
+        [t('Device', 'الجهاز'), <span dir="ltr" title={visitor.user_agent || ''}>{deviceOf(visitor.user_agent) || '—'}</span>],
+        [t('Started', 'بدأ'), <span dir="ltr">{visitor.started_at || '—'}</span>],
+        [t('Came from', 'جاي من'), visitor.referrer ? <PersonLine person={visitor.referrer} /> : t('No referral link', 'من غير رابط إحالة')],
+    ];
+
+    return (
+        <dl className="grid gap-3 rounded-xl border bg-white p-4 text-sm sm:grid-cols-2 lg:grid-cols-5">
+            {rows.map(([label, value]) => (
+                <div key={label} className="min-w-0 wrap-break-word">
+                    <dt className="text-slate-500">{label}</dt>
+                    <dd>{value}</dd>
+                </div>
+            ))}
+        </dl>
+    );
 }
 
 /** Names the worker knows how to use for a deploy; any other name is passed to the build as it is. */
@@ -243,6 +275,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
                     {project.build_model && <> · <span dir="ltr">{project.build_model}</span></>}
                     {project.client_name && <> · <span dir="auto">{project.client_name}</span> <span dir="ltr">{project.client_whatsapp} {project.client_email}</span></>}
                 </p>
+                <VisitorCard visitor={project.visitor} />
                 <Money project={project} />
                 {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap" dir="ltr">{project.error}</p>}
 

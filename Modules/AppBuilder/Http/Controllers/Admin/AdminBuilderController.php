@@ -27,11 +27,13 @@ class AdminBuilderController extends Controller
     public function index(Request $request): Response
     {
         $projects = BuilderProject::query()
+            ->with(['user', 'referrer'])
             ->when($request->boolean('waiting'), fn ($query) => $query->where('awaiting_answer', true))
             ->latest('updated_at')
-            ->paginate(self::PER_PAGE, ['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'updated_at'])
+            ->paginate(self::PER_PAGE, ['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'ip', 'user_agent', 'user_id', 'referrer_user_id', 'created_at', 'updated_at'])
             ->withQueryString()
-            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name', 'updated_at']) + ['chat_cost_usd' => $project->chatCostUsd()]);
+            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name', 'updated_at'])
+                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)]);
 
         return Inertia::render('Admin/Builder/Index', [
             'projects' => $projects,
@@ -43,11 +45,11 @@ class AdminBuilderController extends Controller
 
     public function show(BuilderProject $project): Response
     {
-        $project->load('messages.attachments');
+        $project->load(['messages.attachments', 'user', 'referrer']);
 
         return Inertia::render('Admin/Builder/Show', [
             'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
-                + ['chat_cost_usd' => $project->chatCostUsd()],
+                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
                 'role' => $message->role,
@@ -59,6 +61,34 @@ class AdminBuilderController extends Controller
             'secrets' => $this->secrets->listing($project),
             'chatUrl' => route('builder.show', $project),
         ]);
+    }
+
+    /** Who started the chat: the signed-in account if any, the address and device, and whose link they came from. */
+    private function visitor(BuilderProject $project): array
+    {
+        return [
+            'ip' => $project->ip,
+            'user_agent' => $project->user_agent,
+            'started_at' => $project->created_at?->timezone('Africa/Cairo')->toDateTimeString(),
+            'user' => $this->person($project->user),
+            'referrer' => $this->person($project->referrer),
+        ];
+    }
+
+    /** @return array{id: int, name: string, email: string|null, phone: string|null, url: string}|null */
+    private function person(?\App\Models\User $user): ?array
+    {
+        if ($user === null) {
+            return null;
+        }
+
+        return [
+            'id' => $user->id,
+            'name' => (string) $user->name,
+            'email' => $user->email,
+            'phone' => $user->mobile_1 ?: $user->whatsapp_number ?: $user->phone ?: null,
+            'url' => route('admin.users.show', $user->id),
+        ];
     }
 
     /** A line from the team. While the build waits it is the answer; otherwise the chat reads it on the next turn. */

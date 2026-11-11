@@ -1084,6 +1084,25 @@ class AppBuilderTest extends TestCase
         return $user;
     }
 
+    public function test_the_owner_sees_who_started_a_chat_their_address_and_device(): void
+    {
+        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'name' => 'Sara Ali', 'email' => 'sara@example.com']);
+        $this->answer('Sure.');
+        $uuid = $this->actingAs($customer)->withHeaders(['User-Agent' => 'Mozilla/5.0 (Linux; Android 14) Chrome/130.0'])
+            ->postJson('/ai/messages', ['text' => 'a menu page'])->assertOk()->json('uuid');
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get('/admin/builder/'.$uuid)->assertOk()->assertInertia(fn ($page) => $page
+            ->where('project.visitor.user.name', 'Sara Ali')
+            ->where('project.visitor.user.email', 'sara@example.com')
+            ->where('project.visitor.ip', '127.0.0.1')
+            ->where('project.visitor.user_agent', 'Mozilla/5.0 (Linux; Android 14) Chrome/130.0')
+            ->where('project.visitor.referrer', null));
+        $this->actingAs($admin)->get('/admin/builder')->assertOk()->assertInertia(fn ($page) => $page->where('projects.data.0.visitor.user.id', $customer->id));
+    }
+
     public function test_the_short_ai_link_keeps_the_referral_and_opens_the_chat(): void
     {
         $referrer = $this->referrer();

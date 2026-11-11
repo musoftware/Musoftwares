@@ -17,6 +17,34 @@ interface Project {
     chat_cost_usd: number;
     client_name: string | null;
     updated_at: string;
+    visitor: Visitor;
+}
+
+export interface Person {
+    id: number;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    url: string;
+}
+
+/** Who started a chat: the signed-in account if any, the address and device, and whose link they came from. */
+export interface Visitor {
+    ip: string | null;
+    user_agent: string | null;
+    started_at: string | null;
+    user: Person | null;
+    referrer: Person | null;
+}
+
+const SYSTEMS: [RegExp, string][] = [[/android/i, 'Android'], [/iphone|ipad|ios/i, 'iPhone'], [/windows/i, 'Windows'], [/mac os/i, 'Mac'], [/linux/i, 'Linux']];
+const BROWSERS: [RegExp, string][] = [[/edg\//i, 'Edge'], [/opr\/|opera/i, 'Opera'], [/samsungbrowser/i, 'Samsung'], [/chrome|crios/i, 'Chrome'], [/firefox|fxios/i, 'Firefox'], [/safari/i, 'Safari']];
+
+/** "Android · Chrome" from the browser's long user agent text. */
+export function deviceOf(userAgent: string | null): string {
+    if (!userAgent) return '';
+    const pick = (list: [RegExp, string][]) => list.find(([pattern]) => pattern.test(userAgent))?.[1];
+    return [pick(SYSTEMS), pick(BROWSERS)].filter(Boolean).join(' · ');
 }
 
 export const STATUS_LABELS: Record<string, [string, string]> = {
@@ -83,7 +111,15 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                             <Link href={`/admin/builder/${project.uuid}`} className="flex flex-col gap-1 p-4 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="min-w-0">
                                     <p className="truncate font-semibold" dir="auto">{project.title || t('(no title yet)', '(لسه من غير اسم)')}</p>
-                                    <p className="text-sm text-slate-500" dir="auto">{project.client_name || '—'} · {project.updated_at}</p>
+                                    <p className="text-sm text-slate-500" dir="auto">
+                                        {project.visitor.user
+                                            ? <span className="font-semibold text-slate-700">{project.visitor.user.name} <span dir="ltr">{project.visitor.user.email}</span></span>
+                                            : (project.client_name || t('Guest', 'زائر'))}
+                                        {' · '}{project.updated_at}
+                                    </p>
+                                    <p className="text-xs text-slate-500" dir="ltr">
+                                        {[project.visitor.ip, deviceOf(project.visitor.user_agent), project.visitor.referrer && `ref: ${project.visitor.referrer.name}`].filter(Boolean).join(' · ')}
+                                    </p>
                                 </div>
                                 <div className="flex shrink-0 flex-wrap items-center gap-3 text-sm">
                                     {project.awaiting_answer && <span className="font-semibold text-amber-700">{t('Needs an answer', 'محتاج رد')}</span>}

@@ -30,13 +30,13 @@ class ProjectChat
     ) {}
 
     /** @throws ChatLimitReached */
-    public function start(string $ip, string $locale, ?int $referrerId = null, ?int $userId = null, bool $unlimited = false): BuilderProject
+    public function start(string $ip, string $locale, ?int $referrerId = null, ?int $userId = null, bool $unlimited = false, ?string $userAgent = null): BuilderProject
     {
         if (! $unlimited && BuilderProject::startedTodayFrom($ip)->count() >= (int) config('builder.limits.projects_per_ip_per_day')) {
             throw new ChatLimitReached('Too many chats from this address today.');
         }
 
-        return BuilderProject::create(['ip' => $ip, 'locale' => $locale, 'currency' => config('builder.pricing.currency'), 'referrer_user_id' => $referrerId, 'user_id' => $userId]);
+        return BuilderProject::create(['ip' => $ip, 'user_agent' => $userAgent !== null ? mb_substr($userAgent, 0, 500) : null,'locale' => $locale, 'currency' => config('builder.pricing.currency'), 'referrer_user_id' => $referrerId, 'user_id' => $userId]);
     }
 
     /**

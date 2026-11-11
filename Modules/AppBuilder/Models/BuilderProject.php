@@ -78,6 +78,12 @@ class BuilderProject extends Model
         return $this->belongsTo(\App\Models\User::class);
     }
 
+    /** Whoever shared the link the customer came from. */
+    public function referrer(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'referrer_user_id');
+    }
+
     public function messages(): HasMany
     {
         return $this->hasMany(BuilderMessage::class, 'project_id')->orderBy('id');
