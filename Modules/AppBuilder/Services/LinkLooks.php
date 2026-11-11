@@ -42,6 +42,9 @@ class LinkLooks
     /** The longest the customer waits before the chat answers anyway. */
     private const WAIT_SECONDS = 50;
 
+    /** A Figma design is drawn without a graphics card on the worker, so it gets longer. */
+    private const FIGMA_WAIT_SECONDS = 150;
+
     private const TEXT_CHARS = 80000;
 
     private const FINISHED = [self::SEEN, self::READ, self::FAILED];
@@ -86,7 +89,7 @@ class LinkLooks
     public function forWorker(): array
     {
         $this->heartbeat->beat(self::HEARTBEAT);
-        $waiting = BuilderProject::where('awaiting_look', true)->where('look_started_at', '>=', now()->subSeconds(self::WAIT_SECONDS))->pluck('uuid', 'id');
+        $waiting = BuilderProject::where('awaiting_look', true)->where('look_started_at', '>=', now()->subSeconds(self::FIGMA_WAIT_SECONDS))->pluck('uuid', 'id');
 
         return BuilderMessage::whereIn('project_id', $waiting->keys())->where('role', BuilderMessage::USER)->latest('id')->limit(20)->get()
             ->flatMap(fn (BuilderMessage $message) => $this->take($message, (string) $waiting[$message->project_id]))->values()->all();
@@ -117,11 +120,15 @@ class LinkLooks
     /** True when the wait is over: what the worker did not finish is read here or marked as not read. */
     public function finishLate(BuilderProject $project): bool
     {
-        if (! $project->awaiting_look || $project->look_started_at?->gt(now()->subSeconds(self::WAIT_SECONDS))) {
+        if (! $project->awaiting_look) {
             return false;
         }
 
-        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->first();
+        $question = $project->lastCustomerMessage();
+        if ($project->look_started_at?->gt(now()->subSeconds($this->waitFor($question)))) {
+            return false;
+        }
+
         if ($question) {
             $shared = collect($question->payload['looks'] ?? [])
                 ->map(fn (array $item) => in_array($item['status'], self::FINISHED, true) ? $item : $this->withoutWorker($item))->all();
@@ -131,10 +138,18 @@ class LinkLooks
         return true;
     }
 
+    private function waitFor(?BuilderMessage $question): int
+    {
+        $figma = collect($question?->payload['looks'] ?? [])
+            ->contains(fn (array $item) => preg_match('/(^|\.)figma\.com$/i', (string) parse_url((string) ($item['url'] ?? ''), PHP_URL_HOST)) === 1);
+
+        return $figma ? self::FIGMA_WAIT_SECONDS : self::WAIT_SECONDS;
+    }
+
     /** True while the worker is reading a file (rather than opening a link), for the line the customer sees. */
     public function isReadingAFile(BuilderProject $project): bool
     {
-        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->first();
+        $question = $project->lastCustomerMessage();
 
         return collect($question?->payload['looks'] ?? [])->contains(fn (array $item) => ($item['kind'] ?? self::LINK) === self::FILE);
     }

@@ -13,6 +13,12 @@ class BuilderAttachment extends Model
 
     public const PDF = 'application/pdf';
 
+    /** A picture the browser made smaller for the chat; the build prefers the original when it comes. */
+    public const PREVIEW = 'preview';
+
+    /** A full-quality file uploaded after payment, for the build only (too big for the chat model). */
+    public const ORIGINAL = 'original';
+
     public const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
     protected $guarded = ['id'];

@@ -108,6 +108,35 @@ class BuilderChatController extends Controller
         return response()->json($this->stateOf($project->refresh()));
     }
 
+    /** The full-quality design pictures and PDFs, uploaded after payment for the build. */
+    public function originals(\Illuminate\Http\Request $request, BuilderProject $project, \Modules\AppBuilder\Services\OriginalFiles $originals): JsonResponse
+    {
+        if (! $originals->isWaiting($project)) {
+            return $this->refuse('builder.errors.no_originals', 409);
+        }
+        $limits = config('builder.limits');
+        $request->validate([
+            'files' => ['required', 'array', 'max:'.(int) $limits['original_files']],
+            'files.*' => ['file', 'max:'.(int) $limits['original_file_kb'], function (string $attribute, mixed $file, \Closure $fail): void {
+                $type = \Modules\AppBuilder\Services\ChatFileTypes::of($file);
+                if ($type === null || \Modules\AppBuilder\Services\ChatFileTypes::isReadByWorker($type)) {
+                    $fail(__('builder.originals.type'));
+                }
+            }],
+        ]);
+        $originals->store($project, array_values($request->file('files', [])));
+
+        return response()->json($this->stateOf($project->refresh()));
+    }
+
+    /** The customer goes on with the pictures they already sent; the build starts now. */
+    public function skipOriginals(BuilderProject $project, \Modules\AppBuilder\Services\OriginalFiles $originals): JsonResponse
+    {
+        $originals->stopWaiting($project);
+
+        return response()->json($this->stateOf($project->refresh()));
+    }
+
     /** The page was closed with the price open (sent by the browser as it leaves, so no answer is read). */
     public function left(BuilderProject $project, \Modules\AppBuilder\Services\LeaveDiscount $discount): \Illuminate\Http\Response
     {
@@ -144,7 +173,7 @@ class BuilderChatController extends Controller
         }
 
         try {
-            $this->chat->send($project, $request->text(), $request->uploads());
+            $this->chat->send($project, $request->text(), $request->uploads(), $request->previewNames());
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         } catch (ChatUnavailable) {

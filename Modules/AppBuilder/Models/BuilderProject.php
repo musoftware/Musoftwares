@@ -46,6 +46,7 @@ class BuilderProject extends Model
         'leave_discount_usd' => 'decimal:2',
         'leave_discount_at' => 'datetime',
         'left_price_at' => 'datetime',
+        'originals_due_at' => 'datetime',
         'leave_reminder_at' => 'datetime',
         'awaiting_look' => 'boolean',
         'look_started_at' => 'datetime',
@@ -79,6 +80,12 @@ class BuilderProject extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(BuilderMessage::class, 'project_id')->orderBy('id');
+    }
+
+    /** The customer's newest line. (messages() is ordered oldest first, so latest() on it would not reverse it.) */
+    public function lastCustomerMessage(): ?BuilderMessage
+    {
+        return $this->messages()->reorder('id', 'desc')->where('role', BuilderMessage::USER)->first();
     }
 
     public function secrets(): HasMany
@@ -175,7 +182,10 @@ class BuilderProject extends Model
     /** Jobs the worker may take: paid and waiting, or started by a worker that stopped answering. */
     public function scopeClaimable(Builder $query, int $maxAttempts): Builder
     {
-        return $query->where('attempts', '<', $maxAttempts)->where(function (Builder $inner): void {
+        return $query->where('attempts', '<', $maxAttempts)
+            // a paid build may wait a while for the full-quality originals of the design pictures
+            ->where(fn (Builder $ready) => $ready->whereNull('originals_due_at')->orWhere('originals_due_at', '<=', now()))
+            ->where(function (Builder $inner): void {
             $inner->where('status', self::QUEUED)
                 ->orWhere(fn (Builder $stale) => $stale->where('status', self::BUILDING)->where('lease_expires_at', '<', now()));
         });

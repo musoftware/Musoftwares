@@ -19,7 +19,11 @@ class AttachmentStore
      * @param  list<UploadedFile>  $files
      * @return list<BuilderAttachment>
      */
-    public function attach(BuilderMessage $message, array $files): array
+    /**
+     * @param  list<string>  $previewNames  pictures the browser made smaller (the page says which)
+     * @param  string|null  $quality  BuilderAttachment::ORIGINAL for the full files uploaded after payment
+     */
+    public function attach(BuilderMessage $message, array $files, array $previewNames = [], ?string $quality = null): array
     {
         $folder = $message->project->storageFolder().'/uploads';
 
@@ -29,6 +33,7 @@ class AttachmentStore
                 // the type comes from the file's content, not from what the browser claims
                 'mime' => ChatFileTypes::of($file) ?? (string) $file->getMimeType(),
                 'size' => (int) $file->getSize(),
+                'quality' => $quality ?? (in_array($file->getClientOriginalName(), $previewNames, true) ? BuilderAttachment::PREVIEW : null),
                 'path' => $file->store($folder, self::DISK),
             ]), $files);
     }
@@ -52,7 +57,8 @@ class AttachmentStore
 
         // a shared link's full-page picture is for the customer; Claude reads the same page as sharp pieces
         $fullPages = collect($message->payload['looks'] ?? [])->pluck('full_id')->filter();
-        $blocks = $message->attachments->reject(fn (BuilderAttachment $file) => $fullPages->contains($file->id))
+        // the full-quality originals are for the build only: too big for the chat model, which saw the previews
+        $blocks = $message->attachments->reject(fn (BuilderAttachment $file) => $fullPages->contains($file->id) || $file->quality === BuilderAttachment::ORIGINAL)
             ->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()->all();
         $text = trim($message->forModel());
         $text = $text !== '' ? $text : self::FILES_ONLY;

@@ -41,17 +41,18 @@ class ProjectChat
 
     /**
      * @param  list<UploadedFile>  $files
+     * @param  list<string>  $previewNames  pictures the page made smaller before sending
      *
      * @throws ChatUnavailable|ChatLimitReached
      */
-    public function send(BuilderProject $project, string $text, array $files = []): BuilderMessage
+    public function send(BuilderProject $project, string $text, array $files = [], array $previewNames = []): BuilderMessage
     {
         if ($project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
             throw new ChatLimitReached('This chat reached its message limit.');
         }
 
         $question = $project->messages()->create(['role' => BuilderMessage::USER, 'content' => $text]);
-        $this->attachments->attach($question, $files);
+        $this->attachments->attach($question, $files, $previewNames);
 
         // links and spreadsheets are looked at first, like a real programmer opens them before answering
         $shared = $this->looks->sharedIn($question);
@@ -74,7 +75,7 @@ class ProjectChat
             return;
         }
 
-        $question = $project->messages()->where('role', BuilderMessage::USER)->latest('id')->firstOrFail();
+        $question = $project->lastCustomerMessage() ?? throw new \RuntimeException('A look finished on a project without a customer message.');
         try {
             $this->answer($project->refresh(), $question, forgetOnFailure: false);
         } catch (ChatUnavailable) {

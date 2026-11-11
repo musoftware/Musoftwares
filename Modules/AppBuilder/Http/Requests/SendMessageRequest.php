@@ -25,7 +25,15 @@ class SendMessageRequest extends FormRequest
                     $fail(__('builder.file_too_big'));
                 }
             }],
+            'previews' => ['nullable', 'array', 'max:'.(int) $limits['files_per_message']],
+            'previews.*' => ['string', 'max:255'],
         ];
+    }
+
+    /** @return list<string> the names of the pictures the page made smaller before sending */
+    public function previewNames(): array
+    {
+        return array_values(array_map('strval', (array) $this->validated('previews', [])));
     }
 
     public function text(): string

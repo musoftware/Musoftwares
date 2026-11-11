@@ -685,6 +685,105 @@ class AppBuilderTest extends TestCase
         $this->assertSame(2, BuilderMessage::count());
     }
 
+    public function test_a_link_in_a_later_message_is_the_one_read_when_the_browser_is_slow(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('<title>عيادة</title><p>احجز موعدك</p>')]);
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $this->answer('أهلاً، عندك مثال؟');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز موقع لعيادتي'])->assertOk()->json('uuid');
+
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'زي ده https://93.184.215.14/clinic'])->assertJsonPath('looking', 'link');
+        $this->answer('شوفت صفحة العيادة.');
+        $this->travel(60)->seconds();
+
+        // the second message's link is read and answered, not the first message
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null)->assertJsonPath('messages.3.text', 'شوفت صفحة العيادة.');
+        $turns = app(ChatModel::class)->seen[1];
+        $this->assertStringContainsString('احجز موعدك', json_encode(end($turns)['content'], JSON_UNESCAPED_UNICODE));
+    }
+
+    public function test_a_figma_link_gets_longer_before_the_chat_answers_without_it(): void
+    {
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $uuid = $this->postJson('/ai/messages', ['text' => 'التصميم ده https://www.figma.com/file/abc123?node-id=1-2'])->assertJsonPath('looking', 'link')->json('uuid');
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+
+        // a normal page would be given up on by now; a Figma design is still being drawn
+        $this->travel(60)->seconds();
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', 'link');
+
+        $this->answer('معلش مقدرتش أفتح التصميم، ابعتلي صور.');
+        $this->travel(100)->seconds();
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null);
+    }
+
+    /** A quoted project whose design picture reached the chat as a smaller preview. */
+    private function quotedWithPreview(): BuilderProject
+    {
+        $this->answer('تمام، ده السعر', 50000);
+        $uuid = $this->post('/ai/messages', ['text' => 'ده التصميم', 'files' => [$this->png()], 'previews' => ['logo.png']], ['Accept' => 'application/json'])->assertOk()->json('uuid');
+
+        return BuilderProject::where('uuid', $uuid)->firstOrFail();
+    }
+
+    public function test_a_picture_made_smaller_by_the_page_is_kept_as_a_preview(): void
+    {
+        $project = $this->quotedWithPreview();
+
+        $this->assertSame(\Modules\AppBuilder\Models\BuilderAttachment::PREVIEW, $project->attachments()->sole()->quality);
+    }
+
+    public function test_after_payment_the_build_waits_for_the_originals_and_then_uses_them(): void
+    {
+        $project = $this->quotedWithPreview();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-1');
+        $this->assertNotNull($project->refresh()->originals_due_at);
+
+        // waiting: the worker gets nothing, and the page asks for the originals by name
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('originals.names', ['logo.png']);
+
+        $this->post('/ai/'.$project->uuid.'/originals', ['files' => [$this->upload('design.png', (string) file_get_contents(__FILE__) === '' ? '' : base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='))]], ['Accept' => 'application/json'])
+            ->assertOk()->assertJsonPath('originals', null);
+
+        // the build starts and gets the original instead of the preview
+        $job = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job');
+        $this->assertSame(['design.png'], array_column($job['attachments'], 'name'));
+    }
+
+    public function test_the_originals_are_never_sent_to_the_chat_model(): void
+    {
+        $project = $this->quotedWithPreview();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-1');
+        $this->post('/ai/'.$project->uuid.'/originals', ['files' => [$this->png()]], ['Accept' => 'application/json'])->assertOk();
+
+        $note = BuilderMessage::where('project_id', $project->id)->where('role', BuilderMessage::USER)->orderByDesc('id')->firstOrFail();
+        $this->assertCount(1, $note->attachments);
+        $this->assertIsString(app(\Modules\AppBuilder\Services\AttachmentStore::class)->contentFor($note->load('attachments')));
+    }
+
+    public function test_the_build_starts_without_the_originals_when_skipped_or_after_the_wait(): void
+    {
+        $skipped = $this->quotedWithPreview();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($skipped, $skipped->quote_version, 'TX-1');
+        $this->postJson('/ai/'.$skipped->uuid.'/originals/skip')->assertOk()->assertJsonPath('originals', null);
+        $this->assertSame($skipped->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
+
+        $waited = $this->quotedWithPreview();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($waited, $waited->quote_version, 'TX-2');
+        $this->travel(31)->minutes();
+        $this->assertSame($waited->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
+    }
+
+    public function test_a_project_without_previews_starts_right_after_payment(): void
+    {
+        $project = $this->quotedProject();
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-1');
+
+        $this->assertNull($project->refresh()->originals_due_at);
+        $this->assertSame($project->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
+    }
+
     private function xlsx(): UploadedFile
     {
         $path = tempnam(sys_get_temp_dir(), 'xl').'.xlsx';

@@ -47,7 +47,7 @@ class ProjectPayment
         return preg_match('/^'.self::ORDER_PREFIX.'(\d+)-(\d+)_/', $merchantOrderId, $m) ? [(int) $m[1], (int) $m[2]] : null;
     }
 
-    public function __construct(private readonly BuilderReferral $referral) {}
+    public function __construct(private readonly BuilderReferral $referral, private readonly OriginalFiles $originals) {}
 
     public function markPaid(BuilderProject $project, int $quoteVersion, ?string $transactionId): bool
     {
@@ -137,6 +137,8 @@ class ProjectPayment
             'job_cost_usd' => 0,
             'progress_note' => null,
             'error' => null,
+            // design pictures were sent as smaller previews: the build waits a while for the originals
+            'originals_due_at' => $this->originals->dueAt($project),
         ]);
     }
 

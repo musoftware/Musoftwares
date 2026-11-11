@@ -106,6 +106,10 @@ return [
         'file_kb' => 5120,
         // Excel, Word and CSV files are read by the worker, not sent to Claude as they are
         'office_file_kb' => 10240,
+        // the full-quality design pictures and PDFs uploaded after payment, for the build only
+        'original_file_kb' => 51200,
+        'original_files' => 15,
+        'originals_wait_minutes' => 30,
         'messages_per_project' => 60,
         'projects_per_ip_per_day' => 6,
         // PHP programs come with vendor/ (thousands of files); the server's upload_max_filesize must allow archive_kb

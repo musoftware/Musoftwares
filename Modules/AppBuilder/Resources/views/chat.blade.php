@@ -160,6 +160,12 @@
     const MAX_FILES = @json((int) config('builder.limits.files_per_message'));
     // the server checks each kind's own limit; this only stops files that are too big for any kind
     const MAX_BYTES = @json(max((int) config('builder.limits.file_kb'), (int) config('builder.limits.office_file_kb')) * 1024);
+    const PICTURE_BYTES = @json((int) config('builder.limits.file_kb') * 1024);
+    // a big design picture is made smaller here for the chat; its original is asked for after payment.
+    // The chat model takes pictures up to 8000 pixels a side.
+    const PREVIEW_FROM_BYTES = 1536 * 1024;
+    const PREVIEW_MAX_SIDE = 8000;
+    const PREVIEW_WIDTH = 1600;
     const fileInput = document.getElementById('files');
     const chips = document.getElementById('chips');
 
@@ -193,7 +199,10 @@
     async function upload(url, text, files) {
         const body = new FormData();
         if (text) body.append('text', text);
-        files.forEach((file) => body.append('files[]', file));
+        files.forEach((file) => {
+            body.append('files[]', file);
+            if (file.isPreview) body.append('previews[]', file.name);
+        });
         const response = await fetch(url, {method: 'POST', headers: {'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF}, body});
         return answerOf(response);
     }
@@ -215,19 +224,55 @@
             chip.append(el('span', {dir: 'auto'}, file.name), remove);
             return chip;
         }));
+        if (picked.some((file) => file.isPreview)) chips.append(el('p', {class: 'hint'}, T.compressed));
         chips.hidden = picked.length === 0;
         sendBtn.disabled = waiting || (!input.value.trim() && picked.length === 0);
         keepRoomForComposer();
     }
 
-    function pickFiles(list) {
+    async function pickFiles(list) {
         showError('');
-        for (const file of list) {
+        for (const original of list) {
             if (picked.length >= MAX_FILES) { showError(T.too_many_files); break; }
-            if (file.size > MAX_BYTES) { showError(T.file_too_big); continue; }
+            const file = await smallerIfBig(original);
+            const limit = /^image\/|pdf$/.test(file.type) ? PICTURE_BYTES : MAX_BYTES;
+            if (file.size > limit) { showError(file.type === 'application/pdf' ? T.pdf_too_big : T.file_too_big); continue; }
             picked.push(file);
         }
         renderChips();
+    }
+
+    /** A picture too big for the chat becomes a smaller JPEG, marked as a preview; other files stay as they are. */
+    async function smallerIfBig(file) {
+        if (!/^image\/(png|jpeg|webp)$/.test(file.type) || !window.createImageBitmap) return file;
+        try {
+            const bitmap = await createImageBitmap(file);
+            const tooTall = Math.max(bitmap.width, bitmap.height) > PREVIEW_MAX_SIDE;
+            if (file.size <= PREVIEW_FROM_BYTES && !tooTall) return file;
+            return (await previewOf(bitmap, file.name)) || file;
+        } catch (error) {
+            return file;
+        }
+    }
+
+    async function previewOf(bitmap, name) {
+        const scale = Math.min(1, PREVIEW_WIDTH / bitmap.width, PREVIEW_MAX_SIDE / bitmap.height);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#fff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        for (const quality of [0.85, 0.75, 0.65, 0.55]) {
+            const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+            if (blob && blob.size <= PICTURE_BYTES * 0.9) {
+                const preview = new File([blob], name.replace(/\.[^.]+$/, '') + '.jpg', {type: 'image/jpeg'});
+                preview.isPreview = true;
+                return preview;
+            }
+        }
+        return null;
     }
 
     function messageNode(message) {
@@ -441,6 +486,33 @@
         return box;
     }
 
+    /** After payment: the build waits a while for the full-quality design files the chat got smaller. */
+    function originalsNode(originals) {
+        const card = el('section', {class: 'card'});
+        const body = T.originals.body.replace(':names', originals.names.join('، ')).replace(':mb', originals.max_mb);
+        const picker = el('input', {type: 'file', multiple: 'multiple', accept: 'image/png,image/jpeg,image/webp,application/pdf', hidden: 'hidden'});
+        const send = el('button', {class: 'btn', type: 'button'}, T.originals.upload);
+        const skip = el('button', {class: 'btn ghost', type: 'button'}, T.originals.skip);
+        const actions = el('div', {class: 'actions'});
+        actions.append(send, skip);
+        card.append(el('div', {class: 'title'}, T.originals.title), el('p', {class: 'note'}, body), picker, actions);
+        send.addEventListener('click', () => picker.click());
+        picker.addEventListener('change', () => sendOriginals(originals.url, [...picker.files], send));
+        skip.addEventListener('click', () => sendOriginals(originals.skip_url, [], skip));
+        return card;
+    }
+
+    async function sendOriginals(url, files, button) {
+        button.disabled = true;
+        button.textContent = files.length ? T.originals.sending : button.textContent;
+        try {
+            state = files.length ? await upload(url, '', files) : await call(url, {});
+        } catch (error) {
+            showError(error.message);
+        }
+        render();
+    }
+
     function statusNode(text) {
         const node = el('div', {class: 'status'});
         node.append(el('span', {class: 'spin', 'aria-hidden': 'true'}), el('span', {}, text));
@@ -519,6 +591,7 @@
         if (state && state.progress) thread.append(statusNode(state.progress));
         if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));
         if (state && state.waiting_for_answer) thread.append(el('p', {class: 'hint'}, T.waiting_answer));
+        if (state && state.originals) thread.append(originalsNode(state.originals));
         if (state && state.trial) { const node = trialNode(state.trial); if (node) thread.append(node); }
         if (state && state.balance) thread.append(balanceNode(state.balance));
         if (state && state.push) { const node = pushNode(state.push); if (node) thread.append(node); }
@@ -577,7 +650,8 @@
         sendBtn.disabled = waiting || (!input.value.trim() && picked.length === 0);
     });
     document.getElementById('attach').addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', () => { pickFiles(fileInput.files); fileInput.value = ''; });
+    // copied first: the list empties when the input is cleared, and the pictures are made smaller after that
+    fileInput.addEventListener('change', () => { const chosen = [...fileInput.files]; fileInput.value = ''; pickFiles(chosen); });
     input.addEventListener('paste', (event) => {
         const pasted = [...(event.clipboardData?.files || [])];
         if (pasted.length) { event.preventDefault(); pickFiles(pasted); }

@@ -38,6 +38,8 @@ class ProjectStateResource extends JsonResource
             // the look is done and the answer is being written in another request, so the page keeps asking
             'answering' => ! $this->awaiting_look && $this->isAnsweringAfterLook(),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
+            // after payment: the build waits a while for the full-quality originals of the pictures sent smaller
+            'originals' => $this->originals(),
             // asked from the first message: replies, a discount, a problem and the delivery all reach the customer
             'push' => \Modules\AppBuilder\Services\BuilderPush::enabled() && ! $this->push_token ? route('builder.push', $this->resource) : null,
             'balance' => $this->hasBalanceDue() ? [
@@ -184,5 +186,21 @@ class ProjectStateResource extends JsonResource
             && $last->role === BuilderMessage::USER
             && ($last->payload['looks'] ?? []) !== []
             && $last->created_at?->gt(now()->subMinutes(self::ANSWER_MINUTES)) === true;
+    }
+
+    /** @return array{names: list<string>, url: string, skip_url: string, max_mb: int}|null */
+    private function originals(): ?array
+    {
+        $originals = app(\Modules\AppBuilder\Services\OriginalFiles::class);
+        if (! $originals->isWaiting($this->resource)) {
+            return null;
+        }
+
+        return [
+            'names' => $originals->previews($this->resource)->pluck('original_name')->values()->all(),
+            'url' => route('builder.originals', $this->resource),
+            'skip_url' => route('builder.originals.skip', $this->resource),
+            'max_mb' => intdiv((int) config('builder.limits.original_file_kb'), 1024),
+        ];
     }
 }

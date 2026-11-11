@@ -24,6 +24,7 @@ class WorkerJobController extends Controller
         private readonly JobQueue $jobs,
         private readonly BuildQuestions $questions,
         private readonly ProjectSecrets $secrets,
+        private readonly \Modules\AppBuilder\Services\OriginalFiles $originals,
     ) {}
 
     public function claim(Request $request): JsonResponse|Response
@@ -49,7 +50,7 @@ class WorkerJobController extends Controller
             'design_url' => $project->design_url,
             // access details go only to the worker, over this token-protected API, and only for this job
             'secrets' => $this->secrets->forWorker($project),
-            'attachments' => $project->attachments()->get()->map(fn (BuilderAttachment $file) => [
+            'attachments' => $this->originals->forBuild($project)->map(fn (BuilderAttachment $file) => [
                 'id' => $file->id,
                 'name' => $file->original_name,
                 'mime' => $file->mime,
