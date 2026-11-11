@@ -63,12 +63,8 @@ export function applyTheme(theme: ThemeMode): void {
 export function initTheme(): () => void {
     if (typeof window === 'undefined' || !document.documentElement) return () => {};
 
-    const root = document.documentElement;
-    if (root.getAttribute('data-theme') === 'light' || root.getAttribute('data-theme-fixed') === 'true') {
-        applyTheme('light');
-        return () => {};
-    }
-
+    // Always listen, even when the first page is a fixed-light public page: the visitor can move to the
+    // dashboard without a reload, and the choice must work there. applyTheme keeps fixed pages light by itself.
     // 1. Initial application
     const initialTheme = useAppStore.getState().theme || 'system';
     applyTheme(initialTheme);

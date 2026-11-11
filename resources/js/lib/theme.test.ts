@@ -75,4 +75,22 @@ describe('Theme auto system mode utility', () => {
         expect(document.documentElement.classList.contains('dark')).toBe(true);
         cleanup();
     });
+
+    it('still follows the chosen theme after moving from a fixed-light public page to the dashboard', () => {
+        const root = document.documentElement;
+        root.setAttribute('data-theme', 'light');
+        root.setAttribute('data-theme-fixed', 'true');
+        const cleanup = initTheme();
+        expect(root.classList.contains('dark')).toBe(false);
+
+        // client-side navigation into the dashboard drops the fixed-light lock
+        root.removeAttribute('data-theme');
+        root.removeAttribute('data-theme-fixed');
+        useAppStore.getState().setTheme('dark');
+        expect(root.classList.contains('dark')).toBe(true);
+
+        useAppStore.getState().setTheme('light');
+        expect(root.classList.contains('dark')).toBe(false);
+        cleanup();
+    });
 });
