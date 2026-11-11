@@ -2695,6 +2695,8 @@
         "study_title": "دراسة جدوى",
         "study_save": "حفظ كملف PDF",
         "study_for": "أعدّتها Musoftware",
+        "design_pick": "اختار التصميم ده",
+        "design_message": "اخترت التصميم: :design (:slug)",
         "starter_title": "برنامج جاهز عندنا نبدأ منه",
         "ideas_title": "أفكار تفيد شغلك في النسخة الجاية",
         "idea_ask": "عايز دي، بكام؟",

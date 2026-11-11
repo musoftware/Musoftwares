@@ -2695,6 +2695,8 @@
         "study_title": "Feasibility study",
         "study_save": "Save as PDF",
         "study_for": "Prepared by Musoftware",
+        "design_pick": "Choose this design",
+        "design_message": "I choose the design: :design (:slug)",
         "starter_title": "A ready program we start from",
         "ideas_title": "Ideas that would help your business next",
         "idea_ask": "I want this, how much?",
