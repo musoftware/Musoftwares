@@ -58,6 +58,24 @@ class FeasibilityStudyTest extends TestCase
         $page->assertSee('الملخص')->assertDontSee('alert(1)', false)->assertDontSee('x()', false);
     }
 
+    public function test_a_study_finished_after_the_payment_never_raises_the_price_paid(): void
+    {
+        $this->quote('page');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز صفحة'])->json('uuid');
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+        $paid = (float) $project->amount;
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaidByAdmin($project, 1);
+
+        // the study arrives late, while the paid build waits in the queue
+        app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class)->write($project->refresh());
+
+        $project->refresh();
+        $this->assertSame('ready', $project->study_status);
+        $this->assertSame($paid, (float) $project->amount);
+        $this->assertSame(0.0, (float) $project->study_fee);
+        $this->assertFalse($project->hasBalanceDue());
+    }
+
     public function test_a_small_page_gets_no_study(): void
     {
         $this->quote('page');

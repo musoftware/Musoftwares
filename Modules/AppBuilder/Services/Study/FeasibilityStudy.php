@@ -49,7 +49,10 @@ class FeasibilityStudy
     {
         try {
             $result = $this->writer->write($this->systemPrompt(), $this->brief($project));
-            $fee = $this->fee($result['input_tokens'], $result['output_tokens']);
+            // the study is written after the reply, so the customer may already have paid the price they saw:
+            // then it is on us, and the price they paid never grows behind their back
+            $open = $project->status === BuilderProject::QUOTED && (float) $project->quote_paid <= 0;
+            $fee = $open ? $this->fee($result['input_tokens'], $result['output_tokens']) : 0.0;
             $project->update([
                 'study_status' => self::READY,
                 'study_html' => $this->clean($result['html']),
