@@ -1285,7 +1285,7 @@ class AppBuilderTest extends TestCase
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'ضيف صفحة جديدة'])->assertOk()->assertJsonPath('quote.free', false);
         $this->postJson('/ai/'.$project->uuid.'/fix')->assertStatus(409);
 
-        $project->update(['free_fixes_used' => 3]);
+        $project->update(['free_fixes_used' => (int) config('builder.free_fixes.per_project')]);
         $this->answerAfterDelivery('fix', 10000);
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'فيه عطل تاني'])->assertOk()->assertJsonPath('quote.free', false);
         $this->postJson('/ai/'.$project->uuid.'/fix')->assertStatus(409);

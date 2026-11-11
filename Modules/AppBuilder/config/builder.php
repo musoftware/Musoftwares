@@ -131,9 +131,10 @@ return [
         'clearing_days' => (int) env('BUILDER_REFERRAL_CLEARING_DAYS', 14),
     ],
 
-    // Fixing a bug in a delivered program is free; a new change is paid. These limits stop a change passing as a fix.
+    // A fix or an adjustment within the agreed idea is free after delivery; a new idea is paid. These limits keep a
+    // new idea from passing as an adjustment.
     'free_fixes' => [
-        'per_project' => (int) env('BUILDER_FREE_FIXES', 3),
+        'per_project' => (int) env('BUILDER_FREE_FIXES', 5),
         'max_tokens' => (int) env('BUILDER_FREE_FIX_MAX_TOKENS', 30000),
         'days' => (int) env('BUILDER_FREE_FIX_DAYS', 30),
     ],
