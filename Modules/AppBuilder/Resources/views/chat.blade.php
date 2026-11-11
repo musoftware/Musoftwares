@@ -86,6 +86,9 @@
         .leave::backdrop{background:rgba(0,0,0,.35)}
         .leave h2{margin:0 0 8px;font-size:20px}
         .leave p{margin:0 0 16px;color:var(--muted);line-height:1.8}
+        .how{margin-top:24px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
+        .how h2{margin:0 0 8px;font-size:16px}
+        .how ol{margin:0;padding-inline-start:20px;display:grid;gap:6px;color:var(--muted);font-size:15px;line-height:1.7}
         .viewer{max-width:720px;margin:0 auto;padding:12px 16px 0;display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
         .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
         .card .before{color:var(--muted);text-decoration:line-through;font-size:16px;font-weight:400;margin-inline-start:8px}
@@ -105,6 +108,14 @@
         <h1>{{ __('builder.greeting') }}</h1>
         <p>{{ __('builder.greeting_hint') }}</p>
         @unless ($state)
+            <section class="how" aria-labelledby="how-title">
+                <h2 id="how-title">{{ __('builder.how_title') }}</h2>
+                <ol>
+                    @foreach (__('builder.how_steps') as $step)
+                        <li>{{ $step }}</li>
+                    @endforeach
+                </ol>
+            </section>
             <div class="choose" id="choose">
                 <button type="button" class="choice" data-size="big"><strong>{{ __('builder.start_big') }}</strong><span>{{ __('builder.start_big_note') }}</span></button>
                 <button type="button" class="choice" data-size="small"><strong>{{ __('builder.start_small') }}</strong><span>{{ __('builder.start_small_note') }}</span></button>
@@ -405,7 +416,7 @@
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
         if (quote.study) card.append(studyNode(quote.study, quote.currency));
         appendFreeBuild(card, quote.free_build);
-        card.append(el('p', {class: 'note'}, T.pay_note));
+        card.append(el('p', {class: 'note'}, T.pay_note + ' ' + T.close_page_note));
         // a guest is told that signing in first means getting money back when the work costs less
         if (!SIGNED_IN && !quote.free_build) card.append(el('p', {class: 'note'}, T.refund_sign_in), link(SIGN_IN_URL, T.sign_in, true));
         appendPayForm(card, quote.pay_url, T.pay, quote.shares || []);

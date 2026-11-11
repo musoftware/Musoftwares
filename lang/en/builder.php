@@ -21,6 +21,27 @@ return [
     'wallet_confirm' => 'Pay this price from your balance on the site and start the build now?',
     'wallet_short' => 'Your balance (:balance) does not cover this price yet.',
     'wallet_top_up' => 'Add balance',
+    'how_title' => 'How it works',
+    'how_steps' => ['Tell us your idea here. The engineer asks what it needs and gives you a price.', 'After payment, your program is built on the Musoftware computers, not on this page. You can close the page; nothing stops.', 'We email you and send a notification when it is ready, or if the engineer needs something from you.', 'Open your project link (it is in your email and your account) to see the program, try it and download it.'],
+    'close_page_note' => 'After payment you can close this page: the build runs on our computers, and the project link reaches your email.',
+    'mail_paid_subject' => 'Your program is being built',
+    'mail_paid_body' => "Hello,
+
+We received your payment and the engineer started building your program on our computers. You can close the page; you will get an email when it is ready.
+
+Your project, any time:
+:link
+
+The Musoftware team",
+    'mail_new_account' => "We opened a Musoftware account with this email so your project is never lost. Set your password here:
+:link",
+    'mail_ready_subject' => 'Your program is ready',
+    'mail_ready_body' => "Hello,
+
+Your program is ready. Open it, try it and download it here:
+:link
+
+The Musoftware team",
     'price_settled' => 'Good news: the work cost less than its price, so :amount went back to your balance on the site. You can use it for your next program.',
     'refund_sign_in' => 'Sign in before you pay: if the work costs less than the price, the difference comes back to you as balance for your next program.',
     'free_build_note' => 'Your first simple page is on us: no payment, the build starts now.',

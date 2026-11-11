@@ -75,6 +75,8 @@ class ProjectPayment
         if ($project->needsDesign()) {
             $this->tellOwner($project, 'Design needed: '.$project->title.'. Add the Figma link on the admin page to start the build.');
         }
+        // the project joins the payer's account (opened for them if needed) and the link goes to their email
+        app(ProjectAccount::class)->afterPayment($project->refresh());
 
         return true;
     }

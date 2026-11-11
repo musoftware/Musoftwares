@@ -78,6 +78,7 @@ class JobQueue
             Log::error('App builder: price settlement failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
         }
         app(BuilderPush::class)->notify($project, 'delivered');
+        app(ProjectAccount::class)->afterDelivery($project);
         // an extension can only be tried in a browser, so its live trial starts by itself
         if ($this->trials->kind($project->refresh()) === 'extension') {
             $this->trials->request($project);

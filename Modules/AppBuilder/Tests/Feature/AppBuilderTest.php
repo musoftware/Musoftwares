@@ -306,6 +306,38 @@ class AppBuilderTest extends TestCase
         return $price;
     }
 
+    /** Every mail the array mailer has sent so far, as subject => recipient. */
+    private function sentMails(): array
+    {
+        return collect(app('mailer')->getSymfonyTransport()->messages())
+            ->mapWithKeys(fn ($sent) => [$sent->getOriginalMessage()->getSubject() => $sent->getEnvelope()->getRecipients()[0]->getAddress()])
+            ->all();
+    }
+
+    public function test_a_guest_who_pays_gets_an_account_and_the_project_link_by_email(): void
+    {
+        config(['mail.default' => 'array']);
+        $project = $this->quotedProject();
+        $project->update(['client_name' => 'منى', 'client_email' => 'Mona@Example.com', 'client_whatsapp' => '01012345678']);
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-ACCOUNT');
+
+        $user = \App\Models\User::where('email', 'mona@example.com')->firstOrFail();
+        $this->assertSame($user->id, $project->refresh()->user_id);
+        $this->assertSame('mona@example.com', strtolower($this->sentMails()[__('builder.mail_paid_subject', [], 'ar')] ?? ''));
+
+        // an existing account is used, never a second one
+        $again = $this->quotedProject();
+        $again->update(['client_email' => 'mona@example.com']);
+        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($again, $again->quote_version, 'TX-ACCOUNT-2');
+        $this->assertSame($user->id, $again->refresh()->user_id);
+        $this->assertSame(1, \App\Models\User::where('email', 'mona@example.com')->count());
+
+        // and the delivery is announced too
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1000], $this->worker())->assertOk();
+        $this->assertArrayHasKey(__('builder.mail_ready_subject', [], 'ar'), $this->sentMails());
+    }
+
     private function quotePage(): void
     {
         $this->script[] = ChatTurn::fromArray([
