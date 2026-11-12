@@ -97,14 +97,15 @@ const onDone = (en: string, ar: string) => ({
 
 function MessageList({ messages }: { messages: Message[] }) {
     return (
-        <ol className="space-y-3">
+        // min-w-0 and wrap-anywhere: a long link without spaces (fbclid=...) must wrap, not widen every card
+        <ol className="min-w-0 space-y-3">
             {messages.map((message) => (
                 <li key={message.id} className={`rounded-xl border p-3 ${message.role === 'user' ? 'bg-slate-50' : 'bg-white'} ${message.question ? 'border-amber-400' : ''}`}>
                     <p className="mb-1 text-xs font-semibold text-slate-500">
                         {t(...(WHO[message.role] ?? [message.role, message.role]))}{message.question && ` · ${t('question from the build', 'سؤال من البناء')}`} · <span dir="ltr">{message.at}</span>
                     </p>
-                    <p className="whitespace-pre-wrap break-words" dir="auto">{message.text}</p>
-                    {message.files.length > 0 && <p className="mt-1 text-sm text-slate-500" dir="auto">{message.files.join(' · ')}</p>}
+                    <p className="whitespace-pre-wrap wrap-anywhere" dir="auto">{message.text}</p>
+                    {message.files.length > 0 && <p className="mt-1 text-sm text-slate-500 wrap-anywhere" dir="auto">{message.files.join(' · ')}</p>}
                 </li>
             ))}
         </ol>
@@ -264,7 +265,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
     return (
         <AdminSidebarLayout>
             <Head title={project.title || t('AI builder chat', 'محادثة منشئ البرامج')} />
-            <div className="mx-auto max-w-5xl space-y-4 p-4">
+            <div className="mx-auto max-w-5xl space-y-4 overflow-x-clip p-4">
                 <Link href="/admin/builder" className="text-sm font-semibold text-slate-600">{t('All chats', 'كل المحادثات')}</Link>
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h1 className="text-2xl font-bold" dir="auto">{project.title || t('(no title yet)', '(لسه من غير اسم)')}</h1>
@@ -278,11 +279,11 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
                 </p>
                 <VisitorCard visitor={project.visitor} />
                 <Money project={project} />
-                {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap" dir="ltr">{project.error}</p>}
+                {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap wrap-anywhere" dir="ltr">{project.error}</p>}
 
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
                     <MessageList messages={messages} />
-                    <div className="space-y-4">
+                    <div className="min-w-0 space-y-4">
                         <RetryBuild project={project} />
                         <DesignLink project={project} />
                         <AskForMore project={project} />
