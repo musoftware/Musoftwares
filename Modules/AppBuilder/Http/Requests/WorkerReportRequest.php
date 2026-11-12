@@ -20,6 +20,8 @@ class WorkerReportRequest extends FormRequest
                 'cost_usd' => ['required', 'numeric', 'min:0', 'max:10000'],
                 // ideas for the next version, as JSON: [{"title": "...", "description": "..."}]
                 'ideas' => ['nullable', 'string', 'max:6000'],
+                // an imported project's MUSOFTWARE.md after the change: what the program has now
+                'study' => ['nullable', 'string', 'max:40000'],
             ],
             'builder.worker.imported' => [
                 'profile' => ['required', 'string', 'max:20000'],

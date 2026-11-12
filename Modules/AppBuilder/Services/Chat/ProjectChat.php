@@ -151,6 +151,15 @@ class ProjectChat
         }
 
         $turn->quoteReady ? $this->applyQuote($project, $turn) : $this->withdrawQuote($project);
+        $this->startImportedFix($project);
+    }
+
+    /** In the customer's own imported program, a change to what it already has goes to the engineer at once, with no button. */
+    private function startImportedFix(BuilderProject $project): void
+    {
+        if ($project->isImported() && $project->status === BuilderProject::QUOTED && $project->free_fix) {
+            app(\Modules\AppBuilder\Services\ProjectPayment::class)->startFreeFix($project);
+        }
     }
 
     /** Access details typed in the chat are saved encrypted, and the chat keeps only a mask in their place. */
@@ -166,7 +175,8 @@ class ProjectChat
 
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
-        $free = $turn->isFix && $project->canGetFreeFix($turn->estimatedTokens);
+        // the customer's own imported program: every change to what it already has is free, with no count or time limit
+        $free = $turn->isFix && ($project->isImported() || $project->canGetFreeFix($turn->estimatedTokens));
         $price = $free
             ? $this->pricer->freeFix($turn->estimatedTokens, $turn->complex)
             : $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType);
@@ -250,8 +260,8 @@ class ProjectChat
 
     /** The prompt, the project's real state, and the language this answer must be in. */
     /**
-     * The customer's own program, which Musoftware brought in: it counts as delivered (version 1), its description is
-     * the agreed brief, and the "After a delivery" rules decide what is a free fix and what is a paid new idea.
+     * The customer's own program, which Musoftware brought in: it counts as delivered (version 1), and its study (the
+     * project's MUSOFTWARE.md) decides what is old, a free change that starts at once, and what is new and paid.
      */
     private function importedProject(BuilderProject $project): string
     {
@@ -261,9 +271,13 @@ class ProjectChat
 
         return "\n\n## This is the customer's existing program\n\n"
             ."Musoftware brought this customer's own working program in, and the build engineer has all its files. Treat it as "
-            ."already delivered: the description below is the agreed brief, and every request follows the After a delivery rules "
-            ."(a fix to what exists is free within the limits; a new feature, screen or integration is a paid new idea). Never "
-            ."offer ready programs, designs, a download or a live trial for it. Changes go live on the customer's own server.\n\n"
+            ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has, and it decides "
+            ."what is old and what is new. A fix or a change to anything it already has (how it works, looks or is worded) is "
+            ."`kind` \"fix\": it is free and goes to the engineer at once by itself, with no button and no price, so say plainly "
+            ."that you started on it. Something it does not have yet (a new feature, screen, report, kind of user or integration) "
+            ."is a paid new idea, `kind` \"build\". For a fix keep the `spec` short: the engineer reads the customer's own words "
+            ."and the code. Never offer ready programs, designs, a download or a live trial for it. Changes go live on the "
+            ."customer's own server.\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
     }
 

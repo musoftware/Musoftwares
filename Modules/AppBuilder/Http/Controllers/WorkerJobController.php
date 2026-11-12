@@ -42,7 +42,8 @@ class WorkerJobController extends Controller
         return response()->json(['job' => [
             'uuid' => $project->uuid,
             'title' => $project->title,
-            'spec' => $project->spec,
+            // an imported project's engineer works from the customer's own words, like a developer told directly
+            'spec' => $project->isImported() ? app(\Modules\AppBuilder\Services\ProjectImports::class)->briefFor($project) : $project->spec,
             'locale' => $project->customerLanguage(),
             'budget_usd' => (float) $project->budget_usd,
             'estimated_tokens' => $project->estimated_tokens,
@@ -184,8 +185,10 @@ class WorkerJobController extends Controller
 
             return response()->json(['message' => $e->getMessage()], 422);
         }
-        // "after every change": the build already pushed its pull request and deployed
         $imports = app(\Modules\AppBuilder\Services\ProjectImports::class);
+        // the engineer updated the project's study (MUSOFTWARE.md) with what the change added
+        $imports->updateStudy($project, (string) $request->validated('study'));
+        // "after every change": the build already pushed its pull request and deployed
         if ($project->isImported() && $request->boolean('released')) {
             $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
         } elseif ($project->isImported() && $request->filled('release_error')) {

@@ -15,6 +15,14 @@ use Modules\AppBuilder\Models\BuilderProject;
  */
 class ProjectImports
 {
+    /** Where the owner's description ends and the worker's study of the files begins, in import_profile. */
+    private const STUDY_HEADING = "\n\n## The project's study (its MUSOFTWARE.md)\n\n";
+
+    /** The heading used before the study file existed; still split on it for projects imported then. */
+    private const OLD_STUDY_HEADING = "\n\n## What the worker found in the files";
+
+    private const MAX_STUDY_CHARS = 20000;
+
     public function __construct(private readonly ProjectPayment $payment) {}
 
     /** @param array{title: string, import_url: string, locale: string, description: string, release_mode: string, release_after_changes: int, release_quiet_minutes: int, deploy_enabled: bool} $data */
@@ -58,7 +66,7 @@ class ProjectImports
                 'lease_expires_at' => null,
                 'progress_step' => null,
                 'attempts' => 0,
-                'import_profile' => trim($project->import_profile."\n\n## What the worker found in the files\n\n".mb_substr($profile, 0, 20000)),
+                'import_profile' => $this->withStudy($project, $profile),
             ]);
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
@@ -66,6 +74,42 @@ class ProjectImports
             ]);
         });
         $this->payment->tellOwner($project, 'Imported: '.$project->title.'. Send the customer the chat link.');
+    }
+
+    /** After a change the engineer updates MUSOFTWARE.md, so the chat knows what the program has now. */
+    public function updateStudy(BuilderProject $project, string $study): void
+    {
+        if ($project->isImported() && trim($study) !== '') {
+            $project->update(['import_profile' => $this->withStudy($project, $study)]);
+        }
+    }
+
+    /** The owner's description, then the latest study; an older study is replaced, never stacked. */
+    private function withStudy(BuilderProject $project, string $study): string
+    {
+        $description = Str::before(Str::before((string) $project->import_profile, self::STUDY_HEADING), self::OLD_STUDY_HEADING);
+
+        return trim($description.self::STUDY_HEADING.mb_substr(trim($study), 0, self::MAX_STUDY_CHARS));
+    }
+
+    /**
+     * What the engineer works from in an imported project: the customer's own words since the last delivery, as they
+     * wrote them, then the chat's short note. Like the owner writing to a developer directly.
+     */
+    public function briefFor(BuilderProject $project): string
+    {
+        $words = $project->messages()
+            ->where('role', BuilderMessage::USER)
+            ->when($project->built_at, fn ($query, $since) => $query->where('created_at', '>=', $since))
+            ->orderBy('id')
+            ->pluck('content')
+            ->map(fn ($text) => trim((string) $text))
+            ->filter()
+            ->unique()
+            ->implode("\n\n");
+
+        return "## The customer's own words\n\n".($words !== '' ? $words : '(none: see the note)')
+            ."\n\n## Note from the chat\n\n".trim((string) $project->spec);
     }
 
     /** Batch releases that are due: enough changes are waiting, or the customer has been quiet long enough. */

@@ -175,6 +175,58 @@ class ProjectImportTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$other->uuid.'/complete', ['summary' => 'done', 'cost_usd' => 1], $this->worker())->assertStatus(422);
     }
 
+    /** The chat model answers with a brief of this kind: "fix" for what the program has, "build" for something new. */
+    private function chatAnswers(string $kind): void
+    {
+        $turn = \Modules\AppBuilder\Services\Chat\ChatTurn::fromArray([
+            'reply' => 'تمام',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'تعديل', 'spec' => 'Short note.', 'estimated_output_tokens' => 400000, 'kind' => $kind, 'complex' => false],
+        ]);
+        $this->app->instance(\Modules\AppBuilder\Services\Chat\ChatModel::class, new class($turn) implements \Modules\AppBuilder\Services\Chat\ChatModel
+        {
+            public function __construct(private \Modules\AppBuilder\Services\Chat\ChatTurn $turn) {}
+
+            public function reply(string $system, array $turns): \Modules\AppBuilder\Services\Chat\ChatTurn
+            {
+                return $this->turn;
+            }
+        });
+    }
+
+    public function test_a_change_to_what_the_program_has_starts_at_once_from_the_customers_own_words(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $this->chatAnswers('fix');
+
+        // big and long after the import: an imported project has no free-fix count, size or time limit
+        $this->travel(90)->days();
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'زرار الاشتراك مش بيفتح'])->assertOk();
+
+        $project->refresh();
+        $this->assertSame(BuilderProject::QUEUED, $project->status);
+        $this->assertTrue($project->free_fix);
+        $spec = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job.spec');
+        $this->assertStringContainsString('زرار الاشتراك مش بيفتح', $spec);
+        $this->assertStringContainsString('Short note.', $spec);
+    }
+
+    public function test_something_new_still_gets_a_price_and_the_study_follows_each_change(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $this->chatAnswers('build');
+
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'عايز نظام اشتراكات جديد'])->assertOk();
+        $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
+        $this->assertFalse($project->free_fix);
+
+        $this->deliverChange($project, ['study' => '# ZainArena\n- Paywall for news and reels']);
+        $profile = $project->refresh()->import_profile;
+        $this->assertStringContainsString('Paywall for news and reels', $profile);
+        $this->assertStringNotContainsString('Flutter app in /mobile', $profile);
+        $this->assertStringContainsString('Laravel admin and a Flutter app', $profile);
+    }
+
     public function test_the_import_form_takes_only_a_drive_link(): void
     {
         $this->actingAs($this->admin())->post('/admin/builder/import', [
