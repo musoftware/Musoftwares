@@ -70,11 +70,9 @@ class WorkerJobController extends Controller
             'kind' => $project->job_kind ?: BuilderProject::JOB_BUILD,
             'imported' => $project->isImported(),
             'import_url' => $project->import_url,
-            'github_repo' => $project->github_repo,
             // a change is released inside its own build only in "after every change" mode
             'release_now' => $project->isImported() && $project->release_mode === BuilderProject::RELEASE_EACH,
             'deploy' => $project->isImported() && $project->deploy_enabled,
-            'deploy_command' => $project->deploy_command,
         ];
     }
 
@@ -83,7 +81,7 @@ class WorkerJobController extends Controller
     {
         $this->assertBuilding($project);
         abort_unless($project->job_kind === BuilderProject::JOB_IMPORT, 409, 'This job is not an import.');
-        $imports->imported($project, $request->validated('profile'));
+        $imports->imported($project, $request->validated('profile'), $request->validated('github_repo'));
 
         return response()->json(['status' => 'imported']);
     }

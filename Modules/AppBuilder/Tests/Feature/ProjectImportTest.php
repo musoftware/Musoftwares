@@ -43,14 +43,11 @@ class ProjectImportTest extends TestCase
             'title' => 'Shop ERP',
             'description' => 'Laravel admin and a Flutter app for a shop.',
             'import_url' => 'https://drive.google.com/file/d/1AbCdEf/view?usp=sharing',
-            'github_repo' => 'https://github.com/acme/shop-erp.git',
-            'github_token' => 'github_pat_secret',
             'locale' => 'ar',
             'release_mode' => $mode,
             'release_after_changes' => 3,
             'release_quiet_minutes' => 60,
             'deploy_enabled' => true,
-            'deploy_command' => 'bash deploy.sh',
         ])->assertRedirect();
         auth()->logout();
 
@@ -62,7 +59,8 @@ class ProjectImportTest extends TestCase
     {
         $project = $this->importAs($mode);
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
-        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/imported', ['profile' => 'Laravel 11, Flutter app in /mobile.'], $this->worker())->assertOk();
+        // the repo comes from the project's own .git folder, read by the worker
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/imported', ['profile' => 'Laravel 11, Flutter app in /mobile.', 'github_repo' => 'acme/shop-erp'], $this->worker())->assertOk();
 
         return $project->refresh();
     }
@@ -74,18 +72,17 @@ class ProjectImportTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/complete', $release + ['summary' => 'تم التعديل.', 'cost_usd' => 1], $this->worker())->assertOk();
     }
 
-    public function test_the_worker_gets_the_import_with_its_repo_and_rules_and_the_token_only_as_a_secret(): void
+    public function test_the_worker_gets_the_import_with_its_release_rules_and_nothing_else_is_asked(): void
     {
         $project = $this->importAs(BuilderProject::RELEASE_BATCH);
 
-        $this->assertSame('acme/shop-erp', $project->github_repo);
         $job = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job');
         $this->assertSame('import', $job['kind']);
         $this->assertSame('https://drive.google.com/file/d/1AbCdEf/view?usp=sharing', $job['import_url']);
-        $this->assertSame('acme/shop-erp', $job['github_repo']);
         $this->assertTrue($job['deploy']);
         $this->assertFalse($job['release_now']);
-        $this->assertSame('github_pat_secret', collect($job['secrets'])->firstWhere('name', 'github_token')['value']);
+        $this->assertSame([], $job['secrets']);
+        $this->assertNull($project->github_repo);
     }
 
     public function test_an_imported_project_opens_as_a_delivered_chat_without_download_or_trial(): void
@@ -94,6 +91,7 @@ class ProjectImportTest extends TestCase
 
         $this->assertSame(BuilderProject::READY, $project->status);
         $this->assertSame(1, $project->version);
+        $this->assertSame('acme/shop-erp', $project->github_repo);
         $this->assertStringContainsString('Flutter app in /mobile', $project->import_profile);
         $state = $this->getJson('/ai/'.$project->uuid.'/state')->assertOk();
         $state->assertJsonPath('open_for_chat', true)->assertJsonPath('delivery.download_url', null)->assertJsonPath('trial', fn ($trial) => $trial['can_request'] === false);
@@ -177,12 +175,12 @@ class ProjectImportTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$other->uuid.'/complete', ['summary' => 'done', 'cost_usd' => 1], $this->worker())->assertStatus(422);
     }
 
-    public function test_the_import_form_takes_only_drive_and_github_links(): void
+    public function test_the_import_form_takes_only_a_drive_link(): void
     {
         $this->actingAs($this->admin())->post('/admin/builder/import', [
-            'title' => 'X', 'description' => 'Y', 'import_url' => 'https://example.com/x.zip', 'github_repo' => 'https://gitlab.com/a/b',
+            'title' => 'X', 'description' => 'Y', 'import_url' => 'https://example.com/x.zip',
             'locale' => 'ar', 'release_mode' => 'each', 'release_after_changes' => 1, 'release_quiet_minutes' => 60,
-        ])->assertSessionHasErrors(['import_url', 'github_repo']);
+        ])->assertSessionHasErrors(['import_url']);
 
         $this->assertSame(0, BuilderProject::count());
     }

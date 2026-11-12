@@ -12,10 +12,10 @@ const MODES: [ReleaseMode, [string, string], [string, string]][] = [
 
 const field = 'w-full rounded-lg border px-3 py-2 text-sm';
 
-/** The owner brings in an existing project (a Drive zip and its GitHub repo) for a customer to keep changing in the chat. */
+/** The owner brings in an existing project (a Drive zip of its folder) for a customer to keep changing in the chat. */
 export default function ImportProject() {
     const form = useForm({
-        title: '', description: '', import_url: '', github_repo: '', github_token: '', locale: 'ar',
+        title: '', description: '', import_url: '', locale: 'ar',
         release_mode: 'batch' as ReleaseMode, release_after_changes: 3, release_quiet_minutes: 60, deploy_enabled: true,
     });
     const error = (name: keyof typeof form.data) => form.errors[name] && <p className="text-sm text-red-700">{form.errors[name]}</p>;
@@ -31,13 +31,8 @@ export default function ImportProject() {
                 <textarea className={field} rows={3} placeholder={t('What the project is and who uses it (the chat reads this)', 'المشروع ده إيه ومين بيستخدمه (الشات بيقرا ده)')} value={form.data.description} onChange={(e) => form.setData('description', e.target.value)} dir="auto" required />
                 {error('description')}
                 <input className={field} placeholder={t('Google Drive link to the project .zip', 'لينك Google Drive لملف المشروع .zip')} value={form.data.import_url} onChange={(e) => form.setData('import_url', e.target.value)} dir="ltr" required />
-                <p className="text-xs text-slate-500">{t('Share it as "Anyone with the link". The SSH and deploy files inside it stay on the build PC and are never shown to the customer.', 'شاركه "أي حد معاه اللينك". ملفات الـ SSH والـ deploy اللي جواه بتفضل على جهاز البناء ومبتظهرش للعميل.')}</p>
+                <p className="text-xs text-slate-500">{t('Share it as "Anyone with the link". Zip the whole project folder with its .git folder: its GitHub repo, SSH and deploy files are read from it, stay on the build PC, and are never shown to the customer.', 'شاركه "أي حد معاه اللينك". اضغط مجلد المشروع كله ومعاه مجلد .git: الـ GitHub والـ SSH وملفات الـ deploy بتتقري منه، وبتفضل على جهاز البناء ومبتظهرش للعميل.')}</p>
                 {error('import_url')}
-                <div className="grid gap-3 sm:grid-cols-2">
-                    <input className={field} placeholder="https://github.com/owner/repo" value={form.data.github_repo} onChange={(e) => form.setData('github_repo', e.target.value)} dir="ltr" />
-                    <input className={field} type="password" autoComplete="off" placeholder={t('GitHub token (Contents + Pull requests)', 'توكن GitHub (Contents + Pull requests)')} value={form.data.github_token} onChange={(e) => form.setData('github_token', e.target.value)} dir="ltr" />
-                </div>
-                {error('github_repo')}{error('github_token')}
                 <select className={field} value={form.data.locale} onChange={(e) => form.setData('locale', e.target.value)} aria-label={t('Customer language', 'لغة العميل')}>
                     <option value="ar">{t('Customer speaks Arabic', 'العميل بيتكلم عربي')}</option>
                     <option value="en">{t('Customer speaks English', 'العميل بيتكلم إنجليزي')}</option>
@@ -52,11 +47,11 @@ export default function ImportProject() {
 }
 
 type ImportForm = ReturnType<typeof useForm<{
-    title: string; description: string; import_url: string; github_repo: string; github_token: string; locale: string;
+    title: string; description: string; import_url: string; locale: string;
     release_mode: ReleaseMode; release_after_changes: number; release_quiet_minutes: number; deploy_enabled: boolean;
 }>>;
 
-/** When the changes go out (GitHub pull request, then the deploy), and how the deploy runs. */
+/** When the changes go out (a branch on GitHub for review, then the deploy). */
 function ReleaseRules({ form }: { form: ImportForm }) {
     return (
         <fieldset className="grid gap-2 rounded-lg border p-3">

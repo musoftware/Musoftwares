@@ -77,7 +77,6 @@ class AdminBuilderController extends Controller
             'release_after_changes' => $project->release_after_changes,
             'release_quiet_minutes' => $project->release_quiet_minutes,
             'deploy_enabled' => $project->deploy_enabled,
-            'deploy_command' => $project->deploy_command,
             'imported_at' => $project->imported_at?->timezone('Africa/Cairo')->toDateTimeString(),
             'released_at' => $project->released_at?->timezone('Africa/Cairo')->toDateTimeString(),
             'changes_waiting' => $project->changesWaiting(),

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
-use Modules\AppBuilder\Models\BuilderSecret;
 
 /**
  * A project the owner brings in for a customer who keeps asking for changes. The worker downloads it (a Google Drive
@@ -16,13 +15,12 @@ use Modules\AppBuilder\Models\BuilderSecret;
  */
 class ProjectImports
 {
-    public function __construct(private readonly ProjectSecrets $secrets, private readonly ProjectPayment $payment) {}
+    public function __construct(private readonly ProjectPayment $payment) {}
 
-    /** @param array{title: string, import_url: string, github_repo?: ?string, github_token?: ?string, locale: string, description: string, release_mode: string, release_after_changes: int, release_quiet_minutes: int, deploy_enabled: bool, deploy_command?: ?string} $data */
+    /** @param array{title: string, import_url: string, locale: string, description: string, release_mode: string, release_after_changes: int, release_quiet_minutes: int, deploy_enabled: bool} $data */
     public function import(array $data, string $ip): BuilderProject
     {
-        return DB::transaction(function () use ($data, $ip): BuilderProject {
-            $project = BuilderProject::create([
+        return BuilderProject::create([
                 'ip' => $ip,
                 'locale' => $data['locale'],
                 'currency' => config('builder.pricing.currency'),
@@ -34,36 +32,23 @@ class ProjectImports
                 'status' => BuilderProject::QUEUED,
                 'job_kind' => BuilderProject::JOB_IMPORT,
                 'paid_at' => now(),
-                'import_url' => $data['import_url'],
-                'github_repo' => $this->repoPath($data['github_repo'] ?? null),
-                'release_mode' => $data['release_mode'],
-                'release_after_changes' => $data['release_after_changes'],
-                'release_quiet_minutes' => $data['release_quiet_minutes'],
-                'deploy_enabled' => $data['deploy_enabled'],
-                'deploy_command' => $data['deploy_command'] ?? null,
-            ]);
-            // the token goes only to the worker, which keeps it out of the build's sandbox
-            $this->secrets->save($project, [['name' => 'github_token', 'value' => (string) ($data['github_token'] ?? '')]], BuilderSecret::FROM_TEAM);
-
-            return $project;
-        });
+            'import_url' => $data['import_url'],
+            'release_mode' => $data['release_mode'],
+            'release_after_changes' => $data['release_after_changes'],
+            'release_quiet_minutes' => $data['release_quiet_minutes'],
+            'deploy_enabled' => $data['deploy_enabled'],
+        ]);
     }
 
-    /** "https://github.com/owner/repo(.git)" becomes "owner/repo"; anything else is refused by the form before this. */
-    public function repoPath(?string $url): ?string
+    /**
+     * The worker has the project in its folder: it is now a delivered project the customer can change. Its GitHub
+     * repo is the one the project's own .git folder points to, if any.
+     */
+    public function imported(BuilderProject $project, string $profile, ?string $githubRepo): void
     {
-        if ($url === null || ! preg_match('#github\.com[/:]([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?/?$#', trim($url), $m)) {
-            return null;
-        }
-
-        return $m[1].'/'.$m[2];
-    }
-
-    /** The worker has the project in its folder: it is now a delivered project the customer can change. */
-    public function imported(BuilderProject $project, string $profile): void
-    {
-        DB::transaction(function () use ($project, $profile): void {
+        DB::transaction(function () use ($project, $profile, $githubRepo): void {
             $project->update([
+                'github_repo' => $githubRepo,
                 'status' => BuilderProject::READY,
                 'job_kind' => BuilderProject::JOB_BUILD,
                 'version' => 1,

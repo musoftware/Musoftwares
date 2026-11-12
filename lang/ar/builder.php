@@ -98,7 +98,6 @@ return [
         'import_started' => 'الـ worker بيحمّل المشروع. هيوصلك إيميل لما الشات يبقى جاهز تبعته للعميل.',
         'release_started' => 'التعديلات المستنية بتترفع على GitHub والسيرفر دلوقتي.',
         'import_drive_only' => 'استخدم لينك مشاركة من Google Drive لملف .zip (أي حد معاه اللينك يقدر يشوفه).',
-        'import_github_only' => 'استخدم لينك الـ repo، زي https://github.com/owner/repo.',
     ],
     'trial_request' => 'جرّبه في متصفح حقيقي',
     'trial_waiting' => 'بنجهّزلك متصفح حقيقي فيه البرنامج، دقيقة واحدة...',

@@ -21,7 +21,11 @@ class WorkerReportRequest extends FormRequest
                 // ideas for the next version, as JSON: [{"title": "...", "description": "..."}]
                 'ideas' => ['nullable', 'string', 'max:6000'],
             ],
-            'builder.worker.imported' => ['profile' => ['required', 'string', 'max:20000']],
+            'builder.worker.imported' => [
+                'profile' => ['required', 'string', 'max:20000'],
+                // "owner/repo", read from the project's own .git folder
+                'github_repo' => ['nullable', 'string', 'max:200', 'regex:#^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$#'],
+            ],
             'builder.worker.released' => self::release(),
             default => ['error' => ['required', 'string', 'max:8000'], 'cost_usd' => ['required', 'numeric', 'min:0', 'max:10000']],
         };

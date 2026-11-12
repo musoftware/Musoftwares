@@ -8,7 +8,6 @@ export interface ImportState {
     release_after_changes: number;
     release_quiet_minutes: number;
     deploy_enabled: boolean;
-    deploy_command: string | null;
     imported_at: string | null;
     released_at: string | null;
     changes_waiting: number;
@@ -33,8 +32,8 @@ export default function ReleasePanel({ uuid, state }: { uuid: string; state: Imp
             {state.github_repo && <p dir="ltr"><a className="font-semibold text-blue-700" href={`https://github.com/${state.github_repo}`} target="_blank" rel="noopener">github.com/{state.github_repo}</a></p>}
             <p>{t('Changes go out:', 'التعديلات بتترفع:')} {ruleText(state)}</p>
             <p>{state.deploy_enabled
-                ? <>{t('Deploys to the server', 'بيرفع على السيرفر')}{state.deploy_command && <> · <code dir="ltr">{state.deploy_command}</code></>}</>
-                : t('GitHub pull request only, no deploy', 'pull request على GitHub بس، من غير رفع على السيرفر')}</p>
+                ? t('Deploys to the server the way the project does', 'بيرفع على السيرفر بنفس طريقة المشروع')
+                : t('GitHub review only, no deploy', 'مراجعة على GitHub بس، من غير رفع على السيرفر')}</p>
             <p>{t(`Changes waiting: ${state.changes_waiting}`, `تعديلات مستنية: ${state.changes_waiting}`)}{state.released_at && <> · {t('last release', 'آخر رفع')} <span dir="ltr">{state.released_at}</span></>}</p>
             {state.pull_request_url && <p dir="ltr"><a className="font-semibold text-blue-700 wrap-anywhere" href={state.pull_request_url} target="_blank" rel="noopener">{state.pull_request_url}</a></p>}
             {state.can_release && (
