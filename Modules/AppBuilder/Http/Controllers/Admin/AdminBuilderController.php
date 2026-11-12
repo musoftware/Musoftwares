@@ -163,22 +163,11 @@ class AdminBuilderController extends Controller
         return back()->with('success', __('builder.admin.design_saved'));
     }
 
-    /**
-     * A paid build that failed goes back to the worker. The worker starts from the project's folder on the drive,
-     * so the work already done is kept and the build only finishes what is left.
-     */
+    /** A paid build that failed goes back to the worker, keeping the work already done. */
     public function retry(BuilderProject $project): RedirectResponse
     {
         abort_unless($project->status === BuilderProject::FAILED, 409);
-        $project->update([
-            'status' => BuilderProject::QUEUED,
-            'attempts' => 0,
-            'error' => null,
-            'lease_expires_at' => null,
-            'progress_step' => null,
-            'progress_file' => null,
-            'progress_note' => null,
-        ]);
+        app(\Modules\AppBuilder\Services\JobQueue::class)->requeue($project);
 
         return back()->with('success', __('builder.admin.retried'));
     }

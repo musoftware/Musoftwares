@@ -187,5 +187,8 @@ return [
         'snapshot_kb' => 4096,
         'lease_minutes' => 120,
         'max_attempts' => 3,
+        // a build that crashed goes back to the worker by itself this many times, after this wait
+        'auto_retries' => (int) env('BUILDER_AUTO_RETRIES', 2),
+        'auto_retry_after_minutes' => 5,
     ],
 ];

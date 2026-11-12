@@ -606,6 +606,28 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/retry')->assertStatus(409);
     }
 
+    public function test_a_crashed_build_restarts_by_itself_twice_and_a_real_failure_waits_for_the_owner(): void
+    {
+        $crashed = $this->buildingProject();
+        $crashed->update(['budget_usd' => 10, 'job_cost_usd' => 3]);
+        $this->travel(-10)->minutes();
+        $crashed->update(['status' => BuilderProject::FAILED, 'error' => 'The agent stopped with an error: Claude Code process terminated by signal SIGABRT']);
+        $spent = $this->buildingProject();
+        $spent->update(['status' => BuilderProject::FAILED, 'error' => 'The agent stopped: the budget for this job is used up.', 'budget_usd' => 10, 'job_cost_usd' => 3]);
+        $this->travelBack();
+        $retries = app(\Modules\AppBuilder\Services\CrashRetries::class);
+
+        $this->assertSame(1, $retries->retryAll());
+        $this->assertSame(BuilderProject::QUEUED, $crashed->refresh()->status);
+        $this->assertSame(1, $crashed->auto_retries);
+        $this->assertSame(BuilderProject::FAILED, $spent->refresh()->status);
+
+        // after two tries it waits for the owner, so a broken build never loops
+        $crashed->update(['auto_retries' => 2, 'status' => BuilderProject::FAILED]);
+        $this->travel(10)->minutes();
+        $this->assertSame(0, $retries->retryAll());
+    }
+
     public function test_the_customer_sees_the_builds_phases_in_plain_words(): void
     {
         config(['builder.retell_delivery' => true]);

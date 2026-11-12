@@ -70,6 +70,7 @@ class JobQueue
                 'progress_note' => null,
                 'build_cost_usd' => (float) $project->build_cost_usd + $costUsd,
                 'job_cost_usd' => 0,
+                'auto_retries' => 0,
             ]);
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
@@ -127,6 +128,23 @@ class JobQueue
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * A failed build goes back to the worker. The worker starts from the project's folder on the drive, so the work
+     * already done is kept and the build only finishes what is left.
+     */
+    public function requeue(BuilderProject $project): void
+    {
+        $project->update([
+            'status' => BuilderProject::QUEUED,
+            'attempts' => 0,
+            'error' => null,
+            'lease_expires_at' => null,
+            'progress_step' => null,
+            'progress_file' => null,
+            'progress_note' => null,
+        ]);
     }
 
     /** A job whose worker died on every try stops here, so the owner hears about it instead of a silent loop. */

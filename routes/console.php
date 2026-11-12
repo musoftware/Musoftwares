@@ -74,6 +74,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)
     ->everyMinute()
     ->withoutOverlapping(2);
 
+// the AI builder: a paid build that crashed (not a real failure) goes back to the worker by itself, twice at most
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\CrashRetries::class)->retryAll())
+    ->name('builder-crash-retries')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(4);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
