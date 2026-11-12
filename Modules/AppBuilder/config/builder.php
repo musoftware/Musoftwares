@@ -69,6 +69,9 @@ return [
         ],
         'markup' => (float) env('BUILDER_MARKUP', 3),
         'minimum' => (float) env('BUILDER_MINIMUM_PRICE', 0),
+        // a change to a delivered or imported program is priced by its own work, never by the minimum of a whole
+        // project of its type (a change to a Flutter app is not a new app); this is the least a change costs
+        'change_minimum' => (float) env('BUILDER_CHANGE_MINIMUM', 5),
         // the worker stops spending once real cost passes the estimate times this
         'budget_factor' => (float) env('BUILDER_BUDGET_FACTOR', 2),
         'min_tokens' => 8000,
@@ -137,13 +140,9 @@ return [
         'clearing_days' => (int) env('BUILDER_REFERRAL_CLEARING_DAYS', 14),
     ],
 
-    // A fix or an adjustment within the agreed idea is free after delivery; a new idea is paid. These limits keep a
-    // new idea from passing as an adjustment.
-    'free_fixes' => [
-        'per_project' => (int) env('BUILDER_FREE_FIXES', 5),
-        'max_tokens' => (int) env('BUILDER_FREE_FIX_MAX_TOKENS', 30000),
-        'days' => (int) env('BUILDER_FREE_FIX_DAYS', 30),
-    ],
+    // The warranty: for this many days after the first delivery (or the import) every fix to what the program has or
+    // promises is free, however many. Something new is always paid, and after the warranty a fix is paid too.
+    'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
 
     'limits' => [
         'message_chars' => 3000,

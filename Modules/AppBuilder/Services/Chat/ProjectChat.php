@@ -47,7 +47,8 @@ class ProjectChat
      */
     public function send(BuilderProject $project, string $text, array $files = [], array $previewNames = []): BuilderMessage
     {
-        if ($project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
+        // a paid project is an ongoing conversation; the limit only stops endless talk before a price
+        if (! $project->takesRequests() && $project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
             throw new ChatLimitReached('This chat reached its message limit.');
         }
         if ($this->freeChat->mustSignIn($project)) {
@@ -127,7 +128,8 @@ class ProjectChat
 
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
-        $this->updateQuote($project, $turn);
+        // a project that started and was paid keeps a list of requests instead of one price
+        $project->takesRequests() ? $this->addRequest($project, $turn, $question) : $this->updateQuote($project, $turn);
 
         return $project->messages()->create([
             'role' => BuilderMessage::ASSISTANT,
@@ -151,14 +153,13 @@ class ProjectChat
         }
 
         $turn->quoteReady ? $this->applyQuote($project, $turn) : $this->withdrawQuote($project);
-        $this->startImportedFix($project);
     }
 
-    /** In the customer's own imported program, a change to what it already has goes to the engineer at once, with no button. */
-    private function startImportedFix(BuilderProject $project): void
+    /** A message that asks for work becomes one request in the list; questions and small talk add nothing. */
+    private function addRequest(BuilderProject $project, ChatTurn $turn, BuilderMessage $question): void
     {
-        if ($project->isImported() && $project->status === BuilderProject::QUOTED && $project->free_fix) {
-            app(\Modules\AppBuilder\Services\ProjectPayment::class)->startFreeFix($project);
+        if ($turn->quoteReady) {
+            app(\Modules\AppBuilder\Services\ProjectRequests::class)->add($project, $turn, $question);
         }
     }
 
@@ -175,11 +176,13 @@ class ProjectChat
 
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
-        // the customer's own imported program: every change to what it already has is free, with no count or time limit
-        $free = $turn->isFix && ($project->isImported() || $project->canGetFreeFix($turn->estimatedTokens));
-        $price = $free
-            ? $this->pricer->freeFix($turn->estimatedTokens, $turn->complex)
-            : $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType);
+        $free = $turn->isFix && $project->isUnderWarranty();
+        $price = match (true) {
+            $free => $this->pricer->freeFix($turn->estimatedTokens, $turn->complex),
+            // a change to what is delivered is priced by its own work, not as a new program of its type
+            $project->hasDelivery() => $this->pricer->change($turn->estimatedTokens, $turn->complex),
+            default => $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType),
+        };
         // a program we already sold keeps its known price: the same system is never cheaper than it was sold for
         if (! $free && ! $project->hasDelivery()) {
             $price['amount'] = max($price['amount'], app(\Modules\AppBuilder\Services\Starters::class)->knownPrice($project->starter));
@@ -271,14 +274,56 @@ class ProjectChat
 
         return "\n\n## This is the customer's existing program\n\n"
             ."Musoftware brought this customer's own working program in, and the build engineer has all its files. Treat it as "
-            ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has, and it decides "
-            ."what is old and what is new. A fix or a change to anything it already has (how it works, looks or is worded) is "
-            ."`kind` \"fix\": it is free and goes to the engineer at once by itself, with no button and no price, so say plainly "
-            ."that you started on it. Something it does not have yet (a new feature, screen, report, kind of user or integration) "
-            ."is a paid new idea, `kind` \"build\". For a fix keep the `spec` short: the engineer reads the customer's own words "
-            ."and the code. Never offer ready programs, designs, a download or a live trial for it. Changes go live on the "
-            ."customer's own server.\n\n"
+            ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has; use it, with "
+            ."what the customer shows you, to tell a fix from something new. Never offer ready programs, designs, a download or "
+            ."a live trial for it. Changes go live on the customer's own server.\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
+    }
+
+    /**
+     * A project that started and was paid: the customer writes like in a messaging app, during a build too, and each
+     * change becomes one item in the list beside the chat.
+     */
+    private function requestList(BuilderProject $project): string
+    {
+        if (! $project->takesRequests()) {
+            return '';
+        }
+
+        return "\n\n## The customer's list of requests\n\n"
+            ."This project has started and is paid, so the customer writes here like in a messaging app, at any time, even "
+            ."while the engineer works, and every change they ask for in the chat becomes one item in a list beside the chat. "
+            ."For each message decide: when it asks for work and you know enough, send it as a quote (`quote.ready` true) for "
+            ."that one request only, never one that is already in the list below. Ask first only when you truly cannot tell "
+            ."what they want.\n\n"
+            ."Fix or development, fairly:\n"
+            ."- `kind` \"fix\" (تصليح): something the program already has, shows or promises does not work, or works differently "
+            ."from what the customer means: a broken screen, a wrong result, a wording, a look, the steps of something it has. "
+            ."A promise counts: when the program's own screens or texts already offer it (for example a subscription screen "
+            ."that lists \"videos for subscribers only\"), making it really work is a fix, not development.\n"
+            ."- `kind` \"build\" (تطوير): something the program does not have and never promised: a new feature, screen, report, "
+            ."section of the admin panel, kind of user or integration.\n"
+            ."- Mixed: send the fix now, and say the new part comes as its own item once they ask for it.\n\n"
+            .$this->warrantyLine($project)."\n\n"
+            ."Keep `spec` short: the engineer also reads the customer's own words. Answer in one or two lines, and always say "
+            ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
+            ."وبدأنا عليه\" or \"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\". Never say "
+            ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
+            ."nothing.\n\nThe list now:\n"
+            .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project);
+    }
+
+    /** The warranty as facts for the chat: fixes are free until it ends, then priced like any work. */
+    private function warrantyLine(BuilderProject $project): string
+    {
+        $until = $project->warranty_until?->timezone('Africa/Cairo')->toDateString();
+        if ($project->isUnderWarranty()) {
+            return "Warranty: until {$until}. Every fix is free until then, however many, and goes to the engineer by itself. "
+                .'Development always has its own price.';
+        }
+
+        return 'Warranty: '.($until ? "ended on {$until}" : 'none').'. A fix now has its own price too, like development; '
+            .'say so kindly when it comes up.';
     }
 
     private function systemPrompt(BuilderProject $project): string
@@ -294,6 +339,7 @@ class ProjectChat
             .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
             .($designs !== '' ? "\n\n## Free designs\n\n".$designs : '')
             .$this->importedProject($project)
+            .$this->requestList($project)
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
             ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }

@@ -101,10 +101,37 @@
         .viewer{max-width:720px;margin:0 auto;padding:12px 16px 0;display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
         .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
         .card .before{color:var(--muted);text-decoration:line-through;font-size:16px;font-weight:400;margin-inline-start:8px}
+        /* the list of requests: fixed on the left of a wide screen, a full sheet opened from the top bar on a phone */
+        .requests{display:none}
+        body.has-requests .requests{display:flex;flex-direction:column;gap:8px;position:fixed;left:16px;top:16px;bottom:16px;width:300px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff;overflow-y:auto;z-index:5}
+        body.has-requests{padding-left:332px}
+        body.has-requests .composer{left:332px}
+        .requests .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+        .requests h2{margin:0;font-size:18px}
+        .requests .close,.show-requests{display:none}
+        .req{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:10px 0;border-top:1px solid var(--line)}
+        label.req{cursor:pointer}
+        .req input{width:20px;height:20px;margin:4px 0 0;flex:none}
+        .req .body{flex:1;min-width:0}
+        .req .t{font-weight:600;overflow-wrap:anywhere}
+        .req .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--muted)}
+        .req .meta strong{color:var(--ink)}
+        .req.done .t{color:var(--muted);font-weight:400}
+        .requests .pay{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+        .requests .total{margin:0;font-weight:600}
+        .show-requests{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+        @media (max-width:1099px){
+            body.has-requests{padding-left:0}
+            body.has-requests .composer{left:0}
+            body.has-requests .requests{display:none}
+            body.has-requests.requests-shown .requests{display:flex;inset:0;width:auto;border:0;border-radius:0;z-index:30}
+            body.has-requests .show-requests,.requests .close{display:inline-flex;align-items:center}
+        }
     </style>
 </head>
 <body>
 <div class="viewer">
+    <button type="button" class="show-requests" id="requests-open" aria-controls="requests"></button>
     @if ($state)
         <a href="{{ route('builder.index') }}">{{ __('builder.new_chat') }}</a>
     @endif
@@ -152,6 +179,8 @@
         @endunless
     </section>
 </main>
+
+<aside class="requests" id="requests" aria-label="{{ __('builder.requests.title') }}"></aside>
 
 <div class="composer">
     <div class="box">
@@ -713,7 +742,104 @@
         try { sessionStorage.setItem('leave-offer-' + state.uuid, '1'); } catch (error) { /* private mode: the server still limits it */ }
     }
 
+    // The list of requests beside the chat. It is drawn again only when it changes, so the polling during a build never
+    // wipes the details the customer is typing into its payment form.
+    const requestsBox = document.getElementById('requests');
+    const requestsOpen = document.getElementById('requests-open');
+    const unticked = new Set();
+    let requestsKey = '';
+    let requestsPayOpen = false;
+
+    function renderRequests() {
+        const list = state && state.requests;
+        document.body.classList.toggle('has-requests', !!list);
+        if (!list) { requestsBox.replaceChildren(); requestsKey = ''; return; }
+        requestsOpen.textContent = T.requests.open.replace(':count', list.items.length);
+        const key = JSON.stringify(list);
+        if (key === requestsKey) return;
+        requestsKey = key;
+        requestsBox.replaceChildren(...requestsNodes(list));
+    }
+
+    function requestsNodes(list) {
+        const head = el('div', {class: 'head'});
+        const close = el('button', {class: 'btn ghost close', type: 'button'}, T.requests.close);
+        close.addEventListener('click', hideRequests);
+        head.append(el('h2', {}, T.requests.title), close);
+        const nodes = [head, el('p', {class: 'hint'}, T.requests.how)];
+        if (list.warranty) nodes.push(el('p', {class: 'hint'}, (list.warranty.active ? T.requests.warranty : T.requests.warranty_over).replace(':date', list.warranty.until)));
+        if (!list.items.length) return [...nodes, el('p', {class: 'hint'}, T.requests.empty)];
+        list.items.forEach((item) => nodes.push(requestRow(item, list.currency)));
+        const unpaid = list.items.filter((item) => item.status === 'unpaid');
+        if (unpaid.length) nodes.push(requestsPay(list, unpaid));
+        return nodes;
+    }
+
+    /** One request: fix or development, free or its price, and where it is now. An unpaid one can be ticked. */
+    function requestRow(item, currency) {
+        const unpaid = item.status === 'unpaid';
+        const row = el(unpaid ? 'label' : 'div', {class: 'req' + (item.status === 'done' ? ' done' : '')});
+        if (unpaid) {
+            const box = el('input', {type: 'checkbox', 'aria-label': item.title});
+            box.checked = !unticked.has(item.id);
+            box.addEventListener('change', () => { box.checked ? unticked.delete(item.id) : unticked.add(item.id); updateRequestsTotal(); });
+            row.append(box);
+        }
+        const body = el('div', {class: 'body'});
+        const meta = el('div', {class: 'meta'});
+        meta.append(
+            el('span', {}, T.requests[item.kind] || ''),
+            el('strong', {}, item.free ? T.requests.free : item.amount + ' ' + currency),
+            el('span', {}, T.requests.status[item.status] || item.status),
+        );
+        body.append(el('div', {class: 't', dir: 'auto'}, item.title), meta);
+        row.append(body);
+        return row;
+    }
+
+    let requestsPayParts = null;
+
+    /** The total of the ticked requests and one payment for them; an admin can mark them paid instead. */
+    function requestsPay(list, unpaid) {
+        const box = el('div', {class: 'pay'});
+        const total = el('p', {class: 'total'});
+        const ids = el('input', {type: 'hidden', name: 'ids'});
+        const [open, payForm] = payFormNodes(list.pay_url, T.requests.pay, [], requestsPayOpen, () => { requestsPayOpen = true; });
+        payForm.append(ids);
+        box.append(total, open, payForm);
+        const admin = list.admin_paid_url ? el('button', {class: 'btn ghost', type: 'button'}, T.requests.admin_paid) : null;
+        if (admin) {
+            admin.addEventListener('click', () => markRequestsPaid(list.admin_paid_url, ids.value, admin));
+            box.append(admin);
+        }
+        requestsPayParts = {unpaid, currency: list.currency, total, ids, buttons: [open, payForm.querySelector('[type=submit]'), admin].filter(Boolean)};
+        updateRequestsTotal();
+        return box;
+    }
+
+    function updateRequestsTotal() {
+        if (!requestsPayParts) return;
+        const chosen = requestsPayParts.unpaid.filter((item) => !unticked.has(item.id));
+        const sum = chosen.reduce((all, item) => all + Number(item.amount), 0);
+        requestsPayParts.total.textContent = T.requests.total.replace(':amount', sum.toFixed(2) + ' ' + requestsPayParts.currency);
+        requestsPayParts.ids.value = chosen.map((item) => item.id).join(',');
+        requestsPayParts.buttons.forEach((button) => { button.disabled = chosen.length === 0; });
+    }
+
+    async function markRequestsPaid(url, ids, button) {
+        if (!ids || !window.confirm(T.requests.admin_paid_confirm)) return;
+        button.disabled = true;
+        showError('');
+        try { state = await call(url, {ids}); render(); } catch (error) { showError(error.message); button.disabled = false; }
+    }
+
+    function showRequests() { document.body.classList.add('requests-shown'); requestsBox.querySelector('.close')?.focus(); }
+    function hideRequests() { document.body.classList.remove('requests-shown'); requestsOpen.focus(); }
+    requestsOpen.addEventListener('click', showRequests);
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && document.body.classList.contains('requests-shown')) hideRequests(); });
+
     function render() {
+        renderRequests();
         thread.querySelectorAll(':scope > :not(#empty)').forEach((node) => node.remove());
         const messages = state ? state.messages : [];
         empty.hidden = messages.length > 0 || waiting;
@@ -744,7 +870,9 @@
     function schedulePoll() {
         clearTimeout(pollTimer);
         const studyWriting = state && state.study && state.study.status === 'writing';
-        if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting)) return;
+        // a request in line or being built changes on its own; a paid one appears when the gateway reports it
+        const requestsMoving = state && state.requests && state.requests.items.some((item) => item.status === 'ready' || item.status === 'building');
+        if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }
             render();

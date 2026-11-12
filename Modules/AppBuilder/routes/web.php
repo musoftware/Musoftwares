@@ -29,6 +29,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
         Route::post('/{project}/study/pay', [BuilderPaymentController::class, 'payStudy'])->middleware('throttle:10,1')->name('study.pay');
+        Route::post('/{project}/requests/pay', [BuilderPaymentController::class, 'payRequests'])->middleware('throttle:10,1')->name('requests.pay');
         Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60')->name('push');
         Route::post('/{project}/trial', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'request'])->middleware('throttle:6,60')->name('trial');
         Route::get('/{project}/download', [BuilderDeliveryController::class, 'download'])->middleware('throttle:20,1')->name('download');
@@ -67,6 +68,7 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');
     Route::post('/{project}/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markPaid'])->name('mark-paid');
+    Route::post('/{project}/requests/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markRequestsPaid'])->name('requests.mark-paid');
     Route::post('/{project}/extra', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'extra'])->name('extra');
     Route::post('/{project}/retry', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'retry'])->name('retry');
     Route::post('/{project}/design', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'design'])->name('design');

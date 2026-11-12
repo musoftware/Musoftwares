@@ -38,6 +38,21 @@ class QuotePricer
         ];
     }
 
+    /**
+     * A change to a program that is already delivered: its own work times the markup, at least the change minimum.
+     * The minimum of the project's type is for building a whole program from nothing, so it never applies here.
+     *
+     * @return array{tokens: int, cost: float, amount: float, design_fee: float, budget: float, model: string, project_type: string}
+     */
+    public function change(int $estimatedTokens, bool $complex = false): array
+    {
+        $pricing = config('builder.pricing');
+        $price = $this->price($estimatedTokens, $complex);
+        $amount = max((float) $pricing['change_minimum'], ceil($price['cost'] * $pricing['markup']));
+
+        return ['amount' => $amount, 'budget' => round($amount * $pricing['budget_factor'] / $pricing['markup'], 4)] + $price;
+    }
+
     /** A free fix gets the same model and spending cap as paid work; only the customer's price is zero. */
     public function freeFix(int $estimatedTokens, bool $complex = false): array
     {

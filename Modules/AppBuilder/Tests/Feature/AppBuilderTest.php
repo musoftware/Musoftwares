@@ -491,7 +491,9 @@ class AppBuilderTest extends TestCase
         $project->refresh();
         $this->assertSame(BuilderProject::QUEUED, $project->status);
         $this->assertSame('6.00', $project->paid_total);
-        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.queued'))->assertJsonPath('open_for_chat', false);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.queued'))
+            // paid and started: the customer can keep writing, and new changes join the list of requests
+            ->assertJsonPath('open_for_chat', true);
     }
 
     public function test_paying_an_old_quote_or_an_unsigned_webhook_starts_nothing(): void
@@ -1310,14 +1312,14 @@ class AppBuilderTest extends TestCase
         $this->assertSame($paidBefore, $project->paid_total);
     }
 
-    public function test_a_change_or_a_fix_past_the_limit_is_paid(): void
+    public function test_a_change_or_a_fix_after_the_warranty_is_paid(): void
     {
         $project = $this->deliveredProject();
         $this->answerAfterDelivery('build', 10000);
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'ضيف صفحة جديدة'])->assertOk()->assertJsonPath('quote.free', false);
         $this->postJson('/ai/'.$project->uuid.'/fix')->assertStatus(409);
 
-        $project->update(['free_fixes_used' => (int) config('builder.free_fixes.per_project')]);
+        $this->travel((int) config('builder.warranty_days') + 1)->days();
         $this->answerAfterDelivery('fix', 10000);
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'فيه عطل تاني'])->assertOk()->assertJsonPath('quote.free', false);
         $this->postJson('/ai/'.$project->uuid.'/fix')->assertStatus(409);

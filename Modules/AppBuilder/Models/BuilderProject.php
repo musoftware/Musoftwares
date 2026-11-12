@@ -78,6 +78,7 @@ class BuilderProject extends Model
         'build_cost_usd' => 'decimal:4',
         'paid_at' => 'datetime',
         'built_at' => 'datetime',
+        'warranty_until' => 'datetime',
         'lease_expires_at' => 'datetime',
         'free_fix' => 'boolean',
         'free_build' => 'boolean',
@@ -134,10 +135,30 @@ class BuilderProject extends Model
         return 'uuid';
     }
 
-    /** A running build that asked a question opens the chat for the answer. */
+    /** The changes the customer asked for after the project started, oldest first. */
+    public function requests(): HasMany
+    {
+        return $this->hasMany(BuilderRequest::class, 'project_id')->orderBy('id');
+    }
+
+    /**
+     * A running build that asked a question opens the chat for the answer. A project that started and was paid stays
+     * open like a messaging app: what the customer writes during a build joins their list of requests.
+     */
     public function isOpenForChat(): bool
     {
-        return in_array($this->status, self::OPEN_FOR_CHAT, true) || $this->isWaitingForAnswer();
+        return in_array($this->status, self::OPEN_FOR_CHAT, true) || $this->isWaitingForAnswer() || $this->takesRequests();
+    }
+
+    /** Started and paid (or brought in by the owner): each new change is a request in the list beside the chat. */
+    public function takesRequests(): bool
+    {
+        $started = $this->hasDelivery() || in_array($this->status, [self::QUEUED, self::BUILDING, self::DESIGNING], true);
+
+        return $started
+            && $this->job_kind !== self::JOB_IMPORT
+            && $this->status !== self::FAILED
+            && ((float) $this->paid_total > 0 || $this->isImported());
     }
 
     /** What is still owed on the current quote after a deposit; 0 when nothing was paid yet or all is paid. */
@@ -212,16 +233,10 @@ class BuilderProject extends Model
         return $this->version > 0;
     }
 
-    /** A bug in what was delivered is fixed for free, a few times, soon after delivery, if the fix is small. */
-    public function canGetFreeFix(int $estimatedTokens): bool
+    /** Every fix is free, however many, until the warranty ends (two months after the first delivery or the import). */
+    public function isUnderWarranty(): bool
     {
-        $rules = config('builder.free_fixes');
-
-        return $this->hasDelivery()
-            && ! $this->hasBalanceDue()
-            && $this->free_fixes_used < (int) $rules['per_project']
-            && $estimatedTokens <= (int) $rules['max_tokens']
-            && (bool) $this->built_at?->greaterThanOrEqualTo(now()->subDays((int) $rules['days']));
+        return $this->hasDelivery() && ! $this->hasBalanceDue() && (bool) $this->warranty_until?->isFuture();
     }
 
     /** Folder on the local disk that holds every delivered version. */

@@ -42,8 +42,8 @@ class WorkerJobController extends Controller
         return response()->json(['job' => [
             'uuid' => $project->uuid,
             'title' => $project->title,
-            // an imported project's engineer works from the customer's own words, like a developer told directly
-            'spec' => $project->isImported() ? app(\Modules\AppBuilder\Services\ProjectImports::class)->briefFor($project) : $project->spec,
+            // the customer's requests in their own words, like a developer told directly; the first build has the agreed brief
+            'spec' => app(\Modules\AppBuilder\Services\ProjectRequests::class)->briefFor($project) ?? $project->spec,
             'locale' => $project->customerLanguage(),
             'budget_usd' => (float) $project->budget_usd,
             'estimated_tokens' => $project->estimated_tokens,
@@ -195,6 +195,8 @@ class WorkerJobController extends Controller
             // delivered, but not out: the change waits for the owner's "release now"
             $imports->failed($project, (string) $request->validated('release_error'));
         }
+        // the requests this build carried are done; the ones that became ready meanwhile start now
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->finish($project->refresh());
 
         return response()->json(['status' => 'delivered', 'version' => $project->refresh()->version]);
     }

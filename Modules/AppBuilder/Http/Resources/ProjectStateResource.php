@@ -54,6 +54,34 @@ class ProjectStateResource extends JsonResource
             'admin_paid_url' => $request->user()?->isAdmin() ? route('admin.builder.mark-paid', $this->resource) : null,
             'delivery' => $this->hasDelivery() ? $this->delivery() : null,
             'failed' => $this->status === BuilderProject::FAILED,
+            'requests' => $this->requestList($request),
+        ];
+    }
+
+    /** The list beside the chat, once the project started and was paid: each change, its price or free, and its state. */
+    private function requestList(Request $request): ?array
+    {
+        if (! $this->takesRequests() && ! $this->requests()->exists()) {
+            return null;
+        }
+
+        return [
+            'items' => $this->requests()->latest('id')->limit(50)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'kind' => $item->kind,
+                'free' => $item->free,
+                'amount' => number_format((float) $item->amount, 2, '.', ''),
+                'status' => $item->status,
+            ])->values(),
+            'currency' => $this->currency,
+            // fixes are free until this day; after it a fix is priced like new work
+            'warranty' => $this->warranty_until ? [
+                'until' => $this->warranty_until->timezone('Africa/Cairo')->translatedFormat('j F Y'),
+                'active' => $this->isUnderWarranty(),
+            ] : null,
+            'pay_url' => route('builder.requests.pay', $this->resource),
+            'admin_paid_url' => $request->user()?->isAdmin() ? route('admin.builder.requests.mark-paid', $this->resource) : null,
         ];
     }
 

@@ -168,6 +168,17 @@ class AdminBuilderController extends Controller
         return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
     }
 
+    /** The owner marks the requests ticked in the customer's list as paid (paid by hand, or a test). */
+    public function markRequestsPaid(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectRequests $requests): JsonResponse
+    {
+        $ids = array_map('intval', explode(',', (string) $request->validate(['ids' => ['required', 'string', 'max:200', 'regex:/^\d+(,\d+)*$/']])['ids']));
+        if ($requests->markPaid($project, $ids, 'admin-'.$request->user()->id.'-'.now()->timestamp) === 0) {
+            return response()->json(['message' => __('builder.errors.no_requests')], 409);
+        }
+
+        return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
+    }
+
     /** The work turned out bigger: ask the customer for more, up to the top of the range they saw. */
     public function extra(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectPayment $payment): RedirectResponse
     {

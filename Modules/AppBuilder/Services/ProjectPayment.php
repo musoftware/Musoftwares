@@ -18,6 +18,9 @@ class ProjectPayment
     /** The order id marks a feasibility study bought on its own instead of a quote version. */
     private const STUDY_ORDER = 'study';
 
+    /** The order id marks a payment for requests from the list, followed by their ids. */
+    private const REQUESTS_ORDER = 'r';
+
     /** @param array{client_name: string, client_email: string, client_whatsapp: string, share?: int|null} $client */
     public function paymentUrl(BuilderProject $project, array $client): string
     {
@@ -35,6 +38,29 @@ class ProjectPayment
         $project->update($client);
 
         return $this->checkout($project, Study\FeasibilityStudy::price(), $project->id.'-'.self::STUDY_ORDER);
+    }
+
+    /**
+     * One payment for the requests the customer ticked in the list; their ids ride in the order id.
+     *
+     * @param  array{client_name: string, client_email: string, client_whatsapp: string}  $client
+     * @param  \Illuminate\Support\Collection<int, \Modules\AppBuilder\Models\BuilderRequest>  $requests
+     */
+    public function requestsPaymentUrl(BuilderProject $project, array $client, \Illuminate\Support\Collection $requests): string
+    {
+        $project->update($client);
+
+        return $this->checkout($project, (float) $requests->sum('amount'), $project->id.'-'.self::REQUESTS_ORDER.$requests->pluck('id')->implode('x'));
+    }
+
+    /** @return array{0: int, 1: list<int>}|null the project id and the paid request ids, for a payment of requests */
+    public function parseRequestsOrder(string $merchantOrderId): ?array
+    {
+        if (! preg_match('/^'.self::ORDER_PREFIX.'(\d+)-'.self::REQUESTS_ORDER.'([\dx]+)_/', $merchantOrderId, $m)) {
+            return null;
+        }
+
+        return [(int) $m[1], array_map('intval', array_filter(explode('x', $m[2])))];
     }
 
     private function checkout(BuilderProject $project, float $amount, string $invoiceId): string

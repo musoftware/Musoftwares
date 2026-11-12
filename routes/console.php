@@ -63,6 +63,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectImports::class)-
     ->everyFiveMinutes()
     ->withoutOverlapping(4);
 
+// the AI builder: requests that became ready while the engineer was busy (or a release ran) start once it is free
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)->startAllWaiting())
+    ->name('builder-start-requests')
+    ->everyMinute()
+    ->withoutOverlapping(2);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')

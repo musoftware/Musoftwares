@@ -194,14 +194,13 @@ class ProjectImportTest extends TestCase
         });
     }
 
-    public function test_a_change_to_what_the_program_has_starts_at_once_from_the_customers_own_words(): void
+    public function test_a_fix_in_the_warranty_starts_at_once_from_the_customers_own_words(): void
     {
         $project = $this->imported(BuilderProject::RELEASE_MANUAL);
         $this->chatAnswers('fix');
 
-        // big and long after the import: an imported project has no free-fix count, size or time limit
-        $this->travel(90)->days();
-        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'زرار الاشتراك مش بيفتح'])->assertOk();
+        // big work, but a fix during the two months after the import: free, with no count or size limit
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'زرار الاشتراك مش بيفتح'])->assertOk()->assertJsonPath('requests.items.0.free', true);
 
         $project->refresh();
         $this->assertSame(BuilderProject::QUEUED, $project->status);
@@ -216,9 +215,9 @@ class ProjectImportTest extends TestCase
         $project = $this->imported(BuilderProject::RELEASE_MANUAL);
         $this->chatAnswers('build');
 
-        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'عايز نظام اشتراكات جديد'])->assertOk();
-        $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
-        $this->assertFalse($project->free_fix);
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'عايز نظام اشتراكات جديد'])->assertOk()
+            ->assertJsonPath('requests.items.0.status', 'unpaid')->assertJsonPath('requests.items.0.free', false);
+        $this->assertSame(BuilderProject::READY, $project->refresh()->status);
 
         $this->deliverChange($project, ['study' => '# ZainArena\n- Paywall for news and reels']);
         $profile = $project->refresh()->import_profile;

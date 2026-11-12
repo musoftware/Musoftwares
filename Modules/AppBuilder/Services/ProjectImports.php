@@ -63,6 +63,7 @@ class ProjectImports
                 'released_version' => 1,
                 'imported_at' => now(),
                 'built_at' => now(),
+                'warranty_until' => now()->addDays((int) config('builder.warranty_days')),
                 'lease_expires_at' => null,
                 'progress_step' => null,
                 'attempts' => 0,
@@ -90,26 +91,6 @@ class ProjectImports
         $description = Str::before(Str::before((string) $project->import_profile, self::STUDY_HEADING), self::OLD_STUDY_HEADING);
 
         return trim($description.self::STUDY_HEADING.mb_substr(trim($study), 0, self::MAX_STUDY_CHARS));
-    }
-
-    /**
-     * What the engineer works from in an imported project: the customer's own words since the last delivery, as they
-     * wrote them, then the chat's short note. Like the owner writing to a developer directly.
-     */
-    public function briefFor(BuilderProject $project): string
-    {
-        $words = $project->messages()
-            ->where('role', BuilderMessage::USER)
-            ->when($project->built_at, fn ($query, $since) => $query->where('created_at', '>=', $since))
-            ->orderBy('id')
-            ->pluck('content')
-            ->map(fn ($text) => trim((string) $text))
-            ->filter()
-            ->unique()
-            ->implode("\n\n");
-
-        return "## The customer's own words\n\n".($words !== '' ? $words : '(none: see the note)')
-            ."\n\n## Note from the chat\n\n".trim((string) $project->spec);
     }
 
     /** Batch releases that are due: enough changes are waiting, or the customer has been quiet long enough. */

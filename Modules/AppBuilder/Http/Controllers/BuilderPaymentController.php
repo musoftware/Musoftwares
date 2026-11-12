@@ -34,6 +34,23 @@ class BuilderPaymentController extends Controller
         }
     }
 
+    /** Answers with the Kashier link for the requests the customer ticked in the list. */
+    public function payRequests(\Modules\AppBuilder\Http\Requests\RequestsPayRequest $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectRequests $requests): JsonResponse
+    {
+        $chosen = $requests->unpaid($project, $request->ids());
+        if ($chosen->isEmpty()) {
+            return response()->json(['message' => __('builder.errors.no_requests')], 409);
+        }
+
+        try {
+            return response()->json(['url' => $this->payment->requestsPaymentUrl($project, $request->client(), $chosen)]);
+        } catch (\Throwable $e) {
+            Log::error('App builder: requests payment start failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
+
+            return response()->json(['message' => __('builder.errors.payment')], 503);
+        }
+    }
+
     /** A signed-in customer pays from their site wallet; the build starts at once. */
     public function payWithWallet(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\WalletPayment $wallet): JsonResponse
     {
@@ -73,6 +90,9 @@ class BuilderPaymentController extends Controller
         }
 
         $data = $request->json('data', []);
+        if (($data['status'] ?? '') === 'SUCCESS' && ($paid = $this->payment->parseRequestsOrder((string) ($data['merchantOrderId'] ?? '')))) {
+            return $this->requestsPaid($paid, $data['transactionId'] ?? null);
+        }
         $order = $this->payment->parseOrderId((string) ($data['merchantOrderId'] ?? ''));
         if (($data['status'] ?? '') !== 'SUCCESS' || ! $order) {
             return response()->json(['status' => 'ignored']);
@@ -86,6 +106,18 @@ class BuilderPaymentController extends Controller
         $order[2]
             ? app(FeasibilityStudy::class)->markPaid($project, $data['transactionId'] ?? null)
             : $this->payment->markPaid($project, $order[1], $data['transactionId'] ?? null);
+
+        return response()->json(['status' => 'processed']);
+    }
+
+    /** @param array{0: int, 1: list<int>} $paid */
+    private function requestsPaid(array $paid, ?string $transactionId): JsonResponse
+    {
+        $project = BuilderProject::find($paid[0]);
+        if (! $project) {
+            return response()->json(['status' => 'error', 'message' => 'Project not found'], 404);
+        }
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->markPaid($project, $paid[1], $transactionId);
 
         return response()->json(['status' => 'processed']);
     }

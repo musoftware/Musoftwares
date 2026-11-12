@@ -58,6 +58,8 @@ class JobQueue
                 'status' => BuilderProject::READY,
                 'version' => $version,
                 'built_at' => now(),
+                // two months of free fixes start with the first delivery
+                'warranty_until' => $project->warranty_until ?? now()->addDays((int) config('builder.warranty_days')),
                 'lease_expires_at' => null,
                 'progress_step' => null,
                 'progress_file' => null,
