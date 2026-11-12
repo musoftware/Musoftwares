@@ -2645,7 +2645,7 @@
         "requests": {
             "title": "Your requests",
             "close": "Close",
-            "how": "Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty and starts by itself; development (something new) gets its price here, and you pay when you like.",
+            "how": "Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty, and the engineer reviews it and starts it; development (something new) gets its price here, and you pay when you like.",
             "fix": "Fix",
             "build": "Development",
             "warranty": "Warranty until :date: every fix is free.",
@@ -2660,6 +2660,7 @@
                 "done": "Done"
             },
             "rolled_back": "We took this change back, the program is as it was before it: :title",
+            "review": "Review and approve (admin)",
             "rejected": "We reviewed \":title\" and will not build it as it is. Write to us here if you want to talk it over.",
             "total": "Selected: :amount",
             "pay": "Pay for the selected",
@@ -2806,6 +2807,7 @@
         "copy_link": "Save the link of this page to come back any time.",
         "steps": {
             "designing": "Our designer is working on your design; the build starts as soon as it is ready",
+            "owner_review": "Paid. The engineer is reviewing your request and starts it soon",
             "queued": "Paid. Your program is next in line",
             "started": "The build has started",
             "planning": "Planning the program",
@@ -2843,6 +2845,11 @@
             "take": "Take the discount",
             "no": "No, thanks",
             "applied": ":percent% off the programming price is applied."
+        },
+        "telegram": {
+            "not_configured": "The Telegram bot is not set up on the server.",
+            "test_message": "Test message from Musoftware: your alerts will arrive here.",
+            "test_failed": "Not sent. Link Telegram first."
         },
         "errors": {
             "no_rollback": "This change cannot be rolled back now: it must be delivered with its commits known, and the project must not be busy.",
@@ -3751,6 +3758,18 @@
             "empty": "No one has earned points this month yet. Be the first."
         },
         "settings": {
+            "telegram_test_message": "Test message from Musoftware: your account is linked and alerts will arrive here.",
+            "telegram_title": "Telegram",
+            "telegram_off": "Link your account to the Musoftware Telegram bot: see your invoices and projects, ask the AI assistant, and get alerts.",
+            "telegram_on": "Your account is linked to",
+            "telegram_link": "Link Telegram",
+            "telegram_waiting": "Press Start in the bot...",
+            "telegram_linked_now": "Linked. The bot is sending you a message now.",
+            "telegram_not_seen": "We did not see the Start yet. Open the bot, press Start, and try again.",
+            "telegram_test": "Send a test message",
+            "telegram_test_sent": "Sent. Check Telegram.",
+            "telegram_unlink": "Unlink",
+            "telegram_failed": "Something went wrong, try again.",
             "title": "Settings",
             "account": "Account",
             "profile": "Profile",
@@ -19424,6 +19443,40 @@
         "login_here": "Sign in here",
         "download_starting_automatically": "Download starting automatically...",
         "apply_coupon_and_proceed": "Apply Coupon & Complete Order"
+    },
+    "telegram": {
+        "welcome": "Hello :name, your Musoftware account is linked here. Use the buttons below to see your invoices and projects, or write any question and the AI assistant answers.",
+        "not_linked": "Welcome to Musoftware. To see your invoices and projects here, link your account from the settings page: :url",
+        "btn_invoices": "My invoices",
+        "btn_projects": "My projects",
+        "btn_support": "Ask the assistant",
+        "support_prompt": "Write your question here and the AI assistant will answer.",
+        "invoices_title": "Your latest invoices:",
+        "invoices_none": "There are no invoices on your account.",
+        "invoice_line": "Invoice #:id · :amount · :status",
+        "invoice_status": {
+            "paid": "Paid",
+            "unpaid": "Unpaid",
+            "partially_paid": "Partly paid",
+            "cancelled": "Cancelled",
+            "refunded": "Refunded"
+        },
+        "pay": "Pay invoice #:id",
+        "all_invoices": "All invoices",
+        "projects_title": "Your projects:",
+        "projects_none": "No projects yet. You can start one here: :url",
+        "project_line": ":title · :status",
+        "project_status": {
+            "chatting": "Still in the chat",
+            "quoted": "Priced, waiting for payment",
+            "queued": "Paid, in line",
+            "designing": "Being designed",
+            "building": "Being built now",
+            "ready": "Ready",
+            "failed": "Stopped, the team is on it"
+        },
+        "untitled": "Untitled project",
+        "open": "Open: :title"
     },
     "tools": {
         "monthly_only_restriction": "This tool only allows monthly subscriptions.",
