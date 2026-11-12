@@ -158,6 +158,12 @@ class ProjectRequests
         return (string) config('builder.build_models.'.($strong ? 'strong' : 'standard').'.model');
     }
 
+    /** The customer takes back a request the engineer has not started: one waiting for payment, or one in line. */
+    public function cancel(BuilderProject $project, int $id): bool
+    {
+        return $project->requests()->whereKey($id)->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY])->first()?->delete() ?? false;
+    }
+
     /** Every project with a request waiting for a free engineer; run every minute in case a start was missed. */
     public function startAllWaiting(): int
     {

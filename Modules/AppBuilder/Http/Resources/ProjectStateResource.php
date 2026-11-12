@@ -28,7 +28,8 @@ class ProjectStateResource extends JsonResource
             'status' => $this->status,
             'open_for_chat' => $this->isOpenForChat(),
             'messages' => $this->messages->map(fn (BuilderMessage $message) => $this->line($message))->values(),
-            'quote' => $this->status === BuilderProject::QUOTED ? $this->quote() : null,
+            // once the project takes requests, prices live in the list; an old single price is never shown beside it
+            'quote' => $this->status === BuilderProject::QUOTED && ! $this->takesRequests() ? $this->quote() : null,
             'study' => $this->study(),
             'progress' => in_array($this->status, [BuilderProject::QUEUED, BuilderProject::BUILDING, BuilderProject::DESIGNING], true) && ! $this->awaiting_answer ? $this->progressLine() : null,
             // the bar shows once the build has said how far it is
@@ -73,6 +74,9 @@ class ProjectStateResource extends JsonResource
                 'free' => $item->free,
                 'amount' => number_format((float) $item->amount, 2, '.', ''),
                 'status' => $item->status,
+                // only what the engineer has not started can be taken back
+                'cancel_url' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true)
+                    ? route('builder.requests.cancel', [$this->resource, $item->id]) : null,
             ])->values(),
             'currency' => $this->currency,
             // fixes are free until this day; after it a fix is priced like new work

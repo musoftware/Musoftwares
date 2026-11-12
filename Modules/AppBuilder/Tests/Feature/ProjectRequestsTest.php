@@ -48,21 +48,24 @@ class ProjectRequestsTest extends TestCase
         return $project;
     }
 
-    /** The chat model answers every message with a brief of this kind. */
+    /** @var list<ChatTurn> the chat model's next answers, in order (the chat keeps one model for the whole test) */
+    public array $answers = [];
+
+    /** The chat model's next answer is a brief of this kind. */
     private function chatAnswers(string $kind, string $title): void
     {
-        $turn = ChatTurn::fromArray([
+        $this->answers[] = ChatTurn::fromArray([
             'reply' => 'تمام',
             'needs_team' => false,
             'quote' => ['ready' => true, 'title' => $title, 'spec' => 'Note for '.$title, 'estimated_output_tokens' => 20000, 'kind' => $kind, 'complex' => false],
         ]);
-        $this->app->instance(ChatModel::class, new class($turn) implements ChatModel
+        $this->app->instance(ChatModel::class, new class($this) implements ChatModel
         {
-            public function __construct(private ChatTurn $turn) {}
+            public function __construct(private ProjectRequestsTest $test) {}
 
             public function reply(string $system, array $turns): ChatTurn
             {
-                return $this->turn;
+                return array_shift($this->test->answers);
             }
         });
     }
@@ -146,6 +149,34 @@ class ProjectRequestsTest extends TestCase
 
         $state->assertJsonPath('requests.items.0.kind', 'fix')->assertJsonPath('requests.items.0.free', false)->assertJsonPath('requests.items.0.status', 'unpaid')->assertJsonPath('requests.warranty.active', false);
         $this->assertSame(BuilderProject::READY, $project->refresh()->status);
+    }
+
+    public function test_a_request_not_started_can_be_cancelled_and_one_in_work_cannot(): void
+    {
+        $project = $this->deliveredProject();
+        $this->chatAnswers('build', 'ميزة جديدة');
+        $item = $this->say($project, 'ضيف ميزة')->json('requests.items.0');
+
+        $this->postJson($item['cancel_url'])->assertOk()->assertJsonPath('requests.items', []);
+
+        $this->chatAnswers('fix', 'تصليح');
+        $this->say($project, 'صلح ده');
+        $building = $project->requests()->where('status', BuilderRequest::BUILDING)->firstOrFail();
+        $this->postJson('/ai/'.$project->uuid.'/requests/'.$building->id.'/cancel')->assertStatus(409);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('requests.items.0.cancel_url', null);
+    }
+
+    public function test_an_old_single_price_is_closed_once_the_list_takes_over(): void
+    {
+        $project = $this->deliveredProject();
+        $project->update(['status' => BuilderProject::QUOTED, 'amount' => 200, 'quote_version' => 1]);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('quote', null);
+
+        $this->chatAnswers('fix', 'تصليح');
+        $this->say($project, 'صلح ده');
+
+        // the old price is gone and the free fix went to the engineer
+        $this->assertSame(BuilderProject::QUEUED, $project->refresh()->status);
     }
 
     public function test_a_chat_before_payment_has_no_list(): void

@@ -158,6 +158,8 @@ class ProjectChat
     /** A message that asks for work becomes one request in the list; questions and small talk add nothing. */
     private function addRequest(BuilderProject $project, ChatTurn $turn, BuilderMessage $question): void
     {
+        // a price shown before the list existed is closed: the list holds every price now
+        $this->withdrawQuote($project);
         if ($turn->quoteReady) {
             app(\Modules\AppBuilder\Services\ProjectRequests::class)->add($project, $turn, $question);
         }

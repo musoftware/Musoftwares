@@ -51,6 +51,20 @@ class BuilderPaymentController extends Controller
         }
     }
 
+    /** The customer takes back a request that has not started; a paid one waiting in line keeps its money as a note for the owner. */
+    public function cancelRequest(BuilderProject $project, int $item, \Modules\AppBuilder\Services\ProjectRequests $requests): JsonResponse
+    {
+        $request = $project->requests()->whereKey($item)->first();
+        if (! $request || ! $requests->cancel($project, $item)) {
+            return response()->json(['message' => __('builder.errors.request_started')], 409);
+        }
+        if ($request->paid_at !== null) {
+            $this->payment->tellOwner($project, 'Paid request cancelled by the customer (refund or credit it): '.$request->title.' '.$request->amount.' '.$project->currency);
+        }
+
+        return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
+    }
+
     /** A signed-in customer pays from their site wallet; the build starts at once. */
     public function payWithWallet(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\WalletPayment $wallet): JsonResponse
     {

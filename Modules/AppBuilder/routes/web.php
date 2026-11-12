@@ -30,6 +30,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
         Route::post('/{project}/study/pay', [BuilderPaymentController::class, 'payStudy'])->middleware('throttle:10,1')->name('study.pay');
         Route::post('/{project}/requests/pay', [BuilderPaymentController::class, 'payRequests'])->middleware('throttle:10,1')->name('requests.pay');
+        Route::post('/{project}/requests/{item}/cancel', [BuilderPaymentController::class, 'cancelRequest'])->whereNumber('item')->middleware('throttle:20,1')->name('requests.cancel');
         Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60')->name('push');
         Route::post('/{project}/trial', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'request'])->middleware('throttle:6,60')->name('trial');
         Route::get('/{project}/download', [BuilderDeliveryController::class, 'download'])->middleware('throttle:20,1')->name('download');

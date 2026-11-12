@@ -120,6 +120,8 @@
         .req .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--muted)}
         .req .meta strong{color:var(--ink)}
         .req.done .t{color:var(--muted);font-weight:400}
+        .req .cancel{min-height:32px;padding:0 10px;margin-inline-start:auto;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+        .req .cancel:hover{color:var(--danger);border-color:var(--danger)}
         .requests .pay{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
         .requests .total{margin:0;font-weight:600}
         .show-requests{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
@@ -800,9 +802,23 @@
             el('strong', {}, item.free ? T.requests.free : item.amount + ' ' + currency),
             el('span', {}, T.requests.status[item.status] || item.status),
         );
+        if (item.cancel_url) meta.append(cancelButton(item));
         body.append(el('div', {class: 't', dir: 'auto'}, item.title), meta);
         row.append(body);
         return row;
+    }
+
+    /** Takes back a request the engineer has not started yet. */
+    function cancelButton(item) {
+        const button = el('button', {class: 'cancel', type: 'button', 'aria-label': T.requests.cancel + ': ' + item.title}, T.requests.cancel);
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            if (!window.confirm(T.requests.cancel_confirm)) return;
+            button.disabled = true;
+            showError('');
+            try { state = await call(item.cancel_url, {}); unticked.delete(item.id); render(); } catch (error) { showError(error.message); button.disabled = false; }
+        });
+        return button;
     }
 
     let requestsPayParts = null;
