@@ -47,6 +47,19 @@ TEXT;
 
         $items = array_map(fn (array $phase, string $title) => ['title' => $title, 'done' => $phase['done']], $phases, $titles);
         $project->update(['progress_phases' => ['hash' => $hash, 'items' => $items]]);
+        $this->tellFinished($project, $known['items'] ?? [], $items);
+    }
+
+    /** A phase that was just ticked reaches the customer (Telegram, browser): the first plan only sets the list. */
+    private function tellFinished(BuilderProject $project, array $before, array $after): void
+    {
+        $doneBefore = count(array_filter(array_column($before, 'done')));
+        $done = array_values(array_filter($after, fn (array $item) => $item['done']));
+        if ($before === [] || count($done) <= $doneBefore) {
+            return;
+        }
+
+        app(BuilderPush::class)->notify($project, 'phase', ['phase' => end($done)['title'], 'done' => (string) count($done), 'all' => (string) count($after)]);
     }
 
     /** @return list<array{title: string, done: bool}> */

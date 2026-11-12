@@ -211,4 +211,87 @@ class SiteBotTest extends TestCase
 
         $this->assertSame(0, $project->messages()->count());
     }
+
+    public function test_the_customer_sees_balance_tickets_and_the_invite_link(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788', 'loyalty_points_balance' => 120])->save();
+        \App\Models\Ticket::create(['user_id' => $this->user->id, 'ticket_subject' => 'البرنامج مش بيفتح', 'ticket_message' => 'x', 'ticket_status' => 'agent_replied']);
+
+        $this->telegramSends('رصيدي');
+        $this->telegramSends('تذاكري');
+        $this->telegramSends('ادعي صاحبك');
+
+        [$balance, $tickets, $invite] = $this->sentText();
+        $this->assertStringContainsString('120', $balance);
+        $this->assertStringContainsString('البرنامج مش بيفتح · الفريق رد', $tickets);
+        $this->assertStringContainsString('/r/', $invite);
+        $this->assertStringContainsString('/ai', $invite);
+    }
+
+    public function test_settings_stop_the_alerts_and_switch_the_language(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+
+        $this->telegramSends('الإعدادات');
+        $this->presses('al:t');
+        $this->assertTrue($this->user->refresh()->telegram_alerts_off);
+
+        $this->presses('lg:en');
+        $this->assertSame('en', $this->user->refresh()->telegram_locale);
+        // the menu comes back in English, and the old Arabic button still works
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/sendMessage') && ($request['reply_markup']['keyboard'][0][0]['text'] ?? '') === 'My invoices');
+        $this->telegramSends('رصيدي');
+        $this->assertStringContainsString('Your balance on the site', collect($this->sentText())->last());
+    }
+
+    public function test_build_news_reaches_the_linked_telegram_unless_alerts_are_off(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+        $project = \Modules\AppBuilder\Models\BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'ZainArena', 'status' => 'building', 'user_id' => $this->user->id]);
+
+        app(\Modules\AppBuilder\Services\BuilderPush::class)->notify($project, 'delivered');
+        $this->assertStringContainsString('ZainArena اتسلّم', collect($this->sentText())->last());
+
+        $this->user->forceFill(['telegram_alerts_off' => true])->save();
+        $before = count($this->sentText());
+        app(\Modules\AppBuilder\Services\BuilderPush::class)->notify($project->refresh(), 'question');
+        $this->assertCount($before, $this->sentText());
+    }
+
+    public function test_a_project_being_built_shows_how_far_it_is(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+        \Modules\AppBuilder\Models\BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'منيو المطعم', 'status' => 'building', 'user_id' => $this->user->id, 'progress_percent' => 83,
+            'progress_phases' => ['hash' => 'h', 'items' => [['title' => 'الأساس', 'done' => true], ['title' => 'الشاشات الأخيرة', 'done' => false]]]]);
+
+        $this->telegramSends('مشاريعي');
+
+        $text = collect($this->sentText())->last();
+        $this->assertStringContainsString('83%', $text);
+        $this->assertStringContainsString('الشاشات الأخيرة', $text);
+    }
+
+    public function test_an_unpaid_invoice_is_mentioned_once_every_few_days(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+        $invoice = Invoice::create(['user_id' => $this->user->id, 'status' => 'unpaid']);
+        $invoice->forceFill(['created_at' => now()->subDays(2)])->save();
+        \Illuminate\Support\Facades\Cache::store('file')->forget('telegram_invoice_reminder_'.$invoice->id);
+        $reminders = app(\App\Services\Telegram\InvoiceReminders::class);
+
+        $this->assertSame(1, $reminders->sendDue());
+        $this->assertSame(0, $reminders->sendDue());
+        $this->assertStringContainsString('فاتورة #'.$invoice->id.' لسه مش مدفوعة', collect($this->sentText())->last());
+        \Illuminate\Support\Facades\Cache::store('file')->forget('telegram_invoice_reminder_'.$invoice->id);
+    }
+
+    public function test_the_customer_hears_when_the_team_answers_a_ticket(): void
+    {
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+        $ticket = \App\Models\Ticket::create(['user_id' => $this->user->id, 'ticket_subject' => 'الدفع', 'ticket_message' => 'x', 'ticket_status' => 'open']);
+
+        $ticket->update(['ticket_status' => 'agent_replied']);
+
+        $this->assertStringContainsString("تذكرتك #{$ticket->id} (الدفع)\nالحالة دلوقتي: الفريق رد", collect($this->sentText())->last());
+    }
 }

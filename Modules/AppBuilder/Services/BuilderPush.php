@@ -43,20 +43,32 @@ class BuilderPush
     /** A notification problem never breaks the build or the delivery. */
     public function notify(BuilderProject $project, string $key, array $replace = []): void
     {
-        if (! $project->push_token) {
-            return;
-        }
-
         $language = $project->customerLanguage();
         $data = [
             'title' => __("builder.push.{$key}_title", $replace, $language),
             'description' => __("builder.push.{$key}_body", $replace + ['title' => (string) $project->title], $language),
         ];
+        $this->toTelegram($project, $data, $language);
+        if (! $project->push_token) {
+            return;
+        }
 
         try {
             FcmHelper::send_push_notif_to_device($project->push_token, $data, route('builder.show', $project));
         } catch (\Throwable $e) {
             Log::warning('App builder: push notification failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /** The same news reaches the customer's Telegram when their account is linked there, with the chat one tap away. */
+    private function toTelegram(BuilderProject $project, array $data, string $language): void
+    {
+        try {
+            app(\App\Services\Telegram\CustomerAlerts::class)->send($project->user, $data['title']."\n".$data['description'], [
+                [__('telegram.chat_open_page', [], $language), route('builder.show', $project)],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('App builder: Telegram alert failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
         }
     }
 }

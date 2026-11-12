@@ -176,6 +176,8 @@ return [
         'trial_body' => 'متصفح فيه :title جاهز تجرّبه دلوقتي.',
         'discount_title' => 'خصم :percent% مستنيك',
         'discount_body' => 'سعر :title لسه مفتوح، ولو بدأت دلوقتي ليك خصم :percent% على البرمجة.',
+        'phase_title' => 'مرحلة خلصت (:done من :all)',
+        'phase_body' => ':title: خلصنا ":phase".',
         'failed_title' => 'حصلت مشكلة في التنفيذ',
         'failed_body' => 'تنفيذ :title وقف بسبب مشكلة. افتح الصفحة وشوف التفاصيل.',
     ],

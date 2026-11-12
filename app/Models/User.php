@@ -105,6 +105,7 @@ class User extends Authenticatable
             'max_devices' => 'integer',
             'can_view_all_devices' => 'boolean',
             'enable_notifications' => 'boolean',
+            'telegram_alerts_off' => 'boolean',
             'enable_custom_hour_rate' => 'boolean',
             'enable_3d_dashboard' => 'boolean',
             'lifetime_spend'               => 'decimal:2',

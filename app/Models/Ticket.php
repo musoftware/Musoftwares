@@ -184,6 +184,16 @@ class Ticket extends Model
         return $this->belongsTo(User::class);
     }
 
+    /** The customer hears in Telegram when the team moves their ticket on (not when they change it themselves). */
+    protected static function booted(): void
+    {
+        static::updated(function (self $ticket): void {
+            if ($ticket->wasChanged('ticket_status') && $ticket->user_id && auth()->id() !== $ticket->user_id) {
+                \Illuminate\Support\Facades\DB::afterCommit(fn () => app(\App\Services\Telegram\TicketAlerts::class)->statusChanged($ticket));
+            }
+        });
+    }
+
     public function assignedEmployee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_employee_id');

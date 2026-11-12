@@ -80,6 +80,13 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\CrashRetries::class)->r
     ->everyFiveMinutes()
     ->withoutOverlapping(4);
 
+// Telegram: an unpaid invoice is mentioned in the customer's linked Telegram, at most once every 3 days
+Schedule::call(fn () => app(\App\Services\Telegram\InvoiceReminders::class)->sendDue())
+    ->name('telegram-invoice-reminders')
+    ->dailyAt('11:00')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(30);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
