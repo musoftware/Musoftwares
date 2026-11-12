@@ -138,6 +138,7 @@
         .requests .total{margin:0;font-weight:600}
         .show-requests{align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
         .show-requests:hover{border-color:var(--ink)}
+        .req .review{font-weight:600;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center}
         .show-requests .due{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--ink);color:#fff;font-size:13px;line-height:22px;text-align:center}
     </style>
 </head>
@@ -832,6 +833,8 @@
             el('strong', {}, item.free ? T.requests.free : money(item.amount, currency)),
             el('span', {}, T.requests.status[item.status] || item.status),
         );
+        // only the owner gets this link: the request waits for their approval on the admin page
+        if (item.review_url) meta.append(el('a', {href: item.review_url, class: 'review'}, T.requests.review));
         if (item.cancel_url) meta.append(cancelButton(item));
         body.append(el('div', {class: 't', dir: 'auto'}, item.title), meta);
         row.append(body);

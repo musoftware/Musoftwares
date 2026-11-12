@@ -147,4 +147,32 @@ class OwnerReviewTest extends TestCase
         $this->actingAs($this->owner)->post('/admin/builder/push-test')->assertRedirect();
         Notification::assertSentTo($this->owner, BuilderOwnerAlert::class, fn (BuilderOwnerAlert $alert) => str_contains($alert->body, 'Test notification'));
     }
+
+    public function test_the_owner_also_gets_a_telegram_message_with_a_button_to_the_request(): void
+    {
+        config(['builder.owner_telegram' => ['bot_token' => 'test-token', 'chat_id' => '12345']]);
+        \Illuminate\Support\Facades\Http::fake(['api.telegram.org/*' => \Illuminate\Support\Facades\Http::response(['ok' => true])]);
+        $project = $this->deliveredProject();
+
+        $item = $this->customerAsks($project, 'build', 'قسم للبلس في الداشبورد');
+
+        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => str_contains($request->url(), '/bottest-token/sendMessage')
+            && $request['chat_id'] === '12345'
+            && str_contains($request['text'], 'قسم للبلس في الداشبورد')
+            && str_ends_with($request['reply_markup']['inline_keyboard'][0][0]['url'], '#request-'.$item->id));
+    }
+
+    public function test_the_chat_knows_a_paid_request_is_paid_and_only_the_owner_sees_the_review_link(): void
+    {
+        $project = $this->deliveredProject();
+        $item = $this->customerAsks($project, 'build', 'قسم للبلس في الداشبورد');
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->markPaid($project, [$item->id], 'admin-test');
+
+        // a bare "ready" made the chat tell the customer the request was not paid
+        $this->assertStringContainsString('PAID; the engineer is reviewing it', app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project->refresh()));
+
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('requests.items.0.review_url', null);
+        $this->actingAs($this->owner)->getJson('/ai/'.$project->uuid.'/state')
+            ->assertJsonPath('requests.items.0.review_url', route('admin.builder.show', $project).'#request-'.$item->id);
+    }
 }

@@ -53,6 +53,7 @@ return [
         'free' => 'Free',
         'status' => ['unpaid' => 'Waiting for payment', 'reviewing' => 'The engineer is reviewing it', 'ready' => 'In line', 'building' => 'Working on it', 'done' => 'Done'],
         'rolled_back' => 'We took this change back, the program is as it was before it: :title',
+        'review' => 'Review and approve (admin)',
         'rejected' => 'We reviewed ":title" and will not build it as it is. Write to us here if you want to talk it over.',
         'total' => 'Selected: :amount',
         'pay' => 'Pay for the selected',

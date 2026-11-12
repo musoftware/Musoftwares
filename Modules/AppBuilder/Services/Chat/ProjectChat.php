@@ -368,7 +368,9 @@ class ProjectChat
             ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
             ."وبدأنا عليه\" or \"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\". Never say "
             ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
-            ."nothing.\n\nThe list now:\n"
+            ."nothing.\n\nThe list below is the truth about these requests: what is paid, what is being worked on, what is done. "
+            ."Never tell the customer a request is unpaid when the list says PAID. Something the customer asked about earlier "
+            ."that is not in the list is not open (it was cancelled or never asked for); do not count it.\n\nThe list now:\n"
             .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project);
     }
 

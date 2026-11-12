@@ -235,8 +235,21 @@ class ProjectRequests
     public function forPrompt(BuilderProject $project): string
     {
         $lines = $project->requests()->latest('id')->limit(30)->get()->reverse()
-            ->map(fn (BuilderRequest $request) => '- ['.$request->status.', '.($request->free ? 'free' : number_format((float) $request->amount, 2).' '.$project->currency).'] '.$request->title);
+            ->map(fn (BuilderRequest $request) => '- '.$request->title.' ('.($request->free ? 'free' : number_format((float) $request->amount, 2).' '.$project->currency).'): '.$this->stateForPrompt($request));
 
         return $lines->isEmpty() ? '(empty)' : $lines->implode("\n");
+    }
+
+    /** Where a request is, in words the chat cannot misread (a bare "ready" was taken for "not paid"). */
+    private function stateForPrompt(BuilderRequest $request): string
+    {
+        return match (true) {
+            $request->rolled_back_at !== null => 'delivered, then taken back by the team',
+            $request->status === BuilderRequest::DONE => 'done and delivered',
+            $request->status === BuilderRequest::BUILDING => 'the engineer is working on it now',
+            $request->waitsForOwner() => ($request->free ? 'free fix' : 'PAID').'; the engineer is reviewing it and starts it soon',
+            $request->status === BuilderRequest::READY => ($request->free ? 'free fix' : 'PAID').'; it starts as soon as the engineer is free',
+            default => 'waiting for the customer to pay it from the list',
+        };
     }
 }

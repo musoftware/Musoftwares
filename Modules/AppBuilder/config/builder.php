@@ -148,6 +148,12 @@ return [
     // the owner reads and approves every request (from a phone notification) before the engineer starts it
     'owner_approval' => (bool) env('BUILDER_OWNER_APPROVAL', true),
 
+    // the owner's alerts also go to Telegram, which reaches the phone even when browser pushes do not
+    'owner_telegram' => [
+        'bot_token' => env('BUILDER_TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('BUILDER_TELEGRAM_CHAT_ID'),
+    ],
+
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
 
     // A customer's own project, brought as a Google Drive link: a fixed fee to inspect it in a locked box (no internet,
