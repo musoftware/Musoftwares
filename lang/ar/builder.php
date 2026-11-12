@@ -18,6 +18,8 @@ return [
     'guest' => 'زائر',
     'sign_in' => 'سجّل دخول',
     'sign_in_google' => 'دخول بجوجل',
+    // prices on the chat page in the customer's own money
+    'currency_names' => ['EGP' => 'جنيه', 'SAR' => 'ريال', 'AED' => 'درهم', 'MAD' => 'درهم', 'IQD' => 'دينار', 'EUR' => 'يورو', 'GBP' => 'جنيه إسترليني', 'USD' => 'دولار'],
     'new_chat' => 'محادثة جديدة',
     'inspection' => [
         'bring' => 'مشروع جاهز عندي على Google Drive',

@@ -811,6 +811,16 @@ class AppBuilderTest extends TestCase
         $this->assertSame('10.000', $record->work_factor);
     }
 
+    public function test_a_change_to_a_delivered_program_teaches_the_price_of_changes_only(): void
+    {
+        $project = $this->buildingProject();
+        $project->update(['version' => 1]);
+
+        app(\Modules\AppBuilder\Services\BuildCostHistory::class)->record($project->refresh(), 5);
+
+        $this->assertSame(\Modules\AppBuilder\Services\QuotePricer::CHANGE, \Modules\AppBuilder\Models\BuilderBuildCost::where('project_id', $project->id)->sole()->project_type);
+    }
+
     public function test_a_shared_link_is_opened_in_the_workers_browser_before_the_chat_answers(): void
     {
         $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk()->assertJsonPath('looks', []);

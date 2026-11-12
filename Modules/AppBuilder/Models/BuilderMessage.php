@@ -47,7 +47,8 @@ class BuilderMessage extends Model
         }
 
         return match ($this->role) {
-            self::TEAM => '[Message from the Musoftware team] '.$this->content,
+            // the team's line (a notice or the owner's own words) is already on the customer's page
+            self::TEAM => '[The Musoftware team wrote this to the customer; the customer did not write it. Do not reply to it or thank anyone for it, answer only what the customer writes] '.$this->content,
             self::PROGRESS => '[The build showed the customer a screenshot of finished work] '.$this->content,
             default => $this->content.$this->linkNotes(),
         };

@@ -56,6 +56,8 @@ class ProjectStateResource extends JsonResource
             'delivery' => $this->hasDelivery() ? $this->delivery() : null,
             'failed' => $this->status === BuilderProject::FAILED,
             'requests' => $this->requestList($request),
+            // every price on the page is also shown in the customer's own money, at the rate the gateway charges
+            'local_price' => app(\Modules\AppBuilder\Services\LocalPrice::class)->for($this->resource),
             'inspection' => $this->inspection($request),
             // the paperclip offers "a project of my own" while no paid build has started
             'bring_url' => app(\Modules\AppBuilder\Services\ProjectInspection::class)->canOffer($this->resource) ? route('builder.inspect', $this->resource) : null,

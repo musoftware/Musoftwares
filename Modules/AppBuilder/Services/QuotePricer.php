@@ -13,6 +13,9 @@ class QuotePricer
 {
     public const DEFAULT_TYPE = 'other';
 
+    /** Changes to a delivered or imported program learn their cost from other changes, not from new builds. */
+    public const CHANGE = 'change';
+
     public function __construct(private readonly BuildCostHistory $history) {}
 
     /** @return array{tokens: int, cost: float, amount: float, design_fee: float, budget: float, model: string, project_type: string} */
@@ -21,7 +24,7 @@ class QuotePricer
         $pricing = config('builder.pricing');
         $tokens = (int) min(max($estimatedTokens, $pricing['min_tokens']), $pricing['max_tokens']);
         $model = $this->buildModel($complex);
-        $type = $this->type($projectType);
+        $type = $projectType === self::CHANGE ? self::CHANGE : $this->type($projectType);
         // what builds of this kind really cost per estimated token, learned from delivered work
         $cost = $tokens / 1_000_000 * $model['output_usd_per_mtok'] * $this->history->workFactor($type);
         $programming = max((float) $pricing['minimum'], $this->minimumFor($type), ceil($cost * $pricing['markup']));
@@ -47,7 +50,7 @@ class QuotePricer
     public function change(int $estimatedTokens, bool $complex = false): array
     {
         $pricing = config('builder.pricing');
-        $price = $this->price($estimatedTokens, $complex);
+        $price = $this->price($estimatedTokens, $complex, 0, self::CHANGE);
         $amount = max((float) $pricing['change_minimum'], ceil($price['cost'] * $pricing['markup']));
 
         return ['amount' => $amount, 'budget' => round($amount * $pricing['budget_factor'] / $pricing['markup'], 4)] + $price;
@@ -56,7 +59,7 @@ class QuotePricer
     /** A free fix gets the same model and spending cap as paid work; only the customer's price is zero. */
     public function freeFix(int $estimatedTokens, bool $complex = false): array
     {
-        $paid = $this->price($estimatedTokens, $complex);
+        $paid = $this->price($estimatedTokens, $complex, 0, self::CHANGE);
 
         // a fix is small work, so its cap follows its own estimate, not the minimum of a whole project
         return ['amount' => 0.0, 'budget' => round($paid['cost'] * config('builder.pricing.budget_factor'), 4)] + $paid;

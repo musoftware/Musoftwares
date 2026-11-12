@@ -512,19 +512,27 @@
         card.append(el('p', {class: 'note'}, T.free_build_sign_in), link(free.sign_in_url, T.sign_in, true));
     }
 
+    /** A price in the customer's own money when the site has a rate for it; the gateway charges with the same rate. */
+    function money(amount, currency) {
+        const value = Number(String(amount).replaceAll(',', ''));
+        const local = state && state.local_price;
+        if (!local || currency !== local.from) return amount + ' ' + currency;
+        return Math.round(value * local.rate).toLocaleString('en-US') + ' ' + local.name;
+    }
+
     function quoteNode(quote) {
         if (quote.free) return freeFixNode(quote);
         const card = el('section', {class: 'card'});
         card.append(el('div', {class: 'title', dir: 'auto'}, quote.title || ''));
-        const price = el('div', {class: 'price'}, quote.amount + ' ' + quote.currency);
-        if (quote.discount) price.append(el('span', {class: 'before'}, quote.discount.before));
+        const price = el('div', {class: 'price'}, money(quote.amount, quote.currency));
+        if (quote.discount) price.append(el('span', {class: 'before'}, money(quote.discount.before, quote.currency)));
         card.append(price);
         if (quote.range) card.append(el('p', {class: 'note'}, T.range_note
-            .replaceAll(':from', quote.range.from + ' ' + quote.currency)
-            .replaceAll(':to', quote.range.to + ' ' + quote.currency)
-            .replaceAll(':price', quote.amount + ' ' + quote.currency)));
+            .replaceAll(':from', money(quote.range.from, quote.currency))
+            .replaceAll(':to', money(quote.range.to, quote.currency))
+            .replaceAll(':price', money(quote.amount, quote.currency))));
         if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
-        if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
+        if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', money(quote.design_fee, quote.currency))));
         appendFreeBuild(card, quote.free_build);
         card.append(el('p', {class: 'note'}, T.pay_note + ' ' + T.close_page_note));
         // a guest is told that signing in first means getting money back when the work costs less
@@ -539,13 +547,13 @@
         const box = el('section', {class: 'card'});
         if (study.status === 'offer') {
             box.append(el('div', {class: 'title'}, T.study_offer_title));
-            box.append(el('p', {class: 'note'}, T.study_offer.replace(':price', study.price + ' ' + study.currency)));
-            box.append(...payFormNodes(study.pay_url, T.study_buy.replace(':price', study.price + ' ' + study.currency), [], false, () => {}, true));
+            box.append(el('p', {class: 'note'}, T.study_offer.replace(':price', money(study.price, study.currency))));
+            box.append(...payFormNodes(study.pay_url, T.study_buy.replace(':price', money(study.price, study.currency)), [], false, () => {}, true));
             return box;
         }
         if (study.status === 'ready') box.append(link(study.url, T.study_open, true));
         if (study.status === 'failed') box.append(el('p', {class: 'note'}, T.study_failed));
-        if (study.credit) box.append(el('p', {class: 'note'}, T.study_credit.replace(':amount', study.credit + ' ' + study.currency)));
+        if (study.credit) box.append(el('p', {class: 'note'}, T.study_credit.replace(':amount', money(study.credit, study.currency))));
         return box;
     }
 
@@ -618,7 +626,7 @@
     function balanceNode(balance) {
         const card = el('section', {class: 'card'});
         card.append(el('div', {class: 'title'}, T.balance_title));
-        card.append(el('div', {class: 'price'}, balance.due + ' ' + balance.currency));
+        card.append(el('div', {class: 'price'}, money(balance.due, balance.currency)));
         card.append(el('p', {class: 'note'}, T.balance_note));
         appendPayForm(card, balance.pay_url, T.balance_pay, []);
         return card;
@@ -821,7 +829,7 @@
         const meta = el('div', {class: 'meta'});
         meta.append(
             el('span', {}, T.requests[item.kind] || ''),
-            el('strong', {}, item.free ? T.requests.free : item.amount + ' ' + currency),
+            el('strong', {}, item.free ? T.requests.free : money(item.amount, currency)),
             el('span', {}, T.requests.status[item.status] || item.status),
         );
         if (item.cancel_url) meta.append(cancelButton(item));
@@ -867,7 +875,7 @@
         if (!requestsPayParts) return;
         const chosen = requestsPayParts.unpaid.filter((item) => !unticked.has(item.id));
         const sum = chosen.reduce((all, item) => all + Number(item.amount), 0);
-        requestsPayParts.total.textContent = T.requests.total.replace(':amount', sum.toFixed(2) + ' ' + requestsPayParts.currency);
+        requestsPayParts.total.textContent = T.requests.total.replace(':amount', money(sum, requestsPayParts.currency));
         requestsPayParts.ids.value = chosen.map((item) => item.id).join(',');
         requestsPayParts.buttons.forEach((button) => { button.disabled = chosen.length === 0; });
     }
@@ -927,9 +935,9 @@
     function inspectionNode(inspection) {
         const card = el('section', {class: 'card'});
         card.append(el('div', {class: 'title'}, T.inspection.card_title));
-        card.append(el('div', {class: 'price'}, inspection.price + ' ' + inspection.currency));
+        card.append(el('div', {class: 'price'}, money(inspection.price, inspection.currency)));
         card.append(el('p', {class: 'note'}, T.inspection.card_note));
-        card.append(...payFormNodes(inspection.pay_url, T.inspection.pay.replace(':price', inspection.price + ' ' + inspection.currency), [], payOpen, () => { payOpen = true; }));
+        card.append(...payFormNodes(inspection.pay_url, T.inspection.pay.replace(':price', money(inspection.price, inspection.currency)), [], payOpen, () => { payOpen = true; }));
         if (inspection.admin_paid_url) card.append(actionButton(T.inspection.admin_paid, inspection.admin_paid_url, {confirm: T.admin_mark_paid_confirm, ghost: true}));
         return card;
     }

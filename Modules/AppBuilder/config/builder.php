@@ -61,6 +61,9 @@ return [
         // an agent that writes N tokens of code also thinks, re-reads files and runs tests; this covers that work.
         // It is the starting value: once a kind of project has enough delivered builds, their real cost is used.
         'work_factor' => (float) env('BUILDER_WORK_FACTOR', 4),
+        // a change reads, runs and tests the whole existing project before it writes a line, so each estimated
+        // token costs more than in a new build (the ZainArena paywall change cost 14x its estimate)
+        'change_work_factor' => (float) env('BUILDER_CHANGE_WORK_FACTOR', 14),
         'learning' => [
             'samples' => 10,
             'min_samples' => 5,

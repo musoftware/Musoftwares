@@ -89,6 +89,36 @@ class ProjectRequestsTest extends TestCase
         $this->assertStringContainsString('Note for زرار الاشتراك', $spec);
     }
 
+    public function test_a_request_carries_only_the_customers_lines_since_the_last_reply(): void
+    {
+        $project = $this->deliveredProject();
+        $project->messages()->create(['role' => BuilderMessage::USER, 'content' => 'بكام معاينة قصيرة؟']);
+        $project->messages()->create(['role' => BuilderMessage::ASSISTANT, 'content' => 'السعر تحت.']);
+        $project->messages()->create(['role' => BuilderMessage::TEAM, 'content' => 'التعديلات اترفعت.']);
+        $project->messages()->create(['role' => BuilderMessage::USER, 'content' => 'عايز قسم للبلس في الداشبورد']);
+        $this->chatAnswers('build', 'قسم البلس');
+
+        $this->say($project, 'والاشتراك يبقى تلقائي مع جوجل');
+
+        // the older question was already answered, so the engineer never reads it as part of this request
+        $this->assertSame("عايز قسم للبلس في الداشبورد
+
+والاشتراك يبقى تلقائي مع جوجل", $project->requests()->sole()->customer_words);
+    }
+
+    public function test_a_change_is_priced_by_what_changes_really_cost_not_new_builds(): void
+    {
+        $project = $this->deliveredProject();
+        $this->chatAnswers('build', 'قسم البلس');
+
+        $this->say($project, 'عايز قسم للبلس في الداشبورد');
+
+        // 20k tokens x $10 per million (standard model) x the change factor 14 = $2.8 of real work, x3 markup
+        $item = $project->requests()->sole();
+        $this->assertSame('9.00', $item->amount);
+        $this->assertSame('6.0000', $item->budget_usd);
+    }
+
     public function test_the_customer_keeps_writing_during_a_build_and_the_next_build_takes_what_waited(): void
     {
         $project = $this->deliveredProject();

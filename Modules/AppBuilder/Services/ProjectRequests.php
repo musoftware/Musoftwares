@@ -57,10 +57,14 @@ class ProjectRequests
         return $request;
     }
 
-    /** The customer's lines since the previous request, as they wrote them. */
+    /**
+     * The customer's lines for this request, as they wrote them: the messages they sent since the last reply
+     * (one request split over a few messages), never older questions the chat already answered.
+     */
     private function customerWords(BuilderProject $project, BuilderMessage $question): string
     {
-        $after = (int) $project->requests()->whereNotNull('message_id')->max('message_id');
+        $lastReply = (int) $project->messages()->where('role', '!=', BuilderMessage::USER)->where('id', '<', $question->id)->max('id');
+        $after = max($lastReply, (int) $project->requests()->whereNotNull('message_id')->max('message_id'));
 
         return $project->messages()
             ->reorder('id', 'desc')

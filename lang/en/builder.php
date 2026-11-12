@@ -18,6 +18,8 @@ return [
     'guest' => 'Guest',
     'sign_in' => 'Sign in',
     'sign_in_google' => 'Sign in with Google',
+    // prices on the chat page in the customer's own money
+    'currency_names' => ['EGP' => 'EGP', 'SAR' => 'SAR', 'AED' => 'AED', 'MAD' => 'MAD', 'IQD' => 'IQD', 'EUR' => 'EUR', 'GBP' => 'GBP', 'USD' => 'USD'],
     'new_chat' => 'New chat',
     'inspection' => [
         'bring' => 'A project I already have (Google Drive link)',

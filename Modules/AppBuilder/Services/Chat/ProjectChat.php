@@ -259,7 +259,10 @@ class ProjectChat
     /** Read-only numbers for the chat: it can tell them to the customer but never change them. */
     private function paymentFacts(BuilderProject $project): string
     {
-        $money = fn (float $value) => number_format($value, 2).' '.$project->currency;
+        // the page shows prices in the customer's own money, so the chat says the same numbers
+        $local = app(\Modules\AppBuilder\Services\LocalPrice::class)->for($project);
+        $money = fn (float $value) => number_format($value, 2).' '.$project->currency
+            .($local !== null ? ' ('.number_format(round($value * $local['rate'])).' '.$local['currency'].', the amount the customer sees and pays; say this one)' : '');
         $facts = 'Paid in total on this project: '.$money((float) $project->paid_total).'.';
         if ($project->status === BuilderProject::QUOTED) {
             $facts .= ' Open price: '.$money((float) $project->amount).'.';

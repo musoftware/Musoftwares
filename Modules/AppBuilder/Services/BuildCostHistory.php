@@ -23,7 +23,8 @@ class BuildCostHistory
 
         BuilderBuildCost::create([
             'project_id' => $project->id,
-            'project_type' => $project->project_type ?: QuotePricer::DEFAULT_TYPE,
+            // a program that was already delivered got a change: it reads and tests a whole project first
+            'project_type' => $project->hasDelivery() ? QuotePricer::CHANGE : ($project->project_type ?: QuotePricer::DEFAULT_TYPE),
             'model' => (string) $project->build_model,
             'estimated_tokens' => $project->estimated_tokens,
             'cost_usd' => round($jobCostUsd, 4),
@@ -39,7 +40,7 @@ class BuildCostHistory
             ->map(fn ($factor) => (float) $factor)->sort()->values();
 
         if ($factors->count() < (int) $learning['min_samples']) {
-            return (float) config('builder.pricing.work_factor');
+            return (float) config($projectType === QuotePricer::CHANGE ? 'builder.pricing.change_work_factor' : 'builder.pricing.work_factor');
         }
 
         // the median ignores one build that went very well or very badly; the limits stop a broken record
