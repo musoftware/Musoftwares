@@ -573,10 +573,17 @@
     function studyNode(study) {
         if (study.status === 'writing') return statusNode(T.study_writing);
         const box = el('section', {class: 'card'});
+        if (study.status === 'offer_free') {
+            box.append(el('div', {class: 'title'}, T.study_offer_title), el('p', {class: 'note'}, T.study_offer_free));
+            box.append(actionButton(T.study_get_free, study.free_url, {ghost: true}));
+            return box;
+        }
         if (study.status === 'offer') {
             box.append(el('div', {class: 'title'}, T.study_offer_title));
             box.append(el('p', {class: 'note'}, T.study_offer.replace(':price', money(study.price, study.currency))));
             box.append(...payFormNodes(study.pay_url, T.study_buy.replace(':price', money(study.price, study.currency)), [], false, () => {}, true));
+            // signing in makes it free
+            if (study.sign_in_url) box.append(el('p', {class: 'note'}, T.study_sign_in_free), link(study.sign_in_url, T.sign_in, true));
             return box;
         }
         if (study.status === 'ready') box.append(link(study.url, T.study_open, true));

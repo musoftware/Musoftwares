@@ -201,7 +201,14 @@ class BuilderProject extends Model
      */
     public function studyIsPaid(): bool
     {
-        return (float) $this->study_paid > 0 || ((float) $this->study_fee > 0 && (float) $this->quote_paid > 0) || $this->hasDelivery();
+        return (float) $this->study_paid > 0 || ((float) $this->study_fee > 0 && (float) $this->quote_paid > 0) || $this->hasDelivery()
+            || $this->study_payment_reference === \Modules\AppBuilder\Services\Study\FeasibilityStudy::FREE_REFERENCE;
+    }
+
+    /** A signed-in customer reads the study for free; a guest pays for it. */
+    public function studyOpensFor(?\App\Models\User $viewer): bool
+    {
+        return $this->studyIsPaid() || $viewer !== null;
     }
 
     public function studyCredit(): float

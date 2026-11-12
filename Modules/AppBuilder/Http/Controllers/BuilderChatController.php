@@ -186,10 +186,21 @@ class BuilderChatController extends Controller
         return response()->json($this->stateOf($project->refresh()));
     }
 
+    /** A signed-in customer gets the study for free: it is written now. */
+    public function studyFree(\Illuminate\Http\Request $request, BuilderProject $project): JsonResponse
+    {
+        abort_if($request->user() === null, 403);
+        if (! app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class)->startFree($project, $request->user())) {
+            return $this->refuse('builder.errors.no_study', 409);
+        }
+
+        return response()->json($this->stateOf($project->refresh()));
+    }
+
     /** The feasibility study as a printable page; the browser saves it as a PDF with Arabic shaped correctly. */
     public function study(BuilderProject $project): View
     {
-        abort_unless($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY && ($project->studyIsPaid() || request()->user()?->isAdmin()), 404);
+        abort_unless($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY && $project->studyOpensFor(request()->user()), 404);
 
         return view('appbuilder::study', ['project' => $project]);
     }

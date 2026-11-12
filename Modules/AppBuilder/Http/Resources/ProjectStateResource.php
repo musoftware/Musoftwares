@@ -205,12 +205,15 @@ class ProjectStateResource extends JsonResource
     private function study(): ?array
     {
         $study = app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class);
+        $viewer = request()->user();
         if ($study->canBuy($this->resource)) {
-            return [
+            // signed in: free, one tap; a guest pays, and is told signing in makes it free
+            return $study->isFreeFor($viewer) ? ['status' => 'offer_free', 'free_url' => route('builder.study.free', $this->resource)] : [
                 'status' => 'offer',
                 'price' => number_format($study::price(), 2),
                 'currency' => $this->currency,
                 'pay_url' => route('builder.study.pay', $this->resource),
+                'sign_in_url' => $viewer === null ? route('login', ['redirect' => route('builder.show', $this->resource, false)]) : null,
             ];
         }
         if ($this->study_status === null) {
@@ -219,7 +222,7 @@ class ProjectStateResource extends JsonResource
 
         return [
             'status' => $this->study_status,
-            'url' => $this->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? route('builder.study', $this->resource) : null,
+            'url' => $this->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY && $this->studyOpensFor($viewer) ? route('builder.study', $this->resource) : null,
             // what was paid for it, taken off the first price
             'credit' => (float) $this->study_paid > 0 ? number_format((float) $this->study_paid, 2) : null,
             'currency' => $this->currency,

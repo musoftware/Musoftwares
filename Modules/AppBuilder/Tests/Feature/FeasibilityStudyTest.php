@@ -131,4 +131,30 @@ class FeasibilityStudyTest extends TestCase
         $this->postJson('/ai/'.$uuid.'/study/pay', ['client_name' => 'Ali', 'client_email' => 'a@example.com', 'client_whatsapp' => '01000000000'])->assertStatus(409);
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
     }
+
+    public function test_a_signed_in_customer_gets_the_study_for_free_and_a_guest_is_told_to_sign_in(): void
+    {
+        $uuid = $this->quote('system');
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer')->assertJsonPath('study.sign_in_url', fn ($url) => str_contains((string) $url, '/login'));
+
+        $user = \App\Models\User::factory()->create(['email_verified_at' => now()]);
+        BuilderProject::where('uuid', $uuid)->update(['user_id' => $user->id]);
+        $this->actingAs($user)->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer_free');
+
+        $this->actingAs($user)->postJson('/ai/'.$uuid.'/study/free')->assertOk();
+
+        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
+        $this->assertSame(1, $this->written);
+        $this->assertSame('0.00', $project->study_paid);
+        $this->actingAs($user)->get('/ai/'.$uuid.'/study')->assertOk();
+    }
+
+    public function test_a_guest_cannot_take_the_free_study(): void
+    {
+        $uuid = $this->quote('system');
+
+        $this->postJson('/ai/'.$uuid.'/study/free')->assertForbidden();
+
+        $this->assertSame(0, $this->written);
+    }
 }

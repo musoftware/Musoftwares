@@ -31,6 +31,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
         Route::post('/{project}/study/pay', [BuilderPaymentController::class, 'payStudy'])->middleware('throttle:10,1')->name('study.pay');
+        Route::post('/{project}/study/free', [BuilderChatController::class, 'studyFree'])->middleware('throttle:5,1')->name('study.free');
         Route::post('/{project}/inspect', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'bring'])->middleware('throttle:5,1')->name('inspect');
         Route::post('/{project}/inspect/pay', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'pay'])->middleware('throttle:10,1')->name('inspect.pay');
         Route::post('/{project}/requests/pay', [BuilderPaymentController::class, 'payRequests'])->middleware('throttle:10,1')->name('requests.pay');

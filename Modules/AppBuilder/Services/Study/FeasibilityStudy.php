@@ -24,6 +24,12 @@ class FeasibilityStudy
     /** Only safe structural tags survive; every attribute is removed. */
     private const ALLOWED_TAGS = '<h2><h3><p><ul><ol><li><table><thead><tbody><tr><th><td><strong><em><br>';
 
+    /** The study a signed-in customer got for free (the payment reference says so). */
+    public const FREE_REFERENCE = 'free-signed-in';
+
+    /** Each study is a long Opus answer: an account gets this many free ones a day. */
+    private const FREE_PER_DAY = 3;
+
     public function __construct(private readonly StudyWriter $writer) {}
 
     public static function price(): float
@@ -39,6 +45,7 @@ class FeasibilityStudy
             && ! $project->hasDelivery()
             // not asked for yet, or written for free before studies were sold apart
             && ($project->study_status === null || ($project->study_status === self::READY && ! $project->studyIsPaid()))
+            && $project->study_payment_reference === null
             && (float) $project->study_paid <= 0
             && self::price() > 0
             && in_array($project->project_type, (array) config('builder.study.for_types'), true);
@@ -68,6 +75,28 @@ class FeasibilityStudy
         if ($project->study_status !== self::READY) {
             $this->start($project);
         }
+
+        return true;
+    }
+
+    /** Signed in and under the day's limit: the study costs this customer nothing. */
+    public function isFreeFor(?\App\Models\User $user): bool
+    {
+        return $user !== null && BuilderProject::where('user_id', $user->id)->where('study_payment_reference', self::FREE_REFERENCE)
+            ->where('updated_at', '>', now()->subDay())->count() < self::FREE_PER_DAY;
+    }
+
+    /** A signed-in customer asked for the study: written now, nothing to pay, and the chat joins their account. */
+    public function startFree(BuilderProject $project, \App\Models\User $user): bool
+    {
+        if (! $this->canBuy($project) || ! $this->isFreeFor($user)) {
+            return false;
+        }
+        $project->update(['study_payment_reference' => self::FREE_REFERENCE, 'user_id' => $project->user_id ?? $user->id]);
+        if ($project->study_status !== self::READY) {
+            $this->start($project);
+        }
+        app(ProjectPayment::class)->tellOwner($project, 'Free study (signed in): '.$project->title);
 
         return true;
     }
