@@ -2654,10 +2654,13 @@
             "free": "Free",
             "status": {
                 "unpaid": "Waiting for payment",
+                "reviewing": "The engineer is reviewing it",
                 "ready": "In line",
                 "building": "Working on it",
                 "done": "Done"
             },
+            "rolled_back": "We took this change back, the program is as it was before it: :title",
+            "rejected": "We reviewed \":title\" and will not build it as it is. Write to us here if you want to talk it over.",
             "total": "Selected: :amount",
             "pay": "Pay for the selected",
             "cancel": "Cancel",
@@ -2842,6 +2845,7 @@
             "applied": ":percent% off the programming price is applied."
         },
         "errors": {
+            "no_rollback": "This change cannot be rolled back now: it must be delivered with its commits known, and the project must not be busy.",
             "looking": "One moment, still looking at the link you sent.",
             "unavailable": "Sorry, a short problem happened. Please send your message again.",
             "limit": "You reached today's limit of new chats. Continue in one of your chats, or come back tomorrow.",
