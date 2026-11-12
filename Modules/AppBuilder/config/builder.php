@@ -148,13 +148,14 @@ return [
     // the owner reads and approves every request (from a phone notification) before the engineer starts it
     'owner_approval' => (bool) env('BUILDER_OWNER_APPROVAL', true),
 
-    // the owner's alerts also go to Telegram, which reaches the phone even when browser pushes do not
-    'owner_telegram' => [
-        'bot_token' => env('BUILDER_TELEGRAM_BOT_TOKEN'),
-        'chat_id' => env('BUILDER_TELEGRAM_CHAT_ID'),
-    ],
+    // the engineer's delivery note is retold in plain words by the chat before the customer reads it
+    'retell_delivery' => (bool) env('BUILDER_RETELL_DELIVERY', true),
+
 
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
+    // the first days of the warranty: every change within the program's main idea is free, new work included;
+    // only something that is really another program has a price. After them, new work is priced and fixes stay free.
+    'free_changes_days' => (int) env('BUILDER_FREE_CHANGES_DAYS', 45),
 
     // A customer's own project, brought as a Google Drive link: a fixed fee to inspect it in a locked box (no internet,
     // nothing else on the build PC), and the maintenance price shows after it. The fee is its own price.

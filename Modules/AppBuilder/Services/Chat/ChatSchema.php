@@ -14,7 +14,7 @@ final class ChatSchema
                 'title' => ['type' => 'string'],
                 'spec' => ['type' => 'string'],
                 'estimated_output_tokens' => ['type' => 'integer'],
-                'kind' => ['type' => 'string', 'enum' => ['build', 'fix']],
+                'kind' => ['type' => 'string', 'enum' => ['build', 'fix', 'new_project']],
                 'complex' => ['type' => 'boolean'],
                 'design_fee' => ['type' => 'number'],
                 'project_type' => ['type' => 'string', 'enum' => array_keys((array) config('builder.project_types'))],
@@ -33,6 +33,8 @@ final class ChatSchema
                 'keep_quote' => ['type' => 'boolean'],
                 // the customer asks to put the delivered changes live (upload, publish, update the app): the worker releases them
                 'release_now' => ['type' => 'boolean'],
+                // the number of an open request in the list that this quote takes the place of, 0 for none
+                'replaces_request' => ['type' => 'integer'],
                 // a program Musoftware already has that this idea starts from, '' for none
                 'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
                 // free ready designs to show as pictures under this answer, so the customer picks one
@@ -44,7 +46,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'replaces_request', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
     }

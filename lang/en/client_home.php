@@ -101,6 +101,18 @@ return [
     ],
 
     'settings' => [
+        'telegram_test_message' => 'Test message from Musoftware: your account is linked and alerts will arrive here.',
+        'telegram_title' => 'Telegram',
+        'telegram_off' => 'Link your account to the Musoftware Telegram bot: see your invoices and projects, ask the AI assistant, and get alerts.',
+        'telegram_on' => 'Your account is linked to',
+        'telegram_link' => 'Link Telegram',
+        'telegram_waiting' => 'Press Start in the bot...',
+        'telegram_linked_now' => 'Linked. The bot is sending you a message now.',
+        'telegram_not_seen' => 'We did not see the Start yet. Open the bot, press Start, and try again.',
+        'telegram_test' => 'Send a test message',
+        'telegram_test_sent' => 'Sent. Check Telegram.',
+        'telegram_unlink' => 'Unlink',
+        'telegram_failed' => 'Something went wrong, try again.',
         'title' => 'Settings',
         'account' => 'Account',
         'profile' => 'Profile',

@@ -114,6 +114,11 @@ return [
         'per_ip_per_hour' => (int) env('GUEST_ORDER_PER_IP_PER_HOUR', 5),
     ],
 
+    // the site's Telegram bot (accounts link it from /settings); BUILDER_TELEGRAM_BOT_TOKEN is the first name it had
+    'site_telegram' => [
+        'bot_token' => env('SITE_TELEGRAM_BOT_TOKEN', env('BUILDER_TELEGRAM_BOT_TOKEN')),
+    ],
+
     'anthropic' => [
         'key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-opus-5-5'),

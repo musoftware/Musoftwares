@@ -49,7 +49,7 @@ class AdminBuilderController extends Controller
 
         return Inertia::render('Admin/Builder/Show', [
             'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
-                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)],
+                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner()],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
                 'role' => $message->role,

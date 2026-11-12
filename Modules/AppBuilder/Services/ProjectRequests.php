@@ -29,8 +29,14 @@ class ProjectRequests
     /** The chat's brief for one request becomes an item in the list; a free one goes to the engineer at once. */
     public function add(BuilderProject $project, ChatTurn $turn, BuilderMessage $question): BuilderRequest
     {
+        $this->withdrawReplaced($project, $turn->replacesRequest);
+        // the same request sent again ("yes, start") stays one item
+        $same = $this->openWithTitle($project, $turn->title);
+        if ($same !== null) {
+            return $same;
+        }
         // a fix is free, however many, while the warranty lasts; something new is always priced
-        $free = $turn->isFix && $project->isUnderWarranty();
+        $free = $project->changeIsFree($turn->isFix, $turn->isNewProject);
         // priced by its own work, never by the minimum of the whole project's type
         $price = $free ? $this->pricer->freeFix($turn->estimatedTokens, $turn->complex) : $this->pricer->change($turn->estimatedTokens, $turn->complex);
 
@@ -62,6 +68,30 @@ class ProjectRequests
         }
 
         return $request;
+    }
+
+    /**
+     * The customer changed an open request (for example "that is a fix, not new work"): the old item leaves the list.
+     * Only one nobody paid for and the engineer has not started; a paid one stays for the owner to settle.
+     */
+    private function withdrawReplaced(BuilderProject $project, int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        $project->requests()->whereKey($id)
+            ->where(fn ($open) => $open->where('status', BuilderRequest::UNPAID)->orWhere(fn ($free) => $free->where('status', BuilderRequest::READY)->where('free', true)))
+            ->first()?->delete();
+    }
+
+    /** An item with the same title that is not done yet (waiting, paid or being built), or null. */
+    private function openWithTitle(BuilderProject $project, string $title): ?BuilderRequest
+    {
+        $wanted = mb_strtolower(trim($title));
+
+        return $wanted === '' ? null : $project->requests()->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY, BuilderRequest::BUILDING])->get()
+            ->first(fn (BuilderRequest $request) => mb_strtolower(trim((string) $request->title)) === $wanted);
     }
 
     /**
@@ -235,7 +265,7 @@ class ProjectRequests
     public function forPrompt(BuilderProject $project): string
     {
         $lines = $project->requests()->latest('id')->limit(30)->get()->reverse()
-            ->map(fn (BuilderRequest $request) => '- '.$request->title.' ('.($request->free ? 'free' : number_format((float) $request->amount, 2).' '.$project->currency).'): '.$this->stateForPrompt($request));
+            ->map(fn (BuilderRequest $request) => '- #'.$request->id.' '.$request->title.' ('.($request->free ? 'free' : number_format((float) $request->amount, 2).' '.$project->currency).'): '.$this->stateForPrompt($request));
 
         return $lines->isEmpty() ? '(empty)' : $lines->implode("\n");
     }

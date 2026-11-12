@@ -101,6 +101,18 @@ return [
     ],
 
     'settings' => [
+        'telegram_test_message' => 'رسالة تجربة من Musoftware: حسابك مربوط والتنبيهات هتوصلك هنا.',
+        'telegram_title' => 'تيليجرام',
+        'telegram_off' => 'اربط حسابك ببوت Musoftware على تيليجرام: تشوف فواتيرك ومشاريعك، وتسأل المساعد الذكي، وتوصلك التنبيهات.',
+        'telegram_on' => 'حسابك مربوط بالبوت',
+        'telegram_link' => 'اربط تيليجرام',
+        'telegram_waiting' => 'دوس Start في البوت...',
+        'telegram_linked_now' => 'اتربط. هتوصلك رسالة من البوت دلوقتي.',
+        'telegram_not_seen' => 'لسه موصلناش الـ Start. افتح البوت ودوس Start، وبعدين جرّب تاني.',
+        'telegram_test' => 'ابعت رسالة تجربة',
+        'telegram_test_sent' => 'اتبعتت. شوف تيليجرام.',
+        'telegram_unlink' => 'افصل',
+        'telegram_failed' => 'حصلت مشكلة، جرّب تاني.',
         'title' => 'الإعدادات',
         'account' => 'الحساب',
         'profile' => 'الملف الشخصي',

@@ -45,6 +45,12 @@ class OwnerReview
         app(ProjectRequests::class)->startNext($project);
     }
 
+    /** A new project's first build: the owner's corrected brief is what the engineer builds, and it starts now. */
+    public function approveProject(BuilderProject $project, ?string $spec): void
+    {
+        $project->update(array_filter(['owner_approved_at' => now(), 'spec' => $spec !== null && trim($spec) !== '' ? trim($spec) : null]));
+    }
+
     /** Saves the owner's corrections without approving yet. */
     public function save(BuilderRequest $request, array $changes): void
     {

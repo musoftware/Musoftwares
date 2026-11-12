@@ -268,6 +268,15 @@ class ProjectPayment
 
     private function queue(BuilderProject $project, array $extra): void
     {
+        $this->queueWithoutAsking($project, $extra);
+        // a new project waits for the owner, who reads the brief from the alert and approves it
+        if ($project->refresh()->waitsForOwner()) {
+            $this->tellOwner($project, 'New project to approve: '.$project->title.' ('.$project->amount.' '.$project->currency.')', route('admin.builder.show', $project).'#approve');
+        }
+    }
+
+    private function queueWithoutAsking(BuilderProject $project, array $extra): void
+    {
         $project->update($extra + [
             // a project with a paid design waits for the designer before it goes to the worker
             'status' => $project->needsDesign() ? BuilderProject::DESIGNING : BuilderProject::QUEUED,

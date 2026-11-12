@@ -1324,6 +1324,8 @@ class AppBuilderTest extends TestCase
 
     public function test_a_change_or_a_fix_after_the_warranty_is_paid(): void
     {
+        // after the free first period, new work has a price
+        config(['builder.free_changes_days' => 0]);
         $project = $this->deliveredProject();
         $this->answerAfterDelivery('build', 10000);
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'ضيف صفحة جديدة'])->assertOk()->assertJsonPath('quote.free', false);

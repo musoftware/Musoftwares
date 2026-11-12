@@ -48,6 +48,7 @@ interface Project {
     error: string | null;
     version: number;
     visitor: Visitor;
+    waits_for_owner: boolean;
 }
 
 function PersonLine({ person }: { person: Person }) {
@@ -195,6 +196,22 @@ function leaveDiscountNote(project: Project): string {
     return t(`after a ${project.leave_discount_percent}% leave discount (-${amount})`, `بعد خصم ${project.leave_discount_percent}% عند المغادرة (-${amount})`);
 }
 
+/** A paid new project waits here: the owner reads (and may correct) the brief the engineer builds from, then starts it. */
+function ProjectApproval({ project }: { project: Project }) {
+    const [spec, setSpec] = useState(project.spec || '');
+    if (!project.waits_for_owner) return null;
+    const approve = () => router.post(`/admin/builder/${project.uuid}/approve`, { spec }, onDone('Approved, the build starts', 'اتوافق عليه، والتنفيذ بدأ'));
+
+    return (
+        <section id="approve" className="scroll-mt-4 space-y-3 rounded-xl border border-amber-400 bg-white p-4">
+            <h2 className="font-semibold">{t('New project waiting for your approval', 'مشروع جديد مستني موافقتك')}</h2>
+            <p className="text-sm text-slate-500">{t('Paid. Nothing is built before you approve. This brief is exactly what the engineer builds from.', 'اتدفع. مفيش حاجة هتتبني قبل موافقتك. الـ brief ده هو اللي المهندس هيبني منه بالظبط.')}</p>
+            <textarea value={spec} onChange={(event) => setSpec(event.target.value)} rows={10} dir="auto" aria-label={t('Build brief', 'الـ brief')} className="w-full rounded-lg border p-2 text-sm" />
+            <button type="button" onClick={approve} className="min-h-11 w-full rounded-lg bg-slate-900 px-5 font-semibold text-white sm:w-auto">{t('Approve and start', 'وافق وابدأ')}</button>
+        </section>
+    );
+}
+
 /** The four numbers the owner checks first: what the customer was quoted and paid, and what the chat and the build cost. */
 function Money({ project }: { project: Project }) {
     const items: [string, string, string][] = [
@@ -281,6 +298,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl, impor
                 </p>
                 <VisitorCard visitor={project.visitor} />
                 <Money project={project} />
+                <ProjectApproval project={project} />
                 <RequestReview uuid={project.uuid} items={requests} currency={project.currency} />
                 {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap wrap-anywhere" dir="ltr">{project.error}</p>}
 

@@ -186,7 +186,7 @@ class ProjectChat
 
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
-        $free = $turn->isFix && $project->isUnderWarranty();
+        $free = $project->hasDelivery() && $project->changeIsFree($turn->isFix, $turn->isNewProject);
         $price = match (true) {
             $free => $this->pricer->freeFix($turn->estimatedTokens, $turn->complex),
             // a change to what is delivered is priced by its own work, not as a new program of its type
@@ -277,7 +277,7 @@ class ProjectChat
     /** The prompt, the project's real state, and the language this answer must be in. */
     /**
      * The customer's own program, which Musoftware brought in: it counts as delivered (version 1), and its study (the
-     * project's MUSOFTWARE.md) decides what is old, a free change that starts at once, and what is new and paid.
+     * project's MUSOFTWARE.md) decides what is old, a free change the engineer reviews and starts, and what is new and paid.
      */
     private function importedProject(BuilderProject $project): string
     {
@@ -353,23 +353,28 @@ class ProjectChat
             ."This project has started and is paid, so the customer writes here like in a messaging app, at any time, even "
             ."while the engineer works, and every change they ask for in the chat becomes one item in a list beside the chat. "
             ."For each message decide: when it asks for work and you know enough, send it as a quote (`quote.ready` true) for "
-            ."that one request only, never one that is already in the list below. Ask first only when you truly cannot tell "
-            ."what they want.\n\n"
+            ."that one request only, never one that is already in the list below. When the customer changes an item that is "
+            ."still open (\"that is a fix, not new work\", other details), send the corrected quote with `replaces_request` set "
+            ."to that item's number from the list, so the old one leaves; otherwise `replaces_request` is 0. \"Yes, start\" "
+            ."about an item already in the list adds nothing. Ask first only when you truly cannot tell what they want.\n\n"
             ."Fix or development, fairly:\n"
             ."- `kind` \"fix\" (تصليح): something the program already has, shows or promises does not work, or works differently "
             ."from what the customer means: a broken screen, a wrong result, a wording, a look, the steps of something it has. "
             ."A promise counts: when the program's own screens or texts already offer it (for example a subscription screen "
             ."that lists \"videos for subscribers only\"), making it really work is a fix, not development.\n"
             ."- `kind` \"build\" (تطوير): something the program does not have and never promised: a new feature, screen, report, "
-            ."section of the admin panel, kind of user or integration.\n"
+            ."section of the admin panel, kind of user or integration, as long as it belongs to this program's main idea.\n"
+            ."- `kind` \"new_project\" (مشروع تاني): really another program, outside this one's main idea (a separate app, "
+            ."a different system or business). It always has its own price.\n"
             ."- Mixed: send the fix now, and say the new part comes as its own item once they ask for it.\n\n"
             .$this->warrantyLine($project)."\n\n"
             ."Keep `spec` short: the engineer also reads the customer's own words. Answer in one or two lines, and always say "
             ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
-            ."وبدأنا عليه\" or \"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\". Never say "
+            ."والمهندس هيراجعه ويبدأ عليه\" or \"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\". Never say "
             ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
             ."nothing.\n\nThe list below is the truth about these requests: what is paid, what is being worked on, what is done. "
-            ."Never tell the customer a request is unpaid when the list says PAID. Something the customer asked about earlier "
+            ."Never tell the customer a request is unpaid when the list says PAID, and never say work started or finished "
+            ."unless the list says so: an item the engineer is reviewing has not started yet. Something the customer asked about earlier "
             ."that is not in the list is not open (it was cancelled or never asked for); do not count it.\n\nThe list now:\n"
             .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project);
     }
@@ -378,9 +383,15 @@ class ProjectChat
     private function warrantyLine(BuilderProject $project): string
     {
         $until = $project->warranty_until?->timezone('Africa/Cairo')->toDateString();
+        $freeUntil = $project->freeChangesUntil()?->timezone('Africa/Cairo')->toDateString();
+        if ($project->changeIsFree(false, false)) {
+            return "Free changes: until {$freeUntil} every change within the program's main idea is free, a fix or new work alike "
+                ."(say it is part of their project's first period). Only `new_project` has a price. After that date, until "
+                ."{$until}, fixes stay free and new work is priced. Every request goes to the engineer, who reviews it first.";
+        }
         if ($project->isUnderWarranty()) {
-            return "Warranty: until {$until}. Every fix is free until then, however many, and goes to the engineer by itself. "
-                .'Development always has its own price.';
+            return "Warranty: until {$until}. Every fix is free until then, however many, and goes to the engineer, who reviews it first. "
+                .'New work has its own price (the free first period ended on '.$freeUntil.').';
         }
 
         return 'Warranty: '.($until ? "ended on {$until}" : 'none').'. A fix now has its own price too, like development; '
@@ -390,7 +401,7 @@ class ProjectChat
     private function systemPrompt(BuilderProject $project): string
     {
         $prompt = (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
-        $state = (self::STATE_LINES[$project->status] ?? 'Unknown.').' '.$this->paymentFacts($project);
+        $state = ($project->waitsForOwner() ? 'Paid. The engineer is reviewing the brief and starts the build soon; it has not started yet.' : (self::STATE_LINES[$project->status] ?? 'Unknown.')).' '.$this->paymentFacts($project);
 
         // an imported project is already a working program: no ready programs or designs to offer it
         $starters = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();

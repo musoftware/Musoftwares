@@ -259,6 +259,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/settings', [\App\Http\Controllers\Client\SettingsController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('client.settings');
 
+// the account in the site's Telegram bot: invoices, projects, the AI assistant, and the owner's alerts for admins
+Route::middleware(['auth', 'verified'])->prefix('settings/telegram')->name('client.telegram.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Client\TelegramLinkController::class, 'show'])->middleware('throttle:60,1')->name('show');
+    Route::post('/link', [\App\Http\Controllers\Client\TelegramLinkController::class, 'link'])->middleware('throttle:10,1')->name('link');
+    Route::post('/test', [\App\Http\Controllers\Client\TelegramLinkController::class, 'test'])->middleware('throttle:5,1')->name('test');
+    Route::delete('/', [\App\Http\Controllers\Client\TelegramLinkController::class, 'unlink'])->name('unlink');
+});
+
 Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
     ->middleware(['auth', 'verified'])->name('dashboard.directory');
 

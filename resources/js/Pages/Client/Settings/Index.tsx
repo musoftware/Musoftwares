@@ -7,6 +7,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import TelegramAlerts from '@/Components/Settings/TelegramAlerts';
 
 type Row = { href: string; icon: typeof UserRound; label: string; hint?: string; external?: boolean };
 
@@ -84,6 +85,8 @@ export default function SettingsIndex({ currentLang, whatsappUrl }: { currentLan
                         <p className="mt-2 px-1 text-xs text-[#1d1d1f]/50 dark:text-zinc-500">{__('client_home.settings.language_hint')}</p>
                     </section>
                 )}
+
+                {user && <TelegramAlerts />}
 
                 {groups.map((group) => (
                     <section key={group.title} className="mt-6">

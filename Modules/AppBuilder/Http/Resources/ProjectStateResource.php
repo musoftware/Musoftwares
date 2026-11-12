@@ -235,7 +235,8 @@ class ProjectStateResource extends JsonResource
             // an import or a release is not a paid build: it says what it really does
             $this->job_kind === BuilderProject::JOB_IMPORT && $this->customer_project => 'inspecting',
             $this->job_kind === BuilderProject::JOB_IMPORT => 'importing',
-            $this->job_kind === BuilderProject::JOB_RELEASE => 'releasing',
+            in_array($this->job_kind, [BuilderProject::JOB_RELEASE, BuilderProject::JOB_ROLLBACK], true) => 'releasing',
+            $this->waitsForOwner() => 'owner_review',
             $this->status === BuilderProject::QUEUED => 'queued',
             $this->status === BuilderProject::DESIGNING => 'designing',
             default => $this->progress_step ?: 'started',

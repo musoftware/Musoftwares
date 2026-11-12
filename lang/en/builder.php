@@ -44,7 +44,7 @@ return [
     'requests' => [
         'title' => 'Your requests',
         'close' => 'Close',
-        'how' => 'Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty and starts by itself; development (something new) gets its price here, and you pay when you like.',
+        'how' => 'Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty, and the engineer reviews it and starts it; development (something new) gets its price here, and you pay when you like.',
         'fix' => 'Fix',
         'build' => 'Development',
         'warranty' => 'Warranty until :date: every fix is free.',
@@ -220,6 +220,7 @@ The Musoftware team",
     'copy_link' => 'Save the link of this page to come back any time.',
     'steps' => [
         'designing' => 'Our designer is working on your design; the build starts as soon as it is ready',
+        'owner_review' => 'Paid. The engineer is reviewing your request and starts it soon',
         'queued' => 'Paid. Your program is next in line',
         'started' => 'The build has started',
         'planning' => 'Planning the program',
@@ -257,6 +258,11 @@ The Musoftware team",
         'take' => 'Take the discount',
         'no' => 'No, thanks',
         'applied' => ':percent% off the programming price is applied.',
+    ],
+    'telegram' => [
+        'not_configured' => 'The Telegram bot is not set up on the server.',
+        'test_message' => 'Test message from Musoftware: your alerts will arrive here.',
+        'test_failed' => 'Not sent. Link Telegram first.',
     ],
     'errors' => [
         'no_rollback' => 'This change cannot be rolled back now: it must be delivered with its commits known, and the project must not be busy.',

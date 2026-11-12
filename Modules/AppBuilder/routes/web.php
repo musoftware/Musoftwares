@@ -69,7 +69,8 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::get('/', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'index'])->name('index');
     Route::post('/import', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'store'])->name('import');
     Route::post('/push-test', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'testPush'])->middleware('throttle:5,1')->name('push-test');
-    // the owner approves each request before the engineer starts it
+    // the owner approves each new project and each request before the engineer starts it
+    Route::post('/{project}/approve', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'approveProject'])->name('approve');
     Route::post('/{project}/requests/{item}/save', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'save'])->whereNumber('item')->name('requests.save');
     Route::post('/{project}/requests/{item}/approve', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'approve'])->whereNumber('item')->name('requests.approve');
     Route::post('/{project}/requests/{item}/reject', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'reject'])->whereNumber('item')->name('requests.reject');

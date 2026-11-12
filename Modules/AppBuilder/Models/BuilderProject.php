@@ -83,6 +83,7 @@ class BuilderProject extends Model
         'budget_usd' => 'decimal:4',
         'build_cost_usd' => 'decimal:4',
         'paid_at' => 'datetime',
+        'owner_approved_at' => 'datetime',
         'built_at' => 'datetime',
         'warranty_until' => 'datetime',
         'lease_expires_at' => 'datetime',
@@ -242,6 +243,13 @@ class BuilderProject extends Model
         return round(($this->chat_input_tokens * $prices['input_usd_per_mtok'] + $this->chat_output_tokens * $prices['output_usd_per_mtok']) / 1_000_000, 4);
     }
 
+    /** Paid for its first build, which waits for the owner to read and approve the brief. */
+    public function waitsForOwner(): bool
+    {
+        return config('builder.owner_approval') && $this->owner_approved_at === null && ! $this->hasDelivery()
+            && in_array($this->status, [self::QUEUED, self::DESIGNING], true) && ($this->job_kind ?: self::JOB_BUILD) === self::JOB_BUILD;
+    }
+
     public function hasDelivery(): bool
     {
         return $this->version > 0;
@@ -251,6 +259,25 @@ class BuilderProject extends Model
     public function isUnderWarranty(): bool
     {
         return $this->hasDelivery() && ! $this->hasBalanceDue() && (bool) $this->warranty_until?->isFuture();
+    }
+
+    /** The last day any change within the program's main idea is free (the start of the warranty plus the free days). */
+    public function freeChangesUntil(): ?\Illuminate\Support\Carbon
+    {
+        return $this->warranty_until?->copy()->subDays((int) config('builder.warranty_days'))->addDays((int) config('builder.free_changes_days'));
+    }
+
+    /**
+     * Whether a change costs nothing: a fix until the warranty ends; new work within the main idea in the free days;
+     * another program never.
+     */
+    public function changeIsFree(bool $isFix, bool $isNewProject): bool
+    {
+        if ($isNewProject || ! $this->isUnderWarranty()) {
+            return false;
+        }
+
+        return $isFix || (bool) $this->freeChangesUntil()?->isFuture();
     }
 
     /** Folder on the local disk that holds every delivered version. */
@@ -275,6 +302,9 @@ class BuilderProject extends Model
         return $query->where('attempts', '<', $maxAttempts)
             // a paid build may wait a while for the full-quality originals of the design pictures
             ->where(fn (Builder $ready) => $ready->whereNull('originals_due_at')->orWhere('originals_due_at', '<=', now()))
+            // a new project's first build waits for the owner's approval (its changes are approved one by one)
+            ->when(config('builder.owner_approval'), fn (Builder $approved) => $approved->where(fn (Builder $either) => $either
+                ->whereNotNull('owner_approved_at')->orWhere('version', '>', 0)->orWhereNotIn('job_kind', [self::JOB_BUILD])))
             ->where(function (Builder $inner): void {
             $inner->where('status', self::QUEUED)
                 ->orWhere(fn (Builder $stale) => $stale->where('status', self::BUILDING)->where('lease_expires_at', '<', now()));

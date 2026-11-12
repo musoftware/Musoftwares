@@ -27,6 +27,10 @@ final readonly class ChatTurn
         public bool $keepQuote = false,
         /** the customer asked to put the delivered changes live; the worker releases them */
         public bool $releaseNow = false,
+        /** an open request this quote takes the place of (the customer changed or re-classified it), 0 for none */
+        public int $replacesRequest = 0,
+        /** really another program, not part of this one's main idea: always priced */
+        public bool $isNewProject = false,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -52,6 +56,8 @@ final readonly class ChatTurn
             designs: array_values(array_slice(array_filter((array) ($data['designs'] ?? []), 'is_string'), 0, 6)),
             keepQuote: (bool) ($data['keep_quote'] ?? false),
             releaseNow: (bool) ($data['release_now'] ?? false),
+            replacesRequest: max(0, (int) ($data['replaces_request'] ?? 0)),
+            isNewProject: ($quote['kind'] ?? 'build') === 'new_project',
         );
     }
 
@@ -66,13 +72,14 @@ final readonly class ChatTurn
                 'title' => $this->title,
                 'spec' => $this->spec,
                 'estimated_output_tokens' => $this->estimatedTokens,
-                'kind' => $this->isFix ? 'fix' : 'build',
+                'kind' => $this->isFix ? 'fix' : ($this->isNewProject ? 'new_project' : 'build'),
                 'complex' => $this->complex,
                 'design_fee' => $this->designFee,
                 'project_type' => $this->projectType,
             ],
             'keep_quote' => $this->keepQuote,
             'release_now' => $this->releaseNow,
+            'replaces_request' => $this->replacesRequest,
             'starter' => $this->starter,
             'designs' => $this->designs,
         ];

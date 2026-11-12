@@ -37,6 +37,15 @@ class AdminRequestController extends Controller
         return back();
     }
 
+    /** A paid new project: the owner reads (and may correct) the brief, and the first build starts. */
+    public function approveProject(OwnerReviewRequest $request, BuilderProject $project): RedirectResponse
+    {
+        abort_unless($project->waitsForOwner(), 409);
+        $this->review->approveProject($project, $request->validated('spec'));
+
+        return back();
+    }
+
     /** Undo a delivered change: the worker reverts its commits and releases (GitHub, deploy, the app). */
     public function rollback(BuilderProject $project, int $item, OwnerRollback $rollback): RedirectResponse
     {

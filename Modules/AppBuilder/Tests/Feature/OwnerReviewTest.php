@@ -32,7 +32,8 @@ class OwnerReviewTest extends TestCase
         parent::setUp();
         Storage::fake('local');
         Notification::fake();
-        config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => true]);
+        // new work priced, as after the free first period; FreeChangesTest covers that period
+        config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => true, 'builder.free_changes_days' => 0]);
         Role::findOrCreate('admin');
         $this->owner = User::factory()->create(['email_verified_at' => now()]);
         $this->owner->assignRole('admin');
@@ -150,7 +151,9 @@ class OwnerReviewTest extends TestCase
 
     public function test_the_owner_also_gets_a_telegram_message_with_a_button_to_the_request(): void
     {
-        config(['builder.owner_telegram' => ['bot_token' => 'test-token', 'chat_id' => '12345']]);
+        config(['services.site_telegram.bot_token' => 'test-token']);
+        // the owner linked Telegram from the settings page
+        $this->owner->forceFill(['telegram_chat_id' => '12345'])->save();
         \Illuminate\Support\Facades\Http::fake(['api.telegram.org/*' => \Illuminate\Support\Facades\Http::response(['ok' => true])]);
         $project = $this->deliveredProject();
 
@@ -174,5 +177,22 @@ class OwnerReviewTest extends TestCase
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('requests.items.0.review_url', null);
         $this->actingAs($this->owner)->getJson('/ai/'.$project->uuid.'/state')
             ->assertJsonPath('requests.items.0.review_url', route('admin.builder.show', $project).'#request-'.$item->id);
+    }
+
+    public function test_a_paid_new_project_waits_for_the_owner_who_approves_the_brief(): void
+    {
+        $project = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'منيو', 'spec' => 'A menu page.', 'amount' => 40, 'status' => BuilderProject::QUOTED, 'quote_version' => 1]);
+
+        $this->actingAs($this->owner)->post('/admin/builder/'.$project->uuid.'/mark-paid', ['version' => 1]);
+        auth()->logout();
+
+        $this->assertTrue($project->refresh()->waitsForOwner());
+        Notification::assertSentTo($this->owner, BuilderOwnerAlert::class, fn (BuilderOwnerAlert $alert) => str_ends_with($alert->url, '#approve'));
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
+
+        $this->actingAs($this->owner)->post('/admin/builder/'.$project->uuid.'/approve', ['spec' => 'A menu page with prices in EGP.'])->assertRedirect();
+        auth()->logout();
+
+        $this->assertSame('A menu page with prices in EGP.', $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job.spec'));
     }
 }

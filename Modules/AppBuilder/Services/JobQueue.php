@@ -52,8 +52,10 @@ class JobQueue
         // this job's whole cost, failed tries included, teaches the next price and settles this one
         $jobCost = (float) $project->job_cost_usd + $costUsd;
         $this->costs->record($project, $jobCost);
+        // the engineer writes for engineers; the customer reads the contact's plain retelling, the owner the original
+        $forCustomer = app(Chat\CustomerVoice::class)->retell($project, $summary);
 
-        DB::transaction(function () use ($project, $version, $summary, $costUsd, $ideasJson): void {
+        DB::transaction(function () use ($project, $version, $forCustomer, $summary, $costUsd, $ideasJson): void {
             $project->update([
                 'status' => BuilderProject::READY,
                 'version' => $version,
@@ -70,8 +72,8 @@ class JobQueue
             ]);
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
-                'content' => $summary,
-                'payload' => ['reply' => $summary, 'delivered_version' => $version, 'ideas' => $this->ideas($ideasJson), 'needs_team' => false, 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0]],
+                'content' => $forCustomer,
+                'payload' => ['reply' => $forCustomer, 'engineer_note' => $summary, 'delivered_version' => $version, 'ideas' => $this->ideas($ideasJson), 'needs_team' => false, 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0]],
             ]);
         });
         // money back is good news, never a reason for a delivery to fail
@@ -86,7 +88,7 @@ class JobQueue
         if ($this->trials->kind($project->refresh()) === 'extension') {
             $this->trials->request($project);
         }
-        $this->payment->tellOwner($project, 'Delivered: '.$project->title.' v'.$version.' (cost '.$costUsd.' USD)');
+        $this->payment->tellOwner($project, 'Delivered: '.$project->title.' v'.$version.' (cost '.$costUsd.' USD)'."\n\nEngineer: ".\Illuminate\Support\Str::limit($summary, 600));
     }
 
     public function fail(BuilderProject $project, string $error, float $costUsd): void

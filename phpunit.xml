@@ -86,5 +86,8 @@
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <env name="APP_BUSINESS_TIMEZONE" value="UTC"/>
         <env name="AI_FILES_PATH" value="storage/framework/testing/ai-files"/>
+        <!-- the builder flows run without the owner step; OwnerReviewTest turns it on -->
+        <env name="BUILDER_OWNER_APPROVAL" value="false"/>
+        <env name="BUILDER_RETELL_DELIVERY" value="false"/>
     </php>
 </phpunit>
