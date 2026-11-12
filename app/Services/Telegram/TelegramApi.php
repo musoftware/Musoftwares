@@ -85,6 +85,23 @@ class TelegramApi
         return $this->call('setWebhook', ['url' => $url, 'secret_token' => $this->webhookSecret(), 'allowed_updates' => ['message', 'callback_query'], 'drop_pending_updates' => true]) !== null;
     }
 
+    /**
+     * The list Telegram shows when someone types "/": one for Arabic phones (the default) and one for English ones.
+     *
+     * @param  array<string, array<string, string>>  $byLanguage  language => [command => description]
+     */
+    public function setCommands(array $byLanguage): bool
+    {
+        $ok = true;
+        foreach ($byLanguage as $language => $commands) {
+            $list = array_map(fn (string $command, string $description) => ['command' => $command, 'description' => $description], array_keys($commands), $commands);
+            $payload = ['commands' => $list] + ($language === 'ar' ? [] : ['language_code' => $language]);
+            $ok = $this->call('setMyCommands', $payload) !== null && $ok;
+        }
+
+        return $ok;
+    }
+
     /** Derived from the app key, so there is no second secret to keep. */
     public function webhookSecret(): string
     {

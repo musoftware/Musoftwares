@@ -226,6 +226,10 @@ class SiteBotTest extends TestCase
         $this->assertStringContainsString('البرنامج مش بيفتح · الفريق رد', $tickets);
         $this->assertStringContainsString('/r/', $invite);
         $this->assertStringContainsString('/ai', $invite);
+
+        // the same screen from the "/" commands list
+        $this->telegramSends('/balance');
+        $this->assertStringContainsString('120', collect($this->sentText())->last());
     }
 
     public function test_settings_stop_the_alerts_and_switch_the_language(): void

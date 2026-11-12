@@ -23,6 +23,9 @@ class SiteBot
     /** The buttons under the typing box, in order; an admin also gets the approvals first. */
     private const BUTTONS = ['invoices', 'projects', 'balance', 'tickets', 'invite', 'settings', 'support'];
 
+    /** The same screens as commands, listed when someone types "/" (/projects, /balance...). */
+    public const COMMANDS = ['projects', 'invoices', 'balance', 'tickets', 'invite', 'settings', 'support'];
+
     public function __construct(
         private readonly TelegramApi $api,
         private readonly TelegramLinks $links,
@@ -146,6 +149,11 @@ class SiteBot
     /** Which menu button the text is, in either language (the keyboard may still show the language before a switch). */
     private function button(string $text): ?string
     {
+        // a command from the "/" list (/projects, or /projects@bot in a group-style tap)
+        $command = preg_match('/^\/([a-z]+)(@\w+)?$/', $text, $match) ? $match[1] : null;
+        if ($command !== null && in_array($command, [...self::COMMANDS, 'approvals'], true)) {
+            return $command;
+        }
         foreach (['approvals', ...self::BUTTONS] as $key) {
             if (in_array($text, [__('telegram.btn_'.$key, [], 'ar'), __('telegram.btn_'.$key, [], 'en')], true)) {
                 return $key;

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Telegram\SiteBot;
 use App\Services\Telegram\TelegramApi;
 use Illuminate\Console\Command;
 
@@ -27,6 +28,9 @@ class TelegramWebhook extends Command
         }
 
         $this->info('Webhook set for @'.$api->botUsername().': '.$url);
+        $commands = collect(['ar', 'en'])->mapWithKeys(fn (string $language) => [$language => collect(SiteBot::COMMANDS)
+            ->mapWithKeys(fn (string $key) => [$key => __('telegram.btn_'.$key, [], $language)])->all()])->all();
+        $api->setCommands($commands) ? $this->info('Commands set.') : $this->warn('Telegram refused the commands; see the log.');
 
         return self::SUCCESS;
     }
