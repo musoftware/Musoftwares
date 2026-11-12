@@ -23,6 +23,8 @@ final readonly class ChatTurn
         public string $starter = '',
         /** @var list<string> free designs shown as pictures under this answer */
         public array $designs = [],
+        /** a plain answer while a price is shown: the price and its program stay as they are */
+        public bool $keepQuote = false,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -46,6 +48,7 @@ final readonly class ChatTurn
             projectType: (string) ($quote['project_type'] ?? 'other'),
             starter: trim((string) ($data['starter'] ?? '')),
             designs: array_values(array_slice(array_filter((array) ($data['designs'] ?? []), 'is_string'), 0, 6)),
+            keepQuote: (bool) ($data['keep_quote'] ?? false),
         );
     }
 
@@ -65,6 +68,7 @@ final readonly class ChatTurn
                 'design_fee' => $this->designFee,
                 'project_type' => $this->projectType,
             ],
+            'keep_quote' => $this->keepQuote,
             'starter' => $this->starter,
             'designs' => $this->designs,
         ];

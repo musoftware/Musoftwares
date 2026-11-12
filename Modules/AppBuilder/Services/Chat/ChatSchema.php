@@ -29,6 +29,8 @@ final class ChatSchema
                 'reply' => ['type' => 'string'],
                 'needs_team' => ['type' => 'boolean'],
                 'quote' => $quote,
+                // true when a price is already shown and this answer changes nothing in what gets built
+                'keep_quote' => ['type' => 'boolean'],
                 // a program Musoftware already has that this idea starts from, '' for none
                 'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
                 // free ready designs to show as pictures under this answer, so the customer picks one
@@ -40,7 +42,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
     }

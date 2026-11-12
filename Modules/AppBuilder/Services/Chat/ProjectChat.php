@@ -128,6 +128,24 @@ class ProjectChat
 
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
+        $this->updateQuote($project, $turn);
+
+        return $project->messages()->create([
+            'role' => BuilderMessage::ASSISTANT,
+            'content' => $this->secrets->mask($project, $turn->reply),
+            'payload' => $turn->payload(),
+        ]);
+    }
+
+    /**
+     * A new price, no price, or the shown price kept: a plain answer (which language, how hosting works) while a
+     * price is shown must never take the price away.
+     */
+    private function updateQuote(BuilderProject $project, ChatTurn $turn): void
+    {
+        if (! $turn->quoteReady && $turn->keepQuote && $project->status === BuilderProject::QUOTED) {
+            return;
+        }
         // a ready program to start from matters only for the first build; later builds start from the delivered one
         if (! $project->hasDelivery()) {
             $project->update(['starter' => app(\Modules\AppBuilder\Services\Starters::class)->find($turn->starter)['slug'] ?? null]);
@@ -137,12 +155,6 @@ class ProjectChat
         if ($turn->quoteReady && $this->study->isDue($project->refresh())) {
             $this->study->start($project);
         }
-
-        return $project->messages()->create([
-            'role' => BuilderMessage::ASSISTANT,
-            'content' => $this->secrets->mask($project, $turn->reply),
-            'payload' => $turn->payload(),
-        ]);
     }
 
     /** Access details typed in the chat are saved encrypted, and the chat keeps only a mask in their place. */

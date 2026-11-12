@@ -150,6 +150,24 @@ class AppBuilderTest extends TestCase
         $this->assertStringContainsString('"estimated_output_tokens":50000', $seen[1]['content']);
     }
 
+    public function test_a_plain_question_after_the_price_keeps_the_price(): void
+    {
+        $project = $this->quotedProject();
+        $amount = $project->amount;
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'هيتبني بـ Laravel، والسعر ظاهر تحت الرسالة.',
+            'needs_team' => false,
+            'keep_quote' => true,
+            'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0],
+        ]);
+
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'لغة برمجة ايه؟'])->assertOk()->assertJsonPath('quote.amount', number_format((float) $amount, 2));
+
+        $project->refresh();
+        $this->assertSame(BuilderProject::QUOTED, $project->status);
+        $this->assertSame($amount, $project->amount);
+    }
+
     public function test_a_failed_claude_turn_drops_the_unanswered_line(): void
     {
         $project = $this->quotedProject();
