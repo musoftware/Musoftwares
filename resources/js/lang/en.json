@@ -2796,6 +2796,12 @@
             "failed": "Stopped"
         },
         "progress_bar": "How much of the work is done",
+        "phases_title": "Work phases",
+        "phase_states": {
+            "done": "Done",
+            "now": "Working on it now",
+            "next": "Not started"
+        },
         "download_apk": "Download the Android app",
         "looking": "Opening the link in a browser to look at the site...",
         "reading_file": "Reading the file and its calculations...",
