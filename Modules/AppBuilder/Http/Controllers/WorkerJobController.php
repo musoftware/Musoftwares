@@ -60,7 +60,42 @@ class WorkerJobController extends Controller
             'starter' => $project->hasDelivery() ? null : $project->starter,
             // a program learned from an earlier paid project: the worker copies that project's code, cleaned
             'starter_source' => $project->hasDelivery() ? null : (app(\Modules\AppBuilder\Services\Starters::class)->find($project->starter)['source_uuid'] ?? null),
-        ]]);
+        ] + $this->importDetails($project)]);
+    }
+
+    /** For a project the owner imported: where it comes from, its GitHub repo, and how its changes are released. */
+    private function importDetails(BuilderProject $project): array
+    {
+        return [
+            'kind' => $project->job_kind ?: BuilderProject::JOB_BUILD,
+            'imported' => $project->isImported(),
+            'import_url' => $project->import_url,
+            'github_repo' => $project->github_repo,
+            // a change is released inside its own build only in "after every change" mode
+            'release_now' => $project->isImported() && $project->release_mode === BuilderProject::RELEASE_EACH,
+            'deploy' => $project->isImported() && $project->deploy_enabled,
+            'deploy_command' => $project->deploy_command,
+        ];
+    }
+
+    /** The worker has the imported project in its folder; the customer can start asking for changes. */
+    public function imported(WorkerReportRequest $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectImports $imports): JsonResponse
+    {
+        $this->assertBuilding($project);
+        abort_unless($project->job_kind === BuilderProject::JOB_IMPORT, 409, 'This job is not an import.');
+        $imports->imported($project, $request->validated('profile'));
+
+        return response()->json(['status' => 'imported']);
+    }
+
+    /** The delivered changes were pushed to GitHub as a pull request and, when asked, deployed. */
+    public function released(WorkerReportRequest $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectImports $imports): JsonResponse
+    {
+        $this->assertBuilding($project);
+        abort_unless($project->job_kind === BuilderProject::JOB_RELEASE, 409, 'This job is not a release.');
+        $imports->released($project, $request->validated('pull_request_url'), (bool) $request->validated('deployed'), (string) $request->validated('note'));
+
+        return response()->json(['status' => 'released']);
     }
 
     /** The last delivered version, so a change request starts from the real files. */
@@ -142,21 +177,30 @@ class WorkerJobController extends Controller
     {
         $this->assertBuilding($project);
 
+        abort_unless(($project->job_kind ?: BuilderProject::JOB_BUILD) === BuilderProject::JOB_BUILD, 409, 'This job is not a build.');
+
         try {
-            $this->jobs->complete($project, $request->file('archive')->getRealPath(), $request->validated('summary'), (float) $request->validated('cost_usd'), (string) $request->validated('ideas'));
+            $this->jobs->complete($project, $request->file('archive')?->getRealPath(), $request->validated('summary'), (float) $request->validated('cost_usd'), (string) $request->validated('ideas'));
         } catch (InvalidArgumentException $e) {
             Log::warning('App builder: worker sent a bad archive', ['project_id' => $project->id, 'error' => $e->getMessage()]);
 
             return response()->json(['message' => $e->getMessage()], 422);
         }
+        // "after every change": the build already pushed its pull request and deployed
+        if ($project->isImported() && $request->boolean('released')) {
+            app(\Modules\AppBuilder\Services\ProjectImports::class)->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
+        }
 
-        return response()->json(['status' => 'delivered', 'version' => $project->version]);
+        return response()->json(['status' => 'delivered', 'version' => $project->refresh()->version]);
     }
 
     public function fail(WorkerReportRequest $request, BuilderProject $project): JsonResponse
     {
         $this->assertBuilding($project);
-        $this->jobs->fail($project, $request->validated('error'), (float) $request->validated('cost_usd'));
+        // an import or a release that fails is the owner's matter; a failed build also tells the customer
+        ($project->job_kind ?: BuilderProject::JOB_BUILD) === BuilderProject::JOB_BUILD
+            ? $this->jobs->fail($project, $request->validated('error'), (float) $request->validated('cost_usd'))
+            : app(\Modules\AppBuilder\Services\ProjectImports::class)->failed($project, $request->validated('error'));
 
         return response()->json(['status' => 'recorded']);
     }

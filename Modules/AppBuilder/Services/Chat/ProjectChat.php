@@ -249,17 +249,37 @@ class ProjectChat
     }
 
     /** The prompt, the project's real state, and the language this answer must be in. */
+    /**
+     * The customer's own program, which Musoftware brought in: it counts as delivered (version 1), its description is
+     * the agreed brief, and the "After a delivery" rules decide what is a free fix and what is a paid new idea.
+     */
+    private function importedProject(BuilderProject $project): string
+    {
+        if (! $project->isImported()) {
+            return '';
+        }
+
+        return "\n\n## This is the customer's existing program\n\n"
+            ."Musoftware brought this customer's own working program in, and the build engineer has all its files. Treat it as "
+            ."already delivered: the description below is the agreed brief, and every request follows the After a delivery rules "
+            ."(a fix to what exists is free within the limits; a new feature, screen or integration is a paid new idea). Never "
+            ."offer ready programs, designs, a download or a live trial for it. Changes go live on the customer's own server.\n\n"
+            .mb_substr((string) $project->import_profile, 0, 12000);
+    }
+
     private function systemPrompt(BuilderProject $project): string
     {
         $prompt = (string) file_get_contents(module_path('AppBuilder', 'Resources/prompts/chat.md'));
         $state = (self::STATE_LINES[$project->status] ?? 'Unknown.').' '.$this->paymentFacts($project);
 
-        $starters = app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
-        $designs = app(\Modules\AppBuilder\Services\Starters::class)->designsForPrompt();
+        // an imported project is already a working program: no ready programs or designs to offer it
+        $starters = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
+        $designs = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->designsForPrompt();
 
         return $prompt
             .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
             .($designs !== '' ? "\n\n## Free designs\n\n".$designs : '')
+            .$this->importedProject($project)
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
             ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }

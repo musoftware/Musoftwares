@@ -153,6 +153,8 @@ class BuilderChatController extends Controller
             $unlimited = (bool) $request->user()?->isAdmin();
             $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id, $unlimited, $request->userAgent());
             $project->update(['country' => \Modules\AppBuilder\Services\Chat\Dialect::countryOf($request)]);
+            // this browser started the chat, so it keeps it even after the chat joins an account at payment
+            \Modules\AppBuilder\Http\Middleware\OnlyProjectOwner::rememberStarter($request, $project);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }

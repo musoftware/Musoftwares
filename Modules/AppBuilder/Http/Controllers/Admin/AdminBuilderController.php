@@ -60,7 +60,30 @@ class AdminBuilderController extends Controller
             ])->values(),
             'secrets' => $this->secrets->listing($project),
             'chatUrl' => route('builder.show', $project),
+            'import' => $this->importState($project),
         ]);
+    }
+
+    /** An imported project's release rule, what waits to go out, and the last pull request. */
+    private function importState(BuilderProject $project): ?array
+    {
+        if (! $project->isImported()) {
+            return null;
+        }
+
+        return [
+            'github_repo' => $project->github_repo,
+            'release_mode' => $project->release_mode,
+            'release_after_changes' => $project->release_after_changes,
+            'release_quiet_minutes' => $project->release_quiet_minutes,
+            'deploy_enabled' => $project->deploy_enabled,
+            'deploy_command' => $project->deploy_command,
+            'imported_at' => $project->imported_at?->timezone('Africa/Cairo')->toDateTimeString(),
+            'released_at' => $project->released_at?->timezone('Africa/Cairo')->toDateTimeString(),
+            'changes_waiting' => $project->changesWaiting(),
+            'pull_request_url' => $project->pull_request_url,
+            'can_release' => $project->status === BuilderProject::READY && $project->changesWaiting() > 0,
+        ];
     }
 
     /** Who started the chat: the signed-in account if any, the address and device, and whose link they came from. */

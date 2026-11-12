@@ -13,7 +13,8 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
     Route::post('/messages', [BuilderChatController::class, 'start'])->middleware('throttle:10,1')->name('start');
     Route::post('/webhook', [BuilderPaymentController::class, 'webhook'])->name('webhook');
 
-    Route::whereUuid('project')->group(function () {
+    // a chat that belongs to an account opens only for that account and for admins
+    Route::whereUuid('project')->middleware(\Modules\AppBuilder\Http\Middleware\OnlyProjectOwner::class)->group(function () {
         Route::get('/{project}', [BuilderChatController::class, 'show'])->name('show');
         Route::get('/{project}/state', [BuilderChatController::class, 'state'])->middleware('throttle:60,1')->name('state');
         Route::post('/{project}/messages', [BuilderChatController::class, 'send'])->middleware('throttle:15,1')->name('send');
@@ -53,11 +54,15 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
         Route::get('/jobs/{project}/answers', [WorkerJobController::class, 'answers'])->name('answers');
         Route::post('/jobs/{project}/complete', [WorkerJobController::class, 'complete'])->name('complete');
         Route::post('/jobs/{project}/fail', [WorkerJobController::class, 'fail'])->name('fail');
+        Route::post('/jobs/{project}/imported', [WorkerJobController::class, 'imported'])->name('imported');
+        Route::post('/jobs/{project}/released', [WorkerJobController::class, 'released'])->name('released');
     });
 
 // -- Admin: every chat, and a way for the owner to step in ------------------------------------------
 Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')->name('admin.builder.')->whereUuid('project')->group(function () {
     Route::get('/', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'index'])->name('index');
+    Route::post('/import', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'store'])->name('import');
+    Route::post('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'release'])->name('release');
     Route::get('/{project}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'show'])->name('show');
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');

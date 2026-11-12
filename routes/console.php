@@ -57,6 +57,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\Starters\LearnedStarter
     ->everyThirtyMinutes()
     ->withoutOverlapping(20);
 
+// an imported project in batch mode releases its changes once enough are waiting or the customer has gone quiet
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectImports::class)->queueDueReleases())
+    ->name('builder-due-releases')
+    ->everyFiveMinutes()
+    ->withoutOverlapping(4);
+
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')

@@ -38,6 +38,8 @@ class LearnedStarters
             ->where('version', '>', 0)
             ->where('paid_total', '>', 0)
             ->where('free_build', false)
+            // a project the owner imported belongs to that customer, never a template for others
+            ->whereNull('import_url')
             ->whereNotExists(fn ($learned) => $learned->from('builder_starters')
                 ->whereColumn('builder_starters.source_project_id', 'builder_projects.id')
                 ->where(fn ($done) => $done->whereColumn('builder_starters.version', '>=', 'builder_projects.version')

@@ -29,6 +29,20 @@ class BuilderProject extends Model
 
     public const FAILED = 'failed';
 
+    /** What the worker does with a queued project: build a paid change, import the owner's project, or release changes. */
+    public const JOB_BUILD = 'build';
+
+    public const JOB_IMPORT = 'import';
+
+    public const JOB_RELEASE = 'release';
+
+    /** When an imported project's changes go to GitHub and the server: after each change, in batches, or by the owner. */
+    public const RELEASE_EACH = 'each';
+
+    public const RELEASE_BATCH = 'batch';
+
+    public const RELEASE_MANUAL = 'manual';
+
     /** The customer can type only while no build is waiting or running. */
     private const OPEN_FOR_CHAT = [self::CHATTING, self::QUOTED, self::READY];
 
@@ -53,6 +67,12 @@ class BuilderProject extends Model
         'look_started_at' => 'datetime',
         'study_fee' => 'decimal:2',
         'study_paid' => 'decimal:2',
+        'imported_at' => 'datetime',
+        'released_at' => 'datetime',
+        'deploy_enabled' => 'boolean',
+        'released_version' => 'integer',
+        'release_after_changes' => 'integer',
+        'release_quiet_minutes' => 'integer',
         'job_cost_usd' => 'decimal:4',
         'budget_usd' => 'decimal:4',
         'build_cost_usd' => 'decimal:4',
@@ -126,6 +146,18 @@ class BuilderProject extends Model
         return (float) $this->quote_paid > 0 ? max(0.0, round((float) $this->amount - (float) $this->quote_paid, 2)) : 0.0;
     }
 
+    /** The owner brought this project in (a Drive zip, maybe its GitHub repo) for a customer to keep changing. */
+    public function isImported(): bool
+    {
+        return $this->import_url !== null;
+    }
+
+    /** Delivered changes not yet pushed to GitHub and deployed. */
+    public function changesWaiting(): int
+    {
+        return $this->isImported() ? max(0, (int) $this->version - (int) $this->released_version) : 0;
+    }
+
     /** What the customer paid for the feasibility study comes off the price of the first build, never a later one. */
     public function studyCredit(): float
     {
@@ -151,6 +183,10 @@ class BuilderProject extends Model
     public function customerLanguage(): string
     {
         $written = $this->messages()->where('role', BuilderMessage::USER)->pluck('content')->implode(' ');
+        // an imported project has no customer lines yet: the owner chose its language
+        if ($written === '') {
+            return $this->locale === 'ar' ? 'ar' : 'en';
+        }
 
         return preg_match('/\p{Arabic}/u', $written) ? 'ar' : 'en';
     }

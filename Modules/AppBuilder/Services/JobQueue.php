@@ -45,9 +45,10 @@ class JobQueue
         $project->update(['progress_step' => $step, 'progress_file' => $file, 'lease_expires_at' => now()->setTimestamp($lease)]);
     }
 
-    public function complete(BuilderProject $project, string $zipPath, string $summary, float $costUsd, string $ideasJson = ''): void
+    public function complete(BuilderProject $project, ?string $zipPath, string $summary, float $costUsd, string $ideasJson = ''): void
     {
-        $version = $this->store->store($project, $zipPath);
+        // an imported project's change lives in its folder on the build PC and its GitHub repo, not in a download
+        $version = $zipPath !== null ? $this->store->store($project, $zipPath) : $project->version + 1;
         // this job's whole cost, failed tries included, teaches the next price and settles this one
         $jobCost = (float) $project->job_cost_usd + $costUsd;
         $this->costs->record($project, $jobCost);

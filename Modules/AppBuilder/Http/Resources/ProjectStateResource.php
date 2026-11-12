@@ -174,9 +174,12 @@ class ProjectStateResource extends JsonResource
 
     private function progressLine(): string
     {
-        $step = match ($this->status) {
-            BuilderProject::QUEUED => 'queued',
-            BuilderProject::DESIGNING => 'designing',
+        $step = match (true) {
+            // an import or a release is not a paid build: it says what it really does
+            $this->job_kind === BuilderProject::JOB_IMPORT => 'importing',
+            $this->job_kind === BuilderProject::JOB_RELEASE => 'releasing',
+            $this->status === BuilderProject::QUEUED => 'queued',
+            $this->status === BuilderProject::DESIGNING => 'designing',
             default => $this->progress_step ?: 'started',
         };
         // the engineer's own plain line on the last finished part reads better than a step and a file name
@@ -190,7 +193,8 @@ class ProjectStateResource extends JsonResource
     private function delivery(): array
     {
         $preview = $this->previewUrl();
-        $source = $this->hasBalanceDue() ? null : route('builder.download', $this->resource);
+        // an imported project's code goes to its GitHub repo and server, so there is nothing to download here
+        $source = $this->hasBalanceDue() || $this->isImported() ? null : route('builder.download', $this->resource);
         $apk = $this->releaseUrl(DeliveryStore::APK_FILE);
 
         return [

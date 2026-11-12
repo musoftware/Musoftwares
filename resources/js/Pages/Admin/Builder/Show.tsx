@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import { STATUS_LABELS, Person, Visitor, deviceOf } from './Index';
+import ReleasePanel, { ImportState } from '@/Components/Admin/Builder/ReleasePanel';
 
 interface Message {
     id: number;
@@ -261,7 +262,7 @@ function DesignLink({ project }: { project: Project }) {
 }
 
 /** One AI builder chat: the whole conversation, the brief, the costs, and the owner's ways to help. */
-export default function BuilderShow({ project, messages, secrets, chatUrl }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string }) {
+export default function BuilderShow({ project, messages, secrets, chatUrl, import: imported }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string; import: ImportState | null }) {
     return (
         <AdminSidebarLayout>
             <Head title={project.title || t('AI builder chat', 'محادثة منشئ البرامج')} />
@@ -284,6 +285,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl }: { p
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
                     <MessageList messages={messages} />
                     <div className="min-w-0 space-y-4">
+                        {imported && <ReleasePanel uuid={project.uuid} state={imported} />}
                         <RetryBuild project={project} />
                         <DesignLink project={project} />
                         <AskForMore project={project} />

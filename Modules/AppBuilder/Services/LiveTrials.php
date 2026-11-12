@@ -25,7 +25,8 @@ class LiveTrials
 
     public function canRequest(BuilderProject $project): bool
     {
-        return $project->hasDelivery() && ! $this->isLive($project) && ! $this->isWaiting($project);
+        // an imported project runs on its own server, with its own data; a trial here would run it without either
+        return $project->hasDelivery() && ! $project->isImported() && ! $this->isLive($project) && ! $this->isWaiting($project);
     }
 
     public function request(BuilderProject $project): bool

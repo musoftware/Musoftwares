@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import ShopPager, { Paginated } from '@/Components/Admin/Shop/ShopPager';
+import ImportProject from '@/Components/Admin/Builder/ImportProject';
 
 interface Project {
     id: number;
@@ -102,6 +103,7 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                     </Link>
                 </div>
 
+                <ImportProject />
                 <PriceLearning learning={learning} defaultFactor={defaultFactor} />
 
                 {projects.data.length === 0 && <p className="text-slate-500">{t('No chats yet.', 'لسه مفيش محادثات.')}</p>}
