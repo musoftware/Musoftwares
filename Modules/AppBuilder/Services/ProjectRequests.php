@@ -243,6 +243,7 @@ class ProjectRequests
                 'progress_step' => null,
                 'progress_file' => null,
                 'progress_percent' => 0,
+                'progress_phases' => null,
                 'progress_note' => null,
                 'job_cost_usd' => 0,
                 'budget_usd' => round((float) $ready->sum('budget_usd'), 4),

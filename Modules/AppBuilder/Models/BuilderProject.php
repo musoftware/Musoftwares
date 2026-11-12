@@ -84,6 +84,7 @@ class BuilderProject extends Model
         'build_cost_usd' => 'decimal:4',
         'paid_at' => 'datetime',
         'owner_approved_at' => 'datetime',
+        'progress_phases' => 'array',
         'built_at' => 'datetime',
         'warranty_until' => 'datetime',
         'lease_expires_at' => 'datetime',

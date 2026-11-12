@@ -66,6 +66,7 @@ class JobQueue
                 'progress_step' => null,
                 'progress_file' => null,
                 'progress_percent' => null,
+                'progress_phases' => null,
                 'progress_note' => null,
                 'build_cost_usd' => (float) $project->build_cost_usd + $costUsd,
                 'job_cost_usd' => 0,

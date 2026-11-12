@@ -167,7 +167,12 @@ class WorkerJobController extends Controller
             'percent' => ['required', 'integer', 'min:0', 'max:100'],
             'caption' => ['required', 'string', 'max:300'],
             'image' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:'.(int) config('builder.limits.snapshot_kb')],
+            'plan' => ['nullable', 'string', 'max:20000'],
         ]);
+        // the engineer's phases (progress.md); a problem here never refuses the progress itself
+        if (! empty($data['plan'])) {
+            rescue(fn () => app(\Modules\AppBuilder\Services\BuildPhases::class)->update($project, (string) $data['plan']), report: true);
+        }
 
         return $snapshots->update($project, (int) $data['percent'], strip_tags($data['caption']), $data['image'] ?? null)
             ? response()->json(['status' => 'ok'], 201)

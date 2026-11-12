@@ -606,6 +606,39 @@ class AppBuilderTest extends TestCase
         $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/retry')->assertStatus(409);
     }
 
+    public function test_the_customer_sees_the_builds_phases_in_plain_words(): void
+    {
+        config(['builder.retell_delivery' => true]);
+        $calls = 0;
+        $this->app->instance(\Modules\AppBuilder\Services\Chat\ChatModel::class, new class($calls) implements \Modules\AppBuilder\Services\Chat\ChatModel
+        {
+            public function __construct(public int &$calls) {}
+
+            public function reply(string $system, array $turns): \Modules\AppBuilder\Services\Chat\ChatTurn
+            {
+                $this->calls++;
+
+                return \Modules\AppBuilder\Services\Chat\ChatTurn::fromArray(['reply' => "الأساس والدخول\nالمنيو والطلبات\nشاشات الموقع", 'quote' => []]);
+            }
+        });
+        $project = $this->buildingProject();
+        $url = '/api/builder/worker/jobs/'.$project->uuid.'/snapshot';
+        $plan = "# Progress (phases)\n- [x] 1 Foundation: DB migrations, auth\n- [ ] 2 Orders API, SSE\n- [ ] 3 Web: dashboard shell\n";
+
+        $before = $calls;
+
+        $this->post($url, ['percent' => 30, 'caption' => 'الأساس خلص', 'plan' => $plan], $this->worker())->assertCreated();
+        $this->post($url, ['percent' => 50, 'caption' => 'الطلبات خلصت', 'plan' => str_replace('[ ] 2', '[x] 2', $plan)], $this->worker())->assertCreated();
+        // the same phases are retold once; only the ticks change after that
+        $this->assertSame(1, $calls - $before);
+
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('phases', [
+            ['title' => 'الأساس والدخول', 'state' => 'done'],
+            ['title' => 'المنيو والطلبات', 'state' => 'done'],
+            ['title' => 'شاشات الموقع', 'state' => 'now'],
+        ]);
+    }
+
     public function test_the_build_shows_the_customer_screenshots_of_finished_parts(): void
     {
         config(['builder.limits.snapshots_per_build' => 2]);

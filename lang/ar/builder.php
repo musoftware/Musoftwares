@@ -209,6 +209,8 @@ return [
     'my_projects' => 'مشاريعك',
     'status_labels' => ['chatting' => 'بنتكلم', 'quoted' => 'مستني الدفع', 'queued' => 'في الطابور', 'designing' => 'التصميم', 'building' => 'بيتنفذ', 'ready' => 'جاهز', 'failed' => 'وقف'],
     'progress_bar' => 'نسبة الشغل اللي خلص',
+    'phases_title' => 'مراحل الشغل',
+    'phase_states' => ['done' => 'خلصت', 'now' => 'شغالين فيها دلوقتي', 'next' => 'لسه'],
     'download_apk' => 'نزّل تطبيق أندرويد',
     'looking' => 'بفتح الرابط في متصفح وبشوف الموقع...',
     'reading_file' => 'بقرا الملف وبفهم الحسابات اللي فيه...',

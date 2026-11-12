@@ -34,6 +34,7 @@ class ProjectStateResource extends JsonResource
             'progress' => in_array($this->status, [BuilderProject::QUEUED, BuilderProject::BUILDING, BuilderProject::DESIGNING], true) && ! $this->awaiting_answer ? $this->progressLine() : null,
             // the bar shows once the build has said how far it is
             'progress_percent' => $this->status === BuilderProject::BUILDING && ! $this->awaiting_answer ? $this->progress_percent : null,
+            'phases' => $this->status === BuilderProject::BUILDING ? $this->phases() : [],
             'waiting_for_answer' => $this->isWaitingForAnswer(),
             // what the customer waits for: a link being opened or a file being read
             'looking' => $this->awaiting_look ? (app(\Modules\AppBuilder\Services\LinkLooks::class)->isReadingAFile($this->resource) ? 'file' : 'link') : null,
@@ -238,6 +239,23 @@ class ProjectStateResource extends JsonResource
         }
 
         return $free->availableTo($this->resource, $request->user()) ? ['url' => route('builder.free', $this->resource)] : null;
+    }
+
+    /**
+     * The build's phases in the customer's words: finished ones, the one being built now (the first not finished),
+     * and the ones still to come.
+     *
+     * @return list<array{title: string, state: string}>
+     */
+    private function phases(): array
+    {
+        $items = $this->progress_phases['items'] ?? [];
+        $now = array_search(false, array_column($items, 'done'), true);
+
+        return array_map(fn (array $item, int $index) => [
+            'title' => (string) $item['title'],
+            'state' => $item['done'] ? 'done' : ($index === $now ? 'now' : 'next'),
+        ], $items, array_keys($items));
     }
 
     private function progressLine(): string

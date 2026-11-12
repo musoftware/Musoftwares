@@ -88,6 +88,18 @@
         .bar .fill{height:100%;border-radius:999px;background:var(--ink);transition:width .6s ease}
         .bar .pct{display:block;margin-top:6px;font-size:14px;font-weight:600}
         @media (prefers-reduced-motion:reduce){.bar .fill{transition:none}}
+        .phases{margin:-8px 0 24px}
+        .phases ol{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+        .phases li{display:flex;align-items:flex-start;gap:12px;padding:8px 0}
+        .phases li+li{border-top:1px solid var(--line)}
+        .phases .mark{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+        .phases .done .mark{background:var(--ink);border-color:var(--ink);color:#fff}
+        .phases .now .mark{border-color:var(--ink)}
+        .phases .now .mark::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--ink)}
+        .phases .text{flex:1;min-width:0;overflow-wrap:anywhere}
+        .phases .state{display:block;font-size:13px;color:var(--muted)}
+        .phases .now .state{color:var(--ink);font-weight:600}
+        .phases .next .text{color:var(--muted)}
         .msg .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
         .msg .thumb{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);cursor:zoom-in;min-width:44px;min-height:44px}
         .msg .thumb img{display:block;width:120px;height:120px;object-fit:cover}
@@ -713,6 +725,27 @@
         return box;
     }
 
+    /** The build's phases: finished, being built now, still to come. */
+    function phasesNode(phases) {
+        const done = phases.filter((phase) => phase.state === 'done').length;
+        const box = el('section', {class: 'phases', 'aria-label': T.phases_title});
+        const title = el('div', {class: 'title'}, T.phases_title + ' ');
+        title.append(el('span', {class: 'hint', dir: 'ltr'}, done + ' / ' + phases.length));
+        box.append(title);
+        const list = el('ol');
+        phases.forEach((phase) => {
+            const mark = el('span', {class: 'mark', 'aria-hidden': 'true'});
+            if (phase.state === 'done') mark.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+            const text = el('span', {class: 'text'}, phase.title);
+            text.append(el('span', {class: 'state'}, T.phase_states[phase.state]));
+            const item = el('li', {class: phase.state});
+            item.append(mark, text);
+            list.append(item);
+        });
+        box.append(list);
+        return box;
+    }
+
     /** After payment: the build waits a while for the full-quality design files the chat got smaller. */
     function originalsNode(originals) {
         const card = el('section', {class: 'card'});
@@ -992,6 +1025,7 @@
         if (state && state.inspection) thread.append(inspectionNode(state.inspection));
         if (state && state.progress) thread.append(statusNode(state.progress));
         if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));
+        if (state && state.phases && state.phases.length) thread.append(phasesNode(state.phases));
         if (state && state.waiting_for_answer) thread.append(el('p', {class: 'hint'}, T.waiting_answer));
         if (state && state.originals) thread.append(originalsNode(state.originals));
         if (state && state.trial) { const node = trialNode(state.trial); if (node) thread.append(node); }
