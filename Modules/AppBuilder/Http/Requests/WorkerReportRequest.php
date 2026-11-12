@@ -35,6 +35,8 @@ class WorkerReportRequest extends FormRequest
             'pull_request_url' => ['nullable', 'url', 'max:500', 'starts_with:https://github.com/'],
             'deployed' => ['nullable', 'boolean'],
             'note' => ['nullable', 'string', 'max:4000'],
+            // the build was delivered but its release did not go out
+            'release_error' => ['nullable', 'string', 'max:4000'],
         ];
     }
 }

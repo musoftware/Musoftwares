@@ -187,8 +187,12 @@ class WorkerJobController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
         // "after every change": the build already pushed its pull request and deployed
+        $imports = app(\Modules\AppBuilder\Services\ProjectImports::class);
         if ($project->isImported() && $request->boolean('released')) {
-            app(\Modules\AppBuilder\Services\ProjectImports::class)->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
+            $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
+        } elseif ($project->isImported() && $request->filled('release_error')) {
+            // delivered, but not out: the change waits for the owner's "release now"
+            $imports->failed($project, (string) $request->validated('release_error'));
         }
 
         return response()->json(['status' => 'delivered', 'version' => $project->refresh()->version]);

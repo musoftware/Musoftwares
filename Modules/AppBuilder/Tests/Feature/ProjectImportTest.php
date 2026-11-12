@@ -157,6 +157,18 @@ class ProjectImportTest extends TestCase
         $this->assertSame(BuilderProject::JOB_RELEASE, $project->refresh()->job_kind);
     }
 
+    public function test_a_delivered_change_whose_release_failed_waits_and_the_owner_hears(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_EACH);
+
+        $this->deliverChange($project, ['release_error' => 'Release failed: Could not push to GitHub']);
+
+        $project->refresh();
+        $this->assertSame(BuilderProject::READY, $project->status);
+        $this->assertSame(1, $project->changesWaiting());
+        $this->assertStringContainsString('Could not push', $project->error);
+    }
+
     public function test_only_an_imported_project_may_finish_a_build_without_files(): void
     {
         $other = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'en', 'currency' => 'USD', 'status' => BuilderProject::QUEUED, 'paid_at' => now(), 'title' => 'Page']);
