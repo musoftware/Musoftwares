@@ -16,7 +16,7 @@ const field = 'w-full rounded-lg border px-3 py-2 text-sm';
 export default function ImportProject() {
     const form = useForm({
         title: '', description: '', import_url: '', github_repo: '', github_token: '', locale: 'ar',
-        release_mode: 'batch' as ReleaseMode, release_after_changes: 3, release_quiet_minutes: 60, deploy_enabled: true, deploy_command: '',
+        release_mode: 'batch' as ReleaseMode, release_after_changes: 3, release_quiet_minutes: 60, deploy_enabled: true,
     });
     const error = (name: keyof typeof form.data) => form.errors[name] && <p className="text-sm text-red-700">{form.errors[name]}</p>;
     const submit = (event: React.FormEvent) => { event.preventDefault(); form.post('/admin/builder/import'); };
@@ -53,7 +53,7 @@ export default function ImportProject() {
 
 type ImportForm = ReturnType<typeof useForm<{
     title: string; description: string; import_url: string; github_repo: string; github_token: string; locale: string;
-    release_mode: ReleaseMode; release_after_changes: number; release_quiet_minutes: number; deploy_enabled: boolean; deploy_command: string;
+    release_mode: ReleaseMode; release_after_changes: number; release_quiet_minutes: number; deploy_enabled: boolean;
 }>>;
 
 /** When the changes go out (GitHub pull request, then the deploy), and how the deploy runs. */
@@ -78,11 +78,11 @@ function ReleaseRules({ form }: { form: ImportForm }) {
             )}
             <label className="flex gap-2 text-sm">
                 <input type="checkbox" checked={form.data.deploy_enabled} onChange={(e) => form.setData('deploy_enabled', e.target.checked)} />
-                <span>{t('Also deploy to the server (not only the GitHub pull request)', 'ارفع على السيرفر كمان (مش بس pull request على GitHub)')}</span>
+                <span>
+                    {t('Also deploy to the server (not only the GitHub pull request)', 'ارفع على السيرفر كمان (مش بس pull request على GitHub)')}
+                    <span className="block text-slate-500">{t('The cheapest AI reads the project\'s own deploy files (scripts, SSH, README), deploys, and saves the steps; later releases repeat them without AI.', 'أرخص AI بيقرا ملفات الـ deploy اللي في المشروع (السكريبتات والـ SSH والـ README)، ويرفع، ويحفظ الخطوات؛ المرات الجاية تتكرر من غير AI.')}</span>
+                </span>
             </label>
-            {form.data.deploy_enabled && (
-                <input className={field} placeholder={t('Deploy command, optional (e.g. bash deploy.sh). Empty: the AI deploys the way the project already does.', 'أمر الـ deploy، اختياري (مثلاً bash deploy.sh). فاضي: الـ AI يرفع بنفس طريقة المشروع.')} value={form.data.deploy_command} onChange={(e) => form.setData('deploy_command', e.target.value)} dir="ltr" />
-            )}
         </fieldset>
     );
 }
