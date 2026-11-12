@@ -57,7 +57,8 @@ class GeminiChatModel implements ChatModel
         return match ($block['type'] ?? '') {
             'text' => ['text' => (string) $block['text']],
             'image', 'document' => ($source['type'] ?? '') === 'base64'
-                ? ['inline_data' => ['mime_type' => $source['media_type'], 'data' => $source['data']]]
+                // our blocks use the Anthropic PHP SDK's key name, mediaType
+                ? ['inline_data' => ['mime_type' => (string) ($source['mediaType'] ?? $source['media_type'] ?? ''), 'data' => (string) ($source['data'] ?? '')]]
                 : null,
             default => null,
         };

@@ -221,6 +221,17 @@ class AppBuilderTest extends TestCase
             && $request['generationConfig']['responseMimeType'] === 'application/json');
     }
 
+    public function test_a_guest_picture_reaches_the_free_model_with_its_type(): void
+    {
+        config(['builder.free_chat.key' => 'test-key']);
+        $this->geminiAnswers('شفت الصورة');
+
+        $this->post('/ai/messages', ['text' => 'زي دي', 'files' => [$this->png()]], ['Accept' => 'application/json'])->assertOk();
+
+        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => collect($request['contents'])->flatMap(fn ($content) => $content['parts'])
+            ->contains(fn ($part) => ($part['inline_data']['mime_type'] ?? null) === 'image/png'));
+    }
+
     public function test_when_the_free_model_fails_claude_answers_and_signed_in_customers_always_get_claude(): void
     {
         config(['builder.free_chat.key' => 'test-key']);
