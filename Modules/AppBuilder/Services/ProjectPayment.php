@@ -15,24 +15,40 @@ class ProjectPayment
 {
     public const ORDER_PREFIX = 'bld_';
 
+    /** The order id marks a feasibility study bought on its own instead of a quote version. */
+    private const STUDY_ORDER = 'study';
+
     /** @param array{client_name: string, client_email: string, client_whatsapp: string, share?: int|null} $client */
     public function paymentUrl(BuilderProject $project, array $client): string
     {
         $due = $this->amountDue($project, (int) ($client['share'] ?? 100));
         unset($client['share']);
+        $project->update($client + ['payment_due' => $due]);
+
+        // the quote version rides in the order id, so paying an old price never starts a build
+        return $this->checkout($project, $due, $project->id.'-'.$project->quote_version);
+    }
+
+    /** @param array{client_name: string, client_email: string, client_whatsapp: string} $client */
+    public function studyPaymentUrl(BuilderProject $project, array $client): string
+    {
+        $project->update($client);
+
+        return $this->checkout($project, Study\FeasibilityStudy::price(), $project->id.'-'.self::STUDY_ORDER);
+    }
+
+    private function checkout(BuilderProject $project, float $amount, string $invoiceId): string
+    {
         // the gateway converts with our own rates; an unknown currency would be charged as EGP
         if ($project->currency !== 'EGP' && ! Currency::where('currency', $project->currency)->exists()) {
             throw new RuntimeException("No exchange rate for {$project->currency}");
         }
 
-        $project->update($client + ['payment_due' => $due]);
-
         return KashierCheckoutBuilder::make()
-            ->forAmount($due, $project->currency)
+            ->forAmount($amount, $project->currency)
             ->forGuest($project->client_name, $project->client_email, self::ORDER_PREFIX.$project->id)
             ->withSource('app-builder', self::ORDER_PREFIX)
-            // the quote version rides in the order id, so paying an old price never starts a build
-            ->withMetadata(['invoice_id' => $project->id.'-'.$project->quote_version])
+            ->withMetadata(['invoice_id' => $invoiceId])
             ->withRoutes(
                 success: route('builder.show', $project),
                 failure: route('builder.show', $project),
@@ -41,10 +57,15 @@ class ProjectPayment
             ->build();
     }
 
-    /** @return array{0: int, 1: int}|null project id and quote version */
+    /** @return array{0: int, 1: int, 2: bool}|null project id, quote version (0 for a study) and whether it paid the study */
     public function parseOrderId(string $merchantOrderId): ?array
     {
-        return preg_match('/^'.self::ORDER_PREFIX.'(\d+)-(\d+)_/', $merchantOrderId, $m) ? [(int) $m[1], (int) $m[2]] : null;
+        if (! preg_match('/^'.self::ORDER_PREFIX.'(\d+)-(\d+|'.self::STUDY_ORDER.')_/', $merchantOrderId, $m)) {
+            return null;
+        }
+        $study = $m[2] === self::STUDY_ORDER;
+
+        return [(int) $m[1], $study ? 0 : (int) $m[2], $study];
     }
 
     public function __construct(private readonly BuilderReferral $referral, private readonly OriginalFiles $originals) {}

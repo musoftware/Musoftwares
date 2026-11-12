@@ -474,7 +474,6 @@
             .replaceAll(':price', quote.amount + ' ' + quote.currency)));
         if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', quote.design_fee + ' ' + quote.currency)));
-        if (quote.study) card.append(studyNode(quote.study, quote.currency));
         appendFreeBuild(card, quote.free_build);
         card.append(el('p', {class: 'note'}, T.pay_note + ' ' + T.close_page_note));
         // a guest is told that signing in first means getting money back when the work costs less
@@ -483,13 +482,19 @@
         return card;
     }
 
-    /** The feasibility study: being written, or the link to read and save it as a PDF. */
-    function studyNode(study, currency) {
+    /** The feasibility study: offered for its price, being written, failed, or the link to read and save it as a PDF. */
+    function studyNode(study) {
         if (study.status === 'writing') return statusNode(T.study_writing);
-        if (study.status !== 'ready') return el('span');
-        const box = el('div', {class: 'actions'});
-        box.append(link(study.url, T.study_open, true));
-        if (study.fee) box.append(el('span', {class: 'note'}, T.study_included.replace(':amount', study.fee + ' ' + currency)));
+        const box = el('section', {class: 'card'});
+        if (study.status === 'offer') {
+            box.append(el('div', {class: 'title'}, T.study_offer_title));
+            box.append(el('p', {class: 'note'}, T.study_offer.replace(':price', study.price + ' ' + study.currency)));
+            box.append(...payFormNodes(study.pay_url, T.study_buy.replace(':price', study.price + ' ' + study.currency), [], false, () => {}, true));
+            return box;
+        }
+        if (study.status === 'ready') box.append(link(study.url, T.study_open, true));
+        if (study.status === 'failed') box.append(el('p', {class: 'note'}, T.study_failed));
+        if (study.credit) box.append(el('p', {class: 'note'}, T.study_credit.replace(':amount', study.credit + ' ' + study.currency)));
         return box;
     }
 
@@ -509,16 +514,23 @@
 
     /** The customer's details and the button that opens the payment page. */
     function appendPayForm(card, url, openLabel, shares) {
-        const open = el('button', {class: 'btn', type: 'button'}, openLabel);
+        card.append(...payFormNodes(url, openLabel, shares, payOpen, () => { payOpen = true; }));
+        appendWalletPay(card);
+        appendAdminPaid(card);
+    }
+
+    /** A button that opens the details form, and the form that sends the customer to the payment page. */
+    function payFormNodes(url, openLabel, shares, isOpen, onOpen, ghost = false) {
+        const open = el('button', {class: ghost ? 'btn ghost' : 'btn', type: 'button'}, openLabel);
         const payForm = el('form', {class: 'form'});
-        payForm.hidden = !payOpen;
-        open.hidden = payOpen;
+        payForm.hidden = !isOpen;
+        open.hidden = isOpen;
         if (shares.length > 1) payForm.append(sharePicker(shares));
         [['client_name', T.name, 'text', 'name'], ['client_email', T.email, 'email', 'email'], ['client_whatsapp', T.whatsapp, 'tel', 'tel']]
             .forEach(([name, label, type, autocomplete]) => payForm.append(el('input', {name, type, autocomplete, required: '', placeholder: label, 'aria-label': label})));
         const go = el('button', {class: 'btn', type: 'submit'}, T.pay_go);
         payForm.append(go);
-        open.addEventListener('click', () => { payOpen = true; open.hidden = true; payForm.hidden = false; payForm.querySelector('input:not([type=radio])').focus(); });
+        open.addEventListener('click', () => { onOpen(); open.hidden = true; payForm.hidden = false; payForm.querySelector('input:not([type=radio])').focus(); });
         payForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             go.disabled = true;
@@ -531,9 +543,7 @@
                 go.disabled = false;
             }
         });
-        card.append(open, payForm);
-        appendWalletPay(card);
-        appendAdminPaid(card);
+        return [open, payForm];
     }
 
     /** A signed-in customer can pay from the site wallet: a button when it covers the price, otherwise a top-up link. */
@@ -711,6 +721,7 @@
         if (waiting || (state && state.answering)) thread.append(statusNode(T.thinking));
         if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
         if (state && state.quote) thread.append(quoteNode(state.quote));
+        if (state && state.study) thread.append(studyNode(state.study));
         if (state && state.progress) thread.append(statusNode(state.progress));
         if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));
         if (state && state.waiting_for_answer) thread.append(el('p', {class: 'hint'}, T.waiting_answer));
@@ -732,7 +743,7 @@
 
     function schedulePoll() {
         clearTimeout(pollTimer);
-        const studyWriting = state && state.quote && state.quote.study && state.quote.study.status === 'writing';
+        const studyWriting = state && state.study && state.study.status === 'writing';
         if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }

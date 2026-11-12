@@ -52,6 +52,7 @@ class BuilderProject extends Model
         'awaiting_look' => 'boolean',
         'look_started_at' => 'datetime',
         'study_fee' => 'decimal:2',
+        'study_paid' => 'decimal:2',
         'job_cost_usd' => 'decimal:4',
         'budget_usd' => 'decimal:4',
         'build_cost_usd' => 'decimal:4',
@@ -123,6 +124,12 @@ class BuilderProject extends Model
     public function balanceDue(): float
     {
         return (float) $this->quote_paid > 0 ? max(0.0, round((float) $this->amount - (float) $this->quote_paid, 2)) : 0.0;
+    }
+
+    /** What the customer paid for the feasibility study comes off the price of the first build, never a later one. */
+    public function studyCredit(): float
+    {
+        return $this->hasDelivery() ? 0.0 : (float) $this->study_paid;
     }
 
     public function hasBalanceDue(): bool

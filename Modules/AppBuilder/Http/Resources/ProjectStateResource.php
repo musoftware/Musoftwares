@@ -29,6 +29,7 @@ class ProjectStateResource extends JsonResource
             'open_for_chat' => $this->isOpenForChat(),
             'messages' => $this->messages->map(fn (BuilderMessage $message) => $this->line($message))->values(),
             'quote' => $this->status === BuilderProject::QUOTED ? $this->quote() : null,
+            'study' => $this->study(),
             'progress' => in_array($this->status, [BuilderProject::QUEUED, BuilderProject::BUILDING, BuilderProject::DESIGNING], true) && ! $this->awaiting_answer ? $this->progressLine() : null,
             // the bar shows once the build has said how far it is
             'progress_percent' => $this->status === BuilderProject::BUILDING && ! $this->awaiting_answer ? $this->progress_percent : null,
@@ -115,11 +116,6 @@ class ProjectStateResource extends JsonResource
             ] : null,
             'design_fee' => (float) $this->design_fee > 0 ? number_format((float) $this->design_fee, 2) : null,
             'shares' => array_values((array) config('builder.deposit_shares')),
-            'study' => $this->study_status ? [
-                'status' => $this->study_status,
-                'url' => $this->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? route('builder.study', $this->resource) : null,
-                'fee' => (float) $this->study_fee > 0 ? number_format((float) $this->study_fee, 2) : null,
-            ] : null,
             // offered once if the customer starts to leave; the page asks before it takes it
             'leave_offer' => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->offerFor($this->resource),
             'discount_url' => route('builder.discount', $this->resource),
@@ -134,6 +130,34 @@ class ProjectStateResource extends JsonResource
             'fix_url' => route('builder.fix', $this->resource),
             // the first simple page is free for a signed-in customer; a guest is asked to sign in for it
             'free_build' => $this->freeBuild(request()),
+        ];
+    }
+
+    /**
+     * The feasibility study: offered for its price next to an open quote, then being written, ready or failed once
+     * bought. A bought study stays on the page whatever happens to the price.
+     */
+    private function study(): ?array
+    {
+        $study = app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class);
+        if ($study->canBuy($this->resource)) {
+            return [
+                'status' => 'offer',
+                'price' => number_format($study::price(), 2),
+                'currency' => $this->currency,
+                'pay_url' => route('builder.study.pay', $this->resource),
+            ];
+        }
+        if ($this->study_status === null) {
+            return null;
+        }
+
+        return [
+            'status' => $this->study_status,
+            'url' => $this->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? route('builder.study', $this->resource) : null,
+            // what was paid for it, taken off the first price
+            'credit' => (float) $this->study_paid > 0 ? number_format((float) $this->study_paid, 2) : null,
+            'currency' => $this->currency,
         ];
     }
 

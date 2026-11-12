@@ -5,10 +5,12 @@ namespace Modules\AppBuilder\Services\Study;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
+use Modules\AppBuilder\Services\PriceRange;
+use Modules\AppBuilder\Services\ProjectPayment;
 
 /**
- * A short feasibility study for a serious customer: once the scope of a bigger project is agreed, the strong
- * model writes it in the customer's language, and what it cost (times the markup) is added to the price.
+ * A full feasibility study for a bigger project. It is offered next to the price for a small fixed amount and the
+ * strong model writes it only after the customer pays for it. What they paid comes off the project's first price.
  * The customer reads it on its own page and saves it as a PDF from the browser, which shapes Arabic correctly.
  */
 class FeasibilityStudy
@@ -24,18 +26,61 @@ class FeasibilityStudy
 
     public function __construct(private readonly StudyWriter $writer) {}
 
-    /** A study is offered once per project, for the kinds of work where planning matters. */
-    public function isDue(BuilderProject $project): bool
+    public static function price(): float
     {
-        return $project->study_status === null
+        return (float) config('builder.study.price');
+    }
+
+    /** Offered with an open price for the kinds of work where planning matters, once, before the first build. */
+    public function canBuy(BuilderProject $project): bool
+    {
+        return $project->status === BuilderProject::QUOTED
+            && ! $project->free_fix
+            && ! $project->hasDelivery()
+            && $project->study_status === null
+            && (float) $project->study_paid <= 0
+            && self::price() > 0
             && in_array($project->project_type, (array) config('builder.study.for_types'), true);
     }
 
-    public function start(BuilderProject $project): void
+    /**
+     * The study was paid: it is written now, and an open price that is not paid yet goes down by what was paid.
+     * The gateway may report one payment twice; a study already paid is never counted again.
+     */
+    public function markPaid(BuilderProject $project, ?string $reference): bool
+    {
+        if ((float) $project->study_paid > 0) {
+            return false;
+        }
+
+        $paid = self::price();
+        $project->update([
+            'study_paid' => $paid,
+            'study_payment_reference' => $reference,
+            'paid_total' => (float) $project->paid_total + $paid,
+        ]);
+        $this->lowerOpenPrice($project, $paid);
+        app(ProjectPayment::class)->tellOwner($project, 'Study paid: '.$project->title.' ('.$paid.' '.$project->currency.')');
+        $this->start($project);
+
+        return true;
+    }
+
+    private function lowerOpenPrice(BuilderProject $project, float $paid): void
+    {
+        if ($project->status !== BuilderProject::QUOTED || (float) $project->quote_paid > 0 || $project->hasDelivery()) {
+            return;
+        }
+
+        $amount = max(1.0, (float) $project->amount - $paid);
+        $project->update(['amount' => $amount, 'payment_due' => 0, 'price_max' => PriceRange::around($amount)['to']]);
+    }
+
+    private function start(BuilderProject $project): void
     {
         $project->update(['study_status' => self::WRITING]);
-        // written after the customer already has the reply (the app's terminating step runs after the response
-        // is sent), so the chat never waits for it; nothing is serialized, so no queue worker is needed
+        // written after the answer to the payment is sent (the app's terminating step), so nothing waits for it;
+        // nothing is serialized, so no queue worker is needed
         $id = $project->id;
         app()->terminating(function () use ($id): void {
             $fresh = BuilderProject::find($id);
@@ -49,29 +94,13 @@ class FeasibilityStudy
     {
         try {
             $result = $this->writer->write($this->systemPrompt(), $this->brief($project));
-            // the study is written after the reply, so the customer may already have paid the price they saw:
-            // then it is on us, and the price they paid never grows behind their back
-            $open = $project->status === BuilderProject::QUOTED && (float) $project->quote_paid <= 0;
-            $fee = $open ? $this->fee($result['input_tokens'], $result['output_tokens']) : 0.0;
-            $project->update([
-                'study_status' => self::READY,
-                'study_html' => $this->clean($result['html']),
-                'study_fee' => $fee,
-                'amount' => (float) $project->amount + $fee,
-            ]);
+            $project->update(['study_status' => self::READY, 'study_html' => $this->clean($result['html'])]);
         } catch (\Throwable $e) {
+            // the customer paid for it, so the owner hears at once; what they paid still comes off the project
             Log::warning('App builder: feasibility study failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
             $project->update(['study_status' => self::FAILED]);
+            app(ProjectPayment::class)->tellOwner($project, 'Paid study failed to write: '.$project->title);
         }
-    }
-
-    /** What the study cost on the strong model, times the markup, never less than 1. */
-    private function fee(int $input, int $output): float
-    {
-        $study = config('builder.study');
-        $cost = ($input * $study['input_usd_per_mtok'] + $output * $study['output_usd_per_mtok']) / 1_000_000;
-
-        return max(1.0, ceil($cost * (float) config('builder.pricing.markup')));
     }
 
     private function brief(BuilderProject $project): string

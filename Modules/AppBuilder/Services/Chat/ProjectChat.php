@@ -24,7 +24,6 @@ class ProjectChat
         private readonly AttachmentStore $attachments,
         private readonly ProjectSecrets $secrets,
         private readonly BuilderReferral $referral,
-        private readonly \Modules\AppBuilder\Services\Study\FeasibilityStudy $study,
         private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
         private readonly \Modules\AppBuilder\Services\LeaveDiscount $leaveDiscount,
         private readonly FreeChat $freeChat,
@@ -152,9 +151,6 @@ class ProjectChat
         }
 
         $turn->quoteReady ? $this->applyQuote($project, $turn) : $this->withdrawQuote($project);
-        if ($turn->quoteReady && $this->study->isDue($project->refresh())) {
-            $this->study->start($project);
-        }
     }
 
     /** Access details typed in the chat are saved encrypted, and the chat keeps only a mask in their place. */
@@ -185,8 +181,8 @@ class ProjectChat
             'title' => mb_substr($turn->title, 0, 255) ?: null,
             'spec' => $turn->spec,
             'estimated_tokens' => $price['tokens'],
-            // a feasibility study already written stays part of the price when the scope changes
-            'amount' => $share['amount'] + ($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0),
+            // an older study whose cost was put in the price stays there; a study bought on its own comes off the first price
+            'amount' => max(1.0, $share['amount'] + ($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0) - $project->studyCredit()),
             'project_type' => $price['project_type'],
             'referral_commission' => $share['commission'],
             'design_fee' => $price['design_fee'] ?? 0,

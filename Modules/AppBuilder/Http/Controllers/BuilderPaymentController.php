@@ -8,6 +8,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Http\Requests\PayRequest;
+use Modules\AppBuilder\Http\Requests\StudyPayRequest;
+use Modules\AppBuilder\Services\Study\FeasibilityStudy;
 use Modules\AppBuilder\Http\Resources\ProjectStateResource;
 use Modules\AppBuilder\Models\BuilderProject;
 use Modules\AppBuilder\Services\ProjectPayment;
@@ -81,8 +83,26 @@ class BuilderPaymentController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Project not found'], 404);
         }
 
-        $this->payment->markPaid($project, $order[1], $data['transactionId'] ?? null);
+        $order[2]
+            ? app(FeasibilityStudy::class)->markPaid($project, $data['transactionId'] ?? null)
+            : $this->payment->markPaid($project, $order[1], $data['transactionId'] ?? null);
 
         return response()->json(['status' => 'processed']);
+    }
+
+    /** Answers with the Kashier link for the feasibility study alone; the study is written once it is paid. */
+    public function payStudy(StudyPayRequest $request, BuilderProject $project, FeasibilityStudy $study): JsonResponse
+    {
+        if (! $study->canBuy($project)) {
+            return response()->json(['message' => __('builder.errors.no_study')], 409);
+        }
+
+        try {
+            return response()->json(['url' => $this->payment->studyPaymentUrl($project, $request->validated())]);
+        } catch (\Throwable $e) {
+            Log::error('App builder: study payment start failed', ['project_id' => $project->id, 'error' => $e->getMessage()]);
+
+            return response()->json(['message' => __('builder.errors.payment')], 503);
+        }
     }
 }

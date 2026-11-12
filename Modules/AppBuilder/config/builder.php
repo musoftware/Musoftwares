@@ -99,10 +99,11 @@ return [
         'strong' => ['model' => env('BUILDER_STRONG_MODEL', 'claude-opus-5-5'), 'output_usd_per_mtok' => (float) env('BUILDER_STRONG_USD_PER_MTOK', 20)],
     ],
 
-    // A feasibility study for bigger projects, written by the strong model once the scope is agreed;
-    // what it costs (times the markup) is added to the price.
+    // A full feasibility study for bigger projects, offered with the price and written by the strong model only
+    // after the customer buys it. What they paid comes off the project's first price when they go on to build it.
     'study' => [
         'for_types' => ['system', 'web_app', 'desktop', 'app_full', 'app_fancy'],
+        'price' => (float) env('BUILDER_STUDY_PRICE', 5),
         'model' => env('BUILDER_STUDY_MODEL', 'claude-opus-5-5'),
         'effort' => env('BUILDER_STUDY_EFFORT', 'medium'),
         'input_usd_per_mtok' => (float) env('BUILDER_STUDY_INPUT_USD_PER_MTOK', 4),

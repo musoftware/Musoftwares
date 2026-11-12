@@ -27,6 +27,7 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
+        Route::post('/{project}/study/pay', [BuilderPaymentController::class, 'payStudy'])->middleware('throttle:10,1')->name('study.pay');
         Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60')->name('push');
         Route::post('/{project}/trial', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'request'])->middleware('throttle:6,60')->name('trial');
         Route::get('/{project}/download', [BuilderDeliveryController::class, 'download'])->middleware('throttle:20,1')->name('download');

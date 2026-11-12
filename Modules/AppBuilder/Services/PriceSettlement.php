@@ -63,8 +63,10 @@ class PriceSettlement
 
         // a program we already sold keeps its known price, however little this build cost
         $known = $project->version <= 1 ? app(Starters::class)->knownPrice($project->starter) : 0;
+        // what the customer paid for the study comes off the first build's price here too, as it did on the quote
+        $studyCredit = $project->version <= 1 ? (float) $project->study_paid : 0;
 
-        return min((float) $project->amount, max($known, ceil(($work + $fees) * 100) / 100));
+        return min((float) $project->amount, max(1.0, max($known, ceil(($work + $fees) * 100) / 100) - $studyCredit));
     }
 
     private function currencyId(BuilderProject $project): ?int
