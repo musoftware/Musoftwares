@@ -18,6 +18,9 @@ class ProjectPayment
     /** The order id marks a feasibility study bought on its own instead of a quote version. */
     private const STUDY_ORDER = 'study';
 
+    /** The order id marks the fee for inspecting a project the customer brought. */
+    private const INSPECTION_ORDER = 'inspect';
+
     /** The order id marks a payment for requests from the list, followed by their ids. */
     private const REQUESTS_ORDER = 'r';
 
@@ -51,6 +54,20 @@ class ProjectPayment
         $project->update($client);
 
         return $this->checkout($project, (float) $requests->sum('amount'), $project->id.'-'.self::REQUESTS_ORDER.$requests->pluck('id')->implode('x'));
+    }
+
+    /** @param array{client_name: string, client_email: string, client_whatsapp: string} $client */
+    public function inspectionPaymentUrl(BuilderProject $project, array $client): string
+    {
+        $project->update($client);
+
+        return $this->checkout($project, ProjectInspection::price(), $project->id.'-'.self::INSPECTION_ORDER);
+    }
+
+    /** The project id when the payment was an inspection fee, otherwise null. */
+    public function parseInspectionOrder(string $merchantOrderId): ?int
+    {
+        return preg_match('/^'.self::ORDER_PREFIX.'(\d+)-'.self::INSPECTION_ORDER.'_/', $merchantOrderId, $m) ? (int) $m[1] : null;
     }
 
     /** @return array{0: int, 1: list<int>}|null the project id and the paid request ids, for a payment of requests */

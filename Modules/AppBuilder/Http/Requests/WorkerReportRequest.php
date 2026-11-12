@@ -15,7 +15,7 @@ class WorkerReportRequest extends FormRequest
             'builder.worker.progress' => ['step' => ['required', 'in:'.implode(',', self::STEPS)], 'file' => ['nullable', 'string', 'max:200']],
             'builder.worker.complete' => self::release() + [
                 // an imported project's changes go to its GitHub repo and server, not into a download
-                'archive' => [$this->route('project')?->isImported() ? 'nullable' : 'required', 'file', 'max:'.(int) config('builder.limits.archive_kb')],
+                'archive' => [$this->route('project')?->isOwnerImport() ? 'nullable' : 'required', 'file', 'max:'.(int) config('builder.limits.archive_kb')],
                 'summary' => ['required', 'string', 'max:6000'],
                 'cost_usd' => ['required', 'numeric', 'min:0', 'max:10000'],
                 // ideas for the next version, as JSON: [{"title": "...", "description": "..."}]
@@ -27,6 +27,12 @@ class WorkerReportRequest extends FormRequest
                 'profile' => ['required', 'string', 'max:20000'],
                 // "owner/repo", read from the project's own .git folder
                 'github_repo' => ['nullable', 'string', 'max:200', 'regex:#^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$#'],
+                // a customer's own project: the report for them, and the maintenance work it needs, estimated
+                'report' => ['nullable', 'string', 'max:6000'],
+                'request_title' => ['nullable', 'string', 'max:255'],
+                'request_spec' => ['nullable', 'string', 'max:10000'],
+                'request_tokens' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+                'request_complex' => ['nullable', 'boolean'],
             ],
             'builder.worker.released' => self::release(),
             default => ['error' => ['required', 'string', 'max:8000'], 'cost_usd' => ['required', 'numeric', 'min:0', 'max:10000']],

@@ -144,6 +144,12 @@ return [
     // promises is free, however many. Something new is always paid, and after the warranty a fix is paid too.
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
 
+    // A customer's own project, brought as a Google Drive link: a fixed fee to inspect it in a locked box (no internet,
+    // nothing else on the build PC), and the maintenance price shows after it. The fee is its own price.
+    'inspection' => [
+        'price' => (float) env('BUILDER_INSPECTION_PRICE', 5),
+    ],
+
     'limits' => [
         'message_chars' => 3000,
         'files_per_message' => 5,

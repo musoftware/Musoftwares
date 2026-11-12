@@ -107,6 +107,12 @@ class BuilderPaymentController extends Controller
         if (($data['status'] ?? '') === 'SUCCESS' && ($paid = $this->payment->parseRequestsOrder((string) ($data['merchantOrderId'] ?? '')))) {
             return $this->requestsPaid($paid, $data['transactionId'] ?? null);
         }
+        if (($data['status'] ?? '') === 'SUCCESS' && ($inspected = $this->payment->parseInspectionOrder((string) ($data['merchantOrderId'] ?? '')))) {
+            $project = BuilderProject::find($inspected);
+            $project && app(\Modules\AppBuilder\Services\ProjectInspection::class)->markPaid($project, $data['transactionId'] ?? null);
+
+            return response()->json(['status' => $project ? 'processed' : 'ignored']);
+        }
         $order = $this->payment->parseOrderId((string) ($data['merchantOrderId'] ?? ''));
         if (($data['status'] ?? '') !== 'SUCCESS' || ! $order) {
             return response()->json(['status' => 'ignored']);

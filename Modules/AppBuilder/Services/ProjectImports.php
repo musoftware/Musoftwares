@@ -52,29 +52,35 @@ class ProjectImports
      * The worker has the project in its folder: it is now a delivered project the customer can change. Its GitHub
      * repo is the one the project's own .git folder points to, if any.
      */
-    public function imported(BuilderProject $project, string $profile, ?string $githubRepo): void
+    /**
+     * @param  array{report?: string|null, title?: string|null, spec?: string|null, tokens?: int|null, complex?: bool|null}  $inspection
+     *                                                                                                                              what the worker found in a customer's own project: a report for them and the maintenance it estimated
+     */
+    public function imported(BuilderProject $project, string $profile, ?string $githubRepo, array $inspection = []): void
     {
-        DB::transaction(function () use ($project, $profile, $githubRepo): void {
+        $customer = (bool) $project->customer_project;
+        DB::transaction(function () use ($project, $profile, $githubRepo, $customer, $inspection): void {
             $project->update([
-                'github_repo' => $githubRepo,
+                // a customer's own project never goes to a GitHub repo from here; its changes are delivered as files
+                'github_repo' => $customer ? null : $githubRepo,
                 'status' => BuilderProject::READY,
                 'job_kind' => BuilderProject::JOB_BUILD,
                 'version' => 1,
                 'released_version' => 1,
                 'imported_at' => now(),
                 'built_at' => now(),
-                'warranty_until' => now()->addDays((int) config('builder.warranty_days')),
+                // the warranty covers what we built or took over for the owner, not a project a customer brings
+                'warranty_until' => $customer ? null : now()->addDays((int) config('builder.warranty_days')),
                 'lease_expires_at' => null,
                 'progress_step' => null,
                 'attempts' => 0,
                 'import_profile' => $this->withStudy($project, $profile),
             ]);
-            $project->messages()->create([
-                'role' => BuilderMessage::ASSISTANT,
-                'content' => __('builder.import.welcome', ['title' => $project->title], $project->customerLanguage()),
-            ]);
+            $customer
+                ? app(ProjectInspection::class)->done($project, (string) ($inspection['report'] ?? ''), $inspection)
+                : $project->messages()->create(['role' => BuilderMessage::ASSISTANT, 'content' => __('builder.import.welcome', ['title' => $project->title], $project->customerLanguage())]);
         });
-        $this->payment->tellOwner($project, 'Imported: '.$project->title.'. Send the customer the chat link.');
+        $this->payment->tellOwner($project, ($customer ? 'Inspected: ' : 'Imported: ').$project->title.($customer ? '' : '. Send the customer the chat link.'));
     }
 
     /** After a change the engineer updates MUSOFTWARE.md, so the chat knows what the program has now. */
@@ -123,7 +129,7 @@ class ProjectImports
     /** Sends the delivered changes to the worker for release; only while nothing else runs for the project. */
     public function queueRelease(BuilderProject $project): bool
     {
-        if (! $project->isImported() || $project->status !== BuilderProject::READY || $project->changesWaiting() === 0) {
+        if (! $project->isOwnerImport() || $project->status !== BuilderProject::READY || $project->changesWaiting() === 0) {
             return false;
         }
 
@@ -158,6 +164,11 @@ class ProjectImports
      */
     public function failed(BuilderProject $project, string $error): void
     {
+        if ($project->customer_project && $project->job_kind === BuilderProject::JOB_IMPORT) {
+            app(ProjectInspection::class)->failed($project, $error);
+
+            return;
+        }
         $import = $project->job_kind === BuilderProject::JOB_IMPORT;
         $project->update([
             'status' => $import ? BuilderProject::FAILED : BuilderProject::READY,

@@ -70,6 +70,8 @@ class BuilderProject extends Model
         'imported_at' => 'datetime',
         'released_at' => 'datetime',
         'deploy_enabled' => 'boolean',
+        'customer_project' => 'boolean',
+        'inspection_paid' => 'decimal:2',
         'released_version' => 'integer',
         'release_after_changes' => 'integer',
         'release_quiet_minutes' => 'integer',
@@ -175,10 +177,16 @@ class BuilderProject extends Model
         return $this->import_url !== null;
     }
 
+    /** The owner brought it in for a customer: its changes go to its own GitHub and server, never into a download. */
+    public function isOwnerImport(): bool
+    {
+        return $this->isImported() && ! $this->customer_project;
+    }
+
     /** Delivered changes not yet pushed to GitHub and deployed. */
     public function changesWaiting(): int
     {
-        return $this->isImported() ? max(0, (int) $this->version - (int) $this->released_version) : 0;
+        return $this->isOwnerImport() ? max(0, (int) $this->version - (int) $this->released_version) : 0;
     }
 
     /** What the customer paid for the feasibility study comes off the price of the first build, never a later one. */

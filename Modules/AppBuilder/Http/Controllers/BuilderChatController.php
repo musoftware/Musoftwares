@@ -12,17 +12,17 @@ use Modules\AppBuilder\Services\Chat\ChatLimitReached;
 use Modules\AppBuilder\Services\Chat\ChatUnavailable;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Services\AttachmentStore;
-use Modules\AppBuilder\Services\BuilderReferral;
 use Modules\AppBuilder\Services\BuildQuestions;
 use Modules\AppBuilder\Services\Chat\ProjectChat;
 
 class BuilderChatController extends Controller
 {
+    use OpensChat;
+
     public function __construct(
         private readonly ProjectChat $chat,
         private readonly BuildQuestions $questions,
         private readonly AttachmentStore $attachments,
-        private readonly BuilderReferral $referral,
     ) {}
 
     /** The start page: big or simple project, and the signed-in customer's own projects. */
@@ -149,12 +149,7 @@ class BuilderChatController extends Controller
     public function start(SendMessageRequest $request): JsonResponse
     {
         try {
-            // the owner and the team test as often as they need
-            $unlimited = (bool) $request->user()?->isAdmin();
-            $project = $this->chat->start((string) $request->ip(), app()->getLocale(), $this->referral->referrerFor($request), $request->user()?->id, $unlimited, $request->userAgent());
-            $project->update(['country' => \Modules\AppBuilder\Services\Chat\Dialect::countryOf($request)]);
-            // this browser started the chat, so it keeps it even after the chat joins an account at payment
-            \Modules\AppBuilder\Http\Middleware\OnlyProjectOwner::rememberStarter($request, $project);
+            $project = $this->openChat($request);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }

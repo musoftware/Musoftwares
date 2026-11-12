@@ -147,6 +147,10 @@ class ProjectChat
         if (! $turn->quoteReady && $turn->keepQuote && $project->status === BuilderProject::QUOTED) {
             return;
         }
+        // a customer's own project has no price before its paid inspection, whatever the model says
+        if ($project->customer_project && $project->inspection_status !== \Modules\AppBuilder\Services\ProjectInspection::DONE) {
+            return;
+        }
         // a ready program to start from matters only for the first build; later builds start from the delivered one
         if (! $project->hasDelivery()) {
             $project->update(['starter' => app(\Modules\AppBuilder\Services\Starters::class)->find($turn->starter)['slug'] ?? null]);
@@ -273,12 +277,36 @@ class ProjectChat
         if (! $project->isImported()) {
             return '';
         }
+        if ($project->customer_project) {
+            return $this->customerProject($project);
+        }
 
         return "\n\n## This is the customer's existing program\n\n"
             ."Musoftware brought this customer's own working program in, and the build engineer has all its files. Treat it as "
             ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has; use it, with "
             ."what the customer shows you, to tell a fix from something new. Never offer ready programs, designs, a download or "
             ."a live trial for it. Changes go live on the customer's own server.\n\n"
+            .mb_substr((string) $project->import_profile, 0, 12000);
+    }
+
+    /**
+     * A project the customer brought themselves (a Google Drive link). Until the paid inspection is done there is no
+     * price to give; after it, the report and the study say what it has. We did not build it, so nothing is under warranty.
+     */
+    private function customerProject(BuilderProject $project): string
+    {
+        $inspected = $project->inspection_status === \Modules\AppBuilder\Services\ProjectInspection::DONE;
+        $head = "\n\n## The customer brought their own project\n\n";
+        if (! $inspected) {
+            return $head."They sent a Google Drive link to a project of their own and said what they need. Before any price, the "
+                ."project is inspected for a small fixed fee shown on the page (the inspection card). Do not quote anything now "
+                ."(`quote.ready` false): answer their questions, and say the maintenance price shows after the inspection. What "
+                ."they asked for:\n".mb_substr((string) $project->inspection_need, 0, 3000);
+        }
+
+        return $head."We inspected it; the study below says what it has. We did not build it, so there is no warranty: every fix "
+            ."and every change is priced (`kind` \"fix\" for a fix, \"build\" for something new; both get a price). The finished "
+            ."files are delivered as a download. Never offer ready programs, designs or a live trial for it.\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
     }
 

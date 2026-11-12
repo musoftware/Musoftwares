@@ -56,6 +56,26 @@ class ProjectStateResource extends JsonResource
             'delivery' => $this->hasDelivery() ? $this->delivery() : null,
             'failed' => $this->status === BuilderProject::FAILED,
             'requests' => $this->requestList($request),
+            'inspection' => $this->inspection($request),
+            // the paperclip offers "a project of my own" while no paid build has started
+            'bring_url' => app(\Modules\AppBuilder\Services\ProjectInspection::class)->canOffer($this->resource) ? route('builder.inspect', $this->resource) : null,
+        ];
+    }
+
+    /** A customer's own project: the inspection fee to pay, the inspection running, or failed. A done one shows as its report. */
+    private function inspection(Request $request): ?array
+    {
+        $status = $this->inspection_status;
+        if ($status !== \Modules\AppBuilder\Services\ProjectInspection::OFFER) {
+            return null;
+        }
+
+        return [
+            'status' => $status,
+            'price' => number_format(\Modules\AppBuilder\Services\ProjectInspection::price(), 2),
+            'currency' => $this->currency,
+            'pay_url' => route('builder.inspect.pay', $this->resource),
+            'admin_paid_url' => $request->user()?->isAdmin() ? route('admin.builder.inspect.mark-paid', $this->resource) : null,
         ];
     }
 
@@ -208,6 +228,7 @@ class ProjectStateResource extends JsonResource
     {
         $step = match (true) {
             // an import or a release is not a paid build: it says what it really does
+            $this->job_kind === BuilderProject::JOB_IMPORT && $this->customer_project => 'inspecting',
             $this->job_kind === BuilderProject::JOB_IMPORT => 'importing',
             $this->job_kind === BuilderProject::JOB_RELEASE => 'releasing',
             $this->status === BuilderProject::QUEUED => 'queued',
@@ -226,7 +247,7 @@ class ProjectStateResource extends JsonResource
     {
         $preview = $this->previewUrl();
         // an imported project's code goes to its GitHub repo and server, so there is nothing to download here
-        $source = $this->hasBalanceDue() || $this->isImported() ? null : route('builder.download', $this->resource);
+        $source = $this->hasBalanceDue() || $this->isOwnerImport() ? null : route('builder.download', $this->resource);
         $apk = $this->releaseUrl(DeliveryStore::APK_FILE);
 
         return [

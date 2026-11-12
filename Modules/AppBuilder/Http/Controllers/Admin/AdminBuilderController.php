@@ -67,7 +67,7 @@ class AdminBuilderController extends Controller
     /** An imported project's release rule, what waits to go out, and the last pull request. */
     private function importState(BuilderProject $project): ?array
     {
-        if (! $project->isImported()) {
+        if (! $project->isOwnerImport()) {
             return null;
         }
 

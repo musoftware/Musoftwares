@@ -11,6 +11,8 @@ use Modules\AppBuilder\Http\Middleware\AuthenticateBuilderWorker;
 Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
     Route::get('/', [BuilderChatController::class, 'index'])->name('index');
     Route::post('/messages', [BuilderChatController::class, 'start'])->middleware('throttle:10,1')->name('start');
+    // a customer brings a project of their own (a Google Drive link) for a paid inspection
+    Route::post('/inspect', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'start'])->middleware('throttle:5,1')->name('inspect.start');
     Route::post('/webhook', [BuilderPaymentController::class, 'webhook'])->name('webhook');
 
     // a chat that belongs to an account opens only for that account and for admins
@@ -29,6 +31,8 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
         Route::post('/{project}/study/pay', [BuilderPaymentController::class, 'payStudy'])->middleware('throttle:10,1')->name('study.pay');
+        Route::post('/{project}/inspect', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'bring'])->middleware('throttle:5,1')->name('inspect');
+        Route::post('/{project}/inspect/pay', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'pay'])->middleware('throttle:10,1')->name('inspect.pay');
         Route::post('/{project}/requests/pay', [BuilderPaymentController::class, 'payRequests'])->middleware('throttle:10,1')->name('requests.pay');
         Route::post('/{project}/requests/{item}/cancel', [BuilderPaymentController::class, 'cancelRequest'])->whereNumber('item')->middleware('throttle:20,1')->name('requests.cancel');
         Route::post('/{project}/push', [BuilderChatController::class, 'push'])->middleware('throttle:10,60')->name('push');
@@ -69,6 +73,7 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');
     Route::post('/{project}/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markPaid'])->name('mark-paid');
+    Route::post('/{project}/inspect/mark-paid', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'markPaid'])->name('inspect.mark-paid');
     Route::post('/{project}/requests/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markRequestsPaid'])->name('requests.mark-paid');
     Route::post('/{project}/extra', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'extra'])->name('extra');
     Route::post('/{project}/retry', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'retry'])->name('retry');

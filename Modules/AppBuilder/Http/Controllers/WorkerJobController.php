@@ -69,11 +69,13 @@ class WorkerJobController extends Controller
     {
         return [
             'kind' => $project->job_kind ?: BuilderProject::JOB_BUILD,
-            'imported' => $project->isImported(),
+            // the owner's import (its own GitHub and server); a customer's own project is delivered as files
+            'imported' => $project->isOwnerImport(),
+            'customer_project' => (bool) $project->customer_project,
             'import_url' => $project->import_url,
             // a change is released inside its own build only in "after every change" mode
-            'release_now' => $project->isImported() && $project->release_mode === BuilderProject::RELEASE_EACH,
-            'deploy' => $project->isImported() && $project->deploy_enabled,
+            'release_now' => $project->isOwnerImport() && $project->release_mode === BuilderProject::RELEASE_EACH,
+            'deploy' => $project->isOwnerImport() && $project->deploy_enabled,
         ];
     }
 
@@ -82,7 +84,13 @@ class WorkerJobController extends Controller
     {
         $this->assertBuilding($project);
         abort_unless($project->job_kind === BuilderProject::JOB_IMPORT, 409, 'This job is not an import.');
-        $imports->imported($project, $request->validated('profile'), $request->validated('github_repo'));
+        $imports->imported($project, $request->validated('profile'), $request->validated('github_repo'), [
+            'report' => $request->validated('report'),
+            'title' => $request->validated('request_title'),
+            'spec' => $request->validated('request_spec'),
+            'tokens' => (int) $request->validated('request_tokens'),
+            'complex' => $request->boolean('request_complex'),
+        ]);
 
         return response()->json(['status' => 'imported']);
     }
@@ -189,9 +197,9 @@ class WorkerJobController extends Controller
         // the engineer updated the project's study (MUSOFTWARE.md) with what the change added
         $imports->updateStudy($project, (string) $request->validated('study'));
         // "after every change": the build already pushed its pull request and deployed
-        if ($project->isImported() && $request->boolean('released')) {
+        if ($project->isOwnerImport() && $request->boolean('released')) {
             $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
-        } elseif ($project->isImported() && $request->filled('release_error')) {
+        } elseif ($project->isOwnerImport() && $request->filled('release_error')) {
             // delivered, but not out: the change waits for the owner's "release now"
             $imports->failed($project, (string) $request->validated('release_error'));
         }

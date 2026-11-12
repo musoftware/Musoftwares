@@ -98,7 +98,8 @@
         .how{margin-top:24px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
         .how h2{margin:0 0 8px;font-size:16px}
         .how ol{margin:0;padding-inline-start:20px;display:grid;gap:6px;color:var(--muted);font-size:15px;line-height:1.7}
-        .viewer{max-width:720px;margin:0 auto;padding:12px 16px 0;display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
+        /* the top bar stays at the top while the chat scrolls, so the cart is always one tap away */
+        .viewer{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);padding:8px max(16px,calc((100% - 720px) / 2));display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
         .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
         .viewer{flex-wrap:wrap}
         .viewer a.google{gap:8px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#fff;text-decoration:none}
@@ -123,6 +124,16 @@
         .req.done .t{color:var(--muted);font-weight:400}
         .req .cancel{min-height:32px;padding:0 10px;margin-inline-start:auto;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
         .req .cancel:hover{color:var(--danger);border-color:var(--danger)}
+        /* the paperclip's menu: a file, or a project the customer already has */
+        .attach-menu{position:absolute;bottom:calc(100% + 8px);inset-inline-start:0;display:grid;gap:4px;min-width:260px;padding:6px;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:15}
+        .attach-menu button{min-height:44px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+        .attach-menu button:hover{background:var(--soft)}
+        .composer .box{position:relative}
+        .bring{max-width:min(480px,calc(100vw - 32px));border:1px solid var(--line);border-radius:16px;padding:24px;color:var(--ink)}
+        .bring::backdrop{background:rgba(0,0,0,.35)}
+        .bring h2{margin:0 0 8px;font-size:20px}
+        .bring p{margin:0 0 12px;color:var(--muted);line-height:1.8}
+        .bring textarea{width:100%;min-height:96px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;resize:vertical}
         .requests .pay{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
         .requests .total{margin:0;font-weight:600}
         .show-requests{align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
@@ -192,6 +203,10 @@
 <div class="composer">
     <div class="box">
         <p class="error" id="error" role="alert" hidden></p>
+        <div class="attach-menu" id="attach-menu" role="menu" hidden>
+            <button type="button" role="menuitem" id="attach-file">{{ __('builder.inspection.file') }}</button>
+            <button type="button" role="menuitem" id="attach-project">{{ __('builder.inspection.bring') }}</button>
+        </div>
         <div class="chips" id="chips" hidden></div>
         <form id="composer">
             <input type="file" id="files" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,.xlsx,.xls,.csv,.docx" multiple hidden>
@@ -870,6 +885,55 @@
     document.getElementById('requests-backdrop').addEventListener('click', hideRequests);
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && document.body.classList.contains('requests-shown')) hideRequests(); });
 
+    /** A project the customer already has: its Google Drive link and what to change; a paid inspection comes next. */
+    function openBringForm() {
+        const dialog = el('dialog', {class: 'bring', 'aria-labelledby': 'bring-title'});
+        const form = el('form', {class: 'form'});
+        const link = el('input', {name: 'drive_url', type: 'url', required: '', dir: 'ltr', placeholder: 'https://drive.google.com/...', 'aria-label': T.inspection.link});
+        const need = el('textarea', {name: 'need', required: '', dir: 'auto', maxlength: '3000', placeholder: T.inspection.need, 'aria-label': T.inspection.need});
+        const go = el('button', {class: 'btn', type: 'submit'}, T.inspection.send);
+        const back = el('button', {class: 'btn ghost', type: 'button'}, T.inspection.cancel);
+        const error = el('p', {class: 'error', role: 'alert', hidden: ''});
+        const actions = el('div', {class: 'actions'});
+        actions.append(go, back);
+        form.append(link, need, error, actions);
+        dialog.append(el('h2', {id: 'bring-title'}, T.inspection.title), el('p', {}, T.inspection.how), form);
+        back.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('close', () => dialog.remove());
+        form.addEventListener('submit', (event) => { event.preventDefault(); sendProject(dialog, go, error, link.value.trim(), need.value.trim()); });
+        document.body.append(dialog);
+        dialog.showModal();
+        link.focus();
+    }
+
+    async function sendProject(dialog, button, error, driveUrl, need) {
+        button.disabled = true;
+        error.hidden = true;
+        try {
+            const isNew = !state || !state.uuid;
+            state = await call(bringUrl(), {drive_url: driveUrl, need, timezone: TIMEZONE, country: await COUNTRY});
+            if (isNew) history.replaceState(null, '', BASE + '/' + state.uuid);
+            document.body.classList.remove('choosing');
+            dialog.close();
+            render();
+        } catch (failure) {
+            error.textContent = failure.message;
+            error.hidden = false;
+            button.disabled = false;
+        }
+    }
+
+    /** The inspection fee: what it is, and paying it; an admin can mark it paid instead. */
+    function inspectionNode(inspection) {
+        const card = el('section', {class: 'card'});
+        card.append(el('div', {class: 'title'}, T.inspection.card_title));
+        card.append(el('div', {class: 'price'}, inspection.price + ' ' + inspection.currency));
+        card.append(el('p', {class: 'note'}, T.inspection.card_note));
+        card.append(...payFormNodes(inspection.pay_url, T.inspection.pay.replace(':price', inspection.price + ' ' + inspection.currency), [], payOpen, () => { payOpen = true; }));
+        if (inspection.admin_paid_url) card.append(actionButton(T.inspection.admin_paid, inspection.admin_paid_url, {confirm: T.admin_mark_paid_confirm, ghost: true}));
+        return card;
+    }
+
     function render() {
         renderRequests();
         thread.querySelectorAll(':scope > :not(#empty)').forEach((node) => node.remove());
@@ -880,6 +944,7 @@
         if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.study) thread.append(studyNode(state.study));
+        if (state && state.inspection) thread.append(inspectionNode(state.inspection));
         if (state && state.progress) thread.append(statusNode(state.progress));
         if (state && state.progress_percent !== null && state.progress_percent !== undefined) thread.append(barNode(state.progress_percent));
         if (state && state.waiting_for_answer) thread.append(el('p', {class: 'hint'}, T.waiting_answer));
@@ -943,7 +1008,16 @@
         keepRoomForComposer();
         sendBtn.disabled = waiting || (!input.value.trim() && picked.length === 0);
     });
-    document.getElementById('attach').addEventListener('click', () => fileInput.click());
+    // the paperclip: a file straight away, or a menu that also offers bringing a project of one's own
+    const attachMenu = document.getElementById('attach-menu');
+    const bringUrl = () => (state ? state.bring_url : BASE + '/inspect');
+    document.getElementById('attach').addEventListener('click', () => {
+        if (!bringUrl()) { fileInput.click(); return; }
+        attachMenu.hidden = !attachMenu.hidden;
+    });
+    document.getElementById('attach-file').addEventListener('click', () => { attachMenu.hidden = true; fileInput.click(); });
+    document.getElementById('attach-project').addEventListener('click', () => { attachMenu.hidden = true; openBringForm(); });
+    document.addEventListener('click', (event) => { if (!event.target.closest('#attach-menu, #attach')) attachMenu.hidden = true; });
     // copied first: the list empties when the input is cleared, and the pictures are made smaller after that
     fileInput.addEventListener('change', () => { const chosen = [...fileInput.files]; fileInput.value = ''; pickFiles(chosen); });
     input.addEventListener('paste', (event) => {
