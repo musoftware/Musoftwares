@@ -66,6 +66,12 @@ class DeliveryStore
         return $version;
     }
 
+    /** The app a release built (an imported project has no zip): kept with the current version, to download from the chat. */
+    public function keepApk(BuilderProject $project, string $apkPath): void
+    {
+        Storage::disk('local')->put($project->versionFolder().'/'.self::APK_FILE, (string) file_get_contents($apkPath));
+    }
+
     /** Absolute path of a delivered file, or null when it does not exist or leaves the version folder. */
     public function file(BuilderProject $project, string $path): ?string
     {

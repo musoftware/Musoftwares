@@ -194,6 +194,65 @@ class ProjectImportTest extends TestCase
         });
     }
 
+    /** The chat model hears "upload it" and answers with the order for the worker. */
+    private function chatReleases(): void
+    {
+        $turn = \Modules\AppBuilder\Services\Chat\ChatTurn::fromArray(['reply' => 'تمام، بنرفعه دلوقتي', 'needs_team' => false, 'release_now' => true]);
+        $this->app->instance(\Modules\AppBuilder\Services\Chat\ChatModel::class, new class($turn) implements \Modules\AppBuilder\Services\Chat\ChatModel
+        {
+            public function __construct(private \Modules\AppBuilder\Services\Chat\ChatTurn $turn) {}
+
+            public function reply(string $system, array $turns): \Modules\AppBuilder\Services\Chat\ChatTurn
+            {
+                return $this->turn;
+            }
+        });
+    }
+
+    public function test_upload_it_in_the_chat_releases_the_changes_now(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $this->deliverChange($project);
+        $this->chatReleases();
+
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'انا فاهم ارفع التطبيق بقي علشان اشوفه'])->assertOk();
+
+        $this->assertSame([BuilderProject::QUEUED, BuilderProject::JOB_RELEASE], [$project->refresh()->status, $project->job_kind]);
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.kind', 'release');
+    }
+
+    public function test_a_release_with_the_new_app_puts_its_download_in_the_chat(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $this->deliverChange($project);
+        app(ProjectImports::class)->queueRelease($project->refresh());
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+        $apk = \Illuminate\Http\UploadedFile::fake()->createWithContent('app-release.apk', 'PK'.str_repeat('x', 100));
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/released', ['deployed' => 1, 'note' => 'deployed', 'apk' => $apk], $this->worker())->assertOk();
+
+        $state = $this->getJson('/ai/'.$project->uuid.'/state')->assertOk();
+        $this->assertStringContainsString('/app/release/app-release.apk', (string) $state->json('delivery.apk_url'));
+        $this->assertSame(__('builder.import.live_with_app', [], 'ar'), collect($state->json('messages'))->last()['text']);
+        $this->assertSame($project->refresh()->version, collect($state->json('messages'))->last()['delivered_version']);
+    }
+
+    public function test_upload_it_during_a_build_goes_out_right_after_the_build(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $this->deliverChange($project);
+        $project->refresh()->update(['status' => BuilderProject::QUEUED, 'job_kind' => BuilderProject::JOB_BUILD, 'paid_at' => now(), 'attempts' => 0]);
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+        $this->chatReleases();
+
+        $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'ارفعه'])->assertOk();
+        $this->assertNotNull($project->refresh()->release_asked_at);
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['summary' => 'تم', 'cost_usd' => 1], $this->worker())->assertOk();
+
+        $this->assertSame([BuilderProject::QUEUED, BuilderProject::JOB_RELEASE], [$project->refresh()->status, $project->job_kind]);
+        $this->assertNull($project->release_asked_at);
+    }
+
     public function test_a_fix_in_the_warranty_starts_at_once_from_the_customers_own_words(): void
     {
         $project = $this->imported(BuilderProject::RELEASE_MANUAL);

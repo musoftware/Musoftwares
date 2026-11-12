@@ -133,14 +133,37 @@ class ProjectImports
             return false;
         }
 
-        $project->update(['status' => BuilderProject::QUEUED, 'job_kind' => BuilderProject::JOB_RELEASE, 'paid_at' => now(), 'attempts' => 0, 'error' => null, 'progress_note' => null]);
+        $project->update(['status' => BuilderProject::QUEUED, 'job_kind' => BuilderProject::JOB_RELEASE, 'paid_at' => now(), 'attempts' => 0, 'error' => null, 'progress_note' => null, 'release_asked_at' => null]);
 
         return true;
     }
 
-    /** A release ended: the pull request and the deploy are recorded and the customer hears it is live. */
-    public function released(BuilderProject $project, ?string $pullRequestUrl, bool $deployed, string $note): void
+    /**
+     * The customer asked in the chat to put the changes live. They go out now when nothing else runs; during a build
+     * the ask is kept and the release goes out the moment the build is delivered, before the next change starts.
+     */
+    public function askRelease(BuilderProject $project): bool
     {
+        if (! $project->isOwnerImport()) {
+            return false;
+        }
+        if ($this->queueRelease($project)) {
+            return true;
+        }
+        $busy = in_array($project->status, [BuilderProject::QUEUED, BuilderProject::BUILDING], true) && $project->job_kind !== BuilderProject::JOB_RELEASE;
+        if ($busy) {
+            $project->update(['release_asked_at' => now()]);
+        }
+
+        return $busy;
+    }
+
+    /** A release ended: the pull request and the deploy are recorded and the customer hears it is live. */
+    public function released(BuilderProject $project, ?string $pullRequestUrl, bool $deployed, string $note, ?\Illuminate\Http\UploadedFile $apk = null): void
+    {
+        if ($apk !== null) {
+            app(DeliveryStore::class)->keepApk($project, $apk->getRealPath());
+        }
         $project->update([
             'status' => BuilderProject::READY,
             'job_kind' => BuilderProject::JOB_BUILD,
@@ -152,8 +175,13 @@ class ProjectImports
             'progress_step' => null,
             'attempts' => 0,
         ]);
-        if ($deployed) {
-            $project->messages()->create(['role' => BuilderMessage::TEAM, 'content' => __('builder.import.live', [], $project->customerLanguage())]);
+        if ($deployed || $apk !== null) {
+            // the app's download button shows under this message, as under a delivery
+            $project->messages()->create([
+                'role' => BuilderMessage::TEAM,
+                'content' => __($apk !== null ? 'builder.import.live_with_app' : 'builder.import.live', [], $project->customerLanguage()),
+                'payload' => $apk !== null ? ['delivered_version' => $project->version] : null,
+            ]);
         }
         $this->payment->tellOwner($project, 'Released: '.$project->title.($pullRequestUrl ? ' '.$pullRequestUrl : '').($deployed ? ' (deployed)' : '').' '.Str::limit($note, 500));
     }

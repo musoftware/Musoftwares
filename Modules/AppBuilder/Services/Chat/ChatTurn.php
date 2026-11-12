@@ -25,6 +25,8 @@ final readonly class ChatTurn
         public array $designs = [],
         /** a plain answer while a price is shown: the price and its program stay as they are */
         public bool $keepQuote = false,
+        /** the customer asked to put the delivered changes live; the worker releases them */
+        public bool $releaseNow = false,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -49,6 +51,7 @@ final readonly class ChatTurn
             starter: trim((string) ($data['starter'] ?? '')),
             designs: array_values(array_slice(array_filter((array) ($data['designs'] ?? []), 'is_string'), 0, 6)),
             keepQuote: (bool) ($data['keep_quote'] ?? false),
+            releaseNow: (bool) ($data['release_now'] ?? false),
         );
     }
 
@@ -69,6 +72,7 @@ final readonly class ChatTurn
                 'project_type' => $this->projectType,
             ],
             'keep_quote' => $this->keepQuote,
+            'release_now' => $this->releaseNow,
             'starter' => $this->starter,
             'designs' => $this->designs,
         ];

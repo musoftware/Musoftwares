@@ -100,7 +100,7 @@ class WorkerJobController extends Controller
     {
         $this->assertBuilding($project);
         abort_unless($project->job_kind === BuilderProject::JOB_RELEASE, 409, 'This job is not a release.');
-        $imports->released($project, $request->validated('pull_request_url'), (bool) $request->validated('deployed'), (string) $request->validated('note'));
+        $imports->released($project, $request->validated('pull_request_url'), (bool) $request->validated('deployed'), (string) $request->validated('note'), $request->file('apk'));
 
         return response()->json(['status' => 'released']);
     }
@@ -198,7 +198,7 @@ class WorkerJobController extends Controller
         $imports->updateStudy($project, (string) $request->validated('study'));
         // "after every change": the build already pushed its pull request and deployed
         if ($project->isOwnerImport() && $request->boolean('released')) {
-            $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'));
+            $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'), $request->file('apk'));
         } elseif ($project->isOwnerImport() && $request->filled('release_error')) {
             // delivered, but not out: the change waits for the owner's "release now"
             $imports->failed($project, (string) $request->validated('release_error'));

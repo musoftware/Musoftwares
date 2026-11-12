@@ -121,6 +121,10 @@ class ProjectRequests
         if ($project->status !== BuilderProject::READY || ($project->job_kind ?: BuilderProject::JOB_BUILD) !== BuilderProject::JOB_BUILD) {
             return false;
         }
+        // the customer asked to put the changes live while the last build ran: that goes first
+        if ($project->release_asked_at !== null && app(ProjectImports::class)->queueRelease($project)) {
+            return true;
+        }
         $ready = $project->requests()->where('status', BuilderRequest::READY)->get();
         if ($ready->isEmpty()) {
             return false;
@@ -171,7 +175,7 @@ class ProjectRequests
     {
         return BuilderProject::query()
             ->where('status', BuilderProject::READY)
-            ->whereHas('requests', fn ($query) => $query->where('status', BuilderRequest::READY))
+            ->where(fn ($query) => $query->whereNotNull('release_asked_at')->orWhereHas('requests', fn ($requests) => $requests->where('status', BuilderRequest::READY)))
             ->get()
             ->filter(fn (BuilderProject $project) => $this->startNext($project))
             ->count();

@@ -233,6 +233,7 @@ The Musoftware team",
     'import' => [
         'welcome' => 'Hello. Your project ":title" is ready here, and I can see all its files. Tell me any change or problem you want solved, and I will tell you how we will do it.',
         'live' => 'The changes are live on your server now.',
+        'live_with_app' => 'The changes are live, and the new version of the app is ready to download here.',
     ],
     'originals' => [
         'title' => 'Upload the original design files',

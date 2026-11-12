@@ -69,6 +69,7 @@ class BuilderProject extends Model
         'study_paid' => 'decimal:2',
         'imported_at' => 'datetime',
         'released_at' => 'datetime',
+        'release_asked_at' => 'datetime',
         'deploy_enabled' => 'boolean',
         'customer_project' => 'boolean',
         'inspection_paid' => 'decimal:2',

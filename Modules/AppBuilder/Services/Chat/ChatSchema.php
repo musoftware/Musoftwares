@@ -31,6 +31,8 @@ final class ChatSchema
                 'quote' => $quote,
                 // true when a price is already shown and this answer changes nothing in what gets built
                 'keep_quote' => ['type' => 'boolean'],
+                // the customer asks to put the delivered changes live (upload, publish, update the app): the worker releases them
+                'release_now' => ['type' => 'boolean'],
                 // a program Musoftware already has that this idea starts from, '' for none
                 'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
                 // free ready designs to show as pictures under this answer, so the customer picks one
@@ -42,7 +44,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
     }

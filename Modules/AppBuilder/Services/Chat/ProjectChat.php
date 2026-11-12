@@ -130,6 +130,10 @@ class ProjectChat
         $project->increment('chat_output_tokens', $turn->outputTokens);
         // a project that started and was paid keeps a list of requests instead of one price
         $project->takesRequests() ? $this->addRequest($project, $turn, $question) : $this->updateQuote($project, $turn);
+        // "upload it", "publish the app": an order for the worker, which puts the delivered changes live
+        if ($turn->releaseNow) {
+            app(\Modules\AppBuilder\Services\ProjectImports::class)->askRelease($project->refresh());
+        }
 
         return $project->messages()->create([
             'role' => BuilderMessage::ASSISTANT,
@@ -286,7 +290,29 @@ class ProjectChat
             ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has; use it, with "
             ."what the customer shows you, to tell a fix from something new. Never offer ready programs, designs, a download or "
             ."a live trial for it. Changes go live on the customer's own server.\n\n"
+            .$this->releaseFacts($project)."\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
+    }
+
+    /**
+     * Putting changes live is the worker's job, done on the customer's word: "upload it", "publish", "update the app",
+     * "I want to see it". The chat sets release_now and says it is on its way; it never says it cannot upload.
+     */
+    private function releaseFacts(BuilderProject $project): string
+    {
+        $waiting = $project->changesWaiting();
+        $state = match (true) {
+            $project->job_kind === BuilderProject::JOB_RELEASE && in_array($project->status, [BuilderProject::QUEUED, BuilderProject::BUILDING], true) => 'A release is running now.',
+            $project->release_asked_at !== null => 'The customer already asked to put the changes live; it goes out as soon as the current work is delivered.',
+            $waiting > 0 => "{$waiting} delivered change(s) are not live yet.",
+            default => 'Everything delivered is already live.',
+        };
+
+        return "Putting changes live: the worker does it by itself (GitHub and the customer's server, and the app's new "
+            ."version when the project builds one). When the customer asks to upload, publish, update or see the changes "
+            ."live, set `release_now` true and say plainly it is on its way and they get a message here when it is live "
+            ."(if a build is running, it goes out right after it). Never say you cannot upload or deploy. If everything is "
+            ."already live, say so. Now: {$state}";
     }
 
     /**
