@@ -39,6 +39,7 @@ class AdminBuilderController extends Controller
             'projects' => $projects,
             'waitingOnly' => $request->boolean('waiting'),
             'learning' => app(\Modules\AppBuilder\Services\BuildCostHistory::class)->summary(),
+            'deliveryStats' => app(\Modules\AppBuilder\Services\DeliveryStats::class)->summary(),
             'defaultFactor' => (float) config('builder.pricing.work_factor'),
         ]);
     }
@@ -143,6 +144,10 @@ class AdminBuilderController extends Controller
     public function message(Request $request, BuilderProject $project): RedirectResponse
     {
         $text = trim((string) $request->validate(['text' => ['required', 'string', 'max:3000']])['text']);
+        // the owner stepped into a build: that delivery does not count as done without a person
+        if (in_array($project->status, [BuilderProject::QUEUED, BuilderProject::BUILDING, BuilderProject::FAILED], true)) {
+            $project->update(['owner_touched' => true]);
+        }
 
         $project->isWaitingForAnswer()
             ? $this->questions->answer($project, $text, BuilderMessage::TEAM)
@@ -167,6 +172,7 @@ class AdminBuilderController extends Controller
     public function retry(BuilderProject $project): RedirectResponse
     {
         abort_unless($project->status === BuilderProject::FAILED, 409);
+        $project->update(['owner_touched' => true]);
         app(\Modules\AppBuilder\Services\JobQueue::class)->requeue($project);
 
         return back()->with('success', __('builder.admin.retried'));

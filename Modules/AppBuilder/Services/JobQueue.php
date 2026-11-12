@@ -55,7 +55,7 @@ class JobQueue
         // the engineer writes for engineers; the customer reads the contact's plain retelling, the owner the original
         $forCustomer = app(Chat\CustomerVoice::class)->retell($project, $summary);
 
-        DB::transaction(function () use ($project, $version, $forCustomer, $summary, $costUsd, $ideasJson): void {
+        DB::transaction(function () use ($project, $version, $forCustomer, $summary, $costUsd, $ideasJson, $jobCost): void {
             $project->update([
                 'status' => BuilderProject::READY,
                 'version' => $version,
@@ -72,6 +72,8 @@ class JobQueue
                 'job_cost_usd' => 0,
                 'auto_retries' => 0,
             ]);
+            app(DeliveryStats::class)->record($project, $jobCost);
+            $project->update(['owner_touched' => false]);
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
                 'content' => $forCustomer,

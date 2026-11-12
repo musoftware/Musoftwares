@@ -628,6 +628,26 @@ class AppBuilderTest extends TestCase
         $this->assertSame(0, $retries->retryAll());
     }
 
+    public function test_the_owner_sees_how_often_a_build_needs_no_programmer(): void
+    {
+        $stats = app(\Modules\AppBuilder\Services\DeliveryStats::class);
+        $alone = $this->buildingProject();
+        $alone->update(['paid_total' => 100]);
+        $stats->record($alone, 20);
+        $helped = $this->buildingProject();
+        $helped->update(['paid_total' => 100, 'owner_touched' => true]);
+        $stats->record($helped, 30);
+        // the customer of the second one asked for a fix soon after
+        \Modules\AppBuilder\Models\BuilderRequest::create(['project_id' => $helped->id, 'kind' => \Modules\AppBuilder\Models\BuilderRequest::FIX, 'title' => 'زرار مش شغال', 'spec' => 'fix', 'status' => \Modules\AppBuilder\Models\BuilderRequest::READY]);
+
+        $summary = $stats->summary();
+
+        $this->assertSame(2, $summary['count']);
+        $this->assertSame(50, $summary['hands_off']);
+        $this->assertSame(50, $summary['accepted']);
+        $this->assertSame(25, $summary['cost_share']);
+    }
+
     public function test_the_customer_sees_the_builds_phases_in_plain_words(): void
     {
         config(['builder.retell_delivery' => true]);

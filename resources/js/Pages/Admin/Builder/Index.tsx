@@ -91,6 +91,49 @@ function PriceLearning({ learning, defaultFactor }: { learning: Learned[]; defau
     );
 }
 
+interface DeliveryStats {
+    count: number;
+    hands_off: number | null;
+    accepted: number | null;
+    cost_share: number | null;
+    cost_usd: number;
+    price_usd: number;
+}
+
+/** Does the system work without a programmer? Three numbers over the last 30 deliveries. */
+function WithoutAProgrammer({ stats }: { stats: DeliveryStats }) {
+    const percent = (value: number | null) => (value === null ? '-' : `${value}%`);
+    const rows = [
+        { label: t('Delivered without you stepping in', 'اتسلّم من غير ما تتدخل'), value: percent(stats.hands_off), good: (stats.hands_off ?? 0) >= 80 },
+        { label: t('Kept by the customer without a fix', 'العميل خده من غير ما يطلب تصليح'), value: percent(stats.accepted), good: (stats.accepted ?? 0) >= 80 },
+        { label: t('Real cost out of the price paid', 'التكلفة الحقيقية من السعر المدفوع'), value: percent(stats.cost_share), good: stats.cost_share !== null && stats.cost_share <= 50 },
+    ];
+
+    return (
+        <section className="rounded-xl border bg-white p-4">
+            <h2 className="font-semibold">{t('Does it work without a programmer?', 'هل بيشتغل من غير مبرمج؟')}</h2>
+            <p className="mt-1 text-sm text-slate-500">
+                {stats.count === 0
+                    ? t('Counted from the next delivery.', 'العدّ بيبدأ من أول تسليم جاي.')
+                    : t(`The last ${stats.count} deliveries. Aim: above 80% for the first two.`, `آخر ${stats.count} تسليم. الهدف: أكتر من 80% في أول اتنين.`)}
+            </p>
+            <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+                {rows.map((row) => (
+                    <div key={row.label} className="rounded-lg border p-3">
+                        <dt className="text-sm text-slate-500">{row.label}</dt>
+                        <dd className={`mt-1 text-2xl font-bold ${stats.count > 0 && row.good ? 'text-emerald-700' : ''}`} dir="ltr">{row.value}</dd>
+                    </div>
+                ))}
+            </dl>
+            {stats.count > 0 && (
+                <p className="mt-2 text-sm text-slate-500" dir="ltr">
+                    {t(`Cost $${stats.cost_usd} · paid $${stats.price_usd}`, `التكلفة $${stats.cost_usd} · المدفوع $${stats.price_usd}`)}
+                </p>
+            )}
+        </section>
+    );
+}
+
 /** Every AI builder chat, newest first, with the ones waiting for an answer easy to find. */
 /** Sends a push to every admin's phone and browsers, to see that the builder's alerts really arrive. */
 function TestPush() {
@@ -103,7 +146,7 @@ function TestPush() {
     return <button type="button" onClick={send} className="rounded-lg border px-4 py-2 text-sm font-semibold">{t('Test notification', 'جرّب الإشعار')}</button>;
 }
 
-export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor }: { projects: Paginated<Project>; waitingOnly: boolean; learning: Learned[]; defaultFactor: number }) {
+export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor, deliveryStats }: { projects: Paginated<Project>; waitingOnly: boolean; learning: Learned[]; defaultFactor: number; deliveryStats: DeliveryStats }) {
     return (
         <AdminSidebarLayout>
             <Head title={t('AI builder', 'منشئ البرامج')} />
@@ -118,6 +161,7 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                     </div>
                 </div>
 
+                <WithoutAProgrammer stats={deliveryStats} />
                 <ImportProject />
                 <PriceLearning learning={learning} defaultFactor={defaultFactor} />
 
