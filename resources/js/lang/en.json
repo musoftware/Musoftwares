@@ -2614,11 +2614,11 @@
         "follow_up": {
             "your_idea": "your idea",
             "remind_subject": "Your project is waiting: :title",
-            "remind_body": "Hello,\r\n\r\nYou told us about :title. Everything you said is saved, and we can pick up where you stopped and get it built.\r\n\r\nYour chat:\r\n:link\r\n\r\nThe Musoftware team",
+            "remind_body": "Hello,\n\nYou told us about :title. Everything you said is saved, and we can pick up where you stopped and get it built.\n\nYour chat:\n:link\n\nThe Musoftware team",
             "offer_subject": ":percent% off :title, for you",
-            "offer_body": "Hello,\r\n\r\nWe still have :title ready to build. We took :percent% off for you: it is now :price instead of :before.\r\n\r\nOpen your chat and start whenever you are ready:\r\n:link\r\n\r\nThe Musoftware team",
+            "offer_body": "Hello,\n\nWe still have :title ready to build. We took :percent% off for you: it is now :price instead of :before.\n\nOpen your chat and start whenever you are ready:\n:link\n\nThe Musoftware team",
             "again_subject": "Shall we build :title?",
-            "again_body": "Hello,\r\n\r\nYour chat about :title is still here. Write to us any time and the engineer will pick it up.\r\n\r\n:link\r\n\r\nThe Musoftware team"
+            "again_body": "Hello,\n\nYour chat about :title is still here. Write to us any time and the engineer will pick it up.\n\n:link\n\nThe Musoftware team"
         },
         "how_title": "How it works",
         "how_steps": [
@@ -2629,10 +2629,10 @@
         ],
         "close_page_note": "After payment you can close this page: the build runs on our computers, and the project link reaches your email.",
         "mail_paid_subject": "Your program is being built",
-        "mail_paid_body": "Hello,\r\n\r\nWe received your payment and the engineer started building your program on our computers. You can close the page; you will get an email when it is ready.\r\n\r\nYour project, any time:\r\n:link\r\n\r\nThe Musoftware team",
-        "mail_new_account": "We opened a Musoftware account with this email so your project is never lost. Set your password here:\r\n:link",
+        "mail_paid_body": "Hello,\n\nWe received your payment and the engineer started building your program on our computers. You can close the page; you will get an email when it is ready.\n\nYour project, any time:\n:link\n\nThe Musoftware team",
+        "mail_new_account": "We opened a Musoftware account with this email so your project is never lost. Set your password here:\n:link",
         "mail_ready_subject": "Your program is ready",
-        "mail_ready_body": "Hello,\r\n\r\nYour program is ready. Open it, try it and download it here:\r\n:link\r\n\r\nThe Musoftware team",
+        "mail_ready_body": "Hello,\n\nYour program is ready. Open it, try it and download it here:\n:link\n\nThe Musoftware team",
         "price_settled": "Good news: the work cost less than its price, so :amount went back to your balance on the site. You can use it for your next program.",
         "refund_sign_in": "Sign in before you pay: if the work costs less than the price, the difference comes back to you as balance for your next program.",
         "free_build_note": "Your first simple page is on us: no payment, the build starts now.",
@@ -2655,7 +2655,11 @@
             "design_saved": "Saved, and the build has started.",
             "sent": "Sent.",
             "secret_saved": "Saved.",
-            "secret_removed": "Removed."
+            "secret_removed": "Removed.",
+            "import_started": "The worker is downloading the project. You get an email when the chat is ready to send to the customer.",
+            "release_started": "The waiting changes are being pushed and deployed now.",
+            "import_drive_only": "Use a Google Drive share link to a .zip file (anyone with the link can view).",
+            "import_github_only": "Use the repo link, like https:\/\/github.com\/owner\/repo."
         },
         "trial_request": "Try it in a real browser",
         "trial_waiting": "Preparing a real browser with your program, one minute...",
@@ -2752,7 +2756,13 @@
             "reviewing": "Specialists are reviewing the program",
             "deploying": "Putting the program live on your server",
             "waiting": "Waiting for your answer",
-            "packaging": "Packing the files for delivery"
+            "packaging": "Packing the files for delivery",
+            "importing": "Getting your project ready to work on",
+            "releasing": "Putting the changes live on your server"
+        },
+        "import": {
+            "welcome": "Hello. Your project \":title\" is ready here, and I can see all its files. Tell me any change or problem you want solved, and I will tell you how we will do it.",
+            "live": "The changes are live on your server now."
         },
         "originals": {
             "title": "Upload the original design files",
@@ -2783,6 +2793,7 @@
             "trial": "A live trial is not available right now.",
             "balance_due": "Please pay the remaining amount first; then we continue with any change.",
             "no_quote": "There is no open price to pay right now.",
+            "sign_in_to_open": "This chat belongs to an account. Sign in to open it.",
             "no_study": "The study can be ordered only while a price is shown, once per project.",
             "no_free_build": "The free first page is not available for this one. You can pay to start it.",
             "sign_in": "To go on with this chat, please sign in (the link at the top). Your chat stays as it is.",
