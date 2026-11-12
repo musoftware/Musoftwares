@@ -2607,6 +2607,16 @@
         "guest": "زائر",
         "sign_in": "سجّل دخول",
         "sign_in_google": "دخول بجوجل",
+        "currency_names": {
+            "EGP": "جنيه",
+            "SAR": "ريال",
+            "AED": "درهم",
+            "MAD": "درهم",
+            "IQD": "دينار",
+            "EUR": "يورو",
+            "GBP": "جنيه إسترليني",
+            "USD": "دولار"
+        },
         "new_chat": "محادثة جديدة",
         "inspection": {
             "bring": "مشروع جاهز عندي على Google Drive",
