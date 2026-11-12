@@ -189,7 +189,7 @@ class BuilderChatController extends Controller
     /** The feasibility study as a printable page; the browser saves it as a PDF with Arabic shaped correctly. */
     public function study(BuilderProject $project): View
     {
-        abort_unless($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY, 404);
+        abort_unless($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY && ($project->studyIsPaid() || request()->user()?->isAdmin()), 404);
 
         return view('appbuilder::study', ['project' => $project]);
     }

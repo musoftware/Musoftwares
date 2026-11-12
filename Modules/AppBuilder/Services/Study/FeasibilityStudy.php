@@ -37,7 +37,8 @@ class FeasibilityStudy
         return $project->status === BuilderProject::QUOTED
             && ! $project->free_fix
             && ! $project->hasDelivery()
-            && $project->study_status === null
+            // not asked for yet, or written for free before studies were sold apart
+            && ($project->study_status === null || ($project->study_status === self::READY && ! $project->studyIsPaid()))
             && (float) $project->study_paid <= 0
             && self::price() > 0
             && in_array($project->project_type, (array) config('builder.study.for_types'), true);
@@ -63,7 +64,10 @@ class FeasibilityStudy
         app(ProjectPayment::class)->tellOwner($project, 'Study paid: '.$project->title.' ('.$paid.' '.$project->currency.')');
         app(\Modules\AppBuilder\Services\ProjectAccount::class)->linkAfterFee($project);
         app(\Modules\AppBuilder\Services\PaymentInvoices::class)->feePaid($project->refresh(), __('builder.invoice.study', [], $project->customerLanguage()), $paid);
-        $this->start($project);
+        // a study written before it was sold apart opens now; it is not written (and paid to Opus) again
+        if ($project->study_status !== self::READY) {
+            $this->start($project);
+        }
 
         return true;
     }

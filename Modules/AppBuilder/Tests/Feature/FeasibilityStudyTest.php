@@ -64,6 +64,22 @@ class FeasibilityStudyTest extends TestCase
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
     }
 
+    public function test_a_study_written_for_free_before_the_rule_stays_closed_until_it_is_paid(): void
+    {
+        $uuid = $this->quote('system');
+        // written by the old flow, which gave every system a study with its price
+        BuilderProject::where('uuid', $uuid)->update(['study_status' => 'ready', 'study_html' => '<p>دراسة قديمة</p>', 'study_fee' => 5]);
+
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer');
+        $this->get('/ai/'.$uuid.'/study')->assertNotFound();
+
+        app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class)->markPaid(BuilderProject::where('uuid', $uuid)->firstOrFail(), 'tx-1');
+
+        // it opens now, and Claude did not write it again
+        $this->assertSame(0, $this->written);
+        $this->get('/ai/'.$uuid.'/study')->assertOk()->assertSee('دراسة قديمة', false);
+    }
+
     public function test_paying_the_study_writes_it_and_takes_it_off_the_project_price(): void
     {
         $uuid = $this->quote('system');

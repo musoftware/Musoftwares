@@ -195,6 +195,15 @@ class BuilderProject extends Model
     }
 
     /** What the customer paid for the feasibility study comes off the price of the first build, never a later one. */
+    /**
+     * The study opens only once paid: on its own, or (studies from before it was sold apart) with its fee inside a
+     * price the customer paid. Studies written for free back then wait for payment like any other.
+     */
+    public function studyIsPaid(): bool
+    {
+        return (float) $this->study_paid > 0 || ((float) $this->study_fee > 0 && (float) $this->quote_paid > 0) || $this->hasDelivery();
+    }
+
     public function studyCredit(): float
     {
         return $this->hasDelivery() ? 0.0 : (float) $this->study_paid;

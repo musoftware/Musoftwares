@@ -29,6 +29,16 @@ class BuilderMessage extends Model
 
     protected $casts = ['payload' => 'array'];
 
+    /** The chat's answers and the team's lines also reach the customer's Telegram while they talk to this project there. */
+    protected static function booted(): void
+    {
+        static::created(function (self $message): void {
+            if (in_array($message->role, [self::ASSISTANT, self::TEAM], true)) {
+                \Illuminate\Support\Facades\DB::afterCommit(fn () => app(\Modules\AppBuilder\Services\TelegramChat::class)->forward($message));
+            }
+        });
+    }
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(BuilderProject::class, 'project_id');

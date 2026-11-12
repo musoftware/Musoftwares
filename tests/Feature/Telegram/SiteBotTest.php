@@ -26,6 +26,9 @@ class SiteBotTest extends TestCase
         config(['services.site_telegram.bot_token' => 'test-token']);
         Http::fake([
             'api.telegram.org/bottest-token/getMe' => Http::response(['ok' => true, 'result' => ['username' => 'musoftwarescom_bot']]),
+            // a picture someone sent the bot: where it is, then its bytes
+            'api.telegram.org/bottest-token/getFile' => Http::response(['ok' => true, 'result' => ['file_path' => 'photos/p.jpg', 'file_size' => 70]]),
+            'api.telegram.org/file/bottest-token/photos/p.jpg' => Http::response(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')),
             'api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]]),
         ]);
         $this->app->instance(AssistantModel::class, new class implements AssistantModel
@@ -155,5 +158,57 @@ class SiteBotTest extends TestCase
         $this->presses('ap:r:'.$request->id);
 
         $this->assertNull($request->refresh()->approved_at);
+    }
+
+    private function customersProject(): \Modules\AppBuilder\Models\BuilderProject
+    {
+        $this->app->instance(\Modules\AppBuilder\Services\Chat\ChatModel::class, new class implements \Modules\AppBuilder\Services\Chat\ChatModel
+        {
+            public function reply(string $system, array $turns): \Modules\AppBuilder\Services\Chat\ChatTurn
+            {
+                return \Modules\AppBuilder\Services\Chat\ChatTurn::fromArray(['reply' => 'تمام، فهمت الصورة. **قسم البلس** هيتعمل.', 'quote' => []]);
+            }
+        });
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $this->user->forceFill(['telegram_chat_id' => '788'])->save();
+
+        return \Modules\AppBuilder\Models\BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'ZainArena', 'status' => 'chatting', 'user_id' => $this->user->id]);
+    }
+
+    public function test_the_customer_talks_to_a_projects_ai_inside_telegram(): void
+    {
+        $project = $this->customersProject();
+
+        $this->presses('ch:'.$project->id);
+        $this->telegramSends('عايز قسم للبلس في لوحة التحكم');
+
+        $this->assertSame('عايز قسم للبلس في لوحة التحكم', $project->messages()->where('role', 'user')->value('content'));
+        // the AI's answer came back to Telegram, as plain text
+        $this->assertContains('تمام، فهمت الصورة. قسم البلس هيتعمل.', $this->sentText());
+    }
+
+    public function test_a_picture_sent_in_telegram_reaches_the_chat_as_an_attachment(): void
+    {
+        $project = $this->customersProject();
+        $this->presses('ch:'.$project->id);
+
+        $this->postJson('/api/telegram/webhook', ['update_id' => 3, 'message' => ['chat' => ['id' => 788, 'type' => 'private'], 'caption' => 'زي دي', 'photo' => [['file_id' => 'small'], ['file_id' => 'big']]]], [
+            'X-Telegram-Bot-Api-Secret-Token' => app(TelegramApi::class)->webhookSecret(),
+        ])->assertNoContent();
+
+        $question = $project->messages()->where('role', 'user')->firstOrFail();
+        $this->assertSame('زي دي', $question->content);
+        $this->assertSame(1, $question->attachments()->count());
+    }
+
+    public function test_someone_cannot_enter_another_accounts_chat(): void
+    {
+        $project = $this->customersProject();
+        $project->update(['user_id' => User::factory()->create()->id]);
+
+        $this->presses('ch:'.$project->id);
+        $this->telegramSends('ورّيني المحادثة');
+
+        $this->assertSame(0, $project->messages()->count());
     }
 }

@@ -16,6 +16,9 @@ class TelegramApi
     /** Telegram's own limit for one message. */
     private const MAX_TEXT = 4000;
 
+    /** The chat takes files up to 10 MB, like the page. */
+    private const MAX_FILE_BYTES = 10 * 1024 * 1024;
+
     public function configured(): bool
     {
         return $this->token() !== '';
@@ -49,6 +52,25 @@ class TelegramApi
         }
 
         return $this->call('sendMessage', $payload) !== null;
+    }
+
+    /** A picture or file someone sent the bot, or null when it is too big or cannot be read. */
+    public function file(string $fileId): ?string
+    {
+        $file = $this->call('getFile', ['file_id' => $fileId]);
+        if ($file === null || empty($file['file_path']) || (int) ($file['file_size'] ?? 0) > self::MAX_FILE_BYTES) {
+            return null;
+        }
+
+        try {
+            $response = Http::timeout(self::SECONDS * 3)->get('https://api.telegram.org/file/bot'.$this->token().'/'.$file['file_path']);
+        } catch (Throwable $error) {
+            Log::warning('Telegram file download failed', ['error' => Str::of($error->getMessage())->replace($this->token(), '***')->value()]);
+
+            return null;
+        }
+
+        return $response->successful() ? $response->body() : null;
     }
 
     /** Closes the spinner on a pressed button, with a short line on top of the chat. */

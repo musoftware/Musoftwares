@@ -6,10 +6,12 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Services\AiAssistant\AssistantChat;
 use App\Services\AiAssistant\AssistantLimiter;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderProject;
 use Modules\AppBuilder\Services\OwnerApprovals;
+use Modules\AppBuilder\Services\TelegramChat;
 use Throwable;
 
 /**
@@ -40,8 +42,10 @@ class SiteBot
         }
         $message = $update['message'] ?? [];
         $chatId = (string) ($message['chat']['id'] ?? '');
-        $text = trim((string) ($message['text'] ?? ''));
-        if ($chatId === '' || ($message['chat']['type'] ?? '') !== 'private' || $text === '') {
+        // a picture or a file comes with its caption as the text
+        $text = trim((string) ($message['text'] ?? $message['caption'] ?? ''));
+        $hasFile = isset($message['photo']) || isset($message['document']);
+        if ($chatId === '' || ($message['chat']['type'] ?? '') !== 'private' || ($text === '' && ! $hasFile)) {
             return;
         }
         // the language of the person's Telegram (their phone), Arabic first
@@ -59,16 +63,23 @@ class SiteBot
             return;
         }
 
-        $this->answer($user, $chatId, $text);
+        $this->answer($user, $chatId, $text, $message);
     }
 
-    /** A button on a card (only admins get cards with buttons): approve, turn down, price, free. */
+    /** A button: talk to a project or start a new chat (any account), or an approval card (admins only). */
     private function pressed(array $button): void
     {
         $chatId = (string) ($button['message']['chat']['id'] ?? '');
-        $admin = $chatId !== '' ? $this->links->userFor($chatId) : null;
-        $reply = $admin?->isAdmin() ? app(OwnerApprovals::class)->act($chatId, (string) ($button['data'] ?? '')) : __('telegram.not_linked', ['url' => route('client.settings')]);
-        $this->api->answerButton((string) ($button['id'] ?? ''), $reply);
+        $user = $chatId !== '' ? $this->links->userFor($chatId) : null;
+        $data = (string) ($button['data'] ?? '');
+        $reply = match (true) {
+            $user === null => __('telegram.not_linked', ['url' => route('client.settings')]),
+            (bool) preg_match('/^ch:(\d{1,10})$/', $data, $match) => app(TelegramChat::class)->enter($user, $chatId, (int) $match[1]),
+            $data === 'nw:0' => app(TelegramChat::class)->startNew($user, $chatId),
+            $user->isAdmin() => app(OwnerApprovals::class)->act($chatId, $data),
+            default => __('telegram.chat_not_yours'),
+        };
+        $this->api->answerButton((string) ($button['id'] ?? ''), mb_substr($reply, 0, 190));
         $this->api->send($chatId, $reply);
     }
 
@@ -84,7 +95,8 @@ class SiteBot
         $this->api->send($chatId, __('telegram.welcome', ['name' => $user->name]), menu: $this->menu($user));
     }
 
-    private function answer(User $user, string $chatId, string $text): void
+    /** @param  array<string, mixed>  $message */
+    private function answer(User $user, string $chatId, string $text, array $message): void
     {
         // a price the owner was asked for on an approval card
         if ($user->isAdmin() && app(OwnerApprovals::class)->priceTyped($chatId, $text)) {
@@ -94,9 +106,50 @@ class SiteBot
             __('telegram.btn_approvals') => $user->isAdmin() ? app(OwnerApprovals::class)->sendWaiting($chatId) : $this->ask($user, $chatId, $text),
             __('telegram.btn_invoices') => $this->invoices($user, $chatId),
             __('telegram.btn_projects') => $this->projects($user, $chatId),
-            __('telegram.btn_support') => $this->api->send($chatId, __('telegram.support_prompt'), menu: $this->menu($user)),
-            default => $this->ask($user, $chatId, $text),
+            __('telegram.btn_support') => $this->toAssistant($user, $chatId),
+            default => $this->talk($user, $chatId, $text, $message),
         };
+    }
+
+    /** Leaves any project chat: from here on, messages are questions for the site's assistant. */
+    private function toAssistant(User $user, string $chatId): void
+    {
+        app(TelegramChat::class)->leave($chatId);
+        $this->api->send($chatId, __('telegram.support_prompt'), menu: $this->menu($user));
+    }
+
+    /** In a project chat the message goes to that project's AI; otherwise to the site's assistant. */
+    private function talk(User $user, string $chatId, string $text, array $message): void
+    {
+        $project = app(TelegramChat::class)->active($user, $chatId);
+        if ($project === null) {
+            $text !== '' ? $this->ask($user, $chatId, $text) : $this->api->send($chatId, __('telegram.chat_pick_first'), menu: $this->menu($user));
+
+            return;
+        }
+
+        app(TelegramChat::class)->say($project, $chatId, $text, $this->files($message));
+    }
+
+    /**
+     * The picture or file the customer sent, as an upload the chat takes like one from the page.
+     *
+     * @return list<UploadedFile>
+     */
+    private function files(array $message): array
+    {
+        $photo = $message['photo'] ?? null;
+        $file = is_array($photo) && $photo !== [] ? ['id' => end($photo)['file_id'] ?? '', 'name' => 'photo.jpg', 'mime' => 'image/jpeg']
+            : (isset($message['document']) ? ['id' => $message['document']['file_id'] ?? '', 'name' => (string) ($message['document']['file_name'] ?? 'file'), 'mime' => (string) ($message['document']['mime_type'] ?? '')] : null);
+        $bytes = $file !== null && $file['id'] !== '' ? $this->api->file((string) $file['id']) : null;
+        if ($bytes === null) {
+            return [];
+        }
+
+        $path = tempnam(sys_get_temp_dir(), 'tg');
+        file_put_contents($path, $bytes);
+
+        return [new UploadedFile($path, basename($file['name']), $file['mime'] ?: null, null, true)];
     }
 
     private function invoices(User $user, string $chatId): void
@@ -122,7 +175,7 @@ class SiteBot
     {
         $projects = BuilderProject::where('user_id', $user->id)->latest('id')->limit(self::SHOWN)->get();
         if ($projects->isEmpty()) {
-            $this->api->send($chatId, __('telegram.projects_none', ['url' => url('/ai')]), menu: $this->menu($user));
+            $this->api->send($chatId, __('telegram.projects_none', ['url' => url('/ai')]), actions: [[__('telegram.chat_new_button'), 'nw:0']]);
 
             return;
         }
@@ -131,8 +184,9 @@ class SiteBot
             'title' => $project->title ?: __('telegram.untitled'),
             'status' => __('telegram.project_status.'.$project->status),
         ]));
-        $open = $projects->map(fn (BuilderProject $project) => [__('telegram.open', ['title' => mb_substr($project->title ?: __('telegram.untitled'), 0, 40)]), route('builder.show', $project)])->all();
-        $this->api->send($chatId, __('telegram.projects_title')."\n\n".$lines->implode("\n"), $open);
+        // each project's chat continues here in Telegram, or a new one starts
+        $talk = $projects->map(fn (BuilderProject $project) => [__('telegram.chat_talk', ['title' => mb_substr($project->title ?: __('telegram.untitled'), 0, 30)]), 'ch:'.$project->id])->all();
+        $this->api->send($chatId, __('telegram.projects_title')."\n\n".$lines->implode("\n")."\n\n".__('telegram.chat_how'), actions: [...$talk, [__('telegram.chat_new_button'), 'nw:0']]);
     }
 
     /** Any other message is a question for the site's AI assistant, with the same limits as on the site. */
