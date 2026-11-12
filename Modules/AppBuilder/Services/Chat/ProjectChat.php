@@ -234,10 +234,31 @@ class ProjectChat
     /** @return list<array{role: string, content: string|list<array<string, mixed>>}> */
     private function turns(BuilderProject $project): array
     {
-        return $project->messages()->with('attachments')->get()
+        $turns = $project->messages()->with('attachments')->get()
             ->map(fn (BuilderMessage $message) => ['role' => $message->modelRole(), 'content' => $this->attachments->contentFor($message)])
             ->values()
             ->all();
+
+        return $this->withFactsNow($project, $turns);
+    }
+
+    /**
+     * The request list again, next to the customer's last message: earlier answers in a long chat said things that are
+     * no longer true (unpaid, not started), and the model follows the chat more than the rules far above it.
+     */
+    private function withFactsNow(BuilderProject $project, array $turns): array
+    {
+        $last = array_key_last($turns);
+        if ($last === null || ! $project->takesRequests() || $turns[$last]['role'] !== BuilderMessage::USER) {
+            return $turns;
+        }
+
+        $facts = "[Facts right now, newer than anything said earlier in this chat. The request list:\n"
+            .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project)."]";
+        $content = $turns[$last]['content'];
+        $turns[$last]['content'] = is_array($content) ? [...$content, ['type' => 'text', 'text' => $facts]] : $content."\n\n".$facts;
+
+        return $turns;
     }
 
     private const LANGUAGE_RULES = [
@@ -370,9 +391,13 @@ class ProjectChat
             .$this->warrantyLine($project)."\n\n"
             ."Keep `spec` short: the engineer also reads the customer's own words. Answer in one or two lines, and always say "
             ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
-            ."والمهندس هيراجعه ويبدأ عليه\" or \"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\". Never say "
+            ."والمهندس هيراجعه ويبدأ عليه\" or, for new work: ".($project->changeIsFree(false, false)
+                ? "\"ده تطوير جديد ضمن فكرة مشروعك، ومجاني في الفترة الأولى، والمهندس هيراجعه ويبدأ عليه\""
+                : "\"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\"")
+            .". Never say "
             ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
             ."nothing.\n\nThe list below is the truth about these requests: what is paid, what is being worked on, what is done. "
+            ."Earlier answers in this chat may be out of date; the list is what is true now. "
             ."Never tell the customer a request is unpaid when the list says PAID, and never say work started or finished "
             ."unless the list says so: an item the engineer is reviewing has not started yet. Something the customer asked about earlier "
             ."that is not in the list is not open (it was cancelled or never asked for); do not count it.\n\nThe list now:\n"

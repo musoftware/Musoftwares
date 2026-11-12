@@ -24,6 +24,9 @@ class ProjectRequests
     /** How many of the customer's lines before a request are read as its own words. */
     private const MAX_WORDS_MESSAGES = 6;
 
+    /** Below this length two titles are the same thing only when they are equal. */
+    private const SAME_THING_CHARS = 12;
+
     public function __construct(private readonly QuotePricer $pricer, private readonly ProjectPayment $payment) {}
 
     /** The chat's brief for one request becomes an item in the list; a free one goes to the engineer at once. */
@@ -45,7 +48,11 @@ class ProjectRequests
             'title' => mb_substr($turn->title, 0, 255) ?: mb_substr($question->content, 0, 80),
             'spec' => $turn->spec,
             'customer_words' => $this->customerWords($project, $question),
-            'kind' => $turn->isFix ? BuilderRequest::FIX : BuilderRequest::BUILD,
+            'kind' => match (true) {
+                $turn->isFix => BuilderRequest::FIX,
+                $turn->isNewProject => BuilderRequest::NEW_PROJECT,
+                default => BuilderRequest::BUILD,
+            },
             'free' => $free,
             'complex' => $turn->complex,
             'estimated_tokens' => $price['tokens'],
@@ -85,13 +92,61 @@ class ProjectRequests
             ->first()?->delete();
     }
 
-    /** An item with the same title that is not done yet (waiting, paid or being built), or null. */
-    private function openWithTitle(BuilderProject $project, string $title): ?BuilderRequest
+    /** An item for the same thing that is not done yet (waiting, paid or being built), or null. */
+    private function openWithTitle(BuilderProject $project, string $title, ?int $except = null): ?BuilderRequest
     {
-        $wanted = mb_strtolower(trim($title));
+        return $project->requests()->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY, BuilderRequest::BUILDING])
+            ->when($except, fn ($others) => $others->whereKeyNot($except))->get()
+            ->first(fn (BuilderRequest $request) => $this->sameThing((string) $request->title, $title));
+    }
 
-        return $wanted === '' ? null : $project->requests()->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY, BuilderRequest::BUILDING])->get()
-            ->first(fn (BuilderRequest $request) => mb_strtolower(trim((string) $request->title)) === $wanted);
+    /**
+     * Two titles for the same thing: equal, or one holds the other ("زرار التعليق" and "تصليح زرار التعليق"). Very
+     * short titles only count when equal, so "Plus" never swallows every Plus request.
+     */
+    private function sameThing(string $first, string $second): bool
+    {
+        [$a, $b] = [mb_strtolower(trim($first)), mb_strtolower(trim($second))];
+        if ($a === '' || $b === '') {
+            return false;
+        }
+
+        return $a === $b || (min(mb_strlen($a), mb_strlen($b)) >= self::SAME_THING_CHARS && (str_contains($a, $b) || str_contains($b, $a)));
+    }
+
+    /**
+     * The free first period also covers what was priced before the rule: an unpaid piece of new work within the
+     * idea becomes free and goes to the owner like any free change. One that only repeats another open item leaves.
+     */
+    public function freeInFirstPeriod(BuilderProject $project): int
+    {
+        if (! $project->changeIsFree(false, false)) {
+            return 0;
+        }
+
+        $changed = 0;
+        foreach ($project->requests()->where('status', BuilderRequest::UNPAID)->where('kind', BuilderRequest::BUILD)->get() as $request) {
+            if ($this->openWithTitle($project, (string) $request->title, $request->id) !== null) {
+                $request->delete();
+                $changed++;
+
+                continue;
+            }
+            $price = $this->pricer->freeFix((int) $request->estimated_tokens, (bool) $request->complex);
+            $request->update(['free' => true, 'amount' => 0, 'budget_usd' => $price['budget'], 'status' => BuilderRequest::READY]);
+            app(OwnerReview::class)->ask($project, $request->refresh());
+            $changed++;
+        }
+        $this->startNext($project);
+
+        return $changed;
+    }
+
+    /** Every project still in its free first period, each minute: what was priced before the rule becomes free. */
+    public function freeAllInFirstPeriod(): int
+    {
+        return BuilderProject::whereHas('requests', fn ($unpaid) => $unpaid->where('status', BuilderRequest::UNPAID)->where('kind', BuilderRequest::BUILD))
+            ->get()->sum(fn (BuilderProject $project) => $this->freeInFirstPeriod($project));
     }
 
     /**

@@ -101,4 +101,34 @@ class FreeChangesTest extends TestCase
         $this->assertSoftDeleted($old);
         $this->assertSame(['تصليح زرار التعليق على آخر الأخبار'], $project->requests()->pluck('title')->all());
     }
+
+    public function test_new_work_priced_before_the_rule_becomes_free_and_a_repeat_of_another_item_leaves(): void
+    {
+        $project = $this->project();
+        $common = ['estimated_tokens' => 40000, 'amount' => 17, 'budget_usd' => 11, 'model' => 'claude-sonnet-5-5', 'status' => 'unpaid', 'kind' => 'build'];
+        $plus = $project->requests()->create($common + ['title' => 'قسم إدارة البلس في لوحة التحكم', 'spec' => 'Plus section.']);
+        $repeat = $project->requests()->create($common + ['title' => 'زرار التعليق على آخر الأخبار', 'spec' => 'Comments.']);
+        $project->requests()->create(['title' => 'تصليح زرار التعليق على آخر الأخبار', 'spec' => 'Comments fix.', 'kind' => 'fix', 'free' => true, 'status' => 'ready', 'amount' => 0, 'model' => 'claude-sonnet-5-5']);
+        $other = $project->requests()->create(['title' => 'تطبيق متجر منفصل', 'spec' => 'A shop.', 'kind' => 'new_project'] + $common);
+
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->freeAllInFirstPeriod();
+
+        $this->assertTrue($plus->refresh()->free);
+        $this->assertSame('0.00', $plus->amount);
+        $this->assertSoftDeleted($repeat);
+        $this->assertFalse($other->refresh()->free);
+    }
+
+    public function test_a_customers_picture_has_a_preview_under_the_message(): void
+    {
+        $project = $this->project();
+        $this->answers[] = ChatTurn::fromArray(['reply' => 'تمام', 'quote' => []]);
+        $png = \Illuminate\Http\UploadedFile::fake()->createWithContent('plus.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+
+        $state = $this->post('/ai/'.$project->uuid.'/messages', ['text' => 'زي دي', 'files' => [$png]], ['Accept' => 'application/json'])->assertOk()->json();
+
+        $file = collect($state['messages'])->firstWhere('role', 'user')['files'][0];
+        $this->assertSame('plus.png', $file['name']);
+        $this->get($file['url'])->assertOk()->assertHeader('Content-Type', 'image/png');
+    }
 }

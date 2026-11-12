@@ -131,7 +131,12 @@ class ProjectStateResource extends JsonResource
         ];
     }
 
-    /** A customer's own files are shown by name; pictures the build or a shared link made are shown as pictures. */
+    /**
+     * A customer's own files under their message: a picture with its preview, any other file by name. Pictures a
+     * shared link made are for Claude, not shown again.
+     *
+     * @return list<array{name: string, url: string|null}>
+     */
     private function fileNames(BuilderMessage $message): array
     {
         if ($message->role === BuilderMessage::PROGRESS) {
@@ -140,7 +145,10 @@ class ProjectStateResource extends JsonResource
         $looks = collect($message->payload['looks'] ?? []);
         $madeHere = $looks->pluck('full_id')->merge($looks->pluck('piece_ids')->flatten())->filter();
 
-        return $message->attachments->reject(fn ($file) => $madeHere->contains($file->id))->pluck('original_name')->values()->all();
+        return $message->attachments->reject(fn ($file) => $madeHere->contains($file->id))->map(fn ($file) => [
+            'name' => $file->original_name,
+            'url' => $file->isImage() ? route('builder.file', [$this->resource, $file->id]) : null,
+        ])->values()->all();
     }
 
     /**

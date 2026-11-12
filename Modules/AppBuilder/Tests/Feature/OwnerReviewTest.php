@@ -162,7 +162,9 @@ class OwnerReviewTest extends TestCase
         \Illuminate\Support\Facades\Http::assertSent(fn ($request) => str_contains($request->url(), '/bottest-token/sendMessage')
             && $request['chat_id'] === '12345'
             && str_contains($request['text'], 'قسم للبلس في الداشبورد')
-            && str_ends_with($request['reply_markup']['inline_keyboard'][0][0]['url'], '#request-'.$item->id));
+            // the approval card: its buttons, and the link to the request's page
+            && collect($request['reply_markup']['inline_keyboard'])->flatten(1)->pluck('callback_data')->contains('ap:r:'.$item->id)
+            && collect($request['reply_markup']['inline_keyboard'])->flatten(1)->pluck('url')->filter()->contains(fn ($url) => str_ends_with($url, '#request-'.$item->id)));
     }
 
     public function test_the_chat_knows_a_paid_request_is_paid_and_only_the_owner_sees_the_review_link(): void

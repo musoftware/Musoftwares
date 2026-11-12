@@ -64,6 +64,11 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectImports::class)-
     ->withoutOverlapping(4);
 
 // the AI builder: requests that became ready while the engineer was busy (or a release ran) start once it is free
+// the free first period also frees what was priced before it (unpaid new work within the project's idea)
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)->freeAllInFirstPeriod())
+    ->name('builder-free-first-period')
+    ->everyMinute()
+    ->withoutOverlapping(2);
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)->startAllWaiting())
     ->name('builder-start-requests')
     ->everyMinute()

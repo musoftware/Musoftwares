@@ -89,6 +89,12 @@
         .bar .pct{display:block;margin-top:6px;font-size:14px;font-weight:600}
         @media (prefers-reduced-motion:reduce){.bar .fill{transition:none}}
         .msg .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:14px;color:var(--muted)}
+        .msg .thumb{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);cursor:zoom-in;min-width:44px;min-height:44px}
+        .msg .thumb img{display:block;width:120px;height:120px;object-fit:cover}
+        dialog.preview{max-width:min(96vw,900px);max-height:94vh;padding:12px;border:0;border-radius:16px;background:#fff;display:flex;flex-direction:column;gap:10px;align-items:center}
+        dialog.preview:not([open]){display:none}
+        dialog.preview::backdrop{background:rgba(0,0,0,.7)}
+        dialog.preview img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:10px}
         :focus-visible{outline:2px solid #2563eb;outline-offset:2px}
         [hidden]{display:none!important}
         .leave{max-width:min(420px,calc(100vw - 32px));border:1px solid var(--line);border-radius:16px;padding:24px;color:var(--ink)}
@@ -376,6 +382,27 @@
         return null;
     }
 
+    /** A picture the customer sent, small under the message; a tap opens it full size. */
+    function thumbnail(file) {
+        const button = el('button', {type: 'button', class: 'thumb', 'aria-label': T.preview_open + ': ' + file.name});
+        button.append(el('img', {src: file.url, alt: '', loading: 'lazy'}));
+        button.addEventListener('click', () => openPreview(file));
+        return button;
+    }
+
+    function openPreview(file) {
+        const dialog = el('dialog', {class: 'preview', 'aria-label': file.name});
+        const close = el('button', {type: 'button', class: 'btn ghost'}, T.preview_close);
+        close.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('close', () => dialog.remove());
+        // a tap outside the picture closes it, like a phone's gallery
+        dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+        dialog.append(el('img', {src: file.url, alt: file.name}), close);
+        document.body.append(dialog);
+        dialog.showModal();
+        close.focus();
+    }
+
     function messageNode(message) {
         const node = el('div', {class: 'msg ' + message.role, dir: 'auto'});
         if (message.role === 'team') node.append(el('span', {class: 'who'}, T.team_label));
@@ -388,7 +415,7 @@
         }
         if (message.files && message.files.length) {
             const files = el('div', {class: 'files'});
-            message.files.forEach((name) => files.append(el('span', {dir: 'auto'}, name)));
+            message.files.forEach((file) => files.append(file.url ? thumbnail(file) : el('span', {dir: 'auto'}, file.name)));
             node.append(files);
         }
         const actions = el('div', {class: 'actions'});

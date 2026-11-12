@@ -271,7 +271,7 @@ class ProjectPayment
         $this->queueWithoutAsking($project, $extra);
         // a new project waits for the owner, who reads the brief from the alert and approves it
         if ($project->refresh()->waitsForOwner()) {
-            $this->tellOwner($project, 'New project to approve: '.$project->title.' ('.$project->amount.' '.$project->currency.')', route('admin.builder.show', $project).'#approve');
+            $this->tellOwner($project, 'New project to approve: '.$project->title.' ('.$project->amount.' '.$project->currency.')', route('admin.builder.show', $project).'#approve', app(OwnerApprovals::class)->projectCard($project));
         }
     }
 
@@ -297,9 +297,9 @@ class ProjectPayment
      * The owner hears by mail and by a push to their phone, which opens the page to act on ($url, the project's admin
      * page by default). A mail or push problem must never undo a payment or a delivery.
      */
-    public function tellOwner(BuilderProject $project, string $line, ?string $url = null): void
+    public function tellOwner(BuilderProject $project, string $line, ?string $url = null, ?array $card = null): void
     {
-        app(OwnerAlerts::class)->send($project, $line, $url);
+        app(OwnerAlerts::class)->send($project, $line, $url, $card);
         try {
             Mail::raw($line."\n".route('builder.show', $project), fn ($mail) => $mail->to(AdminRecipients::emails())->subject('App builder: '.$line));
         } catch (\Throwable $e) {

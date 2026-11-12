@@ -17,6 +17,8 @@ return [
     'admin_mark_paid_confirm' => 'Mark this price as paid and start the build? No money is taken.',
     'guest' => 'Guest',
     'sign_in' => 'Sign in',
+    'preview_open' => 'Show the picture',
+    'preview_close' => 'Close',
     'sign_in_google' => 'Sign in with Google',
     // prices on the chat page in the customer's own money
     'currency_names' => ['EGP' => 'EGP', 'SAR' => 'SAR', 'AED' => 'AED', 'MAD' => 'MAD', 'IQD' => 'IQD', 'EUR' => 'EUR', 'GBP' => 'GBP', 'USD' => 'USD'],
@@ -47,6 +49,7 @@ return [
         'how' => 'Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty, and the engineer reviews it and starts it; development (something new) gets its price here, and you pay when you like.',
         'fix' => 'Fix',
         'build' => 'Development',
+        'new_project' => 'Separate project',
         'warranty' => 'Warranty until :date: every fix is free.',
         'warranty_over' => 'The warranty ended on :date; fixes are priced now.',
         'empty' => 'No requests yet. Any change you write in the chat shows here.',

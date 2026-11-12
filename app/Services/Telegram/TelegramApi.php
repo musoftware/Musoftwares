@@ -34,12 +34,16 @@ class TelegramApi
     /**
      * @param  list<array{0: string, 1: string}>  $links  buttons that open a page: [label, url]
      * @param  list<string>  $menu  the buttons kept under the typing box
+     * @param  list<array{0: string, 1: string}>  $actions  buttons the bot answers itself: [label, callback data], two a row
      */
-    public function send(string $chatId, string $text, array $links = [], array $menu = []): bool
+    public function send(string $chatId, string $text, array $links = [], array $menu = [], array $actions = []): bool
     {
         $payload = ['chat_id' => $chatId, 'text' => mb_substr($text, 0, self::MAX_TEXT), 'disable_web_page_preview' => true];
-        if ($links !== []) {
-            $payload['reply_markup'] = ['inline_keyboard' => array_map(fn (array $link) => [['text' => $link[0], 'url' => $link[1]]], $links)];
+        if ($links !== [] || $actions !== []) {
+            $payload['reply_markup'] = ['inline_keyboard' => [
+                ...array_map(fn (array $row) => array_map(fn (array $action) => ['text' => $action[0], 'callback_data' => $action[1]], $row), array_chunk($actions, 2)),
+                ...array_map(fn (array $link) => [['text' => $link[0], 'url' => $link[1]]], $links),
+            ]];
         } elseif ($menu !== []) {
             $payload['reply_markup'] = ['keyboard' => array_map(fn (array $row) => array_map(fn (string $label) => ['text' => $label], $row), array_chunk($menu, 2)), 'resize_keyboard' => true];
         }
@@ -47,10 +51,16 @@ class TelegramApi
         return $this->call('sendMessage', $payload) !== null;
     }
 
+    /** Closes the spinner on a pressed button, with a short line on top of the chat. */
+    public function answerButton(string $callbackId, string $text): void
+    {
+        $this->call('answerCallbackQuery', ['callback_query_id' => $callbackId, 'text' => mb_substr($text, 0, 190)]);
+    }
+
     /** Telegram sends every message to the site at once, signed with this secret. */
     public function setWebhook(string $url): bool
     {
-        return $this->call('setWebhook', ['url' => $url, 'secret_token' => $this->webhookSecret(), 'allowed_updates' => ['message'], 'drop_pending_updates' => true]) !== null;
+        return $this->call('setWebhook', ['url' => $url, 'secret_token' => $this->webhookSecret(), 'allowed_updates' => ['message', 'callback_query'], 'drop_pending_updates' => true]) !== null;
     }
 
     /** Derived from the app key, so there is no second secret to keep. */

@@ -24,7 +24,7 @@ class OwnerReview
 
         $kind = $request->kind === BuilderRequest::FIX ? 'Fix' : 'New work';
         $price = $request->free ? 'free' : number_format((float) $request->amount, 2).' '.$project->currency;
-        $this->payment->tellOwner($project, "{$kind} to approve ({$price}): {$request->title}", $this->url($project, $request));
+        $this->payment->tellOwner($project, "{$kind} to approve ({$price}): {$request->title}", $this->url($project, $request), app(OwnerApprovals::class)->requestCard($request));
     }
 
     /** The page the owner's push opens, scrolled to this request. */
@@ -49,6 +49,14 @@ class OwnerReview
     public function approveProject(BuilderProject $project, ?string $spec): void
     {
         $project->update(array_filter(['owner_approved_at' => now(), 'spec' => $spec !== null && trim($spec) !== '' ? trim($spec) : null]));
+    }
+
+    /** Approved as free work (the owner chose not to charge for it): it starts like a free fix. */
+    public function approveFree(BuilderProject $project, BuilderRequest $request): void
+    {
+        $price = $this->pricer->freeFix((int) $request->estimated_tokens, (bool) $request->complex);
+        $request->update(['free' => true, 'amount' => 0, 'budget_usd' => $price['budget'], 'status' => BuilderRequest::READY, 'approved_at' => now()]);
+        app(ProjectRequests::class)->startNext($project);
     }
 
     /** Saves the owner's corrections without approving yet. */

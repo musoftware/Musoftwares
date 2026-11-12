@@ -9,6 +9,7 @@ use App\Services\AiAssistant\AssistantLimiter;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderProject;
+use Modules\AppBuilder\Services\OwnerApprovals;
 use Throwable;
 
 /**
@@ -32,13 +33,18 @@ class SiteBot
     /** @param  array<string, mixed>  $update  one update from Telegram's webhook */
     public function handle(array $update): void
     {
+        if (isset($update['callback_query'])) {
+            $this->pressed($update['callback_query']);
+
+            return;
+        }
         $message = $update['message'] ?? [];
         $chatId = (string) ($message['chat']['id'] ?? '');
         $text = trim((string) ($message['text'] ?? ''));
         if ($chatId === '' || ($message['chat']['type'] ?? '') !== 'private' || $text === '') {
             return;
         }
-        // before an account is known, the language Telegram reports for the person; Arabic first
+        // the language of the person's Telegram (their phone), Arabic first
         app()->setLocale(str_starts_with((string) ($message['from']['language_code'] ?? 'ar'), 'en') ? 'en' : 'ar');
 
         if (str_starts_with($text, '/start')) {
@@ -56,6 +62,16 @@ class SiteBot
         $this->answer($user, $chatId, $text);
     }
 
+    /** A button on a card (only admins get cards with buttons): approve, turn down, price, free. */
+    private function pressed(array $button): void
+    {
+        $chatId = (string) ($button['message']['chat']['id'] ?? '');
+        $admin = $chatId !== '' ? $this->links->userFor($chatId) : null;
+        $reply = $admin?->isAdmin() ? app(OwnerApprovals::class)->act($chatId, (string) ($button['data'] ?? '')) : __('telegram.not_linked', ['url' => route('client.settings')]);
+        $this->api->answerButton((string) ($button['id'] ?? ''), $reply);
+        $this->api->send($chatId, $reply);
+    }
+
     private function start(string $chatId, string $code): void
     {
         $user = $code !== '' ? $this->links->link($code, $chatId) : $this->links->userFor($chatId);
@@ -65,17 +81,20 @@ class SiteBot
             return;
         }
 
-        $this->speak($user);
-        $this->api->send($chatId, __('telegram.welcome', ['name' => $user->name]), menu: $this->menu());
+        $this->api->send($chatId, __('telegram.welcome', ['name' => $user->name]), menu: $this->menu($user));
     }
 
     private function answer(User $user, string $chatId, string $text): void
     {
-        $this->speak($user);
+        // a price the owner was asked for on an approval card
+        if ($user->isAdmin() && app(OwnerApprovals::class)->priceTyped($chatId, $text)) {
+            return;
+        }
         match ($text) {
+            __('telegram.btn_approvals') => $user->isAdmin() ? app(OwnerApprovals::class)->sendWaiting($chatId) : $this->ask($user, $chatId, $text),
             __('telegram.btn_invoices') => $this->invoices($user, $chatId),
             __('telegram.btn_projects') => $this->projects($user, $chatId),
-            __('telegram.btn_support') => $this->api->send($chatId, __('telegram.support_prompt'), menu: $this->menu()),
+            __('telegram.btn_support') => $this->api->send($chatId, __('telegram.support_prompt'), menu: $this->menu($user)),
             default => $this->ask($user, $chatId, $text),
         };
     }
@@ -84,7 +103,7 @@ class SiteBot
     {
         $invoices = Invoice::where('user_id', $user->id)->latest('id')->limit(self::SHOWN)->get();
         if ($invoices->isEmpty()) {
-            $this->api->send($chatId, __('telegram.invoices_none'), menu: $this->menu());
+            $this->api->send($chatId, __('telegram.invoices_none'), menu: $this->menu($user));
 
             return;
         }
@@ -103,7 +122,7 @@ class SiteBot
     {
         $projects = BuilderProject::where('user_id', $user->id)->latest('id')->limit(self::SHOWN)->get();
         if ($projects->isEmpty()) {
-            $this->api->send($chatId, __('telegram.projects_none', ['url' => url('/ai')]), menu: $this->menu());
+            $this->api->send($chatId, __('telegram.projects_none', ['url' => url('/ai')]), menu: $this->menu($user));
 
             return;
         }
@@ -120,7 +139,7 @@ class SiteBot
     private function ask(User $user, string $chatId, string $text): void
     {
         if (! $this->limiter->allow(['user:'.$user->id], 'telegram:'.$chatId)) {
-            $this->api->send($chatId, AssistantChat::limitMessage(), menu: $this->menu());
+            $this->api->send($chatId, AssistantChat::limitMessage(), menu: $this->menu($user));
 
             return;
         }
@@ -131,18 +150,12 @@ class SiteBot
             Log::error('Telegram assistant reply failed', ['user_id' => $user->id, 'error' => $error->getMessage()]);
             $reply = AssistantChat::fallbackMessage();
         }
-        $this->api->send($chatId, $reply, menu: $this->menu());
+        $this->api->send($chatId, $reply, menu: $this->menu($user));
     }
 
-    /** The account's own language from here on. */
-    private function speak(User $user): void
+    /** @return list<string> an admin also gets the approvals */
+    private function menu(?User $user = null): array
     {
-        app()->setLocale($user->lang === 'en' ? 'en' : 'ar');
-    }
-
-    /** @return list<string> */
-    private function menu(): array
-    {
-        return [__('telegram.btn_invoices'), __('telegram.btn_projects'), __('telegram.btn_support')];
+        return [...($user?->isAdmin() ? [__('telegram.btn_approvals')] : []), __('telegram.btn_invoices'), __('telegram.btn_projects'), __('telegram.btn_support')];
     }
 }

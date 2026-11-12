@@ -1245,7 +1245,7 @@ class AppBuilderTest extends TestCase
         $this->answer('فهمت: سعر البيع = التكلفة × 1.3 والإجمالي مجموع الفواتير.');
         $this->post('/api/builder/worker/looks/'.$item['message_id'], ['index' => $item['index'], 'text' => "Sheet فواتير\nD2 = =B2*C2 -> 150\nD10 = =SUM(D2:D9) -> 900"], $this->worker())->assertOk();
 
-        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null)->assertJsonPath('messages.0.files.0', 'حسابات.xlsx');
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('looking', null)->assertJsonPath('messages.0.files.0.name', 'حسابات.xlsx');
         $sent = app(ChatModel::class)->seen[0][0]['content'];
         // the spreadsheet itself is not sent to Claude, only what the worker read from it
         $this->assertIsString($sent);
@@ -1383,7 +1383,10 @@ class AppBuilderTest extends TestCase
 
         $response = $this->post('/ai/messages', ['text' => 'ده اللوجو والمنيو', 'files' => [$this->png(), $this->pdf()]], ['Accept' => 'application/json'])->assertOk();
 
-        $response->assertJsonPath('messages.0.files', ['logo.png', 'menu.pdf']);
+        $this->assertSame(['logo.png', 'menu.pdf'], array_column($response->json('messages.0.files'), 'name'));
+        // the picture has a preview, the PDF is shown by name
+        $this->assertNotNull($response->json('messages.0.files.0.url'));
+        $this->assertNull($response->json('messages.0.files.1.url'));
         $sent = $this->model()->seen[0][0]['content'];
         $this->assertSame(['image', 'document', 'text'], array_column($sent, 'type'));
         $this->assertSame('image/png', $sent[0]['source']['mediaType']);

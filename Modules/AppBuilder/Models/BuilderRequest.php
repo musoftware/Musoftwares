@@ -27,6 +27,9 @@ class BuilderRequest extends Model
 
     public const BUILD = 'build';
 
+    /** Really another program, outside the project's main idea: priced even in the free first period. */
+    public const NEW_PROJECT = 'new_project';
+
     protected $guarded = ['id'];
 
     protected $casts = [

@@ -16,17 +16,21 @@ use Throwable;
  */
 class OwnerAlerts
 {
-    /** @return int how many channels took the alert (Telegram counts as one, plus one per admin pushed to) */
-    public function send(BuilderProject $project, string $line, ?string $url = null): int
+    /**
+     * @param  array{text: string, actions: list<array>, links: list<array>}|null  $card  an approval card: Telegram gets it with its buttons
+     * @return int how many channels took the alert (Telegram counts as one, plus one per admin pushed to)
+     */
+    public function send(BuilderProject $project, string $line, ?string $url = null, ?array $card = null): int
     {
         $title = mb_substr((string) ($project->title ?: 'AI builder'), 0, 120);
         $url ??= route('admin.builder.show', $project);
+        $card ??= ['text' => $title."\n\n".mb_substr($line, 0, 900), 'actions' => [], 'links' => [['افتح', $url]]];
 
-        return (int) $this->telegram($title, mb_substr($line, 0, 900), $url) + $this->push($project, $title, mb_substr($line, 0, 400), $url);
+        return (int) $this->telegram($card) + $this->push($project, $title, mb_substr($line, 0, 400), $url);
     }
 
-    /** Every admin who linked Telegram from their settings gets it there, with a button to the page. */
-    private function telegram(string $title, string $line, string $url): bool
+    /** Every admin who linked Telegram from their settings gets it there, with its buttons. */
+    private function telegram(array $card): bool
     {
         $telegram = app(\App\Services\Telegram\TelegramApi::class);
         if (! $telegram->configured()) {
@@ -34,7 +38,7 @@ class OwnerAlerts
         }
 
         return $this->admins()->pluck('telegram_chat_id')->filter()->unique()
-            ->map(fn (string $chatId) => $telegram->send($chatId, $title."\n\n".$line, [['افتح', $url]]))
+            ->map(fn (string $chatId) => $telegram->send($chatId, $card['text'], $card['links'], actions: $card['actions']))
             ->contains(true);
     }
 

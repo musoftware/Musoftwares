@@ -4,6 +4,7 @@
 return [
     'welcome' => 'Hello :name, your Musoftware account is linked here. Use the buttons below to see your invoices and projects, or write any question and the AI assistant answers.',
     'not_linked' => 'Welcome to Musoftware. To see your invoices and projects here, link your account from the settings page: :url',
+    'btn_approvals' => 'Approvals',
     'btn_invoices' => 'My invoices',
     'btn_projects' => 'My projects',
     'btn_support' => 'Ask the assistant',
