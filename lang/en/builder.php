@@ -17,6 +17,7 @@ return [
     'admin_mark_paid_confirm' => 'Mark this price as paid and start the build? No money is taken.',
     'guest' => 'Guest',
     'sign_in' => 'Sign in',
+    'sign_in_google' => 'Sign in with Google',
     'new_chat' => 'New chat',
     'requests' => [
         'title' => 'Your requests',

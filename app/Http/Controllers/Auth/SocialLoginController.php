@@ -17,12 +17,14 @@ use Illuminate\Support\Str;
 class SocialLoginController extends Controller
 {
     /**
-     * Redirect the user to the Google authentication page.
+     * Redirect the user to the Google authentication page. A page that sent them here with ?redirect=/its/path gets
+     * them back after Google, in one step.
      *
      * @return Response
      */
-    public function redirect()
+    public function redirect(Request $request)
     {
+        \App\Support\ReturnAfterSignIn::remember($request);
         $clientId = config('services.google.client_id');
         $redirectUri = route('social.google.callback');
 

@@ -17,6 +17,7 @@ return [
     'admin_mark_paid_confirm' => 'نعتبر السعر ده مدفوع ونبدأ التنفيذ؟ مفيش فلوس هتتسحب.',
     'guest' => 'زائر',
     'sign_in' => 'سجّل دخول',
+    'sign_in_google' => 'دخول بجوجل',
     'new_chat' => 'محادثة جديدة',
     'requests' => [
         'title' => 'طلباتك',
