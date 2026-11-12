@@ -145,6 +145,9 @@ return [
 
     // The warranty: for this many days after the first delivery (or the import) every fix to what the program has or
     // promises is free, however many. Something new is always paid, and after the warranty a fix is paid too.
+    // the owner reads and approves every request (from a phone notification) before the engineer starts it
+    'owner_approval' => (bool) env('BUILDER_OWNER_APPROVAL', true),
+
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
 
     // A customer's own project, brought as a Google Drive link: a fixed fee to inspect it in a locked box (no internet,

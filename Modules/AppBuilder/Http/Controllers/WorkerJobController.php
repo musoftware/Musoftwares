@@ -76,6 +76,8 @@ class WorkerJobController extends Controller
             // a change is released inside its own build only in "after every change" mode
             'release_now' => $project->isOwnerImport() && $project->release_mode === BuilderProject::RELEASE_EACH,
             'deploy' => $project->isOwnerImport() && $project->deploy_enabled,
+            // the commits of the change the owner rolls back
+            'rollback' => $project->job_kind === BuilderProject::JOB_ROLLBACK ? app(\Modules\AppBuilder\Services\OwnerRollback::class)->forWorker($project) : null,
         ];
     }
 
@@ -99,7 +101,7 @@ class WorkerJobController extends Controller
     public function released(WorkerReportRequest $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectImports $imports): JsonResponse
     {
         $this->assertBuilding($project);
-        abort_unless($project->job_kind === BuilderProject::JOB_RELEASE, 409, 'This job is not a release.');
+        abort_unless(in_array($project->job_kind, [BuilderProject::JOB_RELEASE, BuilderProject::JOB_ROLLBACK], true), 409, 'This job is not a release.');
         $imports->released($project, $request->validated('pull_request_url'), (bool) $request->validated('deployed'), (string) $request->validated('note'), $request->file('apk'));
 
         return response()->json(['status' => 'released']);
@@ -204,7 +206,7 @@ class WorkerJobController extends Controller
             $imports->failed($project, (string) $request->validated('release_error'));
         }
         // the requests this build carried are done; the ones that became ready meanwhile start now
-        app(\Modules\AppBuilder\Services\ProjectRequests::class)->finish($project->refresh());
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->finish($project->refresh(), $request->validated('git_from'), $request->validated('git_to'));
 
         return response()->json(['status' => 'delivered', 'version' => $project->refresh()->version]);
     }

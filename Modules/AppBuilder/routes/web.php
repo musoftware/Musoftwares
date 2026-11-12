@@ -68,6 +68,12 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
 Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')->name('admin.builder.')->whereUuid('project')->group(function () {
     Route::get('/', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'index'])->name('index');
     Route::post('/import', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'store'])->name('import');
+    Route::post('/push-test', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'testPush'])->middleware('throttle:5,1')->name('push-test');
+    // the owner approves each request before the engineer starts it
+    Route::post('/{project}/requests/{item}/save', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'save'])->whereNumber('item')->name('requests.save');
+    Route::post('/{project}/requests/{item}/approve', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'approve'])->whereNumber('item')->name('requests.approve');
+    Route::post('/{project}/requests/{item}/reject', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'reject'])->whereNumber('item')->name('requests.reject');
+    Route::post('/{project}/requests/{item}/rollback', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'rollback'])->whereNumber('item')->name('requests.rollback');
     Route::post('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'release'])->name('release');
     Route::get('/{project}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'show'])->name('show');
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');

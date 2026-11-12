@@ -161,6 +161,7 @@ class ProjectImports
     /** A release ended: the pull request and the deploy are recorded and the customer hears it is live. */
     public function released(BuilderProject $project, ?string $pullRequestUrl, bool $deployed, string $note, ?\Illuminate\Http\UploadedFile $apk = null): void
     {
+        $rollback = $project->job_kind === BuilderProject::JOB_ROLLBACK;
         if ($apk !== null) {
             app(DeliveryStore::class)->keepApk($project, $apk->getRealPath());
         }
@@ -175,6 +176,9 @@ class ProjectImports
             'progress_step' => null,
             'attempts' => 0,
         ]);
+        if ($rollback) {
+            app(OwnerRollback::class)->rolledBack($project);
+        }
         if ($deployed || $apk !== null) {
             // the app's download button shows under this message, as under a delivery
             $project->messages()->create([
@@ -198,6 +202,9 @@ class ProjectImports
             return;
         }
         $import = $project->job_kind === BuilderProject::JOB_IMPORT;
+        if ($project->job_kind === BuilderProject::JOB_ROLLBACK) {
+            app(OwnerRollback::class)->failed($project);
+        }
         $project->update([
             'status' => $import ? BuilderProject::FAILED : BuilderProject::READY,
             'job_kind' => $import ? BuilderProject::JOB_IMPORT : BuilderProject::JOB_BUILD,
@@ -205,6 +212,6 @@ class ProjectImports
             'lease_expires_at' => null,
             'progress_step' => null,
         ]);
-        $this->payment->tellOwner($project, ($import ? 'Import failed: ' : 'Release failed: ').$project->title.' '.Str::limit($error, 500));
+        $this->payment->tellOwner($project, ($import ? 'Import failed: ' : 'Release or rollback failed: ').$project->title.' '.Str::limit($error, 500));
     }
 }

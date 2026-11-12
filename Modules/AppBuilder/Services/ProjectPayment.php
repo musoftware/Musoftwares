@@ -284,9 +284,13 @@ class ProjectPayment
         ]);
     }
 
-    /** A mail problem must never undo a payment or a delivery. */
-    public function tellOwner(BuilderProject $project, string $line): void
+    /**
+     * The owner hears by mail and by a push to their phone, which opens the page to act on ($url, the project's admin
+     * page by default). A mail or push problem must never undo a payment or a delivery.
+     */
+    public function tellOwner(BuilderProject $project, string $line, ?string $url = null): void
     {
+        app(OwnerAlerts::class)->send($project, $line, $url);
         try {
             Mail::raw($line."\n".route('builder.show', $project), fn ($mail) => $mail->to(AdminRecipients::emails())->subject('App builder: '.$line));
         } catch (\Throwable $e) {

@@ -50,7 +50,14 @@ class ProjectRequests
         ]);
         if ($free) {
             $project->increment('free_fixes_used');
+        }
+        // the owner reads it first; without that rule a free change only tells the owner and starts
+        if (! $request->isApproved()) {
+            app(OwnerReview::class)->ask($project, $request);
+        } elseif ($free) {
             $this->payment->tellOwner($project, 'Free change added: '.$request->title);
+        }
+        if ($free) {
             $this->startNext($project);
         }
 
@@ -107,7 +114,13 @@ class ProjectRequests
             return 0;
         }
 
-        $this->payment->tellOwner($project, 'Paid requests: '.$project->title.' ('.$paid->pluck('title')->implode(', ').')');
+        // a paid request the owner has not approved yet waits for them; the push opens it
+        $waiting = $paid->first(fn (BuilderRequest $request) => ! $request->isApproved());
+        $this->payment->tellOwner(
+            $project,
+            'Paid requests: '.$project->title.' ('.$paid->pluck('title')->implode(', ').')'.($waiting ? ', waiting for your approval' : ''),
+            $waiting ? app(OwnerReview::class)->url($project, $waiting) : null,
+        );
         app(ProjectAccount::class)->linkAfterFee($project);
         app(PaymentInvoices::class)->requestsPaid($project->refresh(), $paid);
         $this->startNext($project->refresh());
@@ -129,7 +142,7 @@ class ProjectRequests
         if ($project->release_asked_at !== null && app(ProjectImports::class)->queueRelease($project)) {
             return true;
         }
-        $ready = $project->requests()->where('status', BuilderRequest::READY)->get();
+        $ready = $this->approvedReady($project->requests())->get();
         if ($ready->isEmpty()) {
             return false;
         }
@@ -179,16 +192,25 @@ class ProjectRequests
     {
         return BuilderProject::query()
             ->where('status', BuilderProject::READY)
-            ->where(fn ($query) => $query->whereNotNull('release_asked_at')->orWhereHas('requests', fn ($requests) => $requests->where('status', BuilderRequest::READY)))
+            ->where(fn ($query) => $query->whereNotNull('release_asked_at')->orWhereHas('requests', fn ($requests) => $this->approvedReady($requests)))
             ->get()
             ->filter(fn (BuilderProject $project) => $this->startNext($project))
             ->count();
     }
 
-    /** The build that carried these requests was delivered: they are done, in this version. */
-    public function finish(BuilderProject $project): void
+    /** Paid or free, and approved by the owner when the site asks the owner first. */
+    private function approvedReady($query)
     {
-        $project->requests()->where('status', BuilderRequest::BUILDING)->update(['status' => BuilderRequest::DONE, 'built_in_version' => $project->version]);
+        return $query->where('status', BuilderRequest::READY)->when(config('builder.owner_approval'), fn ($approved) => $approved->whereNotNull('approved_at'));
+    }
+
+    /**
+     * The build that carried these requests was delivered: they are done, in this version. The commits it made in the
+     * project's git (from the one before it to its last) are kept, so the owner can roll the change back.
+     */
+    public function finish(BuilderProject $project, ?string $gitFrom = null, ?string $gitTo = null): void
+    {
+        $project->requests()->where('status', BuilderRequest::BUILDING)->update(['status' => BuilderRequest::DONE, 'built_in_version' => $project->version, 'git_from' => $gitFrom, 'git_to' => $gitTo]);
         $this->startNext($project);
     }
 

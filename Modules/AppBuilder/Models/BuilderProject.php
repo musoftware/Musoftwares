@@ -36,6 +36,9 @@ class BuilderProject extends Model
 
     public const JOB_RELEASE = 'release';
 
+    /** Undo one delivered change in the project's git (the owner's choice), then release like a release job. */
+    public const JOB_ROLLBACK = 'rollback';
+
     /** When an imported project's changes go to GitHub and the server: after each change, in batches, or by the owner. */
     public const RELEASE_EACH = 'each';
 

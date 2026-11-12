@@ -26,7 +26,8 @@ class ProjectRequestsTest extends TestCase
     {
         parent::setUp();
         Storage::fake('local');
-        config(['builder.worker_token' => self::TOKEN]);
+        // the request flow on its own; the owner's approval in front of it is OwnerReviewTest
+        config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => false]);
     }
 
     private function worker(): array

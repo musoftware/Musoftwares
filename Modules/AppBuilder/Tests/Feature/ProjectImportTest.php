@@ -20,7 +20,8 @@ class ProjectImportTest extends TestCase
     {
         parent::setUp();
         Storage::fake('local');
-        config(['builder.worker_token' => self::TOKEN]);
+        // the request flow on its own; the owner's approval in front of it is OwnerReviewTest
+        config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => false]);
     }
 
     private function worker(): array
@@ -70,6 +71,29 @@ class ProjectImportTest extends TestCase
         $project->update(['status' => BuilderProject::QUEUED, 'job_kind' => BuilderProject::JOB_BUILD, 'paid_at' => now()]);
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.kind', 'build');
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/complete', $release + ['summary' => 'تم التعديل.', 'cost_usd' => 1], $this->worker())->assertOk();
+    }
+
+    public function test_the_owner_rolls_a_delivered_change_back_and_the_worker_reverts_its_commits(): void
+    {
+        $project = $this->imported(BuilderProject::RELEASE_MANUAL);
+        $item = $project->requests()->create(['title' => 'قسم البلس', 'spec' => 'Plus section.', 'kind' => 'build', 'amount' => 17, 'status' => \Modules\AppBuilder\Models\BuilderRequest::BUILDING]);
+        $this->deliverChange($project, ['git_from' => 'aaaaaaa1', 'git_to' => 'bbbbbbb2']);
+        $this->assertSame(['aaaaaaa1', 'bbbbbbb2'], [$item->refresh()->git_from, $item->git_to]);
+
+        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/requests/'.$item->id.'/rollback')->assertRedirect();
+        auth()->logout();
+
+        $job = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job');
+        $this->assertSame('rollback', $job['kind']);
+        $this->assertSame(['from' => 'aaaaaaa1', 'to' => 'bbbbbbb2', 'title' => 'قسم البلس'], $job['rollback']);
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/released', ['deployed' => 1, 'note' => 'reverted and deployed'], $this->worker())->assertOk();
+
+        $this->assertNotNull($item->refresh()->rolled_back_at);
+        $this->assertSame(BuilderProject::READY, $project->refresh()->status);
+        $this->assertTrue($project->messages()->where('content', 'like', '%قسم البلس%')->where('role', 'team')->exists());
+        // the same change cannot be rolled back twice
+        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/requests/'.$item->id.'/rollback')->assertStatus(409);
     }
 
     public function test_the_worker_gets_the_import_with_its_release_rules_and_nothing_else_is_asked(): void

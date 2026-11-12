@@ -53,7 +53,15 @@ class QuotePricer
         $price = $this->price($estimatedTokens, $complex, 0, self::CHANGE);
         $amount = max((float) $pricing['change_minimum'], ceil($price['cost'] * $pricing['markup']));
 
-        return ['amount' => $amount, 'budget' => round($amount * $pricing['budget_factor'] / $pricing['markup'], 4)] + $price;
+        return ['amount' => $amount, 'budget' => $this->budgetFor($amount)] + $price;
+    }
+
+    /** What a build may spend for a change sold at this price (the owner may set the price by hand). */
+    public function budgetFor(float $amount): float
+    {
+        $pricing = config('builder.pricing');
+
+        return round($amount * $pricing['budget_factor'] / $pricing['markup'], 4);
     }
 
     /** A free fix gets the same model and spending cap as paid work; only the customer's price is zero. */

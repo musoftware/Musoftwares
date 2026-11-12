@@ -5,6 +5,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import { STATUS_LABELS, Person, Visitor, deviceOf } from './Index';
 import ReleasePanel, { ImportState } from '@/Components/Admin/Builder/ReleasePanel';
+import RequestReview, { ReviewItem } from '@/Components/Admin/Builder/RequestReview';
 
 interface Message {
     id: number;
@@ -262,7 +263,7 @@ function DesignLink({ project }: { project: Project }) {
 }
 
 /** One AI builder chat: the whole conversation, the brief, the costs, and the owner's ways to help. */
-export default function BuilderShow({ project, messages, secrets, chatUrl, import: imported }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string; import: ImportState | null }) {
+export default function BuilderShow({ project, messages, secrets, chatUrl, import: imported, requests }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string; import: ImportState | null; requests: ReviewItem[] }) {
     return (
         <AdminSidebarLayout>
             <Head title={project.title || t('AI builder chat', 'محادثة منشئ البرامج')} />
@@ -280,6 +281,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl, impor
                 </p>
                 <VisitorCard visitor={project.visitor} />
                 <Money project={project} />
+                <RequestReview uuid={project.uuid} items={requests} currency={project.currency} />
                 {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap wrap-anywhere" dir="ltr">{project.error}</p>}
 
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">

@@ -61,7 +61,32 @@ class AdminBuilderController extends Controller
             'secrets' => $this->secrets->listing($project),
             'chatUrl' => route('builder.show', $project),
             'import' => $this->importState($project),
+            'requests' => $this->requestsToReview($project),
         ]);
+    }
+
+    /** Every request with exactly what the engineer will read, newest first; the owner approves the open ones. */
+    private function requestsToReview(BuilderProject $project): array
+    {
+        return $project->requests()->latest('id')->limit(30)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
+            'id' => $item->id,
+            'title' => $item->title,
+            'kind' => $item->kind,
+            'status' => $item->status,
+            'free' => $item->free,
+            'amount' => (float) $item->amount,
+            'paid' => $item->paid_at !== null,
+            'model' => $item->model,
+            'spec' => $item->spec,
+            'customer_words' => $item->customer_words,
+            'approved' => $item->isApproved(),
+            // a delivered change of an imported project can be undone from here
+            'can_rollback' => $project->isOwnerImport() && $item->canRollBack(),
+            'rolling_back' => $item->rollback_asked_at !== null,
+            'rolled_back' => $item->rolled_back_at !== null,
+            'open' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true),
+            'at' => $item->created_at?->timezone('Africa/Cairo')->toDateTimeString(),
+        ])->values()->all();
     }
 
     /** An imported project's release rule, what waits to go out, and the last pull request. */

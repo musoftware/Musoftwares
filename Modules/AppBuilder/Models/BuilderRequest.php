@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * One change the customer asked for in a project that already started: free (a fix to what it has) or priced (new).
- * It waits for payment, waits for the engineer, is being built, or is done.
+ * It waits for payment, waits for the engineer, is being built, or is done. The owner approves it before it starts.
  */
 class BuilderRequest extends Model
 {
@@ -36,7 +36,28 @@ class BuilderRequest extends Model
         'referral_commission' => 'decimal:2',
         'budget_usd' => 'decimal:4',
         'paid_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'rollback_asked_at' => 'datetime',
+        'rolled_back_at' => 'datetime',
     ];
+
+    /** Delivered with its commits known, and not undone or being undone. */
+    public function canRollBack(): bool
+    {
+        return $this->status === self::DONE && $this->git_from && $this->git_to && $this->rolled_back_at === null && $this->rollback_asked_at === null;
+    }
+
+    /** The owner read what goes to the engineer and agreed (or the site does not ask the owner). */
+    public function isApproved(): bool
+    {
+        return $this->approved_at !== null || ! config('builder.owner_approval');
+    }
+
+    /** Paid or free, and only the owner's yes is missing. */
+    public function waitsForOwner(): bool
+    {
+        return $this->status === self::READY && ! $this->isApproved();
+    }
 
     public function project(): BelongsTo
     {

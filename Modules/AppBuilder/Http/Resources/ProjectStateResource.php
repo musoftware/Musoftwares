@@ -95,7 +95,8 @@ class ProjectStateResource extends JsonResource
                 'kind' => $item->kind,
                 'free' => $item->free,
                 'amount' => number_format((float) $item->amount, 2, '.', ''),
-                'status' => $item->status,
+                // paid or free, and the engineer reads it before starting
+                'status' => $item->waitsForOwner() ? 'reviewing' : $item->status,
                 // only what the engineer has not started can be taken back
                 'cancel_url' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true)
                     ? route('builder.requests.cancel', [$this->resource, $item->id]) : null,

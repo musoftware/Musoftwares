@@ -976,7 +976,7 @@
         clearTimeout(pollTimer);
         const studyWriting = state && state.study && state.study.status === 'writing';
         // a request in line or being built changes on its own; a paid one appears when the gateway reports it
-        const requestsMoving = state && state.requests && state.requests.items.some((item) => item.status === 'ready' || item.status === 'building');
+        const requestsMoving = state && state.requests && state.requests.items.some((item) => ['reviewing', 'ready', 'building'].includes(item.status));
         if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }

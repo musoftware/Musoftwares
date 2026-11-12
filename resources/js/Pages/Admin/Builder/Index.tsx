@@ -1,5 +1,6 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { toast } from 'sonner';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import ShopPager, { Paginated } from '@/Components/Admin/Shop/ShopPager';
@@ -91,6 +92,17 @@ function PriceLearning({ learning, defaultFactor }: { learning: Learned[]; defau
 }
 
 /** Every AI builder chat, newest first, with the ones waiting for an answer easy to find. */
+/** Sends a push to every admin's phone and browsers, to see that the builder's alerts really arrive. */
+function TestPush() {
+    const send = () => router.post('/admin/builder/push-test', {}, {
+        preserveScroll: true,
+        onSuccess: () => toast.success(t('Sent. It should reach your phone within a minute.', 'اتبعت. المفروض يوصل موبايلك خلال دقيقة.')),
+        onError: () => toast.error(t('Not sent.', 'متبعتش.')),
+    });
+
+    return <button type="button" onClick={send} className="rounded-lg border px-4 py-2 text-sm font-semibold">{t('Test notification', 'جرّب الإشعار')}</button>;
+}
+
 export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor }: { projects: Paginated<Project>; waitingOnly: boolean; learning: Learned[]; defaultFactor: number }) {
     return (
         <AdminSidebarLayout>
@@ -98,9 +110,12 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
             <div className="mx-auto max-w-5xl space-y-4 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <h1 className="text-2xl font-bold">{t('AI builder chats', 'محادثات منشئ البرامج')}</h1>
-                    <Link href={waitingOnly ? '/admin/builder' : '/admin/builder?waiting=1'} className="rounded-lg border px-4 py-2 text-sm font-semibold">
-                        {waitingOnly ? t('Show all', 'اعرض الكل') : t('Waiting for an answer', 'مستني رد')}
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                        <TestPush />
+                        <Link href={waitingOnly ? '/admin/builder' : '/admin/builder?waiting=1'} className="rounded-lg border px-4 py-2 text-sm font-semibold">
+                            {waitingOnly ? t('Show all', 'اعرض الكل') : t('Waiting for an answer', 'مستني رد')}
+                        </Link>
+                    </div>
                 </div>
 
                 <ImportProject />

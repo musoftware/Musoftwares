@@ -22,6 +22,9 @@ class WorkerReportRequest extends FormRequest
                 'ideas' => ['nullable', 'string', 'max:6000'],
                 // an imported project's MUSOFTWARE.md after the change: what the program has now
                 'study' => ['nullable', 'string', 'max:40000'],
+                // the commits this change made in the project's own git, so the owner can roll it back
+                'git_from' => ['nullable', 'string', 'regex:/^[0-9a-f]{7,64}$/'],
+                'git_to' => ['nullable', 'string', 'regex:/^[0-9a-f]{7,64}$/'],
             ],
             'builder.worker.imported' => [
                 'profile' => ['required', 'string', 'max:20000'],
