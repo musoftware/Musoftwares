@@ -105,6 +105,9 @@
 </head>
 <body>
 <div class="viewer">
+    @if ($state)
+        <a href="{{ route('builder.index') }}">{{ __('builder.new_chat') }}</a>
+    @endif
     @auth
         <span dir="auto">{{ auth()->user()->name }}</span>
     @else

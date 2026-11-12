@@ -17,6 +17,7 @@ return [
     'admin_mark_paid_confirm' => 'Mark this price as paid and start the build? No money is taken.',
     'guest' => 'Guest',
     'sign_in' => 'Sign in',
+    'new_chat' => 'New chat',
     'wallet_pay' => 'Pay from my balance (:balance)',
     'wallet_confirm' => 'Pay this price from your balance on the site and start the build now?',
     'wallet_short' => 'Your balance (:balance) does not cover this price yet.',

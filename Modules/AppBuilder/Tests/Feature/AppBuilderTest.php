@@ -801,7 +801,10 @@ class AppBuilderTest extends TestCase
 
         $state = $this->getJson('/ai/'.$uuid.'/state')->assertOk()->assertJsonPath('looking', null)->assertJsonPath('answering', false);
         $customer = $state->json('messages.0');
-        $this->assertCount(1, $customer['images']);
+        // the page's pictures are for Claude; the customer is not shown the page they sent
+        $this->assertSame([], $customer['images']);
+        // the "New chat" link the chat may point to is really on the page
+        $this->get('/ai/'.$uuid)->assertOk()->assertSee(__('builder.new_chat'));
         $this->assertSame([], $customer['files']);
         $this->assertSame('شوفت الموقع: حديقة بتعرض السور بشكل شجر، وفيها تقدم للطفل.', $state->json('messages.1.text'));
 

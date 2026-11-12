@@ -85,14 +85,20 @@ class ProjectStateResource extends JsonResource
         return $message->attachments->reject(fn ($file) => $madeHere->contains($file->id))->pluck('original_name')->values()->all();
     }
 
-    /** @return list<string> */
+    /**
+     * Only the build's own screenshots are shown as pictures. A shared link's page is photographed for Claude to
+     * read, not for the customer, who already knows the page they sent.
+     *
+     * @return list<string>
+     */
     private function images(BuilderMessage $message): array
     {
-        $shown = $message->role === BuilderMessage::PROGRESS
-            ? $message->attachments->filter->isImage()->pluck('id')
-            : collect($message->payload['looks'] ?? [])->pluck('full_id')->filter();
+        if ($message->role !== BuilderMessage::PROGRESS) {
+            return [];
+        }
 
-        return $shown->map(fn ($id) => route('builder.file', [$this->resource, $id]))->values()->all();
+        return $message->attachments->filter->isImage()->pluck('id')
+            ->map(fn ($id) => route('builder.file', [$this->resource, $id]))->values()->all();
     }
 
     private function quote(): array
