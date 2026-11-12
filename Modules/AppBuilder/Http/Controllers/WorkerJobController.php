@@ -165,7 +165,8 @@ class WorkerJobController extends Controller
         $this->assertBuilding($project);
         $data = $request->validate([
             'percent' => ['required', 'integer', 'min:0', 'max:100'],
-            'caption' => ['required', 'string', 'max:300'],
+            // the worker's own update from the ticked phases has no line of its own
+            'caption' => ['required_without:plan', 'nullable', 'string', 'max:300'],
             'image' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:'.(int) config('builder.limits.snapshot_kb')],
             'plan' => ['nullable', 'string', 'max:20000'],
         ]);
@@ -174,7 +175,7 @@ class WorkerJobController extends Controller
             rescue(fn () => app(\Modules\AppBuilder\Services\BuildPhases::class)->update($project, (string) $data['plan']), report: true);
         }
 
-        return $snapshots->update($project, (int) $data['percent'], strip_tags($data['caption']), $data['image'] ?? null)
+        return $snapshots->update($project, (int) $data['percent'], strip_tags((string) ($data['caption'] ?? '')), $data['image'] ?? null)
             ? response()->json(['status' => 'ok'], 201)
             : response()->json(['status' => 'enough pictures'], 429);
     }

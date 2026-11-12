@@ -631,6 +631,10 @@ class AppBuilderTest extends TestCase
         $this->post($url, ['percent' => 50, 'caption' => 'الطلبات خلصت', 'plan' => str_replace('[ ] 2', '[x] 2', $plan)], $this->worker())->assertCreated();
         // the same phases are retold once; only the ticks change after that
         $this->assertSame(1, $calls - $before);
+        // the worker's own update from the ticked phases moves the bar and keeps the last line
+        $this->post($url, ['percent' => 63, 'plan' => str_replace('[ ] 2', '[x] 2', $plan)], $this->worker())->assertCreated();
+        $this->assertSame(63, $project->refresh()->progress_percent);
+        $this->assertSame('الطلبات خلصت', $project->progress_note);
 
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('phases', [
             ['title' => 'الأساس والدخول', 'state' => 'done'],

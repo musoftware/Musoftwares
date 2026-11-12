@@ -20,12 +20,13 @@ class BuildSnapshots
     /** Moves the bar (never backwards) and keeps the screenshot. False when the build already sent its share of pictures. */
     public function update(BuilderProject $project, int $percent, string $note, ?UploadedFile $image = null): bool
     {
-        $project->update([
+        // an update with no line (the bar moved by the ticked phases) keeps the last line the customer read
+        $project->update(array_filter([
             'progress_percent' => min(self::MAX_PERCENT, max((int) $project->progress_percent, $percent)),
-            'progress_note' => mb_substr(trim($note), 0, 300),
-        ]);
+            'progress_note' => trim($note) !== '' ? mb_substr(trim($note), 0, 300) : null,
+        ], fn ($value) => $value !== null));
 
-        if ($image === null) {
+        if ($image === null || trim($note) === '') {
             return true;
         }
         if ($this->sentThisBuild($project) >= (int) config('builder.limits.snapshots_per_build')) {
