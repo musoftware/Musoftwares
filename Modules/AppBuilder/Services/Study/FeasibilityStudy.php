@@ -61,6 +61,8 @@ class FeasibilityStudy
         ]);
         $this->lowerOpenPrice($project, $paid);
         app(ProjectPayment::class)->tellOwner($project, 'Study paid: '.$project->title.' ('.$paid.' '.$project->currency.')');
+        app(\Modules\AppBuilder\Services\ProjectAccount::class)->linkAfterFee($project);
+        app(\Modules\AppBuilder\Services\PaymentInvoices::class)->feePaid($project->refresh(), __('builder.invoice.study', [], $project->customerLanguage()), $paid);
         $this->start($project);
 
         return true;

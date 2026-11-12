@@ -104,6 +104,8 @@ class ProjectRequests
         }
 
         $this->payment->tellOwner($project, 'Paid requests: '.$project->title.' ('.$paid->pluck('title')->implode(', ').')');
+        app(ProjectAccount::class)->linkAfterFee($project);
+        app(PaymentInvoices::class)->requestsPaid($project->refresh(), $paid);
         $this->startNext($project->refresh());
 
         return $paid->count();

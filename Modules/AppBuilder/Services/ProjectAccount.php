@@ -20,17 +20,36 @@ class ProjectAccount
     /** After the first payment: link the project to an account and send the customer the link. */
     public function afterPayment(BuilderProject $project): void
     {
-        $email = Str::lower(trim((string) $project->client_email));
-        $setPassword = null;
-        if ($project->user_id === null && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $email)->first() ?? $this->openAccount($project, $email);
-            $setPassword = $user->wasRecentlyCreated ? $this->passwordLink($user) : null;
-            $project->update(['user_id' => $user->id]);
-        }
+        $setPassword = $this->link($project);
 
         $body = __('builder.mail_paid_body', ['link' => route('builder.show', $project)], $this->language($project))
             .($setPassword ? "\n\n".__('builder.mail_new_account', ['link' => $setPassword], $this->language($project)) : '');
         $this->send($project, __('builder.mail_paid_subject', [], $this->language($project)), $body);
+    }
+
+    /**
+     * Any other payment (requests, a study, an inspection): the project joins the payer's account so the invoice has
+     * a home. Only a newly opened account gets an email, with the link to set its password.
+     */
+    public function linkAfterFee(BuilderProject $project): void
+    {
+        if ($setPassword = $this->link($project)) {
+            $this->send($project, __('builder.mail_paid_subject', [], $this->language($project)), __('builder.mail_new_account', ['link' => $setPassword], $this->language($project)));
+        }
+    }
+
+    /** Links the project to the payer's account, opening one when needed; the set-password link for a new account. */
+    private function link(BuilderProject $project): ?string
+    {
+        $email = Str::lower(trim((string) $project->client_email));
+        if ($project->user_id !== null || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return null;
+        }
+
+        $user = User::where('email', $email)->first() ?? $this->openAccount($project, $email);
+        $project->update(['user_id' => $user->id]);
+
+        return $user->wasRecentlyCreated ? $this->passwordLink($user) : null;
     }
 
     public function afterDelivery(BuilderProject $project): void

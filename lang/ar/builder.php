@@ -19,6 +19,7 @@ return [
     'sign_in' => 'سجّل دخول',
     'sign_in_google' => 'دخول بجوجل',
     'new_chat' => 'محادثة جديدة',
+    'invoice' => ['program' => 'برنامج من مساعد البرمجة', 'study' => 'دراسة جدوى للمشروع', 'inspection' => 'فحص المشروع'],
     'requests' => [
         'title' => 'طلباتك',
         'close' => 'قفل',

@@ -83,6 +83,8 @@ class BuilderProject extends Model
         'free_fix' => 'boolean',
         'free_build' => 'boolean',
         'quote_version' => 'integer',
+        'quote_invoice_id' => 'integer',
+        'quote_invoice_version' => 'integer',
         'price_settled_version' => 'integer',
         'awaiting_answer' => 'boolean',
         'demo_password' => 'encrypted',

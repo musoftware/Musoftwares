@@ -137,6 +137,10 @@ class ProjectRequestsTest extends TestCase
         $project->refresh();
         $this->assertSame(BuilderProject::QUEUED, $project->status);
         $this->assertEqualsWithDelta(150 + (float) $item['amount'], (float) $project->paid_total, 0.01);
+        // the payer got an account, and the payment is a paid invoice there with the request as its line
+        $invoice = \App\Models\Invoice::where('user_id', $project->user_id)->sole();
+        $this->assertSame('paid', $invoice->status);
+        $this->assertSame('قسم بلس في لوحة التحكم', $invoice->items()->value('item_title'));
     }
 
     public function test_after_the_warranty_a_fix_is_priced_too(): void

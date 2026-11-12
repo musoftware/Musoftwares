@@ -19,6 +19,7 @@ return [
     'sign_in' => 'Sign in',
     'sign_in_google' => 'Sign in with Google',
     'new_chat' => 'New chat',
+    'invoice' => ['program' => 'Program from the AI builder', 'study' => 'Feasibility study', 'inspection' => 'Project inspection'],
     'requests' => [
         'title' => 'Your requests',
         'close' => 'Close',

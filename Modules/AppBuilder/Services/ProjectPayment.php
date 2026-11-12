@@ -124,6 +124,8 @@ class ProjectPayment
         }
         // the project joins the payer's account (opened for them if needed) and the link goes to their email
         app(ProjectAccount::class)->afterPayment($project->refresh());
+        // the payment is an invoice in that account, partly paid when this was a deposit
+        app(PaymentInvoices::class)->quotePaid($project->refresh(), $paid);
 
         return true;
     }
@@ -195,6 +197,7 @@ class ProjectPayment
         ]);
         $this->referral->recordEarning($project, $paid);
         $this->tellOwner($project, 'Balance paid: '.$project->title.' ('.$paid.' '.$project->currency.')');
+        app(PaymentInvoices::class)->quotePaid($project->refresh(), $paid);
 
         return true;
     }
