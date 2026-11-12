@@ -21,7 +21,6 @@ return [
     'new_chat' => 'New chat',
     'requests' => [
         'title' => 'Your requests',
-        'open' => 'Your requests (:count)',
         'close' => 'Close',
         'how' => 'Write anything you need in the chat, at any time, even while we work. We look at every message: a fix to something your project has is free during the warranty and starts by itself; development (something new) gets its price here, and you pay when you like.',
         'fix' => 'Fix',

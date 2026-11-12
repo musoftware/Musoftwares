@@ -104,14 +104,15 @@
         .viewer a.google{gap:8px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#fff;text-decoration:none}
         .viewer a.google:hover{border-color:var(--ink)}
         .card .before{color:var(--muted);text-decoration:line-through;font-size:16px;font-weight:400;margin-inline-start:8px}
-        /* the list of requests: fixed on the left of a wide screen, a full sheet opened from the top bar on a phone */
-        .requests{display:none}
-        body.has-requests .requests{display:flex;flex-direction:column;gap:8px;position:fixed;left:16px;top:16px;bottom:16px;width:300px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff;overflow-y:auto;z-index:5}
-        body.has-requests{padding-left:332px}
-        body.has-requests .composer{left:332px}
+        /* the list of requests: a cart button in the top bar opens it as a panel from the left (the whole screen on a phone) */
+        .requests,.requests-backdrop{display:none}
+        body.has-requests.requests-shown .requests{display:flex;flex-direction:column;gap:8px;position:fixed;left:0;top:0;bottom:0;width:min(380px,100vw);padding:16px;background:#fff;border-right:1px solid var(--line);box-shadow:0 0 24px rgba(0,0,0,.12);overflow-y:auto;z-index:30}
+        body.has-requests.requests-shown .requests-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:29}
         .requests .head{display:flex;align-items:center;justify-content:space-between;gap:8px}
         .requests h2{margin:0;font-size:18px}
-        .requests .close,.show-requests{display:none}
+        .show-requests{display:none}
+        body.has-requests .show-requests{display:inline-flex}
+        .requests .close{display:inline-flex;align-items:center}
         .req{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:10px 0;border-top:1px solid var(--line)}
         label.req{cursor:pointer}
         .req input{width:20px;height:20px;margin:4px 0 0;flex:none}
@@ -124,14 +125,9 @@
         .req .cancel:hover{color:var(--danger);border-color:var(--danger)}
         .requests .pay{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
         .requests .total{margin:0;font-weight:600}
-        .show-requests{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
-        @media (max-width:1099px){
-            body.has-requests{padding-left:0}
-            body.has-requests .composer{left:0}
-            body.has-requests .requests{display:none}
-            body.has-requests.requests-shown .requests{display:flex;inset:0;width:auto;border:0;border-radius:0;z-index:30}
-            body.has-requests .show-requests,.requests .close{display:inline-flex;align-items:center}
-        }
+        .show-requests{align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+        .show-requests:hover{border-color:var(--ink)}
+        .show-requests .due{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--ink);color:#fff;font-size:13px;line-height:22px;text-align:center}
     </style>
 </head>
 <body>
@@ -190,6 +186,7 @@
     </section>
 </main>
 
+<div class="requests-backdrop" id="requests-backdrop"></div>
 <aside class="requests" id="requests" aria-label="{{ __('builder.requests.title') }}"></aside>
 
 <div class="composer">
@@ -764,11 +761,21 @@
         const list = state && state.requests;
         document.body.classList.toggle('has-requests', !!list);
         if (!list) { requestsBox.replaceChildren(); requestsKey = ''; return; }
-        requestsOpen.textContent = T.requests.open.replace(':count', list.items.length);
+        drawRequestsButton(list);
         const key = JSON.stringify(list);
         if (key === requestsKey) return;
         requestsKey = key;
         requestsBox.replaceChildren(...requestsNodes(list));
+    }
+
+    const CART_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+
+    /** The cart button: its icon, its name, and how many requests wait for payment. */
+    function drawRequestsButton(list) {
+        const due = list.items.filter((item) => item.status === 'unpaid').length;
+        requestsOpen.innerHTML = CART_ICON;
+        requestsOpen.append(el('span', {}, T.requests.title));
+        if (due) requestsOpen.append(el('span', {class: 'due', 'aria-label': T.requests.status.unpaid + ': ' + due}, String(due)));
     }
 
     function requestsNodes(list) {
@@ -860,6 +867,7 @@
     function showRequests() { document.body.classList.add('requests-shown'); requestsBox.querySelector('.close')?.focus(); }
     function hideRequests() { document.body.classList.remove('requests-shown'); requestsOpen.focus(); }
     requestsOpen.addEventListener('click', showRequests);
+    document.getElementById('requests-backdrop').addEventListener('click', hideRequests);
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && document.body.classList.contains('requests-shown')) hideRequests(); });
 
     function render() {
