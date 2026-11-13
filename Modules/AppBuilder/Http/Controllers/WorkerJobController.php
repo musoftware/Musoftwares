@@ -41,7 +41,8 @@ class WorkerJobController extends Controller
 
         return response()->json(['job' => [
             'uuid' => $project->uuid,
-            'title' => $project->title,
+            // a change is named by what it carries, not by the project's first title
+            'title' => app(\Modules\AppBuilder\Services\ProjectRequests::class)->buildTitle($project) ?? $project->title,
             // the customer's requests in their own words, like a developer told directly; the first build has the agreed brief
             'spec' => app(\Modules\AppBuilder\Services\ProjectRequests::class)->briefFor($project) ?? $project->spec,
             'locale' => $project->customerLanguage(),
@@ -227,7 +228,8 @@ class WorkerJobController extends Controller
             $imports->failed($project, (string) $request->validated('release_error'));
         }
         // the requests this build carried are done; the ones that became ready meanwhile start now
-        app(\Modules\AppBuilder\Services\ProjectRequests::class)->finish($project->refresh(), $request->validated('git_from'), $request->validated('git_to'));
+        $notDone = array_values(array_filter(array_map('intval', explode(',', (string) $request->validated('not_done')))));
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->finish($project->refresh(), $request->validated('git_from'), $request->validated('git_to'), $notDone);
 
         return response()->json(['status' => 'delivered', 'version' => $project->refresh()->version]);
     }

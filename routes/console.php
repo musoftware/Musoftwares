@@ -88,6 +88,13 @@ Schedule::call(fn () => app(\App\Services\Telegram\InvoiceReminders::class)->sen
     ->withoutOverlapping(30);
 
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
+// requests waiting for the owner's approval, twice a day, so a paid change never sits unseen
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\OwnerReview::class)->remindWaiting())
+    ->name('builder-approval-reminders')
+    ->twiceDaily(10, 18)
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(10);
+
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
     ->everyFiveMinutes()

@@ -40,6 +40,7 @@ class BuilderRequest extends Model
         'budget_usd' => 'decimal:4',
         'paid_at' => 'datetime',
         'approved_at' => 'datetime',
+        'not_made_at' => 'datetime',
         'rollback_asked_at' => 'datetime',
         'rolled_back_at' => 'datetime',
     ];
@@ -59,7 +60,7 @@ class BuilderRequest extends Model
     /** Paid or free, and only the owner's yes is missing. */
     public function waitsForOwner(): bool
     {
-        return $this->status === self::READY && ! $this->isApproved();
+        return $this->status === self::READY && (! $this->isApproved() || $this->not_made_at !== null);
     }
 
     public function project(): BelongsTo

@@ -293,17 +293,39 @@ class ProjectRequests
     /** Paid or free, and approved by the owner when the site asks the owner first. */
     private function approvedReady($query)
     {
-        return $query->where('status', BuilderRequest::READY)->when(config('builder.owner_approval'), fn ($approved) => $approved->whereNotNull('approved_at'));
+        return $query->where('status', BuilderRequest::READY)->whereNull('not_made_at')
+            ->when(config('builder.owner_approval'), fn ($approved) => $approved->whereNotNull('approved_at'));
     }
 
     /**
      * The build that carried these requests was delivered: they are done, in this version. The commits it made in the
      * project's git (from the one before it to its last) are kept, so the owner can roll the change back.
      */
-    public function finish(BuilderProject $project, ?string $gitFrom = null, ?string $gitTo = null): void
+    public function finish(BuilderProject $project, ?string $gitFrom = null, ?string $gitTo = null, array $notDone = []): void
     {
-        $project->requests()->where('status', BuilderRequest::BUILDING)->update(['status' => BuilderRequest::DONE, 'built_in_version' => $project->version, 'git_from' => $gitFrom, 'git_to' => $gitTo]);
+        $building = $this->building($project);
+        // the engineer said these could not be made: they stay open and wait for the owner, never shown as delivered
+        $open = $building->filter(fn (BuilderRequest $request, int $index) => in_array($index + 1, $notDone, true));
+        $open->each->update(['status' => BuilderRequest::READY, 'approved_at' => null, 'not_made_at' => now()]);
+        $building->diffKeys($open)->each->update(['status' => BuilderRequest::DONE, 'built_in_version' => $project->version, 'git_from' => $gitFrom, 'git_to' => $gitTo]);
+        if ($open->isNotEmpty()) {
+            $this->payment->tellOwner($project, 'Not made in this build (the engineer gave the reason in the delivery): '.$open->pluck('title')->implode(', ').'. They wait for you on the admin page.');
+        }
         $this->startNext($project);
+    }
+
+    /** The requests the current build carries, always in the same order, so "request 2" means the same one on both sides. */
+    private function building(BuilderProject $project): \Illuminate\Support\Collection
+    {
+        return $project->requests()->where('status', BuilderRequest::BUILDING)->orderBy('id')->get()->values();
+    }
+
+    /** The current build's name: the requests it carries, or null for a first build (which keeps the project's title). */
+    public function buildTitle(BuilderProject $project): ?string
+    {
+        $titles = $this->building($project)->pluck('title');
+
+        return $titles->isEmpty() ? null : mb_substr($titles->implode(' + '), 0, 250);
     }
 
     /**
@@ -312,12 +334,12 @@ class ProjectRequests
      */
     public function briefFor(BuilderProject $project): ?string
     {
-        $building = $project->requests()->where('status', BuilderRequest::BUILDING)->get();
+        $building = $this->building($project);
         if ($building->isEmpty()) {
             return null;
         }
 
-        return "The customer asked for these changes, in this order. Make every one of them.\n\n"
+        return "The customer asked for these changes, in this order. Make every one of them, and confirm each one in /work/.cb/requests.md (see \"Every request\" in your instructions).\n\n"
             .$building->values()->map(fn (BuilderRequest $request, int $index) => '### '.($index + 1).'. '.$request->title
                 ."\n\nThe customer's own words:\n\n".($request->customer_words ?: '(see the note)')
                 ."\n\nNote from the chat:\n\n".trim($request->spec))->implode("\n\n");

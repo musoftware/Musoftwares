@@ -41,7 +41,7 @@ class OwnerReview
      */
     public function approve(BuilderProject $project, BuilderRequest $request, array $changes): void
     {
-        $request->update(['approved_at' => now()] + $this->edits($request, $changes));
+        $request->update(['approved_at' => now(), 'not_made_at' => null] + $this->edits($request, $changes));
         app(ProjectRequests::class)->startNext($project);
     }
 
@@ -55,8 +55,25 @@ class OwnerReview
     public function approveFree(BuilderProject $project, BuilderRequest $request): void
     {
         $price = $this->pricer->freeFix((int) $request->estimated_tokens, (bool) $request->complex);
-        $request->update(['free' => true, 'amount' => 0, 'budget_usd' => $price['budget'], 'status' => BuilderRequest::READY, 'approved_at' => now()]);
+        $request->update(['free' => true, 'amount' => 0, 'budget_usd' => $price['budget'], 'status' => BuilderRequest::READY, 'approved_at' => now(), 'not_made_at' => null]);
         app(ProjectRequests::class)->startNext($project);
+    }
+
+    /**
+     * Twice a day: every request still waiting for the owner, with the oldest first, so a paid one never sits unseen
+     * while the customer is told "the engineer is reviewing it". Nothing is sent when nothing waits.
+     */
+    public function remindWaiting(): int
+    {
+        $waiting = BuilderRequest::with('project')->where('status', BuilderRequest::READY)->where(fn ($open) => $open->whereNull('approved_at')->orWhereNotNull('not_made_at'))->orderBy('created_at')->get()
+            ->filter(fn (BuilderRequest $request) => $request->waitsForOwner() && $request->project !== null);
+        foreach ($waiting->groupBy('project_id') as $requests) {
+            $project = $requests->first()->project;
+            $line = $requests->map(fn (BuilderRequest $request) => $request->title.($request->paid_at ? ' (paid, '.$request->created_at?->diffForHumans().')' : ' (free)'))->implode('; ');
+            $this->payment->tellOwner($project, 'Waiting for your approval: '.$line, $this->url($project, $requests->first()));
+        }
+
+        return $waiting->count();
     }
 
     /** Saves the owner's corrections without approving yet. */

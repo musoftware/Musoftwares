@@ -120,6 +120,31 @@ class ProjectRequestsTest extends TestCase
         $this->assertSame('6.0000', $item->budget_usd);
     }
 
+    public function test_a_request_the_engineer_could_not_make_stays_open_for_the_owner_and_is_not_delivered(): void
+    {
+        $project = $this->deliveredProject();
+        $project->update(['status' => BuilderProject::QUEUED, 'job_kind' => BuilderProject::JOB_BUILD, 'paid_at' => now()]);
+        foreach (['زرار التعليق', 'قسم البلس'] as $title) {
+            $project->requests()->create(['title' => $title, 'spec' => 'Note: '.$title, 'kind' => BuilderRequest::BUILD, 'free' => true, 'amount' => 0, 'status' => BuilderRequest::BUILDING]);
+        }
+
+        $job = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job');
+        // the build is named by what it carries, and the brief numbers them the way the worker reports back
+        $this->assertSame('زرار التعليق + قسم البلس', $job['title']);
+        $this->assertStringContainsString('### 2. قسم البلس', $job['spec']);
+        $this->assertStringContainsString('/work/.cb/requests.md', $job['spec']);
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(), 'summary' => 'تم', 'cost_usd' => 1, 'not_done' => '2'], $this->worker())->assertOk();
+
+        [$made, $open] = $project->requests()->orderBy('id')->get()->all();
+        $this->assertSame(BuilderRequest::DONE, $made->status);
+        $this->assertSame(BuilderRequest::READY, $open->status);
+        $this->assertNull($open->approved_at);
+        $this->assertNull($open->built_in_version);
+        $this->assertNotNull($open->not_made_at);
+        $this->assertTrue($open->waitsForOwner());
+    }
+
     public function test_the_customer_keeps_writing_during_a_build_and_the_next_build_takes_what_waited(): void
     {
         $project = $this->deliveredProject();

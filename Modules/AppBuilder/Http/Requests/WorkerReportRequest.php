@@ -25,6 +25,8 @@ class WorkerReportRequest extends FormRequest
                 // the commits this change made in the project's own git, so the owner can roll it back
                 'git_from' => ['nullable', 'string', 'regex:/^[0-9a-f]{7,64}$/'],
                 'git_to' => ['nullable', 'string', 'regex:/^[0-9a-f]{7,64}$/'],
+                // the requests (by their number in the brief) the engineer could not make, for example "2,3"
+                'not_done' => ['nullable', 'string', 'max:200', 'regex:/^[0-9]+(,[0-9]+)*$/'],
             ],
             'builder.worker.imported' => [
                 'profile' => ['required', 'string', 'max:20000'],
