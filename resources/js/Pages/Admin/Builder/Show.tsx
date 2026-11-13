@@ -196,18 +196,32 @@ function leaveDiscountNote(project: Project): string {
     return t(`after a ${project.leave_discount_percent}% leave discount (-${amount})`, `بعد خصم ${project.leave_discount_percent}% عند المغادرة (-${amount})`);
 }
 
-/** A paid new project waits here: the owner reads (and may correct) the brief the engineer builds from, then starts it. */
+/**
+ * A new project waits here: the owner reads (and may correct) the brief the engineer builds from, then starts it.
+ * One with nothing paid says so plainly, and its main action sends it back to its price instead.
+ */
 function ProjectApproval({ project }: { project: Project }) {
     const [spec, setSpec] = useState(project.spec || '');
     if (!project.waits_for_owner) return null;
+    const paid = Number(project.paid_total) > 0;
     const approve = () => router.post(`/admin/builder/${project.uuid}/approve`, { spec }, onDone('Approved, the build starts', 'اتوافق عليه، والتنفيذ بدأ'));
+    const backToPrice = () => router.post(`/admin/builder/${project.uuid}/back-to-price`, {}, onDone('Back to its price: the customer pays first', 'رجع لسعره: العميل يدفع الأول'));
+    const main = 'min-h-11 w-full rounded-lg bg-slate-900 px-5 font-semibold text-white sm:w-auto';
+    const second = 'min-h-11 w-full rounded-lg border px-5 font-semibold sm:w-auto';
 
     return (
-        <section id="approve" className="scroll-mt-4 space-y-3 rounded-xl border border-amber-400 bg-white p-4">
+        <section id="approve" className={`scroll-mt-4 space-y-3 rounded-xl border bg-white p-4 ${paid ? 'border-amber-400' : 'border-red-500'}`}>
             <h2 className="font-semibold">{t('New project waiting for your approval', 'مشروع جديد مستني موافقتك')}</h2>
-            <p className="text-sm text-slate-500">{t('Paid. Nothing is built before you approve. This brief is exactly what the engineer builds from.', 'اتدفع. مفيش حاجة هتتبني قبل موافقتك. الـ brief ده هو اللي المهندس هيبني منه بالظبط.')}</p>
+            {paid ? (
+                <p className="text-sm text-slate-500">{t('Paid. Nothing is built before you approve. This brief is exactly what the engineer builds from.', 'اتدفع. مفيش حاجة هتتبني قبل موافقتك. الـ brief ده هو اللي المهندس هيبني منه بالظبط.')}</p>
+            ) : (
+                <p className="text-sm font-semibold text-red-700">{t(`Not paid: 0 of ${project.amount} ${project.currency}. Send it back to its price and the customer pays first.`, `مش مدفوع: 0 من ${project.amount} ${project.currency}. رجّعه لسعره والعميل يدفع الأول.`)}</p>
+            )}
             <textarea value={spec} onChange={(event) => setSpec(event.target.value)} rows={10} dir="auto" aria-label={t('Build brief', 'الـ brief')} className="w-full rounded-lg border p-2 text-sm" />
-            <button type="button" onClick={approve} className="min-h-11 w-full rounded-lg bg-slate-900 px-5 font-semibold text-white sm:w-auto">{t('Approve and start', 'وافق وابدأ')}</button>
+            <div className="flex flex-wrap gap-2">
+                {!paid && <button type="button" onClick={backToPrice} className={main}>{t('Back to its price', 'رجّعه لسعره')}</button>}
+                <button type="button" onClick={approve} className={paid ? main : second}>{t(paid ? 'Approve and start' : 'Build it free anyway', paid ? 'وافق وابدأ' : 'ابنيه مجاناً برضه')}</button>
+            </div>
         </section>
     );
 }

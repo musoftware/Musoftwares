@@ -2,6 +2,7 @@
 
 namespace Modules\AppBuilder\Services;
 
+use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 use Modules\AppBuilder\Models\BuilderRequest;
@@ -49,6 +50,22 @@ class OwnerReview
     public function approveProject(BuilderProject $project, ?string $spec): void
     {
         $project->update(array_filter(['owner_approved_at' => now(), 'spec' => $spec !== null && trim($spec) !== '' ? trim($spec) : null]));
+    }
+
+    /**
+     * A new project waiting for approval with nothing paid (it should never be there) goes back to its open price:
+     * the customer sees the pay button again, and nothing is built. False when it is paid or already started.
+     */
+    public function backToPrice(BuilderProject $project): bool
+    {
+        if (! $project->waitsForOwner() || (float) $project->paid_total > 0) {
+            return false;
+        }
+
+        $project->update(['status' => BuilderProject::QUOTED, 'paid_at' => null, 'free_build' => false, 'originals_due_at' => null]);
+        Log::info('App builder: an unpaid project was sent back to its price by the owner', ['project_id' => $project->id]);
+
+        return true;
     }
 
     /** Approved as free work (the owner chose not to charge for it): it starts like a free fix. */

@@ -20,6 +20,12 @@ return [
     'preview_open' => 'Show the picture',
     'preview_close' => 'Close',
     'sign_in_google' => 'Sign in with Google',
+    'google_gate' => [
+        'title' => 'Sign in to start',
+        'text' => 'The assistant talks with you about your project and gives you its price. To keep your chat in your account, sign in with your Google account.',
+        'button' => 'Continue with Google',
+        'why' => 'We use Google only, so every account belongs to a real person. We never see your password.',
+    ],
     // prices on the chat page in the customer's own money
     'currency_names' => ['EGP' => 'EGP', 'SAR' => 'SAR', 'AED' => 'AED', 'MAD' => 'MAD', 'IQD' => 'IQD', 'EUR' => 'EUR', 'GBP' => 'GBP', 'USD' => 'USD'],
     'new_chat' => 'New chat',

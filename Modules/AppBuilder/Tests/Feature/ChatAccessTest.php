@@ -29,13 +29,14 @@ class ChatAccessTest extends TestCase
         return route('social.google.redirect', ['redirect' => $back]);
     }
 
-    public function test_a_visitor_is_sent_to_google_and_comes_back_to_the_same_page(): void
+    public function test_a_visitor_is_asked_first_and_google_brings_them_back_to_the_same_page(): void
     {
         [, $project] = $this->ownedChat();
 
-        $this->get('/ai')->assertRedirect($this->googleSignIn('/ai'));
-        $this->get('/ai/'.$project->uuid)->assertRedirect($this->googleSignIn('/ai/'.$project->uuid));
-        $this->getJson('/ai/'.$project->uuid.'/state')->assertStatus(401)->assertJsonPath('redirect', $this->googleSignIn('/ai/'.$project->uuid.'/state'));
+        // a page that asks, with one button; it does not jump to Google by itself
+        $this->get('/ai')->assertOk()->assertSee(__('builder.google_gate.button'))->assertSee($this->googleSignIn('/ai'), false);
+        $this->get('/ai/'.$project->uuid)->assertOk()->assertSee($this->googleSignIn('/ai/'.$project->uuid), false);
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertStatus(401)->assertJsonPath('redirect', $this->googleSignIn('/ai/'.$project->uuid));
         $this->postJson('/ai/messages', ['text' => 'عايز موقع'])->assertStatus(401);
         // no chat was opened by the visitor
         $this->assertSame(1, BuilderProject::count());
@@ -45,7 +46,7 @@ class ChatAccessTest extends TestCase
     {
         $this->actingAs(User::factory()->create(['onboarding_completed' => true]));
 
-        $this->get('/ai')->assertRedirect($this->googleSignIn('/ai'));
+        $this->get('/ai')->assertOk()->assertSee($this->googleSignIn('/ai'), false);
         $this->postJson('/ai/messages', ['text' => 'عايز موقع'])->assertStatus(401);
     }
 

@@ -71,6 +71,22 @@ class UnpaidWorkWatchTest extends TestCase
         $this->assertCount(2, $this->alerts());
     }
 
+    public function test_the_owner_sends_an_unpaid_new_project_back_to_its_price(): void
+    {
+        config(['builder.owner_approval' => true]);
+        $unpaid = $this->project(['status' => BuilderProject::QUEUED, 'free_build' => true, 'paid_at' => now()]);
+        $paid = $this->project(['status' => BuilderProject::QUEUED, 'paid_total' => 20, 'paid_at' => now()]);
+
+        $this->actingAs($this->admin)->post('/admin/builder/'.$unpaid->uuid.'/back-to-price')->assertRedirect();
+        $this->actingAs($this->admin)->post('/admin/builder/'.$paid->uuid.'/back-to-price')->assertStatus(409);
+
+        $unpaid->refresh();
+        $this->assertSame([BuilderProject::QUOTED, null, false], [$unpaid->status, $unpaid->paid_at, $unpaid->free_build]);
+        $this->assertSame(BuilderProject::QUEUED, $paid->refresh()->status);
+        // a customer cannot do it
+        $this->actingAs(User::factory()->google()->create())->post('/admin/builder/'.$paid->uuid.'/back-to-price')->assertForbidden();
+    }
+
     public function test_it_runs_on_the_schedule(): void
     {
         $names = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())->map(fn ($event) => $event->description);

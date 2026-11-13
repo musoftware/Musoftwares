@@ -46,6 +46,14 @@ class AdminRequestController extends Controller
         return back();
     }
 
+    /** A new project with nothing paid goes back to its price instead of being built. */
+    public function backToPrice(BuilderProject $project): RedirectResponse
+    {
+        abort_unless($this->review->backToPrice($project), 409);
+
+        return back();
+    }
+
     /** Undo a delivered change: the worker reverts its commits and releases (GitHub, deploy, the app). */
     public function rollback(BuilderProject $project, int $item, OwnerRollback $rollback): RedirectResponse
     {
