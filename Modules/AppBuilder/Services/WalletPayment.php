@@ -41,6 +41,8 @@ class WalletPayment
     {
         return DB::transaction(function () use ($project, $user) {
             $locked = User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            // read again under a lock: a second tap at the same moment must see the price already paid
+            $project = BuilderProject::whereKey($project->id)->lockForUpdate()->firstOrFail();
             $due = $this->payment->openAmount($project);
             if ($due === null || (float) $locked->available_balance() < $this->inWalletCurrency($due, $project, $locked)) {
                 return false;

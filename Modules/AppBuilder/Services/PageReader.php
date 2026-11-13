@@ -58,7 +58,7 @@ class PageReader
     private function publicAddressOf(string $host): string
     {
         $addresses = filter_var($host, FILTER_VALIDATE_IP) ? [$host] : (gethostbynamel($host) ?: []);
-        $public = array_filter($addresses, fn (string $ip) => filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE));
+        $public = array_filter($addresses, fn (string $ip) => filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) && ! $this->isSharedRange($ip));
         if ($addresses === [] || count($public) !== count($addresses)) {
             throw new RuntimeException('This address is not a public website.');
         }
@@ -66,7 +66,15 @@ class PageReader
         return $public[array_key_first($public)];
     }
 
-    private function absolute(string $base, string $location): string
+    /** 100.64.0.0/10 (carrier and cloud internal addresses, some cloud metadata) is not covered by PHP's private-range flag. */
+    private function isSharedRange(string $ip): bool
+    {
+        $long = ip2long($ip);
+
+        return $long !== false && ($long & 0xFFC00000) === (ip2long('100.64.0.0') & 0xFFC00000);
+    }
+
+        private function absolute(string $base, string $location): string
     {
         if ($location === '') {
             throw new RuntimeException('The page redirects nowhere.');

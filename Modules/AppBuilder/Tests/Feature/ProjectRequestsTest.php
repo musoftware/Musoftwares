@@ -160,7 +160,7 @@ class ProjectRequestsTest extends TestCase
 
         $this->postJson('/ai/'.$project->uuid.'/requests/pay', ['ids' => (string) $item['id'], 'client_name' => 'أحمد', 'client_email' => 'a@example.com', 'client_whatsapp' => '01012345678'])
             ->assertOk()->assertJson(fn ($json) => $json->where('url', fn ($url) => str_contains($url, 'payments.kashier.io')));
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-r'.$item['id'].'_abc');
+        [$body, $headers] = $this->signedWebhook(\Modules\AppBuilder\Models\BuilderPaymentOrder::latest('id')->value('order_id'));
         $this->postJson('/ai/webhook', $body, $headers)->assertOk()->assertJsonPath('status', 'processed');
         // the gateway may report it twice; it counts once
         $this->postJson('/ai/webhook', $body, $headers)->assertOk();

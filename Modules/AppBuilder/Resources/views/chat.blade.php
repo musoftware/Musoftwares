@@ -688,7 +688,7 @@
             await loadScript('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
             if (!firebase.apps.length) firebase.initializeApp(PUSH.config);
             const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            const token = await firebase.messaging().getToken({vapidKey: PUSH.vapidKey, serviceWorkerRegistration: registration});
+            const token = await firebase.messaging().getToken({vapidKey: PUSH.vapidKey || undefined, serviceWorkerRegistration: registration});
             if (token) { await call(url, {token}); button.replaceWith(el('p', {class: 'hint'}, T.push_on)); }
         } catch (error) {
             showError(T.push_failed);

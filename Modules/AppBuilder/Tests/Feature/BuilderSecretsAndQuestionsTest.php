@@ -159,7 +159,9 @@ class BuilderSecretsAndQuestionsTest extends TestCase
 
     public function test_a_customer_who_allowed_notifications_gets_one_when_the_build_asks(): void
     {
-        config(['services.fcm.web.api_key' => 'public-key', 'services.fcm.web.vapid_key' => 'vapid']);
+        config(['services.fcm.web' => [
+            'api_key' => 'public-key', 'project_id' => 'project', 'messaging_sender_id' => '1', 'app_id' => 'app', 'vapid_key' => '',
+        ]]);
         \Illuminate\Support\Facades\Queue::fake();
         $project = $this->buildingProject();
         $project->update(['paid_at' => now()]);

@@ -87,6 +87,23 @@ class AppBuilderTest extends TestCase
         return new UploadedFile($path, 'program.zip', 'application/zip', null, true);
     }
 
+    /** The order id of the payment link the customer just made (each link pays only its own amount, once). */
+    private function lastOrderId(): string
+    {
+        return \Modules\AppBuilder\Models\BuilderPaymentOrder::latest('id')->value('order_id');
+    }
+
+    /** Makes a payment link the way the customer does and returns its order id. */
+    private function payLink(BuilderProject $project, array $extra = []): string
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $egp = Currency::firstOrCreate(['currency' => 'EGP'], ['symbol' => 'EGP']);
+        CurrenciesExchange::firstOrCreate(['date_string' => now()->toDateString(), 'currency1' => $usd->id, 'currency2' => $egp->id], ['rate' => 50]);
+        $this->postJson('/ai/'.$project->uuid.'/pay', ['client_name' => 'أحمد', 'client_email' => 'a@example.com', 'client_whatsapp' => '01012345678'] + $extra)->assertOk();
+
+        return $this->lastOrderId();
+    }
+
     private function signedWebhook(string $merchantOrderId, string $transactionId = 'TX-1'): array
     {
         $data = ['status' => 'SUCCESS', 'merchantOrderId' => $merchantOrderId, 'transactionId' => $transactionId, 'signatureKeys' => ['merchantOrderId', 'status', 'transactionId']];
@@ -485,7 +502,7 @@ class AppBuilderTest extends TestCase
         $this->postJson('/ai/'.$project->uuid.'/pay', ['client_name' => 'أحمد', 'client_email' => 'a@example.com', 'client_whatsapp' => '01012345678'])
             ->assertOk()->assertJson(fn ($json) => $json->where('url', fn ($url) => str_contains($url, 'payments.kashier.io')));
 
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-1_abc123');
+        [$body, $headers] = $this->signedWebhook($this->lastOrderId());
         $this->postJson('/ai/webhook', $body, $headers)->assertOk()->assertJsonPath('status', 'processed');
 
         $project->refresh();
@@ -494,6 +511,45 @@ class AppBuilderTest extends TestCase
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.queued'))
             // paid and started: the customer can keep writing, and new changes join the list of requests
             ->assertJsonPath('open_for_chat', true);
+    }
+
+    public function test_an_older_cheaper_link_pays_only_its_own_amount(): void
+    {
+        config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
+        $project = $this->quotedProject();
+
+        // a 25% link first, then a full link: paying the cheap one must not count as the full price
+        $cheap = $this->payLink($project, ['share' => 25]);
+        $this->payLink($project);
+        [$body, $headers] = $this->signedWebhook($cheap);
+        $this->postJson('/ai/webhook', $body, $headers)->assertOk()->assertJsonPath('status', 'processed');
+
+        $project->refresh();
+        $this->assertSame('2.00', $project->paid_total);
+        $this->assertTrue($project->hasBalanceDue());
+
+        // the same link paid again (a replay with another transaction id) is not counted twice
+        [$again, $againHeaders] = $this->signedWebhook($cheap, 'TX-REPLAY');
+        $this->postJson('/ai/webhook', $again, $againHeaders)->assertOk()->assertJsonPath('status', 'ignored');
+        $this->assertSame('2.00', $project->refresh()->paid_total);
+    }
+
+    public function test_a_signed_amount_below_the_link_or_an_unknown_link_credits_nothing(): void
+    {
+        config(['services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
+        $project = $this->quotedProject();
+        $order = $this->payLink($project);
+
+        $data = ['status' => 'SUCCESS', 'merchantOrderId' => $order, 'transactionId' => 'TX-LOW', 'amount' => '1.00', 'currency' => 'EGP', 'signatureKeys' => ['amount', 'currency', 'merchantOrderId', 'status', 'transactionId']];
+        $keys = $data['signatureKeys'];
+        sort($keys);
+        $query = http_build_query(array_combine($keys, array_map(fn ($key) => $data[$key], $keys)), '', '&', PHP_QUERY_RFC3986);
+        $this->postJson('/ai/webhook', ['data' => $data], ['x-kashier-signature' => hash_hmac('sha256', $query, 'secret')])->assertJsonPath('status', 'ignored');
+
+        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-1_made-up');
+        $this->postJson('/ai/webhook', $body, $headers)->assertJsonPath('status', 'ignored');
+
+        $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
     }
 
     public function test_paying_an_old_quote_or_an_unsigned_webhook_starts_nothing(): void
@@ -1590,7 +1646,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame('8.00', $project->amount);
         $this->assertSame('2.00', $project->referral_commission);
 
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-1_abc123');
+        [$body, $headers] = $this->signedWebhook($this->payLink($project));
         $this->postJson('/ai/webhook', $body, $headers)->assertOk();
 
         $earning = \App\Models\Earning::where('user_id', $referrer->id)->firstOrFail();
@@ -1630,7 +1686,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame('206.00', $project->amount);
         $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('quote.design_fee', '200.00');
 
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-1_abc123');
+        [$body, $headers] = $this->signedWebhook($this->payLink($project));
         $this->postJson('/ai/webhook', $body, $headers)->assertOk();
         $this->assertSame(BuilderProject::DESIGNING, $project->refresh()->status);
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
@@ -1700,7 +1756,7 @@ class AppBuilderTest extends TestCase
 
         $this->postJson('/ai/'.$project->uuid.'/pay', $client + ['share' => 50])->assertOk();
         $this->assertSame('3.00', $project->refresh()->payment_due);
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-1_abc123');
+        [$body, $headers] = $this->signedWebhook($this->lastOrderId());
         $this->postJson('/ai/webhook', $body, $headers)->assertOk();
         $this->postJson('/ai/webhook', $body, $headers)->assertOk();
 
@@ -1708,21 +1764,28 @@ class AppBuilderTest extends TestCase
         $this->assertSame(BuilderProject::QUEUED, $project->status);
         $this->assertSame('3.00', $project->paid_total);
         $project->update(['status' => BuilderProject::BUILDING]);
-        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1000], $this->worker())->assertOk();
+        $files = ['index.html' => '<h1>Menu</h1>', 'css/site.css' => 'h1{}', 'package.json' => '{}', 'src/server.ts' => 'secret()', 'dist/server/app.js' => 'x', 'SETUP.md' => '# setup'];
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip($files), 'summary' => 'تم', 'cost_usd' => 1000], $this->worker())->assertOk();
 
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('balance.due', '3.00')->assertJsonPath('delivery.download_url', null);
         $this->get('/ai/'.$project->uuid.'/download')->assertStatus(402);
         $this->get('/ai/'.$project->uuid.'/app/index.html')->assertOk();
+        $this->get('/ai/'.$project->uuid.'/app/css/site.css')->assertOk();
+        // the source stays locked until the rest is paid, also through the preview link
+        foreach (['package.json', 'src/server.ts', 'dist/server/app.js', 'SETUP.md'] as $source) {
+            $this->get('/ai/'.$project->uuid.'/app/'.$source)->assertStatus(402);
+        }
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'عايز تعديل'])->assertStatus(409);
 
         $this->postJson('/ai/'.$project->uuid.'/pay', $client)->assertOk();
         $this->assertSame('3.00', $project->refresh()->payment_due);
-        [$rest, $restHeaders] = $this->signedWebhook('bld_'.$project->id.'-1_def456', 'TX-2');
+        [$rest, $restHeaders] = $this->signedWebhook($this->lastOrderId(), 'TX-2');
         $this->postJson('/ai/webhook', $rest, $restHeaders)->assertOk();
 
         $this->assertSame('6.00', $project->refresh()->paid_total);
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('balance', null);
         $this->get('/ai/'.$project->uuid.'/download')->assertOk();
+        $this->get('/ai/'.$project->uuid.'/app/src/server.ts')->assertOk();
     }
 
     public function test_a_backup_worker_takes_jobs_only_while_the_main_one_is_silent(): void

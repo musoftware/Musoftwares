@@ -51,6 +51,10 @@ class ProjectChat
         if (! $project->takesRequests() && $project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
             throw new ChatLimitReached('This chat reached its message limit.');
         }
+        // every reply is a paid model call: even an ongoing project has a daily ceiling a real customer never meets
+        if ($project->messages()->where('role', BuilderMessage::USER)->where('created_at', '>=', now()->subDay())->count() >= (int) config('builder.limits.messages_per_day')) {
+            throw new ChatLimitReached('This chat reached its daily message limit.');
+        }
         if ($this->freeChat->mustSignIn($project)) {
             throw new SignInNeeded('A guest reached the free messages without a price.');
         }

@@ -184,10 +184,16 @@ class ProjectRequests
      *
      * @param  list<int>  $ids
      */
-    public function markPaid(BuilderProject $project, array $ids, ?string $reference): int
+    /** $amount is what the payment really paid; requests whose price rose above it since the link was made stay unpaid. */
+    public function markPaid(BuilderProject $project, array $ids, ?string $reference, ?float $amount = null): int
     {
-        $paid = DB::transaction(function () use ($project, $ids, $reference): Collection {
+        $paid = DB::transaction(function () use ($project, $ids, $reference, $amount): Collection {
             $requests = $project->requests()->where('status', BuilderRequest::UNPAID)->whereIn('id', $ids)->lockForUpdate()->get();
+            if ($amount !== null && (float) $requests->sum('amount') > $amount + 0.01) {
+                $this->payment->tellOwner($project, 'A payment of '.$amount.' '.$project->currency.' did not cover the requests it was for (their price changed). Check it in Kashier and settle it by hand.');
+
+                return collect();
+            }
             $requests->each->update(['status' => BuilderRequest::READY, 'paid_at' => now(), 'payment_reference' => $reference]);
             $project->update(['paid_total' => (float) $project->paid_total + (float) $requests->sum('amount')]);
 

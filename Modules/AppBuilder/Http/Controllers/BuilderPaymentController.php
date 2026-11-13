@@ -12,7 +12,10 @@ use Modules\AppBuilder\Http\Requests\StudyPayRequest;
 use Modules\AppBuilder\Services\Study\FeasibilityStudy;
 use Modules\AppBuilder\Http\Resources\ProjectStateResource;
 use Modules\AppBuilder\Models\BuilderProject;
+use Modules\AppBuilder\Services\PaymentOrders;
+use Modules\AppBuilder\Services\ProjectInspection;
 use Modules\AppBuilder\Services\ProjectPayment;
+use Modules\AppBuilder\Services\ProjectRequests;
 
 class BuilderPaymentController extends Controller
 {
@@ -104,42 +107,37 @@ class BuilderPaymentController extends Controller
         }
 
         $data = $request->json('data', []);
-        if (($data['status'] ?? '') === 'SUCCESS' && ($paid = $this->payment->parseRequestsOrder((string) ($data['merchantOrderId'] ?? '')))) {
-            return $this->requestsPaid($paid, $data['transactionId'] ?? null);
+        if (($data['status'] ?? '') !== 'SUCCESS') {
+            return response()->json(['status' => 'ignored']);
         }
-        if (($data['status'] ?? '') === 'SUCCESS' && ($inspected = $this->payment->parseInspectionOrder((string) ($data['merchantOrderId'] ?? '')))) {
-            $project = BuilderProject::find($inspected);
-            $project && app(\Modules\AppBuilder\Services\ProjectInspection::class)->markPaid($project, $data['transactionId'] ?? null);
+        // the link this payment was made from: it says exactly how much was paid, and it pays only once
+        $paidOrder = app(PaymentOrders::class)->claim($data);
+        if (! $paidOrder) {
+            $this->tellOwnerUnmatched((string) ($data['merchantOrderId'] ?? ''));
 
-            return response()->json(['status' => $project ? 'processed' : 'ignored']);
-        }
-        $order = $this->payment->parseOrderId((string) ($data['merchantOrderId'] ?? ''));
-        if (($data['status'] ?? '') !== 'SUCCESS' || ! $order) {
             return response()->json(['status' => 'ignored']);
         }
 
-        $project = BuilderProject::find($order[0]);
-        if (! $project) {
-            return response()->json(['status' => 'error', 'message' => 'Project not found'], 404);
-        }
-
-        $order[2]
-            ? app(FeasibilityStudy::class)->markPaid($project, $data['transactionId'] ?? null)
-            : $this->payment->markPaid($project, $order[1], $data['transactionId'] ?? null);
+        $project = $paidOrder->project;
+        $orderId = $paidOrder->order_id;
+        $amount = (float) $paidOrder->amount;
+        $transaction = $data['transactionId'] ?? null;
+        match (true) {
+            ($paid = $this->payment->parseRequestsOrder($orderId)) !== null => app(ProjectRequests::class)->markPaid($project, $paid[1], $transaction, $amount),
+            $this->payment->parseInspectionOrder($orderId) !== null => app(ProjectInspection::class)->markPaid($project, $transaction),
+            ($order = $this->payment->parseOrderId($orderId)) === null => Log::warning('App builder: paid link of an unknown kind', ['order' => $orderId]),
+            $order[2] => app(FeasibilityStudy::class)->markPaid($project, $transaction),
+            default => $this->payment->markPaid($project, $order[1], $transaction, $amount),
+        };
 
         return response()->json(['status' => 'processed']);
     }
 
-    /** @param array{0: int, 1: list<int>} $paid */
-    private function requestsPaid(array $paid, ?string $transactionId): JsonResponse
+    /** A real payment that matched no open link is never lost silently: the owner checks it in Kashier. */
+    private function tellOwnerUnmatched(string $orderId): void
     {
-        $project = BuilderProject::find($paid[0]);
-        if (! $project) {
-            return response()->json(['status' => 'error', 'message' => 'Project not found'], 404);
-        }
-        app(\Modules\AppBuilder\Services\ProjectRequests::class)->markPaid($project, $paid[1], $transactionId);
-
-        return response()->json(['status' => 'processed']);
+        $project = preg_match('/^'.ProjectPayment::ORDER_PREFIX.'(\d+)-/', $orderId, $m) ? BuilderProject::find((int) $m[1]) : null;
+        $project && $this->payment->tellOwner($project, 'A Kashier payment was not credited (unknown, repeated or wrong amount): '.$orderId.'. Check it in Kashier.');
     }
 
     /** Answers with the Kashier link for the feasibility study alone; the study is written once it is paid. */

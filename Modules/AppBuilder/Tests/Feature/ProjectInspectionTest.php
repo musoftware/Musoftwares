@@ -44,7 +44,7 @@ class ProjectInspectionTest extends TestCase
         $uuid = $this->postJson('/ai/inspect', ['drive_url' => self::LINK, 'need' => 'عايز أضيف دفع أونلاين للمتجر'])->assertOk()->json('uuid');
         $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
         $this->postJson('/ai/'.$uuid.'/inspect/pay', ['client_name' => 'سارة', 'client_email' => 'sara@example.com', 'client_whatsapp' => '01012345678'])->assertOk();
-        [$body, $headers] = $this->signedWebhook('bld_'.$project->id.'-inspect_abc');
+        [$body, $headers] = $this->signedWebhook(\Modules\AppBuilder\Models\BuilderPaymentOrder::latest('id')->value('order_id'));
         $this->postJson('/ai/webhook', $body, $headers)->assertOk()->assertJsonPath('status', 'processed');
 
         return $project->refresh();

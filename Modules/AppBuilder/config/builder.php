@@ -175,6 +175,8 @@ return [
         'original_files' => 15,
         'originals_wait_minutes' => 30,
         'messages_per_project' => 60,
+        // any project, paid or not, in the last 24 hours
+        'messages_per_day' => 150,
         // a guest who talks this long without a price is asked to sign in to go on
         'guest_messages_before_sign_in' => (int) env('BUILDER_GUEST_MESSAGES', 15),
         // many customers on mobile data share one address, so this stays generous; admins have no limit

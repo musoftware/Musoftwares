@@ -7,6 +7,7 @@ use App\Services\AiAssistant\AssistantChat;
 use App\Services\AiAssistant\AssistantLimiter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Modules\AppBuilder\Services\ChatFileTypes;
 use Modules\AppBuilder\Services\OwnerApprovals;
 use Modules\AppBuilder\Services\TelegramChat;
 use Throwable;
@@ -200,8 +201,19 @@ class SiteBot
 
         $path = tempnam(sys_get_temp_dir(), 'tg');
         file_put_contents($path, $bytes);
+        $upload = new UploadedFile($path, basename($file['name']), $file['mime'] ?: null, null, true);
 
-        return [new UploadedFile($path, basename($file['name']), $file['mime'] ?: null, null, true)];
+        return $this->allowedInChat($upload) ? [$upload] : [];
+    }
+
+    /** The same rule as the chat page: the type read from the content, and the size limit for that type. */
+    private function allowedInChat(UploadedFile $file): bool
+    {
+        $limits = config('builder.limits');
+        $type = ChatFileTypes::of($file);
+        $maxKb = $type !== null && ChatFileTypes::isReadByWorker($type) ? (int) $limits['office_file_kb'] : (int) $limits['file_kb'];
+
+        return $type !== null && $file->getSize() <= $maxKb * 1024;
     }
 
     /** Any other message is a question for the site's AI assistant, with the same limits as on the site. */

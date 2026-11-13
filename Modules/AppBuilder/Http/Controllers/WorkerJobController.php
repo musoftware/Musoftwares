@@ -111,6 +111,7 @@ class WorkerJobController extends Controller
     public function source(BuilderProject $project): StreamedResponse
     {
         abort_unless($project->hasDelivery() && Storage::disk('local')->exists($project->archivePath()), 404);
+        abort_unless($this->sourceNeeded($project), 409, 'This project is not being built or tried.');
 
         return Storage::disk('local')->download($project->archivePath(), 'source.zip');
     }
@@ -121,6 +122,8 @@ class WorkerJobController extends Controller
      */
     public function chat(BuilderProject $project): JsonResponse
     {
+        $this->assertBuilding($project);
+
         return response()->json(['messages' => $project->messages()->with('attachments')->get()->map(fn (\Modules\AppBuilder\Models\BuilderMessage $message) => [
             'id' => $message->id,
             'role' => $message->role,
@@ -226,6 +229,21 @@ class WorkerJobController extends Controller
             : app(\Modules\AppBuilder\Services\ProjectImports::class)->failed($project, $request->validated('error'));
 
         return response()->json(['status' => 'recorded']);
+    }
+
+    /**
+     * The token reads a project's files only while the worker really needs them: its own build, a live trial, or a
+     * ready program a build in progress starts from. A leaked token alone cannot pull every customer's program.
+     */
+    private function sourceNeeded(BuilderProject $project): bool
+    {
+        if ($project->status === BuilderProject::BUILDING || in_array($project->demo_status, [\Modules\AppBuilder\Services\LiveTrials::REQUESTED, \Modules\AppBuilder\Services\LiveTrials::LIVE], true)) {
+            return true;
+        }
+        $starters = app(\Modules\AppBuilder\Services\Starters::class);
+
+        return BuilderProject::where('status', BuilderProject::BUILDING)->whereNotNull('starter')->pluck('starter')
+            ->contains(fn (string $slug) => ($starters->find($slug)['source_uuid'] ?? null) === $project->uuid);
     }
 
     private function assertBuilding(BuilderProject $project): void

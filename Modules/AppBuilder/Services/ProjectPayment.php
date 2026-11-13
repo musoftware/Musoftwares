@@ -87,7 +87,7 @@ class ProjectPayment
             throw new RuntimeException("No exchange rate for {$project->currency}");
         }
 
-        return KashierCheckoutBuilder::make()
+        $url = KashierCheckoutBuilder::make()
             ->forAmount($amount, $project->currency)
             ->forGuest($project->client_name, $project->client_email, self::ORDER_PREFIX.$project->id)
             ->withSource('app-builder', self::ORDER_PREFIX)
@@ -98,6 +98,10 @@ class ProjectPayment
                 webhook: route('builder.webhook'),
             )
             ->build();
+        // the webhook pays exactly this link's amount, so an older, cheaper link can never pay a bigger price
+        app(PaymentOrders::class)->record($project, $url, $amount, $invoiceId);
+
+        return $url;
     }
 
     /** @return array{0: int, 1: int, 2: bool}|null project id, quote version (0 for a study) and whether it paid the study */
@@ -113,14 +117,15 @@ class ProjectPayment
 
     public function __construct(private readonly BuilderReferral $referral, private readonly OriginalFiles $originals) {}
 
-    public function markPaid(BuilderProject $project, int $quoteVersion, ?string $transactionId): bool
+    /** $amount is what this payment really paid (the link's own amount); without it, the open price is assumed. */
+    public function markPaid(BuilderProject $project, int $quoteVersion, ?string $transactionId, ?float $amount = null): bool
     {
         // the gateway may send the same payment twice; a known transaction is never counted again
         if ($transactionId !== null && $transactionId === $project->payment_reference) {
             return false;
         }
         if ($project->quote_version === $quoteVersion && $project->hasBalanceDue()) {
-            return $this->markBalancePaid($project, $transactionId);
+            return $this->markBalancePaid($project, $transactionId, $amount);
         }
         if ($project->status !== BuilderProject::QUOTED || $project->quote_version !== $quoteVersion) {
             Log::warning('App builder: payment for a quote that is not open', ['project_id' => $project->id, 'quote_version' => $quoteVersion, 'transaction' => $transactionId]);
@@ -128,7 +133,7 @@ class ProjectPayment
             return false;
         }
 
-        $paid = $this->paidNow($project);
+        $paid = $amount ?? $this->paidNow($project);
         $this->queue($project, [
             'paid_total' => (float) $project->paid_total + $paid,
             'quote_paid' => $paid,
@@ -178,7 +183,7 @@ class ProjectPayment
     {
         $project->update(['payment_due' => $due]);
 
-        return $this->markPaid($project, $project->quote_version, $reference);
+        return $this->markPaid($project, $project->quote_version, $reference, $due);
     }
 
     /**
@@ -203,9 +208,9 @@ class ProjectPayment
     }
 
     /** The rest of a quote after a deposit: the files are handed over once it is paid. */
-    private function markBalancePaid(BuilderProject $project, ?string $transactionId): bool
+    private function markBalancePaid(BuilderProject $project, ?string $transactionId, ?float $amount): bool
     {
-        $paid = min($this->paidNow($project), $project->balanceDue());
+        $paid = min($amount ?? $this->paidNow($project), $project->balanceDue());
         $project->update([
             'paid_total' => (float) $project->paid_total + $paid,
             'quote_paid' => (float) $project->quote_paid + $paid,
@@ -251,10 +256,16 @@ class ProjectPayment
     /** A signed-in customer's first simple page: no payment, and the build may spend only the free cap. */
     public function startFreeBuild(BuilderProject $project, \App\Models\User $user): bool
     {
-        if (! app(FreeBuild::class)->availableTo($project, $user)) {
-            return false;
-        }
+        // the account row is locked, so two projects sent at the same moment cannot both get the one free build
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($project, $user): bool {
+            $locked = \App\Models\User::whereKey($user->id)->lockForUpdate()->firstOrFail();
 
+            return app(FreeBuild::class)->availableTo($project, $locked) && $this->queueFreeBuild($project, $locked);
+        });
+    }
+
+    private function queueFreeBuild(BuilderProject $project, \App\Models\User $user): bool
+    {
         $cap = (float) config('builder.free_build.budget_usd');
         $this->queue($project, [
             'free_build' => true,
