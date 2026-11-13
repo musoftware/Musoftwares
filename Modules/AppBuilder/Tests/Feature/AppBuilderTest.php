@@ -641,6 +641,20 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/progress', ['step' => 'writing'], $this->worker())->assertStatus(409);
     }
 
+    public function test_a_build_cut_off_by_a_worker_restart_is_claimed_again_at_once(): void
+    {
+        $project = $this->buildingProject();
+        // the lease still has two hours; without the hand-back nobody could build it until then
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
+
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/abandoned', [], $this->worker())->assertOk();
+
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.uuid', $project->uuid);
+        $this->assertSame(2, $project->refresh()->attempts);
+        // a job that is not being built cannot be handed back
+        $this->postJson('/api/builder/worker/jobs/'.$this->quotedProject()->uuid.'/abandoned', [], $this->worker())->assertStatus(409);
+    }
+
     public function test_the_owner_can_send_a_failed_build_back_to_the_worker(): void
     {
         $project = $this->buildingProject();

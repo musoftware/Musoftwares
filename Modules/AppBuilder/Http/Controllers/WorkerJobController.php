@@ -141,6 +141,18 @@ class WorkerJobController extends Controller
         return Storage::disk('local')->download($attachment->path, 'file-'.$attachment->id);
     }
 
+    /**
+     * The worker was closed in the middle of this build (an update, a restart): the build is free to be claimed again
+     * now instead of after its lease. The try still counts, so a build that keeps getting cut off stops at the limit.
+     */
+    public function abandoned(BuilderProject $project): JsonResponse
+    {
+        $this->assertBuilding($project);
+        $project->update(['lease_expires_at' => now()->subSecond()]);
+
+        return response()->json(['status' => 'queued']);
+    }
+
     /** The build needs something from the customer or the team, and waits for the answer. */
     public function question(Request $request, BuilderProject $project): JsonResponse
     {

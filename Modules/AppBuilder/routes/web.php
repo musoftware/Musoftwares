@@ -61,6 +61,7 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
         Route::get('/jobs/{project}/answers', [WorkerJobController::class, 'answers'])->name('answers');
         Route::post('/jobs/{project}/complete', [WorkerJobController::class, 'complete'])->name('complete');
         Route::post('/jobs/{project}/fail', [WorkerJobController::class, 'fail'])->name('fail');
+        Route::post('/jobs/{project}/abandoned', [WorkerJobController::class, 'abandoned'])->name('abandoned');
         Route::post('/jobs/{project}/imported', [WorkerJobController::class, 'imported'])->name('imported');
         Route::post('/jobs/{project}/released', [WorkerJobController::class, 'released'])->name('released');
     });
