@@ -66,7 +66,7 @@ class FeasibilityStudyTest extends TestCase
         $this->assertSame('150.00', $project->amount);
         $this->assertNull($project->study_status);
         $this->assertSame(0, $this->written);
-        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer_free');
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer')->assertJsonPath('study.price', '5.00');
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
     }
 
@@ -122,18 +122,12 @@ class FeasibilityStudyTest extends TestCase
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
     }
 
-    public function test_a_signed_in_customer_gets_the_study_for_free(): void
+    public function test_a_signed_in_customer_pays_for_the_study_like_anyone(): void
     {
         $uuid = $this->quote('system');
-        $user = \App\Models\User::factory()->google()->create(['email_verified_at' => now()]);
-        BuilderProject::where('uuid', $uuid)->update(['user_id' => $user->id]);
-        $this->actingAs($user)->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer_free');
 
-        $this->actingAs($user)->postJson('/ai/'.$uuid.'/study/free')->assertOk();
-
-        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
-        $this->assertSame(1, $this->written);
-        $this->assertSame('0.00', $project->study_paid);
-        $this->actingAs($user)->get('/ai/'.$uuid.'/study')->assertOk();
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer')->assertJsonPath('study.price', '5.00');
+        $this->postJson('/ai/'.$uuid.'/study/free')->assertNotFound();
+        $this->assertSame(0, $this->written);
     }
 }

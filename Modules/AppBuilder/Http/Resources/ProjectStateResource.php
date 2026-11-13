@@ -206,13 +206,12 @@ class ProjectStateResource extends JsonResource
         $study = app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class);
         $viewer = request()->user();
         if ($study->canBuy($this->resource)) {
-            // signed in: free, one tap; a guest pays, and is told signing in makes it free
-            return $study->isFreeFor($viewer) ? ['status' => 'offer_free', 'free_url' => route('builder.study.free', $this->resource)] : [
+            // everyone pays for it, signed in or not
+            return [
                 'status' => 'offer',
                 'price' => number_format($study::price(), 2),
                 'currency' => $this->currency,
                 'pay_url' => route('builder.study.pay', $this->resource),
-                'sign_in_url' => $viewer === null ? route('login', ['redirect' => route('builder.show', $this->resource, false)]) : null,
             ];
         }
         if ($this->study_status === null) {

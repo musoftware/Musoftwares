@@ -146,7 +146,7 @@ return [
     'retell_delivery' => (bool) env('BUILDER_RETELL_DELIVERY', true),
 
 
-    'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
+    'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 30),
     // the first days of the warranty: every change within the program's main idea is free, new work included;
     // only something that is really another program has a price. After them, new work is priced and fixes stay free.
     'free_changes_days' => (int) env('BUILDER_FREE_CHANGES_DAYS', 30),

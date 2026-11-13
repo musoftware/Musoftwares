@@ -273,12 +273,18 @@ class BuilderProject extends Model
     }
 
     /**
-     * Every fix is free, however many, until the warranty ends (two months after the first delivery or the import).
-     * Only for a program that was paid: an old free first build has no free changes.
+     * Every fix is free, however many, until the warranty ends (one month after the first delivery or the import).
+     * Only for a program that was paid (or the owner's own import): having an account makes nothing free.
      */
     public function isUnderWarranty(): bool
     {
-        return $this->hasDelivery() && ! $this->free_build && ! $this->hasBalanceDue() && (bool) $this->warranty_until?->isFuture();
+        return $this->hasDelivery() && $this->wasPaid() && ! $this->hasBalanceDue() && (bool) $this->warranty_until?->isFuture();
+    }
+
+    /** Money really came in for this program, or it is the owner's own project. */
+    public function wasPaid(): bool
+    {
+        return (float) $this->paid_total > 0 || $this->isOwnerImport();
     }
 
     /** The last day any change within the program's main idea is free (the start of the warranty plus the free days). */

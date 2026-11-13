@@ -1375,19 +1375,16 @@ class AppBuilderTest extends TestCase
         $this->assertSame('12.00', $project->amount);
     }
 
-    public function test_a_bug_fix_after_delivery_is_free_and_starts_without_payment(): void
+    public function test_a_program_that_was_never_paid_gets_no_free_fix_with_or_without_an_account(): void
     {
+        // the helper's build was queued without money coming in
         $project = $this->deliveredProject();
-        $paidBefore = $project->paid_total;
         $this->answerAfterDelivery('fix', 10000);
 
         $this->postJson('/ai/'.$project->uuid.'/messages', ['text' => 'الزرار مش شغال'])->assertOk()
-            ->assertJsonPath('quote.free', true);
-        $this->postJson('/ai/'.$project->uuid.'/fix')->assertOk()->assertJsonPath('status', BuilderProject::QUEUED);
-
-        $project->refresh();
-        $this->assertSame(1, $project->free_fixes_used);
-        $this->assertSame($paidBefore, $project->paid_total);
+            ->assertJsonPath('quote.free', false);
+        $this->postJson('/ai/'.$project->uuid.'/fix')->assertStatus(409);
+        $this->assertFalse($project->refresh()->isUnderWarranty());
     }
 
     public function test_a_change_or_a_fix_after_the_warranty_is_paid(): void
