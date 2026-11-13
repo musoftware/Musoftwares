@@ -11,7 +11,8 @@ use Modules\AppBuilder\Models\BuilderProject;
  * After a paid build is delivered, its price follows what the work really cost: the cost plus our share (more when a
  * referrer also earns from it), plus the designer and the study as agreed, never above the price the customer
  * accepted. A signed-in customer gets what they paid above that back as site balance for their next program; a guest
- * pays less of what is still due. Once per quote version.
+ * pays less of what is still due. Once per quote version. A price an admin marked as paid by hand is never settled:
+ * no money came in through the site, so there is nothing to give back.
  */
 class PriceSettlement
 {
@@ -49,6 +50,7 @@ class PriceSettlement
             && ! $project->free_fix
             && ! $project->free_build
             && (float) $project->quote_paid > 0
+            && ! str_starts_with((string) $project->payment_reference, ProjectPayment::ADMIN_REFERENCE)
             && $project->price_settled_version !== $project->quote_version
             // the cost is in dollars; another currency would need a rate, so its price stays as agreed
             && $project->currency === 'USD';

@@ -87,6 +87,26 @@ class UnpaidWorkWatchTest extends TestCase
         $this->actingAs(User::factory()->google()->create())->post('/admin/builder/'.$paid->uuid.'/back-to-price')->assertForbidden();
     }
 
+    public function test_an_admin_marks_requests_paid_by_hand_and_the_record_says_so(): void
+    {
+        $project = $this->project(['status' => BuilderProject::READY, 'version' => 1, 'paid_total' => 20, 'warranty_until' => now()->addDays(30)]);
+        $item = $this->change($project, ['free' => false, 'status' => BuilderRequest::UNPAID, 'amount' => 5]);
+
+        $this->actingAs($this->admin)->postJson('/admin/builder/'.$project->uuid.'/requests/mark-paid', ['ids' => (string) $item->id])->assertOk();
+
+        $this->assertNotNull($item->refresh()->paid_at);
+    }
+
+    public function test_an_admin_marks_an_inspection_paid_by_hand(): void
+    {
+        $project = $this->project(['status' => BuilderProject::QUOTED, 'customer_project' => true, 'import_url' => 'https://drive.google.com/file/d/1AbC/view']);
+
+        $status = $this->actingAs($this->admin)->postJson('/admin/builder/'.$project->uuid.'/inspect/mark-paid')->status();
+
+        // the action runs (paid, or refused because nothing is due), never a server error
+        $this->assertContains($status, [200, 302, 409]);
+    }
+
     public function test_it_runs_on_the_schedule(): void
     {
         $names = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())->map(fn ($event) => $event->description);

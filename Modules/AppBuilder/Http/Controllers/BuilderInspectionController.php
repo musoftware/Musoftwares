@@ -62,7 +62,7 @@ class BuilderInspectionController extends Controller
     /** Admins only: mark the fee paid by hand (or for a test); the inspection starts as after a real payment. */
     public function markPaid(\Illuminate\Http\Request $request, BuilderProject $project): JsonResponse
     {
-        abort_unless($this->inspection->markPaid($project, 'admin-'.$request->user()->id.'-'.now()->timestamp), 409);
+        abort_unless($this->inspection->markPaid($project, \Modules\AppBuilder\Services\ProjectPayment::ADMIN_REFERENCE.$request->user()->id.'-'.now()->timestamp), 409);
 
         return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
     }

@@ -196,7 +196,7 @@ class AdminBuilderController extends Controller
     public function markRequestsPaid(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectRequests $requests): JsonResponse
     {
         $ids = array_map('intval', explode(',', (string) $request->validate(['ids' => ['required', 'string', 'max:200', 'regex:/^\d+(,\d+)*$/']])['ids']));
-        if ($requests->markPaid($project, $ids, 'admin-'.$request->user()->id.'-'.now()->timestamp) === 0) {
+        if ($requests->markPaid($project, $ids, \Modules\AppBuilder\Services\ProjectPayment::ADMIN_REFERENCE.$request->user()->id.'-'.now()->timestamp) === 0) {
             return response()->json(['message' => __('builder.errors.no_requests')], 409);
         }
 

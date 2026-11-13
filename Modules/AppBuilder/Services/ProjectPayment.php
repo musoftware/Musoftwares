@@ -13,6 +13,9 @@ use RuntimeException;
 /** Kashier checkout for the current quote, and moving a paid project into the worker's queue. */
 class ProjectPayment
 {
+    /** The start of the payment reference when an admin marks a price as paid by hand (no money came through us). */
+    public const ADMIN_REFERENCE = 'admin-';
+
     public const ORDER_PREFIX = 'bld_';
 
     /** The order id marks a feasibility study bought on its own instead of a quote version. */
@@ -165,7 +168,7 @@ class ProjectPayment
 
         Log::info('App builder: marked paid by an admin', ['project_id' => $project->id, 'admin_id' => $adminId]);
 
-        return $this->payOutsideGateway($project, $due, 'admin-'.$adminId.'-'.now()->timestamp);
+        return $this->payOutsideGateway($project, $due, self::ADMIN_REFERENCE.$adminId.'-'.now()->timestamp);
     }
 
     /** What can be paid now in full: the open quote, or the rest after a deposit. Null when nothing is open. */

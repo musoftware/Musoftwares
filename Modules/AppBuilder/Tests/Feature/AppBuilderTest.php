@@ -267,6 +267,25 @@ class AppBuilderTest extends TestCase
         $this->assertSame($project->quote_version, $project->price_settled_version);
     }
 
+    public function test_a_price_an_admin_marked_paid_gives_nothing_back_when_the_work_costs_less(): void
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $this->usdAndEgpRates();
+        $this->actingAs($customer);
+        $project = $this->quotedProject();
+        $price = (float) $project->amount;
+
+        $this->assertTrue(app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaidByAdmin($project, 1));
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 0.10], $this->worker())->assertOk();
+
+        $project->refresh();
+        $this->assertSame($price, (float) $project->amount);
+        $this->assertEqualsWithDelta(0, $this->balanceInUsd($customer), 0.001);
+        $this->assertNull($project->price_settled_version);
+    }
+
     public function test_a_guest_keeps_the_price_they_paid_and_a_cost_above_the_price_changes_nothing(): void
     {
         $guest = $this->deliverPaid(1.00);
