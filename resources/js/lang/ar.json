@@ -2725,7 +2725,7 @@
             "secret_removed": "اتشال.",
             "import_started": "الـ worker بيحمّل المشروع. هيوصلك إيميل لما الشات يبقى جاهز تبعته للعميل.",
             "release_started": "التعديلات المستنية بتترفع على GitHub والسيرفر دلوقتي.",
-            "import_drive_only": "استخدم لينك مشاركة من Google Drive لملف .zip (أي حد معاه اللينك يقدر يشوفه)."
+            "import_drive_only": "اكتب لينك الـ repo على GitHub (https:\/\/github.com\/owner\/repo) أو لينك مشاركة من Google Drive لملف .zip."
         },
         "trial_request": "جرّبه في متصفح حقيقي",
         "trial_waiting": "بنجهّزلك متصفح حقيقي فيه البرنامج، دقيقة واحدة...",

@@ -2725,7 +2725,7 @@
             "secret_removed": "Removed.",
             "import_started": "The worker is downloading the project. You get an email when the chat is ready to send to the customer.",
             "release_started": "The waiting changes are being pushed and deployed now.",
-            "import_drive_only": "Use a Google Drive share link to a .zip file (anyone with the link can view)."
+            "import_drive_only": "Use the GitHub repo address (https:\/\/github.com\/owner\/repo) or a Google Drive share link to a .zip file."
         },
         "trial_request": "Try it in a real browser",
         "trial_waiting": "Preparing a real browser with your program, one minute...",
