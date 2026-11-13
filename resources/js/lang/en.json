@@ -2609,6 +2609,12 @@
         "preview_open": "Show the picture",
         "preview_close": "Close",
         "sign_in_google": "Sign in with Google",
+        "google_gate": {
+            "title": "Sign in to start",
+            "text": "The assistant talks with you about your project and gives you its price. To keep your chat in your account, sign in with your Google account.",
+            "button": "Continue with Google",
+            "why": "We use Google only, so every account belongs to a real person. We never see your password."
+        },
         "currency_names": {
             "EGP": "EGP",
             "SAR": "SAR",
@@ -2871,6 +2877,7 @@
             "balance_due": "Please pay the remaining amount first; then we continue with any change.",
             "no_quote": "There is no open price to pay right now.",
             "sign_in_to_open": "This chat belongs to an account. Sign in to open it.",
+            "sign_in_with_google": "Sign in with your Google account to use the assistant.",
             "no_study": "The study can be ordered only while a price is shown, once per project.",
             "request_started": "Work on this request has started, so it cannot be cancelled now.",
             "no_requests": "None of the chosen requests is waiting for payment.",
