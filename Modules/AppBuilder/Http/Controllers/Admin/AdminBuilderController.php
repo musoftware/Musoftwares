@@ -67,6 +67,7 @@ class AdminBuilderController extends Controller
             'chatUrl' => route('builder.show', $project),
             'import' => $this->importState($project),
             'requests' => $this->requestsToReview($project),
+            'workerEvents' => fn () => app(\Modules\AppBuilder\Services\WorkerActivity::class)->forAdmin($project),
         ]);
     }
 

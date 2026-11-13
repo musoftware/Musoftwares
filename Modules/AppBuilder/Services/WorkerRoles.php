@@ -32,7 +32,7 @@ class WorkerRoles
         return $this->roleOf($request) === self::MAIN || ! $this->heartbeat->seenWithin(self::MAIN, self::MAIN_SILENT_SECONDS);
     }
 
-    private function roleOf(Request $request): string
+    public function roleOf(Request $request): string
     {
         return $request->header('X-Worker-Role') === self::BACKUP ? self::BACKUP : self::MAIN;
     }

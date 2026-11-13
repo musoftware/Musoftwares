@@ -196,6 +196,23 @@ class WorkerJobController extends Controller
             : response()->json(['status' => 'enough pictures'], 429);
     }
 
+    /** The build's new commits, oldest first, one line each in the owner's log of this project. */
+    public function commits(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\WorkerActivity $activity, \Modules\AppBuilder\Services\WorkerRoles $roles): JsonResponse
+    {
+        $this->assertBuilding($project);
+        $commits = $request->validate([
+            'commits' => ['required', 'array', 'max:50'],
+            'commits.*.hash' => ['required', 'string', 'regex:/^[0-9a-f]{7,64}$/'],
+            'commits.*.at' => ['required', 'integer', 'min:0'],
+            'commits.*.message' => ['nullable', 'string', 'max:300'],
+        ])['commits'];
+        foreach ($commits as $commit) {
+            $activity->record($project, 'commit', substr($commit['hash'], 0, 7).' '.($commit['message'] ?? ''), $roles->roleOf($request));
+        }
+
+        return response()->json(['status' => 'ok', 'count' => count($commits)]);
+    }
+
     public function progress(WorkerReportRequest $request, BuilderProject $project): JsonResponse
     {
         $this->assertBuilding($project);

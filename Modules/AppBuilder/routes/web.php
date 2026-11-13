@@ -45,7 +45,7 @@ Route::middleware(['web', SignedInWithGoogle::class])->prefix('ai')->name('build
 });
 
 // The owner's worker: token only, no session, no CSRF. It calls out to here; the site never calls the worker.
-Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 'throttle:120,1'])
+Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 'throttle:120,1', \Modules\AppBuilder\Http\Middleware\RecordWorkerActivity::class])
     ->prefix('api/builder/worker')->name('builder.worker.')->whereUuid('project')->group(function () {
         Route::post('/claim', [WorkerJobController::class, 'claim'])->name('claim');
         Route::get('/trials', [\Modules\AppBuilder\Http\Controllers\LiveTrialController::class, 'pending'])->name('trials');
@@ -55,6 +55,7 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
         Route::get('/jobs/{project}/chat', [WorkerJobController::class, 'chat'])->name('chat');
         Route::get('/jobs/{project}/attachments/{attachment}', [WorkerJobController::class, 'attachment'])->whereNumber('attachment')->name('attachment');
         Route::post('/jobs/{project}/progress', [WorkerJobController::class, 'progress'])->name('progress');
+        Route::post('/jobs/{project}/commits', [WorkerJobController::class, 'commits'])->name('commits');
         Route::get('/looks', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'pending'])->name('looks');
         Route::post('/looks/{message}', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'store'])->whereNumber('message')->name('looks.store');
         Route::post('/jobs/{project}/snapshot', [WorkerJobController::class, 'snapshot'])->name('snapshot');

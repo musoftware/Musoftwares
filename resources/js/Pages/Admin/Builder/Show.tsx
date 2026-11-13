@@ -6,6 +6,7 @@ import { t } from '@/Components/Admin/SoftwareStore/t';
 import { STATUS_LABELS, Person, Visitor, deviceOf } from './Index';
 import ReleasePanel, { ImportState } from '@/Components/Admin/Builder/ReleasePanel';
 import RequestReview, { ReviewItem } from '@/Components/Admin/Builder/RequestReview';
+import WorkerLog, { WorkerEvent } from '@/Components/Admin/Builder/WorkerLog';
 
 interface Message {
     id: number;
@@ -294,7 +295,7 @@ function DesignLink({ project }: { project: Project }) {
 }
 
 /** One AI builder chat: the whole conversation, the brief, the costs, and the owner's ways to help. */
-export default function BuilderShow({ project, messages, secrets, chatUrl, import: imported, requests }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string; import: ImportState | null; requests: ReviewItem[] }) {
+export default function BuilderShow({ project, messages, secrets, chatUrl, import: imported, requests, workerEvents }: { project: Project; messages: Message[]; secrets: Secret[]; chatUrl: string; import: ImportState | null; requests: ReviewItem[]; workerEvents: WorkerEvent[] }) {
     return (
         <AdminSidebarLayout>
             <Head title={project.title || t('AI builder chat', 'محادثة منشئ البرامج')} />
@@ -319,6 +320,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl, impor
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
                     <MessageList messages={messages} />
                     <div className="min-w-0 space-y-4">
+                        <WorkerLog events={workerEvents} live={project.status === 'building'} />
                         {imported && <ReleasePanel uuid={project.uuid} state={imported} />}
                         <RetryBuild project={project} />
                         <DesignLink project={project} />
