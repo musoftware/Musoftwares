@@ -641,6 +641,27 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/progress', ['step' => 'writing'], $this->worker())->assertStatus(409);
     }
 
+    public function test_the_admin_page_keeps_the_teams_own_chats_apart_from_customers(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $customer = \App\Models\User::factory()->create();
+        $make = fn (array $fields) => BuilderProject::create(['uuid' => (string) \Illuminate\Support\Str::uuid(), 'status' => BuilderProject::CHATTING, 'currency' => 'USD'] + $fields);
+
+        $own = $make(['title' => 'admin test', 'user_id' => $admin->id, 'ip' => '156.1.1.1']);
+        $ownSignedOut = $make(['title' => 'admin signed out', 'ip' => '156.1.1.1']);
+        $buyer = $make(['title' => 'customer', 'user_id' => $customer->id, 'ip' => '156.1.1.1']);
+        $guest = $make(['title' => 'guest', 'ip' => '41.2.2.2']);
+        $noAddress = $make(['title' => 'guest without address']);
+
+        $titles = fn (string $url) => collect($this->actingAs($admin)->get($url)->assertOk()->viewData('page')['props']['projects']['data'])->pluck('title')->sort()->values()->all();
+
+        $this->assertSame(['customer', 'guest', 'guest without address'], $titles('/admin/builder'));
+        $this->assertSame(['admin signed out', 'admin test'], $titles('/admin/builder?tab=team'));
+        $this->actingAs($admin)->get('/admin/builder')->assertInertia(fn ($page) => $page->where('tabCounts', ['customers' => 3, 'team' => 2])->where('tab', 'customers'));
+    }
+
     public function test_a_build_cut_off_by_a_worker_restart_is_claimed_again_at_once(): void
     {
         $project = $this->buildingProject();

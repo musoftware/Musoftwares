@@ -146,7 +146,45 @@ function TestPush() {
     return <button type="button" onClick={send} className="rounded-lg border px-4 py-2 text-sm font-semibold">{t('Test notification', 'جرّب الإشعار')}</button>;
 }
 
-export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor, deliveryStats }: { projects: Paginated<Project>; waitingOnly: boolean; learning: Learned[]; defaultFactor: number; deliveryStats: DeliveryStats }) {
+type ChatTab = 'customers' | 'team';
+
+const TABS: { key: ChatTab; label: [string, string] }[] = [
+    { key: 'customers', label: ['Customers and guests', 'العملاء والزوار'] },
+    { key: 'team', label: ['Admin chats', 'محادثات الأدمن'] },
+];
+
+/** Customers' chats apart from the team's own tests, each tab with how many chats it holds. */
+function ChatTabs({ tab, counts, waitingOnly }: { tab: ChatTab; counts: Record<ChatTab, number>; waitingOnly: boolean }) {
+    return (
+        <div role="tablist" className="flex flex-wrap gap-2 border-b">
+            {TABS.map(({ key, label }) => (
+                <Link
+                    key={key}
+                    role="tab"
+                    aria-selected={tab === key}
+                    href={`/admin/builder?${new URLSearchParams({ ...(key === 'team' ? { tab: 'team' } : {}), ...(waitingOnly ? { waiting: '1' } : {}) })}`}
+                    preserveScroll
+                    className={`-mb-px min-h-11 border-b-2 px-4 py-2 text-sm font-semibold ${tab === key ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                >
+                    {t(...label)} <span className="font-normal text-slate-500" dir="ltr">({counts[key]})</span>
+                </Link>
+            ))}
+        </div>
+    );
+}
+
+interface IndexProps {
+    projects: Paginated<Project>;
+    waitingOnly: boolean;
+    learning: Learned[];
+    defaultFactor: number;
+    deliveryStats: DeliveryStats;
+    tab: ChatTab;
+    tabCounts: Record<ChatTab, number>;
+}
+
+export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor, deliveryStats, tab, tabCounts }: IndexProps) {
+    const tabQuery = tab === 'team' ? 'tab=team&' : '';
     return (
         <AdminSidebarLayout>
             <Head title={t('AI builder', 'منشئ البرامج')} />
@@ -155,7 +193,7 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                     <h1 className="text-2xl font-bold">{t('AI builder chats', 'محادثات منشئ البرامج')}</h1>
                     <div className="flex flex-wrap gap-2">
                         <TestPush />
-                        <Link href={waitingOnly ? '/admin/builder' : '/admin/builder?waiting=1'} className="rounded-lg border px-4 py-2 text-sm font-semibold">
+                        <Link href={waitingOnly ? `/admin/builder?${tabQuery}` : `/admin/builder?${tabQuery}waiting=1`} className="rounded-lg border px-4 py-2 text-sm font-semibold">
                             {waitingOnly ? t('Show all', 'اعرض الكل') : t('Waiting for an answer', 'مستني رد')}
                         </Link>
                     </div>
@@ -164,6 +202,8 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                 <WithoutAProgrammer stats={deliveryStats} />
                 <ImportProject />
                 <PriceLearning learning={learning} defaultFactor={defaultFactor} />
+
+                <ChatTabs tab={tab} counts={tabCounts} waitingOnly={waitingOnly} />
 
                 {projects.data.length === 0 && <p className="text-slate-500">{t('No chats yet.', 'لسه مفيش محادثات.')}</p>}
 

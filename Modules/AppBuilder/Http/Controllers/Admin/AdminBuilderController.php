@@ -26,7 +26,9 @@ class AdminBuilderController extends Controller
 
     public function index(Request $request): Response
     {
-        $projects = BuilderProject::query()
+        $chats = app(\Modules\AppBuilder\Services\AdminChats::class);
+        $team = $request->query('tab') === 'team';
+        $projects = $chats->only(BuilderProject::query(), $team)
             ->with(['user', 'referrer'])
             ->when($request->boolean('waiting'), fn ($query) => $query->where('awaiting_answer', true))
             ->latest('updated_at')
@@ -38,6 +40,8 @@ class AdminBuilderController extends Controller
         return Inertia::render('Admin/Builder/Index', [
             'projects' => $projects,
             'waitingOnly' => $request->boolean('waiting'),
+            'tab' => $team ? 'team' : 'customers',
+            'tabCounts' => $chats->counts(),
             'learning' => app(\Modules\AppBuilder\Services\BuildCostHistory::class)->summary(),
             'deliveryStats' => app(\Modules\AppBuilder\Services\DeliveryStats::class)->summary(),
             'defaultFactor' => (float) config('builder.pricing.work_factor'),
