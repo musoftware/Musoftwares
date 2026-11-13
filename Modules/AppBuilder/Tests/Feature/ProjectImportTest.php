@@ -310,12 +310,35 @@ class ProjectImportTest extends TestCase
         $this->assertStringContainsString('Laravel admin and a Flutter app', $profile);
     }
 
-    public function test_the_import_form_takes_only_a_drive_link(): void
+    public function test_the_import_form_takes_a_github_repo_or_a_drive_link_and_nothing_else(): void
     {
-        $this->actingAs($this->admin())->post('/admin/builder/import', [
-            'title' => 'X', 'description' => 'Y', 'import_url' => 'https://example.com/x.zip',
-            'locale' => 'ar', 'release_mode' => 'each', 'release_after_changes' => 1, 'release_quiet_minutes' => 60,
-        ])->assertSessionHasErrors(['import_url']);
+        $form = ['title' => 'X', 'description' => 'Y', 'locale' => 'ar', 'release_mode' => 'each', 'release_after_changes' => 1, 'release_quiet_minutes' => 60];
+        $refused = [
+            'https://example.com/x.zip',
+            'https://github.com.evil.com/musoftware/ZeinaArena',
+            'https://evil.com/github.com/musoftware/ZeinaArena',
+            'https://github.com/musoftware',
+            'https://github.com/musoftware/ZeinaArena/tree/main',
+            'https://github.com/musoftware/Zeina;rm -rf',
+            'https://token@github.com/musoftware/ZeinaArena',
+        ];
+        foreach ($refused as $link) {
+            $this->actingAs($this->admin())->post('/admin/builder/import', $form + ['import_url' => $link])->assertSessionHasErrors(['import_url']);
+        }
+        $this->assertSame(0, BuilderProject::count());
+
+        $this->actingAs($this->admin())->post('/admin/builder/import', $form + ['import_url' => 'https://github.com/musoftware/ZeinaArena'])->assertRedirect();
+
+        // the worker gets the repo address as the import's source
+        $this->assertSame('https://github.com/musoftware/ZeinaArena', BuilderProject::firstOrFail()->import_url);
+    }
+
+    public function test_a_customer_cannot_bring_a_github_link_and_only_an_admin_imports(): void
+    {
+        $form = ['title' => 'X', 'description' => 'Y', 'locale' => 'ar', 'release_mode' => 'each', 'release_after_changes' => 1, 'release_quiet_minutes' => 60, 'import_url' => 'https://github.com/musoftware/ZeinaArena'];
+
+        $this->actingAs($this->customer)->post('/admin/builder/import', $form)->assertForbidden();
+        $this->actingAs($this->customer)->postJson('/ai/inspect', ['drive_url' => 'https://github.com/musoftware/ZeinaArena', 'need' => 'fix the login page please'])->assertStatus(422);
 
         $this->assertSame(0, BuilderProject::count());
     }
