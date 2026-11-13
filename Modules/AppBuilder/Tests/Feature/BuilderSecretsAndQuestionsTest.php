@@ -17,7 +17,7 @@ use Tests\TestCase;
 /** Access details typed in the chat, questions from a running build, and the owner stepping in. */
 class BuilderSecretsAndQuestionsTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
@@ -29,6 +29,7 @@ class BuilderSecretsAndQuestionsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         // the array mailer really sends, into memory, so the test can read who got what
         config(['mail.default' => 'array']);
@@ -120,7 +121,7 @@ class BuilderSecretsAndQuestionsTest extends TestCase
     public function test_the_owner_answers_and_adds_access_details_from_the_admin_page(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
-        $admin = User::factory()->create(['onboarding_completed' => true]);
+        $admin = User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $project = $this->buildingProject();
         $asked = $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/question', ['question' => 'بيانات الـ FTP؟'], $this->worker())->json('message_id');
@@ -138,7 +139,7 @@ class BuilderSecretsAndQuestionsTest extends TestCase
     public function test_only_an_admin_can_open_the_admin_pages(): void
     {
         $project = $this->buildingProject();
-        $customer = User::factory()->create(['onboarding_completed' => true]);
+        $customer = User::factory()->google()->create(['onboarding_completed' => true]);
 
         $this->actingAs($customer)->get('/admin/builder/'.$project->uuid)->assertForbidden();
         $this->actingAs($customer)->post('/admin/builder/'.$project->uuid.'/secrets', ['name' => 'x', 'value' => 'y'])->assertForbidden();

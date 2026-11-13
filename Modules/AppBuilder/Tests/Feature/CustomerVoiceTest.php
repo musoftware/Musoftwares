@@ -15,7 +15,7 @@ use Tests\TestCase;
 /** The engineer's delivery note reaches the customer retold in plain words; the owner keeps the engineer's own note. */
 class CustomerVoiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const ENGINEER_NOTE = 'Test script now runs in 1m40s; 538/539 backend tests pass; flutter analyze clean; run php artisan migrate.';
 
@@ -27,6 +27,7 @@ class CustomerVoiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         config(['builder.retell_delivery' => true]);
         $this->app->instance(ChatModel::class, new class($this) implements ChatModel

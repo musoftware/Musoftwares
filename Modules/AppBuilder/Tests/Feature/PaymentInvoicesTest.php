@@ -23,7 +23,7 @@ class PaymentInvoicesTest extends TestCase
 
     public function test_a_deposit_is_a_partly_paid_invoice_and_the_rest_completes_the_same_one(): void
     {
-        $customer = User::factory()->create();
+        $customer = User::factory()->google()->create();
         $project = $this->project($customer->id);
         $balanceBefore = (float) $customer->balance();
         $invoices = app(PaymentInvoices::class);
@@ -43,7 +43,7 @@ class PaymentInvoicesTest extends TestCase
 
     public function test_a_payment_paid_even_while_an_older_invoice_is_unpaid(): void
     {
-        $customer = User::factory()->create();
+        $customer = User::factory()->google()->create();
         Invoice::create(['user_id' => $customer->id, 'status' => 'unpaid']);
 
         app(PaymentInvoices::class)->feePaid($this->project($customer->id), 'فحص المشروع', 5);

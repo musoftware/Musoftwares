@@ -7,13 +7,16 @@ use Modules\AppBuilder\Http\Controllers\BuilderDeliveryController;
 use Modules\AppBuilder\Http\Controllers\BuilderPaymentController;
 use Modules\AppBuilder\Http\Controllers\WorkerJobController;
 use Modules\AppBuilder\Http\Middleware\AuthenticateBuilderWorker;
+use Modules\AppBuilder\Http\Middleware\SignedInWithGoogle;
 
-Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
+// the payment provider calls this one, so it is the only /ai address that does not ask for a Google sign-in
+Route::middleware('web')->post('ai/webhook', [BuilderPaymentController::class, 'webhook'])->name('builder.webhook');
+
+Route::middleware(['web', SignedInWithGoogle::class])->prefix('ai')->name('builder.')->group(function () {
     Route::get('/', [BuilderChatController::class, 'index'])->name('index');
     Route::post('/messages', [BuilderChatController::class, 'start'])->middleware('throttle:10,1')->name('start');
     // a customer brings a project of their own (a Google Drive link) for a paid inspection
     Route::post('/inspect', [\Modules\AppBuilder\Http\Controllers\BuilderInspectionController::class, 'start'])->middleware('throttle:5,1')->name('inspect.start');
-    Route::post('/webhook', [BuilderPaymentController::class, 'webhook'])->name('webhook');
 
     // a chat that belongs to an account opens only for that account and for admins
     Route::whereUuid('project')->middleware(\Modules\AppBuilder\Http\Middleware\OnlyProjectOwner::class)->group(function () {
@@ -26,7 +29,6 @@ Route::middleware('web')->prefix('ai')->name('builder.')->group(function () {
         Route::post('/{project}/discount', [BuilderChatController::class, 'discount'])->middleware('throttle:10,1')->name('discount');
         Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1')->name('pay');
         Route::post('/{project}/pay/wallet', [BuilderPaymentController::class, 'payWithWallet'])->middleware(['auth', 'throttle:10,1'])->name('pay.wallet');
-        Route::post('/{project}/free', [BuilderPaymentController::class, 'freeBuild'])->middleware(['auth', 'verified', 'throttle:5,1'])->name('free');
         Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');

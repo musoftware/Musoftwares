@@ -17,7 +17,7 @@ use ZipArchive;
 
 class AppBuilderTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
@@ -27,6 +27,7 @@ class AppBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         config(['builder.worker_token' => self::TOKEN]);
         // these tests check the markup arithmetic; the minimum per project type has its own test
@@ -208,7 +209,7 @@ class AppBuilderTest extends TestCase
     {
         config(['builder.limits.projects_per_ip_per_day' => 1]);
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $this->actingAs($admin);
 
@@ -224,31 +225,6 @@ class AppBuilderTest extends TestCase
         \Illuminate\Support\Facades\Http::fake(['generativelanguage.googleapis.com/*' => \Illuminate\Support\Facades\Http::response(['candidates' => [['content' => ['parts' => [['text' => $json]]]]]])]);
     }
 
-    public function test_a_guest_before_a_price_talks_with_the_free_model_and_costs_nothing(): void
-    {
-        config(['builder.free_chat.key' => 'test-key']);
-        $this->geminiAnswers('أهلاً، احكيلي عن شغلك');
-
-        $uuid = $this->postJson('/ai/messages', ['text' => 'إزيك'])->assertOk()->json('uuid');
-
-        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
-        $this->assertSame('أهلاً، احكيلي عن شغلك', $project->messages()->reorder('id', 'desc')->value('content'));
-        $this->assertSame(0.0, $project->chatCostUsd());
-        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => $request->hasHeader('x-goog-api-key', 'test-key')
-            && $request['generationConfig']['responseMimeType'] === 'application/json');
-    }
-
-    public function test_a_guest_picture_reaches_the_free_model_with_its_type(): void
-    {
-        config(['builder.free_chat.key' => 'test-key']);
-        $this->geminiAnswers('شفت الصورة');
-
-        $this->post('/ai/messages', ['text' => 'زي دي', 'files' => [$this->png()]], ['Accept' => 'application/json'])->assertOk();
-
-        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => collect($request['contents'])->flatMap(fn ($content) => $content['parts'])
-            ->contains(fn ($part) => ($part['inline_data']['mime_type'] ?? null) === 'image/png'));
-    }
-
     public function test_when_the_free_model_fails_claude_answers_and_signed_in_customers_always_get_claude(): void
     {
         config(['builder.free_chat.key' => 'test-key']);
@@ -258,21 +234,10 @@ class AppBuilderTest extends TestCase
         $this->assertSame('Claude هنا', BuilderProject::where('uuid', $uuid)->firstOrFail()->messages()->reorder('id', 'desc')->value('content'));
 
         $this->geminiAnswers('مجاني');
-        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
+        $this->actingAs(\App\Models\User::factory()->google()->create(['onboarding_completed' => true]));
         $this->answer('Claude للعميل المسجّل');
         $signed = $this->postJson('/ai/messages', ['text' => 'إزيك'])->assertOk()->json('uuid');
         $this->assertSame('Claude للعميل المسجّل', BuilderProject::where('uuid', $signed)->firstOrFail()->messages()->reorder('id', 'desc')->value('content'));
-    }
-
-    public function test_a_guest_who_talks_long_without_a_price_is_asked_to_sign_in(): void
-    {
-        config(['builder.limits.guest_messages_before_sign_in' => 2]);
-        $this->answer('تمام');
-        $this->answer('تمام');
-        $uuid = $this->postJson('/ai/messages', ['text' => 'سؤال'])->assertOk()->json('uuid');
-        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تاني'])->assertOk();
-
-        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'سؤال تالت'])->assertForbidden()->assertJsonPath('message', __('builder.errors.sign_in'));
     }
 
     /** A paid quote, built and delivered by the worker at this real cost. */
@@ -291,7 +256,7 @@ class AppBuilderTest extends TestCase
     public function test_a_signed_in_customer_gets_back_what_the_work_did_not_cost(): void
     {
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
         $paid = (float) $this->quotedProjectPrice();
         $project = $this->deliverPaid(1.00, $customer);
 
@@ -308,7 +273,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame((float) $guest->quote_paid, (float) $guest->amount);
 
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
         $paid = (float) $this->quotedProjectPrice();
         $costly = $this->deliverPaid(500.00, $customer);
         $this->assertSame($paid, (float) $costly->amount);
@@ -319,7 +284,7 @@ class AppBuilderTest extends TestCase
     {
         $referrer = $this->referrer();
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
         $this->withSession(['referral' => 'ahmed']);
         $project = $this->deliverPaid(4.00, $customer);
 
@@ -358,30 +323,6 @@ class AppBuilderTest extends TestCase
         return collect(app('mailer')->getSymfonyTransport()->messages())
             ->mapWithKeys(fn ($sent) => [$sent->getOriginalMessage()->getSubject() => $sent->getEnvelope()->getRecipients()[0]->getAddress()])
             ->all();
-    }
-
-    public function test_a_guest_who_pays_gets_an_account_and_the_project_link_by_email(): void
-    {
-        config(['mail.default' => 'array']);
-        $project = $this->quotedProject();
-        $project->update(['client_name' => 'منى', 'client_email' => 'Mona@Example.com', 'client_whatsapp' => '01012345678']);
-        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-ACCOUNT');
-
-        $user = \App\Models\User::where('email', 'mona@example.com')->firstOrFail();
-        $this->assertSame($user->id, $project->refresh()->user_id);
-        $this->assertSame('mona@example.com', strtolower($this->sentMails()[__('builder.mail_paid_subject', [], 'ar')] ?? ''));
-
-        // an existing account is used, never a second one
-        $again = $this->quotedProject();
-        $again->update(['client_email' => 'mona@example.com']);
-        app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($again, $again->quote_version, 'TX-ACCOUNT-2');
-        $this->assertSame($user->id, $again->refresh()->user_id);
-        $this->assertSame(1, \App\Models\User::where('email', 'mona@example.com')->count());
-
-        // and the delivery is announced too
-        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
-        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1000], $this->worker())->assertOk();
-        $this->assertArrayHasKey(__('builder.mail_ready_subject', [], 'ar'), $this->sentMails());
     }
 
     public function test_a_quiet_customer_gets_a_reminder_then_the_discount_by_email_once_each(): void
@@ -424,35 +365,9 @@ class AppBuilderTest extends TestCase
         ]);
     }
 
-    public function test_a_signed_in_customers_first_simple_page_is_free_once_with_a_capped_budget(): void
-    {
-        // a guest sees the offer as a reason to sign in, not as a button
-        $this->quotePage();
-        $guestChat = $this->postJson('/ai/messages', ['text' => 'صفحة منيو'])->assertOk()->json('uuid');
-        $this->assertNotNull($this->getJson('/ai/'.$guestChat.'/state')->json('quote.free_build.sign_in_url'));
-        $this->postJson('/ai/'.$guestChat.'/free')->assertUnauthorized();
-
-        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
-        $this->quotePage();
-        $uuid = $this->postJson('/ai/messages', ['text' => 'صفحة منيو'])->assertOk()->json('uuid');
-        $url = $this->getJson('/ai/'.$uuid.'/state')->json('quote.free_build.url');
-        $this->postJson($url)->assertOk()->assertJsonPath('status', BuilderProject::QUEUED);
-
-        $project = BuilderProject::where('uuid', $uuid)->firstOrFail();
-        $this->assertTrue($project->free_build);
-        $this->assertSame(0.0, (float) $project->paid_total);
-        $this->assertLessThanOrEqual(1.0, (float) $project->budget_usd);
-
-        // one per account: the next page is paid
-        $this->quotePage();
-        $next = $this->postJson('/ai/messages', ['text' => 'صفحة تانية'])->assertOk()->json('uuid');
-        $this->assertNull($this->getJson('/ai/'.$next.'/state')->json('quote.free_build'));
-        $this->postJson('/ai/'.$next.'/free')->assertStatus(409);
-    }
-
     public function test_a_bigger_project_is_never_free(): void
     {
-        $this->actingAs(\App\Models\User::factory()->create(['onboarding_completed' => true]));
+        $this->actingAs(\App\Models\User::factory()->google()->create(['onboarding_completed' => true]));
         $project = $this->quotedProject();
         $this->assertNull($this->getJson('/ai/'.$project->uuid.'/state')->json('quote.free_build'));
     }
@@ -462,7 +377,7 @@ class AppBuilderTest extends TestCase
         $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
         $egp = Currency::firstOrCreate(['currency' => 'EGP'], ['symbol' => 'EGP']);
         CurrenciesExchange::create(['date_string' => now()->toDateString(), 'currency1' => $usd->id, 'currency2' => $egp->id, 'rate' => 50]);
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'currency_id' => $egp->id]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $egp->id]);
         $this->actingAs($customer);
         $project = $this->quotedProject();
         $priceInEgp = (float) $project->amount * 50;
@@ -482,13 +397,6 @@ class AppBuilderTest extends TestCase
         $this->assertSame($customer->id, $project->user_id);
         $this->assertEqualsWithDelta(100, (float) $customer->refresh()->balance(), 0.01);
         $this->assertSame($project->uuid, $this->postJson('/api/builder/worker/claim', [], $this->worker())->json('job.uuid'));
-    }
-
-    public function test_a_guest_cannot_pay_from_a_wallet(): void
-    {
-        $project = $this->quotedProject();
-        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('wallet', null);
-        $this->postJson('/ai/'.$project->uuid.'/pay/wallet')->assertUnauthorized();
     }
 
     public function test_paying_the_open_quote_queues_the_build(): void
@@ -644,9 +552,9 @@ class AppBuilderTest extends TestCase
     public function test_the_admin_page_keeps_the_teams_own_chats_apart_from_customers(): void
     {
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
-        $customer = \App\Models\User::factory()->create();
+        $customer = \App\Models\User::factory()->google()->create();
         $make = fn (array $fields) => BuilderProject::create(['uuid' => (string) \Illuminate\Support\Str::uuid(), 'status' => BuilderProject::CHATTING, 'currency' => 'USD'] + $fields);
 
         $own = $make(['title' => 'admin test', 'user_id' => $admin->id, 'ip' => '156.1.1.1']);
@@ -682,7 +590,7 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/fail', ['error' => 'The pipe is being closed.', 'cost_usd' => 40], $this->worker())->assertOk();
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $this->actingAs($admin)->post('/admin/builder/'.$project->uuid.'/retry')->assertRedirect();
 
@@ -810,7 +718,7 @@ class AppBuilderTest extends TestCase
 
     public function test_a_signed_in_customer_finds_their_projects_on_the_start_page(): void
     {
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
 
         $this->answer('تمام، احكيلي أكتر');
         $uuid = $this->actingAs($customer)->postJson('/ai/messages', ['text' => 'عايز سيستم'])->assertOk()->json('uuid');
@@ -824,16 +732,6 @@ class AppBuilderTest extends TestCase
         $this->actingAs($customer)->get('/ai')->assertOk()
             ->assertSee(__('builder.my_projects'))->assertSee('متجر قديم')->assertSee('/ai/'.$uuid, false)
             ->assertSee('data-size="big"', false)->assertDontSee('id="login-ask"', false);
-    }
-
-    public function test_a_guest_choosing_a_big_project_is_asked_to_sign_in_first(): void
-    {
-        $page = $this->get('/ai')->assertOk();
-
-        $page->assertSee(__('builder.start_big'))->assertSee(__('builder.start_small'))->assertSee(__('builder.start_login'));
-        // sign-in brings them back to the chat, past the choice
-        $page->assertSee(e(route('login', ['redirect' => '/ai?size=big'])), false);
-        $page->assertSee('id="login-ask"', false)->assertDontSee('class="projects"', false);
     }
 
     public function test_the_chat_speaks_the_customers_language_and_never_sends_them_to_the_team(): void
@@ -857,7 +755,7 @@ class AppBuilderTest extends TestCase
         $project->update(['paid_total' => 20, 'build_cost_usd' => 3.5]);
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
 
         // one chat turn: 1200 tokens in x $0.10 + 300 out x $0.50 per million = $0.00027
@@ -1310,7 +1208,7 @@ class AppBuilderTest extends TestCase
 
         $payment->markPaid($project, $project->quote_version, 'TX-1');
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $room = (float) $project->price_max - (float) $project->amount;
         // asking for more than the range allows stops at its top
@@ -1360,12 +1258,12 @@ class AppBuilderTest extends TestCase
         $project = $this->quotedProject();
         // a customer never gets the button, and cannot call the route
         $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('admin_paid_url', null);
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $this->actingAs($customer)->postJson('/admin/builder/'.$project->uuid.'/mark-paid')->assertForbidden();
         $this->assertSame(BuilderProject::QUOTED, $project->refresh()->status);
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $url = $this->actingAs($admin)->getJson('/ai/'.$project->uuid.'/state')->json('admin_paid_url');
         $this->assertNotNull($url);
@@ -1602,7 +1500,7 @@ class AppBuilderTest extends TestCase
     private function referrer(): \App\Models\User
     {
         $currency = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
-        $user = \App\Models\User::factory()->create(['currency_id' => $currency->id]);
+        $user = \App\Models\User::factory()->google()->create(['currency_id' => $currency->id]);
         \App\Models\UserReferral::create(['user_id' => $user->id, 'title' => 'Default', 'key' => 'abc123', 'slug' => 'ahmed']);
 
         return $user;
@@ -1610,13 +1508,13 @@ class AppBuilderTest extends TestCase
 
     public function test_the_owner_sees_who_started_a_chat_their_address_and_device(): void
     {
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true, 'name' => 'Sara Ali', 'email' => 'sara@example.com']);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'name' => 'Sara Ali', 'email' => 'sara@example.com']);
         $this->answer('Sure.');
         $uuid = $this->actingAs($customer)->withHeaders(['User-Agent' => 'Mozilla/5.0 (Linux; Android 14) Chrome/130.0'])
             ->postJson('/ai/messages', ['text' => 'a menu page'])->assertOk()->json('uuid');
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $this->actingAs($admin)->get('/admin/builder/'.$uuid)->assertOk()->assertInertia(fn ($page) => $page
             ->where('project.visitor.user.name', 'Sara Ali')
@@ -1639,22 +1537,6 @@ class AppBuilderTest extends TestCase
         $project->refresh();
         $this->assertNull($project->paid_at);
         $this->assertSame(0.0, (float) $project->paid_total);
-    }
-
-    public function test_an_admin_opening_a_guest_chat_does_not_take_it_but_a_customer_does(): void
-    {
-        $this->answer('Sure.');
-        $uuid = $this->postJson('/ai/messages', ['text' => 'a menu page'])->assertOk()->json('uuid');
-
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
-        $admin->assignRole('admin');
-        $this->actingAs($admin)->get('/ai/'.$uuid)->assertOk();
-        $this->assertNull(BuilderProject::where('uuid', $uuid)->value('user_id'));
-
-        $customer = \App\Models\User::factory()->create(['onboarding_completed' => true]);
-        $this->actingAs($customer)->get('/ai/'.$uuid)->assertOk();
-        $this->assertSame($customer->id, BuilderProject::where('uuid', $uuid)->value('user_id'));
     }
 
     public function test_the_short_ai_link_keeps_the_referral_and_opens_the_chat(): void
@@ -1727,7 +1609,7 @@ class AppBuilderTest extends TestCase
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertNoContent();
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
         $this->actingAs($admin)->post('/admin/builder/'.$uuid.'/design', ['design_url' => 'https://www.figma.com/design/abc/Company'])->assertRedirect();
 

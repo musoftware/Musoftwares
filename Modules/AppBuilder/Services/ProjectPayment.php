@@ -253,30 +253,6 @@ class ProjectPayment
         return true;
     }
 
-    /** A signed-in customer's first simple page: no payment, and the build may spend only the free cap. */
-    public function startFreeBuild(BuilderProject $project, \App\Models\User $user): bool
-    {
-        // the account row is locked, so two projects sent at the same moment cannot both get the one free build
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($project, $user): bool {
-            $locked = \App\Models\User::whereKey($user->id)->lockForUpdate()->firstOrFail();
-
-            return app(FreeBuild::class)->availableTo($project, $locked) && $this->queueFreeBuild($project, $locked);
-        });
-    }
-
-    private function queueFreeBuild(BuilderProject $project, \App\Models\User $user): bool
-    {
-        $cap = (float) config('builder.free_build.budget_usd');
-        $this->queue($project, [
-            'free_build' => true,
-            'user_id' => $project->user_id ?? $user->id,
-            'budget_usd' => min((float) $project->budget_usd, $cap),
-        ]);
-        $this->tellOwner($project, 'Free first build started: '.$project->title);
-
-        return true;
-    }
-
     private function queue(BuilderProject $project, array $extra): void
     {
         $this->queueWithoutAsking($project, $extra);

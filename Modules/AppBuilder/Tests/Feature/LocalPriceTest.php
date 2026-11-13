@@ -12,11 +12,12 @@ use Tests\TestCase;
 /** The chat page shows prices in the customer's own money, at the same rate the payment gateway converts with. */
 class LocalPriceTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         $usd = Currency::create(['currency' => 'USD', 'symbol' => '$', 'string_format' => '%v $', 'country_codes' => ['US'], 'is_default' => true]);
         $egp = Currency::create(['currency' => 'EGP', 'symbol' => 'EGP', 'string_format' => '%v EGP', 'country_codes' => ['EG']]);
         CurrenciesExchange::create(['currency1' => $usd->id, 'currency2' => $egp->id, 'rate' => 50, 'date_string' => now()->toDateString()]);

@@ -17,7 +17,7 @@ use Tests\TestCase;
  */
 class ProjectInspectionTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
@@ -26,6 +26,7 @@ class ProjectInspectionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         config(['builder.worker_token' => self::TOKEN, 'services.kashier.merchant_id' => 'MID-1', 'services.kashier.secret_key' => 'secret', 'services.kashier.mode' => 'test']);
         $usd = \App\Models\Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);

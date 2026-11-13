@@ -17,7 +17,7 @@ use Tests\TestCase;
  */
 class FreeChangesTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     /** @var list<ChatTurn> */
     public array $answers = [];
@@ -25,6 +25,7 @@ class FreeChangesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         config(['builder.owner_approval' => false, 'builder.warranty_days' => 60, 'builder.free_changes_days' => 45]);
         $this->app->instance(ChatModel::class, new class($this) implements ChatModel

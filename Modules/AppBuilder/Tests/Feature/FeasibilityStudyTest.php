@@ -13,7 +13,13 @@ use Tests\TestCase;
 /** The feasibility study is bought on its own for a small fixed price, written only then, and comes off the project price. */
 class FeasibilityStudyTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signInWithGoogle();
+    }
 
     public int $written = 0;
 
@@ -60,24 +66,8 @@ class FeasibilityStudyTest extends TestCase
         $this->assertSame('150.00', $project->amount);
         $this->assertNull($project->study_status);
         $this->assertSame(0, $this->written);
-        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer')->assertJsonPath('study.price', '5.00');
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer_free');
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
-    }
-
-    public function test_a_study_written_for_free_before_the_rule_stays_closed_until_it_is_paid(): void
-    {
-        $uuid = $this->quote('system');
-        // written by the old flow, which gave every system a study with its price
-        BuilderProject::where('uuid', $uuid)->update(['study_status' => 'ready', 'study_html' => '<p>دراسة قديمة</p>', 'study_fee' => 5]);
-
-        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer');
-        $this->get('/ai/'.$uuid.'/study')->assertNotFound();
-
-        app(\Modules\AppBuilder\Services\Study\FeasibilityStudy::class)->markPaid(BuilderProject::where('uuid', $uuid)->firstOrFail(), 'tx-1');
-
-        // it opens now, and Claude did not write it again
-        $this->assertSame(0, $this->written);
-        $this->get('/ai/'.$uuid.'/study')->assertOk()->assertSee('دراسة قديمة', false);
     }
 
     public function test_paying_the_study_writes_it_and_takes_it_off_the_project_price(): void
@@ -132,12 +122,10 @@ class FeasibilityStudyTest extends TestCase
         $this->get('/ai/'.$uuid.'/study')->assertNotFound();
     }
 
-    public function test_a_signed_in_customer_gets_the_study_for_free_and_a_guest_is_told_to_sign_in(): void
+    public function test_a_signed_in_customer_gets_the_study_for_free(): void
     {
         $uuid = $this->quote('system');
-        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer')->assertJsonPath('study.sign_in_url', fn ($url) => str_contains((string) $url, '/login'));
-
-        $user = \App\Models\User::factory()->create(['email_verified_at' => now()]);
+        $user = \App\Models\User::factory()->google()->create(['email_verified_at' => now()]);
         BuilderProject::where('uuid', $uuid)->update(['user_id' => $user->id]);
         $this->actingAs($user)->getJson('/ai/'.$uuid.'/state')->assertJsonPath('study.status', 'offer_free');
 
@@ -147,14 +135,5 @@ class FeasibilityStudyTest extends TestCase
         $this->assertSame(1, $this->written);
         $this->assertSame('0.00', $project->study_paid);
         $this->actingAs($user)->get('/ai/'.$uuid.'/study')->assertOk();
-    }
-
-    public function test_a_guest_cannot_take_the_free_study(): void
-    {
-        $uuid = $this->quote('system');
-
-        $this->postJson('/ai/'.$uuid.'/study/free')->assertForbidden();
-
-        $this->assertSame(0, $this->written);
     }
 }

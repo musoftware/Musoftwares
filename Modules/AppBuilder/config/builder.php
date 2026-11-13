@@ -28,12 +28,6 @@ return [
         'markup' => (float) env('BUILDER_SETTLEMENT_MARKUP', 0.20),
         'referral_markup' => (float) env('BUILDER_SETTLEMENT_REFERRAL_MARKUP', 0.50),
     ],
-    // a signed-in customer's first simple page is built free, once per account, with a hard spending cap
-    'free_build' => [
-        'enabled' => (bool) env('BUILDER_FREE_BUILD', true),
-        'types' => ['page'],
-        'budget_usd' => (float) env('BUILDER_FREE_BUILD_BUDGET', 1.0),
-    ],
     'chat_web_search' => [
         'enabled' => (bool) env('BUILDER_CHAT_WEB_SEARCH', true),
         'tool' => env('BUILDER_CHAT_WEB_SEARCH_TOOL', 'web_search_20250305'),
@@ -155,7 +149,7 @@ return [
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 60),
     // the first days of the warranty: every change within the program's main idea is free, new work included;
     // only something that is really another program has a price. After them, new work is priced and fixes stay free.
-    'free_changes_days' => (int) env('BUILDER_FREE_CHANGES_DAYS', 45),
+    'free_changes_days' => (int) env('BUILDER_FREE_CHANGES_DAYS', 30),
 
     // A customer's own project, brought as a Google Drive link: a fixed fee to inspect it in a locked box (no internet,
     // nothing else on the build PC), and the maintenance price shows after it. The fee is its own price.

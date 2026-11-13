@@ -18,13 +18,14 @@ use Tests\TestCase;
  */
 class ProjectRequestsTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         // the request flow on its own; the owner's approval in front of it is OwnerReviewTest
         config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => false, 'builder.free_changes_days' => 0]);

@@ -42,4 +42,12 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /** An account that signed in with Google at least once, as the AI builder requires. */
+    public function google(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'provider_id' => (string) fake()->unique()->numerify('1##################'),
+        ]);
+    }
 }

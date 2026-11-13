@@ -74,6 +74,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)
     ->everyMinute()
     ->withoutOverlapping(2);
 
+// the AI builder: work waiting for the engineer with no payment behind it is reported to the owner, once each
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\UnpaidWorkWatch::class)->check())
+    ->name('builder-unpaid-watch')
+    ->everyTenMinutes()
+    ->withoutOverlapping(8);
+
 // the AI builder: a paid build that crashed (not a real failure) goes back to the worker by itself, twice at most
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\CrashRetries::class)->retryAll())
     ->name('builder-crash-retries')

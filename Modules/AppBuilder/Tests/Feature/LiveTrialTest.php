@@ -12,13 +12,14 @@ use ZipArchive;
 /** The customer asks for a live trial, the worker starts it and reports the link, and it closes on time. */
 class LiveTrialTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         config(['builder.worker_token' => self::TOKEN]);
     }

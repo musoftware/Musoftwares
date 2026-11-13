@@ -98,7 +98,9 @@ class SocialLoginController extends Controller
 
                 if ($existingUser) {
                     if ($existingUser->id === $authUser->id) {
-                        return redirect()->route('profile.edit')->with('status', __('general.google_account_already_linked', ['email' => $googleEmail]));
+                        $this->rememberGoogle($authUser, $googleUser);
+
+                        return redirect()->intended(route('profile.edit'))->with('status', __('general.google_account_already_linked', ['email' => $googleEmail]));
                     }
 
                     return redirect()->route('profile.edit')->with('error', __('general.google_email_linked_other_account', ['email' => $googleEmail]));
@@ -112,8 +114,9 @@ class SocialLoginController extends Controller
                     'source' => UserEmail::SOURCE_SELF,
                     'added_by_user_id' => $authUser->id,
                 ]);
+                $this->rememberGoogle($authUser, $googleUser);
 
-                return redirect()->route('profile.edit')->with('status', __('general.google_account_linked_success', ['email' => $googleEmail]));
+                return redirect()->intended(route('profile.edit'))->with('status', __('general.google_account_linked_success', ['email' => $googleEmail]));
             }
 
             // Handle Guest Login / Registration
@@ -140,6 +143,7 @@ class SocialLoginController extends Controller
                 event(new Registered($user));
             }
 
+            $this->rememberGoogle($user, $googleUser);
             Auth::login($user, true);
 
             return redirect()->intended(route('dashboard', absolute: false));
@@ -148,5 +152,19 @@ class SocialLoginController extends Controller
             $targetRoute = Auth::check() ? 'profile.edit' : 'login';
             return redirect()->route($targetRoute)->with('error', __('general.google_login_failed', ['message' => $e->getMessage()]));
         }
+    }
+
+    /**
+     * Keeps Google's id for the person on the account: the AI builder opens only for accounts that came through
+     * Google at least once. The first Google account linked stays the one recorded.
+     */
+    private function rememberGoogle(User $user, array $googleUser): void
+    {
+        $googleId = (string) ($googleUser['sub'] ?? '');
+        if ($googleId === '' || $user->provider_id !== null) {
+            return;
+        }
+
+        $user->forceFill(['provider_id' => $googleId])->save();
     }
 }

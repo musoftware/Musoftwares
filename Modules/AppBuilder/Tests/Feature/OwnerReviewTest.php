@@ -21,7 +21,7 @@ use Tests\TestCase;
  */
 class OwnerReviewTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
@@ -30,12 +30,13 @@ class OwnerReviewTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         Notification::fake();
         // new work priced, as after the free first period; FreeChangesTest covers that period
         config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => true, 'builder.free_changes_days' => 0]);
         Role::findOrCreate('admin');
-        $this->owner = User::factory()->create(['email_verified_at' => now()]);
+        $this->owner = User::factory()->google()->create(['email_verified_at' => now()]);
         $this->owner->assignRole('admin');
     }
 
@@ -141,7 +142,7 @@ class OwnerReviewTest extends TestCase
     {
         $project = $this->deliveredProject();
         $item = $this->customerAsks($project, 'fix', 'زرار');
-        $customer = User::factory()->create(['email_verified_at' => now()]);
+        $customer = User::factory()->google()->create(['email_verified_at' => now()]);
 
         $this->actingAs($customer)->post('/admin/builder/'.$project->uuid.'/requests/'.$item->id.'/approve')->assertForbidden();
 

@@ -12,13 +12,14 @@ use Tests\TestCase;
 /** The owner imports a customer's project; the customer changes it in the chat; changes go to GitHub and the server. */
 class ProjectImportTest extends TestCase
 {
-    use RefreshDatabase;
+    use \Modules\AppBuilder\Tests\SignsInWithGoogle, RefreshDatabase;
 
     private const TOKEN = 'worker-secret-token';
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->signInWithGoogle();
         Storage::fake('local');
         // the request flow on its own; the owner's approval in front of it is OwnerReviewTest
         config(['builder.worker_token' => self::TOKEN, 'builder.owner_approval' => false, 'builder.free_changes_days' => 0]);
@@ -32,7 +33,7 @@ class ProjectImportTest extends TestCase
     private function admin(): \App\Models\User
     {
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $admin = \App\Models\User::factory()->create(['onboarding_completed' => true]);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
         $admin->assignRole('admin');
 
         return $admin;
@@ -50,7 +51,7 @@ class ProjectImportTest extends TestCase
             'release_quiet_minutes' => 60,
             'deploy_enabled' => true,
         ])->assertRedirect();
-        auth()->logout();
+        $this->actingAs($this->customer);
 
         return BuilderProject::firstOrFail();
     }
@@ -81,7 +82,7 @@ class ProjectImportTest extends TestCase
         $this->assertSame(['aaaaaaa1', 'bbbbbbb2'], [$item->refresh()->git_from, $item->git_to]);
 
         $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/requests/'.$item->id.'/rollback')->assertRedirect();
-        auth()->logout();
+        $this->actingAs($this->customer);
 
         $job = $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->json('job');
         $this->assertSame('rollback', $job['kind']);
