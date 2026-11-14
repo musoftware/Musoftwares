@@ -67,6 +67,7 @@ return [
         'empty' => 'No requests yet. Any change you write in the chat shows here.',
         'free' => 'Free',
         'status' => ['unpaid' => 'Waiting for payment', 'reviewing' => 'The engineer is reviewing it', 'ready' => 'In line', 'locked' => 'Waiting for more changes to open', 'building' => 'Working on it', 'done' => 'Done'],
+        'groups' => ['building' => 'Working on it now', 'unpaid' => 'Waiting for payment', 'queue' => 'In line', 'done' => 'Done'],
         'rolled_back' => 'We took this change back, the program is as it was before it: :title',
         'review' => 'Review and approve (admin)',
         'rejected' => 'We reviewed ":title" and will not build it as it is. Write to us here if you want to talk it over.',

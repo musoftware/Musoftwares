@@ -138,6 +138,19 @@
         .show-requests{display:none}
         body.has-requests .show-requests{display:inline-flex}
         .requests .close{display:inline-flex;align-items:center}
+        /* the requests in four cards that open and close: working now, waiting for payment, in line, done */
+        .requests > *{flex:none}
+        .req-group{border:1px solid var(--line);border-radius:14px;background:#fff}
+        .req-group summary{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;font-weight:600;cursor:pointer;list-style:none}
+        .req-group summary::-webkit-details-marker{display:none}
+        .req-group summary::after{content:"";width:8px;height:8px;margin-inline-start:auto;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+        .req-group[open] summary::after{transform:translateY(2px) rotate(-135deg)}
+        .req-group summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:14px}
+        .req-group .count{min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:var(--soft);color:var(--ink);font-size:13px;line-height:24px;text-align:center}
+        .req-group.building .count,.req-group.unpaid .count{background:var(--ink);color:#fff}
+        .req-group .items{padding:0 14px 6px}
+        .req-group .items .req:first-child{border-top:0}
+        .req-group .pay{margin:0 0 8px}
         .req{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:10px 0;border-top:1px solid var(--line)}
         label.req{cursor:pointer}
         .req input{width:20px;height:20px;margin:4px 0 0;flex:none}
@@ -876,10 +889,35 @@
         if (changes) nodes.push(el('p', {class: 'hint'}, (changes.left ? T.requests.changes_left : changes.pack ? T.requests.changes_pack : T.requests.changes_used)
             .replaceAll(':total', changes.total).replace(':left', changes.left).replace(':amount', money(changes.pack, list.currency))));
         if (!list.items.length) return [...nodes, el('p', {class: 'hint'}, T.requests.empty)];
-        list.items.forEach((item) => nodes.push(requestRow(item, list.currency)));
-        const unpaid = list.items.filter((item) => item.status === 'unpaid');
-        if (unpaid.length) nodes.push(requestsPay(list, unpaid));
-        return nodes;
+        return [...nodes, ...REQUEST_GROUPS.map((group) => requestGroup(group, list)).filter(Boolean)];
+    }
+
+    /** Which card each request sits in, by its status; a card with no requests is not shown. */
+    const REQUEST_GROUPS = [
+        {key: 'building', statuses: ['building'], open: true},
+        {key: 'unpaid', statuses: ['unpaid', 'locked'], open: true},
+        {key: 'queue', statuses: ['reviewing', 'ready'], open: true},
+        {key: 'done', statuses: ['done'], open: false},
+    ];
+
+    // a card the customer opened or closed stays that way when the list is drawn again
+    const groupOpen = {};
+
+    /** One card: its name and count, its requests, and for the unpaid card the payment. */
+    function requestGroup(group, list) {
+        const items = list.items.filter((item) => group.statuses.includes(item.status));
+        if (!items.length) return null;
+        const card = el('details', {class: 'req-group ' + group.key});
+        card.open = groupOpen[group.key] ?? group.open;
+        card.addEventListener('toggle', () => { groupOpen[group.key] = card.open; });
+        const summary = el('summary', {});
+        summary.append(el('span', {}, T.requests.groups[group.key]), el('span', {class: 'count'}, String(items.length)));
+        const body = el('div', {class: 'items'});
+        items.forEach((item) => body.append(requestRow(item, list.currency)));
+        const unpaid = items.filter((item) => item.status === 'unpaid');
+        if (unpaid.length) body.append(requestsPay(list, unpaid));
+        card.append(summary, body);
+        return card;
     }
 
     /** One request: fix or development, free or its price, and where it is now. An unpaid one can be ticked. */
