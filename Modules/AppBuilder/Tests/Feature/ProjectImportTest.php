@@ -151,12 +151,15 @@ class ProjectImportTest extends TestCase
         // an hour of silence after the last word and the last delivery
         $this->travel(61)->minutes();
         $this->assertSame(1, $imports->queueDueReleases());
+        $costBefore = (float) $project->refresh()->build_cost_usd;
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.kind', 'release');
-        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/released', ['pull_request_url' => 'https://github.com/acme/shop-erp/pull/8', 'deployed' => true], $this->worker())->assertOk();
+        $this->postJson('/api/builder/worker/jobs/'.$project->uuid.'/released', ['pull_request_url' => 'https://github.com/acme/shop-erp/pull/8', 'deployed' => true, 'release_cost_usd' => 0.42], $this->worker())->assertOk();
 
         $project->refresh();
         $this->assertSame(BuilderProject::READY, $project->status);
         $this->assertSame(0, $project->changesWaiting());
+        // what the deploy spent is counted on the project
+        $this->assertEqualsWithDelta($costBefore + 0.42, (float) $project->build_cost_usd, 0.0001);
     }
 
     public function test_a_failed_release_tells_only_the_owner_and_waits_for_release_now(): void

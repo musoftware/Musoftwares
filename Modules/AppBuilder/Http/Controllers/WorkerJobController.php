@@ -104,6 +104,7 @@ class WorkerJobController extends Controller
         $this->assertBuilding($project);
         abort_unless(in_array($project->job_kind, [BuilderProject::JOB_RELEASE, BuilderProject::JOB_ROLLBACK], true), 409, 'This job is not a release.');
         $imports->released($project, $request->validated('pull_request_url'), (bool) $request->validated('deployed'), (string) $request->validated('note'), $request->file('apk'));
+        $imports->countReleaseCost($project, (float) $request->validated('release_cost_usd'));
 
         return response()->json(['status' => 'released']);
     }
@@ -237,6 +238,7 @@ class WorkerJobController extends Controller
         $imports = app(\Modules\AppBuilder\Services\ProjectImports::class);
         // the engineer updated the project's study (MUSOFTWARE.md) with what the change added
         $imports->updateStudy($project, (string) $request->validated('study'));
+        $imports->countReleaseCost($project, (float) $request->validated('release_cost_usd'));
         // "after every change": the build already pushed its pull request and deployed
         if ($project->isOwnerImport() && $request->boolean('released')) {
             $imports->released($project, $request->validated('pull_request_url'), $request->boolean('deployed'), (string) $request->validated('note'), $request->file('apk'));

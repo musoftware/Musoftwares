@@ -191,6 +191,14 @@ class ProjectImports
         $this->payment->tellOwner($project, 'Released: '.$project->title.($pullRequestUrl ? ' '.$pullRequestUrl : '').($deployed ? ' (deployed)' : '').' '.Str::limit($note, 500));
     }
 
+    /** What a release spent is part of what the project cost us; it does not teach the price of the next build. */
+    public function countReleaseCost(BuilderProject $project, float $costUsd): void
+    {
+        if ($costUsd > 0) {
+            $project->increment('build_cost_usd', $costUsd);
+        }
+    }
+
     /**
      * An import or a release failed: the owner hears, the customer is not told a build failed. A failed import
      * waits for the owner to fix the link and retry; a failed release leaves the delivered changes waiting.

@@ -56,6 +56,8 @@ class WorkerReportRequest extends FormRequest
             'note' => ['nullable', 'string', 'max:4000'],
             // the build was delivered but its release did not go out
             'release_error' => ['nullable', 'string', 'max:4000'],
+            // what the deploy spent on the cheap model; counted on the project like a build
+            'release_cost_usd' => ['nullable', 'numeric', 'min:0', 'max:10000'],
             // the app's new version, built by the release the way the project builds it
             'apk' => ['nullable', 'file', 'max:'.(int) config('builder.limits.archive_kb')],
         ];
