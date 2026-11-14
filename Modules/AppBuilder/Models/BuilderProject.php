@@ -247,9 +247,27 @@ class BuilderProject extends Model
     /** The language of the customer's last written line: the chat answers in it, even if they switched. */
     public function lastMessageLanguage(): string
     {
-        $last = (string) $this->messages()->where('role', BuilderMessage::USER)->where('content', '!=', '')->reorder('id', 'desc')->value('content');
+        $recent = $this->messages()->where('role', BuilderMessage::USER)->where('content', '!=', '')->reorder('id', 'desc')->limit(10)->pluck('content');
+        foreach ($recent as $message) {
+            // a link, a number or a file name says nothing about the language: the message before it does
+            $words = (string) preg_replace('~https?://\S+|\S+\.\w{2,5}\b~u', ' ', (string) $message);
+            if (preg_match('/\p{Arabic}/u', $words)) {
+                return 'ar';
+            }
+            if (preg_match('/\p{Latin}{2,}/u', $words)) {
+                return 'en';
+            }
+        }
 
-        return preg_match('/\p{Arabic}/u', $last) ? 'ar' : 'en';
+        return $this->locale === 'en' ? 'en' : 'ar';
+    }
+
+    /** The Arabic the chat writes for this customer: their own dialect once they showed one, otherwise their country's. */
+    public function spokenArabic(): string
+    {
+        $words = $this->messages()->where('role', BuilderMessage::USER)->where('content', '!=', '')->reorder('id')->limit(40)->pluck('content');
+
+        return \Modules\AppBuilder\Services\Chat\Dialect::arabicFor($this->country, $words);
     }
 
     /** What talking with the customer cost on the chat model, in USD. */

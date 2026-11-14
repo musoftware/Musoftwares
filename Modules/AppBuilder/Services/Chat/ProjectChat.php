@@ -266,7 +266,7 @@ class ProjectChat
     }
 
     private const LANGUAGE_RULES = [
-        'ar' => 'The customer\'s last message is in Arabic: write this answer in :dialect, the way people speak where the customer is, even though the examples above are in Egyptian Arabic. If the customer clearly writes in another Arabic dialect, follow theirs.',
+        'ar' => 'The customer\'s last message is in Arabic: write this answer in :dialect, even though the examples above are in Egyptian Arabic. This is the dialect of the whole chat: every answer is in it, from the first word to the last, including prices, questions and delivery notes. Never slip back into Egyptian words (like ايه، مش، دلوقتي، عشان، قولّي) when the dialect is another one; say the same thing in the customer\'s dialect.',
         'en' => 'The customer\'s last message is in English: write this whole answer in English, with no Arabic words, even though the examples above are in Arabic.',
     ];
 
@@ -460,6 +460,6 @@ class ProjectChat
             .$this->importedProject($project)
             .$this->requestList($project)
             ."\n\n## Where this project really is (from the site's records)\n\n".$state
-            ."\n\n## Language of this answer\n\n".str_replace(':dialect', Dialect::arabicFor($project->country), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
+            ."\n\n## Language of this answer\n\n".str_replace(':dialect', $project->spokenArabic(), self::LANGUAGE_RULES[$project->lastMessageLanguage()]);
     }
 }

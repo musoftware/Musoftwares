@@ -55,7 +55,7 @@ TEXT;
     private function system(BuilderProject $project): string
     {
         $language = $project->customerLanguage() === 'ar'
-            ? 'Write in Arabic the way people speak it in the customer\'s country: '.Dialect::arabicFor($project->country).'.'
+            ? 'Write in Arabic the way the customer speaks it, and stay in it: '.$project->spokenArabic().'.'
             : 'Write in English.';
 
         return self::RULES."\n\nThe program: ".($project->title ?: 'their program').".\n".$language;

@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 /**
  * The visitor's country and the Arabic the chat speaks there: a Saudi customer hears Saudi Arabic, a Kuwaiti one
  * Gulf Arabic. The country comes from the IP (the site's offline database); a VPN or an unknown IP falls back to the
- * browser's time zone, which the page sends with the first message.
+ * browser's time zone, which the page sends with the first message. The customer's own words come before the country:
+ * the first message that shows a dialect sets it for the whole chat, so the answers never drift from one to another.
  */
 final class Dialect
 {
@@ -29,6 +30,19 @@ final class Dialect
 
     private const DEFAULT_SPOKEN = 'simple Egyptian Arabic';
 
+    private const GULF = 'everyday Gulf Arabic';
+
+    private const MAGHREB = 'simple Modern Standard Arabic (Maghrebi Darija is hard to read in writing)';
+
+    /** Words that only one dialect uses in writing; a word shared by two dialects is not here. */
+    private const WORDS = [
+        'everyday Levantine Arabic' => ['بدي', 'بدك', 'بدنا', 'بدو', 'شو', 'هيك', 'هلق', 'هلأ', 'منيح', 'هون', 'هاد', 'تزبطو', 'تزبط'],
+        'everyday Iraqi Arabic' => ['شكو', 'ماكو', 'هواي', 'شكد', 'هسه'],
+        self::GULF => ['أبغى', 'ابغى', 'ابغا', 'أبي', 'وش', 'الحين', 'وايد', 'ودي', 'أبغاه', 'تكفى'],
+        self::MAGHREB => ['بزاف', 'واش', 'كيفاش', 'بغيت', 'ديال', 'برشا', 'نحب'],
+        self::DEFAULT_SPOKEN => ['عايز', 'عاوز', 'عايزه', 'ازاي', 'إزاي', 'دلوقتي', 'كده', 'بتاع', 'بتاعي', 'عشان', 'علشان'],
+    ];
+
     /**
      * The browser looks the country up once (api.country.is, from the visitor's own connection) and sends it with the
      * first message; then the browser's time zone; then this server's own IP database. It only picks a dialect, so a
@@ -45,9 +59,33 @@ final class Dialect
             ?? (($fromIp = app(IpGeolocationService::class)->getCountryFromIp((string) $request->ip())) ? strtoupper($fromIp) : null);
     }
 
-    /** How the chat writes Arabic for a customer from this country (Egyptian when unknown). */
-    public static function arabicFor(?string $country): string
+    /**
+     * How the chat writes Arabic for this customer: the dialect of the first of their messages that shows one, otherwise
+     * the dialect of their country (Egyptian when unknown).
+     *
+     * @param  iterable<string>  $customerMessages  oldest first
+     */
+    public static function arabicFor(?string $country, iterable $customerMessages = []): string
     {
-        return self::SPOKEN[strtoupper((string) $country)] ?? self::DEFAULT_SPOKEN;
+        $ofCountry = self::SPOKEN[strtoupper((string) $country)] ?? self::DEFAULT_SPOKEN;
+        foreach ($customerMessages as $message) {
+            $heard = self::heardIn((string) $message);
+            if ($heard !== null) {
+                // Gulf words from a customer in Saudi Arabia are Saudi Arabic
+                return $heard === self::GULF && str_contains($ofCountry, 'Saudi') ? $ofCountry : $heard;
+            }
+        }
+
+        return $ofCountry;
+    }
+
+    /** The dialect with the most of its own words in this message, or null when it shows none. */
+    private static function heardIn(string $message): ?string
+    {
+        $words = preg_split('/[^\p{Arabic}]+/u', $message, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $hits = array_filter(array_map(fn (array $own) => count(array_intersect($words, $own)), self::WORDS));
+        arsort($hits);
+
+        return array_key_first($hits);
     }
 }

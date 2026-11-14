@@ -1261,6 +1261,30 @@ class AppBuilderTest extends TestCase
         $this->assertSame('simple Egyptian Arabic', \Modules\AppBuilder\Services\Chat\Dialect::arabicFor('EG'));
     }
 
+    public function test_the_customers_own_words_set_the_dialect_and_it_stays_for_the_whole_chat(): void
+    {
+        $this->answer('أهلاً فيك');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عندي بروجكت شغال بدي تزبطو', 'country' => 'EG'])->assertOk()->json('uuid');
+        $this->assertStringContainsString('Levantine Arabic', app(ChatModel::class)->lastSystem);
+
+        // a message that is only a link keeps the language and the dialect of the chat
+        $this->answer('شفت الموقع');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'https://dmc-site.onrender.com'])->assertOk();
+        $this->assertStringContainsString('Levantine Arabic', app(ChatModel::class)->lastSystem);
+        $this->assertStringNotContainsString('whole answer in English', app(ChatModel::class)->lastSystem);
+
+        // a later word from another dialect does not move it
+        $this->answer('تمام');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'كده تمام'])->assertOk();
+        $this->assertStringContainsString('Levantine Arabic', app(ChatModel::class)->lastSystem);
+
+        $dialect = \Modules\AppBuilder\Services\Chat\Dialect::class;
+        $this->assertSame('everyday Gulf Arabic', $dialect::arabicFor('EG', ['أبغى موقع لشركتي']));
+        $this->assertStringContainsString('Saudi', $dialect::arabicFor('SA', ['وش السعر']));
+        $this->assertSame('simple Egyptian Arabic', $dialect::arabicFor('JO', ['مرحبا', 'عايز موقع']));
+        $this->assertSame('everyday Levantine Arabic', $dialect::arabicFor('JO', ['مرحبا', 'موقع لشركتي']));
+    }
+
     public function test_the_chat_answers_in_the_language_of_the_customers_last_message(): void
     {
         $this->answer('Sure.');
