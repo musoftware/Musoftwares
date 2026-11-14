@@ -323,6 +323,18 @@ class ShopStorefrontTest extends TestCase
             ->assertSee('"size":"40، 41"', false);
     }
 
+    public function test_the_page_of_all_collections_lists_only_the_ones_with_products(): void
+    {
+        $this->product();
+        ShopCategory::create(['name' => 'قسم فاضي', 'slug' => 'empty', 'is_active' => true]);
+
+        $this->get('/store/collections')->assertOk()
+            ->assertSee($this->category()->url(), false)
+            ->assertSee('أحذية')
+            ->assertDontSee('قسم فاضي')
+            ->assertSee('<link rel="canonical" href="'.route('shop.collections').'">', false);
+    }
+
     public function test_the_store_home_has_a_share_image_and_store_data(): void
     {
         $product = $this->product();

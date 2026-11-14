@@ -36,6 +36,21 @@ class StorefrontController extends Controller
         ]);
     }
 
+    /** Every collection that has something to show, for a visitor who opens /store/collections itself. */
+    public function collections(): View
+    {
+        $categories = ShopCategory::visible()->withVisibleProducts()->get();
+
+        return view('shop::collections', [
+            'seo' => $this->seo->page('الأقسام', $this->seo->shareImage($categories->first()?->image_path, config('shop.name')) + [
+                'description' => $this->seo->homeDescription($categories),
+                'canonical' => route('shop.collections'),
+                'schemas' => [$this->seo->breadcrumbs([config('shop.name') => route('shop.home'), 'الأقسام' => route('shop.collections')])],
+            ]),
+            'categories' => $categories,
+        ]);
+    }
+
     public function collection(Request $request, ShopCategory $category): View
     {
         abort_unless($category->is_active, 404);
