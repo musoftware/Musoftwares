@@ -758,7 +758,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame($customer->id, $guest->refresh()->user_id);
 
         $this->actingAs($customer)->get('/ai')->assertOk()
-            ->assertSee(__('builder.my_projects'))->assertSee('متجر قديم')->assertSee('/ai/'.$uuid, false)
+            ->assertSee(__('builder.chats'))->assertSee('متجر قديم')->assertSee('/ai/'.$uuid, false)
             ->assertSee('data-size="big"', false)->assertDontSee('id="login-ask"', false);
     }
 

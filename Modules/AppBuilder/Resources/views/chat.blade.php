@@ -86,10 +86,24 @@
         .choice span{color:var(--muted);font-size:14px}
         .login-ask{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
         .login-ask p{margin:0 0 12px;color:var(--ink)}
-        .projects{margin-top:32px;text-align:start}
-        .projects h2{font-size:16px;margin:0 0 8px}
-        .projects a{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:12px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none;min-height:44px}
-        .projects a span{color:var(--muted);font-size:14px}
+        /* the customer's chats: always beside the chat on a wide screen, a panel from the menu button on a phone or a tablet */
+        .chats{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(300px,86vw);display:flex;flex-direction:column;gap:4px;padding:12px;background:var(--soft);border-inline-end:1px solid var(--line);overflow-y:auto;z-index:40;transform:translateX({{ $rtl ? '100%' : '-100%' }});transition:transform .2s ease;visibility:hidden}
+        body.chats-shown .chats{transform:none;visibility:visible;box-shadow:0 0 24px rgba(0,0,0,.12)}
+        .chats-backdrop{display:none}
+        body.chats-shown .chats-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:39}
+        .chats-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+        .chats-head .new{flex:1;justify-content:flex-start;padding:8px 12px}
+        .chats h2{margin:8px 12px 4px;font-size:13px;font-weight:600;color:var(--muted)}
+        .chats a.chat{display:grid;gap:0;min-height:44px;padding:8px 12px;border-radius:10px;color:var(--ink);text-decoration:none}
+        .chats a.chat:hover{background:#ebebeb}
+        .chats a.chat[aria-current]{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+        .chats a.chat strong{font-weight:400;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .chats a.chat span{font-size:12px;color:var(--muted)}
+        .chats .hint{margin:4px 12px}
+        .icon-btn{width:44px;height:44px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer}
+        .icon-btn:hover{border-color:var(--ink)}
+        .viewer .menu{margin-inline-end:auto}
+        @media (prefers-reduced-motion:reduce){.chats{transition:none}}
         body.choosing .composer{display:none}
         .bar{margin:-12px 0 24px}
         .bar .track{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
@@ -177,14 +191,48 @@
         .show-requests:hover{border-color:var(--ink)}
         .req .review{font-weight:600;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center}
         .show-requests .due{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--ink);color:#fff;font-size:13px;line-height:22px;text-align:center}
+        @media (min-width:768px){
+            .wrap{max-width:760px;padding-inline:24px}
+            .composer .box{max-width:760px}
+        }
+        @media (min-width:1100px){
+            .chats{transform:none;visibility:visible;width:280px;z-index:5}
+            body.chats-shown .chats{box-shadow:none}
+            body.chats-shown .chats-backdrop,.chats-close,.viewer .menu{display:none}
+            body{padding-inline-start:280px}
+            .composer{inset-inline-start:280px}
+        }
     </style>
 </head>
 <body>
+@php($currentChat = $state['uuid'] ?? null)
+<nav class="chats" id="chats" aria-label="{{ __('builder.chats') }}">
+    <div class="chats-head">
+        <a class="btn ghost new" href="{{ route('builder.index') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            {{ __('builder.new_chat') }}
+        </a>
+        <button type="button" class="icon-btn chats-close" id="chats-close" aria-label="{{ __('builder.requests.close') }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+    </div>
+    <h2>{{ __('builder.chats') }}</h2>
+    @forelse ($projects ?? [] as $own)
+        <a class="chat" href="{{ $own['url'] }}" @if ($own['uuid'] === $currentChat) aria-current="page" @endif>
+            <strong dir="auto">{{ $own['title'] }}</strong>
+            <span>{{ $own['status'] }}</span>
+        </a>
+    @empty
+        <p class="hint">{{ __('builder.no_chats') }}</p>
+    @endforelse
+</nav>
+<div class="chats-backdrop" id="chats-backdrop"></div>
+
 <div class="viewer">
+    <button type="button" class="icon-btn menu" id="chats-open" aria-controls="chats" aria-expanded="false" aria-label="{{ __('builder.chats') }}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
     <button type="button" class="show-requests" id="requests-open" aria-controls="requests"></button>
-    @if ($state)
-        <a href="{{ route('builder.index') }}">{{ __('builder.new_chat') }}</a>
-    @endif
     <span dir="auto">{{ auth()->user()->name }}</span>
 </div>
 <main class="wrap" id="thread" aria-live="polite">
@@ -212,14 +260,6 @@
                         <button type="button" class="btn ghost" id="guest">{{ __('builder.start_guest') }}</button>
                     </div>
                 </div>
-            @endif
-            @if (! empty($projects))
-                <nav class="projects" aria-label="{{ __('builder.my_projects') }}">
-                    <h2>{{ __('builder.my_projects') }}</h2>
-                    @foreach ($projects as $own)
-                        <a href="{{ $own['url'] }}"><strong dir="auto">{{ $own['title'] }}</strong><span>{{ $own['status'] }}</span></a>
-                    @endforeach
-                </nav>
             @endif
         @endunless
     </section>
@@ -993,6 +1033,15 @@
         showError('');
         try { state = await call(url, {ids}); render(); } catch (error) { showError(error.message); button.disabled = false; }
     }
+
+    // the chats panel on a phone or a tablet; on a wide screen it is always shown and these buttons are hidden
+    const chatsOpen = document.getElementById('chats-open');
+    function showChats() { document.body.classList.add('chats-shown'); chatsOpen.setAttribute('aria-expanded', 'true'); document.getElementById('chats-close').focus(); }
+    function hideChats() { document.body.classList.remove('chats-shown'); chatsOpen.setAttribute('aria-expanded', 'false'); chatsOpen.focus(); }
+    chatsOpen.addEventListener('click', showChats);
+    document.getElementById('chats-close').addEventListener('click', hideChats);
+    document.getElementById('chats-backdrop').addEventListener('click', hideChats);
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && document.body.classList.contains('chats-shown')) hideChats(); });
 
     function showRequests() { document.body.classList.add('requests-shown'); requestsBox.querySelector('.close')?.focus(); }
     function hideRequests() { document.body.classList.remove('requests-shown'); requestsOpen.focus(); }

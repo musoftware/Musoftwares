@@ -47,7 +47,11 @@ class BuilderChatController extends Controller
 
         $this->speakCustomerLanguage($project);
 
-        return view('appbuilder::chat', ['state' => $this->stateOf($project), 'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig()]);
+        return view('appbuilder::chat', [
+            'state' => $this->stateOf($project),
+            'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig(),
+            'projects' => $this->ownProjects($request),
+        ]);
     }
 
     /** Buttons and notes follow the language the customer writes in; a chat with no message yet keeps the site's. */
@@ -72,7 +76,7 @@ class BuilderChatController extends Controller
         ]);
     }
 
-    /** @return list<array{title: string, status: string, url: string}> */
+    /** The signed-in customer's chats for the side list, newest first. @return list<array{uuid: string, title: string, status: string, url: string}> */
     private function ownProjects(\Illuminate\Http\Request $request): array
     {
         if (! $request->user()) {
@@ -81,6 +85,7 @@ class BuilderChatController extends Controller
 
         return BuilderProject::where('user_id', $request->user()->id)->latest('updated_at')->limit(30)->get()
             ->map(fn (BuilderProject $project) => [
+                'uuid' => $project->uuid,
                 'title' => $project->title ?: __('builder.untitled'),
                 'status' => __('builder.status_labels.'.$project->status),
                 'url' => route('builder.show', $project),

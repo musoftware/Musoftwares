@@ -221,6 +221,8 @@ return [
     'start_login' => 'سجّل دخول',
     'start_guest' => 'كمّل من غير حساب',
     'my_projects' => 'مشاريعك',
+    'chats' => 'محادثاتك',
+    'no_chats' => 'لسه مفيش محادثات. أي محادثة تبدأها هتظهر هنا.',
     'status_labels' => ['chatting' => 'بنتكلم', 'quoted' => 'مستني الدفع', 'queued' => 'في الطابور', 'designing' => 'التصميم', 'building' => 'بيتنفذ', 'ready' => 'جاهز', 'failed' => 'وقف'],
     'progress_bar' => 'نسبة الشغل اللي خلص',
     'phases_title' => 'مراحل الشغل',
