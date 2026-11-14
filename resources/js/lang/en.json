@@ -2835,6 +2835,8 @@
         "start_login": "Log in",
         "start_guest": "Continue without an account",
         "my_projects": "Your projects",
+        "chats": "Your chats",
+        "no_chats": "No chats yet. Any chat you start shows here.",
         "status_labels": {
             "chatting": "Talking",
             "quoted": "Waiting for payment",
