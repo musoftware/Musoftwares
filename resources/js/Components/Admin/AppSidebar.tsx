@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Component
 import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop, ShoppingBag, LifeBuoy, MessageSquare, Clock, Ticket } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import SidebarFavorites, { DEFAULT_FAVORITES, MenuLink, StarToggle, saveFavorites } from '@/Components/Admin/SidebarFavorites';
 import { __ } from '@/lib/i18n';
 
 type SubItem = { title: string; url: string; fullReload?: boolean; badgeCountKey?: string; alsoActiveOn?: string[] };
@@ -260,6 +261,16 @@ function Badge({ count }: { count: unknown }) {
   return <span className="ms-auto inline-flex items-center justify-center rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-semibold text-white dark:bg-white dark:text-slate-900">{count}</span>;
 }
 
+/** Every page of the menu by its address, for the favorites. A menu entry whose own address is also one of its pages names that page. */
+const menuLinks: Record<string, MenuLink> = (() => {
+  const links: Record<string, MenuLink> = {};
+  sections.flatMap(section => section.items).forEach(item => {
+    item.subItems?.forEach(sub => { links[sub.url] ??= { title: sub.title, url: sub.url, icon: item.icon, badgeCountKey: sub.badgeCountKey }; });
+    if (!item.subItems || links[item.url]) links[item.url] = { title: item.title, url: item.url, icon: item.icon, badgeCountKey: item.badgeCountKey };
+  });
+  return links;
+})();
+
 const isUnder = (path: string, base: string) => path === base || path.startsWith(base + '/');
 
 export function AppSidebar() {
@@ -274,6 +285,12 @@ export function AppSidebar() {
 
   const role = isAdmin ? null : ['accountant', 'support_agent', 'moderator'].find(name => userRoles.includes(name));
   const visibleSections = sectionsFor(role ? ROLE_ACCESS[role] : null);
+  // only a full admin keeps favorites: the other roles see a few pages anyway
+  const saved = auth?.user?.workspace_settings?.admin_favorites;
+  const [favorites, setFavorites] = useState<string[]>(Array.isArray(saved) ? saved : DEFAULT_FAVORITES);
+  const [editing, setEditing] = useState(false);
+  const toggleFavorite = (link: string) => saveFavorites(favorites.includes(link) ? favorites.filter(other => other !== link) : [...favorites, link], setFavorites);
+  const star = (link: string) => editing && <StarToggle url={link} favorites={favorites} onToggle={toggleFavorite} />;
 
   return (
     <Sidebar>
@@ -284,6 +301,17 @@ export function AppSidebar() {
         </a>
       </SidebarHeader>
       <SidebarContent className="p-2">
+        {!role && (
+          <SidebarFavorites
+            links={menuLinks}
+            favorites={favorites}
+            editing={editing}
+            onEditing={setEditing}
+            onChange={(urls) => saveFavorites(urls, setFavorites)}
+            isActive={(link) => isUnder(path, link)}
+            badge={(key) => <Badge count={key ? admin_counts?.[key] : null} />}
+          />
+        )}
         {visibleSections.map((section) => (
         <SidebarGroup key={section.label ?? 'start'}>
           {section.label && <SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__(section.label)}</SidebarGroupLabel>}
@@ -317,8 +345,9 @@ export function AppSidebar() {
                                             const isSubActive = isSubItemActive(subItem);
                                             const count = subItem.badgeCountKey ? admin_counts?.[subItem.badgeCountKey] : null;
                                             return (
-                                                <SidebarMenuSubItem key={subItem.title}>
+                                                <SidebarMenuSubItem key={subItem.title} className="flex items-center gap-0.5">
                                                     <SidebarMenuSubButton
+                                                        className="min-w-0 flex-1"
                                                         isActive={isSubActive}
                                                         render={
                                                             subItem.fullReload
@@ -331,6 +360,7 @@ export function AppSidebar() {
                                                             <Badge count={count} />
                                                         </span>
                                                     </SidebarMenuSubButton>
+                                                    {star(subItem.url)}
                                                 </SidebarMenuSubItem>
                                             );
                                         })}
@@ -342,8 +372,9 @@ export function AppSidebar() {
                 }
 
                 return (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} className="flex items-center gap-0.5">
                     <SidebarMenuButton
+                      className="min-w-0 flex-1"
                       isActive={isActive}
                       tooltip={__(item.title)}
                       render={<Link href={item.url} />}
@@ -352,6 +383,7 @@ export function AppSidebar() {
                       <span>{__(item.title)}</span>
                       <Badge count={item.badgeCountKey ? admin_counts?.[item.badgeCountKey] : null} />
                     </SidebarMenuButton>
+                    {star(item.url)}
                   </SidebarMenuItem>
                 );
               })}

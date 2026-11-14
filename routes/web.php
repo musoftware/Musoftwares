@@ -664,6 +664,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Reports, Email Templates & Outgoing Emails
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/outgoing-emails', [AdminOutgoingEmailController::class, 'index'])->name('outgoing-emails.index');
+    Route::post('/sidebar-favorites', [\App\Http\Controllers\Admin\AdminSidebarFavoritesController::class, 'update'])->name('sidebar-favorites.update');
     Route::get('/assistant-chats', [\App\Http\Controllers\Admin\AdminAssistantChatController::class, 'index'])->name('assistant-chats.index');
     Route::get('/assistant-chats/{visitor}', [\App\Http\Controllers\Admin\AdminAssistantChatController::class, 'show'])->where('visitor', '[A-Za-z0-9:_-]{1,80}')->name('assistant-chats.show');
     Route::get('/email-templates', [AdminEmailTemplateController::class, 'index'])->name('email-templates.index');
