@@ -38,11 +38,14 @@ class WorkerJobController extends Controller
         if (! $project) {
             return response()->noContent();
         }
+        // a change is named by what it carries, not by the project's first title
+        $title = app(\Modules\AppBuilder\Services\ProjectRequests::class)->buildTitle($project) ?? $project->title;
+        // the owner hears on Telegram when the worker starts a job, as he hears when it ends
+        app(\Modules\AppBuilder\Services\OwnerAlerts::class)->send($project, 'The worker started ('.($project->job_kind ?: BuilderProject::JOB_BUILD).', try '.$project->attempts.'): '.$title);
 
         return response()->json(['job' => [
             'uuid' => $project->uuid,
-            // a change is named by what it carries, not by the project's first title
-            'title' => app(\Modules\AppBuilder\Services\ProjectRequests::class)->buildTitle($project) ?? $project->title,
+            'title' => $title,
             // the customer's requests in their own words, like a developer told directly; the first build has the agreed brief
             'spec' => app(\Modules\AppBuilder\Services\ProjectRequests::class)->briefFor($project) ?? $project->spec,
             'locale' => $project->customerLanguage(),

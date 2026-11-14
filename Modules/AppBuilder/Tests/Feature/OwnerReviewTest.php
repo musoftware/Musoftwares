@@ -168,6 +168,20 @@ class OwnerReviewTest extends TestCase
             && collect($request['reply_markup']['inline_keyboard'])->flatten(1)->pluck('url')->filter()->contains(fn ($url) => str_ends_with($url, '#request-'.$item->id)));
     }
 
+    public function test_the_owner_hears_on_telegram_when_the_worker_starts_a_job(): void
+    {
+        config(['services.site_telegram.bot_token' => 'test-token']);
+        $this->owner->forceFill(['telegram_chat_id' => '12345'])->save();
+        \Illuminate\Support\Facades\Http::fake(['api.telegram.org/*' => \Illuminate\Support\Facades\Http::response(['ok' => true])]);
+        $project = $this->deliveredProject();
+        $project->update(['status' => BuilderProject::QUEUED, 'paid_at' => now()]);
+
+        $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk()->assertJsonPath('job.uuid', $project->uuid);
+
+        \Illuminate\Support\Facades\Http::assertSent(fn ($request) => str_contains($request->url(), '/bottest-token/sendMessage')
+            && str_contains($request['text'], 'The worker started (build, try 1)'));
+    }
+
     public function test_the_chat_knows_a_paid_request_is_paid_and_only_the_owner_sees_the_review_link(): void
     {
         $project = $this->deliveredProject();
