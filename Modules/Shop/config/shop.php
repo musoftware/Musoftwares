@@ -13,6 +13,13 @@ return [
     'nav_items' => 5,
     'max_quantity' => 20,
 
+    'orders' => [
+        // more new orders than this from one phone in a day is a flood, not a customer
+        'new_per_phone_a_day' => (int) env('SHOP_NEW_ORDERS_PER_PHONE', 3),
+        // the "I am not a robot" box on the checkout page; needs the site's reCAPTCHA keys
+        'captcha' => (bool) env('SHOP_CHECKOUT_CAPTCHA', true),
+    ],
+
     'governorates' => [
         'القاهرة', 'الجيزة', 'الإسكندرية', 'القليوبية', 'الدقهلية', 'الشرقية', 'الغربية',
         'المنوفية', 'البحيرة', 'كفر الشيخ', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'السويس',

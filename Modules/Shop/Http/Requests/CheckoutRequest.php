@@ -5,6 +5,7 @@ namespace Modules\Shop\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Modules\Shop\Services\Cart;
+use Modules\Shop\Services\CheckoutCaptcha;
 
 class CheckoutRequest extends FormRequest
 {
@@ -27,7 +28,12 @@ class CheckoutRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:500'],
             'angazny_area_id' => $this->areaRules($cart),
             'website' => ['prohibited'],
-        ];
+        ] + $this->captchaRules();
+    }
+
+    private function captchaRules(): array
+    {
+        return app(CheckoutCaptcha::class)->siteKey() === null ? [] : [CheckoutCaptcha::FIELD => ['required', new \App\Rules\Recaptcha]];
     }
 
     public function messages(): array
@@ -43,6 +49,7 @@ class CheckoutRequest extends FormRequest
             'angazny_area_id.in' => 'اختار منطقة من نفس المحافظة',
             'address.required' => 'اكتب العنوان',
             'address.min' => 'اكتب العنوان بالتفصيل',
+            CheckoutCaptcha::FIELD.'.required' => 'علّم على مربع "أنا لست برنامج روبوت"',
         ];
     }
 

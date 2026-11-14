@@ -47,6 +47,7 @@ Route::middleware('web')->group(function () {
         Route::delete('/categories/{category}', [AdminShopCategoryController::class, 'destroy'])->name('categories.destroy');
 
         Route::get('/orders', [AdminShopOrderController::class, 'index'])->name('orders.index');
+        Route::post('/orders/clear-flood', [AdminShopOrderController::class, 'clearFlood'])->name('orders.clear-flood');
         Route::post('/orders/{order}/status', [AdminShopOrderController::class, 'updateStatus'])->name('orders.status');
         Route::post('/orders/{order}/angazny', [AdminShopOrderController::class, 'sendToAngazny'])->name('orders.angazny');
     });

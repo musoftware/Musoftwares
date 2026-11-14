@@ -147,6 +147,26 @@ class ShopAdminTest extends TestCase
         $this->actingAs($admin)->post('/admin/shop/orders/'.$order->id.'/status', ['status' => 'lost'])->assertSessionHasErrors('status');
     }
 
+    public function test_one_press_removes_a_flood_of_orders_and_keeps_real_customers(): void
+    {
+        $admin = $this->admin();
+        $make = fn (string $phone, string $status = 'new') => ShopOrder::create(['customer_name' => 'سارة', 'phone' => $phone, 'governorate' => 'الجيزة', 'address' => 'عنوان طويل', 'subtotal' => 10, 'total' => 10, 'status' => $status]);
+        foreach (range(1, 5) as $ignored) {
+            $make('01112312312');
+        }
+        // an order of the same phone that the owner already handled is not touched
+        $confirmed = $make('01112312312', 'confirmed');
+        $real = [$make('01012345678'), $make('01012345678'), $make('01298765432')];
+
+        $this->actingAs($admin)->get('/admin/shop/orders')->assertInertia(fn ($page) => $page->where('floodCount', 5));
+        $this->actingAs($admin)->post('/admin/shop/orders/clear-flood')->assertSessionHasNoErrors();
+
+        $this->assertEqualsCanonicalizing([$confirmed->id, ...array_map(fn (ShopOrder $order) => $order->id, $real)], ShopOrder::pluck('id')->all());
+        // removed from the list, kept in the database
+        $this->assertSame(5, ShopOrder::onlyTrashed()->count());
+        $this->actingAs($admin)->get('/admin/shop/orders')->assertInertia(fn ($page) => $page->where('floodCount', 0));
+    }
+
     public function test_csv_import_adds_hidden_products_skips_repeats_and_reports_bad_rows(): void
     {
         $admin = $this->admin();

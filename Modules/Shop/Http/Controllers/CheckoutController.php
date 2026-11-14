@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Modules\Shop\Http\Requests\CheckoutRequest;
 use Modules\Shop\Models\ShopOrder;
 use Modules\Shop\Services\Cart;
+use Modules\Shop\Services\CheckoutCaptcha;
+use Modules\Shop\Services\OrderFlood;
 use Modules\Shop\Services\PlaceOrder;
 use Modules\Shop\Services\ShopSeo;
 
@@ -33,14 +35,18 @@ class CheckoutController extends Controller
             'total' => $subtotal + $shipping,
             'governorates' => $this->cart->governorates($lines),
             'areas' => $this->cart->areas($lines),
+            'captchaKey' => app(CheckoutCaptcha::class)->siteKey(),
         ]);
     }
 
-    public function store(CheckoutRequest $request, PlaceOrder $placeOrder): RedirectResponse
+    public function store(CheckoutRequest $request, PlaceOrder $placeOrder, OrderFlood $flood): RedirectResponse
     {
         $lines = $this->cart->lines();
         if ($lines->isEmpty()) {
             return redirect()->route('shop.cart')->with('status', 'السلة فاضية، أو المنتجات اللي فيها خلصت');
+        }
+        if (! $flood->allows((string) $request->validated('phone'))) {
+            return back()->withInput()->withErrors(['phone' => 'وصلتنا طلباتك من الرقم ده وهنتواصل معاك لتأكيدها. لو محتاج طلب تاني جرّب بعد شوية.']);
         }
 
         $order = $placeOrder->handle($request->customer(), $lines);

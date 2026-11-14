@@ -49,6 +49,14 @@
                 @error('notes') <p class="err">{{ $message }}</p> @enderror
             </div>
 
+            @if ($captchaKey)
+                <div class="field">
+                    <div class="g-recaptcha" data-sitekey="{{ $captchaKey }}"></div>
+                    @error('g-recaptcha-response') <p class="err">{{ $message }}</p> @enderror
+                </div>
+                <script src="https://www.google.com/recaptcha/api.js?hl=ar" async defer></script>
+            @endif
+
             <div class="actions"><button class="btn" type="submit">تأكيد الطلب</button></div>
         </form>
 

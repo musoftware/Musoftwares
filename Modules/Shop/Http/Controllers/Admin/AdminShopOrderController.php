@@ -10,10 +10,11 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Shop\Models\ShopOrder;
 use Modules\Shop\Services\Angazny\AngaznyOrderSender;
+use Modules\Shop\Services\OrderFlood;
 
 class AdminShopOrderController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, OrderFlood $flood): Response
     {
         $status = (string) $request->query('status');
 
@@ -28,7 +29,16 @@ class AdminShopOrderController extends Controller
             'statuses' => ShopOrder::STATUSES,
             'status' => $status,
             'currency' => config('shop.currency_symbol'),
+            'floodCount' => $flood->count(),
         ]);
+    }
+
+    /** One press removes every order of a phone that flooded the store; real customers' orders stay. */
+    public function clearFlood(OrderFlood $flood): RedirectResponse
+    {
+        $flood->clear();
+
+        return back();
     }
 
     public function updateStatus(Request $request, ShopOrder $order): RedirectResponse

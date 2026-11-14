@@ -120,6 +120,46 @@ class ShopStorefrontTest extends TestCase
         $this->get(route('shop.checkout'))->assertRedirect(route('shop.cart'));
     }
 
+    public function test_one_phone_cannot_flood_the_store_with_orders(): void
+    {
+        $product = $this->product();
+        $order = fn () => $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '40'])
+            && $this->post(route('shop.checkout.store'), $this->validCustomer());
+
+        $order();
+        // the same order sent again in the same moment is not saved twice
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '40']);
+        $this->post(route('shop.checkout.store'), $this->validCustomer())->assertSessionHasErrors('phone');
+        $this->assertSame(1, ShopOrder::count());
+
+        // later orders pass, up to what a real customer makes in a day
+        foreach ([1, 2] as $minutes) {
+            $this->travel($minutes)->minutes();
+            $order();
+        }
+        $this->assertSame(3, ShopOrder::count());
+        $this->travel(5)->minutes();
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '40']);
+        $this->post(route('shop.checkout.store'), $this->validCustomer())->assertSessionHasErrors('phone');
+        $this->assertSame(3, ShopOrder::count());
+    }
+
+    public function test_the_checkout_asks_for_the_captcha_when_the_site_has_its_keys(): void
+    {
+        config(['shop.orders.captcha' => true, 'services.recaptcha.site_key' => 'site-key', 'services.recaptcha.secret_key' => 'secret']);
+        \Illuminate\Support\Facades\Http::fake(['www.google.com/recaptcha/*' => fn ($request) => \Illuminate\Support\Facades\Http::response(['success' => $request['response'] === 'solved'])]);
+        $product = $this->product();
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '40']);
+
+        $this->get(route('shop.checkout'))->assertOk()->assertSee('data-sitekey="site-key"', false);
+        $this->post(route('shop.checkout.store'), $this->validCustomer())->assertSessionHasErrors('g-recaptcha-response');
+        $this->post(route('shop.checkout.store'), $this->validCustomer(['g-recaptcha-response' => 'wrong']))->assertSessionHasErrors('g-recaptcha-response');
+        $this->assertSame(0, ShopOrder::count());
+
+        $this->post(route('shop.checkout.store'), $this->validCustomer(['g-recaptcha-response' => 'solved']))->assertSessionHasNoErrors();
+        $this->assertSame(1, ShopOrder::count());
+    }
+
     public function test_buy_now_goes_straight_to_checkout(): void
     {
         $product = $this->product();

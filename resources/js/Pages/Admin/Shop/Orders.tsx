@@ -110,14 +110,33 @@ function OrderRow({ order, statuses, currency }: { order: Order; statuses: strin
     );
 }
 
-export default function Orders({ orders, statuses, status, currency }: { orders: Paginated<Order>; statuses: string[]; status: string; currency: string }) {
+/** Shown only when a phone flooded the store: one press takes all of its new orders out of the list. */
+function ClearFlood({ count }: { count: number }) {
+    if (count === 0) return null;
+    const clear = () => {
+        if (window.confirm(t(`Remove ${count} repeated orders from the list?`, `تشيل ${count} طلب مكرر من القايمة؟`))) {
+            router.post('/admin/shop/orders/clear-flood', {}, { preserveScroll: true });
+        }
+    };
+
+    return (
+        <button type="button" onClick={clear} className="min-h-11 rounded-md border border-red-300 px-4 text-sm font-semibold text-red-700 hover:bg-red-50">
+            {t(`Remove the repeated orders (${count})`, `امسح الطلبات المكررة (${count})`)}
+        </button>
+    );
+}
+
+export default function Orders({ orders, statuses, status, currency, floodCount }: { orders: Paginated<Order>; statuses: string[]; status: string; currency: string; floodCount: number }) {
     const filterClass = (active: boolean) => `inline-flex items-center min-h-11 ${active ? 'font-bold underline underline-offset-4' : 'text-blue-600'}`;
 
     return (
         <AdminSidebarLayout>
             <Head title={t('Store orders', 'طلبات المتجر')} />
             <div className="p-4 sm:p-6 space-y-4 overflow-x-clip max-w-full min-w-0">
-                <h1 className="text-2xl font-bold">{t('Store orders', 'طلبات المتجر')}</h1>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h1 className="text-2xl font-bold">{t('Store orders', 'طلبات المتجر')}</h1>
+                    <ClearFlood count={floodCount} />
+                </div>
                 <nav className="flex flex-wrap gap-x-5" aria-label={t('Filter by status', 'فلترة بالحالة')}>
                     <Link href="/admin/shop/orders" className={filterClass(status === '')}>{t('All', 'الكل')}</Link>
                     {statuses.map((key) => (
