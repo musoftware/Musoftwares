@@ -13,6 +13,11 @@ return [
     'nav_items' => 5,
     'max_quantity' => 20,
 
+    'filters' => [
+        // the price filter offers the ranges between these prices, and only the ones a list's prices reach
+        'price_edges' => [250, 500, 1000, 2000],
+    ],
+
     'orders' => [
         // more new orders than this from one phone in a day is a flood, not a customer
         'new_per_phone_a_day' => (int) env('SHOP_NEW_ORDERS_PER_PHONE', 3),

@@ -36,6 +36,9 @@ class ShopServiceProvider extends ServiceProvider
             $view->with([
                 'navCategories' => ShopCategory::visible()->withVisibleProducts()->get(['id', 'name', 'slug']),
                 'cartCount' => app(Cart::class)->count(),
+                // the cart panel that opens from the header on every page
+                'cartLines' => $lines = app(Cart::class)->lines(),
+                'cartSubtotal' => app(Cart::class)->subtotal($lines),
             ]);
         });
     }

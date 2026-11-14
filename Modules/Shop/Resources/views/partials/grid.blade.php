@@ -1,5 +1,5 @@
 @if ($products->isEmpty())
-    <p class="empty">{{ $emptyText ?? 'لسه مفيش منتجات هنا.' }}</p>
+    <p class="empty">{{ ($emptyText ?? null) ?: 'لسه مفيش منتجات هنا.' }}</p>
 @else
     <div class="grid">
         @foreach ($products as $product)

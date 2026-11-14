@@ -48,12 +48,25 @@
 <body>
     @include('shop::partials.header')
     <main id="main" class="page">
-        @if (session('status'))
+        @if (session('status') && ! session('cart_open'))
             <p class="notice" role="status">{{ session('status') }}</p>
         @endif
         @yield('content')
     </main>
     @include('shop::partials.footer')
+    {{-- the cart and checkout pages already show the cart --}}
+    @unless (request()->routeIs('shop.cart', 'shop.checkout'))
+        @include('shop::partials.cart-panel')
+    @endunless
     @stack('scripts')
+    <script>
+        // a choice in a cart line applies as soon as it is made; in the filters only on a wide screen,
+        // where they stay open (on a phone the customer picks several, then presses the button)
+        document.addEventListener('change', function (event) {
+            var form = event.target.closest('form[data-auto-submit]');
+            var wideOnly = form && form.dataset.autoSubmit === 'wide';
+            if (form && (!wideOnly || window.matchMedia('(min-width:960px)').matches)) form.submit();
+        });
+    </script>
 </body>
 </html>

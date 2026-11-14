@@ -19,7 +19,7 @@ class Cart
 
     public function add(ShopProduct $product, int $quantity, ?string $size, ?string $color): void
     {
-        $key = md5($product->id.'|'.$size.'|'.$color);
+        $key = $this->key($product->id, $size, $color);
         $entries = $this->entries();
         $current = $entries[$key]['quantity'] ?? 0;
 
@@ -44,6 +44,32 @@ class Cart
         $this->session->put(self::SESSION_KEY, $entries);
     }
 
+    /**
+     * The customer picked another size or colour for a line already in the cart. The line keeps its place; when the
+     * new choice is already another line, the two become one.
+     */
+    public function changeOptions(string $key, ?string $size, ?string $color): void
+    {
+        $entries = $this->entries();
+        if (! isset($entries[$key])) {
+            return;
+        }
+        $newKey = $this->key($entries[$key]['product_id'], $size, $color);
+        $quantity = $entries[$key]['quantity'] + ($newKey === $key ? 0 : ($entries[$newKey]['quantity'] ?? 0));
+        $changed = ['size' => $size, 'color' => $color, 'quantity' => $this->limit($quantity)] + $entries[$key];
+        unset($entries[$newKey]);
+
+        $this->session->put(self::SESSION_KEY, collect($entries)->mapWithKeys(fn (array $entry, string $entryKey) => $entryKey === $key ? [$newKey => $changed] : [$entryKey => $entry])->all());
+    }
+
+    /** The product of a line in the cart, or null when the line is gone. */
+    public function productOf(string $key): ?ShopProduct
+    {
+        $entry = $this->entries()[$key] ?? null;
+
+        return $entry === null ? null : ShopProduct::find($entry['product_id']);
+    }
+
     public function remove(string $key): void
     {
         $this->session->put(self::SESSION_KEY, array_diff_key($this->entries(), [$key => true]));
@@ -63,6 +89,9 @@ class Cart
     public function lines(): Collection
     {
         $entries = collect($this->entries());
+        if ($entries->isEmpty()) {
+            return collect();
+        }
         $products = ShopProduct::whereIn('id', $entries->pluck('product_id'))->get()->keyBy('id');
 
         return $entries
@@ -138,6 +167,11 @@ class Cart
     private function entries(): array
     {
         return $this->session->get(self::SESSION_KEY, []);
+    }
+
+    private function key(int $productId, ?string $size, ?string $color): string
+    {
+        return md5($productId.'|'.$size.'|'.$color);
     }
 
     private function limit(int $quantity): int

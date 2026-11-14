@@ -9,7 +9,12 @@
     @if ($category->description)
         <p class="lead">{{ $category->description }}</p>
     @endif
-    @include('shop::partials.sorts')
-    @include('shop::partials.grid', ['products' => $products])
-    {{ $products->links('shop::partials.pagination') }}
+    <div class="listing">
+        @include('shop::partials.filters')
+        <div class="listing-main">
+            @include('shop::partials.sorts')
+            @include('shop::partials.grid', ['products' => $products, 'emptyText' => $filters->count() > 0 ? 'مفيش منتجات بالاختيارات دي. جرب تشيل فلتر.' : null])
+            {{ $products->links('shop::partials.pagination') }}
+        </div>
+    </div>
 @endsection

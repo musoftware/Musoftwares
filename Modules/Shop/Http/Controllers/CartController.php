@@ -41,9 +41,7 @@ class CartController extends Controller
 
         $this->cart->add($product, (int) $data['quantity'], $data['size'] ?? null, $data['color'] ?? null);
 
-        return $request->boolean('buy_now')
-            ? redirect()->route('shop.checkout')
-            : redirect()->route('shop.cart')->with('status', 'تمت إضافة المنتج للسلة');
+        return $request->boolean('buy_now') ? redirect()->route('shop.checkout') : $this->backToCart($request, 'تمت إضافة المنتج للسلة');
     }
 
     public function update(Request $request, string $key): RedirectResponse
@@ -51,14 +49,38 @@ class CartController extends Controller
         $data = $request->validate(['quantity' => ['required', 'integer', 'min:1', 'max:'.config('shop.max_quantity')]]);
         $this->cart->setQuantity($key, (int) $data['quantity']);
 
-        return redirect()->route('shop.cart');
+        return $this->backToCart($request);
     }
 
-    public function remove(string $key): RedirectResponse
+    /** Another size or colour for a line already in the cart. */
+    public function options(Request $request, string $key): RedirectResponse
+    {
+        $product = $this->cart->productOf($key);
+        if ($product === null) {
+            return $this->backToCart($request);
+        }
+        $data = $request->validate(['size' => $this->optionRules($product->sizes ?? []), 'color' => $this->optionRules($product->colors ?? [])]);
+        if (! $product->canSupply($data['size'] ?? null, $data['color'] ?? null)) {
+            return $this->backToCart($request, 'الاختيار ده خلص، جرب مقاس أو لون تاني');
+        }
+        $this->cart->changeOptions($key, $data['size'] ?? null, $data['color'] ?? null);
+
+        return $this->backToCart($request);
+    }
+
+    public function remove(Request $request, string $key): RedirectResponse
     {
         $this->cart->remove($key);
 
-        return redirect()->route('shop.cart');
+        return $this->backToCart($request);
+    }
+
+    /** From the cart panel the customer stays on their page with the panel open; otherwise they go to the cart page. */
+    private function backToCart(Request $request, ?string $status = null): RedirectResponse
+    {
+        $response = $request->boolean('panel') ? back()->with('cart_open', true) : redirect()->route('shop.cart');
+
+        return $status === null ? $response : $response->with('status', $status);
     }
 
     private function rules(ShopProduct $product): array

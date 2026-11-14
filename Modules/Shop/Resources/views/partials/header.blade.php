@@ -28,7 +28,7 @@
         </nav>
         <div class="head-icons">
             <a class="icon-link" href="{{ route('shop.search') }}" aria-label="بحث">@include('shop::partials.icon', ['name' => 'search'])</a>
-            <a class="icon-link" href="{{ route('shop.cart') }}" aria-label="السلة، فيها {{ $cartCount }} قطعة">
+            <a class="icon-link" href="{{ route('shop.cart') }}" data-cart-open aria-label="السلة، فيها {{ $cartCount }} قطعة">
                 @include('shop::partials.icon', ['name' => 'bag'])
                 @if ($cartCount > 0)
                     <span class="count" aria-hidden="true">{{ $cartCount }}</span>

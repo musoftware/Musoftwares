@@ -11,6 +11,6 @@
 
     <div class="actions">
         <button class="btn" type="submit" name="buy_now" value="1">اطلب الآن</button>
-        <button class="btn alt" type="submit">أضف للسلة</button>
+        <button class="btn alt" type="submit" name="panel" value="1">أضف للسلة</button>
     </div>
 </form>

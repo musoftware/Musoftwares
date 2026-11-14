@@ -160,6 +160,56 @@ class ShopStorefrontTest extends TestCase
         $this->assertSame(1, ShopOrder::count());
     }
 
+    public function test_a_collection_is_filtered_by_size_colour_and_price(): void
+    {
+        $category = $this->category();
+        $this->product(['name' => 'حذاء أسود', 'slug' => 'black', 'price' => 400, 'sizes' => ['40', '41'], 'colors' => ['أسود']]);
+        $this->product(['name' => 'حذاء بني', 'slug' => 'brown', 'price' => 900, 'sizes' => ['42'], 'colors' => ['بني']]);
+        $this->product(['name' => 'حذاء غالي', 'slug' => 'dear', 'price' => 2500, 'sizes' => ['41', '42'], 'colors' => ['أسود', 'بني']]);
+        $names = fn (array $query) => $this->get($category->url().'?'.http_build_query($query))->assertOk()->viewData('products')->pluck('name')->sort()->values()->all();
+
+        // the choices offered are the list's own sizes, colours and the price ranges its prices reach
+        $page = $this->get($category->url())->assertOk()->assertSee('index,follow', false);
+        $this->assertSame(['40', '41', '42'], $page->viewData('choices')['sizes']);
+        $this->assertSame(['250-500', '500-1000', '2000-'], array_column($page->viewData('choices')['prices'], 'key'));
+
+        $this->assertSame(['حذاء أسود', 'حذاء غالي'], $names(['size' => ['41']]));
+        // any of the chosen sizes, and the chosen colour too
+        $this->assertSame(['حذاء بني', 'حذاء غالي'], $names(['size' => ['40', '42'], 'color' => ['بني']]));
+        $this->assertSame(['حذاء بني'], $names(['price' => '500-1000']));
+        $this->assertSame(['حذاء غالي'], $names(['price' => '2000-', 'color' => ['أسود']]));
+        $this->assertSame([], $names(['size' => ['40'], 'price' => '2000-']));
+        // a filtered list is not a page for search results
+        $this->get($category->url().'?size[]=41')->assertSee('noindex,follow', false);
+    }
+
+    public function test_the_customer_changes_the_size_of_a_line_in_the_cart(): void
+    {
+        $product = $this->product();
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 2, 'size' => '40']);
+        $this->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '41']);
+        $key = app(\Modules\Shop\Services\Cart::class)->lines()->firstWhere('size', '40')['key'];
+        $lines = fn () => app(\Modules\Shop\Services\Cart::class)->lines()->map(fn (array $line) => $line['size'].'x'.$line['quantity'])->all();
+
+        $this->patch(route('shop.cart.options', $key), ['size' => '99'])->assertSessionHasErrors('size');
+        $this->assertSame(['40x2', '41x1'], $lines());
+
+        // the same size as another line: the two lines become one
+        $this->patch(route('shop.cart.options', $key), ['size' => '41'])->assertRedirect(route('shop.cart'));
+        $this->assertSame(['41x3'], $lines());
+    }
+
+    public function test_adding_from_the_product_page_keeps_the_customer_there_with_the_cart_open(): void
+    {
+        $product = $this->product();
+
+        $this->from($product->url())->post(route('shop.cart.add', $product->id), ['quantity' => 1, 'size' => '40', 'panel' => 1])
+            ->assertRedirect($product->url())->assertSessionHas('cart_open', true);
+        $this->get($product->url())->assertOk()->assertSee('id="cart-panel"', false)->assertSee('data-open', false);
+        // the cart page shows the cart itself, so it has no panel
+        $this->get(route('shop.cart'))->assertOk()->assertDontSee('id="cart-panel"', false);
+    }
+
     public function test_buy_now_goes_straight_to_checkout(): void
     {
         $product = $this->product();

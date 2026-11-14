@@ -23,6 +23,7 @@ Route::middleware('web')->group(function () {
         Route::get('/cart', [CartController::class, 'show'])->name('cart');
         Route::post('/cart/{product}', [CartController::class, 'add'])->whereNumber('product')->middleware('throttle:60,1')->name('cart.add');
         Route::patch('/cart/lines/{key}', [CartController::class, 'update'])->name('cart.update');
+        Route::patch('/cart/lines/{key}/options', [CartController::class, 'options'])->name('cart.options');
         Route::delete('/cart/lines/{key}', [CartController::class, 'remove'])->name('cart.remove');
 
         Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout');

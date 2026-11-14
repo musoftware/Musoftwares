@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Modules\Shop\Models\ShopCategory;
 use Modules\Shop\Models\ShopProduct;
+use Modules\Shop\Services\ProductFilters;
 use Modules\Shop\Services\ShopSeo;
 
 class StorefrontController extends Controller
@@ -40,14 +41,18 @@ class StorefrontController extends Controller
         abort_unless($category->is_active, 404);
 
         $sort = $this->sortKey($request);
-        $products = $this->paginate($category->products()->getQuery()->visible(), $sort);
+        $filters = new ProductFilters($request);
+        $all = fn (): Builder => $category->products()->getQuery()->visible();
+        $products = $this->paginate($filters->apply($all()), $sort);
         abort_if($products->isEmpty() && $products->currentPage() > 1, 404);
 
         return view('shop::collection', [
-            'seo' => $this->collectionSeo($category, $products, $sort),
+            'seo' => $this->collectionSeo($category, $products, $sort === 'featured' && $filters->count() === 0),
             'category' => $category,
             'products' => $products,
             'sort' => $sort,
+            'filters' => $filters,
+            'choices' => $filters->choices($all()),
         ]);
     }
 
@@ -106,13 +111,13 @@ class StorefrontController extends Controller
         ]);
     }
 
-    /** A sorted list or an empty category adds nothing to search results, so only the rest is indexed. */
-    private function collectionSeo(ShopCategory $category, LengthAwarePaginator $products, string $sort): array
+    /** A sorted or filtered list, or an empty category, adds nothing to search results, so only the plain list is indexed. */
+    private function collectionSeo(ShopCategory $category, LengthAwarePaginator $products, bool $plainList): array
     {
         $page = $products->currentPage();
         $canonical = $page > 1 ? $category->url().'?page='.$page : $category->url();
         $suffix = $page > 1 ? ' - صفحة '.$page : '';
-        $robots = $sort === 'featured' && $products->isNotEmpty() ? ShopSeo::INDEXABLE : 'noindex,follow';
+        $robots = $plainList && $products->isNotEmpty() ? ShopSeo::INDEXABLE : 'noindex,follow';
         $imagePath = $category->image_path ?? $products->first()?->images[0] ?? null;
 
         return $this->seo->page($category->name.$suffix, $this->seo->shareImage($imagePath, $category->name) + [
