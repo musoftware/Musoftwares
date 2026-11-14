@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AiAssistant\AssistantChat;
 use App\Services\AiAssistant\AssistantLimiter;
+use App\Services\AiAssistant\AssistantLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -33,16 +34,21 @@ class AiAssistantController extends Controller
         return response()->json(['messages' => []]);
     }
 
-    public function message(Request $request, AssistantLimiter $limiter): JsonResponse
+    public function message(Request $request, AssistantLimiter $limiter, AssistantLog $log): JsonResponse
     {
         $validated = $request->validate(['message' => ['required', 'string', 'max:'.self::MAX_MESSAGE_LENGTH]]);
+        $device = 'device:'.$this->deviceId($request);
 
-        if (! $limiter->allow($this->identities($request), (string) $request->ip())) {
+        if (! $limiter->allow($this->identities($request, $device), (string) $request->ip())) {
             return response()->json(['reply' => AssistantChat::limitMessage()], 429);
         }
 
         try {
-            return response()->json(['reply' => $this->chat->answer($validated['message'], $request->user())]);
+            $reply = $this->chat->answer($validated['message'], $request->user());
+            // the owner reads the conversations on the admin page
+            $log->record($device, $request->user(), $request->ip(), $this->pageAskedFrom($request), $validated['message'], $reply);
+
+            return response()->json(['reply' => $reply]);
         } catch (Throwable $e) {
             Log::error('AI assistant reply failed', ['user_id' => $request->user()?->id, 'exception' => $e::class, 'error' => $e->getMessage()]);
 
@@ -51,11 +57,19 @@ class AiAssistantController extends Controller
     }
 
     /** @return list<string> */
-    private function identities(Request $request): array
+    private function identities(Request $request, string $device): array
     {
         $account = $request->user()?->id;
 
-        return array_values(array_filter(['device:'.$this->deviceId($request), $account ? "user:{$account}" : null]));
+        return array_values(array_filter([$device, $account ? "user:{$account}" : null]));
+    }
+
+    /** The page of this site the visitor wrote from, without its query (it can hold private values). */
+    private function pageAskedFrom(Request $request): ?string
+    {
+        $from = (string) $request->headers->get('referer');
+
+        return parse_url($from, PHP_URL_HOST) === $request->getHost() ? (parse_url($from, PHP_URL_PATH) ?: '/') : null;
     }
 
     /** A random id kept in an encrypted cookie, so the same device is known after its IP changes. */

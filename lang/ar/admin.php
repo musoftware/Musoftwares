@@ -2195,6 +2195,7 @@ return [
     'sidebar_section_messages' => 'الرسائل والإيميلات',
     'sidebar_section_system' => 'النظام',
     'sidebar_projects_contracts' => 'المشاريع والعقود',
+    'sidebar_assistant_chats' => 'محادثات المساعد الذكي',
     'sidebar_shop' => 'المتجر',
     'sidebar_shop_products' => 'المنتجات',
     'sidebar_shop_categories' => 'الأقسام',

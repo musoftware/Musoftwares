@@ -58,6 +58,29 @@ class AiAssistantTest extends TestCase
         $this->assertStringContainsString('not signed in', $this->model->calls[0]['system']);
     }
 
+    public function test_the_owner_reads_what_visitors_asked_the_assistant(): void
+    {
+        $this->model->replies = [['text' => 'We build it', 'tool_calls' => [], 'content' => []], ['text' => 'From 50 USD', 'tool_calls' => [], 'content' => []]];
+        // the same browser both times
+        $this->withCredentials()->withCookie('ai_assistant_device', '0a1b2c3d-0000-4000-8000-0123456789ab')->withHeader('referer', 'http://localhost/pricing?secret=1');
+        $this->ask('can you build a shop?')->assertOk();
+        $this->ask('how much?')->assertOk();
+        $this->flushHeaders();
+
+        // both questions belong to one visitor, and the page is kept without its query
+        $exchange = \App\Models\AssistantExchange::latest('id')->first();
+        $this->assertSame(2, \App\Models\AssistantExchange::where('visitor', $exchange->visitor)->count());
+        $this->assertSame(['how much?', 'From 50 USD', '/pricing'], [$exchange->question, $exchange->answer, $exchange->page]);
+
+        $admin = User::factory()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get('/admin/assistant-chats')->assertInertia(fn ($page) => $page
+            ->where('visitors.data.0.questions', 2)->where('visitors.data.0.question', 'how much?'));
+        $this->actingAs($admin)->get('/admin/assistant-chats/'.$exchange->visitor)->assertInertia(fn ($page) => $page
+            ->where('exchanges.0.question', 'can you build a shop?')->where('exchanges.1.answer', 'From 50 USD'));
+        $this->actingAs($admin)->get('/admin/assistant-chats/device:nobody')->assertNotFound();
+    }
+
     public function test_the_account_tool_returns_only_the_signed_in_clients_money(): void
     {
         $this->clientOwing(777);

@@ -15,7 +15,7 @@ import {
   SidebarFooter
 } from '@/Components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/Components/ui/collapsible';
-import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop, ShoppingBag, LifeBuoy, MessageSquare, Clock } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, DollarSign, Settings, ChevronRight, Briefcase, CreditCard, Link2, ListTodo, BarChart3, Wand2, Mail, BookOpen, LayoutTemplate, ClipboardCheck, Laptop, ShoppingBag, LifeBuoy, MessageSquare, Clock, Ticket } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { __ } from '@/lib/i18n';
@@ -45,6 +45,7 @@ const sections: Section[] = [
     label: "admin.sidebar_section_ai",
     items: [
       { title: "admin.sidebar_builder", url: "/admin/builder", icon: Wand2 },
+      { title: "admin.sidebar_assistant_chats", url: "/admin/assistant-chats", icon: MessageSquare },
       { title: "admin.sidebar_prompt_gallery", url: "/admin/prompts", icon: BookOpen },
     ],
   },
@@ -52,7 +53,7 @@ const sections: Section[] = [
     label: "admin.sidebar_section_support",
     items: [
       { title: "admin.sidebar_tickets", url: "/admin/tickets", icon: LifeBuoy, badgeCountKey: "open_tickets" },
-      { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets", icon: MessageSquare },
+      { title: "admin.sidebar_guest_tickets", url: "/admin/guest-tickets", icon: Ticket },
       { title: "admin.sidebar_busy_times", url: "/admin/busy-times", icon: Clock },
     ],
   },

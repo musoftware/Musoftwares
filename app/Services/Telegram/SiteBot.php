@@ -227,6 +227,7 @@ class SiteBot
 
         try {
             $reply = $this->assistant->answer(mb_substr($text, 0, self::MAX_QUESTION), $user);
+            app(\App\Services\AiAssistant\AssistantLog::class)->record('telegram:'.$chatId, $user, null, 'Telegram', mb_substr($text, 0, self::MAX_QUESTION), $reply);
         } catch (Throwable $error) {
             Log::error('Telegram assistant reply failed', ['user_id' => $user->id, 'error' => $error->getMessage()]);
             $reply = AssistantChat::fallbackMessage();
