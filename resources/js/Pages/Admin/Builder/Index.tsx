@@ -146,11 +146,12 @@ function TestPush() {
     return <button type="button" onClick={send} className="rounded-lg border px-4 py-2 text-sm font-semibold">{t('Test notification', 'جرّب الإشعار')}</button>;
 }
 
-type ChatTab = 'customers' | 'paid' | 'team';
+type ChatTab = 'customers' | 'working' | 'paid' | 'team';
 
 const TABS: { key: ChatTab; label: [string, string] }[] = [
     { key: 'customers', label: ['Customers and guests', 'العملاء والزوار'] },
-    { key: 'paid', label: ['Paid projects', 'المشاريع المدفوعة'] },
+    { key: 'working', label: ['Work in progress', 'شغل شغال دلوقتي'] },
+    { key: 'paid', label: ['All paid projects', 'كل المشاريع المدفوعة'] },
     { key: 'team', label: ['Admin chats', 'محادثات الأدمن'] },
 ];
 
