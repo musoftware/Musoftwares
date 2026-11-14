@@ -146,14 +146,15 @@ function TestPush() {
     return <button type="button" onClick={send} className="rounded-lg border px-4 py-2 text-sm font-semibold">{t('Test notification', 'جرّب الإشعار')}</button>;
 }
 
-type ChatTab = 'customers' | 'team';
+type ChatTab = 'customers' | 'paid' | 'team';
 
 const TABS: { key: ChatTab; label: [string, string] }[] = [
     { key: 'customers', label: ['Customers and guests', 'العملاء والزوار'] },
+    { key: 'paid', label: ['Paid projects', 'المشاريع المدفوعة'] },
     { key: 'team', label: ['Admin chats', 'محادثات الأدمن'] },
 ];
 
-/** Customers' chats apart from the team's own tests, each tab with how many chats it holds. */
+/** Customers' chats apart from the team's own tests, and the paid work on its own; each tab with how many chats it holds. */
 function ChatTabs({ tab, counts, waitingOnly }: { tab: ChatTab; counts: Record<ChatTab, number>; waitingOnly: boolean }) {
     return (
         <div role="tablist" className="flex flex-wrap gap-2 border-b">
@@ -162,7 +163,7 @@ function ChatTabs({ tab, counts, waitingOnly }: { tab: ChatTab; counts: Record<C
                     key={key}
                     role="tab"
                     aria-selected={tab === key}
-                    href={`/admin/builder?${new URLSearchParams({ ...(key === 'team' ? { tab: 'team' } : {}), ...(waitingOnly ? { waiting: '1' } : {}) })}`}
+                    href={`/admin/builder?${new URLSearchParams({ ...(key === 'customers' ? {} : { tab: key }), ...(waitingOnly ? { waiting: '1' } : {}) })}`}
                     preserveScroll
                     className={`-mb-px min-h-11 border-b-2 px-4 py-2 text-sm font-semibold ${tab === key ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                 >
@@ -184,7 +185,7 @@ interface IndexProps {
 }
 
 export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor, deliveryStats, tab, tabCounts }: IndexProps) {
-    const tabQuery = tab === 'team' ? 'tab=team&' : '';
+    const tabQuery = tab === 'customers' ? '' : `tab=${tab}&`;
     return (
         <AdminSidebarLayout>
             <Head title={t('AI builder', 'منشئ البرامج')} />

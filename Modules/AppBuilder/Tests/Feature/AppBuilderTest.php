@@ -586,7 +586,12 @@ class AppBuilderTest extends TestCase
 
         $this->assertSame(['customer', 'guest', 'guest without address'], $titles('/admin/builder'));
         $this->assertSame(['admin signed out', 'admin test'], $titles('/admin/builder?tab=team'));
-        $this->actingAs($admin)->get('/admin/builder')->assertInertia(fn ($page) => $page->where('tabCounts', ['customers' => 3, 'team' => 2])->where('tab', 'customers'));
+        $this->actingAs($admin)->get('/admin/builder')->assertInertia(fn ($page) => $page->where('tabCounts', ['customers' => 3, 'paid' => 0, 'team' => 2])->where('tab', 'customers'));
+
+        // the paid tab holds the real work, whoever started it: money paid in, or a project the owner imported
+        $buyer->update(['paid_total' => 50]);
+        $own->update(['import_url' => 'https://github.com/musoftware/shop', 'customer_project' => false]);
+        $this->assertSame(['admin test', 'customer'], $titles('/admin/builder?tab=paid'));
     }
 
     public function test_a_build_cut_off_by_a_worker_restart_is_claimed_again_at_once(): void
