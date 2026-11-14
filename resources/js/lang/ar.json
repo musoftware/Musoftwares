@@ -2776,6 +2776,11 @@
         "design_message": "اخترت التصميم: :design (:slug)",
         "starter_title": "برنامج جاهز عندنا نبدأ منه",
         "ideas_title": "أفكار تفيد شغلك في النسخة الجاية",
+        "checks_title": "اللي جرّبناه قبل التسليم",
+        "checks_what": "جرّبنا إيه",
+        "checks_result": "النتيجة",
+        "checks_ok": "شغّال",
+        "checks_waiting": "لسه",
         "idea_ask": "عايز دي، بكام؟",
         "idea_message": "عايز أضيف: :idea. بكام؟",
         "progress_label": "جزء خلص من الشغل",
@@ -2834,6 +2839,7 @@
             "packaging": "بيجهّز الملفات للتسليم",
             "inspecting": "بنفحص مشروعك في مكان معزول",
             "importing": "بنجهّز مشروعك علشان نبدأ عليه",
+            "copying": "الخطوة الأولى: بننسخ ملفات المشروع (:percent%)",
             "releasing": "بنرفع التعديلات على السيرفر بتاعك"
         },
         "import": {
