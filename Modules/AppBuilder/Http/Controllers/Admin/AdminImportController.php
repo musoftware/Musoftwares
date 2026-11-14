@@ -26,7 +26,7 @@ class AdminImportController extends Controller
      */
     public function release(BuilderProject $project): RedirectResponse
     {
-        $started = $this->imports->queueRelease($project);
+        $started = $this->imports->queueRelease($project, again: true);
 
         return redirect()->route('admin.builder.show', $project)
             ->with($started ? 'success' : 'error', __($started ? 'builder.admin.release_started' : 'builder.admin.release_not_started'));

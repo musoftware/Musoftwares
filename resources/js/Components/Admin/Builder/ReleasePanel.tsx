@@ -42,7 +42,7 @@ export default function ReleasePanel({ uuid, state }: { uuid: string; state: Imp
             <p>{t(`Changes waiting: ${state.changes_waiting}`, `تعديلات مستنية: ${state.changes_waiting}`)}{state.released_at && <> · {t('last release', 'آخر رفع')} <span dir="ltr">{state.released_at}</span></>}</p>
             {state.pull_request_url && <p dir="ltr"><a className="font-semibold text-blue-700 wrap-anywhere" href={state.pull_request_url} target="_blank" rel="noopener">{state.pull_request_url}</a></p>}
             {state.can_release && (
-                <button type="button" onClick={release} disabled={sending} className="min-h-11 rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white disabled:opacity-60">{sending ? t('Starting...', 'بيبدأ...') : t('Release now', 'ارفع دلوقتي')}</button>
+                <button type="button" onClick={release} disabled={sending} className="min-h-11 rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white disabled:opacity-60">{sending ? t('Starting...', 'بيبدأ...') : state.changes_waiting > 0 ? t('Release now', 'ارفع دلوقتي') : t('Release again', 'ارفع تاني')}</button>
             )}
         </section>
     );

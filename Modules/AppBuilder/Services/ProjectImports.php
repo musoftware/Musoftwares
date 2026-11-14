@@ -127,9 +127,10 @@ class ProjectImports
     }
 
     /** Sends the delivered changes to the worker for release; only while nothing else runs for the project. */
-    public function queueRelease(BuilderProject $project): bool
+    /** @param  bool  $again  the owner sends the project again even with nothing waiting, after a release that did not reach the server */
+    public function queueRelease(BuilderProject $project, bool $again = false): bool
     {
-        if (! $project->isOwnerImport() || $project->status !== BuilderProject::READY || $project->changesWaiting() === 0) {
+        if (! $project->isOwnerImport() || $project->status !== BuilderProject::READY || (! $again && $project->changesWaiting() === 0)) {
             return false;
         }
 

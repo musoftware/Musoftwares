@@ -124,7 +124,7 @@ class AdminBuilderController extends Controller
             'released_at' => $project->released_at?->timezone('Africa/Cairo')->toDateTimeString(),
             'changes_waiting' => $project->changesWaiting(),
             'pull_request_url' => $project->pull_request_url,
-            'can_release' => $project->status === BuilderProject::READY && $project->changesWaiting() > 0,
+            'can_release' => $project->status === BuilderProject::READY,
         ];
     }
 

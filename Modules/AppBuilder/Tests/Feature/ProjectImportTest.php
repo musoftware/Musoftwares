@@ -187,6 +187,18 @@ class ProjectImportTest extends TestCase
         $this->actingAs($this->admin())->get('/admin/builder/'.$project->uuid.'/release')->assertRedirect('/admin/builder/'.$project->uuid);
     }
 
+    public function test_the_owner_releases_again_with_nothing_waiting_but_the_rule_does_not(): void
+    {
+        $project = $this->imported('batch');
+        $this->assertSame(0, $project->changesWaiting());
+
+        $this->assertFalse(app(ProjectImports::class)->askRelease($project));
+        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/release')
+            ->assertRedirect('/admin/builder/'.$project->uuid)->assertSessionHas('success');
+        $this->assertSame(BuilderProject::JOB_RELEASE, $project->refresh()->job_kind);
+        $this->assertSame(BuilderProject::QUEUED, $project->status);
+    }
+
     public function test_a_delivered_change_whose_release_failed_waits_and_the_owner_hears(): void
     {
         $project = $this->imported(BuilderProject::RELEASE_EACH);
