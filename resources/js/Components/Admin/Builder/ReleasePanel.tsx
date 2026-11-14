@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 
@@ -27,7 +27,9 @@ function ruleText(state: ImportState): string {
 
 /** An imported project: where its changes go, what is waiting, the last pull request, and a button to release now. */
 export default function ReleasePanel({ uuid, state }: { uuid: string; state: ImportState }) {
-    const release = () => router.post(`/admin/builder/${uuid}/release`, {}, { preserveScroll: true });
+    // one press starts one release: the button waits until the page comes back
+    const [sending, setSending] = useState(false);
+    const release = () => router.post(`/admin/builder/${uuid}/release`, {}, { preserveScroll: true, onStart: () => setSending(true), onFinish: () => setSending(false) });
 
     return (
         <section className="space-y-2 rounded-xl border bg-white p-4 text-sm">
@@ -40,7 +42,7 @@ export default function ReleasePanel({ uuid, state }: { uuid: string; state: Imp
             <p>{t(`Changes waiting: ${state.changes_waiting}`, `تعديلات مستنية: ${state.changes_waiting}`)}{state.released_at && <> · {t('last release', 'آخر رفع')} <span dir="ltr">{state.released_at}</span></>}</p>
             {state.pull_request_url && <p dir="ltr"><a className="font-semibold text-blue-700 wrap-anywhere" href={state.pull_request_url} target="_blank" rel="noopener">{state.pull_request_url}</a></p>}
             {state.can_release && (
-                <button type="button" onClick={release} className="rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white">{t('Release now', 'ارفع دلوقتي')}</button>
+                <button type="button" onClick={release} disabled={sending} className="min-h-11 rounded-lg bg-slate-900 px-4 py-2 font-semibold text-white disabled:opacity-60">{sending ? t('Starting...', 'بيبدأ...') : t('Release now', 'ارفع دلوقتي')}</button>
             )}
         </section>
     );

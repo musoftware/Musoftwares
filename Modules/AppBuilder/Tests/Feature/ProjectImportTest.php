@@ -179,8 +179,12 @@ class ProjectImportTest extends TestCase
         $this->assertSame(0, $project->messages()->where('content', __('builder.failed', [], 'ar'))->count());
         // not retried by itself every few minutes
         $this->assertSame(0, $imports->queueDueReleases());
-        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/release')->assertRedirect();
+        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/release')->assertRedirect('/admin/builder/'.$project->uuid);
         $this->assertSame(BuilderProject::JOB_RELEASE, $project->refresh()->job_kind);
+        // a second press, or the address opened again, goes back to the project without an error page
+        $this->actingAs($this->admin())->post('/admin/builder/'.$project->uuid.'/release')
+            ->assertRedirect('/admin/builder/'.$project->uuid)->assertSessionHas('error', __('builder.admin.release_not_started'));
+        $this->actingAs($this->admin())->get('/admin/builder/'.$project->uuid.'/release')->assertRedirect('/admin/builder/'.$project->uuid);
     }
 
     public function test_a_delivered_change_whose_release_failed_waits_and_the_owner_hears(): void

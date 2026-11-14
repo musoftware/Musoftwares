@@ -151,6 +151,7 @@ return [
         'secret_saved' => 'اتحفظ.',
         'secret_removed' => 'اتشال.',
         'import_started' => 'الـ worker بيحمّل المشروع. هيوصلك إيميل لما الشات يبقى جاهز تبعته للعميل.',
+        'release_not_started' => 'الرفع شغال بالفعل، أو مفيش تعديلات مستنية.',
         'release_started' => 'التعديلات المستنية بتترفع على GitHub والسيرفر دلوقتي.',
         'import_drive_only' => 'اكتب لينك الـ repo على GitHub (https://github.com/owner/repo) أو لينك مشاركة من Google Drive لملف .zip.',
     ],

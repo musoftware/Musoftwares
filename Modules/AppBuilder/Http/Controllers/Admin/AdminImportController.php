@@ -20,11 +20,21 @@ class AdminImportController extends Controller
         return redirect()->route('admin.builder.show', $project)->with('success', __('builder.admin.import_started'));
     }
 
-    /** Pushes and deploys the waiting changes now, whatever the project's release rule says. */
+    /**
+     * Pushes and deploys the waiting changes now, whatever the project's release rule says. A second press while the
+     * release already runs, or with nothing waiting, only tells the owner so; it never shows an error page.
+     */
     public function release(BuilderProject $project): RedirectResponse
     {
-        abort_unless($this->imports->queueRelease($project), 409);
+        $started = $this->imports->queueRelease($project);
 
-        return back()->with('success', __('builder.admin.release_started'));
+        return redirect()->route('admin.builder.show', $project)
+            ->with($started ? 'success' : 'error', __($started ? 'builder.admin.release_started' : 'builder.admin.release_not_started'));
+    }
+
+    /** The release address opened in the browser (a refresh, a copied link) goes back to the project. */
+    public function showProject(BuilderProject $project): RedirectResponse
+    {
+        return redirect()->route('admin.builder.show', $project);
     }
 }

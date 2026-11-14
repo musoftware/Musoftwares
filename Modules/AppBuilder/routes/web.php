@@ -81,6 +81,7 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::post('/{project}/requests/{item}/reject', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'reject'])->whereNumber('item')->name('requests.reject');
     Route::post('/{project}/requests/{item}/rollback', [\Modules\AppBuilder\Http\Controllers\Admin\AdminRequestController::class, 'rollback'])->whereNumber('item')->name('requests.rollback');
     Route::post('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'release'])->name('release');
+    Route::get('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'showProject']);
     Route::get('/{project}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'show'])->name('show');
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');
