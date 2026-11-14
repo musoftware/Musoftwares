@@ -74,6 +74,11 @@ class AdminBuilderController extends Controller
     /** Every request with exactly what the engineer will read, newest first; the owner approves the open ones. */
     private function requestsToReview(BuilderProject $project): array
     {
+        if (! $project->requests()->exists()) {
+            return [];
+        }
+        $stages = new \Modules\AppBuilder\Services\RequestStages($project);
+
         // a payment that opens more free changes is not work: nothing for the owner to review
         return $project->requests()->where('kind', '!=', \Modules\AppBuilder\Models\BuilderRequest::PACK)->latest('id')->limit(30)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
             'id' => $item->id,
@@ -91,6 +96,8 @@ class AdminBuilderController extends Controller
             'can_rollback' => $project->isOwnerImport() && $item->canRollBack(),
             'rolling_back' => $item->rollback_asked_at !== null,
             'rolled_back' => $item->rolled_back_at !== null,
+            'version' => $item->built_in_version,
+            'stages' => $stages->of($item),
             'open' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true),
             'at' => $item->created_at?->timezone('Africa/Cairo')->toDateTimeString(),
         ])->values()->all();
@@ -109,6 +116,10 @@ class AdminBuilderController extends Controller
             'release_after_changes' => $project->release_after_changes,
             'release_quiet_minutes' => $project->release_quiet_minutes,
             'deploy_enabled' => $project->deploy_enabled,
+            // the build deploys by itself only with a way into the server among the access details
+            'server_access' => $project->secrets()->whereIn('name', ['ssh_host', 'ftp_host'])->exists(),
+            'version' => (int) $project->version,
+            'released_version' => (int) $project->released_version,
             'imported_at' => $project->imported_at?->timezone('Africa/Cairo')->toDateTimeString(),
             'released_at' => $project->released_at?->timezone('Africa/Cairo')->toDateTimeString(),
             'changes_waiting' => $project->changesWaiting(),

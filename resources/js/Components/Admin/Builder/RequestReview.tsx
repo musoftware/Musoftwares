@@ -20,6 +20,45 @@ export interface ReviewItem {
     rolled_back: boolean;
     open: boolean;
     at: string | null;
+    version: number | null;
+    stages: Stages;
+}
+
+type Stage = 'yes' | 'no' | 'now' | 'waiting' | 'none' | 'unknown' | 'rolled_back';
+
+interface Stages {
+    work: Stage;
+    build: Stage;
+    tests: Stage;
+    tests_note: string | null;
+    push: Stage;
+    deploy: Stage;
+}
+
+/** What the table needs to know about the project's releases; null for a project that is never released. */
+export interface ReleaseFacts {
+    github_repo: string | null;
+    deploy_enabled: boolean;
+    server_access: boolean;
+    version: number;
+    released_version: number;
+    pull_request_url: string | null;
+}
+
+const STAGE: Record<Stage, [string, string, string]> = {
+    yes: ['Done', 'تم', 'text-emerald-700'],
+    no: ['Failed', 'فشل', 'text-red-700'],
+    now: ['Working now', 'شغال دلوقتي', 'text-amber-700'],
+    waiting: ['Not yet', 'لسه', 'text-slate-500'],
+    none: ['Not used', 'مش مستخدم', 'text-slate-400'],
+    unknown: ['Not recorded', 'مش متسجّل', 'text-slate-400'],
+    rolled_back: ['Rolled back', 'اترجّع', 'text-amber-700'],
+};
+
+function StageCell({ stage, note }: { stage: Stage; note?: string | null }) {
+    const [en, ar, colour] = STAGE[stage];
+
+    return <td className={`px-3 py-2 font-semibold whitespace-nowrap ${colour}`}>{t(en, ar)}{note ? <span className="ms-1 font-normal text-slate-500" dir="ltr">({note})</span> : null}</td>;
 }
 
 const STATUS: Record<ReviewItem['status'], [string, string]> = {
@@ -48,19 +87,43 @@ function DeliveredRequest({ uuid, item, currency }: { uuid: string; item: Review
             'ترجّع التعديل ده؟ الـ worker هيلغي الـ commits بتاعته ويرفع المشروع تاني (GitHub والسيرفر والتطبيق).'))) return;
         router.post(`/admin/builder/${uuid}/requests/${item.id}/rollback`, {}, done('Rollback started', 'الرجوع بدأ'));
     };
-    const state = item.rolled_back ? t('Rolled back', 'اترجّع') : item.rolling_back ? t('Rolling back...', 'بيترجّع...') : '';
 
     return (
-        <li id={`request-${item.id}`} className="flex flex-wrap items-center justify-between gap-2 py-2">
-            <span className="min-w-0 wrap-anywhere" dir="auto">{item.title}</span>
-            <span className="flex flex-wrap items-center gap-2 text-slate-500">
-                <span dir="ltr">{priceLine(item, currency)}</span>
-                {state && <span className="font-semibold text-amber-700">{state}</span>}
+        <tr id={`request-${item.id}`} className="border-t align-middle">
+            <td className="min-w-48 px-3 py-2">
+                <span className="block wrap-anywhere" dir="auto">{item.title}</span>
+                <span className="block text-xs text-slate-500" dir="ltr">{priceLine(item, currency)}{item.version ? ` · v${item.version}` : ''}</span>
+            </td>
+            <StageCell stage={item.rolling_back ? 'now' : item.stages.work} />
+            <StageCell stage={item.stages.build} />
+            <StageCell stage={item.stages.tests} note={item.stages.tests_note} />
+            <StageCell stage={item.stages.push} />
+            <StageCell stage={item.stages.deploy} />
+            <td className="px-3 py-2">
                 {item.can_rollback && (
                     <button type="button" onClick={rollback} className="min-h-11 rounded-lg border px-3 font-semibold text-red-700">{t('Roll back', 'رجّعه')}</button>
                 )}
-            </span>
-        </li>
+            </td>
+        </tr>
+    );
+}
+
+/** The project's own release state above the table: what reached GitHub, and whether a deploy can run at all. */
+function ReleaseLine({ release }: { release: ReleaseFacts }) {
+    const push = !release.github_repo
+        ? t('Push: this project has no GitHub repo.', 'Push: المشروع ده ملوش repo على GitHub.')
+        : t(`Push: version ${release.released_version} of ${release.version} is on GitHub.`, `Push: النسخة ${release.released_version} من ${release.version} على GitHub.`);
+    const deploy = !release.deploy_enabled
+        ? t('Deploy: turned off for this project.', 'Deploy: مقفول للمشروع ده.')
+        : release.server_access
+            ? t('Deploy: on, and the server access is saved.', 'Deploy: شغال، وبيانات السيرفر محفوظة.')
+            : t('Deploy: on, but no server access is saved (ssh_host or ftp_host), so it relies on the deploy files inside the project.', 'Deploy: شغال، بس مفيش بيانات سيرفر محفوظة (ssh_host أو ftp_host)، فهيعتمد على ملفات الـ deploy اللي جوه المشروع.');
+
+    return (
+        <p className="mt-2 text-sm text-slate-600">
+            {push} {deploy}{' '}
+            {release.pull_request_url && <a href={release.pull_request_url} target="_blank" rel="noreferrer" className="font-semibold underline">{t('Last pull request', 'آخر pull request')}</a>}
+        </p>
     );
 }
 
@@ -186,7 +249,7 @@ function Queue({ items }: { items: ReviewItem[] }) {
 }
 
 /** Every request of this project; the open ones first, each opened straight from the owner's push. */
-export default function RequestReview({ uuid, items, currency }: { uuid: string; items: ReviewItem[]; currency: string }) {
+export default function RequestReview({ uuid, items, currency, release }: { uuid: string; items: ReviewItem[]; currency: string; release: ReleaseFacts | null }) {
     // the push opens this page at #request-N; Inertia draws after the browser tried to scroll, so scroll again
     useEffect(() => {
         const target = window.location.hash ? document.querySelector(window.location.hash) : null;
@@ -205,9 +268,25 @@ export default function RequestReview({ uuid, items, currency }: { uuid: string;
             {closed.length > 0 && (
                 <details className="rounded-xl border bg-white p-4">
                     <summary className="cursor-pointer font-semibold">{t(`Started or done (${closed.length})`, `بدأت أو خلصت (${closed.length})`)}</summary>
-                    <ul className="mt-2 divide-y text-sm">
-                        {closed.map((item) => <DeliveredRequest key={item.id} uuid={uuid} item={item} currency={currency} />)}
-                    </ul>
+                    {release && <ReleaseLine release={release} />}
+                    <div className="mt-2 overflow-x-auto">
+                        <table className="w-full text-start text-sm">
+                            <thead>
+                                <tr className="text-xs text-slate-500">
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">{t('Request', 'الطلب')}</th>
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">{t('Work', 'الشغل')}</th>
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">Build</th>
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">Tests</th>
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">Push</th>
+                                    <th scope="col" className="px-3 py-2 text-start font-semibold">Deploy</th>
+                                    <th scope="col" className="px-3 py-2"><span className="sr-only">{t('Roll back', 'رجّعه')}</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {closed.map((item) => <DeliveredRequest key={item.id} uuid={uuid} item={item} currency={currency} />)}
+                            </tbody>
+                        </table>
+                    </div>
                 </details>
             )}
         </section>

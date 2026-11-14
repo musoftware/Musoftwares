@@ -184,7 +184,8 @@ class ProjectImports
             $project->messages()->create([
                 'role' => BuilderMessage::TEAM,
                 'content' => __($apk !== null ? 'builder.import.live_with_app' : 'builder.import.live', [], $project->customerLanguage()),
-                'payload' => $apk !== null ? ['delivered_version' => $project->version] : null,
+                // which version reached the server is kept here, so the owner's list can show it per request
+                'payload' => array_filter(['delivered_version' => $apk !== null ? $project->version : null, 'deployed_version' => $deployed ? $project->version : null]) ?: null,
             ]);
         }
         $this->payment->tellOwner($project, 'Released: '.$project->title.($pullRequestUrl ? ' '.$pullRequestUrl : '').($deployed ? ' (deployed)' : '').' '.Str::limit($note, 500));

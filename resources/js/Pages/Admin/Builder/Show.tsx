@@ -335,7 +335,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl, impor
                 <VisitorCard visitor={project.visitor} />
                 <Money project={project} />
                 <ProjectApproval project={project} />
-                <RequestReview uuid={project.uuid} items={requests} currency={project.currency} />
+                <RequestReview uuid={project.uuid} items={requests} currency={project.currency} release={imported ?? null} />
                 {project.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800 whitespace-pre-wrap wrap-anywhere" dir="ltr">{project.error}</p>}
 
                 <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">

@@ -342,4 +342,24 @@ class ProjectImportTest extends TestCase
 
         $this->assertSame(0, BuilderProject::count());
     }
+    public function test_the_owner_sees_each_request_stage_by_stage(): void
+    {
+        $project = BuilderProject::create([
+            'ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD', 'title' => 'ZainArena', 'spec' => 'x', 'status' => BuilderProject::FAILED,
+            'import_url' => 'https://github.com/musoftware/zain', 'github_repo' => 'musoftware/zain', 'deploy_enabled' => true,
+            'version' => 3, 'released_version' => 2, 'error' => 'The program still fails the final check: tests',
+        ]);
+        $common = ['spec' => 'x', 'kind' => 'build', 'free' => true, 'amount' => 0, 'model' => 'claude-sonnet-5-5'];
+        $live = $project->requests()->create($common + ['title' => 'A', 'status' => 'done', 'built_in_version' => 2]);
+        $waiting = $project->requests()->create($common + ['title' => 'B', 'status' => 'done', 'built_in_version' => 3]);
+        $stopped = $project->requests()->create($common + ['title' => 'C', 'status' => 'building']);
+        $project->messages()->create(['role' => 'assistant', 'content' => 'done', 'payload' => ['delivered_version' => 3, 'checks' => [['what' => 'a', 'passed' => true, 'note' => ''], ['what' => 'b', 'passed' => false, 'note' => '']]]]);
+        $project->messages()->create(['role' => 'team', 'content' => 'live', 'payload' => ['deployed_version' => 2]]);
+
+        $stages = new \Modules\AppBuilder\Services\RequestStages($project);
+
+        $this->assertSame(['work' => 'yes', 'build' => 'yes', 'tests' => 'yes', 'tests_note' => null, 'push' => 'yes', 'deploy' => 'yes'], $stages->of($live));
+        $this->assertSame(['work' => 'yes', 'build' => 'yes', 'tests' => 'no', 'tests_note' => '1/2', 'push' => 'waiting', 'deploy' => 'waiting'], $stages->of($waiting));
+        $this->assertSame(['work' => 'no', 'build' => 'yes', 'tests' => 'no', 'tests_note' => null, 'push' => 'waiting', 'deploy' => 'waiting'], $stages->of($stopped));
+    }
 }

@@ -8,6 +8,9 @@ export interface ImportState {
     release_after_changes: number;
     release_quiet_minutes: number;
     deploy_enabled: boolean;
+    server_access: boolean;
+    version: number;
+    released_version: number;
     imported_at: string | null;
     released_at: string | null;
     changes_waiting: number;
