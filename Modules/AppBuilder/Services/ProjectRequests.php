@@ -38,8 +38,10 @@ class ProjectRequests
         if ($same !== null) {
             return $same;
         }
-        // a fix is free, however many, while the warranty lasts; something new is always priced
+        // a fix is free, however many, while the warranty lasts; new work is free only while free changes are left
         $free = $project->changeIsFree($turn->isFix, $turn->isNewProject);
+        // the free changes are used: new work waits until the customer opens more of them
+        $locked = ! $free && ! $turn->isFix && ! $turn->isNewProject && $project->needsChangesPack();
         // priced by its own work, never by the minimum of the whole project's type
         $price = $free ? $this->pricer->freeFix($turn->estimatedTokens, $turn->complex) : $this->pricer->change($turn->estimatedTokens, $turn->complex);
 
@@ -59,10 +61,19 @@ class ProjectRequests
             'amount' => $price['amount'],
             'budget_usd' => $price['budget'],
             'model' => $price['model'],
-            'status' => $free ? BuilderRequest::READY : BuilderRequest::UNPAID,
+            'status' => match (true) {
+                $free => BuilderRequest::READY,
+                $locked => BuilderRequest::LOCKED,
+                default => BuilderRequest::UNPAID,
+            },
         ]);
         if ($free) {
             $project->increment('free_fixes_used');
+        }
+        if ($locked) {
+            $this->offerPack($project);
+
+            return $request;
         }
         // the owner reads it first; without that rule a free change only tells the owner and starts
         if (! $request->isApproved()) {
@@ -75,6 +86,39 @@ class ProjectRequests
         }
 
         return $request;
+    }
+
+    /** One item in the list that the customer pays to open more free changes; never two at once. */
+    private function offerPack(BuilderProject $project): void
+    {
+        if ($project->requests()->where('kind', BuilderRequest::PACK)->where('status', BuilderRequest::UNPAID)->exists()) {
+            return;
+        }
+
+        $project->requests()->create([
+            'title' => __('builder.requests.pack_title', ['count' => (int) config('builder.free_changes')], $project->customerLanguage()),
+            'spec' => '',
+            'kind' => BuilderRequest::PACK,
+            'free' => false,
+            'amount' => $project->changesPackPrice(),
+            'model' => (string) config('builder.build_models.standard.model'),
+            'status' => BuilderRequest::UNPAID,
+            // nothing for the engineer to read: it is a payment, not work
+            'approved_at' => now(),
+        ]);
+        $this->payment->tellOwner($project, 'The free changes are used: '.$project->title.'. The customer was offered more for '.$project->changesPackPrice().' '.$project->currency.'.');
+    }
+
+    /** A paid pack is done at once, and the new work that waited for it becomes free, up to the new count. */
+    private function openPacks(BuilderProject $project, Collection $paid): void
+    {
+        $packs = $paid->where('kind', BuilderRequest::PACK);
+        if ($packs->isEmpty()) {
+            return;
+        }
+
+        $packs->each->update(['status' => BuilderRequest::DONE]);
+        $this->freeInFirstPeriod($project->refresh());
     }
 
     /**
@@ -95,7 +139,7 @@ class ProjectRequests
     /** An item for the same thing that is not done yet (waiting, paid or being built), or null. */
     private function openWithTitle(BuilderProject $project, string $title, ?int $except = null): ?BuilderRequest
     {
-        return $project->requests()->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY, BuilderRequest::BUILDING])
+        return $project->requests()->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::LOCKED, BuilderRequest::READY, BuilderRequest::BUILDING])
             ->when($except, fn ($others) => $others->whereKeyNot($except))->get()
             ->first(fn (BuilderRequest $request) => $this->sameThing((string) $request->title, $title));
     }
@@ -120,12 +164,12 @@ class ProjectRequests
      */
     public function freeInFirstPeriod(BuilderProject $project): int
     {
-        if (! $project->changeIsFree(false, false)) {
-            return 0;
-        }
-
         $changed = 0;
-        foreach ($project->requests()->where('status', BuilderRequest::UNPAID)->where('kind', BuilderRequest::BUILD)->get() as $request) {
+        foreach ($this->waitingNewWork($project->requests())->orderBy('id')->get() as $request) {
+            // each one made free uses a free change; the rest keep their price
+            if (! $project->hasFreeChanges()) {
+                break;
+            }
             if ($this->openWithTitle($project, (string) $request->title, $request->id) !== null) {
                 $request->delete();
                 $changed++;
@@ -137,15 +181,33 @@ class ProjectRequests
             app(OwnerReview::class)->ask($project, $request->refresh());
             $changed++;
         }
+        $this->unlockWithoutPack($project);
         $this->startNext($project);
 
         return $changed;
     }
 
-    /** Every project still in its free first period, each minute: what was priced before the rule becomes free. */
+    /** New work that waits for more free changes when no more can be opened (their days ended): it gets its own price. */
+    private function unlockWithoutPack(BuilderProject $project): void
+    {
+        if ($project->hasFreeChanges() || $project->needsChangesPack()) {
+            return;
+        }
+
+        $project->requests()->where('status', BuilderRequest::LOCKED)->update(['status' => BuilderRequest::UNPAID]);
+        $project->requests()->where('kind', BuilderRequest::PACK)->where('status', BuilderRequest::UNPAID)->delete();
+    }
+
+    /** New work the customer has not paid for: priced, or waiting for more free changes. */
+    private function waitingNewWork($query)
+    {
+        return $query->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::LOCKED])->where('kind', BuilderRequest::BUILD);
+    }
+
+    /** Every project with new work that waits, each minute: it becomes free while free changes are left. */
     public function freeAllInFirstPeriod(): int
     {
-        return BuilderProject::whereHas('requests', fn ($unpaid) => $unpaid->where('status', BuilderRequest::UNPAID)->where('kind', BuilderRequest::BUILD))
+        return BuilderProject::whereHas('requests', fn ($waiting) => $this->waitingNewWork($waiting))
             ->get()->sum(fn (BuilderProject $project) => $this->freeInFirstPeriod($project));
     }
 
@@ -205,6 +267,7 @@ class ProjectRequests
             return 0;
         }
 
+        $this->openPacks($project, $paid);
         // a paid request the owner has not approved yet waits for them; the push opens it
         $waiting = $paid->first(fn (BuilderRequest $request) => ! $request->isApproved());
         $this->payment->tellOwner(
@@ -276,7 +339,7 @@ class ProjectRequests
     /** The customer takes back a request the engineer has not started: one waiting for payment, or one in line. */
     public function cancel(BuilderProject $project, int $id): bool
     {
-        return $project->requests()->whereKey($id)->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::READY])->first()?->delete() ?? false;
+        return $project->requests()->whereKey($id)->whereIn('status', [BuilderRequest::UNPAID, BuilderRequest::LOCKED, BuilderRequest::READY])->first()?->delete() ?? false;
     }
 
     /** Every project with a request waiting for a free engineer; run every minute in case a start was missed. */
@@ -363,6 +426,8 @@ class ProjectRequests
             $request->status === BuilderRequest::BUILDING => 'the engineer is working on it now',
             $request->waitsForOwner() => ($request->free ? 'free fix' : 'PAID').'; the engineer is reviewing it and starts it soon',
             $request->status === BuilderRequest::READY => ($request->free ? 'free fix' : 'PAID').'; it starts as soon as the engineer is free',
+            $request->status === BuilderRequest::LOCKED => 'not started: it waits until the customer pays the item that opens more free changes',
+            $request->kind === BuilderRequest::PACK => 'not work: the payment that opens more free changes, waiting for the customer to pay it from the list',
             default => 'waiting for the customer to pay it from the list',
         };
     }

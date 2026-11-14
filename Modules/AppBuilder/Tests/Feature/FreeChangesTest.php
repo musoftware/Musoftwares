@@ -74,6 +74,74 @@ class FreeChangesTest extends TestCase
         $this->assertGreaterThan(0, (float) $items[1]->amount);
     }
 
+    public function test_only_a_few_changes_are_free_and_fixes_are_never_counted(): void
+    {
+        config(['builder.free_changes' => 2]);
+        $project = $this->project();
+
+        $this->asks($project, 'build', 'قسم البلس في لوحة التحكم');
+        $this->asks($project, 'fix', 'زرار الاشتراك مش بيفتح');
+        $this->asks($project, 'build', 'تقرير المبيعات الشهري');
+        $state = $this->getJson('/ai/'.$project->uuid.'/state')->assertOk();
+        $state->assertJsonPath('requests.warranty.changes.left', 0)->assertJsonPath('requests.warranty.changes.total', 2);
+        $this->asks($project, 'build', 'صفحة العروض الأسبوعية');
+        $this->asks($project, 'fix', 'لون الزرار غلط في الصفحة الرئيسية');
+
+        $this->assertSame([true, true, true, false, true], $project->requests()->reorder('id')->pluck('free')->all());
+        $this->assertGreaterThan(0, (float) $project->requests()->reorder('id')->get()[3]->amount);
+    }
+
+    public function test_a_free_change_the_customer_took_back_gives_its_place_back(): void
+    {
+        config(['builder.free_changes' => 1]);
+        $project = $this->project();
+        $this->asks($project, 'build', 'قسم البلس في لوحة التحكم');
+        $this->assertSame(0, $project->freeChangesLeft());
+
+        $project->requests()->sole()->delete();
+
+        $this->assertSame(1, $project->freeChangesLeft());
+    }
+
+    public function test_when_the_free_changes_are_used_paying_the_rest_of_the_estimate_opens_more(): void
+    {
+        config(['builder.free_changes' => 1]);
+        $project = $this->project();
+        $project->update(['amount' => 150, 'price_max' => 225]);
+        $this->asks($project, 'build', 'قسم البلس في لوحة التحكم');
+
+        $this->asks($project, 'build', 'تقرير المبيعات الشهري');
+        $this->asks($project, 'build', 'صفحة العروض الأسبوعية');
+
+        // the new work waits, and one item in the list opens more for the rest up to the top of the estimate
+        $pack = $project->requests()->where('kind', 'pack')->sole();
+        $this->assertSame('75.00', $pack->amount);
+        $this->assertSame(['locked', 'locked'], $project->requests()->where('kind', 'build')->reorder('id')->pluck('status')->skip(1)->values()->all());
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('requests.warranty.changes.pack', '75.00');
+
+        app(\Modules\AppBuilder\Services\ProjectRequests::class)->markPaid($project, [$pack->id], 'TX-PACK', 75);
+
+        // one more free change opened: the first that waited takes it, and nothing is left to pay for another set
+        $waited = $project->requests()->where('kind', 'build')->reorder('id')->get();
+        $this->assertTrue($waited[1]->free);
+        $this->assertSame('done', $pack->refresh()->status);
+        $this->assertSame(0.0, $project->refresh()->changesPackPrice());
+        $this->assertSame('unpaid', $waited[2]->status);
+        $this->assertFalse($waited[2]->free);
+    }
+
+    public function test_a_project_with_no_estimate_above_its_price_gets_each_new_change_priced(): void
+    {
+        config(['builder.free_changes' => 1]);
+        $project = $this->project();
+        $this->asks($project, 'build', 'قسم البلس في لوحة التحكم');
+
+        $this->asks($project, 'build', 'تقرير المبيعات الشهري');
+
+        $this->assertSame('unpaid', $project->requests()->reorder('id')->get()[1]->status);
+        $this->assertFalse($project->requests()->where('kind', 'pack')->exists());
+    }
+
     public function test_after_the_first_period_new_work_is_priced_and_fixes_stay_free(): void
     {
         $project = $this->project();

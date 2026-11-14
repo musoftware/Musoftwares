@@ -101,7 +101,7 @@ class ProjectStateResource extends JsonResource
                 // only the owner sees the way to the request's review on the admin page
                 'review_url' => $request->user()?->isAdmin() && $item->waitsForOwner() ? route('admin.builder.show', $this->resource).'#request-'.$item->id : null,
                 // only what the engineer has not started can be taken back
-                'cancel_url' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true)
+                'cancel_url' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::LOCKED, \Modules\AppBuilder\Models\BuilderRequest::READY], true)
                     ? route('builder.requests.cancel', [$this->resource, $item->id]) : null,
             ])->values(),
             'currency' => $this->currency,
@@ -109,6 +109,9 @@ class ProjectStateResource extends JsonResource
             'warranty' => $this->warranty_until ? [
                 'until' => $this->warranty_until->timezone('Africa/Cairo')->translatedFormat('j F Y'),
                 'active' => $this->isUnderWarranty(),
+                // free new work in the first days: how many are left of how many; null once those days are over
+                'changes' => $this->isUnderWarranty() && $this->freeChangesUntil()?->isFuture()
+                    ? ['left' => $this->freeChangesLeft(), 'total' => (int) config('builder.free_changes'), 'pack' => $this->needsChangesPack() ? number_format($this->changesPackPrice(), 2, '.', '') : null] : null,
             ] : null,
             'pay_url' => route('builder.requests.pay', $this->resource),
             'admin_paid_url' => $request->user()?->isAdmin() ? route('admin.builder.requests.mark-paid', $this->resource) : null,

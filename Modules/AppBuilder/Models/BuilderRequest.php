@@ -18,6 +18,9 @@ class BuilderRequest extends Model
 
     public const READY = 'ready';
 
+    /** New work asked for after the free changes were used: it waits until the customer opens more of them. */
+    public const LOCKED = 'locked';
+
     public const BUILDING = 'building';
 
     public const DONE = 'done';
@@ -29,6 +32,9 @@ class BuilderRequest extends Model
 
     /** Really another program, outside the project's main idea: priced even in the free first period. */
     public const NEW_PROJECT = 'new_project';
+
+    /** Not work: the customer's payment that opens another set of free changes. */
+    public const PACK = 'pack';
 
     protected $guarded = ['id'];
 

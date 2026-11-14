@@ -872,6 +872,9 @@
         head.append(el('h2', {}, T.requests.title), close);
         const nodes = [head, el('p', {class: 'hint'}, T.requests.how)];
         if (list.warranty) nodes.push(el('p', {class: 'hint'}, (list.warranty.active ? T.requests.warranty : T.requests.warranty_over).replace(':date', list.warranty.until)));
+        const changes = list.warranty && list.warranty.changes;
+        if (changes) nodes.push(el('p', {class: 'hint'}, (changes.left ? T.requests.changes_left : changes.pack ? T.requests.changes_pack : T.requests.changes_used)
+            .replaceAll(':total', changes.total).replace(':left', changes.left).replace(':amount', money(changes.pack, list.currency))));
         if (!list.items.length) return [...nodes, el('p', {class: 'hint'}, T.requests.empty)];
         list.items.forEach((item) => nodes.push(requestRow(item, list.currency)));
         const unpaid = list.items.filter((item) => item.status === 'unpaid');
@@ -893,7 +896,7 @@
         const meta = el('div', {class: 'meta'});
         meta.append(
             el('span', {}, T.requests[item.kind] || ''),
-            el('strong', {}, item.free ? T.requests.free : money(item.amount, currency)),
+            el('strong', {}, item.free ? T.requests.free : item.status === 'locked' ? '' : money(item.amount, currency)),
             el('span', {}, T.requests.status[item.status] || item.status),
         );
         // only the owner gets this link: the request waits for their approval on the admin page

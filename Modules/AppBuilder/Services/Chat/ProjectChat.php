@@ -395,9 +395,11 @@ class ProjectChat
             .$this->warrantyLine($project)."\n\n"
             ."Keep `spec` short: the engineer also reads the customer's own words. Answer in one or two lines, and always say "
             ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
-            ."والمهندس هيراجعه ويبدأ عليه\" or, for new work: ".($project->changeIsFree(false, false)
-                ? "\"ده تطوير جديد ضمن فكرة مشروعك، ومجاني في الفترة الأولى، والمهندس هيراجعه ويبدأ عليه\""
-                : "\"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\"")
+            ."والمهندس هيراجعه ويبدأ عليه\" or, for new work: ".($project->hasFreeChanges()
+                ? "\"ده تطوير جديد ضمن فكرة مشروعك، وهو واحد من التعديلات المجانية بتاعتك وفاضلك بعده كذا، والمهندس هيراجعه ويبدأ عليه\""
+                : ($project->needsChangesPack()
+                    ? 'the sentence about the used free changes given above'
+                    : "\"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\""))
             .". Never say "
             ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
             ."nothing.\n\nThe list below is the truth about these requests: what is paid, what is being worked on, what is done. "
@@ -413,14 +415,30 @@ class ProjectChat
     {
         $until = $project->warranty_until?->timezone('Africa/Cairo')->toDateString();
         $freeUntil = $project->freeChangesUntil()?->timezone('Africa/Cairo')->toDateString();
-        if ($project->changeIsFree(false, false)) {
-            return "Free changes: until {$freeUntil} every change within the program's main idea is free, a fix or new work alike "
-                ."(say it is part of their project's first period). Only `new_project` has a price. After that date, until "
-                ."{$until}, fixes stay free and new work is priced. Every request goes to the engineer, who reviews it first.";
+        $total = (int) config('builder.free_changes');
+        if ($project->hasFreeChanges()) {
+            $left = $project->freeChangesLeft();
+
+            return "Free changes: the project comes with {$total} free changes (new work within the program's main idea), and {$left} "
+                ."are left, until {$freeUntil}. A `build` item now uses one of them: say it is free, that it is one of their {$total} free "
+                .'changes, and that '.($left - 1)." are left after it, so they choose what matters most. After the {$total}, new work is "
+                ."priced. Fixes are never counted: every fix is free, however many, until {$until}. `new_project` always has a "
+                .'price. Every request goes to the engineer, who reviews it first.';
+        }
+        if ($project->needsChangesPack()) {
+            $pack = number_format($project->changesPackPrice(), 2).' '.$project->currency;
+
+            return "Free changes: the {$total} changes that come with the project are used. To open {$total} more, the customer pays {$pack} "
+                ."from their list: the rest up to the most the project costs (the top of the estimate they saw with the price). A `build` "
+                .'item is still sent as a quote, but it does not start and has no price of its own: it waits in the list until that is paid. '
+                ."Say it kindly and plainly, for example: \"خلصنا الـ {$total} تعديلات المسموحة لمشروعك. علشان تفتح {$total} تعديلات كمان ادفع "
+                ."الباقي لحد أقصى ميزانية المشروع من قائمة طلباتك، وطلبك ده هيبدأ بعدها\". Fixes are never counted: every fix is free, however "
+                ."many, until {$until}. `new_project` always has its own price.";
         }
         if ($project->isUnderWarranty()) {
             return "Warranty: until {$until}. Every fix is free until then, however many, and goes to the engineer, who reviews it first. "
-                .'New work has its own price (the free first period ended on '.$freeUntil.').';
+                ."New work has its own price: the project came with {$total} free changes and they are used up or their time "
+                ."(until {$freeUntil}) is over. When the customer asks for new work, say that kindly and plainly.";
         }
 
         return 'Warranty: '.($until ? "ended on {$until}" : 'none').'. A fix now has its own price too, like development; '

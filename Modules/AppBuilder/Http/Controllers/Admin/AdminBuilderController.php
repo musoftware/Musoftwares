@@ -74,7 +74,8 @@ class AdminBuilderController extends Controller
     /** Every request with exactly what the engineer will read, newest first; the owner approves the open ones. */
     private function requestsToReview(BuilderProject $project): array
     {
-        return $project->requests()->latest('id')->limit(30)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
+        // a payment that opens more free changes is not work: nothing for the owner to review
+        return $project->requests()->where('kind', '!=', \Modules\AppBuilder\Models\BuilderRequest::PACK)->latest('id')->limit(30)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
             'id' => $item->id,
             'title' => $item->title,
             'kind' => $item->kind,

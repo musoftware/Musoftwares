@@ -293,9 +293,45 @@ class BuilderProject extends Model
         return $this->warranty_until?->copy()->subDays((int) config('builder.warranty_days'))->addDays((int) config('builder.free_changes_days'));
     }
 
+    /** How many free pieces of new work are left; a request the customer took back gives its place back. */
+    public function freeChangesLeft(): int
+    {
+        $used = $this->requests()->where('free', true)->where('kind', BuilderRequest::BUILD)->count();
+
+        return max(0, (int) config('builder.free_changes') * (1 + $this->paidChangePacks()->count()) - $used);
+    }
+
+    /** The payments that each opened another set of free changes. */
+    private function paidChangePacks(): HasMany
+    {
+        return $this->requests()->where('kind', BuilderRequest::PACK)->where('status', BuilderRequest::DONE);
+    }
+
     /**
-     * Whether a change costs nothing: a fix until the warranty ends; new work within the main idea in the free days;
-     * another program never.
+     * What opens another set of free changes: the rest up to the top of the estimate the customer saw with the price.
+     * 0 when the project has no such room (it was imported, or that rest is already paid).
+     */
+    public function changesPackPrice(): float
+    {
+        return max(0.0, round((float) $this->price_max - (float) $this->amount - (float) $this->paidChangePacks()->sum('amount'), 2));
+    }
+
+    /** The free changes are used, their days are not over, and paying the rest of the estimate opens more. */
+    public function needsChangesPack(): bool
+    {
+        return $this->isUnderWarranty() && (bool) $this->freeChangesUntil()?->isFuture()
+            && $this->freeChangesLeft() === 0 && $this->changesPackPrice() > 0;
+    }
+
+    /** New work within the main idea can still be free: the free days are not over and some free changes are left. */
+    public function hasFreeChanges(): bool
+    {
+        return $this->isUnderWarranty() && (bool) $this->freeChangesUntil()?->isFuture() && $this->freeChangesLeft() > 0;
+    }
+
+    /**
+     * Whether a change costs nothing: a fix until the warranty ends, however many; new work within the main idea
+     * while free changes are left; another program never.
      */
     public function changeIsFree(bool $isFix, bool $isNewProject): bool
     {
@@ -303,7 +339,7 @@ class BuilderProject extends Model
             return false;
         }
 
-        return $isFix || (bool) $this->freeChangesUntil()?->isFuture();
+        return $isFix || $this->hasFreeChanges();
     }
 
     /** Folder on the local disk that holds every delivered version. */
