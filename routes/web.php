@@ -855,6 +855,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/users/{id}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [UsersController::class, 'destroy'])->name('users.destroy');
 
+    Route::get('/users/{user}/change-id', [\App\Http\Controllers\Admin\UserIdChangeController::class, 'show'])->name('users.change-id');
+    Route::post('/users/{user}/change-id', [\App\Http\Controllers\Admin\UserIdChangeController::class, 'update'])->name('users.change-id.update');
     Route::get('/users/{user}/merge', [App\Http\Controllers\Admin\UserMergeController::class, 'preview'])->name('users.merge.preview');
     Route::get('/users/{user}/merge-select', [App\Http\Controllers\Admin\UserMergeController::class, 'select'])->name('users.merge.select');
     Route::post('/users/{user}/merge/confirm', [App\Http\Controllers\Admin\UserMergeController::class, 'confirm'])->name('users.merge.confirm');

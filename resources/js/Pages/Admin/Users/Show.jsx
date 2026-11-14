@@ -359,6 +359,12 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                                         <span>{__('general.activate_membership')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
+                                        <Link href={`/admin/users/${client.id}/change-id`} className="w-full cursor-pointer flex items-center">
+                                            <Edit className="me-2 h-4 w-4" />
+                                            <span>{__('admin.user_id_change_title')}</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
                                         <Link href={`/admin/users/${client.id}/merge-select`} className="w-full cursor-pointer flex items-center">
                                             <Trash2 className="me-2 h-4 w-4 text-red-600" />
                                             <span className="text-red-600">{__('admin.user_merge_into_another_client')}</span>
