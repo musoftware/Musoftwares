@@ -17,6 +17,7 @@ Route::middleware('web')->group(function () {
         Route::get('/', [StorefrontController::class, 'home'])->name('home');
         Route::get('/sitemap.xml', [ShopSitemapController::class, 'show'])->name('sitemap');
         Route::get('/search', [StorefrontController::class, 'search'])->middleware('throttle:60,1')->name('search');
+        Route::get('/collections', [StorefrontController::class, 'collections'])->name('collections');
         Route::get('/collections/{category:slug}', [StorefrontController::class, 'collection'])->name('collection');
         Route::get('/products/{product:slug}', [StorefrontController::class, 'product'])->name('product');
 
