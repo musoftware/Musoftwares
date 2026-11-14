@@ -164,11 +164,11 @@ function Secrets({ project, secrets }: { project: Project; secrets: Secret[] }) 
                     ))}
                 </ul>
             )}
-            <form onSubmit={save} className="grid gap-2 sm:grid-cols-[1fr_2fr_auto]">
-                <input list="secret-names" value={name} onChange={(event) => setName(event.target.value)} required placeholder="ssh_host" aria-label={t('Name', 'الاسم')} dir="ltr" className="min-h-11 rounded-lg border px-3" />
+            <form onSubmit={save} className="flex flex-col gap-2">
+                <input list="secret-names" value={name} onChange={(event) => setName(event.target.value)} required placeholder="ssh_host" aria-label={t('Name', 'الاسم')} dir="ltr" className="min-h-11 w-full min-w-0 rounded-lg border px-3" />
                 <datalist id="secret-names">{COMMON_SECRETS.map((item) => <option key={item} value={item} />)}</datalist>
-                <textarea value={value} onChange={(event) => setValue(event.target.value)} required rows={1} aria-label={t('Value', 'القيمة')} dir="ltr" className="min-h-11 rounded-lg border px-3 py-2 font-mono" />
-                <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-5 font-semibold text-white">{t('Save', 'احفظ')}</button>
+                <textarea value={value} onChange={(event) => setValue(event.target.value)} required rows={2} placeholder={t('Value', 'القيمة')} aria-label={t('Value', 'القيمة')} dir="ltr" className="min-h-11 w-full min-w-0 rounded-lg border px-3 py-2 font-mono" />
+                <button type="submit" className="min-h-11 self-start rounded-lg bg-slate-900 px-5 font-semibold text-white">{t('Save', 'احفظ')}</button>
             </form>
         </section>
     );
