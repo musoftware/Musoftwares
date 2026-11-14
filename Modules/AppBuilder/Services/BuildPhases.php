@@ -5,7 +5,6 @@ namespace Modules\AppBuilder\Services;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderProject;
 use Modules\AppBuilder\Services\Chat\ChatModel;
-use Modules\AppBuilder\Services\Chat\Dialect;
 use Throwable;
 
 /**
