@@ -1753,6 +1753,59 @@ class AppBuilderTest extends TestCase
         $this->assertSame('زرار واتساب', $last['ideas'][1]['title']);
     }
 
+    public function test_a_long_copy_of_the_project_shows_a_line_that_moves_and_then_clears(): void
+    {
+        $project = $this->buildingProject();
+        $url = '/api/builder/worker/jobs/'.$project->uuid.'/progress';
+
+        $this->postJson($url, ['step' => 'importing'], $this->worker())->assertOk();
+        $this->getJson('/ai/'.$project->uuid.'/state')->assertJsonPath('progress', __('builder.steps.importing'));
+
+        $this->postJson($url, ['step' => 'importing', 'percent' => 60], $this->worker())->assertOk();
+        $this->getJson('/ai/'.$project->uuid.'/state')
+            ->assertJsonPath('progress', __('builder.steps.copying', ['percent' => 60]))
+            ->assertJsonPath('progress_percent', 3);
+
+        $this->postJson($url, ['step' => 'importing', 'percent' => 101], $this->worker())->assertStatus(422);
+
+        // the engineer starts: the copy line is gone and the bar keeps what it reached
+        $this->postJson($url, ['step' => 'started'], $this->worker())->assertOk();
+        $this->getJson('/ai/'.$project->uuid.'/state')
+            ->assertJsonPath('progress', __('builder.steps.started'))
+            ->assertJsonPath('progress_percent', 3);
+    }
+
+    public function test_what_the_engineer_tried_comes_with_the_delivery_as_a_clean_table(): void
+    {
+        $project = $this->buildingProject();
+        $checks = json_encode([
+            ['what' => 'ضفت منتج وظهر في القائمة', 'passed' => true, 'note' => ''],
+            ['what' => '<b>الدفع بالفيزا</b>', 'passed' => false, 'note' => 'محتاج مفتاح البنك'],
+            ['what' => 'نتيجة مش واضحة', 'passed' => 'yes'],
+            ['what' => '   ', 'passed' => true],
+            'words only',
+        ], JSON_UNESCAPED_UNICODE);
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1, 'checks' => $checks], $this->worker())->assertOk();
+
+        $last = collect($this->getJson('/ai/'.$project->uuid.'/state')->assertOk()->json('messages'))->last();
+        $this->assertSame([
+            ['what' => 'ضفت منتج وظهر في القائمة', 'passed' => true, 'note' => ''],
+            ['what' => 'الدفع بالفيزا', 'passed' => false, 'note' => 'محتاج مفتاح البنك'],
+            ['what' => 'نتيجة مش واضحة', 'passed' => false, 'note' => ''],
+        ], $last['checks']);
+    }
+
+    public function test_a_delivery_without_the_table_still_arrives(): void
+    {
+        $project = $this->buildingProject();
+
+        $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => 1, 'checks' => 'not json'], $this->worker())->assertOk();
+
+        $last = collect($this->getJson('/ai/'.$project->uuid.'/state')->assertOk()->json('messages'))->last();
+        $this->assertSame([], $last['checks']);
+    }
+
     /** A real cards file with one ready program, as the chat and the worker read it. */
     private function oneStarter(): void
     {

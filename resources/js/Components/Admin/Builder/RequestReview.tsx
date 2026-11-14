@@ -64,8 +64,37 @@ function DeliveredRequest({ uuid, item, currency }: { uuid: string; item: Review
     );
 }
 
+/** Where an open request stands, so an approved one never reads as still waiting for the owner. */
+function waitLine(item: ReviewItem): string {
+    if (!item.approved) return t('Waiting for your approval: nothing starts before it', 'مستني موافقتك: مفيش حاجة هتبدأ قبلها');
+    if (item.status === 'unpaid') return t('Approved, starts once paid', 'متوافق عليه، هيبدأ بعد الدفع');
+    return t('In the queue: it starts when the work running now is done', 'في الطابور: هيبدأ لما الشغل اللي شغال دلوقتي يخلص');
+}
+
+/** An approved request is closed to one line; the owner opens it only to correct it or turn it down. */
+function OpenRequest(props: { uuid: string; item: ReviewItem; currency: string }) {
+    const { item } = props;
+    if (!item.approved) {
+        return (
+            <article id={`request-${item.id}`} className="scroll-mt-4 space-y-3 rounded-xl border border-amber-400 bg-white p-4">
+                <RequestForm {...props} />
+            </article>
+        );
+    }
+
+    return (
+        <details id={`request-${item.id}`} className="scroll-mt-4 rounded-xl border bg-white p-4">
+            <summary className="cursor-pointer">
+                <span className="font-semibold" dir="auto">{item.title}</span>
+                <span className="block text-sm text-emerald-700">{waitLine(item)}</span>
+            </summary>
+            <div className="mt-3 space-y-3"><RequestForm {...props} /></div>
+        </details>
+    );
+}
+
 /** One open request: the owner corrects what the engineer will read, then approves or turns it down. */
-function OpenRequest({ uuid, item, currency }: { uuid: string; item: ReviewItem; currency: string }) {
+function RequestForm({ uuid, item, currency }: { uuid: string; item: ReviewItem; currency: string }) {
     const [words, setWords] = useState(item.customer_words || '');
     const [spec, setSpec] = useState(item.spec || '');
     const [amount, setAmount] = useState(String(item.amount));
@@ -82,7 +111,7 @@ function OpenRequest({ uuid, item, currency }: { uuid: string; item: ReviewItem;
     };
 
     return (
-        <article id={`request-${item.id}`} className={`scroll-mt-4 space-y-3 rounded-xl border bg-white p-4 ${item.approved ? '' : 'border-amber-400'}`}>
+        <>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 className="font-semibold" dir="auto">{item.title}</h3>
                 <span className="text-sm text-slate-600" dir="ltr">{priceLine(item, currency)}</span>
@@ -90,9 +119,7 @@ function OpenRequest({ uuid, item, currency }: { uuid: string; item: ReviewItem;
             <p className="text-sm text-slate-500">
                 {item.kind === 'fix' ? t('Fix', 'تصليح') : t('New work', 'تطوير')}
                 {item.model && <> · <span dir="ltr">{item.model}</span></>}
-                {' · '}{item.approved
-                    ? t('Approved, starts once paid', 'متوافق عليه، هيبدأ بعد الدفع')
-                    : t('Waiting for your approval: nothing starts before it', 'مستني موافقتك: مفيش حاجة هتبدأ قبلها')}
+                {' · '}{waitLine(item)}
             </p>
 
             <label className="block space-y-1">
@@ -111,10 +138,12 @@ function OpenRequest({ uuid, item, currency }: { uuid: string; item: ReviewItem;
             )}
 
             <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={approve} className="min-h-11 flex-1 rounded-lg bg-slate-900 px-5 font-semibold text-white sm:flex-none">
-                    {item.status === 'unpaid' ? t('Approve', 'وافق') : t('Approve and start', 'وافق وابدأ')}
-                </button>
-                <button type="button" onClick={save} className="min-h-11 rounded-lg border px-5 font-semibold">{t('Save only', 'احفظ بس')}</button>
+                {!item.approved && (
+                    <button type="button" onClick={approve} className="min-h-11 flex-1 rounded-lg bg-slate-900 px-5 font-semibold text-white sm:flex-none">
+                        {item.status === 'unpaid' ? t('Approve', 'وافق') : t('Approve and start', 'وافق وابدأ')}
+                    </button>
+                )}
+                <button type="button" onClick={save} className="min-h-11 rounded-lg border px-5 font-semibold">{item.approved ? t('Save the changes', 'احفظ التعديل') : t('Save only', 'احفظ بس')}</button>
                 <button type="button" onClick={() => setRejecting(!rejecting)} className="min-h-11 rounded-lg px-4 font-semibold text-red-700">{t('Turn down', 'ارفض')}</button>
             </div>
             {rejecting && (
@@ -125,7 +154,34 @@ function OpenRequest({ uuid, item, currency }: { uuid: string; item: ReviewItem;
                     <button type="button" onClick={reject} className="min-h-11 rounded-lg bg-red-700 px-5 font-semibold text-white">{t('Turn it down', 'ارفضه')}</button>
                 </div>
             )}
-        </article>
+        </>
+    );
+}
+
+const isQueued = (item: ReviewItem) => item.open && item.approved && item.status === 'ready';
+
+const titles = (items: ReviewItem[]) => items.map((item) => item.title).join(' · ');
+
+/** The order of work: what the worker does now, then what waits. Everything that waits goes out as one build. */
+function Queue({ items }: { items: ReviewItem[] }) {
+    const queued = items.filter(isQueued);
+    if (!queued.length) return null;
+    const running = items.filter((item) => item.status === 'building');
+
+    return (
+        <div className="rounded-xl border bg-white p-4">
+            <h3 className="font-semibold">{t('Queue', 'الطابور')}</h3>
+            <ol className="mt-2 list-decimal space-y-2 ps-5 text-sm">
+                <li>
+                    <span className="font-semibold">{t('Running now', 'شغال دلوقتي')}</span>
+                    <span className="block text-slate-700 wrap-anywhere" dir="auto">{running.length ? titles(running) : t('Other work on this project', 'شغل تاني على المشروع')}</span>
+                </li>
+                <li>
+                    <span className="font-semibold">{t(`Next, as one build (${queued.length})`, `بعده، في build واحد (${queued.length})`)}</span>
+                    <span className="block text-slate-700 wrap-anywhere" dir="auto">{titles(queued)}</span>
+                </li>
+            </ol>
+        </div>
     );
 }
 
@@ -137,12 +193,14 @@ export default function RequestReview({ uuid, items, currency }: { uuid: string;
         target?.scrollIntoView({ block: 'start' });
     }, []);
     if (!items.length) return null;
-    const open = items.filter((item) => item.open);
+    // what still needs the owner comes first; approved ones wait below, closed
+    const open = items.filter((item) => item.open).sort((a, b) => Number(a.approved) - Number(b.approved));
     const closed = items.filter((item) => !item.open);
 
     return (
         <section className="space-y-3">
             <h2 className="text-lg font-bold">{t('Requests', 'الطلبات')}</h2>
+            <Queue items={items} />
             {open.map((item) => <OpenRequest key={item.id} uuid={uuid} item={item} currency={currency} />)}
             {closed.length > 0 && (
                 <details className="rounded-xl border bg-white p-4">

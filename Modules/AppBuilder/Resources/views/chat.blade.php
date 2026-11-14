@@ -57,6 +57,14 @@
         .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
         .chip button{width:32px;height:32px;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--muted);font:inherit}
         .ideas{margin-top:12px;display:grid;gap:8px}
+        .checks{margin-top:12px;max-width:560px}
+        .checks table{width:100%;border-collapse:collapse;border:1px solid var(--line);font-size:14px}
+        .checks th,.checks td{padding:8px 12px;text-align:start;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+        .checks tr:last-child td{border-bottom:0}
+        .checks th{background:var(--soft);font-weight:600;color:var(--muted);overflow-wrap:normal}
+        .checks td.result{white-space:nowrap;font-weight:600;color:#067647}
+        .checks td.result.waiting{color:#b54708}
+        .checks .note{display:block;margin:2px 0 0;color:var(--muted)}
         .starter{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;max-width:520px}
         .starter img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border-bottom:1px solid var(--line)}
         .starter div{padding:10px 12px}
@@ -425,6 +433,7 @@
             if (state.trial && state.trial.can_request) actions.append(trialButton(state.trial));
         }
         if (actions.children.length) node.append(actions);
+        if (message.checks && message.checks.length) node.append(checksNode(message.checks));
         if (message.ideas && message.ideas.length && state.open_for_chat) node.append(ideasNode(message.ideas));
         if (message.starter) node.append(starterNode(message.starter));
         if (message.designs && message.designs.length && state.open_for_chat) node.append(designsNode(message.designs));
@@ -460,6 +469,24 @@
             card.append(text);
             box.append(card);
         });
+        return box;
+    }
+
+    /** What was tried before the delivery: one plain line per thing, and whether it works. */
+    function checksNode(checks) {
+        const box = el('div', {class: 'checks'});
+        const table = el('table');
+        const head = el('tr');
+        head.append(el('th', {scope: 'col'}, T.checks_what), el('th', {scope: 'col'}, T.checks_result));
+        table.append(head);
+        checks.forEach((check) => {
+            const what = el('td', {dir: 'auto'}, check.what);
+            if (check.note) what.append(el('span', {class: 'note'}, check.note));
+            const row = el('tr');
+            row.append(what, el('td', {class: check.passed ? 'result' : 'result waiting'}, check.passed ? T.checks_ok : T.checks_waiting));
+            table.append(row);
+        });
+        box.append(el('p', {class: 'who'}, T.checks_title), table);
         return box;
     }
 

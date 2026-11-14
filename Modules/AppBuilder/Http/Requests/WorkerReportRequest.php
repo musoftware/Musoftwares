@@ -12,7 +12,7 @@ class WorkerReportRequest extends FormRequest
     public function rules(): array
     {
         return match ($this->route()?->getName()) {
-            'builder.worker.progress' => ['step' => ['required', 'in:'.implode(',', self::STEPS)], 'file' => ['nullable', 'string', 'max:200']],
+            'builder.worker.progress' => ['step' => ['required', 'in:'.implode(',', self::STEPS)], 'file' => ['nullable', 'string', 'max:200'], 'percent' => ['nullable', 'integer', 'min:0', 'max:100']],
             'builder.worker.complete' => self::release() + [
                 // an imported project's changes go to its GitHub repo and server, not into a download
                 'archive' => [$this->route('project')?->isOwnerImport() ? 'nullable' : 'required', 'file', 'max:'.(int) config('builder.limits.archive_kb')],
@@ -20,6 +20,8 @@ class WorkerReportRequest extends FormRequest
                 'cost_usd' => ['required', 'numeric', 'min:0', 'max:10000'],
                 // ideas for the next version, as JSON: [{"title": "...", "description": "..."}]
                 'ideas' => ['nullable', 'string', 'max:6000'],
+                // what the engineer tried, for the customer, as JSON: [{"what": "...", "passed": true, "note": ""}]
+                'checks' => ['nullable', 'string', 'max:6000'],
                 // an imported project's MUSOFTWARE.md after the change: what the program has now
                 'study' => ['nullable', 'string', 'max:40000'],
                 // the commits this change made in the project's own git, so the owner can roll it back

@@ -123,6 +123,8 @@ class ProjectStateResource extends JsonResource
             'text' => $message->content,
             'delivered_version' => $message->payload['delivered_version'] ?? null,
             'ideas' => $message->payload['ideas'] ?? [],
+            // what was tried before this delivery, as a small table
+            'checks' => $message->payload['checks'] ?? [],
             // the ready program this answer offered as the starting point, with its picture
             'starter' => app(\Modules\AppBuilder\Services\Starters::class)->card($message->payload['starter'] ?? null, app()->getLocale()),
             // the free designs this answer offered, as pictures the customer picks from

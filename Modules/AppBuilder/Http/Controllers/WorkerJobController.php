@@ -216,7 +216,7 @@ class WorkerJobController extends Controller
     public function progress(WorkerReportRequest $request, BuilderProject $project): JsonResponse
     {
         $this->assertBuilding($project);
-        $this->jobs->progress($project, $request->validated('step'), $request->validated('file'));
+        $this->jobs->progress($project, $request->validated('step'), $request->validated('file'), $request->validated('percent'));
 
         return response()->json(['status' => 'ok']);
     }
@@ -228,7 +228,7 @@ class WorkerJobController extends Controller
         abort_unless(($project->job_kind ?: BuilderProject::JOB_BUILD) === BuilderProject::JOB_BUILD, 409, 'This job is not a build.');
 
         try {
-            $this->jobs->complete($project, $request->file('archive')?->getRealPath(), $request->validated('summary'), (float) $request->validated('cost_usd'), (string) $request->validated('ideas'));
+            $this->jobs->complete($project, $request->file('archive')?->getRealPath(), $request->validated('summary'), (float) $request->validated('cost_usd'), (string) $request->validated('ideas'), (string) $request->validated('checks'));
         } catch (InvalidArgumentException $e) {
             Log::warning('App builder: worker sent a bad archive', ['project_id' => $project->id, 'error' => $e->getMessage()]);
 

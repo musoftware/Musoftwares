@@ -12,6 +12,9 @@ class JobQueue
 {
     private const PROGRESS_LEASE_MINUTES = 30;
 
+    /** Copying the project into the build box is this much of the customer's bar; the engineer's work is the rest. */
+    private const COPY_SHARE_OF_BAR = 5;
+
     public function __construct(
         private readonly DeliveryStore $store,
         private readonly ProjectPayment $payment,
@@ -38,14 +41,35 @@ class JobQueue
         });
     }
 
-    public function progress(BuilderProject $project, string $step, ?string $file): void
+    /**
+     * @param  int|null  $copied  how far the copy of the project into the build box is, in percent; only the copy sends it
+     */
+    public function progress(BuilderProject $project, string $step, ?string $file, ?int $copied = null): void
     {
         $lease = max($project->lease_expires_at?->getTimestamp() ?? 0, now()->addMinutes(self::PROGRESS_LEASE_MINUTES)->getTimestamp());
 
-        $project->update(['progress_step' => $step, 'progress_file' => $file, 'lease_expires_at' => now()->setTimestamp($lease)]);
+        $project->update(['progress_step' => $step, 'progress_file' => $file, 'lease_expires_at' => now()->setTimestamp($lease)] + $this->copyLine($project, $copied));
     }
 
-    public function complete(BuilderProject $project, ?string $zipPath, string $summary, float $costUsd, string $ideasJson = ''): void
+    /**
+     * A long copy shows the customer a line that moves, and a small part of the bar. The step after the copy clears
+     * that line, so "copying 99%" never stays on the page while the engineer already works.
+     *
+     * @return array<string, mixed>
+     */
+    private function copyLine(BuilderProject $project, ?int $copied): array
+    {
+        if ($copied === null) {
+            return $project->progress_step === 'importing' ? ['progress_note' => null] : [];
+        }
+
+        return [
+            'progress_note' => __('builder.steps.copying', ['percent' => $copied], $project->customerLanguage()),
+            'progress_percent' => max((int) $project->progress_percent, intdiv($copied * self::COPY_SHARE_OF_BAR, 100)),
+        ];
+    }
+
+    public function complete(BuilderProject $project, ?string $zipPath, string $summary, float $costUsd, string $ideasJson = '', string $checksJson = ''): void
     {
         // an imported project's change lives in its folder on the build PC and its GitHub repo, not in a download
         $version = $zipPath !== null ? $this->store->store($project, $zipPath) : $project->version + 1;
@@ -55,7 +79,7 @@ class JobQueue
         // the engineer writes for engineers; the customer reads the contact's plain retelling, the owner the original
         $forCustomer = app(Chat\CustomerVoice::class)->retell($project, $summary);
 
-        DB::transaction(function () use ($project, $version, $forCustomer, $summary, $costUsd, $ideasJson, $jobCost): void {
+        DB::transaction(function () use ($project, $version, $forCustomer, $summary, $costUsd, $ideasJson, $checksJson, $jobCost): void {
             $project->update([
                 'status' => BuilderProject::READY,
                 'version' => $version,
@@ -77,7 +101,7 @@ class JobQueue
             $project->messages()->create([
                 'role' => BuilderMessage::ASSISTANT,
                 'content' => $forCustomer,
-                'payload' => ['reply' => $forCustomer, 'engineer_note' => $summary, 'delivered_version' => $version, 'ideas' => $this->ideas($ideasJson), 'needs_team' => false, 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0]],
+                'payload' => ['reply' => $forCustomer, 'engineer_note' => $summary, 'delivered_version' => $version, 'ideas' => $this->ideas($ideasJson), 'checks' => DeliveryChecks::fromJson($checksJson), 'needs_team' => false, 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0]],
             ]);
         });
         // money back is good news, never a reason for a delivery to fail
