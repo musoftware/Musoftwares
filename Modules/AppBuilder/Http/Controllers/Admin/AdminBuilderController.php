@@ -54,7 +54,7 @@ class AdminBuilderController extends Controller
 
         return Inertia::render('Admin/Builder/Show', [
             'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
-                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner()],
+                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner(), 'chat_banned' => app(\Modules\AppBuilder\Services\ChatBans::class)->isBanned($project->user_id, $project->ip)],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
                 'role' => $message->role,
@@ -212,6 +212,14 @@ class AdminBuilderController extends Controller
         abort_if($payment->askForMore($project, $extra) <= 0, 409);
 
         return back()->with('success', __('builder.admin.extra_asked'));
+    }
+
+    /** The owner closes this visitor's chat, or opens it again after the chat closed it. */
+    public function chatBan(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ChatBans $bans): RedirectResponse
+    {
+        $request->validate(['banned' => ['required', 'boolean']])['banned'] ? $bans->ban($project) : $bans->lift($project);
+
+        return back()->with('success', __('builder.admin.secret_saved'));
     }
 
     public function storeSecret(Request $request, BuilderProject $project): RedirectResponse

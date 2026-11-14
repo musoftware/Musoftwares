@@ -27,7 +27,7 @@ for engineers. Retell it for the customer, who is not technical, as one chat mes
 - Short: a few lines or a short list. No headings, no Markdown symbols.
 - Do not invent anything the note does not say.
 
-Put the message in `reply`. `quote.ready` is false, `needs_team` false, `release_now` false, `replaces_request` 0,
+Put the message in `reply`. `quote.ready` is false, `needs_team` false, `release_now` false, `not_serious` false, `replaces_request` 0,
 and every list is empty.
 TEXT;
 

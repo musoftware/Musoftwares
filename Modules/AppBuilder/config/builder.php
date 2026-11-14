@@ -162,6 +162,10 @@ return [
         'price' => (float) env('BUILDER_INSPECTION_PRICE', 5),
     ],
 
+    // The chat marks an answer to a message that only plays with it (insults, sexual talk, joke requests). After this
+    // many marked answers in one chat, the visitor's chat closes until the owner opens it again on the admin page.
+    'abuse' => ['strikes' => (int) env('BUILDER_ABUSE_STRIKES', 3)],
+
     'limits' => [
         'message_chars' => 3000,
         'files_per_message' => 5,

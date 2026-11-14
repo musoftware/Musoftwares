@@ -27,6 +27,7 @@ class ProjectChat
         private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
         private readonly \Modules\AppBuilder\Services\LeaveDiscount $leaveDiscount,
         private readonly FreeChat $freeChat,
+        private readonly \Modules\AppBuilder\Services\ChatBans $bans,
     ) {}
 
     /** @throws ChatLimitReached */
@@ -34,6 +35,9 @@ class ProjectChat
     {
         if (! $unlimited && BuilderProject::startedTodayFrom($ip)->count() >= (int) config('builder.limits.projects_per_ip_per_day')) {
             throw new ChatLimitReached('Too many chats from this address today.');
+        }
+        if (! $unlimited && $this->bans->isBanned($userId, $ip)) {
+            throw new ChatBanned('This visitor\'s chat is closed.');
         }
 
         return BuilderProject::create(['ip' => $ip, 'user_agent' => $userAgent !== null ? mb_substr($userAgent, 0, 500) : null,'locale' => $locale, 'currency' => config('builder.pricing.currency'), 'referrer_user_id' => $referrerId, 'user_id' => $userId]);
@@ -47,6 +51,9 @@ class ProjectChat
      */
     public function send(BuilderProject $project, string $text, array $files = [], array $previewNames = []): BuilderMessage
     {
+        if ($this->bans->holds($project)) {
+            throw new ChatBanned('This visitor\'s chat is closed.');
+        }
         // a paid project is an ongoing conversation; the limit only stops endless talk before a price
         if (! $project->takesRequests() && $project->messages()->where('role', BuilderMessage::USER)->count() >= (int) config('builder.limits.messages_per_project')) {
             throw new ChatLimitReached('This chat reached its message limit.');
@@ -139,11 +146,16 @@ class ProjectChat
             app(\Modules\AppBuilder\Services\ProjectImports::class)->askRelease($project->refresh());
         }
 
-        return $project->messages()->create([
+        $answer = $project->messages()->create([
             'role' => BuilderMessage::ASSISTANT,
             'content' => $this->secrets->mask($project, $turn->reply),
             'payload' => $turn->payload(),
         ]);
+        if ($turn->notSerious) {
+            $this->bans->countStrike($project);
+        }
+
+        return $answer;
     }
 
     /**

@@ -24,7 +24,7 @@ one per line, written for engineers. Rewrite each one as a short line the custom
 able to see or do), no technical words. Keep the same number of lines in the same order, one phase per line, no
 numbers, no bullets, no Markdown.
 
-Put the lines in `reply`. `quote.ready` is false, `needs_team` false, `release_now` false, `replaces_request` 0, and
+Put the lines in `reply`. `quote.ready` is false, `needs_team` false, `release_now` false, `not_serious` false, `replaces_request` 0, and
 every list is empty.
 TEXT;
 

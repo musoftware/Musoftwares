@@ -33,6 +33,8 @@ final class ChatSchema
                 'keep_quote' => ['type' => 'boolean'],
                 // the customer asks to put the delivered changes live (upload, publish, update the app): the worker releases them
                 'release_now' => ['type' => 'boolean'],
+                // the message only plays with the chat instead of asking for a program; see "A visitor who is not serious"
+                'not_serious' => ['type' => 'boolean'],
                 // the number of an open request in the list that this quote takes the place of, 0 for none
                 'replaces_request' => ['type' => 'integer'],
                 // a program Musoftware already has that this idea starts from, '' for none
@@ -46,7 +48,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'replaces_request', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
     }

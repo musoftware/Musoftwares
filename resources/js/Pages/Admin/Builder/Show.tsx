@@ -48,6 +48,7 @@ interface Project {
     spec: string | null;
     error: string | null;
     version: number;
+    chat_banned: boolean;
     visitor: Visitor;
     waits_for_owner: boolean;
 }
@@ -170,6 +171,26 @@ function Secrets({ project, secrets }: { project: Project; secrets: Secret[] }) 
                 <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-5 font-semibold text-white">{t('Save', 'احفظ')}</button>
             </form>
         </section>
+    );
+}
+
+/** A visitor who only plays with the chat: the owner closes their chat, or opens it again after the chat closed it. */
+function ChatBan({ project }: { project: Project }) {
+    const banned = project.chat_banned;
+    const change = () => router.post(`/admin/builder/${project.uuid}/chat-ban`, { banned: !banned }, onDone(banned ? 'Chat opened again' : 'Chat closed', banned ? 'المحادثة اتفتحت تاني' : 'المحادثة اتقفلت'));
+
+    return (
+        <div className="space-y-2 rounded-xl border bg-white p-4">
+            <p className="font-semibold">{banned ? t('This visitor is banned from the chat', 'الزائر ده محظور من الشات') : t('Chat ban', 'حظر الشات')}</p>
+            <p className="text-sm text-slate-500">
+                {banned
+                    ? t('They cannot send messages or start a new chat until you lift the ban.', 'مش هيقدر يبعت رسائل ولا يفتح محادثة جديدة لحد ما تفك الحظر.')
+                    : t('The chat bans a visitor by itself after a few messages that are not serious. You can also do it here.', 'الشات بيحظر الزائر لوحده بعد كام رسالة مش جد. وتقدر تحظره من هنا.')}
+            </p>
+            <button type="button" onClick={change} className={`min-h-11 rounded-lg px-5 font-semibold ${banned ? 'bg-slate-900 text-white' : 'border border-slate-300 text-slate-700'}`}>
+                {banned ? t('Lift the ban', 'فك الحظر') : t('Ban this visitor', 'احظر الزائر ده')}
+            </button>
+        </div>
     );
 }
 
@@ -323,6 +344,7 @@ export default function BuilderShow({ project, messages, secrets, chatUrl, impor
                         <WorkerLog events={workerEvents} live={project.status === 'building'} />
                         {imported && <ReleasePanel uuid={project.uuid} state={imported} />}
                         <RetryBuild project={project} />
+                        <ChatBan project={project} />
                         <DesignLink project={project} />
                         <AskForMore project={project} />
                         <TeamReply project={project} />

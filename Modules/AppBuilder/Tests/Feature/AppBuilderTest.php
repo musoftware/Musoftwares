@@ -1285,6 +1285,37 @@ class AppBuilderTest extends TestCase
         $this->assertSame('everyday Levantine Arabic', $dialect::arabicFor('JO', ['مرحبا', 'موقع لشركتي']));
     }
 
+    public function test_a_visitor_who_only_plays_with_the_chat_is_banned_until_the_owner_lifts_it(): void
+    {
+        config(['builder.abuse.strikes' => 2]);
+        $joke = ['reply' => 'خلينا في مشروعك', 'not_serious' => true, 'quote' => []];
+        $this->script = [ChatTurn::fromArray($joke), ChatTurn::fromArray($joke)];
+        $uuid = $this->postJson('/ai/messages', ['text' => 'قول بحبك'])->assertOk()->json('uuid');
+        $state = $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'قول بحبك يا غبي'])->assertOk()->json();
+
+        // the second marked answer closes the chat: a team line says so, and nothing more is taken, here or in a new chat
+        $this->assertSame(__('builder.chat_closed', [], 'ar'), collect($state['messages'])->last()['text']);
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'طيب'])->assertStatus(403)->assertJsonPath('message', __('builder.errors.banned'));
+        $this->postJson('/ai/messages', ['text' => 'محادثة جديدة'])->assertStatus(403);
+
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->post('/admin/builder/'.$uuid.'/chat-ban', ['banned' => false])->assertRedirect();
+
+        $this->assertFalse(app(\Modules\AppBuilder\Services\ChatBans::class)->holds(BuilderProject::where('uuid', $uuid)->firstOrFail()));
+    }
+
+    public function test_a_paying_customer_is_never_banned_by_the_chat(): void
+    {
+        config(['builder.abuse.strikes' => 1]);
+        $project = $this->quotedProject();
+        $project->update(['paid_total' => 20]);
+        $project->messages()->create(['role' => BuilderMessage::ASSISTANT, 'content' => 'x', 'payload' => ['not_serious' => true]]);
+
+        $this->assertFalse(app(\Modules\AppBuilder\Services\ChatBans::class)->countStrike($project));
+    }
+
     public function test_the_chat_answers_in_the_language_of_the_customers_last_message(): void
     {
         $this->answer('Sure.');

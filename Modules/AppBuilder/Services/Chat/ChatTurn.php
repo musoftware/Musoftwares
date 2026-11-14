@@ -31,6 +31,8 @@ final readonly class ChatTurn
         public int $replacesRequest = 0,
         /** really another program, not part of this one's main idea: always priced */
         public bool $isNewProject = false,
+        /** the customer's message only played with the chat; enough of these close the chat */
+        public bool $notSerious = false,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -58,6 +60,7 @@ final readonly class ChatTurn
             releaseNow: (bool) ($data['release_now'] ?? false),
             replacesRequest: max(0, (int) ($data['replaces_request'] ?? 0)),
             isNewProject: ($quote['kind'] ?? 'build') === 'new_project',
+            notSerious: (bool) ($data['not_serious'] ?? false),
         );
     }
 
@@ -79,6 +82,7 @@ final readonly class ChatTurn
             ],
             'keep_quote' => $this->keepQuote,
             'release_now' => $this->releaseNow,
+            'not_serious' => $this->notSerious,
             'replaces_request' => $this->replacesRequest,
             'starter' => $this->starter,
             'designs' => $this->designs,

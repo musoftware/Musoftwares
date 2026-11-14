@@ -150,6 +150,8 @@ class BuilderChatController extends Controller
     {
         try {
             $project = $this->openChat($request);
+        } catch (\Modules\AppBuilder\Services\Chat\ChatBanned) {
+            return $this->refuse('builder.errors.banned', 403);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         }
@@ -177,6 +179,8 @@ class BuilderChatController extends Controller
         } catch (\Modules\AppBuilder\Services\Chat\SignInNeeded) {
             // signing in (the link at the top of the page) brings the customer back here, and the chat goes on
             return $this->refuse('builder.errors.sign_in', 403);
+        } catch (\Modules\AppBuilder\Services\Chat\ChatBanned) {
+            return $this->refuse('builder.errors.banned', 403);
         } catch (ChatLimitReached) {
             return $this->refuse('builder.errors.limit', 429);
         } catch (ChatUnavailable) {
