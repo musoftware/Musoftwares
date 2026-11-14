@@ -33,11 +33,17 @@ class ProductFilters
         return count($this->sizes) + count($this->colors) + (int) ($this->price !== null);
     }
 
-    /** Any chosen size and any chosen colour, inside the chosen price range. */
+    /**
+     * Any chosen size and any chosen colour, inside the chosen price range. Sizes and colours are matched here, not
+     * in the database: the server's JSON search misses Arabic values, which are saved escaped (ل...).
+     */
     public function apply(Builder $products): Builder
     {
-        $this->whereAny($products, 'sizes', $this->sizes);
-        $this->whereAny($products, 'colors', $this->colors);
+        if ($this->sizes !== [] || $this->colors !== []) {
+            $matching = (clone $products)->get(['shop_products.id', 'sizes', 'colors'])
+                ->filter(fn ($product) => $this->hasAny($product->sizes, $this->sizes) && $this->hasAny($product->colors, $this->colors));
+            $products->whereKey($matching->modelKeys());
+        }
         if ($this->price === null) {
             return $products;
         }
@@ -70,12 +76,10 @@ class ProductFilters
         return array_values(array_unique(array_slice($values, 0, 20)));
     }
 
-    private function whereAny(Builder $products, string $column, array $values): void
+    /** Nothing chosen lets every product through; otherwise the product must have one of the chosen values. */
+    private function hasAny(?array $values, array $chosen): bool
     {
-        if ($values === []) {
-            return;
-        }
-        $products->where(fn (Builder $any) => collect($values)->each(fn (string $value) => $any->orWhereJsonContains($column, $value)));
+        return $chosen === [] || array_intersect(array_map('strval', $values ?? []), $chosen) !== [];
     }
 
     /** @return list<string> every size or colour the products have, numbers in order first */
