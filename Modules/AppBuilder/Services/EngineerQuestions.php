@@ -9,8 +9,8 @@ use Modules\AppBuilder\Models\BuilderProject;
 /**
  * The chat runs on a small, fast model with short rules. When an answer depends on a fact it is not sure of, it
  * tells the customer it will ask the programmer and leaves the question here. The worker answers it with a stronger
- * model, its knowledge base and the web, and the chat brings the answer back to the customer. Every question stays
- * on the admin page, so the owner sees what the chat keeps missing.
+ * model, its knowledge base and the web, and the chat brings the answer back to the customer. Every question is kept
+ * (builder_engineer_questions), so the owner sees what the chat keeps missing.
  */
 class EngineerQuestions
 {
