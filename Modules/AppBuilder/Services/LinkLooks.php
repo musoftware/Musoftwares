@@ -34,6 +34,9 @@ class LinkLooks
 
     private const MAX_LINKS = 3;
 
+    /** A customer's links are opened at most this many a day; the rest are left, and they send them again tomorrow. */
+    public const LINKS_PER_DAY = 2;
+
     private const HEARTBEAT = 'looks';
 
     /** The worker asks every few seconds; silent longer than this, it is not there. */
@@ -58,13 +61,22 @@ class LinkLooks
     /** @return list<array<string, mixed>> the links and readable files in a customer's message, still to look at */
     public function sharedIn(BuilderMessage $question): array
     {
-        $links = array_map(fn (string $url) => ['kind' => self::LINK, 'url' => $url, 'status' => self::PENDING], $this->linksIn($question->content));
+        $room = max(0, self::LINKS_PER_DAY - $this->linksOpenedToday($question));
+        $links = collect($this->linksIn($question->content))
+            ->map(fn (string $url, int $index) => $index < $room ? ['kind' => self::LINK, 'url' => $url, 'status' => self::PENDING] : $this->overDailyLinks($url))
+            ->all();
         $files = $question->attachments()->get()
             ->filter(fn (BuilderAttachment $file) => ChatFileTypes::isReadByWorker($file->mime))
             ->map(fn (BuilderAttachment $file) => ['kind' => self::FILE, 'attachment_id' => $file->id, 'name' => $file->original_name, 'status' => self::PENDING])
             ->values()->all();
 
         return [...$links, ...$files];
+    }
+
+    /** @param  list<array<string, mixed>>  $shared */
+    public function hasPending(array $shared): bool
+    {
+        return collect($shared)->contains(fn (array $item) => $item['status'] === self::PENDING);
     }
 
     public function workerIsWatching(): bool
@@ -82,7 +94,7 @@ class LinkLooks
     /** No worker: links are read here (the HTML only); files cannot be read without it. */
     public function readHere(BuilderMessage $question, array $shared): void
     {
-        $this->save($question, array_map(fn (array $item) => $this->withoutWorker($item), $shared));
+        $this->save($question, array_map(fn (array $item) => $item['status'] === self::PENDING ? $this->withoutWorker($item) : $item, $shared));
     }
 
     /** @return list<array<string, mixed>> what the worker should look at now, marked as taken */
@@ -152,6 +164,23 @@ class LinkLooks
         $question = $project->lastCustomerMessage();
 
         return collect($question?->payload['looks'] ?? [])->contains(fn (array $item) => ($item['kind'] ?? self::LINK) === self::FILE);
+    }
+
+    /** The links of this customer opened in the last day, over all their chats (a guest counts per chat). */
+    private function linksOpenedToday(BuilderMessage $question): int
+    {
+        $project = $question->project;
+        $projects = $project->user_id ? BuilderProject::where('user_id', $project->user_id)->pluck('id') : collect([$project->id]);
+
+        return BuilderMessage::whereIn('project_id', $projects)->where('role', BuilderMessage::USER)
+            ->where('created_at', '>=', now()->subDay())->whereKeyNot($question->id)->get(['id', 'payload'])
+            ->sum(fn (BuilderMessage $message) => collect($message->payload['looks'] ?? [])
+                ->filter(fn (array $item) => ($item['kind'] ?? self::LINK) === self::LINK && empty($item['over_limit']))->count());
+    }
+
+    private function overDailyLinks(string $url): array
+    {
+        return ['kind' => self::LINK, 'url' => $url, 'status' => self::FAILED, 'over_limit' => true, 'reason' => 'over the daily limit of links'];
     }
 
     /** @return list<string> */

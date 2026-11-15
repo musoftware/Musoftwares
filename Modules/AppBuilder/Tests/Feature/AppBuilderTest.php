@@ -952,6 +952,26 @@ class AppBuilderTest extends TestCase
         $this->assertStringContainsString('real browser', collect($blocks)->where('type', 'text')->first()['text']);
     }
 
+    public function test_a_customer_gets_two_links_opened_a_day_and_is_told_to_send_more_tomorrow(): void
+    {
+        $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();
+        $uuid = $this->postJson('/ai/messages', ['text' => 'زي دول https://quran.example.com/one https://quran.example.com/two'])->assertJsonPath('looking', 'link')->json('uuid');
+        $looks = $this->getJson('/api/builder/worker/looks', $this->worker())->json('looks');
+        $this->assertCount(2, $looks);
+        $this->answer('شوفت الموقعين.');
+        foreach ($looks as $look) {
+            $this->post('/api/builder/worker/looks/'.$look['message_id'], ['index' => $look['index'], 'title' => 'x', 'full_page' => $this->png()], $this->worker())->assertOk();
+        }
+
+        // the third link is not opened at all: the chat answers right away and says to send it tomorrow
+        $this->answer('ابعته بكرة.');
+        $this->postJson('/ai/'.$uuid.'/messages', ['text' => 'وده كمان https://quran.example.com/three'])->assertOk()->assertJsonPath('looking', null);
+
+        $this->assertSame([], $this->getJson('/api/builder/worker/looks', $this->worker())->json('looks'));
+        $last = collect(app(ChatModel::class)->seen)->last();
+        $this->assertStringContainsString('send it again tomorrow', json_encode($last, JSON_UNESCAPED_UNICODE));
+    }
+
     public function test_the_page_keeps_waiting_while_the_answer_after_a_look_is_written(): void
     {
         $this->getJson('/api/builder/worker/looks', $this->worker())->assertOk();

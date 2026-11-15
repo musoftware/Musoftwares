@@ -71,7 +71,7 @@ class ProjectChat
 
         // links and spreadsheets are looked at first, like a real programmer opens them before answering
         $shared = $this->looks->sharedIn($question);
-        if ($shared !== [] && $this->looks->workerIsWatching()) {
+        if ($this->looks->hasPending($shared) && $this->looks->workerIsWatching()) {
             $this->looks->askWorker($question, $shared);
 
             return $question;

@@ -173,8 +173,9 @@ return [
         'file_kb' => 5120,
         // Excel, Word and CSV files are read by the worker, not sent to Claude as they are
         'office_file_kb' => 10240,
-        // the full-quality design pictures and PDFs uploaded after payment, for the build only
-        'original_file_kb' => 51200,
+        // the full-quality design pictures and PDFs uploaded after payment, for the build only; no file a customer
+        // sends is larger than 10 MB
+        'original_file_kb' => 10240,
         'original_files' => 15,
         'originals_wait_minutes' => 30,
         'messages_per_project' => 60,

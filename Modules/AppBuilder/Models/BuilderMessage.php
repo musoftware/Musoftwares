@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AppBuilder\Services\LinkLooks;
 
 /**
  * One line of the chat. `content` is what the customer sees.
@@ -74,6 +75,9 @@ class BuilderMessage extends Model
 
     private function linkNote(array $look): string
     {
+        if (! empty($look['over_limit'])) {
+            return "\n\n[The link {$look['url']} was not opened: the customer already sent ".LinkLooks::LINKS_PER_DAY.' links today, the most in one day. Tell them kindly, in one line, to send it again tomorrow. Do not ask for screenshots of it and do not guess what is on it.]';
+        }
         if (! in_array($look['status'] ?? '', ['seen', 'read'], true)) {
             return "\n\n[The link {$look['url']} could not be opened: ".($look['reason'] ?? 'no answer in time').'. Ask for screenshots if you need to see it.]';
         }
