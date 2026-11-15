@@ -614,6 +614,8 @@
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', money(quote.design_fee, quote.currency))));
         card.append(el('p', {class: 'note'}, T.pay_note + ' ' + T.close_page_note));
         appendPayForm(card, quote.pay_url, T.pay, quote.shares || []);
+        // a customer who wants a person before paying can reach one from the price itself
+        card.append(link(CONTACT_URL, T.contact.go, true));
         return card;
     }
 

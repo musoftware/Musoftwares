@@ -2849,6 +2849,7 @@
         },
         "download_apk": "Download the Android app",
         "looking": "Opening the link in a browser to look at the site...",
+        "asking_engineer": "Asking the programmer; the answer comes here...",
         "reading_file": "Reading the file and its calculations...",
         "file_type": "This kind of file is not supported. Send an image, a PDF, an Excel, Word or CSV file. To send a project or other files, put them in a zip of up to 10 MB on Google Drive, share it with \"anyone with the link\", and send the link from \"A project I already have\" in the paperclip button.",
         "name": "Name",
