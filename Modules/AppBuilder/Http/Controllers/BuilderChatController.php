@@ -25,15 +25,12 @@ class BuilderChatController extends Controller
         private readonly AttachmentStore $attachments,
     ) {}
 
-    /** The start page: big or simple project, and the signed-in customer's own projects. */
+    /** The start page: how it works, a way to reach a programmer, and the signed-in customer's own projects. */
     public function index(\Illuminate\Http\Request $request): View
     {
         return view('appbuilder::chat', [
             'state' => null,
             'push' => \Modules\AppBuilder\Services\BuilderPush::webConfig(),
-            // coming back from sign-in, or a customer who already chose, goes straight to the chat
-            'chosen' => $request->query('size') !== null,
-            'loginUrl' => $request->user() ? null : route('login', ['redirect' => '/ai?size=big']),
             'projects' => $this->ownProjects($request),
         ]);
     }

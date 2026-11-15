@@ -79,13 +79,6 @@
         .msg.progress{border-inline-start:3px solid var(--line);padding-inline-start:12px}
         .shots{display:grid;gap:8px;margin-top:8px}
         .shots img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--soft)}
-        .choose{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:24px;text-align:start}
-        .choice{display:grid;gap:4px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font:inherit;text-align:start;cursor:pointer;min-height:44px}
-        .choice:hover{border-color:var(--ink)}
-        .choice strong{font-size:18px}
-        .choice span{color:var(--muted);font-size:14px}
-        .login-ask{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
-        .login-ask p{margin:0 0 12px;color:var(--ink)}
         /* the customer's chats: always beside the chat on a wide screen, a panel from the menu button on a phone or a tablet */
         .chats{position:fixed;top:0;bottom:0;inset-inline-start:0;width:min(300px,86vw);display:flex;flex-direction:column;gap:4px;padding:12px;background:var(--soft);border-inline-end:1px solid var(--line);overflow-y:auto;z-index:40;transform:translateX({{ $rtl ? '100%' : '-100%' }});transition:transform .2s ease;visibility:hidden}
         body.chats-shown .chats{transform:none;visibility:visible;box-shadow:0 0 24px rgba(0,0,0,.12)}
@@ -104,7 +97,6 @@
         .icon-btn:hover{border-color:var(--ink)}
         .viewer .menu{margin-inline-end:auto}
         @media (prefers-reduced-motion:reduce){.chats{transition:none}}
-        body.choosing .composer{display:none}
         .bar{margin:-12px 0 24px}
         .bar .track{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
         .bar .fill{height:100%;border-radius:999px;background:var(--ink);transition:width .6s ease}
@@ -138,6 +130,8 @@
         .how{margin-top:24px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
         .how h2{margin:0 0 8px;font-size:16px}
         .how ol{margin:0;padding-inline-start:20px;display:grid;gap:6px;color:var(--muted);font-size:15px;line-height:1.7}
+        .contact{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;padding:0 16px;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;font-weight:600}
+        .contact:hover{border-color:var(--ink)}
         /* the top bar stays at the top while the chat scrolls, so the cart is always one tap away */
         .viewer{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);padding:8px max(16px,calc((100% - 720px) / 2));display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
         .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
@@ -248,19 +242,7 @@
                     @endforeach
                 </ol>
             </section>
-            <div class="choose" id="choose">
-                <button type="button" class="choice" data-size="big"><strong>{{ __('builder.start_big') }}</strong><span>{{ __('builder.start_big_note') }}</span></button>
-                <button type="button" class="choice" data-size="small"><strong>{{ __('builder.start_small') }}</strong><span>{{ __('builder.start_small_note') }}</span></button>
-            </div>
-            @if ($loginUrl ?? null)
-                <div class="login-ask" id="login-ask" hidden>
-                    <p>{{ __('builder.start_big_note') }}</p>
-                    <div class="actions">
-                        <a class="btn" href="{{ $loginUrl }}">{{ __('builder.start_login') }}</a>
-                        <button type="button" class="btn ghost" id="guest">{{ __('builder.start_guest') }}</button>
-                    </div>
-                </div>
-            @endif
+            <a class="contact" href="{{ route('company.contact') }}">{{ __('builder.contact_programmer') }}</a>
         @endunless
     </section>
 </main>
@@ -1077,7 +1059,6 @@
             const isNew = !state || !state.uuid;
             state = await call(bringUrl(), {drive_url: driveUrl, need, timezone: TIMEZONE, country: await COUNTRY});
             if (isNew) history.replaceState(null, '', BASE + '/' + state.uuid);
-            document.body.classList.remove('choosing');
             dialog.close();
             render();
         } catch (failure) {
@@ -1198,22 +1179,6 @@
         if ((text || picked.length) && !waiting) send(text, [...picked]);
     });
 
-    /** Big or simple: a guest with a big project is asked to sign in first, so the link is never lost. */
-    function startChoice() {
-        const choose = document.getElementById('choose');
-        if (!choose) return;
-        const loginAsk = document.getElementById('login-ask');
-        const openChat = () => { document.body.classList.remove('choosing'); choose.hidden = true; if (loginAsk) loginAsk.hidden = true; keepRoomForComposer(); input.focus(); };
-        if (@json((bool) ($chosen ?? false))) { openChat(); return; }
-        document.body.classList.add('choosing');
-        choose.querySelectorAll('.choice').forEach((button) => button.addEventListener('click', () => {
-            if (button.dataset.size === 'big' && loginAsk) { choose.hidden = true; loginAsk.hidden = false; loginAsk.querySelector('a').focus(); return; }
-            openChat();
-        }));
-        document.getElementById('guest')?.addEventListener('click', openChat);
-    }
-
-    startChoice();
     watchForLeaving();
     render();
 })();
