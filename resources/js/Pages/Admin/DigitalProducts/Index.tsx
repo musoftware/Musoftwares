@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import Pagination from '@/Components/Pagination';
 import {
+    BarChart3,
     BookOpen,
     Download,
     FolderTree,
@@ -452,6 +453,13 @@ export default function Index({ products, categories, stats, filters = {} }: Pro
                                                         <Link href={route('admin.digitalproducts.edit', product.id)} className="flex items-center gap-2 cursor-pointer">
                                                             <Pencil className="h-3.5 w-3.5 text-slate-600" />
                                                             <span>{__('general.edit')}</span>
+                                                        </Link>
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={route('admin.digitalproducts.stats', product.id)} className="flex items-center gap-2 cursor-pointer">
+                                                            <BarChart3 className="h-3.5 w-3.5 text-slate-600" />
+                                                            <span>{__('admin.digital_products_stats_menu')}</span>
                                                         </Link>
                                                     </DropdownMenuItem>
 

@@ -7,7 +7,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia;
 use Modules\DigitalProducts\Models\DigitalProduct;
+use Modules\DigitalProducts\Models\DigitalProductDownload;
 use Modules\DigitalProducts\Services\DriveBook;
 use Tests\TestCase;
 
@@ -149,6 +151,37 @@ class DigitalProductsDriveAndSeoTest extends TestCase
         $this->get(route('sitemap.part', 'pages'))->assertOk()
             ->assertSee(route('library.index'), false)
             ->assertSee(route('library.show', $book->slug), false);
+    }
+
+    public function test_the_admin_sees_who_downloaded_a_book_and_can_export_the_emails(): void
+    {
+        $book = $this->book();
+        foreach ([['reader@example.com', 'full', 3], ['reader@example.com', 'playbook', 1], ['other@example.com', 'full', 0]] as [$email, $edition, $times]) {
+            DigitalProductDownload::create(['digital_product_id' => $book->id, 'email' => $email, 'edition_type' => $edition, 'download_count' => $times, 'token_expires_at' => now()->addDay()]);
+        }
+
+        $this->actingAs($this->admin)->get(route('admin.digitalproducts.stats', $book->id))->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->component('Admin/DigitalProducts/Stats')
+                ->where('stats.people', 2)
+                ->where('stats.requests', 3)
+                ->where('stats.downloads', 4)
+                ->where('stats.playbook_requests', 1)
+                ->has('downloads.data', 3));
+
+        $this->get(route('admin.digitalproducts.stats', ['id' => $book->id, 'search' => 'other']))
+            ->assertInertia(fn (AssertableInertia $page) => $page->has('downloads.data', 1)->where('downloads.data.0.email', 'other@example.com'));
+
+        $csv = $this->get(route('admin.digitalproducts.stats.export', $book->id))->assertOk()->streamedContent();
+        $this->assertStringContainsString('reader@example.com', $csv);
+        $this->assertStringContainsString('other@example.com', $csv);
+    }
+
+    public function test_customers_cannot_see_who_downloaded_a_book(): void
+    {
+        $customer = User::factory()->create(['onboarding_completed' => true]);
+        $customer->assignRole('client');
+
+        $this->actingAs($customer)->get(route('admin.digitalproducts.stats.export', $this->book()->id))->assertForbidden();
     }
 
     private function book(): DigitalProduct

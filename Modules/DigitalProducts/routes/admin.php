@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\DigitalProducts\Http\Controllers\Admin\AdminDigitalCategoryController;
 use Modules\DigitalProducts\Http\Controllers\Admin\AdminDigitalProductController;
+use Modules\DigitalProducts\Http\Controllers\Admin\AdminDigitalProductStatsController;
 use Modules\DigitalProducts\Http\Controllers\Admin\AdminDriveBookController;
 
 Route::prefix('digital-products')->name('admin.digitalproducts.')->group(function () {
@@ -11,6 +12,8 @@ Route::prefix('digital-products')->name('admin.digitalproducts.')->group(functio
     Route::get('/create', [AdminDigitalProductController::class, 'create'])->name('create');
     Route::post('/', [AdminDigitalProductController::class, 'store'])->name('store');
     Route::get('/{id}/edit', [AdminDigitalProductController::class, 'edit'])->name('edit');
+    Route::get('/{id}/stats', [AdminDigitalProductStatsController::class, 'show'])->whereNumber('id')->name('stats');
+    Route::get('/{id}/stats/export', [AdminDigitalProductStatsController::class, 'export'])->whereNumber('id')->name('stats.export');
     Route::put('/{id}', [AdminDigitalProductController::class, 'update'])->name('update');
     Route::delete('/{id}', [AdminDigitalProductController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/toggle-publish', [AdminDigitalProductController::class, 'togglePublish'])->name('toggle_publish');
