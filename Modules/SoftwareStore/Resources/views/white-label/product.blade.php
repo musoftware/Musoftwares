@@ -72,6 +72,8 @@
             </div>
         @endforeach
 
+        @include('partials.guest-order-captcha')
+
         <button type="submit" class="w-full h-12 rounded-xl bg-[var(--wl-accent)] text-white font-semibold">
             {{ $plans ? __('software.continue_to_payment') : __('software.pay', ['price' => $product->money($price).' '.$product->saleCurrency()]) }}
         </button>

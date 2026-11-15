@@ -104,6 +104,8 @@
                 @endauth
             </div>
 
+            @include('partials.guest-order-captcha')
+
             @if (! empty($copy['terms']))
                 <p class="text-xs text-black/60 leading-relaxed">{{ $copy['terms'] }}</p>
             @endif

@@ -3,6 +3,7 @@
 namespace Modules\SoftwareStore\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\GuestOrderCaptcha;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -64,7 +65,7 @@ class WhiteLabelStoreController extends Controller
         ]);
     }
 
-    public function order(Request $request, WhiteLabelPartner $partner, string $slug)
+    public function order(Request $request, WhiteLabelPartner $partner, string $slug, GuestOrderCaptcha $captcha)
     {
         abort_unless($partner->isActive(), 404);
         $product = $this->sellable($slug);
@@ -75,7 +76,8 @@ class WhiteLabelStoreController extends Controller
             'client_whatsapp' => 'required|string|max:50',
             'plan_key' => $product->hasPlans() ? ['required', Rule::in(array_column($product->planList(), 'key'))] : 'nullable',
             'device_id' => ['nullable', 'string', 'max:128', 'regex:/^[A-Za-z0-9_\- ]+$/'],
-        ]);
+        ] + $captcha->rules(), $captcha->messages());
+        unset($client[GuestOrderCaptcha::FIELD]);
         $client['device_id'] = isset($client['device_id']) ? preg_replace('/\s+/', '', $client['device_id']) : null;
 
         $order = $this->orders->createPendingOrder($product, $client, $partner);

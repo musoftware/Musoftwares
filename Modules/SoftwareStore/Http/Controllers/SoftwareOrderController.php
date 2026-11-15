@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\CouponRedemption;
 use App\Models\Currency;
+use App\Support\GuestOrderCaptcha;
 use Modules\SoftwareStore\Models\SoftwareOrder;
 use Modules\SoftwareStore\Models\SoftwareProduct;
 use Modules\SoftwareStore\Services\RecoveryDiscount;
@@ -22,7 +23,7 @@ class SoftwareOrderController extends Controller
 {
     public function __construct(private readonly SoftwareOrderService $orders, private readonly RecoveryDiscount $recoveryDiscount) {}
 
-    public function store(Request $request, string $slug)
+    public function store(Request $request, string $slug, GuestOrderCaptcha $captcha)
     {
         $product = SoftwareProduct::where('slug', $slug)->firstOrFail();
         abort_unless($product->canBeOrdered(), 404);
@@ -36,7 +37,8 @@ class SoftwareOrderController extends Controller
             'plan_key' => $product->hasPlans() ? ['required', Rule::in(array_column($product->planList(), 'key'))] : 'nullable',
             'device_id' => ['nullable', 'string', 'max:128', 'regex:/^[A-Za-z0-9_\- ]+$/'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
-        ]);
+        ] + $captcha->rules(), $captcha->messages());
+        unset($client[GuestOrderCaptcha::FIELD]);
 
         if ($authUser) {
             $client['client_name'] = ! empty($client['client_name']) ? $client['client_name'] : $authUser->name;
