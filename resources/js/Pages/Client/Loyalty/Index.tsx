@@ -122,7 +122,14 @@ export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = []
             {/* Badge, points and progress */}
             <Card>
                 <div className="flex items-center gap-4">
-                    <img src={`/images/tiers/${tierSlug}.svg`} alt="" className="h-20 w-20 shrink-0" />
+                    {badgeCardUrl ? (
+                        <a href={badgeCardUrl} target="_blank" rel="noopener noreferrer" aria-label={__('badge_card.open')} title={__('badge_card.open')}
+                            className="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071e3]">
+                            <img src={`/images/tiers/${tierSlug}.svg`} alt="" className="h-20 w-20" />
+                        </a>
+                    ) : (
+                        <img src={`/images/tiers/${tierSlug}.svg`} alt="" className="h-20 w-20 shrink-0" />
+                    )}
                     <div className="min-w-0">
                         <p className="text-2xl font-bold">{tierName(summary?.current_tier, tierSlug)}</p>
                         <p className="text-sm text-[#1d1d1f]/70 dark:text-zinc-300">{__('client_rewards.loyalty.points', { count: balance.toLocaleString('en-US') })}</p>

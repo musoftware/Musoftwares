@@ -23,6 +23,12 @@ class BadgeCardService
         return URL::signedRoute('badge-card.show', ['user' => $user->id]);
     }
 
+    /** The shared picture of the card, signed like the card itself. */
+    public function imageLinkFor(User $user): string
+    {
+        return URL::signedRoute('badge-card.image', ['user' => $user->id]);
+    }
+
     /**
      * @return array{first_name: string, tier_slug: string, tier_name: string, color: string, member_since: ?string, invite_url: string}
      */

@@ -155,6 +155,8 @@ class ClientHomeService
             'next_tier_name' => $next ? $this->translated('client_home.tiers.'.strtolower($next->slug), $next->name) : null,
             'points_to_next' => $summary['points_to_next_tier'],
             'monthly' => $this->leaderboard->forUser($user, 5),
+            // pressing the badge opens the client's card, which they can share
+            'card_url' => app(\App\Services\BadgeCardService::class)->linkFor($user),
         ];
     }
 

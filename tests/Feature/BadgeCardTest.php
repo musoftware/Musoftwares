@@ -84,4 +84,30 @@ class BadgeCardTest extends TestCase
         $this->assertSame('gold', app(BadgeCardService::class)->detailsFor($user)['tier_slug']);
         $this->assertNotNull($gold->id);
     }
+
+    public function test_a_shared_card_shows_a_picture_with_the_name_and_level(): void
+    {
+        $this->goldTier();
+        $user = $this->clientWithPoints(750, ['name' => 'محمود أمين']);
+        $cards = app(BadgeCardService::class);
+
+        $this->get($cards->linkFor($user))->assertOk()
+            ->assertSee('<meta property="og:image" content="'.e($cards->imageLinkFor($user)).'">', false)
+            ->assertSee('<meta name="twitter:card" content="summary_large_image">', false);
+
+        $image = $this->get($cards->imageLinkFor($user))->assertOk()->assertHeader('Content-Type', 'image/png');
+        $size = getimagesizefromstring($image->getContent());
+        $this->assertSame([1200, 630], [$size[0], $size[1]]);
+
+        $this->get("/badge/{$user->id}/image.png")->assertForbidden();
+    }
+
+    public function test_arabic_names_are_joined_for_the_picture(): void
+    {
+        // م ح م و د: initial, medial, medial, final waw; waw never joins the next letter, so dal stands alone; drawn right to left
+        $this->assertSame('ﺩﻮﻤﺤﻣ', \App\Support\ArabicShaper::forImage('محمود'));
+        $this->assertSame('ﻼﺳ', \App\Support\ArabicShaper::forImage('سلا'));
+        $this->assertSame('Ahmed', \App\Support\ArabicShaper::forImage('Ahmed'));
+        $this->assertSame('2023 ﻦﻣ', \App\Support\ArabicShaper::forImage('من 2023'));
+    }
 }

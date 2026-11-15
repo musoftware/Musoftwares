@@ -43,6 +43,7 @@ type HomeData = {
         next_tier_name: string | null;
         points_to_next: number;
         monthly: MonthlyRankingData;
+        card_url?: string;
     };
 };
 
@@ -191,13 +192,27 @@ function AttentionList({ items, formatDate }: { items: AttentionItem[]; formatDa
     );
 }
 
+/** The badge opens the client's shareable card when there is one. */
+function BadgeLink({ url, label, children }: { url?: string; label: string; children: React.ReactNode }) {
+    if (!url) return <>{children}</>;
+
+    return (
+        <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}
+            className="shrink-0 rounded-full transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071e3]">
+            {children}
+        </a>
+    );
+}
+
 function RewardsCard({ rewards }: { rewards: HomeData['rewards'] }) {
     const { me, participants } = rewards.monthly;
 
     return (
         <Card title={__('client_home.rewards.title')} action={<TextLink href="/loyalty#ranking">{__('client_home.rewards.see_ranking')}</TextLink>}>
             <div className="flex items-center gap-4">
-                <img src={`/images/tiers/${rewards.tier}.svg`} alt="" className="h-16 w-16 shrink-0" />
+                <BadgeLink url={rewards.card_url} label={__('badge_card.open')}>
+                    <img src={`/images/tiers/${rewards.tier}.svg`} alt="" className="h-16 w-16 shrink-0" />
+                </BadgeLink>
                 <div className="min-w-0">
                     <p className="text-xl font-bold">{rewards.tier_name}</p>
                     <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_home.rewards.points', { count: rewards.balance.toLocaleString('en-US') })}</p>
