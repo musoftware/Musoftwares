@@ -272,3 +272,6 @@ storage/app/firebase-credentials.json
 /mer/
 /invoices_md/
 /backlog.txt
+
+# the /ai share picture is drawn by the site each day (AiPageImage)
+/public/images/og/ai-*.png

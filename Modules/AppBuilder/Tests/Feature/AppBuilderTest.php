@@ -220,6 +220,24 @@ class AppBuilderTest extends TestCase
         }
     }
 
+    public function test_a_shared_ai_link_shows_a_picture_the_site_draws_and_redraws(): void
+    {
+        $page = $this->get('/ai')->assertOk();
+        preg_match('#<meta property="og:image" content="([^"]+)">#', $page->getContent(), $found);
+        $this->assertNotEmpty($found[1] ?? null);
+        $file = public_path(parse_url($found[1], PHP_URL_PATH));
+        $this->assertSame([1200, 630], array_slice(getimagesize($file), 0, 2));
+        $page->assertSee('<meta name="twitter:card" content="summary_large_image">', false)
+            ->assertSee('<link rel="canonical" href="'.route('builder.index').'">', false);
+
+        // a new picture gets a new address, so the apps fetch it again; the old one is removed
+        $this->travel(2)->seconds();
+        app(\Modules\AppBuilder\Services\AiPageImage::class)->refresh();
+        $fresh = app(\Modules\AppBuilder\Services\AiPageImage::class)->url(app()->getLocale());
+        $this->assertNotSame($found[1], $fresh);
+        $this->assertFileDoesNotExist($file);
+    }
+
     public function test_the_owner_opens_a_file_the_customer_sent_and_nobody_else_can(): void
     {
         Storage::fake('local');

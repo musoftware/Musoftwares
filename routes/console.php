@@ -101,6 +101,13 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\OwnerReview::class)->re
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(10);
 
+// The /ai page's share picture is drawn again each day with the current number of programs built
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\AiPageImage::class)->refresh())
+    ->name('builder-share-image')
+    ->dailyAt('04:10')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(30);
+
 // What Claude cost yesterday, past the free credit, goes on the costs page as one "Claude AI" cost
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\AiCosts::class)->bookDue())
     ->name('builder-ai-costs')

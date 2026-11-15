@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'og_headline' => 'Tell us your idea, we build it',
+    'og_sub' => 'A program, website or app built with AI, with a real programmer behind it',
+    'og_count' => ':count programs built so far',
+    'og_description' => 'Write your idea in the chat, get a clear price, and AI builds your program while a real programmer reviews it.',
     'page_title' => 'Build your program',
     'greeting' => 'Tell me what you want to build',
     'greeting_hint' => 'A website, a page, a tool, a program for your business, a game... describe it in your own words.',
