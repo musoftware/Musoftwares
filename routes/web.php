@@ -1054,6 +1054,9 @@ Route::permanentRedirect('/store/tools', '/services');
 
 require __DIR__.'/auth.php';
 
+// Small software services: a public page search engines and AI assistants read without signing in
+Route::get('/micro-services', [\App\Http\Controllers\MicroServiceCatalogController::class, 'index'])->name('micro-services.index');
+
 // Guest Support Ticket Routes
 Route::post('/support/guest-tickets', [SupportTicketController::class, 'guestStore'])->name('tickets.guest.store');
 
@@ -1065,8 +1068,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets/{id}', [SupportTicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{id}/resolve', [SupportTicketController::class, 'resolve'])->name('tickets.resolve');
 
-    // Micro Services
-    Route::get('/micro-services', [\App\Http\Controllers\Client\MicroServiceController::class, 'index'])->name('micro-services.index');
+    // Micro Services: a customer's own orders (the public page is outside sign-in)
+    Route::get('/micro-services/my', [\App\Http\Controllers\Client\MicroServiceController::class, 'index'])->name('micro-services.mine');
     Route::post('/micro-services/{microService}/order', [\App\Http\Controllers\Client\MicroServiceController::class, 'order'])->name('micro-services.order');
 });
 

@@ -30,6 +30,7 @@ class AdminMicroServiceController extends Controller
                     'id' => $s->id,
                     'title' => $s->title,
                     'description' => $s->description,
+                    'example_url' => $s->example_url,
                     'price' => (float) $s->price,
                     'formatted_price' => FinanceHelper::instance()->format_money((float) $s->price, $s->currency_id ?: 1),
                     'delivery_days' => $s->delivery_days,
@@ -94,6 +95,7 @@ class AdminMicroServiceController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:500'],
+            'example_url' => ['nullable', 'url:https,http', 'max:500'],
             'price' => ['required', 'numeric', 'min:0'],
             'delivery_days' => ['required', 'integer', 'min:1', 'max:90'],
             'is_active' => ['boolean'],
@@ -112,6 +114,7 @@ class AdminMicroServiceController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:500'],
+            'example_url' => ['nullable', 'url:https,http', 'max:500'],
             'price' => ['required', 'numeric', 'min:0'],
             'delivery_days' => ['required', 'integer', 'min:1', 'max:90'],
             'is_active' => ['boolean'],

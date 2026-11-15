@@ -888,6 +888,7 @@ return [
     'micro_services_form_description' => 'أدخل عنوان الخدمة ووصفها المختصر (سطر واحد) وسعرها الأساسي.',
     'micro_services_title_label' => 'اسم / عنوان الخدمة *',
     'micro_services_title_placeholder' => 'مثال: تنصيب وتفعيل قالب على ووردبريس',
+    'micro_services_example_label' => 'لينك لمثال حقيقي (اختياري، بيظهر في صفحة الخدمات)',
     'micro_services_description_label' => 'وصف الخدمة المختصر (سطر واحد) *',
     'micro_services_description_placeholder' => 'مثال: نقوم برفع ملفات القالب وتثبيت الإضافات وضبط الإعدادات الأساسية خلال 24 ساعة.',
     'micro_services_price_label' => 'السعر الأساسي (EGP) *',

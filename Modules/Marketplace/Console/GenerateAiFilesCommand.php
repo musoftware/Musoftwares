@@ -148,7 +148,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put($this->outputPath('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false));
+        File::put($this->outputPath('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false).$this->microServicesSection($baseUrl, 'en'));
         $this->info('Created public/llms.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullContent .= "- **Content**:\n{$cleanBody}\n\n";
         }
 
-        File::put($this->outputPath('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true));
+        File::put($this->outputPath('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true).$this->microServicesSection($baseUrl, 'en'));
         $this->info('Created public/llms-full.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put($this->outputPath('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false));
+        File::put($this->outputPath('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false).$this->microServicesSection($baseUrl, 'ar'));
         $this->info('Created public/llms-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -332,7 +332,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullArContent .= "- **محتوى المقال**:\n{$cleanBody}\n\n";
         }
 
-        File::put($this->outputPath('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true));
+        File::put($this->outputPath('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true).$this->microServicesSection($baseUrl, 'ar'));
         $this->info('Created public/llms-full-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -471,6 +471,20 @@ class GenerateAiFilesCommand extends Command
     }
 
     /** Programs and services of the software store, in Markdown for AI assistants. */
+    /** The small services: a title, a short description and a real example each, on one public page. */
+    private function microServicesSection(string $baseUrl, string $lang): string
+    {
+        $services = \App\Models\MicroService::active()->get(['title', 'description', 'example_url']);
+        if ($services->isEmpty()) {
+            return '';
+        }
+
+        $page = $baseUrl.'/micro-services'.($lang === 'ar' ? '' : '?lang=en');
+        $lines = $services->map(fn ($service) => "- {$service->title}: {$service->description}".($service->example_url ? " (example: {$service->example_url})" : ''));
+
+        return "\n## ".__('micro_services.title', [], $lang)."\n".__('micro_services.ai_note', [], $lang)."\n- Page: {$page}\n".$lines->implode("\n")."\n";
+    }
+
     private function storeSection(string $baseUrl, string $lang, bool $full): string
     {
         if (! class_exists(SoftwareProduct::class)) {

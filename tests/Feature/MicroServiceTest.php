@@ -66,7 +66,7 @@ class MicroServiceTest extends TestCase
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($this->clientUser)->get(route('micro-services.index'));
+        $response = $this->actingAs($this->clientUser)->get(route('micro-services.mine'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -74,6 +74,29 @@ class MicroServiceTest extends TestCase
             ->has('services', 1)
             ->where('services.0.title', 'تهيئة وإعداد ووردبريس')
         );
+    }
+
+    public function test_the_public_page_is_read_without_signing_in_and_shows_no_price(): void
+    {
+        MicroService::create([
+            'title' => 'ربط بوابة دفع',
+            'description' => 'ربط موقعك ببوابة دفع مصرية خلال يوم.',
+            'example_url' => 'https://example.com/payment-demo',
+            'price' => 150.00,
+            'currency_id' => $this->baseCurrency->id,
+            'delivery_days' => 1,
+            'is_active' => true,
+        ]);
+        MicroService::create(['title' => 'خدمة مخفية', 'description' => 'لا تظهر', 'price' => 1, 'currency_id' => $this->baseCurrency->id, 'delivery_days' => 1, 'is_active' => false]);
+
+        $this->get('/micro-services')->assertOk()
+            ->assertSee('<h2', false)->assertSee('ربط بوابة دفع')->assertSee('ربط موقعك ببوابة دفع مصرية خلال يوم.')
+            ->assertSee('https://example.com/payment-demo', false)
+            ->assertSee(route('builder.index'), false)->assertSee(route('company.contact'), false)
+            ->assertSee('"@type":"Service"', false)->assertSee('application/ld+json', false)
+            ->assertDontSee('150.00')->assertDontSee('خدمة مخفية');
+        // a customer's own orders still need signing in
+        $this->get('/micro-services/my')->assertRedirect(route('login'));
     }
 
     public function test_client_cannot_order_without_sufficient_balance(): void
@@ -121,7 +144,7 @@ class MicroServiceTest extends TestCase
                 'requirements' => 'الرجاء تثبيت شهادة SSL للنطاق example.com والتحويل التلقائي',
             ]);
 
-        $response->assertRedirect(route('micro-services.index'));
+        $response->assertRedirect(route('micro-services.mine'));
         $response->assertSessionHas('success');
 
         // Verify balance was deducted
@@ -188,7 +211,7 @@ class MicroServiceTest extends TestCase
                 'requirements' => 'Server IP: 1.2.3.4, need full audit',
             ]);
 
-        $response->assertRedirect(route('micro-services.index'));
+        $response->assertRedirect(route('micro-services.mine'));
         $this->assertDatabaseHas('micro_service_orders', [
             'user_id' => $usdUser->id,
             'micro_service_id' => $service->id,

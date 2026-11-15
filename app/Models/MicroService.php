@@ -15,6 +15,7 @@ class MicroService extends Model
     protected $fillable = [
         'title',
         'description',
+        'example_url',
         'price',
         'currency_id',
         'delivery_days',

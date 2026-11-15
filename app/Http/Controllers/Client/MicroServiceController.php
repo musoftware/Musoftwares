@@ -95,7 +95,7 @@ class MicroServiceController extends Controller
 
         $this->orderService->purchase(Auth::user(), $microService, $validated['requirements']);
 
-        return redirect()->route('micro-services.index')
+        return redirect()->route('micro-services.mine')
             ->with('success', 'تم شراء الخدمة المصغرة بنجاح وتم إرسال تفاصيل طلبك للإدارة للبدء في التنفيذ.');
     }
 }

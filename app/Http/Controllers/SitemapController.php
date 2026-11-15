@@ -68,6 +68,7 @@ class SitemapController extends Controller
             'home' => '1.0',
             'marketplace.services.index' => '0.9',
             'services.index' => '0.9',
+            'micro-services.index' => '0.8',
             'portfolio' => '0.8',
             'how-we-work' => '0.9',
             'white-label' => '0.7',

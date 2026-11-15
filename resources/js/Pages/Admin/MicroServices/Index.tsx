@@ -43,6 +43,7 @@ interface ServiceItem {
     id: number;
     title: string;
     description: string;
+    example_url: string | null;
     price: number;
     formatted_price: string;
     delivery_days: number;
@@ -114,6 +115,7 @@ export default function AdminMicroServicesIndex({
     const serviceForm = useForm({
         title: '',
         description: '',
+        example_url: '',
         price: '',
         delivery_days: 1,
         is_active: true,
@@ -124,6 +126,7 @@ export default function AdminMicroServicesIndex({
         serviceForm.setData({
             title: '',
             description: '',
+            example_url: '',
             price: '',
             delivery_days: 1,
             is_active: true,
@@ -136,6 +139,7 @@ export default function AdminMicroServicesIndex({
         serviceForm.setData({
             title: service.title,
             description: service.description,
+            example_url: service.example_url ?? '',
             price: String(service.price),
             delivery_days: service.delivery_days,
             is_active: service.is_active,
@@ -604,6 +608,21 @@ export default function AdminMicroServicesIndex({
                             />
                             {serviceForm.errors.description && (
                                 <p className="text-xs text-red-500">{serviceForm.errors.description}</p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold">{__('admin.micro_services_example_label')}</label>
+                            <Input
+                                type="url"
+                                dir="ltr"
+                                value={serviceForm.data.example_url}
+                                onChange={(e) => serviceForm.setData('example_url', e.target.value)}
+                                placeholder="https://"
+                                className="text-xs rounded-xl"
+                            />
+                            {serviceForm.errors.example_url && (
+                                <p className="text-xs text-red-500">{serviceForm.errors.example_url}</p>
                             )}
                         </div>
 
