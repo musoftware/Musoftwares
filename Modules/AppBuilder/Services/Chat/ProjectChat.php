@@ -168,6 +168,7 @@ class ProjectChat
 
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
+        app(\Modules\AppBuilder\Services\AiCosts::class)->recordChat($project, $turn->inputTokens, $turn->outputTokens);
         // a project that started and was paid keeps a list of requests instead of one price
         $project->takesRequests() ? $this->addRequest($project, $turn, $question) : $this->updateQuote($project, $turn);
         // "upload it", "publish the app": an order for the worker, which puts the delivered changes live

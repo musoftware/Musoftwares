@@ -101,6 +101,13 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\OwnerReview::class)->re
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(10);
 
+// What Claude cost yesterday, past the free credit, goes on the costs page as one "Claude AI" cost
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\AiCosts::class)->bookDue())
+    ->name('builder-ai-costs')
+    ->dailyAt('00:20')
+    ->timezone('Africa/Cairo')
+    ->withoutOverlapping(30);
+
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
     ->everyFiveMinutes()

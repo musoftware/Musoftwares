@@ -266,6 +266,10 @@ class AppBuilderTest extends TestCase
         $this->assertEqualsWithDelta($paid - 1.20, $this->balanceInUsd($customer), 0.05);
         $this->assertSame(BuilderMessage::TEAM, $project->messages()->reorder('id', 'desc')->value('role'));
         $this->assertSame($project->quote_version, $project->price_settled_version);
+        // money already counted when the customer paid: it goes back as earned balance, not as new income
+        $this->assertSame('earned', \App\Models\Transaction::where('user_id', $customer->id)->where('reason', 'like', 'AI builder: the build cost less%')->value('type'));
+        // and what the build cost Claude is kept for the costs page
+        $this->assertEqualsWithDelta(1.00, (float) \Modules\AppBuilder\Models\BuilderAiSpending::where('project_id', $project->id)->where('source', 'build')->sum('usd'), 0.0001);
     }
 
     public function test_a_price_an_admin_marked_paid_gives_nothing_back_when_the_work_costs_less(): void

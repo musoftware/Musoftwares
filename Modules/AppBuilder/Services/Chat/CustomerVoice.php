@@ -48,6 +48,7 @@ TEXT;
         }
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
+        app(\Modules\AppBuilder\Services\AiCosts::class)->recordChat($project, $turn->inputTokens, $turn->outputTokens);
 
         return $turn->reply !== '' ? $turn->reply : $engineerNote;
     }

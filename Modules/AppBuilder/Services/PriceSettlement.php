@@ -35,7 +35,7 @@ class PriceSettlement
                 'price_settled_version' => $project->quote_version,
             ]);
             if ($credited) {
-                $project->user->add_balance($refund, 'AI builder: the build cost less than its price ('.$project->title.')', 'received', $this->currencyId($project));
+                $project->user->add_balance($refund, 'AI builder: the build cost less than its price ('.$project->title.')', 'earned', $this->currencyId($project));
                 $project->messages()->create(['role' => BuilderMessage::TEAM, 'content' => __('builder.price_settled', ['amount' => number_format($refund, 2).' '.$project->currency], $project->customerLanguage())]);
             }
         });

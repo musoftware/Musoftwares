@@ -39,6 +39,12 @@ return [
         'output_usd_per_mtok' => (float) env('BUILDER_CHAT_OUTPUT_USD_PER_MTOK', 0.5),
     ],
 
+    // What Claude costs us is a business cost, once the credit Claude gave us for free is used up
+    'ai_cost' => [
+        'free_credit_usd' => (float) env('BUILDER_AI_FREE_CREDIT_USD', 200),
+        'reason' => 'Claude AI',
+    ],
+
     // the cards of Musoftware's ready programs a new project can start from; empty means Resources/starters.json
     'starters_file' => env('BUILDER_STARTERS_FILE', ''),
     // the free ready designs a customer without a design picks from; empty means Resources/designs.json

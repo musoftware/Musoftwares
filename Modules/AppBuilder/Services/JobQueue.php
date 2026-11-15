@@ -76,6 +76,7 @@ class JobQueue
         // this job's whole cost, failed tries included, teaches the next price and settles this one
         $jobCost = (float) $project->job_cost_usd + $costUsd;
         $this->costs->record($project, $jobCost);
+        app(AiCosts::class)->record($project, \Modules\AppBuilder\Models\BuilderAiSpending::BUILD, $costUsd);
         // the engineer writes for engineers; the customer reads the contact's plain retelling, the owner the original
         $forCustomer = app(Chat\CustomerVoice::class)->retell($project, $summary);
 
@@ -121,6 +122,7 @@ class JobQueue
 
     public function fail(BuilderProject $project, string $error, float $costUsd): void
     {
+        app(AiCosts::class)->record($project, \Modules\AppBuilder\Models\BuilderAiSpending::FAILED_BUILD, $costUsd);
         $project->update([
             'status' => BuilderProject::FAILED,
             'error' => mb_substr($error, 0, 4000),

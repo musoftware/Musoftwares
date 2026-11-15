@@ -197,6 +197,7 @@ class ProjectImports
     {
         if ($costUsd > 0) {
             $project->increment('build_cost_usd', $costUsd);
+            app(AiCosts::class)->record($project, \Modules\AppBuilder\Models\BuilderAiSpending::RELEASE, $costUsd);
         }
     }
 
