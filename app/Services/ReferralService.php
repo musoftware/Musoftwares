@@ -41,6 +41,7 @@ class ReferralService extends BaseService
             $referral->key = sha1(md5(uniqid().$user->id));
             $referral->save();
         }
+        app(ReferralSlugs::class)->ensure($referral->setRelation('user', $user));
 
         return $referral;
     }

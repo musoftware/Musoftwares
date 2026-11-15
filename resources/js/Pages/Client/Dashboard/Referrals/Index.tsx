@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
-import { Check, Copy, Lock, MessageCircle, Share2 } from 'lucide-react';
+import { Check, Copy, MessageCircle, Share2 } from 'lucide-react';
 import ClientPage, { Card, Section, TextAction } from '@/Components/Client/ClientPage';
 import ReferralTabs from './Partials/ReferralTabs';
 import { __ } from '@/lib/i18n';
@@ -50,7 +50,6 @@ export default function Index({ referral, commission_percentage, embedKey, aiSha
     const referralLink = `${window.location.origin}/r/${referral?.slug || referral?.key || ''}`;
     const percent = `${((Number(commission_percentage) - 1) * 100).toFixed(0)}%`;
     const [copied, setCopied] = useState<'key' | null>(null);
-    const hasSlug = !!referral?.slug && referral.slug.trim() !== '';
 
     const { data, setData, post, processing, errors } = useForm({ slug: referral?.slug || '' });
 
@@ -76,17 +75,11 @@ export default function Index({ referral, commission_percentage, embedKey, aiSha
 
             <Section title={__('client_rewards.referrals.short_link')}>
                 <Card>
-                    {hasSlug ? (
-                        <p className="flex items-center gap-2 text-sm text-[#1d1d1f]/70 dark:text-zinc-300">
-                            <Lock className="h-4 w-4 shrink-0" />{__('client_rewards.referrals.short_link_locked')}
-                            <span className="font-mono" dir="ltr">/r/{referral.slug}</span>
-                        </p>
-                    ) : (
-                        <form onSubmit={(e) => { e.preventDefault(); post(route('referrals.update_slug'), { preserveScroll: true }); }} className="space-y-2">
+                    <form onSubmit={(e) => { e.preventDefault(); post(route('referrals.update_slug'), { preserveScroll: true }); }} className="space-y-2">
                             <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_rewards.referrals.short_link_hint')}</p>
                             <div className="flex gap-2">
                                 <input id="slug" value={data.slug} onChange={(e) => setData('slug', e.target.value)} disabled={processing} dir="ltr"
-                                    placeholder="my-store" aria-label={__('client_rewards.referrals.short_link')}
+                                    placeholder="ahmed" aria-label={__('client_rewards.referrals.short_link')}
                                     className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 font-mono text-sm dark:border-white/10 dark:bg-zinc-800" />
                                 <button type="submit" disabled={processing}
                                     className="h-11 shrink-0 rounded-full bg-[#1d1d1f] px-5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black">
@@ -95,7 +88,6 @@ export default function Index({ referral, commission_percentage, embedKey, aiSha
                             </div>
                             {errors.slug && <p className="text-sm text-rose-600">{errors.slug}</p>}
                         </form>
-                    )}
                 </Card>
             </Section>
 

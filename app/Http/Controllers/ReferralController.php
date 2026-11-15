@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ReferralController extends Controller
@@ -99,6 +98,7 @@ class ReferralController extends Controller
             $client_request->title = request('title');
             $client_request->key = sha1(md5(uniqid()));
             $client_request->save();
+            app(\App\Services\ReferralSlugs::class)->ensure($client_request);
 
             return redirect()->route('referrals.index')->with('success', __('messages.referral_created_success'));
         }
@@ -114,37 +114,19 @@ class ReferralController extends Controller
             return redirect()->route('referrals.index')->with('error', __('messages.referral_not_found'));
         }
 
-        // Once slug is set, it cannot be changed
-        if ($referral->slug !== null && trim($referral->slug) !== '') {
-            return redirect()->route('referrals.index')->with('info', __('messages.referral_slug_set_cannot_change'));
-        }
-
-        $slugRaw = $request->input('slug');
-        $slugNormalized = ($slugRaw === null || trim((string) $slugRaw) === '') ? null : strtolower(trim($slugRaw));
-
-        $request->merge(['slug' => $slugNormalized]);
+        // the name can change any time; the old one keeps reaching the client (ReferralSlugs::change)
+        $slugs = app(\App\Services\ReferralSlugs::class);
+        $request->merge(['slug' => strtolower(trim((string) $request->input('slug')))]);
         $request->validate([
-            'slug' => [
-                'nullable',
-                'string',
-                'max:100',
-                'min:2',
-                'regex:/^[a-z0-9\-]+$/',
-                Rule::unique('user_referrals', 'slug')
-                    ->ignore($referral->id)
-                    ->whereNull('deleted_at'),
-            ],
+            'slug' => ['required', 'string', 'min:2', 'max:40', 'regex:'.\App\Services\ReferralSlugs::PATTERN,
+                fn ($attribute, $value, $fail) => $slugs->isFree((string) $value, $referral) ? null : $fail(__('messages.referral_slug_taken'))],
         ], [
             'slug.regex' => __('messages.referral_slug_regex_hint'),
-            'slug.unique' => __('messages.referral_slug_taken'),
         ]);
 
-        $referral->slug = $slugNormalized;
-        $referral->save();
+        $slugs->change($referral, (string) $request->input('slug'));
 
-        return redirect()->route('referrals.index')->with('success', $referral->slug
-            ? __('messages.referral_short_link_ready', ['url' => url('r/'.$referral->slug)])
-            : __('messages.referral_slug_removed_default'));
+        return redirect()->route('referrals.index')->with('success', __('messages.referral_short_link_ready', ['url' => url('r/'.$referral->slug)]));
     }
 
     public function registers()

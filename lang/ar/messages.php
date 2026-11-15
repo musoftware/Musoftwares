@@ -29,7 +29,7 @@ return [
     'referral_already_exists' => 'الإحالة موجودة بالفعل.',
     'referral_created_success' => 'تم إنشاء الإحالة بنجاح.',
     'referral_not_found' => 'لم يتم العثور على الإحالة.',
-    'referral_short_link_ready' => 'Referral Short Link Ready',
+    'referral_short_link_ready' => 'رابطك جاهز: :url',
     'referral_slug_regex_hint' => 'يجب أن يتكون اسم الإحالة من حروف وأرقام وشرطات فقط.',
     'referral_slug_removed_default' => 'تمت إزالة رابط الإحالة والعودة للوضع الافتراضي.',
     'referral_slug_set_cannot_change' => 'تم تعيين رابط الإحالة ولا يمكن تغييره.',

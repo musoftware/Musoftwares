@@ -29,7 +29,7 @@ return [
     'referral_already_exists' => 'Referral already exists.',
     'referral_created_success' => 'Referral Created Success',
     'referral_not_found' => 'Referral Not Found',
-    'referral_short_link_ready' => 'Referral Short Link Ready',
+    'referral_short_link_ready' => 'Your link is ready: :url',
     'referral_slug_regex_hint' => 'Referral Slug Regex Hint',
     'referral_slug_removed_default' => 'Referral Slug Removed Default',
     'referral_slug_set_cannot_change' => 'Referral Slug Set Cannot Change',

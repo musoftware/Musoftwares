@@ -38,6 +38,12 @@ class UserReferral extends Model
             return $referral;
         }
 
+        // a name the client had before changing it
+        $old = UserReferralSlug::where('slug', strtolower($ref))->first()?->referral;
+        if ($old) {
+            return $old;
+        }
+
         $user = User::where('slug', $ref)->first();
         if ($user) {
             return $user->referrals()->first();
