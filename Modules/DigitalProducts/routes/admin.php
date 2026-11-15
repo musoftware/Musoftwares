@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\DigitalProducts\Http\Controllers\Admin\AdminDigitalCategoryController;
 use Modules\DigitalProducts\Http\Controllers\Admin\AdminDigitalProductController;
+use Modules\DigitalProducts\Http\Controllers\Admin\AdminDriveBookController;
 
 Route::prefix('digital-products')->name('admin.digitalproducts.')->group(function () {
     // Books CRUD
@@ -13,6 +14,10 @@ Route::prefix('digital-products')->name('admin.digitalproducts.')->group(functio
     Route::put('/{id}', [AdminDigitalProductController::class, 'update'])->name('update');
     Route::delete('/{id}', [AdminDigitalProductController::class, 'destroy'])->name('destroy');
     Route::post('/{id}/toggle-publish', [AdminDigitalProductController::class, 'togglePublish'])->name('toggle_publish');
+
+    // A book brought from a Google Drive link instead of an upload
+    Route::post('/drive', [AdminDriveBookController::class, 'fetch'])->middleware('throttle:20,1')->name('drive.fetch');
+    Route::get('/drive/{token}', [AdminDriveBookController::class, 'show'])->name('drive.show');
 
     // Categories CRUD
     Route::prefix('categories')->name('categories.')->group(function () {

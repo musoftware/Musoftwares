@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import DriveLinkInput from './Components/DriveLinkInput';
 
 interface Category {
     id: number;
@@ -101,12 +102,16 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
 
         // File replacements
         pdf_file: null as File | null,
+        pdf_token: '', // a PDF the site brought from a Drive link
+        pdf_token_name: '',
         cover_image: null as File | null,
 
         // Dual Edition Playbook
         has_free_edition: Boolean(product.has_free_edition),
         free_edition_title: product.free_edition_title || __('admin.digital_products_default_playbook_title'),
         free_edition_pdf_file: null as File | null,
+        free_edition_pdf_token: '',
+        free_edition_pdf_token_name: '',
         free_edition_cover_image: null as File | null,
         free_edition_page_count: product.free_edition_page_count ? String(product.free_edition_page_count) : '',
     });
@@ -160,6 +165,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
         if (form.meta_description) formData.append('meta_description', form.meta_description);
 
         if (form.pdf_file) formData.append('pdf_file', form.pdf_file);
+        else if (form.pdf_token) formData.append('pdf_token', form.pdf_token);
         if (form.cover_image) formData.append('cover_image', form.cover_image);
 
         // Playbook
@@ -168,6 +174,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
             if (form.free_edition_title) formData.append('free_edition_title', form.free_edition_title);
             if (form.free_edition_page_count) formData.append('free_edition_page_count', form.free_edition_page_count);
             if (form.free_edition_pdf_file) formData.append('free_edition_pdf_file', form.free_edition_pdf_file);
+            else if (form.free_edition_pdf_token) formData.append('free_edition_pdf_token', form.free_edition_pdf_token);
             if (form.free_edition_cover_image) formData.append('free_edition_cover_image', form.free_edition_cover_image);
         }
 
@@ -208,7 +215,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
             }
             actions={
                 <a
-                    href={`/library/${product.slug}`}
+                    href={route('library.show', product.slug)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-xs"
@@ -285,7 +292,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         ref={mainPdfInputRef}
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
-                                            if (file) setForm((prev) => ({ ...prev, pdf_file: file }));
+                                            if (file) setForm((prev) => ({ ...prev, pdf_file: file, pdf_token: '', pdf_token_name: '' }));
                                         }}
                                         accept="application/pdf"
                                         className="hidden"
@@ -301,6 +308,10 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                         <FileText className="h-3.5 w-3.5 text-slate-600" />
                                         <span>{form.pdf_file ? __('admin.digital_products_selected_file', { name: form.pdf_file.name }) : __('general.replace_pdf_file')}</span>
                                     </Button>
+
+                                    {form.pdf_token_name
+                                        ? <p className="text-xs text-emerald-700">{__('admin.digital_products_selected_file', { name: form.pdf_token_name })}</p>
+                                        : <DriveLinkInput onReady={(book) => setForm((prev) => ({ ...prev, pdf_file: null, pdf_token: book.token, pdf_token_name: book.name }))} />}
                                 </CardContent>
                             </Card>
                         </div>
@@ -369,7 +380,7 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                     ref={playbookPdfInputRef}
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
-                                                        if (file) setForm((prev) => ({ ...prev, free_edition_pdf_file: file }));
+                                                        if (file) setForm((prev) => ({ ...prev, free_edition_pdf_file: file, free_edition_pdf_token: '', free_edition_pdf_token_name: '' }));
                                                     }}
                                                     accept="application/pdf"
                                                     className="hidden"
@@ -384,6 +395,12 @@ export default function Edit({ product, categories, currencies = [] }: Props) {
                                                     <UploadCloud className="h-3.5 w-3.5 text-emerald-600" />
                                                     <span>{form.free_edition_pdf_file ? __('admin.digital_products_selected_file', { name: form.free_edition_pdf_file.name }) : __('admin.digital_products_replace_playbook_pdf')}</span>
                                                 </Button>
+
+                                                <div className="md:col-span-2">
+                                                    {form.free_edition_pdf_token_name
+                                                        ? <p className="text-xs text-emerald-700">{__('admin.digital_products_selected_file', { name: form.free_edition_pdf_token_name })}</p>
+                                                        : <DriveLinkInput onReady={(book) => setForm((prev) => ({ ...prev, free_edition_pdf_file: null, free_edition_pdf_token: book.token, free_edition_pdf_token_name: book.name }))} />}
+                                                </div>
 
                                                 <input
                                                     type="file"

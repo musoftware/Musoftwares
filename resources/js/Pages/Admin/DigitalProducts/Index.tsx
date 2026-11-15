@@ -457,7 +457,7 @@ export default function Index({ products, categories, stats, filters = {} }: Pro
 
                                                     <DropdownMenuItem asChild>
                                                         <a
-                                                            href={`/library/${product.slug}`}
+                                                            href={route('library.show', product.slug)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="flex items-center gap-2 cursor-pointer"

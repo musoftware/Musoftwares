@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
+use Modules\DigitalProducts\Models\DigitalProduct;
 use Modules\Marketplace\Models\Service as MarketplaceService;
 use Modules\Marketplace\Models\ServiceCategory as MarketplaceCategory;
 use Modules\Marketplace\Models\ServiceLandingPage;
@@ -80,6 +81,7 @@ class SitemapController extends Controller
             'legal.cookies' => '0.5',
             'estimator' => '0.8',
             'blog.index' => '0.8',
+            'library.index' => '0.8',
         ];
         foreach ($staticRoutes as $route => $priority) {
             if (Route::has($route)) {
@@ -99,6 +101,12 @@ class SitemapController extends Controller
         if (class_exists(SoftwareProduct::class)) {
             foreach (SoftwareProduct::where('is_active', true)->orderBy('sort_order')->get() as $product) {
                 $urls[] = $this->url($product->purchaseUrl(), $product->updated_at, 'weekly', '0.9');
+            }
+        }
+
+        if (Route::has('library.show')) {
+            foreach (DigitalProduct::where('is_published', true)->get(['slug', 'updated_at']) as $book) {
+                $urls[] = $this->url(route('library.show', $book->slug), $book->updated_at, 'weekly', '0.8');
             }
         }
 

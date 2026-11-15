@@ -148,7 +148,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put($this->outputPath('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false).$this->microServicesSection($baseUrl, 'en'));
+        File::put($this->outputPath('llms.txt'), $llmsContent.$this->storeSection($baseUrl, 'en', false).$this->microServicesSection($baseUrl, 'en').$this->librarySection($baseUrl));
         $this->info('Created public/llms.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullContent .= "- **Content**:\n{$cleanBody}\n\n";
         }
 
-        File::put($this->outputPath('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true).$this->microServicesSection($baseUrl, 'en'));
+        File::put($this->outputPath('llms-full.txt'), $llmsFullContent.$this->storeSection($baseUrl, 'en', true).$this->microServicesSection($baseUrl, 'en').$this->librarySection($baseUrl));
         $this->info('Created public/llms-full.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -267,7 +267,7 @@ class GenerateAiFilesCommand extends Command
             }
         }
 
-        File::put($this->outputPath('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false).$this->microServicesSection($baseUrl, 'ar'));
+        File::put($this->outputPath('llms-ar.txt'), $llmsArContent.$this->storeSection($baseUrl, 'ar', false).$this->microServicesSection($baseUrl, 'ar').$this->librarySection($baseUrl));
         $this->info('Created public/llms-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -332,7 +332,7 @@ class GenerateAiFilesCommand extends Command
             $llmsFullArContent .= "- **محتوى المقال**:\n{$cleanBody}\n\n";
         }
 
-        File::put($this->outputPath('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true).$this->microServicesSection($baseUrl, 'ar'));
+        File::put($this->outputPath('llms-full-ar.txt'), $llmsFullArContent.$this->storeSection($baseUrl, 'ar', true).$this->microServicesSection($baseUrl, 'ar').$this->librarySection($baseUrl));
         $this->info('Created public/llms-full-ar.txt');
 
         // ─────────────────────────────────────────────────────────────────────
@@ -483,6 +483,19 @@ class GenerateAiFilesCommand extends Command
         $lines = $services->map(fn ($service) => "- {$service->title}: {$service->description}".($service->example_url ? " (example: {$service->example_url})" : ''));
 
         return "\n## ".__('micro_services.title', [], $lang)."\n".__('micro_services.ai_note', [], $lang)."\n- Page: {$page}\n".$lines->implode("\n")."\n";
+    }
+
+    /** The published books of the library, each with its own page. */
+    private function librarySection(string $baseUrl): string
+    {
+        $books = \Modules\DigitalProducts\Models\DigitalProduct::where('is_published', true)->latest()->get(['title', 'slug', 'short_description', 'is_free']);
+        if ($books->isEmpty()) {
+            return '';
+        }
+
+        $lines = $books->map(fn ($book) => "- [{$book->title}]({$baseUrl}/library/book/{$book->slug})".($book->is_free ? ' (free)' : '').($book->short_description ? ": {$book->short_description}" : ''));
+
+        return "\n## Library (e-books)\n- Page: {$baseUrl}/library\n".$lines->implode("\n")."\n";
     }
 
     private function storeSection(string $baseUrl, string $lang, bool $full): string

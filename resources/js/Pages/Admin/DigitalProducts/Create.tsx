@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
+import DriveLinkInput, { DriveBook } from './Components/DriveLinkInput';
 
 interface Category {
     id: number;
@@ -63,6 +64,7 @@ export default function Create({ categories, currencies = [] }: Props) {
 
         // Main Files & Extracted Cover
         pdf_file: null as File | null,
+        pdf_token: '', // a PDF the site brought from a Drive link
         cover_data: '', // base64 data url from client-side PDF.js
         cover_image: null as File | null,
 
@@ -70,6 +72,7 @@ export default function Create({ categories, currencies = [] }: Props) {
         has_free_edition: false,
         free_edition_title: __('admin.digital_products_default_playbook_title'),
         free_edition_pdf_file: null as File | null,
+        free_edition_pdf_token: '',
         free_edition_cover_data: '',
         free_edition_cover_image: null as File | null,
         free_edition_page_count: '',
@@ -115,7 +118,7 @@ export default function Create({ categories, currencies = [] }: Props) {
     };
 
     // Extract Cover & Metadata from PDF
-    const processPdfFile = async (file: File, isPlaybook = false) => {
+    const processPdfFile = async (file: File, isPlaybook = false, driveToken = '') => {
         if (!file || file.type !== 'application/pdf') {
             toast.error(__('general.please_select_valid_pdf'));
             return;
@@ -123,10 +126,10 @@ export default function Create({ categories, currencies = [] }: Props) {
 
         if (isPlaybook) {
             setPlaybookPdfLoading(true);
-            setData('free_edition_pdf_file', file);
+            setData((prev) => ({ ...prev, free_edition_pdf_file: driveToken ? null : file, free_edition_pdf_token: driveToken }));
         } else {
             setMainPdfLoading(true);
-            setData('pdf_file', file);
+            setData((prev) => ({ ...prev, pdf_file: driveToken ? null : file, pdf_token: driveToken }));
 
             // Auto fill title if empty
             if (!data.title) {
@@ -201,6 +204,16 @@ export default function Create({ categories, currencies = [] }: Props) {
         }
     };
 
+    // The PDF already sits on the server; the browser only reads it for the cover and page count.
+    const loadDriveBook = async (book: DriveBook, isPlaybook: boolean) => {
+        try {
+            const blob = await (await fetch(book.preview_url, { credentials: 'same-origin' })).blob();
+            await processPdfFile(new File([blob], book.name, { type: 'application/pdf' }), isPlaybook, book.token);
+        } catch {
+            toast.error(__('general.failed_to_extract_pdf'));
+        }
+    };
+
     const handleMainFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -217,7 +230,7 @@ export default function Create({ categories, currencies = [] }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!data.pdf_file) {
+        if (!data.pdf_file && !data.pdf_token) {
             toast.error(__('general.pdf_file_is_required'));
             return;
         }
@@ -349,6 +362,12 @@ export default function Create({ categories, currencies = [] }: Props) {
                                 </div>
                             )}
 
+                            {!mainPdfInfo && !mainPdfLoading && (
+                                <div className="mt-4">
+                                    <DriveLinkInput onReady={(book) => loadDriveBook(book, false)} />
+                                </div>
+                            )}
+
                             {errors.pdf_file && <p className="text-xs text-red-600 mt-2">{errors.pdf_file}</p>}
                         </CardContent>
                     </Card>
@@ -425,6 +444,10 @@ export default function Create({ categories, currencies = [] }: Props) {
                                                 </p>
                                                 <p className="text-[11px] text-slate-400 mt-0.5">{__('admin.digital_products_cover_auto_generated')}</p>
                                             </div>
+                                        )}
+
+                                        {!playbookPdfInfo && !playbookPdfLoading && (
+                                            <DriveLinkInput onReady={(book) => loadDriveBook(book, true)} />
                                         )}
 
                                         {playbookPdfLoading && (

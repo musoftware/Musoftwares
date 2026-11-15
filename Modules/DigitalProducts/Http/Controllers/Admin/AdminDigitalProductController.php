@@ -7,18 +7,22 @@ use App\Models\Currency;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\DigitalProducts\Models\DigitalCategory;
 use Modules\DigitalProducts\Models\DigitalProduct;
+use Modules\DigitalProducts\Services\DriveBook;
 use Modules\DigitalProducts\Services\PdfProcessingService;
 
 class AdminDigitalProductController extends Controller
 {
     public function __construct(
-        protected PdfProcessingService $pdfService
+        protected PdfProcessingService $pdfService,
+        protected DriveBook $driveBook,
     ) {}
 
     public function index(Request $request): Response
@@ -81,12 +85,14 @@ class AdminDigitalProductController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:digital_products,slug',
-            'pdf_file' => 'required|file|mimes:pdf|max:153600', // max 150MB
+            'pdf_file' => 'required_without:pdf_token|nullable|file|mimes:pdf|max:153600', // max 150MB
+            'pdf_token' => 'nullable|uuid',
             'cover_data' => 'nullable|string', // Base64 data from PDF.js
             'cover_image' => 'nullable|image|max:10240',
             'has_free_edition' => 'nullable|boolean',
             'free_edition_title' => 'nullable|string|max:255',
             'free_edition_pdf_file' => 'nullable|file|mimes:pdf|max:153600',
+            'free_edition_pdf_token' => 'nullable|uuid',
             'free_edition_cover_data' => 'nullable|string',
             'free_edition_cover_image' => 'nullable|image|max:10240',
             'free_edition_page_count' => 'nullable|integer|min:1',
@@ -108,7 +114,7 @@ class AdminDigitalProductController extends Controller
         ]);
 
         // 1. Process and store Main PDF file
-        $pdfResult = $this->pdfService->storePdf($request->file('pdf_file'));
+        $pdfResult = $this->pdfService->storePdf($this->pdfFrom($request, 'pdf_file', 'pdf_token'));
 
         // 2. Process and store Main Cover Image
         $coverPath = null;
@@ -125,8 +131,9 @@ class AdminDigitalProductController extends Controller
         $freeEditionPageCount = null;
         $freeEditionFileSize = null;
 
-        if ($hasFreeEdition && $request->hasFile('free_edition_pdf_file')) {
-            $playbookResult = $this->pdfService->storePdf($request->file('free_edition_pdf_file'));
+        $playbookPdf = $hasFreeEdition ? $this->pdfFrom($request, 'free_edition_pdf_file', 'free_edition_pdf_token', required: false) : null;
+        if ($playbookPdf !== null) {
+            $playbookResult = $this->pdfService->storePdf($playbookPdf);
             $freeEditionFilePath = $playbookResult['file_path'];
             $freeEditionFileSize = $playbookResult['file_size'];
             $freeEditionPageCount = $validated['free_edition_page_count'] ?? $playbookResult['page_count'] ?? 1;
@@ -209,6 +216,7 @@ class AdminDigitalProductController extends Controller
             'has_free_edition' => 'nullable|boolean',
             'free_edition_title' => 'nullable|string|max:255',
             'free_edition_pdf_file' => 'nullable|file|mimes:pdf|max:153600',
+            'free_edition_pdf_token' => 'nullable|uuid',
             'free_edition_cover_image' => 'nullable|image|max:10240',
             'free_edition_page_count' => 'nullable|integer|min:1',
             'author_name' => 'nullable|string|max:255',
@@ -223,15 +231,17 @@ class AdminDigitalProductController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'pdf_file' => 'nullable|file|mimes:pdf|max:153600',
+            'pdf_token' => 'nullable|uuid',
             'cover_image' => 'nullable|image|max:10240',
         ]);
 
-        // If new Main PDF uploaded
-        if ($request->hasFile('pdf_file')) {
+        // If new Main PDF uploaded or brought from Drive
+        $newPdf = $this->pdfFrom($request, 'pdf_file', 'pdf_token', required: false);
+        if ($newPdf !== null) {
             if ($product->file_path && Storage::disk('local')->exists($product->file_path)) {
                 Storage::disk('local')->delete($product->file_path);
             }
-            $pdfResult = $this->pdfService->storePdf($request->file('pdf_file'));
+            $pdfResult = $this->pdfService->storePdf($newPdf);
             $product->file_path = $pdfResult['file_path'];
             $product->file_size = $pdfResult['file_size'];
             if (!$request->filled('page_count') && $pdfResult['page_count']) {
@@ -248,11 +258,12 @@ class AdminDigitalProductController extends Controller
         // Free Playbook updates
         $hasFreeEdition = $request->boolean('has_free_edition');
         if ($hasFreeEdition) {
-            if ($request->hasFile('free_edition_pdf_file')) {
+            $newPlaybook = $this->pdfFrom($request, 'free_edition_pdf_file', 'free_edition_pdf_token', required: false);
+            if ($newPlaybook !== null) {
                 if ($product->free_edition_file_path && Storage::disk('local')->exists($product->free_edition_file_path)) {
                     Storage::disk('local')->delete($product->free_edition_file_path);
                 }
-                $playbookResult = $this->pdfService->storePdf($request->file('free_edition_pdf_file'));
+                $playbookResult = $this->pdfService->storePdf($newPlaybook);
                 $product->free_edition_file_path = $playbookResult['file_path'];
                 $product->free_edition_file_size = $playbookResult['file_size'];
                 if (!$request->filled('free_edition_page_count') && $playbookResult['page_count']) {
@@ -296,6 +307,22 @@ class AdminDigitalProductController extends Controller
 
         return redirect()->route('admin.digitalproducts.index')
             ->with('success', 'تم تحديث بيانات الكتاب بنجاح!');
+    }
+
+    /** The uploaded PDF, or the one brought from a Drive link before saving. */
+    private function pdfFrom(Request $request, string $fileField, string $tokenField, bool $required = true): ?UploadedFile
+    {
+        if ($request->hasFile($fileField)) {
+            return $request->file($fileField);
+        }
+
+        $token = (string) $request->input($tokenField, '');
+        $pdf = $token === '' ? null : $this->driveBook->asUpload($token);
+        if ($pdf === null && ($required || $token !== '')) {
+            throw ValidationException::withMessages([$fileField => __('admin.digital_products_drive_expired')]);
+        }
+
+        return $pdf;
     }
 
     public function togglePublish(int $id): RedirectResponse|JsonResponse

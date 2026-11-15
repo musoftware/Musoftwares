@@ -5,6 +5,7 @@ namespace Modules\DigitalProducts\Http\Controllers\Public;
 use App\Helpers\FinanceHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
@@ -95,20 +96,24 @@ class LibraryController extends Controller
             'type' => 'website',
         ];
 
-        return view('digitalproducts::public.index', compact('products', 'categories', 'featuredProducts', 'viewerCurrency', 'meta'));
+        return view('digitalproducts::public.index', compact('products', 'categories', 'featuredProducts', 'viewerCurrency', 'meta') + self::layoutMeta($meta));
     }
 
     /**
      * Display a single digital product / book details.
      */
-    public function show(Request $request, string $slug): View
+    public function show(Request $request, string $slug): View|RedirectResponse
     {
         $viewerCurrency = FinanceHelper::instance()->getViewerCurrency($request);
 
         $product = DigitalProduct::with(['category', 'currency'])
             ->where('slug', $slug)
             ->where('is_published', true)
-            ->firstOrFail();
+            ->first();
+
+        if ($product === null) {
+            return redirect()->route('library.show', $this->renamedBook($slug)->slug, 301);
+        }
 
         // Increment view count safely
         $product->increment('view_count');
@@ -144,7 +149,7 @@ class LibraryController extends Controller
         $meta = [
             'title' => ($product->meta_title ?: $product->title) . ' | مكتبة Musoftware',
             'description' => $product->meta_description ?: ($product->short_description ?: Str::limit(strip_tags($product->description), 160)),
-            'image' => $product->cover_url,
+            'image' => $product->cover_image_path ? $product->cover_url : null,
             'url' => route('library.show', $product->slug),
             'type' => 'book',
         ];
@@ -158,6 +163,35 @@ class LibraryController extends Controller
             'userPriceFormatted',
             'userConvertedPrice',
             'meta'
-        ));
+        ) + self::layoutMeta($meta));
+    }
+
+    /**
+     * A book whose slug was changed keeps its first link: that link was made from the title,
+     * so a published book whose title gives the old slug is the one asked for. Otherwise 404.
+     */
+    private function renamedBook(string $oldSlug): DigitalProduct
+    {
+        return DigitalProduct::where('is_published', true)->get(['id', 'slug', 'title'])
+            ->first(fn (DigitalProduct $book) => Str::slug((string) $book->title) === $oldSlug)
+            ?? abort(404);
+    }
+
+    /**
+     * layouts.public reads $title, $description, $image, $canonical and $ogType for the page title,
+     * the search snippet and the card shown when the link is shared.
+     *
+     * @param  array<string, string|null>  $meta
+     * @return array<string, string>
+     */
+    private static function layoutMeta(array $meta): array
+    {
+        return array_filter([
+            'title' => $meta['title'] ?? null,
+            'description' => $meta['description'] ?? null,
+            'image' => $meta['image'] ?? null,
+            'canonical' => $meta['url'] ?? null,
+            'ogType' => $meta['type'] ?? null,
+        ]);
     }
 }

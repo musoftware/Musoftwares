@@ -37,8 +37,9 @@
     <meta property="og:title" content="{{ $title ?? 'Musoftwares | Software Engineering Studio' }}">
     <meta property="og:description" content="{{ $description ?? 'Custom Web Apps, Mobile Apps & Enterprise Platforms' }}">
     <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:alt" content="{{ $title ?? 'Musoftwares' }}">
     <meta property="og:url" content="{{ $canonicalUrl }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
     <meta property="og:locale" content="{{ $locale === 'ar' ? 'ar_AR' : 'en_US' }}">
 
     <meta name="twitter:card" content="summary_large_image">

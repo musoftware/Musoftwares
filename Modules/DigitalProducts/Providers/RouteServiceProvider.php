@@ -20,7 +20,7 @@ class RouteServiceProvider extends ServiceProvider
             ->namespace($this->moduleNamespace)
             ->group(module_path('DigitalProducts', '/routes/web.php'));
 
-        Route::middleware(['web', 'auth'])
+        Route::middleware(['web', 'auth', 'admin'])
             ->namespace($this->moduleNamespace)
             ->prefix('admin')
             ->group(module_path('DigitalProducts', '/routes/admin.php'));
