@@ -85,6 +85,8 @@ Route::middleware(['web', 'auth', 'verified', 'admin'])->prefix('admin/builder')
     Route::post('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'release'])->name('release');
     Route::get('/{project}/release', [\Modules\AppBuilder\Http\Controllers\Admin\AdminImportController::class, 'showProject']);
     Route::get('/{project}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'show'])->name('show');
+    // a file the customer sent in the chat, so the owner can open it
+    Route::get('/{project}/files/{attachment}', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'file'])->whereNumber('attachment')->name('file');
     Route::post('/{project}/messages', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'message'])->name('message');
     Route::post('/{project}/secrets', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'storeSecret'])->name('secrets.store');
     Route::post('/{project}/mark-paid', [\Modules\AppBuilder\Http\Controllers\Admin\AdminBuilderController::class, 'markPaid'])->name('mark-paid');

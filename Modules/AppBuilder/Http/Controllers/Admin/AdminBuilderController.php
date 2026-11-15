@@ -60,7 +60,7 @@ class AdminBuilderController extends Controller
                 'role' => $message->role,
                 'text' => $message->content,
                 'question' => (bool) ($message->payload['question'] ?? false),
-                'files' => $message->attachments->pluck('original_name')->values(),
+                'files' => $message->attachments->map(fn ($file) => ['name' => $file->original_name, 'url' => route('admin.builder.file', [$project, $file->id])])->values(),
                 'at' => $message->created_at?->toDateTimeString(),
             ])->values(),
             'secrets' => $this->secrets->listing($project),
@@ -250,5 +250,15 @@ class AdminBuilderController extends Controller
         $secret->delete();
 
         return back()->with('success', __('builder.admin.secret_removed'));
+    }
+
+    /** The file as the customer sent it, under its own name; a picture or a PDF opens in the browser. */
+    public function file(BuilderProject $project, int $attachment): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $file = $project->attachments()->findOrFail($attachment);
+        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($file->path), 404);
+        $inline = $file->isImage() || $file->mime === \Modules\AppBuilder\Models\BuilderAttachment::PDF;
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->response($file->path, $file->original_name, ['Content-Type' => $file->mime], $inline ? 'inline' : 'attachment');
     }
 }

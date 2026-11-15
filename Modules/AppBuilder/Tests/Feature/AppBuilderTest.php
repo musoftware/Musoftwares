@@ -220,6 +220,31 @@ class AppBuilderTest extends TestCase
         }
     }
 
+    public function test_the_owner_opens_a_file_the_customer_sent_and_nobody_else_can(): void
+    {
+        Storage::fake('local');
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $project = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD']);
+        $message = $project->messages()->create(['role' => BuilderMessage::USER, 'content' => 'اعمل لي السيستم ده']);
+        Storage::disk('local')->put('builder/files/plan.pdf', '%PDF-1.4 plan');
+        $file = $project->attachments()->create(['message_id' => $message->id, 'original_name' => 'تحليل_النظام.pdf', 'mime' => 'application/pdf', 'size' => 13, 'path' => 'builder/files/plan.pdf']);
+
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
+        $this->actingAs($customer)->get(route('admin.builder.file', [$project, $file->id]))->assertForbidden();
+
+        $admin = \App\Models\User::factory()->google()->create(['onboarding_completed' => true]);
+        $admin->assignRole('admin');
+        $this->actingAs($admin)->get(route('admin.builder.show', $project))->assertInertia(fn ($page) => $page
+            ->where('messages.0.files.0.name', 'تحليل_النظام.pdf')
+            ->where('messages.0.files.0.url', route('admin.builder.file', [$project, $file->id])));
+        $response = $this->get(route('admin.builder.file', [$project, $file->id]))->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        $this->assertSame('%PDF-1.4 plan', $response->streamedContent());
+
+        // a file of another project is not reached through this one
+        $other = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD']);
+        $this->get(route('admin.builder.file', [$other, $file->id]))->assertNotFound();
+    }
+
     private function geminiAnswers(string $reply): void
     {
         $json = json_encode(['reply' => $reply, 'needs_team' => false, 'secrets' => [], 'quote' => ['ready' => false, 'title' => '', 'spec' => '', 'estimated_output_tokens' => 0, 'kind' => 'build', 'complex' => false, 'design_fee' => 0, 'project_type' => 'other']], JSON_UNESCAPED_UNICODE);

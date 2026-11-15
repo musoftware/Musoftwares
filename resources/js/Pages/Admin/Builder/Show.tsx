@@ -1,6 +1,7 @@
 import React, { FormEvent, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { toast } from 'sonner';
+import { Download } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import { STATUS_LABELS, Person, Visitor, deviceOf } from './Index';
@@ -13,7 +14,7 @@ interface Message {
     role: 'user' | 'assistant' | 'team';
     text: string;
     question: boolean;
-    files: string[];
+    files: { name: string; url: string }[];
     at: string;
 }
 
@@ -110,7 +111,15 @@ function MessageList({ messages }: { messages: Message[] }) {
                         {t(...(WHO[message.role] ?? [message.role, message.role]))}{message.question && ` · ${t('question from the build', 'سؤال من البناء')}`} · <span dir="ltr">{message.at}</span>
                     </p>
                     <p className="whitespace-pre-wrap wrap-anywhere" dir="auto">{message.text}</p>
-                    {message.files.length > 0 && <p className="mt-1 text-sm text-slate-500 wrap-anywhere" dir="auto">{message.files.join(' · ')}</p>}
+                    {message.files.length > 0 && (
+                        <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm wrap-anywhere" dir="auto">
+                            {message.files.map((file) => (
+                                <a key={file.url} href={file.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-700 underline hover:text-blue-900">
+                                    <Download className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />{file.name}
+                                </a>
+                            ))}
+                        </p>
+                    )}
                 </li>
             ))}
         </ol>
