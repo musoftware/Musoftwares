@@ -6,25 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="{{ $state ? 'noindex,nofollow' : 'index,follow' }}">
-    <title>{{ __('builder.page_title') }} | Musoftware</title>
-    @php($shareImage = app(\Modules\AppBuilder\Services\AiPageImage::class)->url(app()->getLocale()))
-    <meta name="description" content="{{ __('builder.og_description') }}">
-    <link rel="canonical" href="{{ route('builder.index') }}">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Musoftware">
-    <meta property="og:title" content="{{ __('builder.og_headline') }}">
-    <meta property="og:description" content="{{ __('builder.og_description') }}">
-    <meta property="og:url" content="{{ route('builder.index') }}">
-    <meta property="og:image" content="{{ $shareImage }}">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="{{ __('builder.og_headline') }}">
-    <meta property="og:locale" content="{{ $rtl ? 'ar_AR' : 'en_US' }}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ __('builder.og_headline') }}">
-    <meta name="twitter:description" content="{{ __('builder.og_description') }}">
-    <meta name="twitter:image" content="{{ $shareImage }}">
+    @include('appbuilder::partials.share-meta')
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">

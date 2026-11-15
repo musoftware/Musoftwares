@@ -236,6 +236,13 @@ class AppBuilderTest extends TestCase
         $fresh = app(\Modules\AppBuilder\Services\AiPageImage::class)->url(app()->getLocale());
         $this->assertNotSame($found[1], $fresh);
         $this->assertFileDoesNotExist($file);
+
+        // Facebook is not signed in: it sees the Google sign-in page, which carries the same card
+        auth()->guard('web')->logout();
+        $this->get('/ai')->assertOk()
+            ->assertSee(route('social.google.redirect', ['redirect' => '/ai']), false)
+            ->assertSee('<meta property="og:image" content="'.$fresh.'">', false)
+            ->assertSee('<meta name="twitter:card" content="summary_large_image">', false);
     }
 
     public function test_the_owner_opens_a_file_the_customer_sent_and_nobody_else_can(): void
