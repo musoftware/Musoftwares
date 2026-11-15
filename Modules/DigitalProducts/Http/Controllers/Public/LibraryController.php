@@ -148,7 +148,7 @@ class LibraryController extends Controller
 
         $meta = [
             'title' => ($product->meta_title ?: $product->title) . ' | مكتبة Musoftware',
-            'description' => $product->meta_description ?: ($product->short_description ?: Str::limit(strip_tags($product->description), 160)),
+            'description' => $product->meta_description ?: ($product->short_description ?: (Str::limit(trim(strip_tags((string) $product->description)), 160) ?: self::writtenDescription($product))),
             'image' => $product->cover_image_path ? $product->cover_url : null,
             'url' => route('library.show', $product->slug),
             'type' => 'book',
@@ -175,6 +175,16 @@ class LibraryController extends Controller
         return DigitalProduct::where('is_published', true)->get(['id', 'slug', 'title'])
             ->first(fn (DigitalProduct $book) => Str::slug((string) $book->title) === $oldSlug)
             ?? abort(404);
+    }
+
+    /** For a book with no description of its own, so search results and shared links still say what it is. */
+    private static function writtenDescription(DigitalProduct $product): string
+    {
+        return __('digitalproducts.written_description', [
+            'title' => $product->title,
+            'pages' => (int) ($product->page_count ?? 0),
+            'price' => $product->is_free ? __('digitalproducts.free') : __('digitalproducts.paid'),
+        ]);
     }
 
     /**

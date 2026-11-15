@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'written_description' => 'كتاب :title الإلكتروني في :pages صفحة بصيغة PDF، :price، من مكتبة Musoftware الرقمية. اقرأ نبذة عنه وحمّله الآن.',
     'digital_library' => 'المكتبة الرقمية',
     'free' => 'مجاناً',
     'paid' => 'مدفوع',

@@ -115,6 +115,15 @@ class DigitalProductsDriveAndSeoTest extends TestCase
             ->assertSee('<meta name="description" content="دليل عملي قصير">', false);
     }
 
+    public function test_a_book_without_a_description_still_says_what_it_is(): void
+    {
+        $book = $this->book();
+        $book->update(['short_description' => null, 'description' => null, 'meta_description' => null]);
+
+        $this->get(route('library.show', $book->slug))->assertOk()
+            ->assertSee('<meta property="og:description" content="'.__('digitalproducts.written_description', ['title' => 'دليل التسويق', 'pages' => 30, 'price' => __('digitalproducts.free')]).'">', false);
+    }
+
     public function test_the_old_admin_book_link_opens_the_book(): void
     {
         $book = $this->book();

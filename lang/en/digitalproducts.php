@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'written_description' => 'The :title e-book: :pages pages as a PDF, :price, from the Musoftware digital library. Read about it and download it now.',
     'digital_library' => 'Digital Library',
     'free' => 'Free',
     'paid' => 'Paid',
