@@ -759,7 +759,7 @@ class AppBuilderTest extends TestCase
 
         $this->actingAs($customer)->get('/ai')->assertOk()
             ->assertSee(__('builder.chats'))->assertSee('متجر قديم')->assertSee('/ai/'.$uuid, false)
-            ->assertSee(__('builder.contact_programmer'))->assertSee(route('company.contact'), false)->assertDontSee('data-size="big"', false);
+            ->assertSee(json_encode(route('company.contact')), false)->assertDontSee('data-size="big"', false);
     }
 
     public function test_the_chat_speaks_the_customers_language_and_never_sends_them_to_the_team(): void

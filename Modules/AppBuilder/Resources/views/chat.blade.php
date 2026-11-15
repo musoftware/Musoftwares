@@ -130,8 +130,6 @@
         .how{margin-top:24px;padding:16px;border:1px solid var(--line);border-radius:16px;text-align:start}
         .how h2{margin:0 0 8px;font-size:16px}
         .how ol{margin:0;padding-inline-start:20px;display:grid;gap:6px;color:var(--muted);font-size:15px;line-height:1.7}
-        .contact{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;padding:0 16px;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;font-weight:600}
-        .contact:hover{border-color:var(--ink)}
         /* the top bar stays at the top while the chat scrolls, so the cart is always one tap away */
         .viewer{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);padding:8px max(16px,calc((100% - 720px) / 2));display:flex;justify-content:flex-end;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
         .viewer a{color:var(--ink);font-weight:600;min-height:44px;display:inline-flex;align-items:center}
@@ -242,7 +240,6 @@
                     @endforeach
                 </ol>
             </section>
-            <a class="contact" href="{{ route('company.contact') }}">{{ __('builder.contact_programmer') }}</a>
         @endunless
     </section>
 </main>
@@ -278,6 +275,7 @@
     const PUSH = @json($push);
     const SIGNED_IN = @json(auth()->check());
     const BASE = @json(route('builder.index'));
+    const CONTACT_URL = @json(route('company.contact'));
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const POLL_MS = 4000;
     const thread = document.getElementById('thread');
@@ -810,8 +808,9 @@
         return node;
     }
 
-    // A customer who saw the price and starts to leave (the mouse heads for the tabs, or they switch away and come
-    // back) is offered a discount once. Closing the tab cannot show our own words; browsers do not allow it.
+    // A customer who starts to leave (the mouse heads for the tabs, or they switch away and come back) is offered the
+    // discount once when they saw a price, otherwise a way to talk to a programmer. Closing the tab cannot show our own
+    // words; browsers do not allow it.
     function watchForLeaving() {
         let away = false;
         // a customer who closes the page on a price may get the discount as a notification later
@@ -825,18 +824,23 @@
         // they came back from that notification: the offer shows at once
         if (state && state.quote && state.quote.offer_now) setTimeout(offerLeaveDiscount, 600);
         document.documentElement.addEventListener('mouseleave', (event) => {
-            if (event.clientY <= 0) offerLeaveDiscount();
+            if (event.clientY <= 0) onLeaving();
         });
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') { away = true; return; }
-            if (away) offerLeaveDiscount();
+            if (away) onLeaving();
             away = false;
         });
     }
 
+    function onLeaving() {
+        if (!offerLeaveDiscount()) offerContact();
+    }
+
+    /** True when the discount was shown. */
     function offerLeaveDiscount() {
         const quote = state && state.quote;
-        if (!quote || !quote.leave_offer || payOpen || waiting || leaveOffered()) return;
+        if (!quote || !quote.leave_offer || payOpen || waiting || leaveOffered()) return false;
         rememberLeaveOffer();
         const dialog = el('dialog', {class: 'leave', 'aria-labelledby': 'leave-title'});
         const take = el('button', {class: 'btn', type: 'button'}, T.leave.take);
@@ -849,6 +853,31 @@
         dialog.addEventListener('close', () => dialog.remove());
         document.body.append(dialog);
         dialog.showModal();
+        return true;
+    }
+
+    /** Once per visit: a customer about to leave can reach a programmer instead. */
+    function offerContact() {
+        if (payOpen || waiting || seenOnce('contact-offer')) return;
+        const dialog = el('dialog', {class: 'leave', 'aria-labelledby': 'contact-title'});
+        const go = el('a', {class: 'btn', href: CONTACT_URL}, T.contact.go);
+        const stay = el('button', {class: 'btn ghost', type: 'button'}, T.contact.stay);
+        const actions = el('div', {class: 'actions'});
+        actions.append(go, stay);
+        dialog.append(el('h2', {id: 'contact-title'}, T.contact.title), el('p', {}, T.contact.body), actions);
+        stay.addEventListener('click', () => dialog.close());
+        dialog.addEventListener('close', () => dialog.remove());
+        document.body.append(dialog);
+        dialog.showModal();
+    }
+
+    // true the second time in this browser tab; private mode shows it each time, which is harmless
+    function seenOnce(key) {
+        try {
+            if (sessionStorage.getItem(key) === '1') return true;
+            sessionStorage.setItem(key, '1');
+        } catch (error) { /* private mode */ }
+        return false;
     }
 
     async function takeLeaveDiscount(dialog, button, url) {
