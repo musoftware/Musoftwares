@@ -40,6 +40,8 @@ class ProjectStateResource extends JsonResource
             'looking' => $this->awaiting_look ? (app(\Modules\AppBuilder\Services\LinkLooks::class)->isReadingAFile($this->resource) ? 'file' : 'link') : null,
             // the look is done and the answer is being written in another request, so the page keeps asking
             'answering' => ! $this->awaiting_look && $this->isAnsweringAfterLook(),
+            // the chat asked the programmer something and brings the answer when it comes
+            'asking_engineer' => app(\Modules\AppBuilder\Services\EngineerQuestions::class)->isAsking($this->resource),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // after payment: the build waits a while for the full-quality originals of the pictures sent smaller
             'originals' => $this->originals(),

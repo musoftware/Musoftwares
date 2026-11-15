@@ -119,6 +119,12 @@ class BuilderProject extends Model
         return $this->belongsTo(\App\Models\User::class, 'referrer_user_id');
     }
 
+    /** What the chat asked the programmer, and the answers it got. */
+    public function engineerQuestions(): HasMany
+    {
+        return $this->hasMany(BuilderEngineerQuestion::class, 'project_id');
+    }
+
     public function messages(): HasMany
     {
         return $this->hasMany(BuilderMessage::class, 'project_id')->orderBy('id');

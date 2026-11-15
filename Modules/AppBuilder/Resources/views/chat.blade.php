@@ -1116,6 +1116,7 @@
         messages.forEach((message) => thread.append(messageNode(message)));
         if (waiting || (state && state.answering)) thread.append(statusNode(T.thinking));
         if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
+        if (state && state.asking_engineer && !state.answering) thread.append(statusNode(T.asking_engineer));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.study) thread.append(studyNode(state.study));
         if (state && state.inspection) thread.append(inspectionNode(state.inspection));
@@ -1144,7 +1145,7 @@
         const studyWriting = state && state.study && state.study.status === 'writing';
         // a request in line or being built changes on its own; a paid one appears when the gateway reports it
         const requestsMoving = state && state.requests && state.requests.items.some((item) => ['reviewing', 'ready', 'building'].includes(item.status));
-        if (!state || (!state.progress && !state.looking && !state.answering && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
+        if (!state || (!state.progress && !state.looking && !state.answering && !state.asking_engineer && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }
             render();

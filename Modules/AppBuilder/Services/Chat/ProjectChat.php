@@ -4,6 +4,7 @@ namespace Modules\AppBuilder\Services\Chat;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\AppBuilder\Models\BuilderEngineerQuestion;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 use Illuminate\Http\UploadedFile;
@@ -133,7 +134,35 @@ class ProjectChat
         return DB::transaction(fn () => $this->record($project, $turn, $question));
     }
 
-    private function record(BuilderProject $project, ChatTurn $turn, BuilderMessage $question): BuilderMessage
+    /**
+     * The programmer answered what the chat asked: the chat writes its next message with the answer, once. The answer
+     * stays in that message, so later turns know it too.
+     */
+    public function continueAfterEngineer(BuilderEngineerQuestion $asked): void
+    {
+        $project = $asked->project;
+        $customer = $project->lastCustomerMessage();
+        if ($customer === null) {
+            return;
+        }
+
+        $note = "[You told the customer you would ask the programmer: \"{$asked->question}\". The programmer answered:\n{$asked->answer}\n"
+            .'Write your next message to the customer now with this answer, in your own plain words and in the dialect of the chat. Do not ask the programmer about it again.]';
+        try {
+            $turn = $this->reply($project, $this->systemPrompt($project), [...$this->turns($project), ['role' => BuilderMessage::USER, 'content' => $note]]);
+        } catch (ChatUnavailable $exception) {
+            Log::warning('App builder: the answer after the programmer could not be written', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
+
+            return;
+        }
+
+        DB::transaction(function () use ($project, $turn, $customer, $asked): void {
+            $answer = $this->record($project, $turn, $customer, mayAsk: false);
+            $answer->update(['payload' => ['engineer' => ['question' => $asked->question, 'answer' => $asked->answer]] + (array) $answer->payload]);
+        });
+    }
+
+    private function record(BuilderProject $project, ChatTurn $turn, BuilderMessage $question, bool $mayAsk = true): BuilderMessage
     {
         $this->keepSecretsApart($project, $turn, $question);
 
@@ -153,6 +182,9 @@ class ProjectChat
         ]);
         if ($turn->notSerious) {
             $this->bans->countStrike($project);
+        }
+        if ($mayAsk && $turn->askEngineer !== '') {
+            app(\Modules\AppBuilder\Services\EngineerQuestions::class)->ask($project, $turn->askEngineer);
         }
 
         return $answer;

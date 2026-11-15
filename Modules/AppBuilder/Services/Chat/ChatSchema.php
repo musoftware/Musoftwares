@@ -28,6 +28,8 @@ final class ChatSchema
             'properties' => [
                 'reply' => ['type' => 'string'],
                 'needs_team' => ['type' => 'boolean'],
+                // a fact this answer depends on that the chat is not sure of, sent to the programmer; '' for none
+                'ask_engineer' => ['type' => 'string'],
                 'quote' => $quote,
                 // true when a price is already shown and this answer changes nothing in what gets built
                 'keep_quote' => ['type' => 'boolean'],
@@ -48,7 +50,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'ask_engineer', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'secrets'],
             'additionalProperties' => false,
         ];
     }

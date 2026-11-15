@@ -53,11 +53,12 @@ class AppBuilderTest extends TestCase
         });
     }
 
-    private function answer(string $reply, int $tokens = 0, bool $needsTeam = false): void
+    private function answer(string $reply, int $tokens = 0, bool $needsTeam = false, string $askEngineer = ''): void
     {
         $this->script[] = ChatTurn::fromArray([
             'reply' => $reply,
             'needs_team' => $needsTeam,
+            'ask_engineer' => $askEngineer,
             'quote' => ['ready' => $tokens > 0, 'title' => $tokens ? 'منيو مطعم' : '', 'spec' => $tokens ? 'Build a restaurant menu page.' : '', 'estimated_output_tokens' => $tokens],
         ], 1200, 300);
     }
@@ -970,6 +971,29 @@ class AppBuilderTest extends TestCase
         $this->assertSame([], $this->getJson('/api/builder/worker/looks', $this->worker())->json('looks'));
         $last = collect(app(ChatModel::class)->seen)->last();
         $this->assertStringContainsString('send it again tomorrow', json_encode($last, JSON_UNESCAPED_UNICODE));
+    }
+
+    public function test_what_the_chat_does_not_know_goes_to_the_programmer_and_the_answer_comes_back(): void
+    {
+        $this->answer('سؤال مهم، هسأل المبرمج وأرجعلك بالرد هنا.', askEngineer: 'Can an iPhone app be installed without the App Store?');
+        $uuid = $this->postJson('/ai/messages', ['text' => 'ينفع التطبيق ينزل على الايفون من غير اب ستور؟'])->assertOk()->json('uuid');
+        $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('asking_engineer', true);
+
+        $questions = $this->getJson('/api/builder/worker/engineer-questions', $this->worker())->assertOk()->json('questions');
+        $this->assertSame('Can an iPhone app be installed without the App Store?', $questions[0]['question']);
+        $this->assertStringContainsString('اب ستور', $questions[0]['chat']);
+        // handed out once while the programmer works on it
+        $this->assertSame([], $this->getJson('/api/builder/worker/engineer-questions', $this->worker())->json('questions'));
+
+        $this->answer('المبرمج بيقول: الايفون لازم يتنشر من خلال اب ستور أو TestFlight.');
+        $this->postJson('/api/builder/worker/engineer-questions/'.$questions[0]['id'], ['answer' => 'No. iPhone apps go through the App Store or TestFlight.'], $this->worker())->assertOk();
+        // the same answer sent twice writes nothing more
+        $this->postJson('/api/builder/worker/engineer-questions/'.$questions[0]['id'], ['answer' => 'again'], $this->worker())->assertOk();
+
+        $state = $this->getJson('/ai/'.$uuid.'/state')->assertJsonPath('asking_engineer', false);
+        $this->assertSame('المبرمج بيقول: الايفون لازم يتنشر من خلال اب ستور أو TestFlight.', collect($state->json('messages'))->last()['text']);
+        $this->assertStringContainsString('iPhone apps go through the App Store', json_encode(collect(app(ChatModel::class)->seen)->last(), JSON_UNESCAPED_UNICODE));
+        $this->assertCount(3, BuilderProject::where('uuid', $uuid)->firstOrFail()->messages);
     }
 
     public function test_the_page_keeps_waiting_while_the_answer_after_a_look_is_written(): void

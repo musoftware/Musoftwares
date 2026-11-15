@@ -33,6 +33,8 @@ final readonly class ChatTurn
         public bool $isNewProject = false,
         /** the customer's message only played with the chat; enough of these close the chat */
         public bool $notSerious = false,
+        /** a fact the chat is not sure of, asked of the programmer; '' when it knows */
+        public string $askEngineer = '',
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -61,6 +63,7 @@ final readonly class ChatTurn
             replacesRequest: max(0, (int) ($data['replaces_request'] ?? 0)),
             isNewProject: ($quote['kind'] ?? 'build') === 'new_project',
             notSerious: (bool) ($data['not_serious'] ?? false),
+            askEngineer: trim((string) ($data['ask_engineer'] ?? '')),
         );
     }
 
@@ -70,6 +73,7 @@ final readonly class ChatTurn
         return [
             'reply' => $this->reply,
             'needs_team' => $this->needsTeam,
+            'ask_engineer' => $this->askEngineer,
             'quote' => [
                 'ready' => $this->quoteReady,
                 'title' => $this->title,
