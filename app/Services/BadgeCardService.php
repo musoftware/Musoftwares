@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\LoyaltyTier;
 use App\Models\User;
 use App\Models\UserReferral;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 /**
  * The client's shareable badge card: a public link and the few details it shows.
@@ -17,16 +17,38 @@ class BadgeCardService
 
     private const DEFAULT_COLOR = '#CD7F32';
 
-    /** A link that works for anyone who has it, but can't be guessed from the user id. */
+    private const TOKEN_LENGTH = 16;
+
+    /** A short link that works for anyone who has it: a random code, never the user id, so it shows nothing. */
     public function linkFor(User $user): string
     {
-        return URL::signedRoute('badge-card.show', ['user' => $user->id]);
+        return route('badge-card.show', ['token' => $this->tokenFor($user)]);
     }
 
-    /** The shared picture of the card, signed like the card itself. */
+    /** The shared picture of the card, under the same code. */
     public function imageLinkFor(User $user): string
     {
-        return URL::signedRoute('badge-card.image', ['user' => $user->id]);
+        return route('badge-card.image', ['token' => $this->tokenFor($user)]);
+    }
+
+    public function userFor(string $token): ?User
+    {
+        return User::where('badge_token', $token)->first();
+    }
+
+    /** The client's code, made the first time their card is shown. */
+    private function tokenFor(User $user): string
+    {
+        if (! empty($user->badge_token)) {
+            return $user->badge_token;
+        }
+
+        do {
+            $token = Str::lower(Str::random(self::TOKEN_LENGTH));
+        } while (User::where('badge_token', $token)->exists());
+        $user->forceFill(['badge_token' => $token])->saveQuietly();
+
+        return $token;
     }
 
     /**

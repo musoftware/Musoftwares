@@ -99,7 +99,24 @@ class BadgeCardTest extends TestCase
         $size = getimagesizefromstring($image->getContent());
         $this->assertSame([1200, 630], [$size[0], $size[1]]);
 
-        $this->get("/badge/{$user->id}/image.png")->assertForbidden();
+        $this->get("/badge/{$user->id}/image.png")->assertNotFound();
+    }
+
+    public function test_the_card_link_is_a_random_code_and_old_signed_links_still_open_it(): void
+    {
+        $user = $this->clientWithPoints(0);
+        $cards = app(BadgeCardService::class);
+        $link = $cards->linkFor($user);
+
+        // no user id and no signature: nothing to count, nothing for Facebook to break
+        $this->assertMatchesRegularExpression('#/badge/[a-z0-9]{16}$#', $link);
+        $this->assertSame($link, $cards->linkFor($user->refresh()));
+        $this->get($link)->assertOk()->assertSee('Ahmed');
+
+        $oldSigned = \Illuminate\Support\Facades\URL::signedRoute('badge-old', ['user' => $user->id]);
+        $this->get($oldSigned)->assertStatus(301)->assertRedirect($link);
+
+        $this->get('/badge/abcdefghijklmnop')->assertNotFound();
     }
 
     public function test_arabic_names_are_joined_for_the_picture(): void

@@ -273,12 +273,14 @@ Route::get('/dashboard/directory', [DashboardController::class, 'directory'])
 Route::get('/loyalty', [\App\Http\Controllers\Client\LoyaltyController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('loyalty.index');
 
-// Public badge card the client shares. Signed so the link can't be guessed from the user id.
-Route::get('/badge/{user}', [\App\Http\Controllers\BadgeCardController::class, 'show'])
-    ->middleware(['signed', 'throttle:60,1'])->name('badge-card.show');
+// Public badge card the client shares, under a random code per client (never the user id)
+Route::get('/badge/{user}', [\App\Http\Controllers\BadgeCardController::class, 'oldLink'])
+    ->whereNumber('user')->middleware(['signed', 'throttle:60,1'])->name('badge-old');
+Route::get('/badge/{token}', [\App\Http\Controllers\BadgeCardController::class, 'show'])
+    ->where('token', '[a-z0-9]{16,32}')->middleware('throttle:60,1')->name('badge-card.show');
 // The picture shown when that link is shared: the badge with the client's name and level
-Route::get('/badge/{user}/image.png', [\App\Http\Controllers\BadgeCardController::class, 'image'])
-    ->middleware(['signed', 'throttle:60,1'])->name('badge-card.image');
+Route::get('/badge/{token}/image.png', [\App\Http\Controllers\BadgeCardController::class, 'image'])
+    ->where('token', '[a-z0-9]{16,32}')->middleware('throttle:60,1')->name('badge-card.image');
 
 // ── Client Projects Portal ────────────────────────────────────────
 // Platform users (clients) view the admin-managed projects assigned to them, including a
