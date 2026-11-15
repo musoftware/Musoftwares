@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import FormErrorSummary from '@/Components/Admin/FormErrorSummary';
-import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle, Mail, Plus, Trash2 } from 'lucide-react';
+import { Save, ArrowLeft, Info, AlertTriangle, CheckCircle, Mail, Plus, Trash2, Hash } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -120,18 +120,26 @@ export default function Edit({ user, currencies = [], plans = [], statuses = [],
             {confirmDialog}
 
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                     <div>
                         <p className="text-sm text-gray-500 font-medium tracking-wider uppercase">{__('whatsapp.ui.system')}</p>
                         <h1 className="text-3xl font-bold text-gray-900">{__('general.edit_account')}</h1>
-                        <p className="text-gray-500 mt-1">{user.name}</p>
+                        <p className="text-gray-500 mt-1">{user.name} <span className="font-mono text-gray-400" dir="ltr">#{user.id}</span></p>
                     </div>
-                    <Link href={`/admin/users/${user.id}`}>
-                        <Button variant="outline">
-                            <ArrowLeft className="me-2 h-4 w-4" />
-                            {__('general.back')}
-                        </Button>
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                        <Link href={`/admin/users/${user.id}/change-id`}>
+                            <Button variant="outline">
+                                <Hash className="me-2 h-4 w-4" />
+                                {__('admin.user_id_change_title')}
+                            </Button>
+                        </Link>
+                        <Link href={`/admin/users/${user.id}`}>
+                            <Button variant="outline">
+                                <ArrowLeft className="me-2 h-4 w-4" />
+                                {__('general.back')}
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
