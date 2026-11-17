@@ -99,7 +99,7 @@ class PlanPaymentLinkTest extends TestCase
         $this->assertSame('gold-saver', $link->metadata['plan']['object']);
         $this->assertSame('https://gold.example.test/billing/success', $link->metadata['return_url']);
         $this->assertTrue($link->expires_at->isFuture());
-        $response->assertJson(['url' => route('guest.payment-links.show', ['uuid' => $link->uuid]), 'currency' => 'USD']);
+        $response->assertJson(['url' => route('guest.payment-links.show', ['uuid' => $link->uuid]), 'currency' => 'EGP']);
     }
 
     public function test_return_url_on_a_foreign_host_is_dropped(): void

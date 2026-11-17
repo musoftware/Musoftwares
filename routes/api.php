@@ -184,7 +184,10 @@ Route::post('webhooks/incoming/{source}', [WebhookController::class, 'handle'])
 
 // ── Geolocation ──────────────────────────────────────────────────────────────
 Route::get('ip-country', function (Request $request) {
-    $ip = $request->ip();
+    // Server-to-server callers (e.g. GoldSaver) pass their visitor's IP as ?ip=; without
+    // it every lookup would geolocate the calling server instead of the visitor.
+    $asked = (string) $request->query('ip', '');
+    $ip = filter_var($asked, FILTER_VALIDATE_IP) ? $asked : $request->ip();
     $service = new IpGeolocationService;
     $country = $service->getCountryFromIp($ip);
     $currency = $service->getCurrencyCodeForCountry($country);
