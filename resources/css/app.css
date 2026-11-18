@@ -485,3 +485,54 @@ select:not([multiple]):not([size]) {
 
 /* fields marked by FormErrorSummary: native selects and textareas get the same red edge as inputs */
 select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, .15); }
+
+/*
+ * Calm motion. One set of curves and timings for the guest pages and the client home.
+ * Entrances use ease-out and stay under 300ms; nothing bounces. Reduced motion turns it all off.
+ */
+:root {
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+    --motion-fast: 160ms;
+    --motion-base: 240ms;
+}
+
+/* Fades up into place. Set --i on each item to stagger them by 50ms. */
+@keyframes calm-rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.calm-rise {
+    animation: calm-rise 420ms var(--ease-out-strong) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* Any pressable thing gets a small press-down so the user feels it was heard. */
+.calm-press {
+    transition: transform var(--motion-fast) var(--ease-out-strong), background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+}
+.calm-press:active:not(:disabled) { transform: scale(0.97); }
+
+/* Progress bars fill from zero the first time they show. */
+@keyframes calm-fill { from { transform: scaleX(0); } }
+.calm-fill {
+    transform-origin: left center;
+    animation: calm-fill 700ms var(--ease-out-strong) both;
+    animation-delay: 150ms;
+}
+[dir="rtl"] .calm-fill { transform-origin: right center; }
+
+/* Draws a check mark stroke. Use on an svg path with pathLength="1". */
+@keyframes calm-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.calm-draw {
+    stroke-dasharray: 1;
+    animation: calm-draw 420ms var(--ease-out-strong) 200ms both;
+}
+
+/* Small messages under a field fade in instead of jumping in. */
+@keyframes calm-fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+.calm-fade { animation: calm-fade var(--motion-base) var(--ease-out-strong) both; }
+
+@media (prefers-reduced-motion: reduce) {
+    .calm-rise, .calm-fill, .calm-draw, .calm-fade { animation: none; }
+    .calm-press:active:not(:disabled) { transform: none; }
+}

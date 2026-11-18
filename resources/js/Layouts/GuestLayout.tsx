@@ -1,106 +1,73 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
-import { PropsWithChildren, useRef } from 'react';
+import { PropsWithChildren } from 'react';
 import { __ } from '@/lib/i18n';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
 import FloatingWhatsAppButton from '@/Components/FloatingWhatsAppButton';
 import ThemeToggle from '@/Components/ThemeToggle';
-import { ShieldCheck, Cpu, Database, Zap } from 'lucide-react';
 
+/**
+ * Sign in, sign up and password pages. A quiet gray picture side on large screens,
+ * and a plain white form side with lots of space. The form fades up once on load.
+ */
 export default function Guest({ children }: PropsWithChildren) {
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    useGSAP(() => {
-        if (containerRef.current) {
-            gsap.from(containerRef.current, {
-                y: 20,
-                opacity: 0,
-                duration: 0.6,
-                ease: 'power3.out',
-            });
-        }
-    });
-
     return (
-        <div className="min-h-screen flex w-full bg-[#ffffff] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] font-sans selection:bg-[#0071e3]/20 selection:text-[#0071e3]">
-            {/* Desktop Left Column: Apple Showcase View */}
-            <div className="hidden lg:flex lg:w-[42%] xl:w-[45%] bg-[#f5f5f7] dark:bg-[#161617] text-[#1d1d1f] dark:text-[#f5f5f7] flex-col justify-between p-12 lg:p-16 border-e border-black/5 dark:border-white/10 relative overflow-hidden">
-                {/* Subtle Ambient Glow */}
-                <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#0071e3]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex min-h-screen w-full overflow-x-clip bg-white font-sans text-[#111] dark:bg-zinc-950 dark:text-zinc-100">
+            <ShowcasePanel />
 
-                {/* Top Branding Header */}
-                <div className="flex items-center space-x-3 relative z-10">
-                    <Link href="/" className="flex items-center space-x-3 group">
-                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/10 shadow-xs flex items-center justify-center p-2">
-                            <ApplicationLogo className="w-full h-full object-contain" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
-                                Musoftware
-                            </span>
-                            <span className="text-[10px] uppercase tracking-wider text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 font-semibold">
-                                {__('frontend.guest_layout_tagline')}
-                            </span>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* Middle Content: Real Vector Illustration Showcase */}
-                <div className="my-auto max-w-sm space-y-4 py-6 relative z-10">
-                    <div className="bg-white dark:bg-[#1d1d1f] border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden shadow-xl shadow-black/5 p-3">
-                        <img 
-                            src="/images/illustrations/auth_showcase.jpg" 
-                            alt={__('frontend.guest_layout_showcase_alt')} 
-                            className="w-full h-auto object-cover rounded-[18px]"
-                        />
-                    </div>
-                    <div className="space-y-1 text-center">
-                        <h3 className="text-sm font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
-                            {__('frontend.guest_layout_showcase_title')}
-                        </h3>
-                        <p className="text-[11px] text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 leading-relaxed font-sans">
-                            {__('frontend.guest_layout_showcase_desc')}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Bottom Footer Links */}
-                <div className="flex items-center justify-between text-xs text-[#1d1d1f]/50 dark:text-[#f5f5f7]/50 border-t border-black/5 dark:border-white/10 pt-6 relative z-10">
-                    <span>© {new Date().getFullYear()} Musoftware</span>
-                    <div className="flex space-x-6 text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60">
-                        <Link href="/docs" className="hover:text-[#0071e3] transition-colors">{__('general.help')}</Link>
-                        <Link href="/privacy-policy" className="hover:text-[#0071e3] transition-colors">{__('general.privacy')}</Link>
-                        <Link href="/terms-of-service" className="hover:text-[#0071e3] transition-colors">{__('general.terms')}</Link>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Side / Centered Form Container */}
-            <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-16 relative bg-white dark:bg-[#090d16]">
-                {/* Theme Toggle Top Right */}
-                <div className="absolute top-6 end-6 z-20">
-                    <ThemeToggle className="h-8 w-8" />
-                </div>
-
-                {/* Mobile / Tablet Minimal Top Bar */}
-                <div className="absolute top-6 start-6 lg:hidden flex items-center space-x-2.5">
-                    <Link href="/" className="flex items-center space-x-2 group">
-                        <div className="w-8 h-8 rounded-lg bg-[#f5f5f7] dark:bg-[#161617] border border-black/5 dark:border-white/10 flex items-center justify-center p-1.5">
-                            <ApplicationLogo className="w-full h-full object-contain" />
-                        </div>
-                        <span className="text-base font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">
-                            Musoftware
+            <main className="flex flex-1 flex-col px-4 py-6 sm:px-8 lg:px-16">
+                <div className="flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2.5 lg:invisible">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F8F8F8] p-1.5 dark:bg-zinc-900">
+                            <ApplicationLogo className="h-full w-full object-contain" />
                         </span>
+                        <span className="text-base font-semibold tracking-tight">Musoftware</span>
                     </Link>
+                    <ThemeToggle className="h-9 w-9" />
                 </div>
 
-                {/* Centered Compact Auth Card Anchor */}
-                <div ref={containerRef} className="w-full max-w-[420px] mx-auto bg-white dark:bg-[#161617] border border-black/5 dark:border-white/10 rounded-[28px] p-8 sm:p-10 shadow-xl shadow-black/5 transition-all">
-                    {children}
+                <div className="flex flex-1 items-center justify-center py-10 sm:py-16">
+                    <div className="calm-rise w-full max-w-[400px]">{children}</div>
                 </div>
-            </div>
+            </main>
+
             <FloatingWhatsAppButton />
         </div>
+    );
+}
+
+function ShowcasePanel() {
+    return (
+        <aside className="hidden flex-col justify-between bg-[#F8F8F8] p-12 dark:bg-zinc-900 lg:flex lg:w-[42%] xl:w-[45%] xl:p-16">
+            <Link href="/" className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-2 dark:bg-zinc-800">
+                    <ApplicationLogo className="h-full w-full object-contain" />
+                </span>
+                <span className="flex flex-col">
+                    <span className="text-lg font-semibold tracking-tight">Musoftware</span>
+                    <span className="text-xs text-[#555] dark:text-zinc-400">{__('frontend.guest_layout_tagline')}</span>
+                </span>
+            </Link>
+
+            <figure className="mx-auto w-full max-w-sm space-y-6">
+                <img
+                    src="/images/illustrations/auth_showcase.jpg"
+                    alt={__('frontend.guest_layout_showcase_alt')}
+                    className="w-full rounded-[20px] object-cover"
+                />
+                <figcaption className="space-y-2 text-center">
+                    <p className="text-[15px] font-semibold">{__('frontend.guest_layout_showcase_title')}</p>
+                    <p className="text-sm leading-relaxed text-[#555] dark:text-zinc-400">{__('frontend.guest_layout_showcase_desc')}</p>
+                </figcaption>
+            </figure>
+
+            <div className="flex items-center justify-between text-[13px] text-[#555] dark:text-zinc-400">
+                <span>© {new Date().getFullYear()} Musoftware</span>
+                <nav className="flex gap-6">
+                    <Link href="/docs" className="hover:text-[#111] dark:hover:text-white">{__('general.help')}</Link>
+                    <Link href="/privacy-policy" className="hover:text-[#111] dark:hover:text-white">{__('general.privacy')}</Link>
+                    <Link href="/terms-of-service" className="hover:text-[#111] dark:hover:text-white">{__('general.terms')}</Link>
+                </nav>
+            </div>
+        </aside>
     );
 }

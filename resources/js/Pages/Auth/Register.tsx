@@ -1,11 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { FormEventHandler, ReactNode } from 'react';
 import { __ } from '@/lib/i18n';
+import { AuthField, PasswordField } from '@/Components/Auth/AuthField';
+import { AuthFooter, AuthHeader, AuthSubmit, GoogleSignIn, authLinkClass } from '@/Components/Auth/AuthParts';
+import { PasswordStrength } from '@/Components/Auth/PasswordStrength';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -17,253 +16,112 @@ export default function Register() {
         marketing_consent: false,
     });
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: '' });
-
-    const checkPasswordStrength = (pass: string) => {
-        let score = 0;
-        if (pass.length > 7) score += 1;
-        if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) score += 1;
-        if (/\d/.test(pass)) score += 1;
-        if (/[^a-zA-Z\d]/.test(pass)) score += 1;
-
-        let label = '';
-        if (score === 0) label = '';
-        else if (score === 1) label = __('general.weak');
-        else if (score === 2) label = __('general.fair');
-        else if (score === 3) label = __('general.good');
-        else if (score === 4) label = __('general.strong');
-
-        setPasswordStrength({ score, label });
-    };
-
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        // One password box with an eye button; the confirm value is the same text.
+        post(route('register'), { onFinish: () => reset('password', 'password_confirmation') });
+    };
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+    const setPassword = (value: string) => {
+        setData((current) => ({ ...current, password: value, password_confirmation: value }));
     };
 
     return (
         <GuestLayout>
             <Head title={__('general.register')} />
 
-            <div className="space-y-6">
-                <div className="space-y-1.5">
-                    <h1 className="text-2xl font-bold tracking-tight text-[#1d1d1f] dark:text-white font-sans">{__('general.create_your_account')}</h1>
-                    <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 font-sans">{__('general.manage_invoices_wallet_and_services_from_one_workspace')}</p>
-                </div>
+            <div className="space-y-8">
+                <AuthHeader title={__('general.create_your_account')} />
 
-                <div className="pt-1">
-                    <a href={route('social.google.redirect')} className="flex w-full items-center justify-center space-x-2 rounded-[980px] border border-black/10 dark:border-white/15 bg-white dark:bg-[#1d1d1f] px-4 py-2.5 text-xs font-semibold text-[#1d1d1f] dark:text-white shadow-xs hover:bg-[#f5f5f7] dark:hover:bg-[#2d2d2f] transition-all">
-                        <svg className="w-4 h-4" viewBox="0 0 24 24">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                        </svg>
-                        <span>{__('general.continue_with_google')}</span>
-                    </a>
-                </div>
+                <div className="space-y-6">
+                    <GoogleSignIn href={route('social.google.redirect')} />
 
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-black/5 dark:border-white/10" />
-                    </div>
-                    <div className="relative flex justify-center text-[10px] uppercase tracking-wider font-semibold">
-                        <span className="bg-white dark:bg-[#161617] px-3 text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40">
-                            {__('general.or_continue_with')}
-                        </span>
-                    </div>
-                </div>
-
-                <form onSubmit={submit} className="space-y-4">
-                    <div className="space-y-1.5">
-                        <Label htmlFor="name" className="text-xs font-semibold text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80">{__('general.full_name_1')}</Label>
-                        <Input
+                    <form onSubmit={submit} className="space-y-5" noValidate>
+                        <AuthField
                             id="name"
-                            name="name"
+                            label={__('general.full_name_1')}
                             placeholder={__('general.john_doe')}
                             value={data.name}
                             autoComplete="name"
                             autoFocus
+                            error={errors.name}
                             onChange={(e) => setData('name', e.target.value)}
-                            required
-                            className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 dark:border-white/15 bg-[#f5f5f7]/50 dark:bg-black/40 text-[#1d1d1f] dark:text-white focus:bg-white dark:focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                         />
-                        {errors.name && (
-                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.name}</p>
-                        )}
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="email" className="text-xs font-semibold text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80">{__('general.email_address_1')}</Label>
-                        <Input
+                        <AuthField
                             id="email"
                             type="email"
-                            name="email"
+                            inputMode="email"
+                            label={__('general.email_address_1')}
                             placeholder={__('general.name_company_com')}
                             value={data.email}
                             autoComplete="username"
+                            error={errors.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            required
-                            className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 dark:border-white/15 bg-[#f5f5f7]/50 dark:bg-black/40 text-[#1d1d1f] dark:text-white focus:bg-white dark:focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
                         />
-                        {errors.email && (
-                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.email}</p>
-                        )}
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="password" className="text-xs font-semibold text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80">
-                            {__('general.password')}
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="password"
-                                type={showPassword ? 'text' : 'password'}
-                                name="password"
-                                placeholder="••••••••"
-                                value={data.password}
-                                autoComplete="new-password"
-                                onChange={(e) => {
-                                    setData('password', e.target.value);
-                                    checkPasswordStrength(e.target.value);
-                                }}
-                                required
-                                className="h-10 px-3 py-2 pe-10 text-sm rounded-xl border-black/10 dark:border-white/15 bg-[#f5f5f7]/50 dark:bg-black/40 text-[#1d1d1f] dark:text-white focus:bg-white dark:focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute end-3 top-3 text-[#1d1d1f]/40 dark:text-[#f5f5f7]/40 hover:text-[#1d1d1f] dark:hover:text-white transition-colors"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                            >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                        </div>
-                        {data.password.length > 0 && (
-                            <div className="mt-2">
-                                <div className="flex items-center space-x-1">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <div 
-                                            key={i} 
-                                            className={`h-1 w-full rounded-full transition-all duration-300 ${
-                                                passwordStrength.score >= i 
-                                                    ? (passwordStrength.score <= 2 ? 'bg-[#ff9500]' : passwordStrength.score === 3 ? 'bg-[#ffcc00]' : 'bg-[#34c759]') 
-                                                    : 'bg-black/5 dark:bg-white/10'
-                                            }`} 
-                                        />
-                                    ))}
-                                </div>
-                                {passwordStrength.label && (
-                                    <p className={`text-[10px] font-semibold mt-1.5 uppercase tracking-wider ${
-                                        passwordStrength.score <= 2 ? 'text-[#ff9500]' : 
-                                        passwordStrength.score === 3 ? 'text-[#ff9500]' : 
-                                        'text-[#34c759]'
-                                    }`}>
-                                        {passwordStrength.label}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                        {errors.password && (
-                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password}</p>
-                        )}
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <Label htmlFor="password_confirmation" className="text-xs font-semibold text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80">{__('general.confirm_password')}</Label>
-                        <Input
-                            id="password_confirmation"
-                            type={showPassword ? 'text' : 'password'}
-                            name="password_confirmation"
-                            placeholder="••••••••"
-                            value={data.password_confirmation}
+                        <PasswordField
+                            id="password"
+                            label={__('general.password')}
+                            value={data.password}
                             autoComplete="new-password"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            required
-                            className="h-10 px-3 py-2 text-sm rounded-xl border-black/10 dark:border-white/15 bg-[#f5f5f7]/50 dark:bg-black/40 text-[#1d1d1f] dark:text-white focus:bg-white dark:focus:bg-black/60 focus-visible:ring-2 focus-visible:ring-[#0071e3] transition-all font-normal"
+                            error={errors.password ?? errors.password_confirmation}
+                            hint={<PasswordStrength password={data.password} />}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
-                        {errors.password_confirmation && (
-                            <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.password_confirmation}</p>
-                        )}
-                    </div>
 
-                    <div className="space-y-3 pt-1">
-                        <div>
-                            <div className="flex items-start gap-2.5">
-                                <input
-                                    type="checkbox"
-                                    id="privacy_consent"
-                                    name="privacy_consent"
-                                    required
-                                    checked={data.privacy_consent}
-                                    onChange={(e) => setData('privacy_consent', e.target.checked)}
-                                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 dark:border-white/25 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
-                                />
-                                <Label
-                                    htmlFor="privacy_consent"
-                                    className="text-xs font-medium text-[#1d1d1f]/80 dark:text-[#f5f5f7]/80 cursor-pointer select-none leading-relaxed"
-                                >
-                                    {__('privacy_compliance.register_privacy_consent_label')}{' '}
-                                    (<Link href="/privacy-policy" className="font-semibold text-[#0071e3] hover:underline">{__('privacy_compliance.read_privacy_policy')}</Link>
-                                    {' / '}
-                                    <Link href="/terms-of-service" className="font-semibold text-[#0071e3] hover:underline">{__('privacy_compliance.read_terms')}</Link>)
-                                </Label>
-                            </div>
-                            {errors.privacy_consent && (
-                                <p className="text-xs text-[#ff3b30] font-medium mt-1">{errors.privacy_consent}</p>
-                            )}
-                        </div>
-
-                        <div className="flex items-start gap-2.5">
-                            <input
-                                type="checkbox"
+                        <div className="space-y-3 pt-1">
+                            <ConsentBox
+                                id="privacy_consent"
+                                checked={data.privacy_consent}
+                                error={errors.privacy_consent}
+                                onChange={(checked) => setData('privacy_consent', checked)}
+                            >
+                                {__('privacy_compliance.register_privacy_consent_label')}{' '}
+                                (<Link href="/privacy-policy" className={authLinkClass}>{__('privacy_compliance.read_privacy_policy')}</Link>
+                                {' / '}
+                                <Link href="/terms-of-service" className={authLinkClass}>{__('privacy_compliance.read_terms')}</Link>)
+                            </ConsentBox>
+                            <ConsentBox
                                 id="marketing_consent"
-                                name="marketing_consent"
                                 checked={data.marketing_consent}
-                                onChange={(e) => setData('marketing_consent', e.target.checked)}
-                                className="mt-0.5 h-4 w-4 shrink-0 rounded border-black/25 dark:border-white/25 text-[#0071e3] focus:ring-[#0071e3] transition-colors cursor-pointer"
-                            />
-                            <Label
-                                htmlFor="marketing_consent"
-                                className="text-xs font-normal text-[#1d1d1f]/65 dark:text-[#f5f5f7]/65 cursor-pointer select-none leading-relaxed"
+                                onChange={(checked) => setData('marketing_consent', checked)}
                             >
                                 {__('privacy_compliance.register_marketing_consent_label')}
-                            </Label>
+                            </ConsentBox>
                         </div>
-                    </div>
 
-                    <div className="pt-2">
-                        <Button
-                            className="w-full h-11 bg-[#0071e3] hover:bg-[#0077ed] text-white font-semibold text-sm rounded-[980px] shadow-md shadow-blue-500/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
-                            type="submit"
-                            disabled={processing}
-                        >
-                            {processing ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                                    <span>{__('general.creating_account')}</span>
-                                </>
-                            ) : (
-                                <span>{__('general.create_account_1')}</span>
-                            )}
-                        </Button>
-                    </div>
-                </form>
-
-                <div className="text-center pt-4 border-t border-black/5 dark:border-white/10 mt-6">
-                    <p className="text-xs text-[#1d1d1f]/60 dark:text-[#f5f5f7]/60 font-medium">
-                        {__('general.already_registered')}{' '}
-                        <Link
-                            href={route('login')}
-                            className="font-semibold text-[#0071e3] hover:underline"
-                        >{__('general.log_in')}</Link>
-                    </p>
+                        <AuthSubmit busy={processing} label={__('general.create_account_1')} busyLabel={__('general.creating_account')} />
+                    </form>
                 </div>
+
+                <AuthFooter>
+                    {__('general.already_registered')}{' '}
+                    <Link href={route('login')} className={authLinkClass}>{__('general.log_in')}</Link>
+                </AuthFooter>
             </div>
         </GuestLayout>
+    );
+}
+
+type ConsentProps = { id: string; checked: boolean; error?: string; onChange: (checked: boolean) => void; children: ReactNode };
+
+function ConsentBox({ id, checked, error, onChange, children }: ConsentProps) {
+    return (
+        <div>
+            <div className="flex items-start gap-3">
+                <input
+                    type="checkbox"
+                    id={id}
+                    name={id}
+                    checked={checked}
+                    aria-invalid={error ? true : undefined}
+                    onChange={(e) => onChange(e.target.checked)}
+                    className="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer rounded border-black/20 text-[#111] focus:ring-[#111] dark:border-white/20"
+                />
+                <label htmlFor={id} className="cursor-pointer select-none text-[13px] leading-relaxed text-[#555] dark:text-zinc-400">
+                    {children}
+                </label>
+            </div>
+            {error && <p className="calm-fade mt-1.5 ps-[30px] text-[13px] text-[#D93025]">{error}</p>}
+        </div>
     );
 }

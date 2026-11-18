@@ -1,6 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import {
-    AlertCircle, Bell, CheckCircle2, ChevronRight, CreditCard, FolderKanban, KeyRound, LifeBuoy,
+    AlertCircle, Bell, ChevronRight, CreditCard, FolderKanban, KeyRound, LifeBuoy,
     MessageSquare, Plus, RefreshCw, Settings, ShoppingBag, UserRound, Wallet,
 } from 'lucide-react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -61,9 +61,9 @@ export default function Dashboard({ home, vaultAssets = [], vaultStats }: { home
         <AuthenticatedLayout>
             <Head title={__('client_home.nav.home')} />
             <div className="mx-auto w-full max-w-[1100px] px-4 py-6 sm:px-6 sm:py-10">
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{__('client_home.greeting', { name: firstName })}</h1>
+                <h1 className="calm-rise text-2xl font-semibold tracking-tight text-[#111] dark:text-white sm:text-3xl">{__('client_home.greeting', { name: firstName })}</h1>
 
-                <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div className="space-y-6 lg:col-span-2">
                         <MoneyCard money={home.money} formatDate={formatDate} />
                         {home.attention.length > 0 && <AttentionList items={home.attention} formatDate={formatDate} />}
@@ -81,12 +81,18 @@ export default function Dashboard({ home, vaultAssets = [], vaultStats }: { home
     );
 }
 
-function Card({ title, action, children, className }: { title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+type CardProps = { title?: string; action?: React.ReactNode; children: React.ReactNode; className?: string; order?: number };
+
+/** Every block on the home page. Fades up once, in reading order, so the page settles calmly. */
+function Card({ title, action, children, className, order = 0 }: CardProps) {
     return (
-        <section className={cn('rounded-[24px] border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-zinc-900 sm:p-6', className)}>
+        <section
+            className={cn('calm-rise rounded-[20px] border border-black/[0.06] bg-white p-5 dark:border-white/10 dark:bg-zinc-900 sm:p-7', className)}
+            style={{ '--i': order + 1 } as React.CSSProperties}
+        >
             {(title || action) && (
-                <div className="mb-4 flex items-center justify-between gap-3">
-                    {title && <h2 className="text-base font-bold">{title}</h2>}
+                <div className="mb-5 flex items-center justify-between gap-3">
+                    {title && <h2 className="text-base font-semibold text-[#111] dark:text-white">{title}</h2>}
                     {action}
                 </div>
             )}
@@ -100,12 +106,12 @@ function MoneyCard({ money, formatDate }: { money: HomeData['money']; formatDate
     const owes = money.unpaid_count > 0;
 
     return (
-        <Card title={__('client_home.money.title')} action={<TextLink href={money.links.invoices}>{__('client_home.money.all_invoices')}</TextLink>}>
+        <Card order={0} title={__('client_home.money.title')} action={<TextLink href={money.links.invoices}>{__('client_home.money.all_invoices')}</TextLink>}>
             {owes ? (
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_home.money.you_owe')}</p>
-                        <p className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl" dir="ltr">{money.total_due_formatted}</p>
+                        <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums text-[#111] dark:text-white sm:text-4xl" dir="ltr">{money.total_due_formatted}</p>
                         <p className="mt-2 text-sm text-[#1d1d1f]/70 dark:text-zinc-300">
                             {money.unpaid_count === 1 ? __('client_home.money.invoices_one') : __('client_home.money.invoices_many', { count: money.unpaid_count })}
                             {money.overdue_count > 0 && (
@@ -120,14 +126,14 @@ function MoneyCard({ money, formatDate }: { money: HomeData['money']; formatDate
                         )}
                     </div>
                     {next && (
-                        <SafeLink href={next.pay_url} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0071e3] px-7 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-[#0077ed]">
+                        <SafeLink href={next.pay_url} className="calm-press inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0071e3] px-7 text-[15px] font-medium text-white hover:bg-[#0068d1]">
                             <CreditCard className="h-4 w-4" />{__('client_home.money.pay_now')}
                         </SafeLink>
                     )}
                 </div>
             ) : (
                 <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-9 w-9 shrink-0 text-emerald-600" />
+                    <DrawnCheck />
                     <div>
                         <p className="text-lg font-bold">{__('client_home.money.all_set')}</p>
                         <p className="text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{__('client_home.money.all_set_hint')}</p>
@@ -173,16 +179,16 @@ function AttentionList({ items, formatDate }: { items: AttentionItem[]; formatDa
     };
 
     return (
-        <Card title={__('client_home.attention.title')}>
+        <Card order={1} title={__('client_home.attention.title')}>
             <ul className="-my-1 divide-y divide-black/5 dark:divide-white/10">
                 {items.map((item, i) => {
                     const { icon: Icon, tone, text } = row(item);
                     return (
                         <li key={i}>
-                            <SafeLink href={item.url} className="flex items-center gap-3 py-3 text-[15px] hover:text-[#0071e3]">
+                            <SafeLink href={item.url} className="group flex items-center gap-3 py-3.5 text-[15px] transition-colors hover:text-[#0071e3]">
                                 <Icon className={cn('h-5 w-5 shrink-0', tone)} />
                                 <span className="flex-1">{text}</span>
-                                <ChevronRight className="h-4 w-4 shrink-0 text-[#1d1d1f]/30 rtl:rotate-180" />
+                                <ChevronRight className="h-4 w-4 shrink-0 text-[#1d1d1f]/30 transition-transform duration-150 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
                             </SafeLink>
                         </li>
                     );
@@ -208,7 +214,7 @@ function RewardsCard({ rewards }: { rewards: HomeData['rewards'] }) {
     const { me, participants } = rewards.monthly;
 
     return (
-        <Card title={__('client_home.rewards.title')} action={<TextLink href="/loyalty#ranking">{__('client_home.rewards.see_ranking')}</TextLink>}>
+        <Card order={2} title={__('client_home.rewards.title')} action={<TextLink href="/loyalty#ranking">{__('client_home.rewards.see_ranking')}</TextLink>}>
             <div className="flex items-center gap-4">
                 <BadgeLink url={rewards.card_url} label={__('badge_card.open')}>
                     <img src={`/images/tiers/${rewards.tier}.svg`} alt="" className="h-16 w-16 shrink-0" />
@@ -219,9 +225,7 @@ function RewardsCard({ rewards }: { rewards: HomeData['rewards'] }) {
                 </div>
             </div>
             <div className="mt-4">
-                <div className="h-2 overflow-hidden rounded-full bg-[#f5f5f7] dark:bg-zinc-800" role="progressbar" aria-valuenow={rewards.progress} aria-valuemin={0} aria-valuemax={100}>
-                    <div className="h-full rounded-full bg-[#0071e3]" style={{ width: `${rewards.progress}%` }} />
-                </div>
+                <ProgressBar value={rewards.progress} className="h-2 bg-[#F2F2F2] dark:bg-zinc-800" fill="bg-[#0071e3]" />
                 <p className="mt-2 text-xs text-[#1d1d1f]/60 dark:text-zinc-400">
                     {rewards.next_tier_name
                         ? __('client_home.rewards.to_next', { points: rewards.points_to_next.toLocaleString('en-US'), tier: rewards.next_tier_name })
@@ -249,7 +253,7 @@ function RewardsCard({ rewards }: { rewards: HomeData['rewards'] }) {
 
 function ServicesCard({ services, formatDate }: { services: HomeData['services']; formatDate: (d: string | null) => string }) {
     return (
-        <Card title={__('client_home.services.title')}>
+        <Card order={3} title={__('client_home.services.title')}>
             <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-[#1d1d1f]/70 dark:text-zinc-300">{__('client_home.services.projects')}</h3>
                 {services.projects_count > 0 && <TextLink href="/projects">{__('client_home.services.all_projects')}</TextLink>}
@@ -258,14 +262,12 @@ function ServicesCard({ services, formatDate }: { services: HomeData['services']
                 <ul className="space-y-3">
                     {services.projects.map((project) => (
                         <li key={project.id}>
-                            <SafeLink href={project.url} className="block rounded-2xl bg-[#f5f5f7] p-3 hover:bg-[#ebebed] dark:bg-zinc-800 dark:hover:bg-zinc-700">
+                            <SafeLink href={project.url} className="calm-press block rounded-2xl bg-[#F8F8F8] p-4 hover:bg-[#F2F2F2] dark:bg-zinc-800 dark:hover:bg-zinc-700">
                                 <div className="flex items-center justify-between gap-3 text-sm font-semibold">
                                     <span className="truncate">{project.name}</span>
                                     <span className="shrink-0 tabular-nums" dir="ltr">{project.progress}%</span>
                                 </div>
-                                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
-                                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${project.progress}%` }} />
-                                </div>
+                                <ProgressBar value={project.progress} label={project.name} className="mt-3 h-1.5 bg-black/5 dark:bg-white/10" fill="bg-emerald-500" />
                             </SafeLink>
                         </li>
                     ))}
@@ -307,11 +309,11 @@ function Shortcuts() {
     ];
 
     return (
-        <Card title={__('client_home.services.shortcuts')}>
+        <Card order={4} title={__('client_home.services.shortcuts')}>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
                 {items.map(({ href, icon: Icon, label }) => (
-                    <SafeLink key={href} href={href} className="flex flex-col items-center gap-2 rounded-2xl p-3 text-center text-xs font-medium hover:bg-[#f5f5f7] dark:hover:bg-zinc-800">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0071e3]/10 text-[#0071e3]"><Icon className="h-5 w-5" /></span>
+                    <SafeLink key={href} href={href} className="calm-press flex flex-col items-center gap-2 rounded-2xl p-3 text-center text-xs font-medium text-[#555] hover:bg-[#F8F8F8] hover:text-[#111] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F2F2F2] text-[#111] dark:bg-zinc-800 dark:text-white"><Icon className="h-5 w-5" strokeWidth={1.75} /></span>
                         {label}
                     </SafeLink>
                 ))}
@@ -325,5 +327,26 @@ function TextLink({ href, children }: { href: string; children: React.ReactNode 
         <SafeLink href={href} className="shrink-0 text-sm font-semibold text-[#0071e3] hover:underline">
             {children}
         </SafeLink>
+    );
+}
+
+/** Fills from zero the first time it shows. One bar for rewards and every project. */
+function ProgressBar({ value, label, className, fill }: { value: number; label?: string; className: string; fill: string }) {
+    const percent = Math.min(100, Math.max(0, value));
+
+    return (
+        <div className={cn('overflow-hidden rounded-full', className)} role="progressbar" aria-label={label} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
+            <div className={cn('calm-fill h-full rounded-full', fill)} style={{ width: `${percent}%` }} />
+        </div>
+    );
+}
+
+/** "All set" check that draws itself once, calmly. */
+function DrawnCheck() {
+    return (
+        <svg viewBox="0 0 36 36" className="h-9 w-9 shrink-0 text-emerald-600" fill="none" aria-hidden="true">
+            <circle cx="18" cy="18" r="17" className="fill-emerald-50 dark:fill-emerald-950/40" />
+            <path d="M11 18.5l4.5 4.5L25 13.5" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" pathLength={1} className="calm-draw" />
+        </svg>
     );
 }
