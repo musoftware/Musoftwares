@@ -97,19 +97,44 @@
             <div class="lg:col-span-6 flex items-center justify-center">
                 <div id="hero-orbit" class="hero-orbit relative w-full max-w-[540px]" role="img" aria-label="{{ $t('موسوفت وأدوات البرمجة اللي بنشتغل بيها', 'Musoftware and the tools we build with') }}">
                     <img src="{{ asset('images/hero/orbit/logo.webp') }}" alt="" fetchpriority="high"
-                         class="hero-orbit-logo z-10" style="left: {{ $heroLogo['x'] }}%; top: {{ $heroLogo['y'] }}%; width: {{ $heroLogo['w'] }}%;">
+                         class="hero-orbit-logo z-10" style="left: {{ $heroLogo['x'] }}%; top: {{ $heroLogo['y'] }}%; width: {{ $heroLogo['w'] }}%; --depth: -0.8;">
                     @foreach ($heroIcons as $i => $icon)
                         <img src="{{ asset('images/hero/orbit/'.$icon['name'].'.webp') }}" alt="" loading="eager" decoding="async"
                              class="hero-orbit-icon"
-                             style="left: {{ $icon['x'] }}%; top: {{ $icon['y'] }}%; width: {{ $icon['w'] }}%; --i: {{ $i }}; --dx: {{ $icon['dx'] }}cqw; --dy: {{ $icon['dy'] }}cqw;">
+                             style="left: {{ $icon['x'] }}%; top: {{ $icon['y'] }}%; width: {{ $icon['w'] }}%; --i: {{ $i }}; --dx: {{ $icon['dx'] }}cqw; --dy: {{ $icon['dy'] }}cqw; --depth: {{ 1.6 + ($i % 3) * 0.8 }};">
                     @endforeach
                 </div>
                 <script>
                     (function () {
+                        var orbit = document.getElementById('hero-orbit');
                         try {
-                            if (localStorage.getItem('hero-orbit-seen')) { document.getElementById('hero-orbit').classList.add('is-seen'); return; }
-                            localStorage.setItem('hero-orbit-seen', '1');
+                            if (localStorage.getItem('hero-orbit-seen')) orbit.classList.add('is-seen');
+                            else localStorage.setItem('hero-orbit-seen', '1');
                         } catch (e) {}
+
+                        // Mouse depth: ease the pieces toward the pointer, and back to rest when it leaves.
+                        var canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+                        var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+                        if (!canHover || calm) return;
+
+                        var target = { x: 0, y: 0 }, now = { x: 0, y: 0 }, frame = 0;
+                        var step = function () {
+                            now.x += (target.x - now.x) * 0.08;
+                            now.y += (target.y - now.y) * 0.08;
+                            orbit.style.setProperty('--mx', now.x.toFixed(3));
+                            orbit.style.setProperty('--my', now.y.toFixed(3));
+                            var settled = Math.abs(target.x - now.x) < 0.002 && Math.abs(target.y - now.y) < 0.002;
+                            frame = settled ? 0 : requestAnimationFrame(step);
+                        };
+                        var follow = function (x, y) {
+                            target.x = x; target.y = y;
+                            if (!frame) frame = requestAnimationFrame(step);
+                        };
+                        orbit.addEventListener('pointermove', function (e) {
+                            var box = orbit.getBoundingClientRect();
+                            follow((e.clientX - box.left) / box.width * 2 - 1, (e.clientY - box.top) / box.height * 2 - 1);
+                        });
+                        orbit.addEventListener('pointerleave', function () { follow(0, 0); });
                     })();
                 </script>
             </div>

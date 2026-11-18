@@ -564,3 +564,20 @@ select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #dc26
 @media (prefers-reduced-motion: reduce) {
     .hero-orbit > img { animation: none; }
 }
+
+/*
+ * Hero hover. Uses the separate translate / scale / rotate properties, so it adds on top of the
+ * entrance animation's transform instead of fighting it. --mx and --my (-1..1) come from a small
+ * script that eases toward the mouse; each piece moves by its own --depth, the logo slightly the other way.
+ */
+.hero-orbit > img {
+    translate: calc(var(--mx, 0) * var(--depth, 0) * 1cqw) calc(var(--my, 0) * var(--depth, 0) * 1cqw);
+    transition: scale 320ms var(--ease-out-strong), rotate 320ms var(--ease-out-strong);
+}
+@media (hover: hover) and (pointer: fine) {
+    .hero-orbit-icon:hover { scale: 1.12; rotate: -8deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-orbit > img { translate: none; transition: none; }
+    .hero-orbit-icon:hover { scale: none; rotate: none; }
+}
