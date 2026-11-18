@@ -100,7 +100,7 @@ return array (
   'ab_test_sub' => 'إدارة متغيرات اختبارات A/B ومقاييس أداء الزيارات.',
   'ab_test_variants' => 'متغيرات اختبار A/B',
   'about' => 'حول',
-  'about_eng_mahmoud' => 'عن المهندس محمود',
+  'about_eng_mahmoud' => 'عن محمود أمين',
   'about_formats' => 'عن الصيغ والأنماط',
   'about_profile_summary' => 'حول / ملخص الملف الشخصي',
   'about_project' => 'عن المشروع',

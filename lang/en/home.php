@@ -102,8 +102,8 @@ return [
 
     // About Architect
     'about_badge' => 'Direct Communication',
-    'about_title' => 'Eng. Mahmoud — Architect & Developer',
-    'about_role' => 'Software Architect & Full-Stack Engineer',
+    'about_title' => 'Mahmoud Amin — Architect & Developer',
+    'about_role' => 'Software Architect & Full-Stack Developer',
     'about_text' => 'I believe technology is built to empower people, and true design is how the product feels and operates every day. I work directly with you as an architect to turn your vision into intuitive, high-performance software.',
     'about_cta' => 'Discuss Your Project Directly',
 
@@ -115,5 +115,5 @@ return [
     // Final CTA
     'final_cta_title' => 'Ready to Elevate Your Business Management?',
     'final_cta_desc' => 'Let us engineer a system combining enterprise-level power with intuitive simplicity.',
-    'final_cta_btn' => 'Talk with the Engineer on WhatsApp',
+    'final_cta_btn' => 'Talk with Mahmoud on WhatsApp',
 ];

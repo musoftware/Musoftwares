@@ -100,7 +100,7 @@ return array (
   'ab_test_sub' => 'Manage A/B tests variations and traffic performance metrics.',
   'ab_test_variants' => 'A/B testing variables',
   'about' => 'About',
-  'about_eng_mahmoud' => 'About Engineer Mahmoud',
+  'about_eng_mahmoud' => 'About Mahmoud Amin',
   'about_formats' => 'About formulas and patterns',
   'about_profile_summary' => 'About/Profile Summary',
   'about_project' => 'About the project',

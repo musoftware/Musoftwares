@@ -356,7 +356,7 @@
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'عن المهندس' : 'Founder' }}</h3>
+                    <h3 class="text-[12px] font-semibold text-[#1d1d1f]">{{ $locale === 'ar' ? 'عن المؤسس' : 'Founder' }}</h3>
                     <ul class="space-y-2 text-[12px]">
                         <li><a href="/about/mahmoud-amin" class="hover:text-[#0071e3] transition-colors">Mahmoud Amin (Profile)</a></li>
                         <li><a href="https://github.com/musoftware" target="_blank" rel="noopener noreferrer" class="hover:text-[#0071e3] transition-colors">GitHub</a></li>

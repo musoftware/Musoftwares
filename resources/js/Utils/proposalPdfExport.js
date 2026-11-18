@@ -80,7 +80,7 @@ export async function downloadProposalPdf({
     // WhatsApp Direct Link
     const waPhone = '201015218548';
     const waMsg = isAr
-        ? `مرحباً م. محمود أمين، أراجع العرض الهندسي الموثق #${code} لنظام (${platformsTitle}) بإجمالي ${totalDisplay}. أود التنسيق لبدء المشروع!`
+        ? `مرحباً محمود، أراجع العرض الهندسي الموثق #${code} لنظام (${platformsTitle}) بإجمالي ${totalDisplay}. أود التنسيق لبدء المشروع!`
         : `Hello Mahmoud, reviewing verified quotation #${code} for (${platformsTitle}) totaling ${totalDisplay}. Let's discuss proceeding with this scope!`;
     const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`;
 
