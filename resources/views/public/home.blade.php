@@ -27,6 +27,32 @@
         ['key' => 'services', 'title' => $t('شغل بنعمله لك', 'Work we do for you'), 'body' => $t('مواقع ومتاجر ولوجو وإعلانات.', 'Websites, online stores, logos and ads.')],
     ];
 
+    // Hero pieces cut from hero_tech_stack_3d_transparent.png: place and size in % of the square,
+    // listed clockwise from the top so they land one after another around the logo.
+    $heroLogo = ['x' => 32.71, 'y' => 29.59, 'w' => 33.79, 'h' => 43.16];
+    $heroIcons = array_map(function (array $icon) use ($heroLogo) {
+        $toLogo = fn (float $start, float $size, float $logoStart, float $logoSize) => round(($logoStart + $logoSize / 2) - ($start + $size / 2), 2);
+
+        return $icon + [
+            'dx' => $toLogo($icon['x'], $icon['w'], $heroLogo['x'], $heroLogo['w']),
+            'dy' => $toLogo($icon['y'], $icon['h'], $heroLogo['y'], $heroLogo['h']),
+        ];
+    }, [
+        ['name' => 'node', 'x' => 38.77, 'y' => 15.43, 'w' => 9.77, 'h' => 10.45],
+        ['name' => 'python', 'x' => 52.93, 'y' => 16.21, 'w' => 9.08, 'h' => 9.28],
+        ['name' => 'java', 'x' => 66.21, 'y' => 20.51, 'w' => 7.32, 'h' => 10.25],
+        ['name' => 'cpp', 'x' => 73.54, 'y' => 31.25, 'w' => 9.57, 'h' => 11.23],
+        ['name' => 'go', 'x' => 78.52, 'y' => 46.39, 'w' => 9.08, 'h' => 11.62],
+        ['name' => 'vue', 'x' => 72.75, 'y' => 61.13, 'w' => 10.55, 'h' => 10.06],
+        ['name' => 'laravel', 'x' => 61.52, 'y' => 69.53, 'w' => 12.01, 'h' => 10.64],
+        ['name' => 'd', 'x' => 41.89, 'y' => 73.83, 'w' => 14.65, 'h' => 12.79],
+        ['name' => 'angular', 'x' => 29.69, 'y' => 69.92, 'w' => 11.62, 'h' => 15.92],
+        ['name' => 'swift', 'x' => 17.29, 'y' => 59.67, 'w' => 10.45, 'h' => 10.74],
+        ['name' => 'dark', 'x' => 12.21, 'y' => 45.51, 'w' => 9.57, 'h' => 9.08],
+        ['name' => 'ruby', 'x' => 13.96, 'y' => 31.05, 'w' => 11.04, 'h' => 9.77],
+        ['name' => 'react', 'x' => 24.12, 'y' => 19.34, 'w' => 11.33, 'h' => 10.45],
+    ]);
+
     $steps = [
         [$t('احكيلنا', 'Tell us'), $t('قولنا فكرتك وعايز توصل لإيه.', 'Tell us your idea and your goal.')],
         [$t('اعرف السعر', 'Get the price'), $t('بنقولك هيتكلف كام قبل ما نبدأ.', 'We tell you the cost before we start.')],
@@ -69,15 +95,23 @@
             </div>
 
             <div class="lg:col-span-6 flex items-center justify-center">
-                <div class="relative w-full max-w-[540px]">
-                    <picture>
-                        <source srcset="{{ asset('images/hero/hero_tech_stack_3d_square.png') }}" type="image/png">
-                        <img src="{{ asset('images/hero/hero_tech_stack_3d_square.jpg') }}" 
-                             alt="{{ $t('استوديو موسوفت للبرمجيات', 'Musoftware Engineering Studio') }}" 
-                             class="w-full h-auto object-contain mx-auto mix-blend-multiply" 
-                             fetchpriority="high">
-                    </picture>
+                <div id="hero-orbit" class="hero-orbit relative w-full max-w-[540px]" role="img" aria-label="{{ $t('موسوفت وأدوات البرمجة اللي بنشتغل بيها', 'Musoftware and the tools we build with') }}">
+                    <img src="{{ asset('images/hero/orbit/logo.webp') }}" alt="" fetchpriority="high"
+                         class="hero-orbit-logo z-10" style="left: {{ $heroLogo['x'] }}%; top: {{ $heroLogo['y'] }}%; width: {{ $heroLogo['w'] }}%;">
+                    @foreach ($heroIcons as $i => $icon)
+                        <img src="{{ asset('images/hero/orbit/'.$icon['name'].'.webp') }}" alt="" loading="eager" decoding="async"
+                             class="hero-orbit-icon"
+                             style="left: {{ $icon['x'] }}%; top: {{ $icon['y'] }}%; width: {{ $icon['w'] }}%; --i: {{ $i }}; --dx: {{ $icon['dx'] }}cqw; --dy: {{ $icon['dy'] }}cqw;">
+                    @endforeach
                 </div>
+                <script>
+                    (function () {
+                        try {
+                            if (localStorage.getItem('hero-orbit-seen')) { document.getElementById('hero-orbit').classList.add('is-seen'); return; }
+                            localStorage.setItem('hero-orbit-seen', '1');
+                        } catch (e) {}
+                    })();
+                </script>
             </div>
         </div>
 

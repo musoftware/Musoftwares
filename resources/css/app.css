@@ -536,3 +536,31 @@ select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #dc26
     .calm-rise, .calm-fill, .calm-draw, .calm-fade { animation: none; }
     .calm-press:active:not(:disabled) { transform: none; }
 }
+
+/*
+ * Home hero: the logo settles first, then each tech icon comes out from behind it,
+ * turns once and lands in its place around the logo. About 1.6s in all, once per visitor.
+ * The box is a size container so the icons can travel in container units (cqw).
+ */
+.hero-orbit { container-type: inline-size; aspect-ratio: 1; }
+.hero-orbit > img { position: absolute; max-width: none; height: auto; }
+
+@keyframes hero-orbit-logo {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes hero-orbit-icon {
+    from { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(-200deg) scale(0.4); }
+    35% { opacity: 1; }
+    to { opacity: 1; transform: none; }
+}
+.hero-orbit-logo { animation: hero-orbit-logo 600ms var(--ease-out-strong) both; }
+.hero-orbit-icon {
+    animation: hero-orbit-icon 900ms var(--ease-out-strong) both;
+    animation-delay: calc(250ms + var(--i, 0) * 45ms);
+}
+.hero-orbit.is-seen > img { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-orbit > img { animation: none; }
+}
