@@ -36,7 +36,7 @@ class SystemsCatalog
             'description_en' => $system['tagline_en'],
             'description_ar' => $system['tagline_ar'],
             'currency' => 'EGP',
-            'plans' => self::plans(),
+            'plans' => self::plans($system),
             'theme' => [
                 'colors' => $system['colors'],
                 'sections' => ['problems', 'showcase', 'pillars', 'video', 'steps', 'before_after', 'metrics', 'gallery', 'plans'],
@@ -45,12 +45,18 @@ class SystemsCatalog
         ];
     }
 
-    private static function plans(): array
+    /** The stack and the demo data line come from the system: Laravel with demo data unless it says otherwise. */
+    private static function plans(array $system): array
     {
+        $stack = $system['stack'] ?? 'Laravel';
+        $demo = $system['demo_data'] ?? true;
+        $guide = $demo ? 'install guide and demo data' : 'install guide';
+        $guideAr = $demo ? 'دليل التركيب وبيانات تجريبية' : 'دليل التركيب';
+
         return [
             ['key' => 'source', 'name' => 'Source code', 'name_ar' => 'الكود المصدري', 'price' => self::SOURCE_PRICE,
-                'description' => 'Full Laravel source code, install guide and demo data, as it is. No modifications. You host it yourself.',
-                'description_ar' => 'كود Laravel كامل مع دليل التركيب وبيانات تجريبية، زي ما هو من غير أي تعديلات. أنت اللي بتستضيفه.'],
+                'description' => "Full {$stack} source code, {$guide}, as it is. No modifications. You host it yourself.",
+                'description_ar' => "كود {$stack} كامل مع {$guideAr}، زي ما هو من غير أي تعديلات. أنت اللي بتستضيفه."],
             ['key' => 'custom', 'name' => 'Source code with changes', 'name_ar' => 'الكود مع التعديلات', 'price' => self::CUSTOM_PRICE,
                 'description' => 'The full source code plus any programming change your business needs. Any change request is available. We agree the list with you on WhatsApp.',
                 'description_ar' => 'الكود المصدري كامل مع أي تعديل برمجي يحتاجه شغلك. أي طلب برمجي للتعديل متاح. بنتفق معاك على القائمة على الواتساب.'],
@@ -62,6 +68,9 @@ class SystemsCatalog
         $t = $system[$lang];
         $common = self::common($lang);
         $common['included'] = $t['included'] ?? $common['included'];
+        $common['need_body'] = $t['need_body'] ?? $common['need_body'];
+        $common['faq'][1] = $t['install_faq'] ?? $common['faq'][1];
+        $common['faq'][2] = $t['language_faq'] ?? $common['faq'][2];
         $common['faq'][3] = $t['payments_faq'] ?? $common['faq'][3];
 
         return [
@@ -154,6 +163,7 @@ class SystemsCatalog
         return [self::autoCare(), self::clinic(), self::coffee(), self::gym(), self::mobileShop(), self::salon(), ...SystemsCatalogExtra::systems(),
             ...SystemsCatalogEducation::systems(), ...SystemsCatalogLab::systems(), SystemsCatalogRealEstate::system(),
             ...SystemsCatalogWholesale::systems(), SystemsCatalogSupermarket::system(), SystemsCatalogNursery::system(),
+            SystemsCatalogMenu::system(),
         ];
     }
 
