@@ -15,6 +15,31 @@ class StoreSeo
 {
     private const SCHEMA = 'https://schema.org';
 
+    /**
+     * Programs carry a brand name nobody searches for, so their search title adds the words people type.
+     * Systems and services are already named that way ("نظام إدارة الصيدلية").
+     */
+    private const SEARCH_WORDS = [
+        'maps-leads-pro' => ['برنامج استخراج بيانات العملاء من خرائط جوجل', 'Google Maps business data extractor'],
+        'email-finder-pro' => ['برنامج استخراج إيميلات الشركات', 'Company email finder'],
+        'email-sender-pro' => ['برنامج إرسال إيميلات جماعية', 'Bulk email sender'],
+        'inbox-sender-pro' => ['برنامج رسائل لعملاء صفحة فيسبوك', 'Facebook page inbox messages'],
+        'telegram-sender-pro' => ['برنامج إرسال رسائل تليجرام جماعية', 'Bulk Telegram sender'],
+        'whatsapp-bulk-sender' => ['برنامج إرسال رسائل واتساب جماعية', 'Bulk WhatsApp sender'],
+        'shop-manager-pro' => ['برنامج فواتير ومخزن للمحلات', 'Invoice and stock program for shops'],
+        'gridreader' => ['برنامج فتح ملفات إكسل وCSV الكبيرة', 'Large Excel and CSV file viewer'],
+        'marketing-suite' => ['أدوات تسويق إلكتروني', 'Online marketing tools'],
+        'whatsapp-official' => ['واتساب الأعمال الرسمي API', 'Official WhatsApp Business API'],
+    ];
+
+    /** The page title: the name, what it is in search words when the name does not say it, and the site name. */
+    public function title(SoftwareProduct $product): string
+    {
+        $words = self::SEARCH_WORDS[$product->slug][app()->getLocale() === 'ar' ? 0 : 1] ?? null;
+
+        return $product->localized('name').($words ? ': '.$words : '').__('seo.suffix');
+    }
+
     public function description(SoftwareProduct $product): string
     {
         $copy = $product->landingCopy();

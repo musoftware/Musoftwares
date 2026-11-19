@@ -22,21 +22,23 @@ class HomeController extends Controller
 {
     use ConvertsCurrency;
 
+    /** Client projects on the homepage: a website, a store, a factory site, two systems and a platform. */
+    private const HOME_WORK = ['acelbay', 'umkhalid-mixing', 'alsawan-foods', 'food-lab', 'airtech', 'kbdny'];
+
     public function index(Request $request, \Modules\SoftwareStore\Services\StoreHighlights $store)
     {
         $isAr = app()->getLocale() === 'ar';
 
         return view('public.home', [
-            'storeCounts' => $store->groupCounts(),
-            'storeFrom' => $store->groupFromPrices(),
             'featuredProducts' => $store->featured(),
-            'heroShots' => $store->heroShots(),
+            'heroShot' => $store->heroShots(1)->first(),
+            'clientWork' => PortfolioData::only(self::HOME_WORK),
             'title' => $isAr
-                ? 'موسوفت | هنعملك أي برنامج أو موقع أو SaaS أو RaaS'
-                : 'Musoftware | We build you any program, website, SaaS or RaaS',
+                ? 'موسوفت | بنعملك البرنامج أو الموقع أو التطبيق اللي شغلك محتاجه'
+                : 'Musoftware | We build the program, website or app your business needs',
             'description' => $isAr
-                ? 'شركة برمجة مصرية في السويس. هنعملك أي برنامج أو موقع أو SaaS أو RaaS، بنبنيه معاك خطوة بخطوة وبنحاول قدر الإمكان إن مشروعك يكبر وينجح.'
-                : 'An Egyptian software company in Suez. We build you any program, website, SaaS or RaaS, step by step with you, and do everything we can to help your project grow and succeed.',
+                ? 'شركة برمجة مصرية في السويس. بنعملك البرنامج أو الموقع أو التطبيق اللي شغلك محتاجه، خطوة بخطوة معاك، وبسعر تعرفه قبل ما نبدأ.'
+                : 'An Egyptian software company in Suez. We build the program, website or app your business needs, step by step with you, at a price you know before we start.',
         ]);
     }
 
@@ -66,37 +68,14 @@ class HomeController extends Controller
             }
         }
 
-        if (!$project) {
-            $project = [
-                'slug' => $slug,
-                'title_en' => ucwords(str_replace('-', ' ', $slug)) . ' System',
-                'title_ar' => 'نظام ' . ucwords(str_replace('-', ' ', $slug)),
-                'category' => 'SaaS & Cloud',
-                'category_ar' => 'منصات سحابية SaaS',
-                'desc_en' => 'Custom enterprise software engineered and deployed by Musoftwares.',
-                'desc_ar' => 'نظام برمجي مخصص تم تصميمه وتطويره بواسطة استوديو Musoftwares.',
-                'img' => '/images/portfolio/musoftwares.png',
-                'techs' => ['Laravel', 'PostgreSQL', 'TailwindCSS'],
-                'live_url' => null,
-                'metrics' => [
-                    'Architecture' => 'Custom Production Platform',
-                    'Latency' => '< 10ms',
-                    'Ownership' => 'Source code included with websites',
-                ],
-                'highlights_en' => [
-                    'Bespoke software architecture tailored to operational workflows.',
-                    'Source code is included with websites and web systems.',
-                ],
-                'highlights_ar' => [
-                    'بنية برمجية مخصصة بالكامل لمتطلبات ودورة عمل العميل.',
-                    'الكود المصدري بييجي مع المواقع وأنظمة الويب.',
-                ],
-            ];
-        }
+        $project ??= self::caseStudyPage($slug);
+
+        // An unknown address is a 404, not a made-up project page that search engines would index.
+        abort_if(! $project, 404);
 
         $locale = app()->getLocale();
         $title = ($project['title_' . $locale] ?? $project['title_en']).__('seo.suffix');
-        $description = $project['desc_' . $locale] ?? $project['desc_en'];
+        $description = Str::limit($project['desc_' . $locale] ?? $project['desc_en'], 160);
 
         $viewName = view()->exists("public.portfolio.{$slug}") 
             ? "public.portfolio.{$slug}" 
@@ -109,6 +88,31 @@ class HomeController extends Controller
             'title' => $title,
             'description' => $description,
         ]);
+    }
+
+    /**
+     * Projects that have their own written case study view but are not on the portfolio list.
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function caseStudyPage(string $slug): ?array
+    {
+        $pages = [
+            'am-sms-gateway' => ['AM SMS Gateway', 'بوابة رسائل AM SMS', 'Send OTP and alert SMS from your own system through Android phones with local SIM cards, with delivery reports.', 'ابعت رسائل التحقق والتنبيهات من نظامك عن طريق موبايلات أندرويد بشرايح محلية، مع تقرير بوصول كل رسالة.', '/images/portfolio/am-sms.jpg'],
+            'email-sender' => ['Email Sender', 'منصة إرسال الإيميلات', 'A platform that sends newsletters and alerts from several SMTP servers in turn, cleans bounced addresses and reports opens and clicks.', 'منصة بتبعت النشرات والتنبيهات من أكتر من سيرفر SMTP بالتبادل، وبتشيل العناوين اللي بترجع، وبتقولك مين فتح ومين ضغط.', '/images/portfolio/emailsender.png'],
+            'revflow' => ['RevFlow', 'ريف فلو', 'Accounting and stock for traders: every sale, purchase, payment and stock move writes its own balanced journal entry, and closed periods cannot be changed.', 'حسابات ومخازن للتجار: كل بيع وشراء وسداد وحركة مخزن بتعمل قيدها لوحدها، والفترات المقفولة مايتعدلش فيها.', '/images/portfolio/revFlow.png'],
+        ];
+
+        if (! isset($pages[$slug]) || ! view()->exists("public.portfolio.{$slug}")) {
+            return null;
+        }
+        [$titleEn, $titleAr, $descEn, $descAr, $img] = $pages[$slug];
+
+        return [
+            'slug' => $slug, 'title_en' => $titleEn, 'title_ar' => $titleAr, 'desc_en' => $descEn, 'desc_ar' => $descAr,
+            'category' => 'Systems', 'category_ar' => 'أنظمة', 'img' => $img, 'techs' => [], 'live_url' => null,
+            'metrics' => [], 'highlights_en' => [], 'highlights_ar' => [],
+        ];
     }
 
     public function services(Request $request)
@@ -215,6 +219,11 @@ class HomeController extends Controller
 
     public function compare($slug = 'laravel-vs-nodejs')
     {
+        // There is one comparison; other names would be copies of it under new addresses.
+        if ($slug !== 'laravel-vs-nodejs') {
+            return redirect()->route('compare.laravel-vs-nodejs', request()->query(), 301);
+        }
+
         return view('public.compare', PageSeo::for('compare'));
     }
 

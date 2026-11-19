@@ -1,4 +1,4 @@
-@extends('layouts.public', ['title' => __($succeeded ? 'software.success_title' : 'software.failed_title').' | Musoftwares'])
+@extends('layouts.public', ['title' => __($succeeded ? 'software.success_title' : 'software.failed_title').__('seo.suffix')])
 
 @push('head')
     <meta name="robots" content="noindex">

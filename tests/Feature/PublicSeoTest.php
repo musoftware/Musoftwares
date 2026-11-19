@@ -21,8 +21,8 @@ class PublicSeoTest extends TestCase
 
     public function test_home_page_title_is_the_page_title_not_a_section_heading(): void
     {
-        $this->get('/?lang=en')->assertOk()->assertSee('<title>Musoftware | We build you any program', false);
-        $this->get('/?lang=ar')->assertOk()->assertSee('<title>موسوفت | هنعملك أي برنامج', false);
+        $this->get('/?lang=en')->assertOk()->assertSee('<title>Musoftware | We build the program, website or app', false);
+        $this->get('/?lang=ar')->assertOk()->assertSee('<title>موسوفت | بنعملك البرنامج أو الموقع أو التطبيق', false);
     }
 
     public function test_fixed_pages_have_a_title_and_description_in_the_page_language(): void

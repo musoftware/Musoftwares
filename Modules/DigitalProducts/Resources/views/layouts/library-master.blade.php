@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#ffffff">
 
-    <title>{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares Studio' }}</title>
+    <title>{{ $meta['title'] ?? 'المكتبة الرقمية | موسوفت Studio' }}</title>
     <meta name="description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية، الأدلة الهندسية، وقوالب النظم الجاهزة للتطبيق.' }}">
     <link rel="canonical" href="{{ $meta['url'] ?? url()->current() }}">
 
@@ -19,7 +19,7 @@
     <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
     <meta property="og:site_name" content="Musoftwares Library">
     <meta property="og:url" content="{{ $meta['url'] ?? $currentUrl }}">
-    <meta property="og:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares' }}">
+    <meta property="og:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | موسوفت' }}">
     <meta property="og:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة الهندسية.' }}">
     @if(!empty($meta['image']))
         <meta property="og:image" content="{{ $meta['image'] }}">
@@ -29,7 +29,7 @@
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ $meta['url'] ?? $currentUrl }}">
-    <meta property="twitter:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | Musoftwares' }}">
+    <meta property="twitter:title" content="{{ $meta['title'] ?? 'المكتبة الرقمية | موسوفت' }}">
     <meta property="twitter:description" content="{{ $meta['description'] ?? 'تصفح وحمّل أفضل الكتب الرقمية والأدلة الهندسية.' }}">
     @if(!empty($meta['image']))
         <meta property="twitter:image" content="{{ $meta['image'] }}">

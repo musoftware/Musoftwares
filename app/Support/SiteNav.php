@@ -82,8 +82,8 @@ class SiteNav
         return [
             'brand' => self::BRAND,
             'tagline' => $isAr
-                ? 'شركة برمجة في السويس، مصر، بيديرها محمود أمين. هنعملك أي برنامج أو موقع أو SaaS أو RaaS، وبنحاول قدر الإمكان إن مشروعك يكبر وينجح.'
-                : 'A software company in Suez, Egypt, run by Mahmoud Amin. We build you any program, website, SaaS or RaaS, and do everything we can to help your project grow and succeed.',
+                ? 'شركة برمجة في السويس، مصر، بيديرها محمود أمين. بنعملك البرنامج أو الموقع أو التطبيق اللي شغلك محتاجه، خطوة بخطوة معاك.'
+                : 'A software company in Suez, Egypt, run by Mahmoud Amin. We build the program, website or app your business needs, step by step with you.',
             'columns' => array_map(fn (array $column) => [
                 'title' => $column[$lang],
                 'links' => array_map(fn (array $link) => [

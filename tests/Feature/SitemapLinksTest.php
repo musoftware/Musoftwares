@@ -31,6 +31,11 @@ class SitemapLinksTest extends TestCase
         $this->assertStringContainsString('<loc>'.url('/estimator').'</loc>', $xml);
         $this->assertStringContainsString('<loc>'.url('/blog').'</loc>', $xml);
         $this->assertStringNotContainsString('<loc>'.url('/pricing').'</loc>', $xml);
+
+        // real client work and the start page are what a searching business owner should land on
+        $this->assertStringContainsString('<loc>'.url('/start-project').'</loc>', $xml);
+        $this->assertStringContainsString('<loc>'.url('/portfolio/acelbay').'</loc>', $xml);
+        $this->assertStringContainsString('<loc>'.url('/portfolio/food-lab').'</loc>', $xml);
     }
 
     public function test_sitemap_is_an_index_of_small_parts(): void

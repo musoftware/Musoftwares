@@ -40,8 +40,16 @@ class PublicRoutesTest extends TestCase
     public function test_portfolio_page_returns_successful_response()
     {
         $this->get('/portfolio')->assertStatus(200);
-        $this->get('/portfolio/test-slug')->assertStatus(200);
-        $this->get('/portfolio/trenz-agency')->assertStatus(200);
+        // made-up addresses are not pages: no invented "project" for search engines to index
+        $this->get('/portfolio/test-slug')->assertNotFound();
+        $this->get('/portfolio/trenz-agency')->assertNotFound();
+
+        // the written case studies outside the list keep their pages, with their own name
+        foreach (['am-sms-gateway' => 'AM SMS Gateway', 'email-sender' => 'Email Sender', 'revflow' => 'RevFlow'] as $slug => $name) {
+            $this->get('/portfolio/'.$slug.'?lang=en')->assertOk()->assertSee($name)->assertDontSee('Latency');
+        }
+
+        $this->get('/compare/anything')->assertRedirect(route('compare.laravel-vs-nodejs'));
 
         // Verify all registered portfolio slugs in PortfolioData
         $allPortfolio = \App\Services\PortfolioData::all();

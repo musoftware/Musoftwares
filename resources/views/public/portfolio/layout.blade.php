@@ -2,14 +2,12 @@
 
 @php
     $locale = app()->getLocale();
-    $title = $project['title_' . $locale] ?? $project['title_en'] ?? 'Musoftware System';
+    $projectTitle = $project['title_' . $locale] ?? $project['title_en'] ?? 'Musoftware System';
     $desc = $project['desc_' . $locale] ?? $project['desc_en'] ?? '';
     $category = $project['category_' . $locale] ?? $project['category'] ?? 'Platform';
     $highlights = $project['highlights_' . $locale] ?? $project['highlights_en'] ?? [];
 @endphp
 
-@section('title', $title . ' | Musoftwares')
-@section('description', $desc)
 
 @section('content')
 <div class="w-full bg-[#ffffff] text-[#1d1d1f] pt-12 sm:pt-16 pb-28">
@@ -33,7 +31,7 @@
                         {{ $category }}
                     </span>
                     <h1 class="text-3xl sm:text-5xl font-bold text-[#1d1d1f] tracking-tight apple-headline leading-tight">
-                        {{ $title }}
+                        {{ $projectTitle }}
                     </h1>
                 </div>
 
@@ -78,7 +76,7 @@
                         </a>
                     @endif
 
-                    <a href="https://wa.me/201015218548?text={{ urlencode('Hello Mahmoud, I am interested in discussing a project similar to ' . ($project['title_en'] ?? $title)) }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-secondary text-[13px] px-5 py-2 flex items-center gap-1.5">
+                    <a href="https://wa.me/201015218548?text={{ urlencode('Hello Mahmoud, I am interested in discussing a project similar to ' . ($project['title_en'] ?? $projectTitle)) }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-secondary text-[13px] px-5 py-2 flex items-center gap-1.5">
                         <span>{{ $locale === 'ar' ? 'استشارة واتساب' : 'WhatsApp Consultation' }}</span>
                         <span>➔</span>
                     </a>
@@ -107,7 +105,7 @@
                 <!-- Media Preview -->
                 <div class="p-6 bg-white flex items-center justify-center min-h-[420px] max-h-[620px] overflow-hidden">
                     @if(!empty($project['img']))
-                        <img src="{{ $project['img'] }}" alt="{{ $title }}" class="w-full h-auto object-contain max-h-[580px] shadow-md rounded-xl">
+                        <img src="{{ $project['img'] }}" alt="{{ $projectTitle }}" class="w-full h-auto object-contain max-h-[580px] shadow-md rounded-xl">
                     @else
                         <div class="py-24 text-center text-[#86868b] text-xs">
                             [MUSOFTWARE PRODUCTION ARCHIVE]
@@ -127,7 +125,7 @@
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
                     @foreach(array_slice($project['gallery'], 1) as $shot)
                         <a href="{{ $shot }}" target="_blank" rel="noopener" class="block bg-[#f5f5f7] rounded-2xl border border-black/[0.06] p-3 hover:shadow-md transition-shadow">
-                            <img src="{{ $shot }}" alt="{{ $title }}" loading="lazy" class="w-full h-auto rounded-xl">
+                            <img src="{{ $shot }}" alt="{{ $projectTitle }}" loading="lazy" class="w-full h-auto rounded-xl">
                         </a>
                     @endforeach
                 </div>

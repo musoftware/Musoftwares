@@ -90,7 +90,7 @@ class GeneralServicesTest extends TestCase
             ->assertSessionHasErrors('plan_key');
     }
 
-    public function test_homepage_shows_the_business_switcher_and_the_lowest_price_of_each_group(): void
+    public function test_homepage_shows_the_business_switcher_without_store_price_groups(): void
     {
         $this->seedServices();
         SoftwareProduct::query()->update(['is_active' => true]);
@@ -99,7 +99,8 @@ class GeneralServicesTest extends TestCase
 
         $this->assertStringContainsString('data-business-switcher', $html);
         $this->assertStringContainsString('صيدلية', $html);
-        $this->assertStringContainsString('من 1,000 جنيه', $html);
+        // the store's price groups live on /services; the homepage only shows ready programs as samples
+        $this->assertStringNotContainsString('إيه اللي بنقدمه؟', $html);
     }
 
     public function test_legacy_company_service_urls_still_resolve(): void

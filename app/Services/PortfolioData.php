@@ -9,6 +9,19 @@ class PortfolioData
      *
      * @return array<string, array>
      */
+    /**
+     * The named projects, in the order given. Unknown names are skipped.
+     *
+     * @param  list<string>  $slugs
+     * @return list<array<string, mixed>>
+     */
+    public static function only(array $slugs): array
+    {
+        $all = self::all();
+
+        return array_values(array_filter(array_map(fn (string $slug) => $all[$slug] ?? null, $slugs)));
+    }
+
     public static function all(): array
     {
         return [

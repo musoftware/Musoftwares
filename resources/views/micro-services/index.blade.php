@@ -1,4 +1,4 @@
-@extends('layouts.public', ['title' => __('micro_services.title').' | Musoftwares', 'description' => __('micro_services.meta_description'), 'canonical' => $canonical])
+@extends('layouts.public', ['title' => __('micro_services.title').__('seo.suffix'), 'description' => __('micro_services.meta_description'), 'canonical' => $canonical])
 
 @push('head')
     <meta name="robots" content="index,follow,max-image-preview:large">

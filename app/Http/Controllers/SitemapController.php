@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogArticle;
 use App\Models\WebsiteService;
+use App\Services\PortfolioData;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Response;
@@ -80,6 +81,7 @@ class SitemapController extends Controller
             'legal.terms' => '0.5',
             'legal.cookies' => '0.5',
             'estimator' => '0.8',
+            'start-project' => '0.9',
             'blog.index' => '0.8',
             'library.index' => '0.8',
         ];
@@ -88,6 +90,11 @@ class SitemapController extends Controller
                 $daily = in_array($route, ['home', 'marketplace.services.index'], true);
                 $urls[] = $this->url(route($route), $today, $daily ? 'daily' : 'weekly', $priority);
             }
+        }
+
+        // Each client project is a page of real work, the best proof a visitor can find in search.
+        foreach (array_keys(PortfolioData::all()) as $slug) {
+            $urls[] = $this->url(url('/portfolio/'.$slug), $today, 'monthly', '0.8');
         }
 
         if (class_exists(WebsiteService::class) && Route::has('website-services.show')) {
