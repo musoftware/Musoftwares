@@ -47,11 +47,61 @@ class PointPurchaseService extends BaseService
     }
 
     /**
-     * Fetch point transactions for a user.
+     * Fetch point transactions for a user. The page number has its own name, so it can share a page
+     * with the loyalty points history.
      */
     public function getUserTransactions(int $userId)
     {
-        return PointTransaction::where('user_id', $userId)->latest()->paginate(10);
+        return PointTransaction::where('user_id', $userId)->latest()->paginate(10, ['*'], 'credit_page');
+    }
+
+    /**
+     * Everything the "service credit" part of the rewards page needs, with prices in the user's currency.
+     *
+     * @return array{tiers: array, quickPackages: array, transactions: mixed, currency: string}
+     */
+    public function creditPageFor(User $user): array
+    {
+        [$currencyCode, $rate] = $this->egpRateFor($user);
+
+        $tiers = array_map(fn (array $tier) => [...$tier, 'price_per_point' => $tier['price_per_point'] * $rate], $this->getTiers());
+
+        $quickPackages = array_map(fn (array $pkg) => [
+            ...$pkg,
+            'full_price' => $pkg['full_price'] * $rate,
+            'total_cost' => $pkg['total_cost'] * $rate,
+            'price_per_point' => $pkg['price_per_point'] * $rate,
+            'savings' => $pkg['savings'] * $rate,
+        ], $this->getQuickPackages());
+
+        return [
+            'tiers' => $tiers,
+            'quickPackages' => $quickPackages,
+            'transactions' => $this->getUserTransactions($user->id),
+            'currency' => $currencyCode,
+        ];
+    }
+
+    /**
+     * The user's currency and the EGP rate for today. With no rate today, prices stay in EGP
+     * instead of failing the page.
+     *
+     * @return array{0: string, 1: float}
+     */
+    private function egpRateFor(User $user): array
+    {
+        $egpId = Currency::where('currency', 'EGP')->value('id');
+        $userCurrency = $user->currency ? Currency::find($user->currency) : null;
+
+        if (! $egpId || ! $userCurrency || (int) $egpId === (int) $userCurrency->id) {
+            return [$userCurrency?->currency ?? 'EGP', 1.0];
+        }
+
+        try {
+            return [$userCurrency->currency, (float) CurrenciesExchange::RateToday(1, $egpId, $userCurrency->id)];
+        } catch (\App\Exceptions\MissingExchangeRateException) {
+            return ['EGP', 1.0];
+        }
     }
 
     /**

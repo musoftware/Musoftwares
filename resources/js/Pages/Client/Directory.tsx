@@ -37,7 +37,7 @@ const DIRECTORY_ITEMS: DirectoryItem[] = [
     { id: 'transactions', category: 'finance', icon: ArrowRightLeft, href: '/financial/transactions' },
     { id: 'vouchers', category: 'rewards', icon: Ticket, href: '/vouchers' },
     { id: 'withdrawals', category: 'finance', icon: ArrowUpRight, href: '/financial/withdrawals' },
-    { id: 'points', category: 'rewards', icon: Award, href: '/points' },
+    { id: 'points', category: 'rewards', icon: Award, href: '/loyalty#credit' },
     { id: 'kyc', category: 'security', icon: ShieldCheck, href: '/kyc' },
 ];
 

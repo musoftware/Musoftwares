@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Award, Check, CheckCircle2, Clock, Copy, ExternalLink, Gift, MessageSquare, Share2, Shield, Users, Zap } from 'lucide-react';
 import ClientPage, { Card, EmptyNote, PrimaryAction, Section, TextAction } from '@/Components/Client/ClientPage';
 import MonthlyRanking, { MonthlyRankingData } from '@/Components/Client/MonthlyRanking';
+import ServiceCredit, { ServiceCreditData } from '@/Components/Client/ServiceCredit';
 import { __ } from '@/lib/i18n';
 import { cn, formatMoney } from '@/lib/utils';
 import { whatsAppLink } from '@/lib/whatsapp';
@@ -50,6 +51,7 @@ interface LoyaltyPageProps {
     pointsConversionRate: number;
     monthlyRanking?: MonthlyRankingData;
     badgeCardUrl?: string;
+    credit?: ServiceCreditData;
 }
 
 /** Translated level name ("Gold" / "ذهبي"), falling back to the name stored with the level. */
@@ -64,7 +66,17 @@ function tierName(tier: LoyaltyTier | null | undefined, fallbackSlug = 'bronze')
  * Rewards: the badge and points first, then this month's ranking, what the points buy, the points
  * history, the levels, how to earn, and the invite link.
  */
-export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = [], referral, pointsConversionRate = 1 / 30, monthlyRanking, badgeCardUrl }: LoyaltyPageProps) {
+/** Splits the page into its two parts: points you earn, and points you buy. */
+function PartHeading({ id, title, hint }: { id: string; title: string; hint: string }) {
+    return (
+        <div id={id} className="scroll-mt-24 border-t border-black/10 pt-6 first:border-t-0 first:pt-0 dark:border-white/10">
+            <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+            <p className="mt-1 text-sm text-[#1d1d1f]/60 dark:text-zinc-400">{hint}</p>
+        </div>
+    );
+}
+
+export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = [], referral, pointsConversionRate = 1 / 30, monthlyRanking, badgeCardUrl, credit }: LoyaltyPageProps) {
     const { auth } = usePage().props as any;
     const [balance, setBalance] = useState<number>(summary?.balance || 0);
     const [redeemingId, setRedeemingId] = useState<number | null>(null);
@@ -118,6 +130,15 @@ export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = []
                     {message.ok ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <Shield className="h-4 w-4 shrink-0" />}{message.text}
                 </div>
             )}
+
+            {credit && (
+                <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold" aria-label={__('client_rewards.loyalty.title')}>
+                    <a href="#earned" className="text-[#0071e3] hover:underline">{__('client_rewards.loyalty.part_title')}</a>
+                    <a href="#credit" className="text-[#0071e3] hover:underline">{__('client_money.points.part_title')}</a>
+                </nav>
+            )}
+
+            <PartHeading id="earned" title={__('client_rewards.loyalty.part_title')} hint={__('client_rewards.loyalty.part_hint')} />
 
             {/* Badge, points and progress */}
             <Card>
@@ -320,6 +341,13 @@ export default function LoyaltyIndex({ summary, ledger, tiers = [], rewards = []
                         <BuilderReferralLink url={`${referral.url}?to=ai`} />
                     </Card>
                 </Section>
+            )}
+
+            {credit && (
+                <>
+                    <PartHeading id="credit" title={__('client_money.points.part_title')} hint={__('client_money.points.hint')} />
+                    <ServiceCredit {...credit} />
+                </>
             )}
         </ClientPage>
     );

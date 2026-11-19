@@ -57,7 +57,44 @@ class GuestInvoiceCurrencyShowTest extends TestCase
             ->component('Guest/InvoiceShow')
             ->where('invoice.id', $invoice->id)
             ->where('invoice.currency', 'USD')
-            ->where('invoice.currency_symbol', '$')
+            ->where('invoice.items.0.title', 'Web Development')
+            ->where('invoice.remaining', fn ($value) => (float) $value === 150.0)
+            ->where('invoice.time_report', null)
+            // a public link: costs, margins, affiliates and the client's balance stay out
+            ->missing('invoice.cost')
+            ->missing('invoice.revenue')
+            ->missing('invoice.margin_percentage')
+            ->missing('invoice.affiliate_data')
+            ->missing('invoice.user')
         );
+    }
+
+    public function test_signed_in_pay_page_uses_the_same_invoice_shape(): void
+    {
+        $this->seedUsdEgpRates();
+        $currency = Currency::firstOrCreate(['id' => 1], ['currency' => 'USD', 'symbol' => '$', 'string_format' => '$%01.2f']);
+        $user = User::factory()->create(['currency_id' => $currency->id, 'onboarding_completed' => true]);
+
+        $invoice = Invoice::create([
+            'user_id' => $user->id,
+            'currency_id' => $currency->id,
+            'status' => 'unpaid',
+            'paid' => 0,
+            'unpaid' => 80,
+            'cost' => 0,
+            'cost_calculated' => '0',
+            'is_suspended' => false,
+        ]);
+        InvoiceItem::create(['invoice_id' => $invoice->id, 'item_title' => 'Hosting', 'item_type' => 'simple', 'qty' => 2, 'amount' => 40]);
+
+        $this->actingAs($user)->get(route('billing.invoices.pay', $invoice->uuid))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Client/Billing/InvoicePay')
+                ->where('invoice.uuid', $invoice->uuid)
+                ->where('invoice.items.0.title', 'Hosting')
+                ->where('invoice.items.0.quantity', fn ($value) => (float) $value === 2.0)
+                ->where('wallet_currency', 'USD')
+            );
     }
 }

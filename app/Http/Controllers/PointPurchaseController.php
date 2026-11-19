@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Builders\KashierCheckoutBuilder;
 use App\Http\Requests\StoreCustomPointPurchaseRequest;
 use App\Http\Requests\StorePackagePointPurchaseRequest;
-use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\KashierCheckout;
 use App\Models\PointPackage;
@@ -27,48 +26,15 @@ class PointPurchaseController extends Controller
         $this->pointsService = $pointsService;
     }
 
+    /** Bought credit lives on the rewards page now, next to the earned points. */
     public function index()
     {
-        $user = auth()->user();
+        return redirect()->to(self::creditPageUrl());
+    }
 
-        $egpCurrency = Currency::where('currency', 'EGP')->first();
-        $userCurrencyId = $user->currency;
-        $userCurrency = Currency::find($userCurrencyId);
-
-        $currencyCode = $userCurrency ? $userCurrency->currency : 'EGP';
-        $rate = 1.0;
-
-        if ($egpCurrency && $userCurrencyId && $egpCurrency->id != $userCurrencyId) {
-            try {
-                $rate = CurrenciesExchange::RateToday(1, $egpCurrency->id, $userCurrencyId);
-            } catch (\App\Exceptions\MissingExchangeRateException) {
-                // no rate today: show the EGP prices instead of failing the page
-                $currencyCode = 'EGP';
-            }
-        }
-
-        $tiers = $this->pointsService->getTiers();
-        foreach ($tiers as &$tier) {
-            $tier['price_per_point'] = $tier['price_per_point'] * $rate;
-        }
-
-        $quickPackages = $this->pointsService->getQuickPackages();
-        foreach ($quickPackages as &$pkg) {
-            $pkg['full_price'] = $pkg['full_price'] * $rate;
-            $pkg['total_cost'] = $pkg['total_cost'] * $rate;
-            $pkg['price_per_point'] = $pkg['price_per_point'] * $rate;
-            $pkg['savings'] = $pkg['savings'] * $rate;
-        }
-
-        $transactions = $this->pointsService->getUserTransactions($user->id);
-
-        return Inertia::render('Core/Points/Index', [
-            'tiers' => $tiers,
-            'quickPackages' => $quickPackages,
-            'transactions' => $transactions,
-            'currency' => $currencyCode,
-            'egpToPreferredRate' => $rate,
-        ]);
+    private static function creditPageUrl(): string
+    {
+        return route('loyalty.index').'#credit';
     }
 
     public function storeWallet(StoreCustomPointPurchaseRequest $request)
@@ -139,12 +105,12 @@ class PointPurchaseController extends Controller
 
     public function success(Request $request)
     {
-        return redirect()->route('points.index')->with('success', __('general.payment_successful_thank_you'));
+        return redirect()->to(self::creditPageUrl())->with('success', __('general.payment_successful_thank_you'));
     }
 
     public function failure(Request $request)
     {
-        return redirect()->route('points.index')->withErrors(['error' => __('general.payment_failed_please_try_again')]);
+        return redirect()->to(self::creditPageUrl())->withErrors(['error' => __('general.payment_failed_please_try_again')]);
     }
 
     public function webhook(Request $request, KashierCheckoutFulfillment $fulfillment)

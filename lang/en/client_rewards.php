@@ -4,7 +4,9 @@
 return [
     'loyalty' => [
         'title' => 'Rewards',
-        'hint' => 'Your badge, your points and what you can get with them.',
+        'hint' => 'The points you earn for free and the points you buy for tools, in one place.',
+        'part_title' => 'Reward points',
+        'part_hint' => 'You earn these for free when you pay early or invite someone, and swap them for rewards.',
         'use_points' => 'Use your points',
         'points' => ':count points',
         'worth' => 'Worth about :amount',

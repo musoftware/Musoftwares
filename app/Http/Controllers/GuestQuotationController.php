@@ -10,6 +10,7 @@ use App\Models\InvoiceItem;
 use App\Models\Quotation;
 use App\Models\QuotationOrder;
 use App\Models\User;
+use App\Support\PaymentResultPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -189,11 +190,23 @@ class GuestQuotationController extends Controller
             ? 'تم استلام الدفعة المقدمة بنجاح! تم إنشاء حسابك وتأكيد بدء العمل على المشروع.'
             : 'تم استلام عملية الدفع وجاري تأكيدها من بوابة الدفع. سيصلك بريد إلكتروني فور التأكيد.';
 
-        return Inertia::render('Guest/QuotationPaymentResult', [
-            'status' => 'success',
-            'order' => $order,
-            'message' => $message,
-        ]);
+        return PaymentResultPage::render(
+            true,
+            $message,
+            [['label' => __('quotations.guest_result_login'), 'href' => '/login'], PaymentResultPage::homeAction()],
+            self::orderDetails($order),
+            __('quotations.guest_result_next_steps_desc'),
+        );
+    }
+
+    /** @return list<array{label: string, value: string}> */
+    private static function orderDetails(QuotationOrder $order): array
+    {
+        return [
+            ['label' => __('quotations.guest_result_order_number'), 'value' => (string) $order->order_number],
+            ['label' => __('quotations.guest_result_project'), 'value' => (string) $order->quotation?->title],
+            ['label' => __('quotations.guest_result_amount_paid'), 'value' => trim($order->deposit_amount.' '.$order->currency)],
+        ];
     }
 
     /**
@@ -203,12 +216,15 @@ class GuestQuotationController extends Controller
     {
         $order = QuotationOrder::with('quotation')->where('uuid', $orderUuid)->firstOrFail();
 
-        return Inertia::render('Guest/QuotationPaymentResult', [
-            'status' => 'failed',
-            'order' => $order,
-            'message' => 'تعذر إتمام عملية الدفع. يرجى المحاولة مرة أخرى أو استخدام وسيلة دفع أخرى.',
-            'retryUrl' => route('guest.quotations.checkout', ['uuid' => $order->quotation->uuid]),
-        ]);
+        return PaymentResultPage::render(
+            false,
+            'تعذر إتمام عملية الدفع. يرجى المحاولة مرة أخرى أو استخدام وسيلة دفع أخرى.',
+            [
+                ['label' => __('quotations.guest_result_retry'), 'href' => route('guest.quotations.checkout', ['uuid' => $order->quotation->uuid])],
+                PaymentResultPage::homeAction(),
+            ],
+            note: __('quotations.guest_result_failed_hint'),
+        );
     }
 
     /**

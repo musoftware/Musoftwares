@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserReferral;
 use App\Services\BadgeCardService;
 use App\Services\LoyaltyService;
+use App\Services\PointPurchaseService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,11 +18,12 @@ class LoyaltyController extends Controller
 {
     public function __construct(
         protected LoyaltyService $loyaltyService,
-        protected ReferralService $referralService
+        protected ReferralService $referralService,
+        protected PointPurchaseService $pointPurchaseService,
     ) {}
 
     /**
-     * Render the dedicated Client Loyalty & Points Hub.
+     * The one points page: earned reward points first, then the bought service credit.
      */
     public function index(Request $request): Response
     {
@@ -67,6 +69,7 @@ class LoyaltyController extends Controller
             'pointsConversionRate' => LoyaltyService::POINTS_TO_CURRENCY_RATE,
             'badgeCardUrl'     => app(BadgeCardService::class)->linkFor($user),
             'monthlyRanking'   => app(\App\Services\Client\MonthlyLeaderboardService::class)->forUser($user, 10),
+            'credit'           => $this->pointPurchaseService->creditPageFor($user),
         ]);
     }
 }

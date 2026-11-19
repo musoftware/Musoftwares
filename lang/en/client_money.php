@@ -104,6 +104,7 @@ return [
 
     'points' => [
         'title' => 'Points',
+        'part_title' => 'Bought points',
         'hint' => 'Points pay for job applications, proposal boosts and premium tools.',
         'balance' => 'You have :count points',
         'packages' => 'Packages',

@@ -19,7 +19,7 @@ class MissingExchangeRateDisplayTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_invoice_page_renders_with_null_business_amount_when_rate_missing(): void
+    public function test_guest_invoice_page_renders_when_rate_missing(): void
     {
         $invoice = $this->usdInvoice(150);
 
@@ -28,7 +28,7 @@ class MissingExchangeRateDisplayTest extends TestCase
 
         $this->get(URL::signedRoute('guest.invoices.show', ['invoice' => $invoice->id]))
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->where('invoice.business_amount', null));
+            ->assertInertia(fn ($page) => $page->where('invoice.currency', 'USD')->missing('invoice.business_amount'));
     }
 
     public function test_money_conversion_still_fails_when_rate_missing(): void

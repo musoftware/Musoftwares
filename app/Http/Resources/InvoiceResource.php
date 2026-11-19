@@ -218,7 +218,7 @@ class InvoiceResource extends JsonResource
         }
     }
 
-    protected function calculateTimerMetrics(): array
+    public function calculateTimerMetrics(): array
     {
         $invoice = $this->resource;
         $currencyId = $this->getCurrencyId();

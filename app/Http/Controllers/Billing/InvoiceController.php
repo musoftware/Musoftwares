@@ -11,6 +11,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use App\Models\Invoice;
+use App\Support\InvoiceSummary;
+use App\Support\PaymentResultPage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -124,32 +126,9 @@ class InvoiceController extends Controller
         }
 
         return Inertia::render('Client/Billing/InvoicePay', [
-            'invoice' => [
-                'id' => $invoice->id,
-                'uuid' => $invoice->uuid,
-                'invoice_number' => $invoice->id,
-                'amount' => round((float) $invoice->total(), 2),
-                'paid_amount' => round((float) $invoice->paid, 2),
-                'remaining' => $invoice->unpaid_total(),
-                'currency' => ($curr = Currency::findCached($invoice->currency_id) ?? Currency::find($invoice->currency_id) ?? $walletCurrency) ? [
-                    'id' => $curr->id,
-                    'currency' => $curr->currency,
-                    'symbol' => $curr->symbol,
-                    'string_format' => $curr->string_format,
-                ] : null,
-                'status' => $invoice->status,
-                'due_date' => $invoice->schedule['start_date'] ?? null,
-                'issued_at' => $invoice->created_at?->format('Y-m-d'),
-                'notes' => $invoice->notes,
-                'items' => $invoice->items->map(fn ($i) => [
-                    'title' => $i->description ?? $i->item_name,
-                    'quantity' => $i->qty,
-                    'unit_price' => $i->price,
-                    'total' => $i->total(),
-                ]),
-            ],
+            'invoice' => InvoiceSummary::of($invoice),
             'client_balance' => round((float) $user->balance(), 2),
-            'wallet_currency' => $walletCurrency,
+            'wallet_currency' => $walletCurrency?->currency,
             'remaining_in_wallet_currency' => $remainingInWalletCurrency,
         ]);
     }
@@ -250,10 +229,7 @@ class InvoiceController extends Controller
      */
     public function paymentSuccess(Request $request)
     {
-        return Inertia::render('Client/Billing/PaymentResult', [
-            'status' => 'success',
-            'message' => __('general.payment_successful_thank_you'),
-        ]);
+        return PaymentResultPage::render(true, __('general.payment_successful_thank_you'), self::resultActions());
     }
 
     /**
@@ -261,10 +237,16 @@ class InvoiceController extends Controller
      */
     public function paymentFailure(Request $request)
     {
-        return Inertia::render('Client/Billing/PaymentResult', [
-            'status' => 'error',
-            'message' => __('general.payment_failed_please_try_again'),
-        ]);
+        return PaymentResultPage::render(false, __('general.payment_failed_please_try_again'), self::resultActions());
+    }
+
+    /** @return list<array{label: string, href: string}> */
+    private static function resultActions(): array
+    {
+        return [
+            ['label' => __('client_money.result.invoices'), 'href' => route('billing.invoices.index')],
+            PaymentResultPage::homeAction(),
+        ];
     }
 
     /**

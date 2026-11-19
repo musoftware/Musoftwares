@@ -422,7 +422,7 @@ class DashboardService extends BaseService
                 'desc' => 'Earned points available for marketplace rewards',
                 'time' => 'Live',
                 'type' => 'success',
-                'link' => url('/points')
+                'link' => url('/loyalty')
             ]);
         }
 

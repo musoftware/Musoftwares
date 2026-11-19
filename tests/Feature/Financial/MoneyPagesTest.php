@@ -43,7 +43,7 @@ class MoneyPagesTest extends TestCase
             '/financial/payout-methods' => 'Client/Financial/PayoutMethods',
             '/financial/transfer' => 'Client/Financial/WalletTransfer/Create',
             '/financial/transfer/history' => 'Client/Financial/WalletTransfer/History',
-            '/billing/invoices/payment/success' => 'Client/Billing/PaymentResult',
+            '/billing/invoices/payment/success' => 'Payment/Result',
         ] as $url => $component) {
             $this->actingAs($user)->get($url)->assertOk()->assertInertia(fn (Assert $page) => $page->component($component));
         }

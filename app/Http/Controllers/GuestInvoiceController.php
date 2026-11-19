@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Builders\KashierCheckoutBuilder;
 use App\Helpers\KashierHelper;
-use App\Http\Resources\InvoiceResource;
 use App\Models\Currency;
 use App\Models\Invoice;
+use App\Support\InvoiceSummary;
+use App\Support\PaymentResultPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -28,10 +29,9 @@ class GuestInvoiceController extends Controller
             abort(404, 'Invoice not found.');
         }
 
-        $invoice->load(['user', 'project', 'items.timers', 'currency']);
-
         return Inertia::render('Guest/InvoiceShow', [
-            'invoice' => (new InvoiceResource($invoice))->resolve(),
+            'invoice' => InvoiceSummary::of($invoice),
+            'prefill' => ['name' => $invoice->user?->name, 'email' => $invoice->user?->email],
             // Pass down signed URL so the frontend can submit the payment form securely
             'pay_url' => URL::signedRoute('guest.invoices.pay', ['invoice' => $invoice->id]),
         ]);
@@ -93,10 +93,7 @@ class GuestInvoiceController extends Controller
      */
     public function paymentSuccess(Request $request)
     {
-        return Inertia::render('Guest/PaymentResult', [
-            'status' => 'success',
-            'message' => __('general.payment_successful_thank_you'),
-        ]);
+        return PaymentResultPage::render(true, __('general.payment_successful_thank_you'));
     }
 
     /**
@@ -104,10 +101,7 @@ class GuestInvoiceController extends Controller
      */
     public function paymentFailure(Request $request)
     {
-        return Inertia::render('Guest/PaymentResult', [
-            'status' => 'error',
-            'message' => __('general.payment_failed_please_try_again'),
-        ]);
+        return PaymentResultPage::render(false, __('general.payment_failed_please_try_again'));
     }
 
     /**

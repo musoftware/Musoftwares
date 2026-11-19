@@ -338,7 +338,7 @@ function AuthenticatedContent({
                                                             <div className="flex items-center justify-between text-xs">
                                                                 <span className="text-[#1d1d1f]/60 dark:text-zinc-400 font-medium">{__('general.points_connects_balance')}</span>
                                                                 <SafeLink
-                                                                    href={safeRoute('points.index', undefined, '/points')}
+                                                                    href="/loyalty#credit"
                                                                     onClick={() => setIsMobileOpen(false)}
                                                                     className="font-bold text-amber-800 dark:text-amber-300 hover:text-amber-900 flex items-center gap-1.5"
                                                                 >
@@ -487,7 +487,7 @@ function AuthenticatedContent({
 
                                     {/* Points pill */}
                                     <SafeLink
-                                        href={safeRoute('points.index', undefined, '/points')}
+                                        href="/loyalty#credit"
                                         className="inline-flex items-center gap-1.5 h-8 px-2.5 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100/60 dark:hover:bg-amber-950/50 border border-amber-200/60 dark:border-amber-500/20 rounded-full transition-all text-xs font-semibold text-amber-800 dark:text-amber-300 shrink-0"
                                         title={__('general.points_connects_balance')}
                                     >

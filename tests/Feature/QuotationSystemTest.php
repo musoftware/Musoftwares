@@ -264,7 +264,7 @@ class QuotationSystemTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page->component('Guest/QuotationPaymentResult'));
+        $response->assertInertia(fn ($page) => $page->component('Payment/Result'));
         $this->assertEquals('pending_payment', $order->refresh()->status);
         $this->assertEquals('unpaid', $order->invoice->status);
     }

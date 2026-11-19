@@ -169,6 +169,22 @@ class ClientHomeTest extends TestCase
         );
     }
 
+    public function test_earned_and_bought_points_share_one_page(): void
+    {
+        $user = $this->client();
+
+        $this->actingAs($user)->get('/points')->assertRedirect(route('loyalty.index').'#credit');
+
+        $this->actingAs($user)->get('/loyalty')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('Client/Loyalty/Index')
+            ->has('summary')
+            ->has('credit.tiers', 3)
+            ->has('credit.quickPackages')
+            ->has('credit.transactions.data')
+            ->has('credit.currency')
+        );
+    }
+
     public function test_users_who_never_picked_a_language_are_not_switched_by_the_column_default(): void
     {
         $user = $this->client(); // users.lang defaults to 'ar', users.locale is empty

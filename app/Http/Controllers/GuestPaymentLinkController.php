@@ -6,6 +6,7 @@ use App\Builders\KashierCheckoutBuilder;
 use App\Jobs\ProcessWebhookJob;
 use App\Models\IncomingWebhook;
 use App\Models\PaymentLink;
+use App\Support\PaymentResultPage;
 use App\Traits\ConvertsCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -20,11 +21,11 @@ class GuestPaymentLinkController extends Controller
         $paymentLink = PaymentLink::with(['currency', 'client'])->where('uuid', $uuid)->firstOrFail();
 
         if ($paymentLink->status === 'paid') {
-            return Inertia::render('Guest/PaymentResult', [
-                'status' => 'success',
-                'message' => __('general.payment_already_paid', ['default' => 'This payment link has already been paid.']),
-                'continue_url' => $paymentLink->metadata['return_url'] ?? null,
-            ]);
+            return PaymentResultPage::render(
+                true,
+                __('general.payment_already_paid', ['default' => 'This payment link has already been paid.']),
+                self::resultActions($paymentLink),
+            );
         }
 
         return Inertia::render('Guest/PaymentLinkShow', [
@@ -89,19 +90,30 @@ class GuestPaymentLinkController extends Controller
             ? PaymentLink::where('uuid', (string) $request->query('link'))->first()
             : null;
 
-        return Inertia::render('Guest/PaymentResult', [
-            'status' => 'success',
-            'message' => __('general.payment_successful_thank_you'),
-            'continue_url' => $link?->metadata['return_url'] ?? null,
-        ]);
+        return PaymentResultPage::render(true, __('general.payment_successful_thank_you'), self::resultActions($link));
     }
 
     public function paymentFailure(Request $request)
     {
-        return Inertia::render('Guest/PaymentResult', [
-            'status' => 'error',
-            'message' => __('general.payment_failed_please_try_again'),
-        ]);
+        return PaymentResultPage::render(false, __('general.payment_failed_please_try_again'));
+    }
+
+    /**
+     * A link made by another page can carry a return url; then "Continue" goes back there first.
+     *
+     * @return list<array{label: string, href: string, external?: bool}>
+     */
+    private static function resultActions(?PaymentLink $link): array
+    {
+        $returnUrl = $link?->metadata['return_url'] ?? null;
+        if (! is_string($returnUrl) || $returnUrl === '') {
+            return [PaymentResultPage::homeAction()];
+        }
+
+        return [
+            ['label' => __('client_money.continue'), 'href' => $returnUrl, 'external' => true],
+            PaymentResultPage::homeAction(),
+        ];
     }
 
     public function paymentWebhook(Request $request)
