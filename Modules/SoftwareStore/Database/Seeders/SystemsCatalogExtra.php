@@ -5,14 +5,15 @@ namespace Modules\SoftwareStore\Database\Seeders;
 /**
  * Pharmacy, restaurant and dental systems. Same shape as the systems in SystemsCatalog.
  * The facts come from the systems' READMEs, seeders and test suites. Limits are stated on purpose:
- * the ETA e-receipt connector is built to the documentation but not tested against the real ETA, no controlled-drug register,
- * demo data is fake, no online payment.
+ * the ETA e-receipt connector (QR code on the printed receipt) is built to the documentation but not tested against the real ETA,
+ * the online-store sync (pharmacy), online payments and WhatsApp (dental) are tested only against simulated answers,
+ * no controlled-drug register, demo data is fake, no online payment in the pharmacy and the restaurant.
  */
 class SystemsCatalogExtra
 {
-    private const ETA_AR = 'أيوه، فيه ربط جاهز بالإيصال الإلكتروني لمصلحة الضرائب (ETA). كتبناه على التوثيق الرسمي للمصلحة واختبرناه على خادم تجريبي بس، ومجربناهوش على خادم المصلحة الحقيقي ومعندناش اعتماد منها. عشان تشغله لازم تسجّل جهاز الكاشير في بوابة المصلحة وتحصل على بياناته وأكواد الأصناف، وتجرّبه على بيئة التجربة الأول. اسأل محاسبك لو نشاطك مطلوب منه الإيصال الإلكتروني.';
+    private const ETA_AR = 'أيوه، فيه ربط جاهز بالإيصال الإلكتروني لمصلحة الضرائب (ETA). كتبناه على التوثيق الرسمي للمصلحة واختبرناه على خادم تجريبي بس، ومجربناهوش على خادم المصلحة الحقيقي (لا التجربة ولا الفعلي) ومعندناش اعتماد منها. كود QR بتاع المصلحة بيتطبع على الإيصال أول ما المصلحة تقبله. عشان تشغله لازم تسجّل جهاز الكاشير في بوابة المصلحة وتحصل على بياناته وأكواد الأصناف، وتجرّبه على بيئة التجربة الأول. اسأل محاسبك لو نشاطك مطلوب منه الإيصال الإلكتروني وأنهي نوع إيصال يناسبه.';
 
-    private const ETA_EN = 'Yes, a connector for the Egyptian Tax Authority e-receipt (ETA) is included. It is written to ETA\'s public documentation and tested only against a simulated server: it has not been tested against the real ETA and it is not certified by ETA. To use it you register your cash register in the ETA portal, get its credentials and your item codes, and try it on the ETA test environment first. Ask your accountant whether your business must issue e-receipts.';
+    private const ETA_EN = 'Yes, a connector for the Egyptian Tax Authority e-receipt (ETA) is included. It is written to ETA\'s public documentation and tested only against a simulated server: it has not been tested against the real ETA (test or live) and it is not certified by ETA. The ETA QR code is printed on the receipt once ETA has accepted it. To use it you register your cash register in the ETA portal, get its credentials and your item codes, and try it on the ETA test environment first. Ask your accountant whether your business must issue e-receipts and which receipt type fits it.';
 
     /** @return array<int, array<string, mixed>> */
     public static function systems(): array
@@ -46,23 +47,25 @@ class SystemsCatalogExtra
                 'pillars' => [
                     ['icon' => 'clock', 'title' => 'الأقرب انتهاءً أولاً', 'body' => 'البيع بيتقسم على الدفعات تلقائيًا لو الدفعة الأولى خلصت.'],
                     ['icon' => 'shield', 'title' => 'روشتة مطلوبة', 'body' => 'الدواء اللي محتاج روشتة لازم الكاشير يأكد إنه شافها، وممكن يسجل اسم الدكتور والمريض.'],
-                    ['icon' => 'refresh', 'title' => 'مرتجعات وتحويلات', 'body' => 'مرتجع عميل ومرتجع مورد وتحويل بين الفروع وتسوية مخزون.'],
+                    ['icon' => 'refresh', 'title' => 'متجرك أونلاين', 'body' => 'المخزون بيروح لمتجرك بالعلبة الكاملة من الدفعات اللي لسه صالحة، والطلب بيتخصم بالأقرب انتهاءً. والدواء اللي بروشتة مبيتعرضش أونلاين أبدًا.'],
                     ['icon' => 'users', 'title' => 'صلاحيات', 'body' => 'كاشير وصيدلي وأمين مخزن ومدير، وكل واحد يشوف شغله.'],
                 ],
                 'before_after' => ['kicker' => 'الفرق العملي', 'title' => 'قبل وبعد النظام', 'before_title' => 'الطريقة التقليدية', 'after_title' => 'مع نظام الصيدلية',
                     'before' => [['b' => 'الصلاحية', 't' => 'جرد يدوي بيكتشف المنتهي متأخر.'], ['b' => 'البيع', 't' => 'بيع من أي علبة والنتيجة منتهي على الرف.'], ['b' => 'الموردين', 't' => 'حسابات على ورق.']],
                     'after' => [['b' => 'الصلاحية', 't' => 'تنبيه قبل الانتهاء بـ 30 و60 و90 يوم.'], ['b' => 'البيع', 't' => 'الأقرب انتهاءً أولاً تلقائيًا.'], ['b' => 'الموردين', 't' => 'رصيد كل مورد ومرتجعاته.']]],
-                'metrics' => [['value' => '60', 'label' => 'دواء تجريبي في النسخة التجريبية'], ['value' => '3', 'label' => 'أحجام طباعة للإيصال'], ['value' => '152', 'label' => 'اختبار آلي في الكود']],
-                'paragraphs' => ['النظام بيحفظ المخزون بالشريط وتقدر تبيع بالعلبة أو بالشريط. كل بند شراء بيعمل دفعة، والكاشير بياخد من الدفعة الأقرب انتهاءً، والمنتهي مبيعش حتى لو اتمسح الباركود. المرتجع بيرجع لنفس الدفعة إلا لو انتهت.', 'جوه النظام: الأدوية والمخزون، والمشتريات والموردين، والعملاء والديون، وتحويلات الفروع، وتسويات المخزون وإعدام المنتهي، وملصقات الأسعار بباركود، وتقارير يومية. فيه بيانات تجريبية خيالية عشان تجرب قبل ما تبدأ.'],
-                'list' => ['كاشير بالباركود والاسم التجاري والعلمي', 'دفعات وتواريخ صلاحية وبيع الأقرب انتهاءً أولاً', 'تنبيهات المنتهي والقريب من الانتهاء والنواقص', 'بيع بالعلبة أو بالشريط', 'تأكيد الروشتة للأدوية اللي بتحتاجها', 'مشتريات وموردين ومرتجعات', 'تحويلات بين الفروع وتسويات مخزون', 'ملصقات أسعار بباركود وإيصالات 80 و58 مم وA4', 'تقارير المبيعات والربح والديون', 'إرسال المبيعات والمرتجعات للإيصال الإلكتروني (ETA) لكل فرع، ويحتاج بيانات مسجّلة عندك'],
+                'metrics' => [['value' => '60', 'label' => 'دواء تجريبي في النسخة التجريبية'], ['value' => '3', 'label' => 'أحجام طباعة للإيصال'], ['value' => '203', 'label' => 'اختبار آلي في الكود']],
+                'paragraphs' => ['النظام بيحفظ المخزون بالشريط وتقدر تبيع بالعلبة أو بالشريط. كل بند شراء بيعمل دفعة، والكاشير بياخد من الدفعة الأقرب انتهاءً، والمنتهي مبيعش حتى لو اتمسح الباركود. المرتجع بيرجع لنفس الدفعة إلا لو انتهت.', 'جوه النظام: الأدوية والمخزون، والمشتريات والموردين، والعملاء والديون، وتحويلات الفروع، وتسويات المخزون وإعدام المنتهي، وملصقات الأسعار بباركود، وتقارير يومية. وبيبعت كل بيع ومرتجع للإيصال الإلكتروني (ETA)، وبيربط المخزون بمتجرك أونلاين. فيه بيانات تجريبية خيالية عشان تجرب قبل ما تبدأ.'],
+                'list' => ['كاشير بالباركود والاسم التجاري والعلمي', 'دفعات وتواريخ صلاحية وبيع الأقرب انتهاءً أولاً', 'تنبيهات المنتهي والقريب من الانتهاء والنواقص', 'بيع بالعلبة أو بالشريط', 'تأكيد الروشتة للأدوية اللي بتحتاجها', 'مشتريات وموردين ومرتجعات', 'تحويلات بين الفروع وتسويات مخزون', 'ملصقات أسعار بباركود وإيصالات 80 و58 مم وA4', 'تقارير المبيعات والربح والديون', 'إرسال المبيعات والمرتجعات للإيصال الإلكتروني (ETA) لكل فرع، بكود QR على الإيصال وعلى إيصال المرتجع، ويحتاج بيانات مسجّلة عندك', 'ربط بمتجرك على Shopify أو WooCommerce أو سلة: المخزون والأسعار بتروح للمتجر والطلبات بترجع مبيعات، والأدوية اللي بروشتة مبتتباعش أونلاين أبدًا'],
                 'faq' => [
                     ['q' => 'بيدعم الإيصال الإلكتروني للضرائب؟', 'a' => self::ETA_AR],
+                    ['q' => 'ينفع أبيع أونلاين؟', 'a' => 'أيوه، بيتربط بمتجرك على Shopify أو WooCommerce أو سلة. كل متجر بيعرض مخزون فرع واحد بالعلبة الكاملة من الدفعات اللي لسه صالحة، وطلب المتجر بيتسجل بيع في الفرع ده مرة واحدة بس، وبيتخصم بالأقرب انتهاءً، وبيتبعت للإيصال الإلكتروني زي بيع الكاشير. الدواء اللي محتاج روشتة مبيتباعش أونلاين أبدًا، ولو جه طلب فيه بيقف لحد ما تراجعه. الربط متجرب على ردود تجريبية بس ومتجربش على متجر حقيقي، فجرّبه على متجر تجريبي الأول.'],
                     ['q' => 'فيه سجل للمخدرات والأدوية المراقبة؟', 'a' => 'لا. النظام بيسجل بيانات الروشتة على الفاتورة بس، ومفيهوش سجل رسمي للأدوية المراقبة. استخدم السجل الورقي المطلوب قانونًا.'],
                     ['q' => 'البيانات التجريبية حقيقية؟', 'a' => 'لا، كل الأدوية والعملاء في النسخة التجريبية خيالية.'],
                 ],
                 'cta_title' => 'جاهز تنظم صيدليتك؟',
-                'included' => ['عربي وإنجليزي مع دعم الاتجاه من اليمين', 'طرق الدفع المسجلة: نقدي وبطاقة وتحويل ومحفظة (تسجيل فقط، من غير دفع أونلاين)'],
-                'payments_faq' => ['q' => 'بيدعم دفع أونلاين جوه النظام؟', 'a' => 'لا. النظام بيسجل طريقة الدفع (نقدي أو بطاقة أو تحويل أو محفظة) لكنه مبيحصلش الدفع بنفسه.'],
+                'included' => array_merge(SystemsCatalogOnline::included('ar', ['eta', 'store']), ['طرق الدفع المسجلة: نقدي وبطاقة وتحويل ومحفظة (تسجيل فقط، من غير دفع أونلاين)']),
+                'need_body' => SystemsCatalogOnline::needBody('ar', 'للإيصالات الإلكترونية ومزامنة المتجر'),
+                'payments_faq' => ['q' => 'بيدعم دفع أونلاين جوه النظام؟', 'a' => 'لا. النظام بيسجل طريقة الدفع (نقدي أو بطاقة أو تحويل أو محفظة) لكنه مبيحصلش الدفع بنفسه. طلب المتجر اللي اتدفع أونلاين بيتسجل بطاقة، والدفع عند الاستلام بيتسجل آجل على العميل.'],
             ],
             'en' => [
                 'kicker' => 'Pharmacies', 'headline' => 'A pharmacy with no expired medicine on the shelf and no mystery stock.',
@@ -83,23 +86,25 @@ class SystemsCatalogExtra
                 'pillars' => [
                     ['icon' => 'clock', 'title' => 'First expiry, first out', 'body' => 'A sale is split across batches automatically when the first batch runs out.'],
                     ['icon' => 'shield', 'title' => 'Prescription required', 'body' => 'For prescription medicines the cashier must confirm the prescription was seen, and can note the doctor and patient.'],
-                    ['icon' => 'refresh', 'title' => 'Returns and transfers', 'body' => 'Customer returns, supplier returns, branch transfers and stock adjustments.'],
+                    ['icon' => 'refresh', 'title' => 'Your online store', 'body' => 'Stock goes to your store in whole packs from unexpired batches, and an order takes the batch that expires first. Prescription-only medicines never go online.'],
                     ['icon' => 'users', 'title' => 'Roles', 'body' => 'Cashier, pharmacist, stock keeper and manager, each sees their own work.'],
                 ],
                 'before_after' => ['kicker' => 'The practical difference', 'title' => 'Before and after the system', 'before_title' => 'The old way', 'after_title' => 'With the pharmacy system',
                     'before' => [['b' => 'Expiry', 't' => 'Manual counts find expired stock late.'], ['b' => 'Selling', 't' => 'Any box is sold and the old one expires.'], ['b' => 'Suppliers', 't' => 'Accounts on paper.']],
                     'after' => [['b' => 'Expiry', 't' => 'Alerts at 30, 60 and 90 days.'], ['b' => 'Selling', 't' => 'First expiry first out, automatically.'], ['b' => 'Suppliers', 't' => 'Each supplier balance and returns.']]],
-                'metrics' => [['value' => '60', 'label' => 'Sample medicines in the demo'], ['value' => '3', 'label' => 'Receipt print sizes'], ['value' => '152', 'label' => 'Automated tests in the code']],
-                'paragraphs' => ['Stock is kept in strips and you can sell by the box or by the strip. Every purchase line creates a batch, the cashier takes from the batch that expires first, and expired stock is never sold. A return goes back to the same batch unless it has expired.', 'Inside: medicines and stock, purchases and suppliers, customers and debts, branch transfers, stock adjustments and write-off of expired stock, price labels with barcodes, and daily reports. It ships with fictional sample data so you can try it first.'],
-                'list' => ['Cashier with barcode, trade name and generic name search', 'Batches, expiry dates and first-expiry-first-out selling', 'Alerts for expired, near-expiry and low stock', 'Sell by the box or by the strip', 'Prescription confirmation for medicines that need one', 'Purchases, suppliers and returns', 'Branch transfers and stock adjustments', 'Barcode price labels and 80 mm, 58 mm and A4 receipts', 'Sales, profit and debt reports', 'Sales and returns sent to the tax e-receipt (ETA), one cash register per branch (needs your own registration)'],
+                'metrics' => [['value' => '60', 'label' => 'Sample medicines in the demo'], ['value' => '3', 'label' => 'Receipt print sizes'], ['value' => '203', 'label' => 'Automated tests in the code']],
+                'paragraphs' => ['Stock is kept in strips and you can sell by the box or by the strip. Every purchase line creates a batch, the cashier takes from the batch that expires first, and expired stock is never sold. A return goes back to the same batch unless it has expired.', 'Inside: medicines and stock, purchases and suppliers, customers and debts, branch transfers, stock adjustments and write-off of expired stock, price labels with barcodes, and daily reports. It also sends each sale and return to the ETA e-receipt and keeps your online store stock in sync. It ships with fictional sample data so you can try it first.'],
+                'list' => ['Cashier with barcode, trade name and generic name search', 'Batches, expiry dates and first-expiry-first-out selling', 'Alerts for expired, near-expiry and low stock', 'Sell by the box or by the strip', 'Prescription confirmation for medicines that need one', 'Purchases, suppliers and returns', 'Branch transfers and stock adjustments', 'Barcode price labels and 80 mm, 58 mm and A4 receipts', 'Sales, profit and debt reports', 'Sales and returns sent to the tax e-receipt (ETA), one cash register per branch, with the QR code on the receipt and the return slip (needs your own registration)', 'Sync with your Shopify, WooCommerce or Salla store: stock and prices go out, orders come back as sales, and prescription-only medicines are never sold online'],
                 'faq' => [
                     ['q' => 'Does it support the tax e-receipt?', 'a' => self::ETA_EN],
+                    ['q' => 'Can I sell online?', 'a' => 'Yes, it connects to your Shopify, WooCommerce or Salla store. Each store shows the stock of one branch in whole packs from unexpired batches, and a store order is recorded once as a sale of that branch, takes the batch that expires first, and goes to the e-receipt like a counter sale. Prescription-only medicines are never sold online, and an order that contains one stops until you check it. The connection is tested against simulated answers only, not against a real store, so try it on a test store first.'],
                     ['q' => 'Is there a controlled-drug register?', 'a' => 'No. The system only notes prescription details on the sale and has no official register for controlled drugs. Keep the paper register the law requires.'],
                     ['q' => 'Is the demo data real?', 'a' => 'No. All medicines and customers in the demo are fictional.'],
                 ],
                 'cta_title' => 'Ready to organize your pharmacy?',
-                'included' => ['Arabic and English with right-to-left support', 'Recorded payment methods: cash, card, transfer and wallet (recorded only, no online payment)'],
-                'payments_faq' => ['q' => 'Does it take online payments inside the system?', 'a' => 'No. The system records the payment method (cash, card, transfer or wallet) but does not collect the payment itself.'],
+                'included' => array_merge(SystemsCatalogOnline::included('en', ['eta', 'store']), ['Recorded payment methods: cash, card, transfer and wallet (recorded only, no online payment)']),
+                'need_body' => SystemsCatalogOnline::needBody('en', 'for e-receipts and online-store sync'),
+                'payments_faq' => ['q' => 'Does it take online payments inside the system?', 'a' => 'No. The system records the payment method (cash, card, transfer or wallet) but does not collect the payment itself. A store order paid online is recorded as a card payment, and cash on delivery as a credit sale to the customer.'],
             ],
         ];
     }
@@ -136,15 +141,17 @@ class SystemsCatalogExtra
                 'before_after' => ['kicker' => 'الفرق العملي', 'title' => 'قبل وبعد النظام', 'before_title' => 'الطريقة التقليدية', 'after_title' => 'مع نظام المطعم',
                     'before' => [['b' => 'الطلب', 't' => 'ورقة بتتوه أو بتتفهم غلط.'], ['b' => 'المطبخ', 't' => 'مفيش تتبع للوقت.'], ['b' => 'الحساب', 't' => 'تقسيم يدوي وفروق.']],
                     'after' => [['b' => 'الطلب', 't' => 'يوصل المطبخ بالتفاصيل والملاحظات.'], ['b' => 'المطبخ', 't' => 'تذاكر بألوان ووقت.'], ['b' => 'الحساب', 't' => 'تقسيم بالقرش وكل جزء يتطبع.']]],
-                'metrics' => [['value' => '12', 'label' => 'طاولة في النسخة التجريبية'], ['value' => '4', 'label' => 'مراحل لتذكرة المطبخ'], ['value' => '132', 'label' => 'اختبار آلي في الكود']],
+                'metrics' => [['value' => '12', 'label' => 'طاولة في النسخة التجريبية'], ['value' => '4', 'label' => 'مراحل لتذكرة المطبخ'], ['value' => '139', 'label' => 'اختبار آلي في الكود']],
                 'paragraphs' => ['النظام بيدير الطاولات والمطبخ والكاشير. الخدمة (12%) والضريبة (14%) نسب افتراضية يغيرها المالك، وبتتطبق على الأكل في المطعم بس. وبتتسجل على كل طاولة وقت فتحها.', 'جوه النظام: خريطة الطاولات، وشاشة مطبخ بمحطات، والتعديلات والملاحظات، وتقسيم الحساب، والتيك أواي والتوصيل (وتذاكرهم بتظهر في المطبخ)، وقائمة الطعام والإعدادات، وتقرير Z. فيه بيانات تجريبية خيالية.'],
-                'list' => ['خريطة الطاولات وفتح الطاولة وطلبات على دفعات', 'شاشة مطبخ بمحطات وألوان ووقت وجرس', 'تعديلات إجبارية واختيارية وملاحظة لكل صنف', 'تقسيم الحساب بالتساوي أو بالأصناف', 'خدمة وضريبة بنسب يحددها المالك', 'صلاحيات للجرسون والكاشير والمالك وسجل للإلغاء والخصم', 'تيك أواي وتوصيل', 'تقرير نهاية اليوم (Z) وطباعة 80 مم', 'إرسال الفواتير المدفوعة وأجزاء الفاتورة المقسّمة للإيصال الإلكتروني (ETA)، ويحتاج بيانات مسجّلة عندك'],
+                'list' => ['خريطة الطاولات وفتح الطاولة وطلبات على دفعات', 'شاشة مطبخ بمحطات وألوان ووقت وجرس', 'تعديلات إجبارية واختيارية وملاحظة لكل صنف', 'تقسيم الحساب بالتساوي أو بالأصناف', 'خدمة وضريبة بنسب يحددها المالك', 'صلاحيات للجرسون والكاشير والمالك وسجل للإلغاء والخصم', 'تيك أواي وتوصيل، وصفحة طلب أونلاين وتتبع للطلب وكود QR على كل طاولة', 'تقرير نهاية اليوم (Z) وطباعة 80 مم', 'إرسال الفواتير المدفوعة وأجزاء الفاتورة المقسّمة وطلبات التيك أواي والتوصيل للإيصال الإلكتروني (ETA) بكود QR على كل إيصال، ويحتاج بيانات مسجّلة عندك'],
                 'faq' => [
-                    ['q' => 'بيدعم الإيصال الإلكتروني للضرائب؟', 'a' => self::ETA_AR],
-                    ['q' => 'فيه مخزون وحجز طاولات؟', 'a' => 'لا. النسخة الحالية مفيهاش تحكم في المخزون ولا حجز طاولات ولا إشعارات.'],
+                    ['q' => 'بيدعم الإيصال الإلكتروني للضرائب؟', 'a' => self::ETA_AR.' الفاتورة المقسّمة ليها إيصال لكل جزء اتدفع. والإلغاء أو الاسترجاع بعد الدفع مبيتبعتش للمصلحة (مفيش إيصال مرتجع).'],
+                    ['q' => 'فيه مخزون وحجز طاولات ودفع أونلاين؟', 'a' => 'لا. النسخة الحالية مفيهاش تحكم في المخزون ولا حجز طاولات ولا دفع أونلاين ولا إشعارات SMS أو واتساب. الدفع نقدي في المطعم، وطلبات التيك أواي والتوصيل فيها روابط واتساب بس.'],
                     ['q' => 'البيانات التجريبية والصور حقيقية؟', 'a' => 'لا. الأصناف والأسعار تجريبية، وصور الأكل في النسخة التجريبية قليلة. هتضيف صور مطعمك من قائمة الطعام.'],
                 ],
                 'cta_title' => 'جاهز تنظم مطعمك؟',
+                'included' => array_merge(SystemsCatalogOnline::included('ar', ['eta']), ['دفع نقدي داخل النظام']),
+                'need_body' => SystemsCatalogOnline::needBody('ar', 'للإيصالات الإلكترونية'),
             ],
             'en' => [
                 'kicker' => 'Restaurants', 'headline' => 'From table to kitchen to bill, with no paper and no shouting.',
@@ -171,15 +178,17 @@ class SystemsCatalogExtra
                 'before_after' => ['kicker' => 'The practical difference', 'title' => 'Before and after the system', 'before_title' => 'The old way', 'after_title' => 'With the restaurant system',
                     'before' => [['b' => 'Ordering', 't' => 'A paper slip that gets lost or misread.'], ['b' => 'Kitchen', 't' => 'No time tracking.'], ['b' => 'Bill', 't' => 'Manual split and rounding gaps.']],
                     'after' => [['b' => 'Ordering', 't' => 'Reaches the kitchen with details and notes.'], ['b' => 'Kitchen', 't' => 'Colour tickets with timers.'], ['b' => 'Bill', 't' => 'Split to the cent, each part printed.']]],
-                'metrics' => [['value' => '12', 'label' => 'Tables in the demo'], ['value' => '4', 'label' => 'Stages of a kitchen ticket'], ['value' => '132', 'label' => 'Automated tests in the code']],
+                'metrics' => [['value' => '12', 'label' => 'Tables in the demo'], ['value' => '4', 'label' => 'Stages of a kitchen ticket'], ['value' => '139', 'label' => 'Automated tests in the code']],
                 'paragraphs' => ['The system runs tables, the kitchen and the cashier. Service charge (12%) and tax (14%) are default rates the owner can change, and they apply to dine-in only. They are copied onto each tab when it opens.', 'Inside: a table map, a kitchen display with stations, modifiers and notes, split bills, take-away and delivery (their tickets also show in the kitchen), the menu and settings, and a Z report. It ships with fictional sample data.'],
-                'list' => ['Table map, opening a table and orders in rounds', 'Kitchen display with stations, colours, timers and a chime', 'Required and optional modifiers and a note on every item', 'Equal or by-item split bills', 'Service charge and tax set by the owner', 'Roles for waiter, cashier and owner, with a log for voids and discounts', 'Take-away and delivery', 'End-of-day (Z) report and 80 mm printing', 'Paid bills and split shares sent to the tax e-receipt (ETA) (needs your own registration)'],
+                'list' => ['Table map, opening a table and orders in rounds', 'Kitchen display with stations, colours, timers and a chime', 'Required and optional modifiers and a note on every item', 'Equal or by-item split bills', 'Service charge and tax set by the owner', 'Roles for waiter, cashier and owner, with a log for voids and discounts', 'Take-away and delivery, with an online ordering page, order tracking and a QR code on each table', 'End-of-day (Z) report and 80 mm printing', 'Paid bills, split shares and take-away and delivery orders sent to the tax e-receipt (ETA), with the QR code on each receipt (needs your own registration)'],
                 'faq' => [
-                    ['q' => 'Does it support the tax e-receipt?', 'a' => self::ETA_EN],
-                    ['q' => 'Does it have stock control and table reservations?', 'a' => 'No. This version has no stock control, table reservations or notifications.'],
+                    ['q' => 'Does it support the tax e-receipt?', 'a' => self::ETA_EN.' A split bill gives one receipt per paid share. A void or refund after payment is not reported to ETA (no return receipt).'],
+                    ['q' => 'Does it have stock control, reservations or online payment?', 'a' => 'No. This version has no stock control, table reservations, online payment, or SMS and WhatsApp notifications. Payment is cash at the restaurant, and take-away and delivery orders only have WhatsApp links.'],
                     ['q' => 'Are the demo data and pictures real?', 'a' => 'No. The dishes and prices are sample data and the demo has few food pictures. You add your own pictures from the menu screen.'],
                 ],
                 'cta_title' => 'Ready to organize your restaurant?',
+                'included' => array_merge(SystemsCatalogOnline::included('en', ['eta']), ['Cash payments inside the system']),
+                'need_body' => SystemsCatalogOnline::needBody('en', 'for e-receipts'),
             ],
         ];
     }
@@ -204,27 +213,31 @@ class SystemsCatalogExtra
                 'showcase_title' => 'من المخطط للحساب', 'showcase' => [
                     ['title' => 'مخطط الأسنان', 'body' => 'ترقيم FDI للأسنان الدائمة واللبنية، وتسع حالات وأسطح لكل سن وملاحظة وتاريخ بالطبيب والتاريخ.'],
                     ['title' => 'خطة العلاج', 'body' => 'إجراءات من قائمة الأسعار على كل سن، والسعر بيتاخد من القائمة مش من النموذج، والمريض يوافق برابط خاص.'],
-                    ['title' => 'الدفعات والأقساط', 'body' => 'دفعات جزئية بإيصالات مرقمة، وجدول أقساط، وقائمة المتأخرين برابط واتساب من غير أي بيانات طبية.'],
+                    ['title' => 'الدفعات والأقساط', 'body' => 'دفعات جزئية بإيصالات مرقمة، وجدول أقساط، وقائمة المتأخرين بتذكير واتساب ورابط دفع أونلاين من غير أي بيانات طبية.'],
                 ],
                 'pillars_title' => 'أربع حاجات تنظم العيادة',
                 'pillars' => [
                     ['icon' => 'check', 'title' => 'ربط الزيارة بالخطة', 'body' => 'علّم الإجراء تم في الزيارة وتتحدث الخطة وحالة السن.'],
-                    ['icon' => 'clock', 'title' => 'حجز أونلاين', 'body' => 'المريض يختار الدكتور ويحجز، والاستقبال يشوف قائمة اليوم والطابور.'],
+                    ['icon' => 'clock', 'title' => 'حجز وتذكير بواتساب', 'body' => 'المريض يختار الدكتور ويحجز أونلاين، وتذكير واتساب بيروحله قبل الموعد (لوحده لو عندك حساب واتساب Business)، ولو رد بـ 1 الموعد بيتأكد.'],
                     ['icon' => 'lock', 'title' => 'صور خاصة', 'body' => 'صور بس (JPG وPNG وWebP حتى 5 ميجا)، بتتخزن بأسماء عشوائية، والاستقبال مبيفتحهاش، وكل فتح بيتسجل.'],
                     ['icon' => 'users', 'title' => 'صلاحيات وسجل', 'body' => 'المالك والدكتور والاستقبال، وسجل مراجعة لكل دخول على بيانات حساسة.'],
                 ],
                 'before_after' => ['kicker' => 'الفرق العملي', 'title' => 'قبل وبعد النظام', 'before_title' => 'الطريقة التقليدية', 'after_title' => 'مع نظام العيادة',
                     'before' => [['b' => 'الحالة', 't' => 'ملاحظات على ورق.'], ['b' => 'الأقساط', 't' => 'متابعة بالدماغ.'], ['b' => 'الصور', 't' => 'على موبايلات وفلاشات.']],
-                    'after' => [['b' => 'الحالة', 't' => 'مخطط وتاريخ لكل سن.'], ['b' => 'الأقساط', 't' => 'جدول ومتأخرات برابط واتساب.'], ['b' => 'الصور', 't' => 'مخزنة بخصوصية ومسجّل كل فتح.']]],
-                'metrics' => [['value' => '9', 'label' => 'حالات لكل سن'], ['value' => '52', 'label' => 'سن (دائمة ولبنية) على المخطط'], ['value' => '106', 'label' => 'اختبار آلي في الكود']],
-                'paragraphs' => ['النظام مبني على نظام حجز العيادات ومضاف له الجانب الخاص بالأسنان. المخطط ترقيمه FDI ومعاه حالة وأسطح (M D O B L I) وملاحظة وتاريخ لكل سن. خطط العلاج بتتقفل بعد موافقة المريض لحد ما تتفتح تاني، وبتتطبع بالعربي والإنجليزي على A4.', 'جوه النظام أيضًا: الحجز والطابور والروشتات والتقييمات وسجل المراجعة، وحساب كل مريض، وإيصالات 80 مم وA4. فيه بيانات تجريبية خيالية، وصور الأشعة فيها كلها مكتوب عليها "تجريبية".'],
-                'list' => ['مخطط أسنان تفاعلي بترقيم FDI (دائمة ولبنية)', 'خطط علاج بأسعار القائمة وموافقة المريض وطباعة', 'ربط الزيارة بإجراءات الخطة', 'دفعات جزئية وإيصالات وجدول أقساط وقائمة متأخرين', 'صور أشعة خاصة بسجل فتح', 'حجز أونلاين وقائمة اليوم والطابور', 'روشتات وتقييمات وسجل مراجعة', 'صلاحيات للمالك والدكتور والاستقبال', 'إرسال الدفعات النقدية للإيصال الإلكتروني (ETA)، ويحتاج بيانات مسجّلة عندك'],
+                    'after' => [['b' => 'الحالة', 't' => 'مخطط وتاريخ لكل سن.'], ['b' => 'الأقساط', 't' => 'جدول وتذكير واتساب ورابط دفع أونلاين.'], ['b' => 'الصور', 't' => 'مخزنة بخصوصية ومسجّل كل فتح.']]],
+                'metrics' => [['value' => '9', 'label' => 'حالات لكل سن'], ['value' => '52', 'label' => 'سن (دائمة ولبنية) على المخطط'], ['value' => '172', 'label' => 'اختبار آلي في الكود']],
+                'paragraphs' => ['النظام مبني على نظام حجز العيادات ومضاف له الجانب الخاص بالأسنان. المخطط ترقيمه FDI ومعاه حالة وأسطح (M D O B L I) وملاحظة وتاريخ لكل سن. خطط العلاج بتتقفل بعد موافقة المريض لحد ما تتفتح تاني، وبتتطبع بالعربي والإنجليزي على A4.', 'جوه النظام أيضًا: الحجز والطابور والروشتات والتقييمات وسجل المراجعة، وحساب كل مريض، وإيصالات 80 مم وA4. والمريض يقدر يدفع رصيد خطته أو فاتورة زيارته أونلاين من رابط، والدفع بيتسجل لوحده ويتبعت للإيصال الإلكتروني (ETA) زي الدفع في العيادة. فيه بيانات تجريبية خيالية، وصور الأشعة فيها كلها مكتوب عليها "تجريبية".'],
+                'list' => ['مخطط أسنان تفاعلي بترقيم FDI (دائمة ولبنية)', 'خطط علاج بأسعار القائمة وموافقة المريض وطباعة', 'ربط الزيارة بإجراءات الخطة', 'دفعات جزئية وإيصالات وجدول أقساط وقائمة متأخرين', 'صور أشعة خاصة بسجل فتح', 'حجز أونلاين وقائمة اليوم والطابور', 'روشتات وتقييمات وسجل مراجعة', 'صلاحيات للمالك والدكتور والاستقبال', 'دفع أونلاين لرصيد الخطة أو فاتورة الزيارة بـ Paymob وفوري وإنستاباي، من غير ذكر أي إجراء', 'تذكير واتساب بالمواعيد والأقساط المتأخرة، والردود على ملف المريض، من غير أي نص طبي', 'إرسال الدفعات النقدية والأونلاين للإيصال الإلكتروني (ETA) بكود QR على الإيصال، وإيصال مرتجع لما دفع أونلاين يترد، ويحتاج بيانات مسجّلة عندك'],
                 'faq' => [
-                    ['q' => 'بيدعم الإيصال الإلكتروني للضرائب؟', 'a' => self::ETA_AR],
+                    ['q' => 'بيدعم الإيصال الإلكتروني للضرائب؟', 'a' => self::ETA_AR.' واسم المريض وتليفونه مبيتبعتوش للمصلحة.'],
+                    ['q' => 'بيبعت رسايل واتساب؟', 'a' => 'أيوه. بحساب واتساب Business بتاعك (Cloud API) بيبعت تذكير الموعد لوحده قبلها، وتذكير القسط المتأخر بزرار، والمريض يرد بـ 1 يأكد أو 2 يغيّر الموعد، والردود بتظهر على ملفه. الرسايل فيها الاسم والدكتور والميعاد والمبلغ بس، من غير أي نص طبي، والمريض يقدر يوقفها. من غير حساب الزراير بتفتح واتساب برسالة جاهزة. الربط متجرب على ردود تجريبية بس، ومتجربش على خوادم Meta.'],
                     ['q' => 'بيدعم صور DICOM أو فحص اللثة أو التأمين؟', 'a' => 'لا. مفيهوش DICOM ولا مخطط لثة ولا تأمين ولا رسائل SMS. الصور المدعومة JPG وPNG وWebP بس.'],
                     ['q' => 'بيانات المرضى محمية قانونيًا بالنظام ده؟', 'a' => 'النظام بيحمي الصور وبيسجل الدخول، لكنه مش بيضمن التزامك بقانون حماية البيانات. المسؤولية القانونية على العيادة، واسأل مستشارك القانوني.'],
                 ],
                 'cta_title' => 'جاهز تنظم عيادتك؟',
+                'included' => SystemsCatalogOnline::included('ar', ['payments', 'whatsapp', 'eta']),
+                'need_body' => SystemsCatalogOnline::needBody('ar', 'للإيصالات الإلكترونية وتذكيرات واتساب ومتابعة المدفوعات'),
+                'payments_faq' => SystemsCatalogOnline::paymentsFaq('ar', 'رصيد خطة العلاج (قسط أو جزء أو الباقي) أو رصيد فاتورة الزيارة'),
             ],
             'en' => [
                 'kicker' => 'Dental clinics', 'headline' => 'The tooth chart, the treatment plan and the instalments in one place.',
@@ -239,27 +252,31 @@ class SystemsCatalogExtra
                 'showcase_title' => 'From the chart to the bill', 'showcase' => [
                     ['title' => 'Tooth chart', 'body' => 'FDI numbering for permanent and primary teeth, nine statuses, surfaces, a note and a history with doctor and date for each tooth.'],
                     ['title' => 'Treatment plan', 'body' => 'Procedures from the price list on each tooth, the price comes from the list and never from the form, and the patient accepts through a private link.'],
-                    ['title' => 'Payments and instalments', 'body' => 'Partial payments with numbered receipts, an instalment schedule, and an overdue list with WhatsApp links that carry no medical text.'],
+                    ['title' => 'Payments and instalments', 'body' => 'Partial payments with numbered receipts, an instalment schedule, and an overdue list with a WhatsApp reminder and an online payment link that carry no medical text.'],
                 ],
                 'pillars_title' => 'Four things that organize the clinic',
                 'pillars' => [
                     ['icon' => 'check', 'title' => 'Visit linked to the plan', 'body' => 'Tick a procedure done during the visit and the plan and the tooth update.'],
-                    ['icon' => 'clock', 'title' => 'Online booking', 'body' => 'The patient picks a doctor and books, and reception sees the day list and the queue.'],
+                    ['icon' => 'clock', 'title' => 'Booking and WhatsApp reminders', 'body' => 'The patient picks a doctor and books online, a WhatsApp reminder goes out before the appointment (by itself with your WhatsApp Business account), and replying 1 confirms it.'],
                     ['icon' => 'lock', 'title' => 'Private images', 'body' => 'Images only (JPG, PNG, WebP up to 5 MB), stored under random names. Reception cannot open them and every open is logged.'],
                     ['icon' => 'users', 'title' => 'Roles and audit log', 'body' => 'Owner, doctor and reception, with an audit log for access to sensitive data.'],
                 ],
                 'before_after' => ['kicker' => 'The practical difference', 'title' => 'Before and after the system', 'before_title' => 'The old way', 'after_title' => 'With the clinic system',
                     'before' => [['b' => 'Records', 't' => 'Notes on paper.'], ['b' => 'Instalments', 't' => 'Followed from memory.'], ['b' => 'Images', 't' => 'On phones and flash drives.']],
-                    'after' => [['b' => 'Records', 't' => 'A chart and a history for each tooth.'], ['b' => 'Instalments', 't' => 'A schedule and overdue list with WhatsApp links.'], ['b' => 'Images', 't' => 'Stored privately, every open logged.']]],
-                'metrics' => [['value' => '9', 'label' => 'Statuses for each tooth'], ['value' => '52', 'label' => 'Teeth (permanent and primary) on the chart'], ['value' => '106', 'label' => 'Automated tests in the code']],
-                'paragraphs' => ['The system is built on the clinic booking system with the dental side added. The chart uses FDI numbering with a status, surfaces (M D O B L I), a note and a history for each tooth. A treatment plan is locked after the patient accepts until it is reopened, and prints in Arabic and English on A4.', 'Inside as well: booking, the queue, prescriptions, reviews and an audit log, each patient\'s account, and 80 mm and A4 receipts. It ships with fictional sample data, and every X-ray in the demo is marked as a demo image.'],
-                'list' => ['Interactive tooth chart with FDI numbering (permanent and primary)', 'Treatment plans with list prices, patient acceptance and printing', 'Visits linked to plan procedures', 'Partial payments, receipts, an instalment schedule and an overdue list', 'Private X-ray images with an access log', 'Online booking, the day list and the queue', 'Prescriptions, reviews and an audit log', 'Roles for owner, doctor and reception', 'Cash payments sent to the tax e-receipt (ETA) (needs your own registration)'],
+                    'after' => [['b' => 'Records', 't' => 'A chart and a history for each tooth.'], ['b' => 'Instalments', 't' => 'A schedule, WhatsApp reminders and an online payment link.'], ['b' => 'Images', 't' => 'Stored privately, every open logged.']]],
+                'metrics' => [['value' => '9', 'label' => 'Statuses for each tooth'], ['value' => '52', 'label' => 'Teeth (permanent and primary) on the chart'], ['value' => '172', 'label' => 'Automated tests in the code']],
+                'paragraphs' => ['The system is built on the clinic booking system with the dental side added. The chart uses FDI numbering with a status, surfaces (M D O B L I), a note and a history for each tooth. A treatment plan is locked after the patient accepts until it is reopened, and prints in Arabic and English on A4.', 'Inside as well: booking, the queue, prescriptions, reviews and an audit log, each patient\'s account, and 80 mm and A4 receipts. The patient can pay a plan or visit balance online from a link, and the payment is recorded by itself and sent to the ETA e-receipt like a payment at the desk. It ships with fictional sample data, and every X-ray in the demo is marked as a demo image.'],
+                'list' => ['Interactive tooth chart with FDI numbering (permanent and primary)', 'Treatment plans with list prices, patient acceptance and printing', 'Visits linked to plan procedures', 'Partial payments, receipts, an instalment schedule and an overdue list', 'Private X-ray images with an access log', 'Online booking, the day list and the queue', 'Prescriptions, reviews and an audit log', 'Roles for owner, doctor and reception', 'Online payment of a plan or visit balance with Paymob, Fawry or InstaPay, with no procedure named', 'WhatsApp reminders for appointments and overdue instalments, with replies on the patient file and no medical text', 'Cash and online payments sent to the tax e-receipt (ETA) with the QR code on the receipt, and a return receipt when an online payment is refunded (needs your own registration)'],
                 'faq' => [
-                    ['q' => 'Does it support the tax e-receipt?', 'a' => self::ETA_EN],
+                    ['q' => 'Does it support the tax e-receipt?', 'a' => self::ETA_EN.' Patient names and phone numbers are not sent to ETA.'],
+                    ['q' => 'Does it send WhatsApp messages?', 'a' => 'Yes. With your own WhatsApp Business (Cloud API) account it sends the appointment reminder by itself before the visit and the overdue instalment reminder from a button. The patient replies 1 to confirm or 2 to change the time, and replies show on the patient file. Messages carry only the name, doctor, time and amount, never medical text, and the patient can stop them. Without an account the buttons open WhatsApp with the message ready. The connection is tested against simulated answers only, not against Meta\'s servers.'],
                     ['q' => 'Does it support DICOM, gum charting or insurance?', 'a' => 'No. It has no DICOM, periodontal charting, insurance or SMS. The only supported images are JPG, PNG and WebP.'],
                     ['q' => 'Does this system make patient data legally compliant?', 'a' => 'The system protects images and logs access, but it does not guarantee that you comply with data protection law. The legal duty stays with the clinic, so ask your legal adviser.'],
                 ],
                 'cta_title' => 'Ready to organize your clinic?',
+                'included' => SystemsCatalogOnline::included('en', ['payments', 'whatsapp', 'eta']),
+                'need_body' => SystemsCatalogOnline::needBody('en', 'for e-receipts, WhatsApp reminders and payment checks'),
+                'payments_faq' => SystemsCatalogOnline::paymentsFaq('en', 'the balance of a treatment plan (an instalment, part of it or the rest) or of a visit invoice'),
             ],
         ];
     }

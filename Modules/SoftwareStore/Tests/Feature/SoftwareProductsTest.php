@@ -2,20 +2,21 @@
 
 namespace Modules\SoftwareStore\Tests\Feature;
 
-use Modules\SoftwareStore\Models\SoftwareOrder;
-use Modules\SoftwareStore\Models\SoftwareProduct;
 use App\Models\Currency;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
 use App\Models\SerialSoftwareLicense;
 use App\Models\SerialUserDevice;
 use App\Models\User;
-use Modules\SoftwareStore\Services\SoftwareOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Marketplace\Console\GenerateAiFilesCommand;
 use Modules\SoftwareStore\Database\Seeders\SoftwareProductSeeder;
+use Modules\SoftwareStore\Database\Seeders\SystemsCatalog;
+use Modules\SoftwareStore\Models\SoftwareOrder;
+use Modules\SoftwareStore\Models\SoftwareProduct;
+use Modules\SoftwareStore\Services\SoftwareOrderService;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -708,6 +709,31 @@ class SoftwareProductsTest extends TestCase
         $this->get('/services/pharmacy-system?lang=en')->assertSee('no official register for controlled drugs', false)->assertSee('does not collect the payment itself', false);
         $this->get('/services/restaurant-pos-system?lang=en')->assertSee('no stock control, table reservations', false);
         $this->get('/services/dental-clinic-system?lang=en')->assertSee('no DICOM', false);
+    }
+
+    public function test_the_ready_made_systems_describe_their_online_payments_e_receipts_and_stores_as_they_are_now(): void
+    {
+        $copy = collect(SystemsCatalog::programs())->keyBy('slug')
+            ->map(fn (array $program) => json_encode($program['landing'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        $online = ['workshop-system', 'clinic-system', 'coffee-shop-system', 'dental-clinic-system', 'education-center-system', 'gym-system', 'lab-system', 'nursery-system', 'real-estate-system', 'salon-system', 'wholesale-system'];
+        $eta = ['workshop-system', 'coffee-shop-system', 'dental-clinic-system', 'lab-system', 'mobile-shop-system', 'pharmacy-system', 'restaurant-pos-system', 'salon-system', 'supermarket-system'];
+        $stores = ['coffee-shop-system', 'mobile-shop-system', 'pharmacy-system', 'supermarket-system', 'wholesale-system'];
+
+        foreach ($online as $slug) {
+            $this->assertStringNotContainsString('Payments inside the system are cash only', $copy[$slug], $slug);
+            $this->assertStringContainsString('tested against simulated answers only', $copy[$slug], $slug);
+        }
+        foreach ($eta as $slug) {
+            $this->assertStringContainsString('QR', $copy[$slug], $slug);
+            $this->assertMatchesRegularExpression('/(not|never) (been )?tested against the real ETA|No receipt was sent to the real ETA/', $copy[$slug], $slug);
+        }
+        foreach ($stores as $slug) {
+            $this->assertStringContainsString('WooCommerce', $copy[$slug], $slug);
+        }
+        $this->assertStringContainsString('prescription-only', $copy['pharmacy-system']);
+        $this->assertStringContainsString('sends nothing to the tax authority', $copy['wholesale-system']);
+        $this->assertStringContainsString('Payments inside the system are cash only', $copy['restaurant-pos-system']);
+        $this->assertStringContainsString('does not collect the payment itself', $copy['supermarket-system']);
     }
 
     public function test_new_lead_programs_have_both_languages_and_telegram_stays_hidden(): void

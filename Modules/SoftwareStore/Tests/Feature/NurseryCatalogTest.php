@@ -30,7 +30,7 @@ class NurseryCatalogTest extends TestCase
     {
         $text = json_encode(SystemsCatalogNursery::system(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        foreach (['Nothing is sent automatically', 'no photo sharing', 'does not guarantee that you comply', 'no e-receipt connector', 'fictional'] as $limit) {
+        foreach (['Nothing is sent automatically without an account', 'no photo sharing', 'does not guarantee that you comply', 'no e-receipt connector', 'fictional'] as $limit) {
             $this->assertStringContainsString($limit, $text, $limit);
         }
         $this->assertStringNotContainsString('.test', $text);

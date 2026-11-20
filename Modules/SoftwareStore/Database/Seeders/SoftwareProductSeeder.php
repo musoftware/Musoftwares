@@ -36,7 +36,7 @@ class SoftwareProductSeeder extends Seeder
         $this->renameLegacyProducts();
 
         foreach ($this->programs() as $program) {
-            $program['landing'] = $this->withExtras($program['slug'], $program['landing']);
+            $program['landing'] = self::withExtras($program['slug'], $program['landing']);
             $program['theme']['sections'] = $this->sectionsWithNewBlocks($program['theme']['sections'], []);
 
             $product = SoftwareProduct::firstOrNew(['slug' => $program['slug']]);
@@ -117,7 +117,8 @@ class SoftwareProductSeeder extends Seeder
         return array_merge(['overview'], $sections, ['details', 'faq']);
     }
 
-    private function withExtras(string $slug, array $landing): array
+    /** The page text of a program with its shared extra blocks (ProductExtras), as the seeder stores it. */
+    public static function withExtras(string $slug, array $landing): array
     {
         foreach (['ar', 'en'] as $lang) {
             $landing[$lang] = ($landing[$lang] ?? []) + ProductExtras::for($slug, $lang);

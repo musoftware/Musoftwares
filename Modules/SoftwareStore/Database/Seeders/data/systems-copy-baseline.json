@@ -1,0 +1,1802 @@
+{
+    "workshop-system": {
+        "tagline_en": [
+            "a5aaf565b93ba0172f435637685fdd044645a0d0"
+        ],
+        "tagline_ar": [
+            "ae21a8713890bde141942c30bd29d8409ca72895"
+        ],
+        "description_en": [
+            "a5aaf565b93ba0172f435637685fdd044645a0d0"
+        ],
+        "description_ar": [
+            "ae21a8713890bde141942c30bd29d8409ca72895"
+        ],
+        "ar.kicker": [
+            "c9bb2135d60cfedd9ae476444968cf363d5f7c91"
+        ],
+        "ar.headline": [
+            "b334dcc5edc40cbf8414b917a51fdf7e0fe8f855"
+        ],
+        "ar.subheadline": [
+            "fa48dcece826d12b98b8d28b84750df0d3126be4"
+        ],
+        "ar.overview": [
+            "27c6d8ad0884e9c711fde243c750180f22dceb93",
+            "4741620e797960241b45c858379ed0dae708084a"
+        ],
+        "ar.problems": [
+            "22692b25c4c1abdaaa735a90910f02c33157b12b"
+        ],
+        "ar.showcase": [
+            "4f3b979a004a978cd165c6bba08be77ea6faa706"
+        ],
+        "ar.pillars": [
+            "8c55fe39ddb8ddfc982aadc09df45bf76b7a425c"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "8f048c065a2126d1f969c3ecbf8d33a5b9d105f1"
+        ],
+        "ar.metrics": [
+            "89751ec66ca022852f972ee1971566abce211bab"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "0ed572ef452ea5cf07a4519022c37405d0109c96"
+        ],
+        "ar.faq": [
+            "093ea2bc176550f6bcc7b9430792391e4a96deef",
+            "2bbdb6781155bf830a507db30c321f9d39942785"
+        ],
+        "ar.cta": [
+            "803a3d62d7ddf3c32cdef05defc81b8b57cd5e09",
+            "47b5557bcc20c968e82d2bcc903ae716af04c78e"
+        ],
+        "en.kicker": [
+            "c8c4f2a2684adc4375775e52849995f4e41502a4"
+        ],
+        "en.headline": [
+            "8d22103e8135c0c35b278ead2eed79d76b1cd2a7"
+        ],
+        "en.subheadline": [
+            "f25c79d6257db97662aea73ad504603d97c6e6f0"
+        ],
+        "en.overview": [
+            "5b823fed7f5907a9b56ec8d36c333131476b3f6f",
+            "4d7aefafab38cc487ed19a01e0c8200cd05e91ce"
+        ],
+        "en.problems": [
+            "8da43999589af0a261bd2309dea790911eb667d0"
+        ],
+        "en.showcase": [
+            "d08960e741dc1a96efa75a1fd151beb24858e3d4"
+        ],
+        "en.pillars": [
+            "a3822e975e930cc4107d17737f91d881462bd4e2"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "fcb942df5f8877b6ab3f96ddfd952a2b95d50c83"
+        ],
+        "en.metrics": [
+            "bcb6da6f4a904f171140853ea5c359ce091de5f6"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "6caea8297b93432dadc4c02238df343d98d987aa"
+        ],
+        "en.faq": [
+            "805174eb0d28327801aa492f64061067c09a9102",
+            "574d442375f4a19a6aaeff8e35536c5eed6c74bb"
+        ],
+        "en.cta": [
+            "02e78edf8d3a2b13b2b31d68ccb87fcb8c4eff1d",
+            "4af322746bf3973ae300a0eef27700e178cc3aba"
+        ]
+    },
+    "clinic-system": {
+        "tagline_en": [
+            "074343445b9961c8ff251b51808adab2e0547b2e"
+        ],
+        "tagline_ar": [
+            "e6b52636efb4f807a9ca64c375f3281913baea12"
+        ],
+        "description_en": [
+            "074343445b9961c8ff251b51808adab2e0547b2e"
+        ],
+        "description_ar": [
+            "e6b52636efb4f807a9ca64c375f3281913baea12"
+        ],
+        "ar.kicker": [
+            "16a81f9fb6e556766c34c0fb4cf66140d7a78958"
+        ],
+        "ar.headline": [
+            "94b5c21ce39b16b8c32a5df23af1f8d6896ddd39"
+        ],
+        "ar.subheadline": [
+            "b3cc222e36884568440548e1462234b189a39fcf"
+        ],
+        "ar.overview": [
+            "be1de1b58524aa8467bb496973b72f3348d855f4",
+            "575618b76515e07e4be139c18dbe087f26875638"
+        ],
+        "ar.problems": [
+            "50378f50597b4d6f6c9fadc5f7b0b6a8d0589983"
+        ],
+        "ar.showcase": [
+            "0d0205350b5d1b9eb7b6bb764b37b1cf33f65c77"
+        ],
+        "ar.pillars": [
+            "7a8f270d70740021f408a6e07a8cd8dcd32ee52d"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "9f38bdaad25add21991e972b66d54077e21c937d"
+        ],
+        "ar.metrics": [
+            "c46f23e300e7922ca636a60e74a03bea93713890"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "3cd304fa92b67ec22c3bdc2afcc962b183c7bf8a"
+        ],
+        "ar.faq": [
+            "ae4a101ad402fb9bf28af928c3b05e9742c567eb",
+            "3ad4cea25a5e76c9015d74d9ac808482f436e8f8"
+        ],
+        "ar.cta": [
+            "7b37123bcba26503304374b0b533a274b713a509",
+            "aed6e60fb0926c5c0a742f936fea56ebff0c4441"
+        ],
+        "en.kicker": [
+            "b719ee0be78fbd479d1b4061bcc756b15c121997"
+        ],
+        "en.headline": [
+            "9127dd3a4656b8550673b69d09d5140d5c9a3ab4"
+        ],
+        "en.subheadline": [
+            "14e8722e861ffef0b52f3f6e5d5377458f5f6b0a"
+        ],
+        "en.overview": [
+            "eb4e6f6665a80ef7b77add394417ffcac01a9d74",
+            "000cafe9bd73c1f0e38c4ac76033079bdaf8157f"
+        ],
+        "en.problems": [
+            "a12888c3d7694b9a0cbbd7103377a2f1437b4cb3"
+        ],
+        "en.showcase": [
+            "465f50ca537459c86f4d68c6a04b940549a98a16"
+        ],
+        "en.pillars": [
+            "f43fd7289f95b229d6f010eea0ed6fd706f426cd"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "b738f44e1107ae6af6573c85097f9623085df9b8"
+        ],
+        "en.metrics": [
+            "967700a6cb88bbe6a19ba45835a7b61cf5aeeba5"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "dfd4dd6a6a93f663d4fc7e0d8d9ef379147dabcd"
+        ],
+        "en.faq": [
+            "7b9b384333f41df03b9ba316fe43926124701c65",
+            "a12fbd5e88b0f177e58b2120cd3cec2e9c0deba2"
+        ],
+        "en.cta": [
+            "1bcb4b1ea24530974af9080276b9d4ec587315a2",
+            "d0e43e4f80ee1a601926f376b3381aa281fbe02a"
+        ]
+    },
+    "coffee-shop-system": {
+        "tagline_en": [
+            "02fd6b8e49530429896f1c5d4f296e39457efd5c"
+        ],
+        "tagline_ar": [
+            "05e2fa1353b2bbc6884bc5fee89df95ffaafa0d1"
+        ],
+        "description_en": [
+            "02fd6b8e49530429896f1c5d4f296e39457efd5c"
+        ],
+        "description_ar": [
+            "05e2fa1353b2bbc6884bc5fee89df95ffaafa0d1"
+        ],
+        "ar.kicker": [
+            "05a7108e4433131d07c77284305a19ea47cece80"
+        ],
+        "ar.headline": [
+            "f283fa741a76b27589173ba28de572760838ce83"
+        ],
+        "ar.subheadline": [
+            "5848ea2d4eb1322c2e4e888873c39c1d90492733"
+        ],
+        "ar.overview": [
+            "9490632bbe4aed0bdfd4bb9d6652af14181126e7",
+            "1488e694ab19aedc2dde3111f126d33c82460c57"
+        ],
+        "ar.problems": [
+            "4c37662cb38c5d3d420fb9b45834f3d7bae4af2e"
+        ],
+        "ar.showcase": [
+            "67dd282d10450aac0fd561582ba113ef721335f8"
+        ],
+        "ar.pillars": [
+            "47dea2d5c7d29aa832b619660edf3bd1c6e4fb45"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "6f81ad604f0f11d0df785a65aff71f68333003dd"
+        ],
+        "ar.metrics": [
+            "98b6f33ee598d64e61dab9b2789597511958354c"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "13a9ef220bddfb4d313f35d07c59d53a18fea2ff"
+        ],
+        "ar.faq": [
+            "a1f8e8e446cbe34a7044faae3866b4c99a58aeec",
+            "12c07ab6c8ba0a9dee87d7a42a63b483d4424622"
+        ],
+        "ar.cta": [
+            "d04cac696e83a19ed736db860dd62b57a68966d1",
+            "a504c915f59a9d9aa6b4695a52dfd2a49ab85d38"
+        ],
+        "en.kicker": [
+            "f0694a4a64b2a5d6084cbcdd500a6fd2c15b5c27"
+        ],
+        "en.headline": [
+            "706c79136aa23bd9820669b5de4e9d046c157264"
+        ],
+        "en.subheadline": [
+            "d90108001be902ada9e2df731681706ef395507b"
+        ],
+        "en.overview": [
+            "0cf56d9cce527645eac21ce0fad05e49cc5b2dbb",
+            "ea39dc1092a1950a3e71d684ea2922ec4f8190d6"
+        ],
+        "en.problems": [
+            "d5dc0b65e077d8e506ebc331b4710a885c4aff55"
+        ],
+        "en.showcase": [
+            "54ef264edc111a468eb0bcabf5da97577efdaf93"
+        ],
+        "en.pillars": [
+            "c8c21118a866d20d62ecdd62ffa97f8f2a4b538b"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "31cd628226964bcdd601a4598adde0a06f1c5cd8"
+        ],
+        "en.metrics": [
+            "8165b4e5b301d84bd586c10c42e4e59f520e8a95"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "3958b59173d4c4ebe022b6e5f71f5212770e018f"
+        ],
+        "en.faq": [
+            "d606c98b86c72e596fb6d4e349cbf8f7fce0874c",
+            "322fe65e69c9a9431269e18aa3fbb00f665689c1"
+        ],
+        "en.cta": [
+            "90d623d2106fbbb49da667f1477227e159e0f6fe",
+            "39a0b081feeabcdcf8b0f7557314344f2d1c1b8e"
+        ]
+    },
+    "gym-system": {
+        "tagline_en": [
+            "25b70f099144fa0d3080fe61fcdc5fa5f6a81847"
+        ],
+        "tagline_ar": [
+            "adcebf70180552c11d27f9bb06739de2463bde11"
+        ],
+        "description_en": [
+            "25b70f099144fa0d3080fe61fcdc5fa5f6a81847"
+        ],
+        "description_ar": [
+            "adcebf70180552c11d27f9bb06739de2463bde11"
+        ],
+        "ar.kicker": [
+            "f77619eb93fa4fa565cfb4eb9dbc37c1129a64d2"
+        ],
+        "ar.headline": [
+            "82f401d78b83f99f3a5f91411294821cffa21e5d"
+        ],
+        "ar.subheadline": [
+            "522645b78e54408c9d501e27557a9dde460fbffe"
+        ],
+        "ar.overview": [
+            "7ed36990aab98b6f693504ccdba7aede82c2e3d8",
+            "aaa32984aa2fe0f7bf2cceb725a938375eafd434"
+        ],
+        "ar.problems": [
+            "b3b91e26913ada087f10b2f27638f0cc7ad6ccde"
+        ],
+        "ar.showcase": [
+            "877becd9224cf85f8b6d38d1e1df1949af36f2eb"
+        ],
+        "ar.pillars": [
+            "d8c58e09e8bb9a1cf1ff834e63f654dc7df5d6a9"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "8347271b6b5d1f041d3d1ca30c7b386075fa5bfe"
+        ],
+        "ar.metrics": [
+            "072e429e9a9474446170b7bc78192f53675c0eb8"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "42862e385c1fcdbf821539155f0e019b50bf5a50"
+        ],
+        "ar.faq": [
+            "82f81334426e2328057ef7f06f385efbd8d90a9f",
+            "e3fd4a2265f243434510050abc13ce296081e35d"
+        ],
+        "ar.cta": [
+            "61400674f98c237e022c790c3a3d4b65e028dc06",
+            "b7724b9c1ee48fcd98c4e16f1822148da1cc9d0c"
+        ],
+        "en.kicker": [
+            "26217dfafb1844de63c0e788fdff0f81f1cd972c"
+        ],
+        "en.headline": [
+            "f31f482e51de0d927959cd07e03ae83c90897b37"
+        ],
+        "en.subheadline": [
+            "0b8d038f853870b48857e64f2864cf253b5075ff"
+        ],
+        "en.overview": [
+            "0b48486ac012829dde2600f6b69129ad5a6d977c",
+            "2b35c49a710c64204ffa90120ea696da280efe9e"
+        ],
+        "en.problems": [
+            "8d69bdb5d662d5a5a19567bc62042b02d050b279"
+        ],
+        "en.showcase": [
+            "f4df4ea2fe668f9d5b6e2f15dd5404c5a1f951f2"
+        ],
+        "en.pillars": [
+            "aed612e271c573a986e98cd2a7ee739edc126991"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "a17dfd3131f48a58c2f5300340effaefbd2ab9c6"
+        ],
+        "en.metrics": [
+            "70a83e6e69b7d5efd6da58bcbb3af19f92f15cb9"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "c8df23e068ef685f815f4edcaa8060d963791a0a"
+        ],
+        "en.faq": [
+            "29ef3d241463e0d5803311b3a739eb9e6d2e7d0a",
+            "131cdfcb81dcb73e397054e851717bc2d427887c"
+        ],
+        "en.cta": [
+            "ab003db4871ce20b17c962b5e14f11778aac928c",
+            "74e82dc6dea3f07f5c2b8d0354dd884950d2cd2d"
+        ]
+    },
+    "mobile-shop-system": {
+        "tagline_en": [
+            "16eca515c9c282e089107322301f3409b9a8bdfb"
+        ],
+        "tagline_ar": [
+            "4df26c394b0d968f4d38b2ab2e0852c8e49584b2"
+        ],
+        "description_en": [
+            "16eca515c9c282e089107322301f3409b9a8bdfb"
+        ],
+        "description_ar": [
+            "4df26c394b0d968f4d38b2ab2e0852c8e49584b2"
+        ],
+        "ar.kicker": [
+            "a83fff417e8bb0d0d83929a187277ecbc55f3737"
+        ],
+        "ar.headline": [
+            "2328fcb1c580ebb71dd7137dff017a0e886b1a71"
+        ],
+        "ar.subheadline": [
+            "1c7d30597541f1efcb1470aa0f97a8a1c46cc471"
+        ],
+        "ar.overview": [
+            "8b792946730f740aaf385c2b42e57574827b1157",
+            "5226d6c400c8c569e6546ff8661eaa561e107b78"
+        ],
+        "ar.problems": [
+            "8d38e9b59e80c5f8f53d26cf3005f1eb17543169"
+        ],
+        "ar.showcase": [
+            "9b983ac0618853e1440f3639a8cc9f016ecd0fd2"
+        ],
+        "ar.pillars": [
+            "db8f3399d2b2d133ed01ba4945f0a514ff74f84b"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "47ad624ec9e9a23bc56a5c72ba0ea95f2bc8cc91"
+        ],
+        "ar.metrics": [
+            "650abd4eea01ed0acbc696d453dcc37a16b520ef"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "68d7e19877535d04e19211670f33f32f8155f4cd"
+        ],
+        "ar.faq": [
+            "402c14cc4abb33afa6630687310d9f62c849cdff",
+            "9428c15cd0b9d1f065ea6a453d4d71330417e1fa"
+        ],
+        "ar.cta": [
+            "30b77600403074010cc9ee3bc5fcbc3a6ed8da6e",
+            "693615839c7d8b251bbe5c94269453433a739c50"
+        ],
+        "en.kicker": [
+            "6ed678742139af92ed3030d04c6cc73c6a3a9845"
+        ],
+        "en.headline": [
+            "123054333e3d75deaec43b895d3d6e70cf49f40b"
+        ],
+        "en.subheadline": [
+            "ffda71528105f4a104f335b3b045130e05503a0f"
+        ],
+        "en.overview": [
+            "071cd6bd1734a9f33316e73a2a8bd82fadd98976",
+            "e8c6e374429c5e157e24be1496c1d4b6c0042f24"
+        ],
+        "en.problems": [
+            "d83eac3eb1ef7455529a3f32272fcad04be95e8f"
+        ],
+        "en.showcase": [
+            "65dad04198f131e283ce4d7fcf32905d42a0cf37"
+        ],
+        "en.pillars": [
+            "79dfc6854a648f31d1295db490aaea07b968696e"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "92403b870eadc20f345caa8470c8ab074f682b32"
+        ],
+        "en.metrics": [
+            "9730e6557569982bd3281a9b07018289ece2b3ee"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "8ba5de7cc3e089126c8dfb0e9f8543cc05bd4cca"
+        ],
+        "en.faq": [
+            "98c94391a57711f746ec366222c6d8ba770a5612",
+            "ef95e721d2b9913ff406a7bd56470667dfee6f5b"
+        ],
+        "en.cta": [
+            "6251d560cc7133a11bf0835155684b2143184535",
+            "c1c75176c424b4d3f2ed6d0ecae6e5c9a0353eff"
+        ]
+    },
+    "salon-system": {
+        "tagline_en": [
+            "04a2ac7923a8e8c072a7008870181979bc7b1bd4"
+        ],
+        "tagline_ar": [
+            "bb8b599f951f805ac705c6c318165d2cabb7864d"
+        ],
+        "description_en": [
+            "04a2ac7923a8e8c072a7008870181979bc7b1bd4"
+        ],
+        "description_ar": [
+            "bb8b599f951f805ac705c6c318165d2cabb7864d"
+        ],
+        "ar.kicker": [
+            "f131cc2e8fa59509bf5886663adb9a63dc026a50"
+        ],
+        "ar.headline": [
+            "3a5e520170ae5dd3c28878382398ab3b272a9b40"
+        ],
+        "ar.subheadline": [
+            "2d059207c5ee077ab9039c34ae34500c1e720159"
+        ],
+        "ar.overview": [
+            "39619c77bbf90bf1e3dc56cbf292e90a512cebb6",
+            "cdae092d950f66346752731d245b15453b239e83"
+        ],
+        "ar.problems": [
+            "bc0a8dc6281a94bacc392790f2948cfeb68ff6f6"
+        ],
+        "ar.showcase": [
+            "21a79df659c80e40d05265ec6bc920caae3f24aa"
+        ],
+        "ar.pillars": [
+            "cbd70073150a2d2497d94bd0408c2711c36740c6"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "7455d1ad528465ab13c53c2fc4b3c7c8458d5c01"
+        ],
+        "ar.metrics": [
+            "f2f9b45f4c93271801b2e5a542204d73ba1482f9"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "73ed67885ad23009f2b8f24b7f79b05c1c39a890"
+        ],
+        "ar.faq": [
+            "212b8d58a5c3ae67e133fc49f9baee7c9f536be8",
+            "742c66c3329fe78dbc4e2d22ca402a5e1b8c974e"
+        ],
+        "ar.cta": [
+            "be493a97805b36f0a3b8bd46d3468026d2f26d23",
+            "1d66a3a3d7370795ed3f5ed22068711f0d671109"
+        ],
+        "en.kicker": [
+            "be4f33f9f4ca9b08ce7f32a6813766e692345cd5"
+        ],
+        "en.headline": [
+            "16c2dfb1352a8bfa137a5710e346c64a450cb941"
+        ],
+        "en.subheadline": [
+            "b69245c757e734f95ce4f77825bb05bd8b929dfd"
+        ],
+        "en.overview": [
+            "99ef386d183605a4f41de0a44531a0776b370901",
+            "fb37babb7ca4436189c944d16bd0d153b0bdb6bd"
+        ],
+        "en.problems": [
+            "5c7cd977fdc6a086daa2f26ec19b0fab3ef1fbd7"
+        ],
+        "en.showcase": [
+            "2fc3ce762b6d6d48810b4ee6b11aadf0833242b8"
+        ],
+        "en.pillars": [
+            "67568ecf323533268bfd3f021afe3c655fecb6fe"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "27cab40bdfc29229f87b214cb7ab45a99e0b1fef"
+        ],
+        "en.metrics": [
+            "eb1fdc24c320644d4bc2d3df7c86d33779bd4e54"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "b748d40940121911fbe2e73a707754299cf1aa58"
+        ],
+        "en.faq": [
+            "5b6398a31d3fd1aed8a447792216f7ee59da160c",
+            "0fb91ad2df6bd94d3008bc2690612e2a7045d137"
+        ],
+        "en.cta": [
+            "17c545bb7cb0a6d748f0ae0de220e53381f32718",
+            "752bf1d232fd7ba12ff8214c7b9eae5b3634f099"
+        ]
+    },
+    "pharmacy-system": {
+        "tagline_en": [
+            "508600bd58cf5e3c03402b10873c2ae47ab5bf35"
+        ],
+        "tagline_ar": [
+            "f1d9bdaa776467d93629f4a85b1e34d5dcaa24ab"
+        ],
+        "description_en": [
+            "508600bd58cf5e3c03402b10873c2ae47ab5bf35"
+        ],
+        "description_ar": [
+            "f1d9bdaa776467d93629f4a85b1e34d5dcaa24ab"
+        ],
+        "ar.kicker": [
+            "9da58b801bd1d2ab65d82eed06a59979a1162bcb"
+        ],
+        "ar.headline": [
+            "3deee6cffea5ad9d9e0c0d5aaa5332457ee23e96"
+        ],
+        "ar.subheadline": [
+            "ed9030a7d31faaa15889194d8c2edff4296b416b"
+        ],
+        "ar.overview": [
+            "c855b03178bb8c3b8aaabd50b50674608bf5a9be",
+            "91ef5c076b1002a4797a75647d37390a9551492d"
+        ],
+        "ar.problems": [
+            "7e601643977a9519b8ca33910f14bf46b9ed1897"
+        ],
+        "ar.showcase": [
+            "e2f34f530eb9ed7eb773b0f8f84ee276e959bbfc"
+        ],
+        "ar.pillars": [
+            "5ac1a0c7a674b8d2fc0bf3fb49041d564b3400c7"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "980efcd68d008a2dfa7b90e4f22af397f1f00cb4"
+        ],
+        "ar.metrics": [
+            "a7c878947576d53c327680869c613f48f6beb67b"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "7c9fd92a3feb99c1986a0a99876b256facf451bd",
+            "6a3c9e8ae0adcf8b6fd4bafe1b536f451f1706d0"
+        ],
+        "ar.details": [
+            "a0d72ac6b3aced8d49ba3daafc86a490ed1ed645"
+        ],
+        "ar.faq": [
+            "0c0431241904cf7497cf2054bb0985db8b727284",
+            "d8aadf10fe981efbdd15b20d215e387e525d3139"
+        ],
+        "ar.cta": [
+            "8a06b6b37e0b99759c44cf35e67cd873dd580a49",
+            "0790aa679967e8896ab5a2a8c057652c56080a03"
+        ],
+        "en.kicker": [
+            "b4afc50787e597d88f7e52861949738339690f92"
+        ],
+        "en.headline": [
+            "da6ad1f4f9e5eeefbe03b6cf581e688e8b5d389f"
+        ],
+        "en.subheadline": [
+            "1cae1d3be2cf20aace0c9b08436b6a90b0c8f039"
+        ],
+        "en.overview": [
+            "c874b35097fea26aa9ab16f22e71c99c477066e3",
+            "aed3b4351f245a9221bf2f1b60880eb5bca78eb0"
+        ],
+        "en.problems": [
+            "186c743902236e4ef046fa1786bbca778fa1d944"
+        ],
+        "en.showcase": [
+            "b7e19aa04fad9b5df878c54055d5231086cd72eb"
+        ],
+        "en.pillars": [
+            "7dbee22aa48c62474764c9a94a60938d99c2e2fb"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "8df5850b698dfb7b3feb7d89dc2dda0e29b16203"
+        ],
+        "en.metrics": [
+            "6fdbfa4bf3fdbc8040d803e4ca51be7541657194"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "5ada3c820d5d3bcb3dde3ff33e7d74dcf33e536c",
+            "684d0d774db0b7f9461a7f45e7f24d9652c754aa"
+        ],
+        "en.details": [
+            "4db61c22577e08437e53d07f157c93c9577b2cc7"
+        ],
+        "en.faq": [
+            "1c73962cf57d9b711b3ff072e2f134d08e95e0c6",
+            "219f0285522fcc31eaba336c56e555987084c14c"
+        ],
+        "en.cta": [
+            "6956df2319dd08b5cfb0a01ce56953d442310039",
+            "0f4e4a140407ea86cff2535d0c90010f476d3db8"
+        ]
+    },
+    "restaurant-pos-system": {
+        "tagline_en": [
+            "f3c811386eabaf1131fc95eb4e91f5ec1770c811"
+        ],
+        "tagline_ar": [
+            "fd75bf98abcd16d0b2b6883808be2e22055659d8"
+        ],
+        "description_en": [
+            "f3c811386eabaf1131fc95eb4e91f5ec1770c811"
+        ],
+        "description_ar": [
+            "fd75bf98abcd16d0b2b6883808be2e22055659d8"
+        ],
+        "ar.kicker": [
+            "656b82fa7e096f507597796f9edbe81929f35a4e"
+        ],
+        "ar.headline": [
+            "acc222bff244a969cfc9034d9ffb70a7e707a786"
+        ],
+        "ar.subheadline": [
+            "d7ec1dd633cc1ac2240f41336d83ca6a5583b849"
+        ],
+        "ar.overview": [
+            "e81c64117b35697fde3bb03fafac18f78b23e3d5",
+            "095c708ba701c87451a39cf63dc7fcb3be3aca13"
+        ],
+        "ar.problems": [
+            "0fdfef0a531c7be1c6d91fdec5a95b43c36c9350"
+        ],
+        "ar.showcase": [
+            "fd8b4d77c596eababa7816b2c99dfeea2b436559"
+        ],
+        "ar.pillars": [
+            "22ae7b30d792dd6ae7f1c12fd91553749b836ccf"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "13a188f11ead5d67790f050c735bc5d1c88927c9"
+        ],
+        "ar.metrics": [
+            "054cb1b220a22503f32eac7b5989bfa9cca6d680"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "119afa5cbcf046d67a5cddbc82d1ade851050199"
+        ],
+        "ar.faq": [
+            "b6717a78d5e78c717063d778976eec55c28e8797",
+            "1ac32683458bd9d91ed64670d0d4f08356d2ef31"
+        ],
+        "ar.cta": [
+            "37504cddc3cad2e6e341f43262a360cabb0660f5",
+            "7ca9fa7fb5259ea9fcdb78965f436fd455e2764b"
+        ],
+        "en.kicker": [
+            "25e1eb7a29c84d0fc87732c01f10216cac5db3f3"
+        ],
+        "en.headline": [
+            "1cc72a149b2e951a22c905f220349f78eb7edfdb"
+        ],
+        "en.subheadline": [
+            "9bf0c2fea608022ac9fcbd9ea4bc531ec8c8ed56"
+        ],
+        "en.overview": [
+            "2b116db33a71f716dffe07fd08ed11f8f6f86ad0",
+            "fb47063e93c275e9c20a4d4c8d8cedcfd0dfd8d7"
+        ],
+        "en.problems": [
+            "7a8a5bda6c2e4626db3c5133e2203d9f7205d10e"
+        ],
+        "en.showcase": [
+            "ae8863a82f991b094d87dbad40eb863e269270cb"
+        ],
+        "en.pillars": [
+            "d843ad773374fc0355920e45a1e75cd5939555a9"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "39e75b65911b71e96a81eb863528e3e8e93c8471"
+        ],
+        "en.metrics": [
+            "9455f1e5adf74df03412e007d6eaa201fe60b6f0"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "807fd5ff01b3ebbb0a8129910ea38e4905b53abe"
+        ],
+        "en.faq": [
+            "4dd320745ddabea2c85694b037bc8f380856c644",
+            "701ed9c5d047658e4224161090e193c656257c06"
+        ],
+        "en.cta": [
+            "73abcf395d920f2dcb1ac4975208515d3871f7b0",
+            "63a43705f998520f35eedcab7e3f4e354ede02f9"
+        ]
+    },
+    "dental-clinic-system": {
+        "tagline_en": [
+            "c7bf59496c422e723605b26014916132e1edd470"
+        ],
+        "tagline_ar": [
+            "28d07577a5358cca0363d09caff035e5e424b3b9"
+        ],
+        "description_en": [
+            "c7bf59496c422e723605b26014916132e1edd470"
+        ],
+        "description_ar": [
+            "28d07577a5358cca0363d09caff035e5e424b3b9"
+        ],
+        "ar.kicker": [
+            "a0d4ab19afd783246707271cb86eba810584641a"
+        ],
+        "ar.headline": [
+            "034ff2f2a8dcd23fbd0161fd7b1eb0d7cb407982"
+        ],
+        "ar.subheadline": [
+            "9b30c29450911a2f3350a3a9282883a45ebc9ee2"
+        ],
+        "ar.overview": [
+            "80f069f29df8cf74a686f28423daa965e86021ec",
+            "355bf0ba86cb93add7813297fe3e82cfd2cd53be"
+        ],
+        "ar.problems": [
+            "a854cb6b38e374d7df5b736742683ecd2cf008c9"
+        ],
+        "ar.showcase": [
+            "5896a64c82ec1466c304ad1aa09d532948a0bd20"
+        ],
+        "ar.pillars": [
+            "fa81cbc819cc2d1ea9098b4260f4bb3c962befe3"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "0aa3a1ca42e21d08bfedb23e187c2c89c777f036"
+        ],
+        "ar.metrics": [
+            "587c717185918623e76eb417aa78276e43e2990c"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "6fcbf80815e32f4240e9579db21644c78dc3dc5d",
+            "358f6473b3b2bc1d3b19889e415fd488b3e5eb25"
+        ],
+        "ar.details": [
+            "96246588c269139a964c98adfaf18b7de091ea4a"
+        ],
+        "ar.faq": [
+            "c5584c7715776eb23a92fe5d0b8a90baab18ca20",
+            "21d4cbc124c824b1c2aaf73e8e3f2373511fe202"
+        ],
+        "ar.cta": [
+            "7b37123bcba26503304374b0b533a274b713a509",
+            "aed6e60fb0926c5c0a742f936fea56ebff0c4441"
+        ],
+        "en.kicker": [
+            "e000c7b96d9dcb052e40d0f5c2490769ac6c9d8f"
+        ],
+        "en.headline": [
+            "e44b0961f6071dde150a7e3b30f8e45b38372671"
+        ],
+        "en.subheadline": [
+            "c398185c3cca2b61d7f39dd3a56b6bc815ec0221"
+        ],
+        "en.overview": [
+            "4a22809b21242ae7b811ba1cbdb74d517901792d",
+            "6d254176f959bb39d6776dd525510f5ac7de3758"
+        ],
+        "en.problems": [
+            "5f1cd2998abf28182f270523d0ce106da0fa8289"
+        ],
+        "en.showcase": [
+            "2d990ed8f52cda76615fad6894a9b21d545440a2"
+        ],
+        "en.pillars": [
+            "f30ef2971650deb25adb093421009cb963c8fe43"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "87c4c4c897d462e9995ce24ecd8357c4196e3d73"
+        ],
+        "en.metrics": [
+            "daaaa97ede1b3349cf42365e708f484672bcb61d"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "52577d32565229c99b3844531d4a970837c6960c",
+            "e89adeeb10aea75278311c2cf7ea3ab8254769c1"
+        ],
+        "en.details": [
+            "a57c3067513a6a72ed0324833c930ea240ce2296"
+        ],
+        "en.faq": [
+            "78b0d19d2b20d69de7bef99f1fad7d9648320619",
+            "dd87e70f57e081fe21a33bc9e4d4a04dca91bf91"
+        ],
+        "en.cta": [
+            "1bcb4b1ea24530974af9080276b9d4ec587315a2",
+            "d0e43e4f80ee1a601926f376b3381aa281fbe02a"
+        ]
+    },
+    "education-center-system": {
+        "tagline_en": [
+            "3d1f6709510cc018f327347017a557a48b3fc823"
+        ],
+        "tagline_ar": [
+            "086c3646e9911918564da6ace29d56fa35a8fbd2"
+        ],
+        "description_en": [
+            "3d1f6709510cc018f327347017a557a48b3fc823"
+        ],
+        "description_ar": [
+            "086c3646e9911918564da6ace29d56fa35a8fbd2"
+        ],
+        "ar.kicker": [
+            "8cfc497795aace12842b15a38113e88e36956155"
+        ],
+        "ar.headline": [
+            "12a7cb518151109baa87391309198d10dbd223da"
+        ],
+        "ar.subheadline": [
+            "a604cd5abe852798c5d6c310efe5c0beb6a9c8ad"
+        ],
+        "ar.overview": [
+            "2d60d8ab2522a1aaa90f7e07013c72b09d161cf6",
+            "c739fd3f6f676a3aafe9934ff4f043fadd767923"
+        ],
+        "ar.problems": [
+            "dc9f608fdda04406c3b520609434fd39e9ea7be3"
+        ],
+        "ar.showcase": [
+            "f80174cae8243eb5ff898c876bf905098f5584c1"
+        ],
+        "ar.pillars": [
+            "41f0e49293abf9d32e674b24d424568a2cc318bd"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "c4980c54d898f3f519dddf7df1b1d1f91cfaaf01"
+        ],
+        "ar.metrics": [
+            "f955a89fd84f66ef6a40506a04831aa3fa673948"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "7c9fd92a3feb99c1986a0a99876b256facf451bd",
+            "6a3c9e8ae0adcf8b6fd4bafe1b536f451f1706d0"
+        ],
+        "ar.details": [
+            "c0170273e557cf5db2a95a68559d7dfbaf1f51af"
+        ],
+        "ar.faq": [
+            "1986bf0c007331174dfe5d37a5fc92727c81bc13",
+            "6141c09827e214b136a7b83c79b307e5ff3ef302"
+        ],
+        "ar.cta": [
+            "87587b93200b8e82f5d0675d00f85716bc8efe23",
+            "69dccdbe39354bdc80629f6485d738c3702b04cc"
+        ],
+        "en.kicker": [
+            "e28f467877e499489fb3983a4ab01b05fd0bcd1f"
+        ],
+        "en.headline": [
+            "586f9e19401dc601ba903eb7e7416f9d5658a37f"
+        ],
+        "en.subheadline": [
+            "6c735f592229f58644b53f3098c0fd6aaf1f7a2b"
+        ],
+        "en.overview": [
+            "fd150b3ea061aed045612ab18fa44e669c468b43",
+            "a5ecd9709b1705459c5ae0941adae21f3e5d26d7"
+        ],
+        "en.problems": [
+            "2a8b37e67182a0d46f9a7db9dfa39418571b43a4"
+        ],
+        "en.showcase": [
+            "9690a3fa3d8a20e8e6fde16a1512f8344add111b"
+        ],
+        "en.pillars": [
+            "2c80e1c91202deb6570fbbfb8b0221bc4bde7088"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "ee47d4871493fdbffdd4afb088c584696b9383b9"
+        ],
+        "en.metrics": [
+            "cda1231ba665871176afc366cee259ba3edc4b7c"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "5ada3c820d5d3bcb3dde3ff33e7d74dcf33e536c",
+            "684d0d774db0b7f9461a7f45e7f24d9652c754aa"
+        ],
+        "en.details": [
+            "44aec68f552f04d5428f838c3a57d9be5e7d314e"
+        ],
+        "en.faq": [
+            "72a354799b35802470378c213ad234fabe78b08e",
+            "5781ebe7609b690cbcbde4f57905067e54cb61cd"
+        ],
+        "en.cta": [
+            "0a56d8db9b8c4bbad0665f65ee365c8055f1c6c2",
+            "e2f271c33691aae0907c88204bc1f296587f8d37"
+        ]
+    },
+    "lab-system": {
+        "tagline_en": [
+            "832ffcbc4519102065197cf6bcf66fb31ff0b656"
+        ],
+        "tagline_ar": [
+            "8219a8f6dc8466db0a51da5ceab890450e982edd"
+        ],
+        "description_en": [
+            "832ffcbc4519102065197cf6bcf66fb31ff0b656"
+        ],
+        "description_ar": [
+            "8219a8f6dc8466db0a51da5ceab890450e982edd"
+        ],
+        "ar.kicker": [
+            "7cb6d858bba10bb6ba105b2f01c6be963b731f79"
+        ],
+        "ar.headline": [
+            "945ea225d0cb0804e0d6a91ce2338251d9857dbe"
+        ],
+        "ar.subheadline": [
+            "3451392a21e8691cb0933d0518a81c9e8c823afb"
+        ],
+        "ar.overview": [
+            "badf7e6db1472695a19d63e021b762e2efce7b56",
+            "17fcd165b357e6f1fe3863008530221c741bab71"
+        ],
+        "ar.problems": [
+            "5e6a6d9bf491ded97616a804de8f0d268bb553bf"
+        ],
+        "ar.showcase": [
+            "214c9c8119005fe4efbaf070a60fac797f4519ac"
+        ],
+        "ar.pillars": [
+            "ba9905e2e3671b35e60b62dd7261d923ba9d162e"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "078d084539d3ff3fc6e825d24a108a1843262d1c"
+        ],
+        "ar.metrics": [
+            "356aaac5f70bb6a4366c03e25bcd9e0df0003804"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "09011aeb6d06e8f76fb28ef7de7a73fa284bbcf7",
+            "9b3ac4c03c3e07bae822123347c77cbb37fbd800"
+        ],
+        "ar.details": [
+            "1ca12027588e8d0e28344b0d7fb8f0595dab618d"
+        ],
+        "ar.faq": [
+            "56edeb11241510a3bd4ab9791fb55633291fb5a7",
+            "89e9f745c362035828842e61d80d11d2448f0931"
+        ],
+        "ar.cta": [
+            "4453e96a9b759e834df38a364ae813e157f8984f",
+            "98d97689e25381527af9b426fbdc0a4774969a14"
+        ],
+        "en.kicker": [
+            "4def82fe765ff9659776d92bfd48d4cce860a656"
+        ],
+        "en.headline": [
+            "c33b984eab60298660fe2a7e3bc02af096e7b71d"
+        ],
+        "en.subheadline": [
+            "935ea3b306fef373190ad64cbdbe3b435c6ef1ea"
+        ],
+        "en.overview": [
+            "525d10d0ba15d1005350ce8dd0f9d08de766b24f",
+            "cb3ed2f9f53592cdb174fdff7a81278ce5046c7f"
+        ],
+        "en.problems": [
+            "4c8fce49e2252873bf3ee879dba349cb39ae81c7"
+        ],
+        "en.showcase": [
+            "f7f436e863fe0c5b4f97445687f682c6c2c1c51d"
+        ],
+        "en.pillars": [
+            "059eea54304d987098af6e4be8a10c38b2dc10b2"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "adf51a68ad160e2f452e2be23290d8c6dd7256b3"
+        ],
+        "en.metrics": [
+            "b8b50afbdc9681635462e793e88588caf798f264"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "88de50e48e6b9b2952feabcdbacef0b25687b2ec",
+            "c448523b66a2eeff72f1c7ce7eed8bed28b72fe7"
+        ],
+        "en.details": [
+            "0079201f17f9c3c8eee0e5f79e707cbc9cdd59c2"
+        ],
+        "en.faq": [
+            "75f268216a641f9c14cac05aa3ac9b1be2b45363",
+            "7ddce533f3748559a9286b7da3a0927ba139fe04"
+        ],
+        "en.cta": [
+            "3683470c66302223b53171b19079bf5d6e740c6c",
+            "5d5bce59f96d40b6a94b4a3f47551c50303995c7"
+        ]
+    },
+    "real-estate-system": {
+        "tagline_en": [
+            "f435d8651fc0f0998c2e4851f9cfa898b89481aa"
+        ],
+        "tagline_ar": [
+            "2e9b3fea6fe7aee81322bc68da57bb510f9aaa7e"
+        ],
+        "description_en": [
+            "f435d8651fc0f0998c2e4851f9cfa898b89481aa"
+        ],
+        "description_ar": [
+            "2e9b3fea6fe7aee81322bc68da57bb510f9aaa7e"
+        ],
+        "ar.kicker": [
+            "38ab4cb3c6dc42c5b81c863023d631226c784aad"
+        ],
+        "ar.headline": [
+            "47185c771ba1830fee8502b58703bf14bb5da571"
+        ],
+        "ar.subheadline": [
+            "ceb9903ab45f6f58b31060837d4a22f63b9cd2e0"
+        ],
+        "ar.overview": [
+            "e2a89bd4233d26b2272f40d698844d3d8440b463",
+            "8daac6561daa378c2708f95f337539732728b461"
+        ],
+        "ar.problems": [
+            "6980b926d9f9e4fb5f1a5455c7ff53ff36ef35b9"
+        ],
+        "ar.showcase": [
+            "362c66d7f8a6cf86dba0d34e811439e6237dc0a6"
+        ],
+        "ar.pillars": [
+            "8fe6194b329cb6bc6bbf0505f18fa50389e6a366"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "e360be0323f362b64372a2021ce61f286b61eee6"
+        ],
+        "ar.metrics": [
+            "ddb7f5a2a70a66d0602804f6a9b03de47f0f57ca"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "9e1f8a6c3cd6b5f5cb268ca30d415f68ff56a1fd",
+            "60ce2fdc548baa369bb0410bf6029e3f3974b0e9"
+        ],
+        "ar.details": [
+            "d42df5c7b6085ebcc37504bb6898ad0dea66e3ba"
+        ],
+        "ar.faq": [
+            "efe717fa883586cb954b19c15bd127cb8ff0117e",
+            "fa93eb42875d04cb64279497aaf0ad832dfb671d"
+        ],
+        "ar.cta": [
+            "63d10082dd46f80eff01b1d57daa9f73efbe9d3b",
+            "ce87bd1c3e76950f44e281d4ae13cbf0baaa82c2"
+        ],
+        "en.kicker": [
+            "db64d83c6f5f69189e08d5747be2fcd972d1059c"
+        ],
+        "en.headline": [
+            "fffa65082d2468cdf81d0e5d951e55a717c9b928"
+        ],
+        "en.subheadline": [
+            "46e55fb8d80ac48e110f5d13e039aef0b99a0334"
+        ],
+        "en.overview": [
+            "721e20caebb78cc5f46d37061f41cfe9333be223",
+            "d0a1f6b527737966626949b404f9bcf4ec245705"
+        ],
+        "en.problems": [
+            "346997f8687f48cc2e86ee8f54dc8a25393ca690"
+        ],
+        "en.showcase": [
+            "9238bc9cdc280541aea7fe1da09e4831c2bcf4c2"
+        ],
+        "en.pillars": [
+            "53fed352bff8a4bb84f5f04658768fc1abab45ab"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "ba07f4ce82e4e878f20fb14511f46bbcb8292efc"
+        ],
+        "en.metrics": [
+            "092c128914eea9a0485ace81569685e6a8027df0"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "6d6a8ceec6927bf09325515fa4348b7dc9fa3869",
+            "355e3b03ea6cd6eef4002013f934a7d256b832fb"
+        ],
+        "en.details": [
+            "ef2116f65697d72b32fb675e7738c7e10519a16b"
+        ],
+        "en.faq": [
+            "3417074086977ee4e1f57821806e758cf51602b9",
+            "3b6dcfc7cb9deae4c3bad8296b1f04de0d23f539"
+        ],
+        "en.cta": [
+            "d981eb486268352478ed25a9bdca68878c48ddf1",
+            "2440887c762b292424a380ee85ba05bfa06dd3a3"
+        ]
+    },
+    "wholesale-system": {
+        "tagline_en": [
+            "26a44d9643380ac6894fbf769e622f9cf03b2bbe"
+        ],
+        "tagline_ar": [
+            "98f19f895f0c45db047af6406b940e2d90ec2dc8"
+        ],
+        "description_en": [
+            "26a44d9643380ac6894fbf769e622f9cf03b2bbe"
+        ],
+        "description_ar": [
+            "98f19f895f0c45db047af6406b940e2d90ec2dc8"
+        ],
+        "ar.kicker": [
+            "13e4d1e030d49de75e0026165fb8756e4e407fc4"
+        ],
+        "ar.headline": [
+            "d7e75e4ad5cf0472b17c52393dd217bca9cb205d"
+        ],
+        "ar.subheadline": [
+            "cf3a912fd89c68216a738311ad7f8ac6031fbe60"
+        ],
+        "ar.overview": [
+            "f5ce0e368419d62153e0adfa6809cf56bd5f84f1",
+            "88f2c5357746397ff3ca918a0cd0f80666c3643c"
+        ],
+        "ar.problems": [
+            "94ffd55069f33174b135798c9d31bd4cd69328de"
+        ],
+        "ar.showcase": [
+            "86bf6f946fb28b69b64dd41202ed67c3fa650c61"
+        ],
+        "ar.pillars": [
+            "213c15523f63f4126785432d5f4be39aad046f76"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "11cb587dc8b66afeeee30808be69e822f99953b3"
+        ],
+        "ar.metrics": [
+            "55d03bcaf1f8cb6b6e8834edb7a279d104af4a80"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "48e23407f40a1f55f036233cc84cb7c012196ec4",
+            "689155505bb7a33d8f70c73cce35db5f98f3aa85"
+        ],
+        "ar.details": [
+            "9be173cd38da920e9c48555298823bc393c01327"
+        ],
+        "ar.faq": [
+            "d46ce255892ae87f4d08363557c74997624ba89f",
+            "70b02a62b854d7ca59514a35ebd18dee4bad45ff"
+        ],
+        "ar.cta": [
+            "8f2a52c5b554f60144626e2ac0af7c7739e48dba",
+            "cbddaab1969d249d2659a4971832d32a0d2ffe1d"
+        ],
+        "en.kicker": [
+            "925b815c22498d7fcc16dde462911667730f67ef"
+        ],
+        "en.headline": [
+            "4f9f99fddafef25a1fe588afee9b6c998647182f"
+        ],
+        "en.subheadline": [
+            "de6da4c7a962602c2911ac7e63a0e29412f17265"
+        ],
+        "en.overview": [
+            "c416b968ebc01ef3e3d1f338bff469a2075e7378",
+            "d668add72bb557a1ce1df36d56d3eeace9971dfd"
+        ],
+        "en.problems": [
+            "93ba083cf1bdce0cf1bf9462df951e33a359813f"
+        ],
+        "en.showcase": [
+            "5ed0f1fa7bcfbccce3c56985a8fc4322e15b8c33"
+        ],
+        "en.pillars": [
+            "e4b3a098501ef4f14a2458db6de2e8ed808cf265"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "0746f44d72e231fa9d72dd801c5d464e6aa6608b"
+        ],
+        "en.metrics": [
+            "8a009b0dd83855fc4847bf33c281611dc6b0ba74"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "477b44f795dd5327adf2e852d0bcaf11d8ca2e50",
+            "d11a141822f79ebbae3343560277670238017dae"
+        ],
+        "en.details": [
+            "c25f11507b1c582e6dcec751a6124ce631ca2464"
+        ],
+        "en.faq": [
+            "8f4f67b4ec5630f303daa353d2937b6f188d00c1",
+            "7754893ad03963e0c0f47483e81e96134e4e6a98"
+        ],
+        "en.cta": [
+            "778bdc2ac2238187d6181474e65a205a17dbf4ce",
+            "a97341a65640c6792c49001c6d7bb2649b87cf73"
+        ]
+    },
+    "supermarket-system": {
+        "tagline_en": [
+            "fb2d3c4428a54287672e1572ae258e5d8048c05c"
+        ],
+        "tagline_ar": [
+            "bcb2668f7a23d69cc34123f74b88a8198738c70a"
+        ],
+        "description_en": [
+            "fb2d3c4428a54287672e1572ae258e5d8048c05c"
+        ],
+        "description_ar": [
+            "bcb2668f7a23d69cc34123f74b88a8198738c70a"
+        ],
+        "ar.kicker": [
+            "afc5783108c6833faba94d44a1e011da9d158024"
+        ],
+        "ar.headline": [
+            "be38d8b99ff9d4c311b96506d85f89f0491bd578"
+        ],
+        "ar.subheadline": [
+            "e91b1c6f914e0531356b1cbf5bafd52f67d3dc28"
+        ],
+        "ar.overview": [
+            "08b25a73c36c20747386afdc44e17429e8463a81",
+            "04ed2ccca1eee47954b1b9f29770bfffdd639fd7"
+        ],
+        "ar.problems": [
+            "24ed113cf92f53f9bcde85ae45dba48e5638643f"
+        ],
+        "ar.showcase": [
+            "1bc18595a8541f61ffc4841721994b009259ba9f"
+        ],
+        "ar.pillars": [
+            "a3e91d6cae73dc22e601708a42b4b9e0fc6cc4d1"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "48a7ed2b15534efeefa897009e1fc4343e70df06"
+        ],
+        "ar.metrics": [
+            "c066a065af610a287d5940454c56c65c95374721"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "7c9fd92a3feb99c1986a0a99876b256facf451bd",
+            "6a3c9e8ae0adcf8b6fd4bafe1b536f451f1706d0"
+        ],
+        "ar.details": [
+            "e5f25db70311ad3e86c087c6d2952057dea06b6f"
+        ],
+        "ar.faq": [
+            "934e017c6b28adf82d503276b9c146ef42e7dc8d",
+            "463b4d0271bb40614272085a1e4bcf0433e5e590"
+        ],
+        "ar.cta": [
+            "2077a70d87bb82785a481710379ec0fb937adf37",
+            "eca3cb1dab070cd004ca1d8a3f6d69c7522db7af"
+        ],
+        "en.kicker": [
+            "70c96f19c916e8cf50517d1c21aad879d7332fe3"
+        ],
+        "en.headline": [
+            "74ce6e5178250adac117ca5f37472dbbddef3cab"
+        ],
+        "en.subheadline": [
+            "b1680dd81184a81dc600aa64198431a24046ef59"
+        ],
+        "en.overview": [
+            "6cd999323dc38018b943a68e9c73e38af207ad33",
+            "934459c3cee82f8033deb6960023776f68611c05"
+        ],
+        "en.problems": [
+            "f0a6b537fd577c4c585cadeac4c4ef64e61bcd2e"
+        ],
+        "en.showcase": [
+            "2a5ca48236112a343a8fdb6550c51a643a770469"
+        ],
+        "en.pillars": [
+            "3b2afbb22b2eefde3a80a562c0cc7fb6f16f2b34"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "d2918bedc292b482a7dad46e7a11bd48d32de092"
+        ],
+        "en.metrics": [
+            "17dc2d3e072cd6dd054a69096f6421e507989edb"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "5ada3c820d5d3bcb3dde3ff33e7d74dcf33e536c",
+            "684d0d774db0b7f9461a7f45e7f24d9652c754aa"
+        ],
+        "en.details": [
+            "4d388f15d4cc19d12d34c0462aea451725260008"
+        ],
+        "en.faq": [
+            "020f86bfd80c4dae81748799966247cd931c0bc2",
+            "69fda6ebc47a2d7e313acb003842cf05b190d3af"
+        ],
+        "en.cta": [
+            "341c6e9e6c0760abbd6a70df8b65193f0433f2c7",
+            "3c8f4fc6d042f8b82de12df21102a3259c9e67ef"
+        ]
+    },
+    "nursery-system": {
+        "tagline_en": [
+            "d95f14623db915d506fd0ab69b91ca8268d1daa1"
+        ],
+        "tagline_ar": [
+            "d41fd8f43596567f74a3d6315a9713ff83cc3948"
+        ],
+        "description_en": [
+            "d95f14623db915d506fd0ab69b91ca8268d1daa1"
+        ],
+        "description_ar": [
+            "d41fd8f43596567f74a3d6315a9713ff83cc3948"
+        ],
+        "ar.kicker": [
+            "6ff36ff0d2e81a8ffa16921661ff3756409b3430"
+        ],
+        "ar.headline": [
+            "f0a7d4c2fec099ccf235064c94a7f76fcc9a2172"
+        ],
+        "ar.subheadline": [
+            "4a9978d01e644298ec37c24e7c4889e7282f5503"
+        ],
+        "ar.overview": [
+            "2563448396425ae32b3f473cbe0aee8ea1b07ac5",
+            "e0afb3f43c6cba22c0604629ac63aa59914a905a"
+        ],
+        "ar.problems": [
+            "6133001382cf62e64282da8f5d54038c7c3955fb"
+        ],
+        "ar.showcase": [
+            "10f8d0f6b879198731552ca8ee97d416ed2a5c70"
+        ],
+        "ar.pillars": [
+            "8c71c43dc4b0b93ff7eef9b82dbe2e214b5a4a64"
+        ],
+        "ar.video": [
+            "f2e3f767d40aeba8e052d9442522059a7ea225c8"
+        ],
+        "ar.steps": [
+            "b7c1982f0222a3b6c23231849925969dd8308489",
+            "9ff3f18730abadbeb558932cf6500e590222468c"
+        ],
+        "ar.before_after": [
+            "e24eef1fcc1ca40009ae8f0165ff12fd5ad397f1"
+        ],
+        "ar.metrics": [
+            "086885ccfc67e478496f7d141868b948aa819271"
+        ],
+        "ar.gallery": [
+            "2a9a037b2d6e22b96eb135c3ce76ce246bb675a4"
+        ],
+        "ar.plans": [
+            "37fe06a0ae16e515e0331e7a0b2842b1b7c21d4a",
+            "2a46117a1395f8ea4ee5cc808e7ab21a4a0e3cf9"
+        ],
+        "ar.details": [
+            "7d134a36d29dce99ce0c9abb5ed0005b1b670c0e"
+        ],
+        "ar.faq": [
+            "61af088e1f877f08f7021d29a11ff44ab8e52201",
+            "9d43dc5e48103a5e82d112a1edfe2a22124c19d1"
+        ],
+        "ar.cta": [
+            "18489ead1befafc0efd1ad797bb309e5ba3ec2eb",
+            "dd10cd9fbcf87a1cdd7de67c75539505e6aad977"
+        ],
+        "en.kicker": [
+            "687814ca6e8e506d0246890b5cbaea365e06750a"
+        ],
+        "en.headline": [
+            "d48ba0b34c47a970102300f60b5e71e6fc349e6d"
+        ],
+        "en.subheadline": [
+            "9bc62efcee59dfb8e3c7e2569c40d6b842676922"
+        ],
+        "en.overview": [
+            "a440f08ed98e633a7b290bfc7e6465e86279e949",
+            "89a20d33e6b87fc3c9a7b28ee1612b0632da67d2"
+        ],
+        "en.problems": [
+            "67d88163ebb87f7658a9cb28b69df0021025b6c4"
+        ],
+        "en.showcase": [
+            "b041fbe2524defc61430fd4b40418ddb4c6b8e5f"
+        ],
+        "en.pillars": [
+            "a951ba778c54b70ee899af014250e80c3b47a1a1"
+        ],
+        "en.video": [
+            "6843dfdc598c582de8fd2e35fff61b96528a1870"
+        ],
+        "en.steps": [
+            "6928806afde58e828029ff24bc1c3dca3944af3b",
+            "9c38f9c349a9a0ce4c3c5779b9d96d402d3c13b8"
+        ],
+        "en.before_after": [
+            "c326e2d654310e9c7b3b8155e5d0bb1139e755af"
+        ],
+        "en.metrics": [
+            "bf5e0a9a9101aeaa65f3dbcfe573b5b43795486e"
+        ],
+        "en.gallery": [
+            "0cba8a90e6baf3299c96956e0b45c677964110dc"
+        ],
+        "en.plans": [
+            "7f08073b86d277aaa70cb76ffab2cd667e4821fa",
+            "41a7cc39bca9f1f7b42c38bd7fb224aa6a861814"
+        ],
+        "en.details": [
+            "d010a1ccb11251c6324a83c465c68c312819493d"
+        ],
+        "en.faq": [
+            "a695a952aa94b7ec8d4f1626ab4d5099b8389893",
+            "2338175c010daa88d1a4f603d589098807b89f6a"
+        ],
+        "en.cta": [
+            "326c45215d1ed37a0c2b7aff6078edf9ad1ff746",
+            "dec62110a6c78d0fb4ec2fb1d129a7426458488a"
+        ]
+    }
+}
