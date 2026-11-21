@@ -28,6 +28,7 @@ class SystemConfigurationService extends BaseService
             'openai_1m_tokens_price', 'gemini_1m_tokens_price',
             'custom_head_scripts', 'custom_body_scripts',
             'notif_channels_invoice_created', 'market_hourly_rate',
+            'timer_minimum_charge', 'timer_minimum_charge_currency',
             'auto_pay_after_days', 'enable_dso_decrement', 'global_dso_limit', 'enable_dso_system',
             'legal_company_name', 'legal_commercial_registry', 'legal_headquarters_address',
             'dpo_email', 'dpo_phone', 'hosting_regions_disclosure', 'privacy_policy_version',

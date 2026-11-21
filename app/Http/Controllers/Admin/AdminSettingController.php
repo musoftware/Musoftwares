@@ -82,6 +82,8 @@ class AdminSettingController extends Controller
             'notif_channels_invoice_created' => AdminSettings::GetValue('notif_channels_invoice_created', 'mail,fcm'),
             'invoice_notification_channels' => AdminSettings::INVOICE_NOTIFICATION_CHANNELS,
             'market_hourly_rate' => AdminSettings::GetValue('market_hourly_rate'),
+            'timer_minimum_charge' => AdminSettings::GetValue('timer_minimum_charge'),
+            'timer_minimum_charge_currency' => AdminSettings::GetValue('timer_minimum_charge_currency'),
             'auto_pay_after_days' => AdminSettings::GetValue('auto_pay_after_days', 3),
             'enable_dso_decrement' => AdminSettings::GetValue('enable_dso_decrement') === '1',
             'global_dso_limit' => (int) AdminSettings::GetValue('global_dso_limit', 30),
@@ -164,6 +166,8 @@ class AdminSettingController extends Controller
                 }
             }],
             'market_hourly_rate' => 'nullable|numeric|min:0',
+            'timer_minimum_charge' => 'nullable|numeric|min:0',
+            'timer_minimum_charge_currency' => 'nullable|string|exists:currencies,currency',
             'auto_pay_after_days' => 'nullable|integer|min:0',
             'legal_company_name' => 'nullable|string|max:255',
             'legal_commercial_registry' => 'nullable|string|max:255',

@@ -40,6 +40,7 @@ interface Props {
     client_rate: number;
     is_custom_rate_enabled?: boolean;
     hour_rate: number | null;
+    minimum_charge?: number | null;
     is_editable?: boolean;
 }
 
@@ -88,7 +89,7 @@ const isSameDateStr = (d1: string, d2: string) => {
 
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
-    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, is_editable = true,
+    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, minimum_charge = null, is_editable = true,
 }: Props) {
     const { confirm, confirmDialog } = useConfirm();
     const isCanEdit = item.invoice_status === 'unpaid' && is_editable !== false;
@@ -298,14 +299,17 @@ export default function TimerDetails({
     };
 
     const currentTotalSeconds = timers.reduce((sum, t) => sum + t.duration_seconds, 0) + (isRunning ? liveSeconds : 0);
-    const currentTotalBillable = timers.reduce((sum, t) => sum + t.amount, 0) + (isRunning ? ((liveSeconds / 3600) * rate * (isPseudoMode ? 0.05 : 1)) : 0);
+    const sessionsBillable = timers.reduce((sum, t) => sum + t.amount, 0) + (isRunning ? ((liveSeconds / 3600) * rate * (isPseudoMode ? 0.05 : 1)) : 0);
+    const hasSessions = timers.length > 0 || isRunning;
+    const isBelowMinimum = !!minimum_charge && hasSessions && sessionsBillable < minimum_charge;
+    const currentTotalBillable = isBelowMinimum ? (minimum_charge as number) : sessionsBillable;
     const currentFullRealValue = (currentTotalSeconds / 3600) * rate;
     const currentDiscountSavings = Math.max(0, currentFullRealValue - currentTotalBillable);
 
     const totalHours = currentTotalSeconds > 0 ? (currentTotalSeconds / 3600) : 0;
     const currentAvgBilledRate = totalHours > 0 ? (currentTotalBillable / totalHours) : 0;
     const currentAvgRealRate = totalHours > 0 ? (currentFullRealValue / totalHours) : 0;
-    const currentEffectiveDiscountPercent = currentFullRealValue > 0 ? Math.round(((currentFullRealValue - currentTotalBillable) / currentFullRealValue) * 100) : 0;
+    const currentEffectiveDiscountPercent = currentFullRealValue > 0 ? Math.max(0, Math.round(((currentFullRealValue - currentTotalBillable) / currentFullRealValue) * 100)) : 0;
 
     const firstStartDate = timers.length > 0
         ? parseDateTime(timers[0].start_date).full
@@ -541,6 +545,16 @@ export default function TimerDetails({
                                 <div className="flex-1 min-w-[130px]">
                                     <span className="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.billed_amount')}</span>
                                     <div className="text-base font-black text-emerald-700">{formatMoney(currentTotalBillable, invoice_currency)}</div>
+                                    {isBelowMinimum && (
+                                        <p className="text-xs text-amber-700 mt-1">
+                                            {__('admin.timer_minimum_charge_applied', { amount: formatMoney(minimum_charge as number, invoice_currency) })}
+                                        </p>
+                                    )}
+                                    {!isBelowMinimum && !!minimum_charge && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            {__('admin.timer_minimum_charge_label')}: {formatMoney(minimum_charge, invoice_currency)}
+                                        </p>
+                                    )}
                                 </div>
                                 {currentDiscountSavings > 0.01 && (
                                     <div className="flex-1 min-w-[120px]">

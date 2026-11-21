@@ -69,6 +69,8 @@ interface SettingsData {
     custom_body_scripts: string | null;
     notif_channels_invoice_created: string | null;
     market_hourly_rate?: string | null;
+    timer_minimum_charge?: string | null;
+    timer_minimum_charge_currency?: string | null;
     auto_pay_after_days?: string | number | null;
     enable_dso_decrement: boolean;
     global_dso_limit?: string | number | null;
@@ -388,6 +390,27 @@ export default function Index({ currencies, whatsappChannels, settings, hasGoogl
                                         {__('admin.settings_market_rate_help')}
                                     </p>
                                 </Field>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Field label={__('admin.settings_timer_minimum_charge')}>
+                                        <Input
+                                            id="timer_minimum_charge"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={form.timer_minimum_charge ?? ''}
+                                            onChange={(e) => set('timer_minimum_charge', e.target.value)}
+                                            placeholder="0"
+                                        />
+                                    </Field>
+                                    <CurrencySelect
+                                        label={__('admin.settings_timer_minimum_charge_currency')}
+                                        currencies={currencies}
+                                        value={form.timer_minimum_charge_currency ?? businessCurrencyCode ?? ''}
+                                        onChange={(v) => set('timer_minimum_charge_currency', v)}
+                                        valueKey="currency"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500 -mt-3">{__('admin.settings_timer_minimum_charge_help')}</p>
                                 <Field label={__('admin.settings_max_devices_default')}>
                                     <Input
                                         id="max_devices_per_tenant"

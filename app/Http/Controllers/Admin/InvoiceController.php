@@ -22,6 +22,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\InvoiceCreatedNotification;
 use App\Services\InvoiceService;
+use App\Services\TimerMinimumCharge;
 use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -1190,6 +1191,7 @@ class InvoiceController extends Controller
             'client_rate' => round($client_rate, 2),
             'is_custom_rate_enabled' => $is_custom_rate_enabled,
             'hour_rate' => $effectiveRate === null ? null : round($effectiveRate, 2),
+            'minimum_charge' => TimerMinimumCharge::inCurrency($item->invoice->currency_id, $item->id),
             'is_editable' => $item->invoice ? $item->invoice->canBeEdited() : false,
         ]);
     }
@@ -1230,19 +1232,25 @@ class InvoiceController extends Controller
             $item->save();
         }
 
-        $newSessionsCount = 0;
-        foreach ($request->sessions as $session) {
-            InvoiceItemTimer::create([
-                'invoice_item_id' => $item->id,
-                'date_start' => Carbon::parse($session['start_date'])->toDateTimeString(),
-                'date_end' => Carbon::parse($session['end_date'])->toDateTimeString(),
-                'amount' => $session['amount'],
-                'project_id' => $item->invoice->project_id ?? null,
-                'user_id' => $item->invoice->user_id ?? auth()->id(),
-                'currency_id' => $item->invoice->currency_id,
-            ]);
-            $newSessionsCount++;
-        }
+        $newSessionsCount = DB::transaction(function () use ($request, $item) {
+            $newest = null;
+            foreach ($request->sessions as $session) {
+                $newest = InvoiceItemTimer::create([
+                    'invoice_item_id' => $item->id,
+                    'date_start' => Carbon::parse($session['start_date'])->toDateTimeString(),
+                    'date_end' => Carbon::parse($session['end_date'])->toDateTimeString(),
+                    'amount' => $session['amount'],
+                    'project_id' => $item->invoice->project_id ?? null,
+                    'user_id' => $item->invoice->user_id ?? auth()->id(),
+                    'currency_id' => $item->invoice->currency_id,
+                ]);
+            }
+            if ($newest) {
+                TimerMinimumCharge::apply($item, $newest);
+            }
+
+            return count($request->sessions);
+        });
 
         // Notify client ONCE with single queued summary notification for total updated invoice timers
         if ($newSessionsCount > 0 && $item->invoice) {
