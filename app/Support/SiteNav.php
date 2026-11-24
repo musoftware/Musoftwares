@@ -30,6 +30,12 @@ class SiteNav
 
     public const WHATSAPP_URL = 'https://wa.me/201015218548';
 
+    /** The ready message a visitor sends us. It is written in the visitor's voice, not ours. */
+    private const WHATSAPP_GREETING = [
+        'ar' => 'أهلًا، أنا مهتم بخدمات Musoftwares وعايز أتكلم معاكم عن مشروع.',
+        'en' => "Hi, I'm interested in Musoftwares services and would like to discuss a project.",
+    ];
+
     private const FOOTER_COLUMNS = [
         ['ar' => 'المنتجات', 'en' => 'Products', 'links' => [
             ['url' => '/services#programs', 'ar' => 'برامج للكمبيوتر', 'en' => 'Computer programs'],
@@ -94,13 +100,10 @@ class SiteNav
             ], self::FOOTER_COLUMNS),
             'social' => self::SOCIAL,
             'copyright' => '© '.date('Y').' '.self::BRAND.'. '.($isAr ? 'جميع الحقوق محفوظة. صُنع في السويس، مصر.' : 'All rights reserved. Made in Suez, Egypt.'),
-            'language_switch' => request()->attributes->getBoolean('locale_locked') ? null : [
-                'label' => $isAr ? 'English' : 'العربية',
-                'url' => request()->fullUrlWithQuery(['lang' => $isAr ? 'en' : 'ar']),
-            ],
+            'language_switch' => self::languageSwitch(),
             'mobile_bar' => [
                 'pricing' => ['url' => '/estimator', 'label' => $isAr ? 'الأسعار' : 'Pricing'],
-                'whatsapp' => ['url' => self::WHATSAPP_URL.'?text='.rawurlencode($isAr ? 'محمود هنا، أرسل لي تفاصيل مشروعك' : 'Mahmoud here, here are my project details'), 'label' => $isAr ? 'محادثة واتساب' : 'WhatsApp chat'],
+                'whatsapp' => ['url' => self::whatsAppChatUrl(), 'label' => $isAr ? 'محادثة واتساب' : 'WhatsApp chat'],
                 'account' => auth()->check()
                     ? ['url' => '/dashboard', 'label' => $isAr ? 'لوحة التحكم' : 'Dashboard']
                     : ['url' => '/login', 'label' => $isAr ? 'تسجيل الدخول' : 'Sign in'],
@@ -108,7 +111,41 @@ class SiteNav
         ];
     }
 
-    /** @return array{all_url: string, labels: array<string, string>, intro: array{text: string, cta: string, url: string}, main: list<array{url: string, label: string, active: bool}>, mega: list<array<string, mixed>>, stores: list<array<string, mixed>>} */
+    /**
+     * Link to the same page in the other language, keeping the current query string. Null when the language
+     * is fixed for this visitor (SetLocale sets locale_locked), so we never show a switch that does nothing.
+     *
+     * @return array{label: string, url: string, lang: string}|null
+     */
+    public static function languageSwitch(): ?array
+    {
+        if (request()->attributes->getBoolean('locale_locked')) {
+            return null;
+        }
+        $target = app()->getLocale() === 'ar' ? 'en' : 'ar';
+
+        return [
+            'label' => $target === 'ar' ? 'العربية' : 'English',
+            'url' => request()->fullUrlWithQuery(['lang' => $target]),
+            'lang' => $target,
+        ];
+    }
+
+    /** A WhatsApp link to us with the visitor's greeting in the page language. */
+    public static function whatsAppChatUrl(?string $locale = null): string
+    {
+        $lang = ($locale ?? app()->getLocale()) === 'ar' ? 'ar' : 'en';
+
+        return self::whatsAppUrl(self::WHATSAPP_GREETING[$lang]);
+    }
+
+    /** A WhatsApp link to our number with a ready message. Write the message in the visitor's voice. */
+    public static function whatsAppUrl(string $message): string
+    {
+        return self::WHATSAPP_URL.'?text='.rawurlencode($message);
+    }
+
+    /** @return array{all_url: string, language_switch: array{label: string, url: string, lang: string}|null, labels: array<string, string>, intro: array{text: string, cta: string, url: string}, main: list<array{url: string, label: string, active: bool}>, mega: list<array<string, mixed>>, stores: list<array<string, mixed>>} */
     public static function links(): array
     {
         $lang = app()->getLocale() === 'ar' ? 'ar' : 'en';
@@ -125,6 +162,7 @@ class SiteNav
             'main' => array_map($shape, self::MAIN),
             'mega' => SiteMegaMenu::groups($lang),
             'stores' => SiteStores::cards($lang),
+            'language_switch' => self::languageSwitch(),
         ];
     }
 }

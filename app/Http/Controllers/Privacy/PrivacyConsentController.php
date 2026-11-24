@@ -13,65 +13,27 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 
+/**
+ * Saves the cookie banner choice. The banner only asks about optional analytics and ad cookies,
+ * so this logs that one choice and nothing else: reading the site needs no other agreement.
+ */
 class PrivacyConsentController extends Controller
 {
-    public function storeGateConsent(
-        Request $request,
-        ConsentAuditService $consentService
-    ): JsonResponse|RedirectResponse {
-        $request->validate([
-            'essential_consent' => ['required', 'accepted'],
-            'cookies_tracking' => ['required', 'boolean'],
-        ]);
+    private const COOKIE_MINUTES = 60 * 24 * 365;
 
-        $user = $request->user();
-        $version = $consentService->currentPolicyVersion();
-        $trackingGranted = $request->boolean('cookies_tracking');
-        $trackingAction = $trackingGranted ? ConsentAction::Granted : ConsentAction::Withdrawn;
+    public function storeCookieChoice(Request $request, ConsentAuditService $consentService): JsonResponse|RedirectResponse
+    {
+        $request->validate(['cookies_tracking' => ['required', 'boolean']]);
 
-        $consentService->record($user, ConsentType::PrivacyPolicy, ConsentAction::Granted, $request, $version);
-        $consentService->record($user, ConsentType::CrossBorderTransfer, ConsentAction::Granted, $request, $version);
-        $consentService->record($user, ConsentType::CookiesTracking, $trackingAction, $request, $version);
+        $action = $request->boolean('cookies_tracking') ? ConsentAction::Granted : ConsentAction::Withdrawn;
+        $consentService->record($request->user(), ConsentType::CookiesTracking, $action, $request);
 
-        Cookie::queue(Cookie::make(ConsentAuditService::ESSENTIAL_COOKIE_NAME, $version, 60 * 24 * 365));
-        Cookie::queue(Cookie::make(ConsentAuditService::TRACKING_COOKIE_NAME, $trackingAction->value, 60 * 24 * 365));
-        Cookie::queue(Cookie::forget(ConsentAuditService::DECLINED_COOKIE_NAME));
+        Cookie::queue(Cookie::make(ConsentAuditService::TRACKING_COOKIE_NAME, $action->value, self::COOKIE_MINUTES));
 
         if ($request->expectsJson() && ! $request->header('X-Inertia')) {
-            return response()->json([
-                'ok' => true,
-                'policyVersion' => $version,
-                'hasEssentialConsent' => true,
-                'isBlocked' => false,
-                'cookiesTracking' => $trackingAction->value,
-            ]);
+            return response()->json(['ok' => true, 'cookiesTracking' => $action->value]);
         }
 
         return redirect()->back(fallback: '/');
     }
-
-    public function declineEssential(
-        Request $request,
-        ConsentAuditService $consentService
-    ): JsonResponse|RedirectResponse {
-        $user = $request->user();
-        $version = $consentService->currentPolicyVersion();
-
-        $consentService->record($user, ConsentType::PrivacyPolicy, ConsentAction::Withdrawn, $request, $version);
-        $consentService->record($user, ConsentType::CookiesTracking, ConsentAction::Withdrawn, $request, $version);
-
-        Cookie::queue(Cookie::forget(ConsentAuditService::ESSENTIAL_COOKIE_NAME));
-        Cookie::queue(Cookie::make(ConsentAuditService::TRACKING_COOKIE_NAME, ConsentAction::Withdrawn->value, 60 * 24 * 365));
-        Cookie::queue(Cookie::make(ConsentAuditService::DECLINED_COOKIE_NAME, '1', 60 * 24 * 30));
-
-        if ($request->expectsJson() && ! $request->header('X-Inertia')) {
-            return response()->json([
-                'ok' => true,
-                'blocked' => true,
-            ]);
-        }
-
-        return redirect('/');
-    }
 }
-

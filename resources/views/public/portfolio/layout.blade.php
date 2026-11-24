@@ -6,6 +6,12 @@
     $desc = $project['desc_' . $locale] ?? $project['desc_en'] ?? '';
     $category = $project['category_' . $locale] ?? $project['category'] ?? 'Platform';
     $highlights = $project['highlights_' . $locale] ?? $project['highlights_en'] ?? [];
+    $metrics = $project['metrics_' . $locale] ?? $project['metrics'] ?? [];
+    $isAr = $locale === 'ar';
+    // Ready messages are written as the visitor, in the page language.
+    $similarMessage = $isAr
+        ? 'أهلًا، أنا شفت شغلكم في "'.$projectTitle.'" وعايز أتكلم معاكم عن مشروع شبهه.'
+        : 'Hi, I saw your work on "'.$projectTitle.'" and would like to discuss a similar project.';
 @endphp
 
 
@@ -15,8 +21,8 @@
     <!-- Top Navigation Breadcrumb -->
     <div class="max-w-[1140px] mx-auto px-6 mb-8">
         <a href="/portfolio" class="inline-flex items-center text-[13px] text-[#0066cc] hover:underline transition-colors group">
-            <span class="inline-block transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 me-2 rtl:me-0 rtl:ms-2">‹</span>
-            {{ $locale === 'ar' ? 'العودة إلى أرشيف المشاريع' : 'Back to Studio Archive' }}
+            <svg class="w-4 h-4 me-1.5 rtl:rotate-180 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 5l-5 5 5 5"/></svg>
+            {{ $isAr ? 'الرجوع لأعمالنا' : 'Back to our work' }}
         </a>
     </div>
 
@@ -39,26 +45,10 @@
                     {{ $desc }}
                 </p>
 
-                <!-- Technical Specs Chips -->
-                @if(!empty($project['techs']))
-                    <div class="pt-6 border-t border-black/[0.08] space-y-3">
-                        <span class="text-[12px] uppercase tracking-wider text-[#86868b] font-medium block">
-                            {{ $locale === 'ar' ? 'البنية والتقنيات المستخدمة:' : 'Engineered Tech Stack:' }}
-                        </span>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($project['techs'] as $tech)
-                                <span class="px-3 py-1 bg-[#f5f5f7] border border-black/[0.06] text-[#1d1d1f] text-[12px] rounded-full">
-                                    {{ $tech }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Operational Metrics Grid -->
-                @if(!empty($project['metrics']))
+                {{-- Short facts about the project, in the page language when the data has them --}}
+                @if(!empty($metrics))
                     <div class="pt-6 border-t border-black/[0.08] grid grid-cols-2 gap-3">
-                        @foreach($project['metrics'] as $key => $val)
+                        @foreach($metrics as $key => $val)
                             <div class="bg-[#f5f5f7] rounded-2xl border border-black/[0.05] p-4 space-y-1">
                                 <span class="text-[10px] text-[#86868b] uppercase tracking-wider block font-semibold">{{ $key }}</span>
                                 <span class="text-[14px] font-semibold text-[#1d1d1f] block">{{ $val }}</span>
@@ -71,18 +61,17 @@
                 <div class="pt-6 flex flex-wrap gap-3">
                     @if(!empty($project['live_url']))
                         <a href="{{ $project['live_url'] }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-primary text-[13px] px-5 py-2 flex items-center gap-1.5 shadow-sm">
-                            <span>{{ $locale === 'ar' ? 'زيارة المنصة الحية' : 'Launch Platform' }}</span>
-                            <span>↗</span>
+                            <span>{{ $isAr ? 'زيارة الموقع' : 'Visit the live site' }}</span>
+                            <svg class="w-3.5 h-3.5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 13l6-6M8 7h5v5"/></svg>
                         </a>
                     @endif
 
-                    <a href="https://wa.me/201015218548?text={{ urlencode('Hello Mahmoud, I am interested in discussing a project similar to ' . ($project['title_en'] ?? $projectTitle)) }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-secondary text-[13px] px-5 py-2 flex items-center gap-1.5">
-                        <span>{{ $locale === 'ar' ? 'استشارة واتساب' : 'WhatsApp Consultation' }}</span>
-                        <span>➔</span>
+                    <a href="/start-project" class="apple-pill-btn apple-pill-secondary text-[13px] px-5 py-2 flex items-center">
+                        {{ $isAr ? 'عايز حاجة زي دي؟ ابدأ مشروعك' : 'Want one like this? Start your project' }}
                     </a>
 
-                    <a href="/start-project" class="apple-pill-btn text-[13px] px-5 py-2 border border-black/[0.12] text-[#86868b] hover:text-[#1d1d1f] hover:border-black transition-all">
-                        {{ $locale === 'ar' ? 'بدء مشروع جديد' : 'Start New Project' }}
+                    <a href="{{ \App\Support\SiteNav::whatsAppUrl($similarMessage) }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn text-[13px] px-5 py-2 border border-black/[0.12] text-[#515154] hover:text-[#1d1d1f] hover:border-black transition-all">
+                        {{ $isAr ? 'كلمنا على واتساب' : 'Message us on WhatsApp' }}
                     </a>
                 </div>
 
@@ -97,7 +86,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
                         <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
                     </div>
-                    <div class="flex-1 bg-white rounded-md px-3 py-1 text-[11px] text-[#86868b] text-center truncate shadow-sm">
+                    <div dir="ltr" class="flex-1 bg-white rounded-md px-3 py-1 text-[11px] text-[#86868b] text-center truncate shadow-sm">
                         {{ $project['live_url'] ?? ('musoftwares.com/portfolio/' . ($project['slug'] ?? 'system')) }}
                     </div>
                 </div>
@@ -135,60 +124,57 @@
         <!-- Custom Case Study Deep Dive (Extended by dedicated blade files) -->
         @yield('case_study')
 
-        <!-- Architectural Highlights Section -->
+        {{-- What was built: the features in plain words --}}
         @sectionMissing('case_study')
             @if(!empty($highlights))
                 <div class="mt-20 pt-12 border-t border-black/[0.08] space-y-8">
                     <div class="space-y-2">
-                        <span class="text-[13px] font-semibold text-[#0071e3] uppercase tracking-wider block">
-                            {{ $locale === 'ar' ? 'القدرات الهندسية والمعمارية' : 'Architectural & Engineering Capabilities' }}
-                        </span>
                         <h2 class="text-2xl sm:text-3xl font-bold text-[#1d1d1f] tracking-tight">
-                            {{ $locale === 'ar' ? 'أبرز مواصفات وقدرات النظام' : 'Key Technical Capabilities' }}
+                            {{ $isAr ? 'اللي عملناه في المشروع ده' : 'What we built in this project' }}
                         </h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ol class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach($highlights as $idx => $highlight)
-                            <div class="bg-[#f5f5f7] rounded-2xl border border-black/[0.05] p-6 space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xs font-semibold text-[#0071e3] px-2 py-0.5 bg-[#0071e3]/10 rounded-md">
-                                        0{{ $idx + 1 }}
-                                    </span>
-                                    <span class="text-xs text-[#86868b] uppercase tracking-wider">
-                                        {{ $locale === 'ar' ? 'مواصفة معمارية' : 'Specification' }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-[#1d1d1f] leading-relaxed">
-                                    {{ $highlight }}
-                                </p>
-                            </div>
+                            <li class="flex items-start gap-3 bg-[#f5f5f7] rounded-2xl border border-black/[0.05] p-5">
+                                <span class="shrink-0 w-7 h-7 rounded-full bg-[#0071e3]/10 text-[#0071e3] text-[13px] font-semibold flex items-center justify-center">{{ $idx + 1 }}</span>
+                                <p class="text-[15px] text-[#1d1d1f] leading-relaxed">{{ $highlight }}</p>
+                            </li>
                         @endforeach
-                    </div>
+                    </ol>
                 </div>
             @endif
+        @endif
+
+        {{-- Technical details come last: most visitors care about what the project does, not how --}}
+        @if(!empty($project['techs']))
+            <div class="mt-16 pt-10 border-t border-black/[0.08] space-y-3">
+                <h2 class="text-xl font-bold text-[#1d1d1f] tracking-tight">{{ $isAr ? 'تفاصيل تقنية' : 'Technical details' }}</h2>
+                <ul class="flex flex-wrap gap-2">
+                    @foreach($project['techs'] as $tech)
+                        <li class="px-3 py-1 bg-[#f5f5f7] border border-black/[0.06] text-[#1d1d1f] text-[13px] rounded-full" dir="ltr">{{ $tech }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <!-- Bottom Studio Consultation CTA Strip -->
         <div class="mt-20 p-8 sm:p-12 bg-[#f5f5f7] rounded-3xl border border-black/[0.05] flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="space-y-2 text-center md:text-start rtl:md:text-right">
-                <span class="text-[12px] font-semibold text-[#0071e3] uppercase tracking-wider block">
-                    {{ $locale === 'ar' ? 'استشارة معمارية مباشرة' : 'Direct Architectural Consultation' }}
-                </span>
                 <h3 class="text-2xl font-bold text-[#1d1d1f] tracking-tight">
-                    {{ $locale === 'ar' ? 'هل تخطط لبناء منصة برمجية مخصصة لشركتك؟' : 'Planning a custom web or mobile platform for your business?' }}
+                    {{ $isAr ? 'عايز موقع أو برنامج لشغلك؟' : 'Want a website or program for your business?' }}
                 </h3>
-                <p class="text-xs text-[#86868b] max-w-xl">
-                    {{ $locale === 'ar' ? 'تواصل مباشرة مع محمود أمين لمناقشة المتطلبات الفنية، بنية قواعد البيانات، والتكلفة التقديرية.' : 'Talk directly with Mahmoud Amin to review architectural scope, database schemas, and delivery roadmaps.' }}
+                <p class="text-[15px] text-[#515154] max-w-xl">
+                    {{ $isAr ? 'احكيلنا عن شغلك، ونقولك نقدر نعمل إيه وهيتكلف كام.' : 'Tell us about your business, and we will tell you what we can build and what it costs.' }}
                 </p>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-                <a href="https://wa.me/201015218548?text={{ urlencode('Hello Mahmoud, I would like to consult on building a custom system.') }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-primary text-[13px] px-6 py-2.5 text-center shadow-sm">
-                    {{ $locale === 'ar' ? 'استشارة واتساب' : 'WhatsApp Consultation' }}
+                <a href="/start-project" class="apple-pill-btn apple-pill-primary text-[13px] px-6 py-2.5 text-center shadow-sm">
+                    {{ $isAr ? 'ابدأ مشروعك' : 'Start your project' }}
                 </a>
-                <a href="/portfolio" class="apple-pill-btn apple-pill-secondary text-[13px] px-6 py-2.5 text-center">
-                    {{ $locale === 'ar' ? 'كافة المشاريع' : 'All Case Studies' }}
+                <a href="{{ \App\Support\SiteNav::whatsAppChatUrl() }}" target="_blank" rel="noopener noreferrer" class="apple-pill-btn apple-pill-secondary text-[13px] px-6 py-2.5 text-center">
+                    {{ $isAr ? 'كلمنا على واتساب' : 'Message us on WhatsApp' }}
                 </a>
             </div>
         </div>

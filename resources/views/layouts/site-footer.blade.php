@@ -34,7 +34,7 @@
                     {{ __('privacy_compliance.manage_cookie_preferences') }}
                 </button>
                 @if ($footer['language_switch'])
-                    <a href="{{ $footer['language_switch']['url'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a>
+                    <a href="{{ $footer['language_switch']['url'] }}" lang="{{ $footer['language_switch']['lang'] }}" hreflang="{{ $footer['language_switch']['lang'] }}" class="hover:text-[#1d1d1f] transition-colors">{{ $footer['language_switch']['label'] }}</a>
                 @endif
             </div>
         </div>

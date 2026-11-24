@@ -169,8 +169,7 @@ Route::get('/company/contact', [HomeController::class, 'companyContact'])->name(
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('legal.privacy');
 Route::get('/terms-of-service', [HomeController::class, 'termsOfService'])->name('legal.terms');
 Route::get('/cookie-policy', [HomeController::class, 'cookiePolicy'])->name('legal.cookies');
-Route::post('/privacy/consent/gate', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'storeGateConsent'])->name('privacy.consent.gate');
-Route::post('/privacy/consent/decline', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'declineEssential'])->name('privacy.consent.decline');
+Route::post('/privacy/consent/gate', [\App\Http\Controllers\Privacy\PrivacyConsentController::class, 'storeCookieChoice'])->name('privacy.consent.gate');
 
 // Site assistant chat
 Route::get('/assistant/history', [\App\Http\Controllers\AiAssistantController::class, 'history'])->name('assistant.history');

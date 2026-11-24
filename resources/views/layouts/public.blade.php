@@ -238,7 +238,7 @@
         @include('layouts.site-footer')
     @endif
 
-    @include('layouts.privacy-consent-gate')
+    @include('layouts.cookie-banner')
 
     <!-- Apple Smooth Scroll Reveal Script -->
     <script>

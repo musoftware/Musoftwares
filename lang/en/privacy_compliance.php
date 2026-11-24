@@ -10,23 +10,23 @@ return [
 
     // Essential Policy Gate & Cookie Banner
     'gate_badge' => 'Under Egyptian Personal Data Protection Law No. 151 of 2020',
-    'gate_title' => 'We value your privacy',
+    'gate_title' => 'Cookie choices',
     'gate_description' => 'We use essential cookies to run this site. Analytics and ad tools only run if you allow them, and you can change your choice at any time.',
-    'gate_essential_checkbox' => 'I agree to the Privacy Policy and Terms of Service, and to my data being stored on secure servers outside Egypt.',
-    'gate_essential_required_hint' => 'Please tick the agreement box first to continue.',
     'gate_accept_all_btn' => 'Accept all',
     'gate_reject_tracking_btn' => 'Essential only',
-    'gate_decline_essential_btn' => 'I do not agree',
+    'gate_customize_btn' => 'Customize',
+    'gate_save_btn' => 'Save my choice',
+    'gate_close_btn' => 'Close',
+    'gate_necessary_title' => 'Necessary',
+    'gate_necessary_desc' => 'Needed for the site to work, such as sign-in, security and remembering this choice.',
+    'gate_always_on' => 'Always on',
+    'gate_tracking_title' => 'Analytics and ads',
+    'gate_tracking_desc' => 'Help us see which pages are visited and measure our ads (such as Google Analytics and Meta Pixel). They only run if you turn them on.',
+    'gate_save_failed' => 'We could not save your choice. Please try again.',
     'read_privacy_policy' => 'Privacy Policy',
     'read_terms' => 'Terms of Service',
     'read_cookies' => 'Cookie Policy',
     'manage_cookie_preferences' => 'Privacy & Cookie Settings',
-
-    // Blocked Website Screen
-    'blocked_title' => 'Website Access Paused — Consent Not Granted',
-    'blocked_description' => 'Accessing and using this platform requires accepting the essential Privacy Policy and Terms of Service in accordance with Egyptian PDPL No. 151 of 2020. Zero tracking scripts have been loaded on your device.',
-    'blocked_accept_and_unlock_btn' => 'Accept Essential Privacy Policy & Unlock Site (No Ad Tracking)',
-    'blocked_accept_all_and_unlock_btn' => 'Accept All Cookies & Unlock Site',
 
     // Client Profile -> Privacy & Data Governance Section
     'profile_section_title' => 'Privacy & Personal Data Governance',

@@ -9,7 +9,7 @@ export type SiteFooterData = {
     columns: { title: string; links: FooterLink[] }[];
     social: { url: string; label: string }[];
     copyright: string;
-    language_switch: { url: string; label: string } | null;
+    language_switch: { url: string; label: string; lang: string } | null;
     mobile_bar: Record<'pricing' | 'whatsapp' | 'account', { url: string; label: string }>;
 };
 
@@ -71,7 +71,7 @@ export default function SiteFooter() {
                         </button>
                         {/* Full page load: the locale is resolved server-side from ?lang. */}
                         {footer.language_switch && (
-                            <a href={footer.language_switch.url} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a>
+                            <a href={footer.language_switch.url} lang={footer.language_switch.lang} hrefLang={footer.language_switch.lang} className="hover:text-[#1d1d1f] transition-colors">{footer.language_switch.label}</a>
                         )}
                     </div>
                 </div>

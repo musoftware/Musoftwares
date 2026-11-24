@@ -3,7 +3,7 @@
 @php
     $isAr = app()->getLocale() === 'ar';
     $t = fn (string $ar, string $en) => $isAr ? $ar : $en;
-    $whatsapp = 'https://wa.me/201015218548?text='.rawurlencode($t('مرحبا، عايز أستفسر عن خدمات موسوفت', 'Hello, I would like to ask about Musoftware services'));
+    $whatsapp = \App\Support\SiteNav::whatsAppChatUrl();
 
     $businessType = [
         'pharmacy-system' => $t('صيدلية', 'Pharmacy'),
@@ -57,6 +57,13 @@
                     <a href="/start-project" style="background-color: #0071e3; color: #ffffff;" class="{{ $primaryButton }}">{{ $t('ابدأ مشروعك', 'Start your project') }}</a>
                     <a href="{{ $whatsapp }}" target="_blank" rel="noopener noreferrer" class="{{ $secondaryButton }}">{{ $t('كلمنا على واتساب', 'Message us on WhatsApp') }}</a>
                 </div>
+                @if (! empty($clientWork))
+                    {{-- A real client project right under the main message, so the promise has proof next to it --}}
+                    <p class="mt-6 text-[15px] text-[#515154]">
+                        {{ $t('من شغلنا لعملاء:', 'From our client work:') }}
+                        <a href="/portfolio/{{ $clientWork[0]['slug'] }}" class="font-semibold text-[#0071e3] hover:underline">{{ $isAr ? $clientWork[0]['title_ar'] : $clientWork[0]['title_en'] }}</a>
+                    </p>
+                @endif
             </div>
 
             @if ($heroShot)

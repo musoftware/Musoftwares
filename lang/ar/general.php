@@ -8089,7 +8089,7 @@ return array (
   'manage_emails' => 'إدارة البريد الإلكتروني',
   'mark_verified' => 'تعيين كمتحقق منه',
   'no_additional_emails' => 'لا توجد عناوين بريد إلكتروني إضافية مضافة.',
-  'whatsapp_float_default_msg' => 'محمود هنا، أرسل لي تفاصيل مشروعك',
+  'whatsapp_float_default_msg' => 'أهلًا، أنا مهتم بخدمات Musoftwares وعايز أتكلم معاكم عن مشروع.',
   'quick_select' => 'اختيار سريع',
   'start_with_preset' => 'أو ابدأ بنموذج جاهز:',
   'ecosystem_registry' => 'سجل النظام البيئي',

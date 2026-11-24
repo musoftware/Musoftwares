@@ -8,7 +8,7 @@ import { Toaster } from '@/Components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
-import { PrivacyConsentGate, type PrivacyComplianceShared } from '@/Components/Privacy/PrivacyConsentGate';
+import { CookieBanner, type PrivacyComplianceShared } from '@/Components/Privacy/CookieBanner';
 import { getLoadedLocale, loadTranslations, syncDocumentDirection } from '@/lib/i18n';
 import { initTheme, applyTheme } from '@/lib/theme';
 import { useAppStore } from '@/store/useAppStore';
@@ -178,7 +178,7 @@ async function bootInertiaApp(pageData: string): Promise<void> {
             root.render(
                 <MarketplaceModeProvider>
                     <App {...props} />
-                    <PrivacyConsentGate initialCompliance={pageProps.privacyCompliance} />
+                    <CookieBanner initialCompliance={pageProps.privacyCompliance} />
                     <Toaster />
                     <SonnerToaster position="top-center" richColors />
                     <GlobalErrorHandler />

@@ -93,43 +93,6 @@ class PdplPrivacyComplianceTest extends TestCase
         $this->assertStringNotContainsString('connect.facebook.net/en_US/fbevents.js', (string) $homeHtml);
     }
 
-    public function test_consent_gate_and_decline_wall_block_and_unlock_site(): void
-    {
-        $declineResponse = $this->postJson('/privacy/consent/decline');
-        $declineResponse->assertOk()->assertJson(['ok' => true, 'blocked' => true]);
-
-        $this->assertDatabaseHas('user_consents_log', [
-            'consent_type' => ConsentType::PrivacyPolicy->value,
-            'action' => ConsentAction::Withdrawn->value,
-        ]);
-
-        // With declined cookie set, browsing regular pages is blocked (403), while legal pages stay accessible (200)
-        $this->withCookie(ConsentAuditService::DECLINED_COOKIE_NAME, '1')
-            ->get('/')
-            ->assertStatus(403);
-
-        $this->withCookie(ConsentAuditService::DECLINED_COOKIE_NAME, '1')
-            ->get('/register')
-            ->assertStatus(403);
-
-        $this->withCookie(ConsentAuditService::DECLINED_COOKIE_NAME, '1')
-            ->get('/privacy-policy')
-            ->assertOk();
-
-        // Accepting essential policy while rejecting tracking unlocks the site and logs both decisions
-        $unlockResponse = $this->withCookie(ConsentAuditService::DECLINED_COOKIE_NAME, '1')
-            ->postJson('/privacy/consent/gate', [
-                'essential_consent' => true,
-                'cookies_tracking' => false,
-            ]);
-
-        $unlockResponse->assertOk()->assertJson([
-            'ok' => true,
-            'hasEssentialConsent' => true,
-            'cookiesTracking' => 'withdrawn',
-        ]);
-    }
-
     public function test_client_profile_consent_switches_portability_export_and_six_business_day_sla(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-11-05 10:00:00', 'Africa/Cairo')); // Thursday in Cairo

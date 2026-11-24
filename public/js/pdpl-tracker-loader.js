@@ -87,8 +87,18 @@
             window['ga-disable-' + cfg.ga_id] = true;
         }
         var names = ['_ga', '_gid', '_gat', '_fbp', '_fbc', '_ttp'];
+        // GA4 also writes one cookie per property, named _ga_<id>.
+        document.cookie.split('; ').forEach(function (pair) {
+            var name = pair.split('=')[0];
+            if (name.indexOf('_ga_') === 0) names.push(name);
+        });
+        // Trackers often set cookies on the main domain (.example.com), so clear those copies too.
+        var host = location.hostname;
+        var domains = ['', '; domain=' + host, '; domain=.' + host.split('.').slice(-2).join('.')];
         for (var i = 0; i < names.length; i++) {
-            document.cookie = names[i] + '=; Max-Age=0; path=/';
+            for (var d = 0; d < domains.length; d++) {
+                document.cookie = names[i] + '=; Max-Age=0; path=/' + domains[d];
+            }
         }
     };
 })();

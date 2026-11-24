@@ -8089,7 +8089,7 @@ return array (
   'manage_emails' => 'Manage Emails',
   'mark_verified' => 'Mark as Verified',
   'no_additional_emails' => 'No additional email addresses added.',
-  'whatsapp_float_default_msg' => 'Mahmoud here, here are my project details',
+  'whatsapp_float_default_msg' => 'Hi, I\'m interested in Musoftwares services and would like to discuss a project.',
   'quick_select' => 'Quick Select',
   'start_with_preset' => 'Or start with a preset template:',
   'ecosystem_registry' => 'Ecosystem Registry',

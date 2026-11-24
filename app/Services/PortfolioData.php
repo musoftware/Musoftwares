@@ -45,6 +45,12 @@ class PortfolioData
                     'Pages' => 'Destinations, hotels and FAQs',
                     'Mobile' => 'Works on any phone',
                 ],
+                'metrics_ar' => [
+                    'النوع' => 'موقع وجهة سياحية',
+                    'المحتوى' => 'الفنادق والشاطئ والأنشطة',
+                    'الصفحات' => 'الوجهات والفنادق والأسئلة الشائعة',
+                    'الموبايل' => 'شغال على أي موبايل',
+                ],
                 'highlights_en' => [
                     'A full-screen beachfront welcome page that presents the destination.',
                     'A page for each hotel: Sentido Acel Beach Resort, and Acel Marina coming soon.',

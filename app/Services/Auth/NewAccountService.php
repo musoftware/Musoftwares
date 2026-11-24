@@ -11,7 +11,6 @@ use App\Services\LoyaltyService;
 use App\Services\Privacy\ConsentAuditService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 
 /** What every new account needs, however it was opened: sign-up page or ordering as a guest. */
@@ -62,7 +61,6 @@ class NewAccountService
             $this->consents->record($user, $type, ConsentAction::Granted, $request, $version);
         }
 
-        Cookie::queue(Cookie::make(ConsentAuditService::ESSENTIAL_COOKIE_NAME, $version, 60 * 24 * 365));
     }
 
     private function assignCurrency(User $user, Request $request): void

@@ -86,6 +86,12 @@
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+            @if ($nav['language_switch'])
+                <a href="{{ $nav['language_switch']['url'] }}" lang="{{ $nav['language_switch']['lang'] }}" hreflang="{{ $nav['language_switch']['lang'] }}" class="hidden lg:inline-flex items-center gap-1.5 min-h-[44px] px-2 text-[14px] font-medium text-[#1d1d1f]/75 hover:text-[#0071e3] transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+                    {{ $nav['language_switch']['label'] }}
+                </a>
+            @endif
             <a href="https://wa.me/201015218548" target="_blank" rel="noopener noreferrer" class="hidden lg:inline-flex p-2 text-[#1d1d1f]/70 hover:text-[#25D366] transition-colors" title="{{ $isAr ? 'تواصل معنا على واتساب' : 'Chat with us on WhatsApp' }}" aria-label="WhatsApp">
                 <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
             </a>
@@ -108,13 +114,19 @@
 
             <a href="/company/contact" style="background-color: #0071e3; color: #ffffff;" class="hidden sm:inline-flex lg:hidden xl:inline-flex items-center justify-center px-5 py-2 rounded-lg text-[14px] font-medium shadow-sm hover:bg-[#0077ed] transition-colors">{{ $isAr ? 'تواصل معنا' : 'Contact us' }}</a>
 
-            <button type="button" onclick="document.getElementById('site-mobile-menu').classList.toggle('hidden')" class="lg:hidden p-2 text-[#1d1d1f] hover:text-[#0071e3] transition-colors" aria-label="{{ $isAr ? 'فتح القائمة' : 'Open menu' }}">
+            <button type="button" onclick="this.setAttribute('aria-expanded', document.getElementById('site-mobile-menu').classList.toggle('hidden') ? 'false' : 'true')" aria-expanded="false" aria-controls="site-mobile-menu" class="lg:hidden p-2 text-[#1d1d1f] hover:text-[#0071e3] transition-colors" aria-label="{{ $isAr ? 'القائمة' : 'Menu' }}">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
         </div>
     </div>
 
     <div id="site-mobile-menu" class="hidden lg:hidden border-t border-black/5 bg-white px-5 py-4 text-[15px] font-medium text-[#1d1d1f] max-h-[calc(100vh-4rem)] overflow-y-auto">
+        @if ($nav['language_switch'])
+            <a href="{{ $nav['language_switch']['url'] }}" lang="{{ $nav['language_switch']['lang'] }}" hreflang="{{ $nav['language_switch']['lang'] }}" class="mb-3 flex items-center gap-2 min-h-[48px] border-b border-black/5 text-[15px] font-semibold text-[#1d1d1f] hover:text-[#0071e3]">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg>
+                {{ $nav['language_switch']['label'] }}
+            </a>
+        @endif
         <div class="rounded-xl bg-[#f5f5f7] p-4">
             <p class="text-[14px] font-normal leading-relaxed">{{ $nav['intro']['text'] }}</p>
             <a href="{{ $nav['intro']['url'] }}" style="background-color: #0071e3; color: #ffffff;" class="mt-3 flex items-center justify-center min-h-[44px] rounded-lg text-[14px] font-semibold">{{ $nav['intro']['cta'] }}</a>

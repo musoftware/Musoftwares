@@ -18,11 +18,7 @@ class ConsentAuditService
 {
     public const DEFAULT_POLICY_VERSION = 'v2.0-2026';
 
-    public const ESSENTIAL_COOKIE_NAME = 'pdpl_essential_consent';
-
     public const TRACKING_COOKIE_NAME = 'pdpl_cookies_tracking';
-
-    public const DECLINED_COOKIE_NAME = 'pdpl_essential_declined';
 
     public function currentPolicyVersion(): string
     {
@@ -81,26 +77,6 @@ class ConsentAuditService
         return $states;
     }
 
-    public function hasAcceptedCurrentEssentialPolicies(User $user): bool
-    {
-        $version = $this->currentPolicyVersion();
-
-        $privacyLatest = $this->latestConsent($user, ConsentType::PrivacyPolicy);
-
-        if (! $privacyLatest || $privacyLatest->policy_version !== $version) {
-            return false;
-        }
-
-        return $this->actionValue($privacyLatest) === ConsentAction::Granted->value;
-    }
-
-    public function hasExplicitlyWithdrawnEssentialPolicy(User $user): bool
-    {
-        $latest = $this->latestConsent($user, ConsentType::PrivacyPolicy);
-
-        return $this->actionValue($latest) === ConsentAction::Withdrawn->value;
-    }
-
     /**
      * Latest log entry of one consent type. All of the user's logs load once per request
      * (record() clears the cache), so several checks share one query.
@@ -126,27 +102,16 @@ class ConsentAuditService
     }
 
     /**
-     * Resolve active consent and tracking state for the current HTTP request (user or guest cookie).
+     * The optional-cookie choice for this request: 'granted', 'withdrawn', or 'unset' when the visitor
+     * has not chosen yet. A signed-in user's logged choice wins over the browser cookie.
      *
-     * @return array{policyVersion: string, hasEssentialConsent: bool, isBlocked: bool, cookiesTracking: string}
+     * @return array{policyVersion: string, cookiesTracking: string}
      */
     public function resolveRequestConsentState(Request $request): array
     {
-        $version = $this->currentPolicyVersion();
-        $user = $request->user();
-
-        $hasUserEssential = $user ? $this->hasAcceptedCurrentEssentialPolicies($user) : false;
-        $hasCookieEssential = $request->cookie(self::ESSENTIAL_COOKIE_NAME) === $version;
-        $isBlocked = $request->cookie(self::DECLINED_COOKIE_NAME) === '1'
-            || ($user ? $this->hasExplicitlyWithdrawnEssentialPolicy($user) : false);
-
-        $cookiesTracking = $this->resolveTrackingPreference($request, $user);
-
         return [
-            'policyVersion' => $version,
-            'hasEssentialConsent' => ! $isBlocked && ($hasUserEssential || $hasCookieEssential),
-            'isBlocked' => $isBlocked,
-            'cookiesTracking' => $isBlocked ? ConsentAction::Withdrawn->value : $cookiesTracking,
+            'policyVersion' => $this->currentPolicyVersion(),
+            'cookiesTracking' => $this->resolveTrackingPreference($request, $request->user()),
         ];
     }
 

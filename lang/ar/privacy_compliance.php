@@ -10,23 +10,23 @@ return [
 
     // Essential Policy Gate & Cookie Banner
     'gate_badge' => 'وفق قانون حماية البيانات الشخصية المصري رقم 151 لسنة 2020',
-    'gate_title' => 'خصوصيتك تهمنا',
+    'gate_title' => 'اختيار ملفات الارتباط',
     'gate_description' => 'نستخدم ملفات الارتباط الضرورية لتشغيل الموقع. أدوات التحليل والإعلانات لا تعمل إلا إذا وافقت عليها، وتقدر تغيّر اختيارك في أي وقت.',
-    'gate_essential_checkbox' => 'أوافق على سياسة الخصوصية وشروط الاستخدام، وعلى حفظ بياناتي على خوادم آمنة خارج مصر.',
-    'gate_essential_required_hint' => 'علّم على مربع الموافقة أولاً للمتابعة.',
     'gate_accept_all_btn' => 'قبول الكل',
     'gate_reject_tracking_btn' => 'الضروري فقط',
-    'gate_decline_essential_btn' => 'لا أوافق',
+    'gate_customize_btn' => 'تخصيص',
+    'gate_save_btn' => 'حفظ اختياري',
+    'gate_close_btn' => 'إغلاق',
+    'gate_necessary_title' => 'ضرورية',
+    'gate_necessary_desc' => 'لازمة عشان الموقع يشتغل، زي تسجيل الدخول والأمان وحفظ اختيارك ده.',
+    'gate_always_on' => 'شغالة دايمًا',
+    'gate_tracking_title' => 'تحليلات وإعلانات',
+    'gate_tracking_desc' => 'بتساعدنا نعرف الصفحات اللي بتتزار ونقيس إعلاناتنا (زي Google Analytics وبكسل Meta). مش بتشتغل غير لو فعّلتها.',
+    'gate_save_failed' => 'ما قدرناش نحفظ اختيارك. جرّب تاني.',
     'read_privacy_policy' => 'سياسة الخصوصية',
     'read_terms' => 'شروط الاستخدام',
     'read_cookies' => 'سياسة ملفات الارتباط',
     'manage_cookie_preferences' => 'إدارة الخصوصية والكوكيز',
-
-    // Blocked Website Screen (when user refuses essential consent)
-    'blocked_title' => 'تم إيقاف الوصول إلى الموقع بناءً على عدم الموافقة',
-    'blocked_description' => 'يتطلب تصفح واستخدام خدمات المنصة الموافقة على سياسة الخصوصية الأساسية وشروط الاستخدام وفقاً لقانون حماية البيانات الشخصية المصري رقم 151 لسنة 2020. لم يتم تحميل أي ملفات تتبع على جهازك.',
-    'blocked_accept_and_unlock_btn' => 'الموافقة على سياسة الخصوصية الأساسية وفتح الموقع (بدون تتبع إعلاني)',
-    'blocked_accept_all_and_unlock_btn' => 'الموافقة مع تفعيل ملفات التحليل وفتح الموقع',
 
     // Client Profile -> Privacy & Data Governance Section
     'profile_section_title' => 'إدارة الخصوصية والبيانات الشخصية',

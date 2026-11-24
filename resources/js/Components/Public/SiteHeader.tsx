@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { usePage } from '@inertiajs/react';
-import { ChevronDown, ChevronLeft, ChevronRight, Menu, X, MessageCircle } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Globe, Menu, X, MessageCircle } from 'lucide-react';
 import SafeLink from '@/Components/SafeLink';
 import { __ } from '@/lib/i18n';
 
@@ -8,7 +8,8 @@ type NavLink = { url: string; label: string; active: boolean };
 type MegaGroup = { key: string; title: string; url: string | null; active: boolean; links: NavLink[]; more: { url: string; label: string } | null };
 type StoreCard = { key: string; name: string; line: string; url: string; image: string; active: boolean };
 type Labels = { services: string; stores: string; stores_note: string; stores_cta: string; contact_url: string };
-type SiteNav = { all_url: string; labels: Labels; intro: { text: string; cta: string; url: string }; main: NavLink[]; mega: MegaGroup[]; stores: StoreCard[] };
+type LanguageSwitch = { label: string; url: string; lang: string };
+type SiteNav = { all_url: string; language_switch: LanguageSwitch | null; labels: Labels; intro: { text: string; cta: string; url: string }; main: NavLink[]; mega: MegaGroup[]; stores: StoreCard[] };
 type OpenMenu = 'services' | 'stores' | null;
 type AccountLink = { url: string; label: string };
 
@@ -146,9 +147,22 @@ function MobileStores({ nav, onNavigate }: { nav: SiteNav; onNavigate: () => voi
     );
 }
 
+/** Full page load on purpose: the server picks the language from ?lang and sets lang/dir on <html>. */
+function LanguageLink({ link, className }: { link: LanguageSwitch; className: string }) {
+    return (
+        <a href={link.url} lang={link.lang} hrefLang={link.lang} className={className}>
+            <Globe className="h-4 w-4" aria-hidden="true" />
+            {link.label}
+        </a>
+    );
+}
+
 function MobileMenu({ nav, account, contactLabel, onNavigate }: { nav: SiteNav; account: AccountLink; contactLabel: string; onNavigate: () => void }) {
     return (
-        <div className="max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-black/5 bg-white px-5 py-4 text-[15px] font-medium text-[#1d1d1f] lg:hidden">
+        <div id="react-site-mobile-menu" className="max-h-[calc(100vh-4rem)] overflow-y-auto border-t border-black/5 bg-white px-5 py-4 text-[15px] font-medium text-[#1d1d1f] lg:hidden">
+            {nav.language_switch && (
+                <LanguageLink link={nav.language_switch} className="mb-3 flex min-h-[48px] items-center gap-2 border-b border-black/5 text-[15px] font-semibold text-[#1d1d1f] hover:text-[#0071e3]" />
+            )}
             <IntroBox intro={nav.intro} stacked />
             <p className="pb-1 pt-5 text-[13px] font-semibold text-[#1d1d1f]/60">{nav.labels.services}</p>
             {nav.mega.map((group) => (
@@ -243,6 +257,9 @@ export default function SiteHeader() {
                 </nav>
 
                 <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+                    {siteNav.language_switch && (
+                        <LanguageLink link={siteNav.language_switch} className="hidden min-h-[44px] items-center gap-1.5 px-2 text-[14px] font-medium text-[#1d1d1f]/75 transition-colors hover:text-[#0071e3] lg:inline-flex" />
+                    )}
                     <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hidden p-2 text-[#1d1d1f]/70 transition-colors hover:text-[#25D366] lg:inline-flex" title={__('general.whatsapp_direct')} aria-label="WhatsApp">
                         <MessageCircle className="h-5 w-5" />
                     </a>
@@ -252,7 +269,7 @@ export default function SiteHeader() {
                     <SafeLink href="/company/contact" className="hidden items-center justify-center rounded-lg bg-[#0071e3] px-5 py-2 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#0077ed] sm:inline-flex lg:hidden xl:inline-flex">
                         {contactLabel}
                     </SafeLink>
-                    <button type="button" onClick={() => setMobileOpen((open) => !open)} className="p-2 text-[#1d1d1f] transition-colors hover:text-[#0071e3] lg:hidden" aria-label={isAr ? 'فتح القائمة' : 'Open menu'}>
+                    <button type="button" onClick={() => setMobileOpen((open) => !open)} aria-expanded={mobileOpen} aria-controls="react-site-mobile-menu" className="p-2 text-[#1d1d1f] transition-colors hover:text-[#0071e3] lg:hidden" aria-label={isAr ? 'القائمة' : 'Menu'}>
                         {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
                 </div>
