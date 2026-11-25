@@ -66,6 +66,39 @@ class UserIdChangeTest extends TestCase
         $this->assertNotNull($client->fresh());
     }
 
+    /** A merge kept the newer ID (912) and soft deleted the old copy (1): the account takes 1 back. */
+    public function test_an_account_takes_back_the_id_of_its_merged_copy(): void
+    {
+        $currency = Currency::firstOrCreate(['currency' => 'USD'], ['name' => 'US Dollar', 'symbol' => '$', 'string_format' => '%s%.2f']);
+        $copy = User::factory()->create();
+        $account = User::factory()->create();
+        $copy->forceFill(['merged_into_user_id' => $account->id])->save();
+        $copy->delete();
+        $leftOnCopy = Invoice::create(['user_id' => $copy->id, 'currency_id' => $currency->id, 'paid' => 0, 'status' => 'unpaid', 'is_suspended' => false, 'due_date' => now()]);
+        $owned = Invoice::create(['user_id' => $account->id, 'currency_id' => $currency->id, 'paid' => 0, 'status' => 'unpaid', 'is_suspended' => false, 'due_date' => now()]);
+        $oldId = (int) $copy->id;
+
+        $this->actingAs($this->admin)->get("/admin/users/{$account->id}/change-id?to={$oldId}")->assertInertia(fn ($page) => $page->where('free', true));
+        $this->actingAs($this->admin)->post("/admin/users/{$account->id}/change-id", ['new_id' => $oldId])->assertRedirect("/admin/users/{$oldId}");
+
+        $this->assertSame($account->email, User::findOrFail($oldId)->email);
+        $this->assertSame($oldId, (int) $owned->fresh()->user_id);
+        // the copy is kept (still soft deleted) at a new ID, with what was left on it, and still points at the account
+        $movedCopy = User::onlyTrashed()->where('email', $copy->email)->sole();
+        $this->assertNotSame($oldId, (int) $movedCopy->id);
+        $this->assertSame($oldId, (int) $movedCopy->merged_into_user_id);
+        $this->assertSame((int) $movedCopy->id, (int) $leftOnCopy->fresh()->user_id);
+    }
+
+    public function test_the_id_of_a_copy_merged_into_another_account_is_refused(): void
+    {
+        $copy = User::factory()->create(['merged_into_user_id' => $this->admin->id]);
+        $copy->delete();
+        $client = User::factory()->create();
+
+        $this->actingAs($this->admin)->post("/admin/users/{$client->id}/change-id", ['new_id' => $copy->id])->assertSessionHasErrors('new_id');
+    }
+
     public function test_the_admin_who_changes_their_own_id_stays_signed_in(): void
     {
         $this->actingAs($this->admin)->post("/admin/users/{$this->admin->id}/change-id", ['new_id' => 7000])->assertRedirect('/admin/users/7000');

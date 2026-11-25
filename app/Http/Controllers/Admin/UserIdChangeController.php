@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
-/** The owner gives an account another, unused ID. */
+/** The owner gives an account another, unused ID (or its own old ID back from a merged copy). */
 class UserIdChangeController extends Controller
 {
     public function __construct(private readonly UserIdChange $ids) {}
@@ -23,7 +23,7 @@ class UserIdChangeController extends Controller
         return Inertia::render('Admin/Users/ChangeId', [
             'client' => $user->only(['id', 'name', 'email']),
             'wanted' => $wanted ?: null,
-            'free' => $wanted > 0 ? $this->ids->isFree($wanted) : null,
+            'free' => $wanted > 0 ? $this->ids->canTake($user, $wanted) : null,
             'moves' => $this->ids->preview((int) $user->id),
         ]);
     }
@@ -32,7 +32,7 @@ class UserIdChangeController extends Controller
     {
         $data = $request->validate(['new_id' => ['required', 'integer', 'min:1', 'max:4294967295']]);
         $newId = (int) $data['new_id'];
-        if (! $this->ids->isFree($newId)) {
+        if (! $this->ids->canTake($user, $newId)) {
             return back()->withErrors(['new_id' => __('admin.user_id_taken')]);
         }
         $own = $request->user()->id === $user->id;
