@@ -18,6 +18,7 @@ final class IntegrationPrompt
             '{{SYSTEM_NAME}}' => $system->name,
             '{{SYSTEM_ID}}' => $system->uuid,
             '{{API_BASE}}' => rtrim(url('/api/client-systems'), '/'),
+            '{{API_FALLBACK}}' => rtrim((string) config('client_systems.fallback_api_base'), '/'),
             '{{API_KEY}}' => $system->api_key,
             '{{API_SECRET}}' => $system->api_secret,
             '{{PUBLIC_KEY}}' => $system->signing_public_key,

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BlockedIp;
 use App\Models\ClientSystem;
 use App\Models\Currency;
 use App\Models\User;
@@ -140,7 +141,8 @@ class ClientSystemsTest extends TestCase
 
         $this->actingAs($this->admin)->get("/admin/client-systems/{$monthly->id}")->assertOk()->assertInertia(fn ($page) => $page
             ->component('Admin/ClientSystems/Show')
-            ->where('prompt', fn ($prompt) => str_contains($prompt, $monthly->api_key) && str_contains($prompt, $monthly->signing_public_key) && ! str_contains($prompt, '/sales')));
+            ->where('prompt', fn ($prompt) => str_contains($prompt, $monthly->api_key) && str_contains($prompt, $monthly->signing_public_key) && ! str_contains($prompt, '/sales')
+                && str_contains($prompt, '`'.config('client_systems.fallback_api_base').'`')));
         $this->actingAs($this->admin)->get("/admin/client-systems/{$shared->id}")->assertInertia(fn ($page) => $page
             ->where('prompt', fn ($prompt) => str_contains($prompt, '7.5% of this system') && ! str_contains($prompt, '{{')));
         $this->actingAs($this->admin)->get("/admin/users/{$this->client->id}")->assertInertia(fn ($page) => $page->has('clientSystems', 2));
@@ -170,6 +172,23 @@ class ClientSystemsTest extends TestCase
 
         $this->signed($old, 'check-in', [])->assertForbidden();
         $this->checkIn($system->fresh())->assertOk();
+    }
+
+    /** All systems may come through one relay address: one noisy system must not stop the others or get it blocked. */
+    public function test_a_noisy_system_is_limited_alone_and_the_shared_address_is_never_blocked(): void
+    {
+        $noisy = $this->createSystem(['monthly_price' => 0, 'sales_percent' => 0]);
+        $quiet = $this->createSystem(['monthly_price' => 0, 'sales_percent' => 0]);
+
+        for ($i = 0; $i < 120; $i++) {
+            $this->signed($noisy, 'check-in', [])->assertOk();
+        }
+        for ($i = 0; $i < 7; $i++) {
+            $this->signed($noisy, 'check-in', [])->assertTooManyRequests();
+        }
+
+        $this->checkIn($quiet);
+        $this->assertSame(0, BlockedIp::count());
     }
 
     public function test_only_admins_reach_the_client_system_pages(): void

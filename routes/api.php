@@ -242,7 +242,7 @@ Route::post('/sso/notify', [\App\Http\Controllers\Api\SsoNotificationController:
 Route::post('/sso/exchange-rates/sync', [ExchangeRateSyncController::class, 'sync'])->name('sso.exchange-rates.sync');
 
 // --- Licensed client systems (any language): signed check-in for a license, and sales for the share-of-sales bill ---
-Route::prefix('client-systems')->middleware(['force.json', 'throttle:120,1', \App\Http\Middleware\VerifyClientSystemSignature::class])->group(function () {
+Route::prefix('client-systems')->withoutMiddleware('throttle:api')->middleware(['force.json', 'throttle:client-systems', \App\Http\Middleware\VerifyClientSystemSignature::class])->group(function () {
     Route::post('check-in', [\App\Http\Controllers\Api\ClientSystemController::class, 'checkIn'])->name('api.client-systems.check-in');
     Route::post('sales', [\App\Http\Controllers\Api\ClientSystemController::class, 'reportSales'])->name('api.client-systems.sales');
 });

@@ -112,7 +112,8 @@ return Application::configure(basePath: dirname(__DIR__))
                         : __('errors.database_error');
                 }
 
-                if ($exception instanceof ThrottleRequestsException) {
+                // client systems are limited per system key and may share one relay address: never block that address
+                if ($exception instanceof ThrottleRequestsException && ! $request->is('api/client-systems/*')) {
                     \App\Support\RateLimitStrikes::record((string) $request->ip());
                 }
 

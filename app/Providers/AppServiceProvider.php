@@ -129,6 +129,13 @@ class AppServiceProvider extends ServiceProvider
             return $getLimit('tenant', 5000, 1, $request)->by(session('tenant_id', $request->user()?->id ?: $request->ip()));
         });
 
+        // Client systems may all reach us through one relay server (one address), so each system counts on its own
+        // key; the address limit is only a high ceiling against floods of made-up keys.
+        RateLimiter::for('client-systems', fn (Request $request) => [
+            Limit::perMinute(120)->by('client-system:'.$request->header('X-System-Key', '')),
+            Limit::perMinute(3000)->by('client-systems-ip:'.$request->ip()),
+        ]);
+
         RateLimiter::for('webhooks', function (Request $request) use ($getLimit) {
             return $getLimit('webhooks', 1500, 1, $request)->by($request->ip());
         });
