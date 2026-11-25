@@ -47,7 +47,6 @@ Route::middleware('web')
             });
         });
 
-        Route::get('/api/services', [ServiceController::class, 'apiIndex'])->name('services.api');
         Route::get('/api/categories', [ServiceCategoryController::class, 'apiIndex'])->name('categories.api');
 
         // Free downloads

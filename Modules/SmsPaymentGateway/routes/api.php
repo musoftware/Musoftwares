@@ -59,8 +59,6 @@ $apiRoutes = function () {
         Route::post('/verify-order/{orderId}', [SmsPaymentGatewayOrderController::class, 'verifyOrder']);
         // Get order status
         Route::get('/status/{orderId}', [SmsPaymentGatewayOrderController::class, 'getOrderStatus']);
-        // Get all orders for user
-        Route::get('/user-orders', [SmsPaymentGatewayOrderController::class, 'getUserOrders']);
     });
 
     // AutoSMS Transaction Verification (requires authentication)

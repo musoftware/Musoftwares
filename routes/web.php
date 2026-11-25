@@ -1414,9 +1414,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::get('/hours-calendar', [HoursCalendarController::class, 'index'])->name('hours-calendar.index');
     Route::post('/hours-calendar/data', [HoursCalendarController::class, 'getData'])->name('hours-calendar.data');
 
-    Route::resource('vouchers', AdminVoucherController::class);
+    Route::resource('vouchers', AdminVoucherController::class)->except(['create', 'edit']);
 
-    Route::resource('coupons', AdminCouponController::class);
+    Route::resource('coupons', AdminCouponController::class)->except(['create', 'edit']);
 
     Route::resource('payment-methods', AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
 
