@@ -13,8 +13,9 @@ import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney as formatCurrency, cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { useConfirm } from '@/hooks/useConfirm';
+import InvoiceActionsMenu from '@/Components/Billing/InvoiceActionsMenu';
 import {
-    Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt,
+    Printer, Download, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
     ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
     Bell, Mail, FolderKanban, ListTodo, StickyNote, Copy, ExternalLink, Link2
@@ -366,7 +367,7 @@ export default function Show({
             confirmLabel: __('general.delete_invoice'),
         });
         if (!accepted) return;
-        router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] });
+        router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id], from: 'show' });
     };
 
     const handleDeleteItem = (index: number) => {
@@ -631,67 +632,34 @@ export default function Show({
                     >
                         <Network className="w-4 h-4 me-2" /> {__('admin.view_linked_transactions')}
                     </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button className="bg-slate-900 hover:bg-slate-900 h-10 px-4 text-white font-semibold">
-                                <Layers className="w-4 h-4 me-2" /> {__('admin.actions')} <ChevronDown className="w-4 h-4 ms-2" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                                <DropdownMenuItem onClick={handleToggleSuspend} className="cursor-pointer">
-                                    {invoice.is_suspended ? (
-                                        <>
-                                            <Check className="w-4 h-4 me-2 text-emerald-600" />
-                                            {__('admin.unsuspend')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <X className="w-4 h-4 me-2 text-rose-600" />
-                                            {__('admin.suspend')}
-                                        </>
-                                    )}
-                                </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => handleOpenShareModal('1_month')} className="cursor-pointer">
-                                <CreditCard className="w-4 h-4 me-2" /> {__('admin.share_signed_invoice_link')}
-                            </DropdownMenuItem>
-                            {invoice.status !== 'paid' && (
-                                <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })} className="cursor-pointer">
-                                    <Receipt className="w-4 h-4 me-2" /> {__('general.bill_from_balance')}
-                                </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => window.location.href = route('admin.transactions.create', { user: invoice.user?.id, type: 'receive' })} className="cursor-pointer">
-                                <Plus className="w-4 h-4 me-2" /> {__('general.receive_money')}
-                            </DropdownMenuItem>
-                            {invoice.status !== 'paid' && (
-                                <DropdownMenuItem onClick={() => setActionModal({ isOpen: true, type: 'external_pay', amount: '' })} className="cursor-pointer">
-                                    <Check className="w-4 h-4 me-2" /> {__('general.mark_as_paid')}
-                                </DropdownMenuItem>
-                            )}
-                            <div className="h-px bg-slate-100 my-1" />
-                            <div className="px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                                <span>{__('admin.share')}</span>
-                                <span className="text-[10px] text-emerald-600 font-semibold uppercase">{__('admin.invoice_shortlink')}</span>
-                            </div>
-                            <DropdownMenuItem onClick={() => handleOpenShareModal('24_hours')} className="cursor-pointer">
-                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
-                                {__('admin.share_24_hours')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenShareModal('3_days')} className="cursor-pointer">
-                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
-                                {__('admin.share_3_days')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenShareModal('1_month')} className="cursor-pointer">
-                                <Clock className="w-3.5 h-3.5 me-2 text-slate-500" />
-                                {__('admin.share_1_month')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenShareModal('never')} className="cursor-pointer">
-                                <Link2 className="w-3.5 h-3.5 me-2 text-slate-500" />
-                                {__('general.no_expiry')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <InvoiceActionsMenu
+                        state={{
+                            status: invoice.status,
+                            isSuspended: !!invoice.is_suspended,
+                            hasClient: !!invoice.user?.id,
+                            hasProject: !!invoice.project,
+                            canAddTime: isUnpaid && invoice.is_editable !== false,
+                        }}
+                        on={{
+                            billFromBalance: () => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' }),
+                            addPayment: () => setActionModal({ isOpen: true, type: 'partial_pay', amount: String(invoice.amount - (invoice.paid_amount || 0)) }),
+                            receiveMoney: () => { window.location.href = route('admin.transactions.create', { user: invoice.user?.id, type: 'receive' }); },
+                            markPaid: () => setActionModal({ isOpen: true, type: 'external_pay', amount: '' }),
+                            jobStatus: () => { setJobStatusForm(invoice.job_status || 'pending'); setJobStatusModal(true); },
+                            reschedule: () => setRescheduleModal(true),
+                            addTime: handleAddTimerItem,
+                            assignProject: () => { setTransferProjectId(invoice.project?.id || null); setTransferModal(true); },
+                            toggleSuspend: handleToggleSuspend,
+                            notifyApp: () => handleSendNotification('fcm'),
+                            notifyEmail: () => handleSendNotification('email'),
+                            share: handleOpenShareModal,
+                            print: () => { window.open(route('admin.invoices.print-pdf', { invoice: String(invoice.id) }), '_blank'); },
+                            downloadPdf: () => { window.location.href = route('admin.invoices.download-pdf', { invoice: String(invoice.id) }); },
+                            linkedTransactions: () => router.visit(route('admin.invoices.linked-transactions', { invoice: String(invoice.id) })),
+                            cancelInvoice: handleCancelInvoice,
+                            deleteInvoice: handleDeleteInvoice,
+                        }}
+                    />
 
                 </div>
             </div>

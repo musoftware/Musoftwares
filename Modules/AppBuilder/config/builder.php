@@ -95,6 +95,8 @@ return [
         'app_fancy' => (float) env('BUILDER_MIN_APP_FANCY', 250),
         // a game is a joint project: design, art, sounds and several rounds of play-testing with the customer
         'game' => (float) env('BUILDER_MIN_GAME', 300),
+        // a copy of a site the customer shows us: its screens and features, found by walking through it (SiteTours)
+        'clone' => (float) env('BUILDER_MIN_CLONE', 200),
         'other' => (float) env('BUILDER_MIN_OTHER', 20),
     ],
 
@@ -143,6 +145,18 @@ return [
         'clearing_days' => (int) env('BUILDER_REFERRAL_CLEARING_DAYS', 14),
     ],
 
+    // The first small program is free only for a customer invited by a paying customer (InvitedFreeBuild); someone who
+    // came on their own pays. Every check must pass, and the owner still approves the build like any other.
+    'free_build' => [
+        'enabled' => (bool) env('BUILDER_FREE_BUILD', true),
+        'types' => array_values(array_filter(explode(',', (string) env('BUILDER_FREE_BUILD_TYPES', 'page')))),
+        'budget_usd' => (float) env('BUILDER_FREE_BUILD_BUDGET', 1.0),
+        // the account must be opened within this many days after the invite link was opened
+        'account_days' => (int) env('BUILDER_FREE_BUILD_ACCOUNT_DAYS', 7),
+        // one inviter cannot hand out more than this many free builds in 30 days
+        'per_inviter_month' => (int) env('BUILDER_FREE_BUILD_PER_INVITER', 3),
+    ],
+
     // The warranty: for this many days after the first delivery (or the import) every fix to what the program has or
     // promises is free, however many. Something new is always paid, and after the warranty a fix is paid too.
     // the owner reads and approves every request (from a phone notification) before the engineer starts it
@@ -171,6 +185,12 @@ return [
     // The chat marks an answer to a message that only plays with it (insults, sexual talk, joke requests). After this
     // many marked answers in one chat, the visitor's chat closes until the owner opens it again on the admin page.
     'abuse' => ['strikes' => (int) env('BUILDER_ABUSE_STRIKES', 3)],
+
+    // A site the customer wants copied is walked through by the worker before the price: pages per walk, walks a day.
+    'tours' => [
+        'max_pages' => (int) env('BUILDER_TOUR_MAX_PAGES', 15),
+        'per_day' => (int) env('BUILDER_TOURS_PER_DAY', 3),
+    ],
 
     'limits' => [
         'message_chars' => 3000,

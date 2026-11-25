@@ -29,6 +29,7 @@ Route::middleware(['web', SignedInWithGoogle::class])->prefix('ai')->name('build
         Route::post('/{project}/discount', [BuilderChatController::class, 'discount'])->middleware('throttle:10,1')->name('discount');
         Route::post('/{project}/pay', [BuilderPaymentController::class, 'pay'])->middleware('throttle:10,1')->name('pay');
         Route::post('/{project}/pay/wallet', [BuilderPaymentController::class, 'payWithWallet'])->middleware(['auth', 'throttle:10,1'])->name('pay.wallet');
+        Route::post('/{project}/free', [BuilderPaymentController::class, 'freeBuild'])->middleware(['auth', 'throttle:5,1'])->name('free');
         Route::post('/{project}/fix', [BuilderPaymentController::class, 'fix'])->middleware('throttle:10,1')->name('fix');
         Route::get('/{project}/files/{attachment}', [BuilderChatController::class, 'file'])->whereNumber('attachment')->middleware('throttle:120,1')->name('file');
         Route::get('/{project}/study', [BuilderChatController::class, 'study'])->name('study');
@@ -58,7 +59,9 @@ Route::middleware([AuthenticateBuilderWorker::class, SubstituteBindings::class, 
         Route::post('/jobs/{project}/commits', [WorkerJobController::class, 'commits'])->name('commits');
         Route::get('/looks', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'pending'])->name('looks');
         Route::post('/looks/{message}', [\Modules\AppBuilder\Http\Controllers\LinkLookController::class, 'store'])->whereNumber('message')->name('looks.store');
-        Route::get('/engineer-questions', [\Modules\AppBuilder\Http\Controllers\EngineerQuestionController::class, 'pending'])->name('engineer-questions');
+        Route::get('/tours', [\Modules\AppBuilder\Http\Controllers\SiteTourController::class, 'pending'])->name('tours');
+        Route::post('/tours/{tour}', [\Modules\AppBuilder\Http\Controllers\SiteTourController::class, 'store'])->whereNumber('tour')->name('tours.store');
+        Route::get('/engineer-questions',[\Modules\AppBuilder\Http\Controllers\EngineerQuestionController::class, 'pending'])->name('engineer-questions');
         Route::post('/engineer-questions/{question}', [\Modules\AppBuilder\Http\Controllers\EngineerQuestionController::class, 'store'])->whereNumber('question')->name('engineer-questions.store');
         Route::post('/jobs/{project}/snapshot', [WorkerJobController::class, 'snapshot'])->name('snapshot');
         Route::post('/jobs/{project}/question', [WorkerJobController::class, 'question'])->name('question');

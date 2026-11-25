@@ -12,6 +12,7 @@ import { formatMoney } from '@/lib/utils';
 import { toast } from 'sonner';
 import { __ } from '@/lib/i18n';
 import { useConfirm } from '@/hooks/useConfirm';
+import ServicePriceCard, { ServiceQuote } from '@/Components/Billing/ServicePriceCard';
 
 interface Timer {
     id: number | string;
@@ -40,7 +41,7 @@ interface Props {
     client_rate: number;
     is_custom_rate_enabled?: boolean;
     hour_rate: number | null;
-    minimum_charge?: number | null;
+    service_quote: ServiceQuote;
     is_editable?: boolean;
 }
 
@@ -89,7 +90,7 @@ const isSameDateStr = (d1: string, d2: string) => {
 
 export default function TimerDetails({
     item, invoice_currency, timers: initialTimers, total_seconds, total_billable, span_seconds,
-    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, minimum_charge = null, is_editable = true,
+    system_base_rate, client_rate, is_custom_rate_enabled, hour_rate, service_quote, is_editable = true,
 }: Props) {
     const { confirm, confirmDialog } = useConfirm();
     const isCanEdit = item.invoice_status === 'unpaid' && is_editable !== false;
@@ -152,6 +153,10 @@ export default function TimerDetails({
     const [rateVisible, setRateVisible] = useState(false);
     const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
     const [isSaving, setIsSaving] = useState(false);
+    const initialMarketHours = item.market_minutes ? String(item.market_minutes / 60) : '';
+    const [requestedAt, setRequestedAt] = useState<string>(item.requested_at || '');
+    const [marketHours, setMarketHours] = useState<string>(initialMarketHours);
+    const priceDetailsChanged = requestedAt !== (item.requested_at || '') || marketHours !== initialMarketHours;
 
     useEffect(() => {
         setRate(hour_rate || system_base_rate || 0);
@@ -278,7 +283,7 @@ export default function TimerDetails({
             return;
         }
         const newSessions = timers.filter((t) => t.isNew);
-        if (newSessions.length === 0) {
+        if (newSessions.length === 0 && !priceDetailsChanged) {
             toast.error(__('general.no_new_sessions_to_save'));
             return;
         }
@@ -287,6 +292,8 @@ export default function TimerDetails({
         router.post(route('admin.invoices.timer-details.store', item.id), {
             sessions: newSessions as any,
             reason,
+            requested_at: requestedAt || null,
+            market_minutes: marketHours ? Math.round(parseFloat(marketHours) * 60) : null,
         }, {
             onSuccess: () => {
                 setIsSaving(false);
@@ -301,8 +308,9 @@ export default function TimerDetails({
     const currentTotalSeconds = timers.reduce((sum, t) => sum + t.duration_seconds, 0) + (isRunning ? liveSeconds : 0);
     const sessionsBillable = timers.reduce((sum, t) => sum + t.amount, 0) + (isRunning ? ((liveSeconds / 3600) * rate * (isPseudoMode ? 0.05 : 1)) : 0);
     const hasSessions = timers.length > 0 || isRunning;
-    const isBelowMinimum = !!minimum_charge && hasSessions && sessionsBillable < minimum_charge;
-    const currentTotalBillable = isBelowMinimum ? (minimum_charge as number) : sessionsBillable;
+    const priceFloor = service_quote.floor;
+    const isBelowFloor = priceFloor > 0 && (hasSessions || !!item.market_minutes) && sessionsBillable < priceFloor;
+    const currentTotalBillable = isBelowFloor ? priceFloor : sessionsBillable;
     const currentFullRealValue = (currentTotalSeconds / 3600) * rate;
     const currentDiscountSavings = Math.max(0, currentFullRealValue - currentTotalBillable);
 
@@ -426,6 +434,19 @@ export default function TimerDetails({
                             </div>
                         </div>
 
+                        <ServicePriceCard
+                            quote={service_quote}
+                            currency={invoice_currency}
+                            hourRate={hour_rate}
+                            item={item}
+                            requestedAt={requestedAt}
+                            marketHours={marketHours}
+                            onRequestedAtChange={setRequestedAt}
+                            onMarketHoursChange={setMarketHours}
+                            isDirty={priceDetailsChanged}
+                            disabled={!isCanEdit}
+                        />
+
                         <div className="border rounded-xl overflow-hidden mb-6">
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-50 border-b border-gray-200">
@@ -545,14 +566,9 @@ export default function TimerDetails({
                                 <div className="flex-1 min-w-[130px]">
                                     <span className="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">{__('general.billed_amount')}</span>
                                     <div className="text-base font-black text-emerald-700">{formatMoney(currentTotalBillable, invoice_currency)}</div>
-                                    {isBelowMinimum && (
+                                    {isBelowFloor && (
                                         <p className="text-xs text-amber-700 mt-1">
-                                            {__('admin.timer_minimum_charge_applied', { amount: formatMoney(minimum_charge as number, invoice_currency) })}
-                                        </p>
-                                    )}
-                                    {!isBelowMinimum && !!minimum_charge && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            {__('admin.timer_minimum_charge_label')}: {formatMoney(minimum_charge, invoice_currency)}
+                                            {__('service_pricing.below_floor', { amount: formatMoney(priceFloor, invoice_currency) })}
                                         </p>
                                     )}
                                 </div>

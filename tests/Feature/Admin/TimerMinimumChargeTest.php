@@ -73,7 +73,7 @@ class TimerMinimumChargeTest extends TestCase
         $this->saveSession(3);
         $this->saveSession(4);
 
-        $this->assertEqualsWithDelta(9.0, (float) $this->item->timers()->sum('amount'), 0.001);
+        $this->assertEqualsWithDelta(7.0, (float) $this->item->timers()->sum('amount'), 0.001);
     }
 
     public function test_zero_turns_the_minimum_off(): void
@@ -85,11 +85,23 @@ class TimerMinimumChargeTest extends TestCase
         $this->assertEqualsWithDelta(0.9, (float) $this->item->timers()->sum('amount'), 0.001);
     }
 
+    public function test_deleting_a_session_recalculates_the_minimum(): void
+    {
+        AdminSettings::SetValue(TimerMinimumCharge::AMOUNT_KEY, '5');
+        $this->saveSession(3);
+        $this->saveSession(4);
+        $first = $this->item->timers()->where('is_service_adjustment', false)->orderBy('id')->first();
+
+        $this->actingAs($this->admin)->delete(route('admin.invoices.timer-details.destroy', [$this->item->id, $first->id]))->assertRedirect();
+
+        $this->assertEqualsWithDelta(5.0, (float) $this->item->timers()->sum('amount'), 0.001);
+    }
+
     public function test_the_page_shows_the_minimum(): void
     {
         AdminSettings::SetValue(TimerMinimumCharge::AMOUNT_KEY, '5');
 
         $this->actingAs($this->admin)->get(route('admin.invoices.timer-details', $this->item->id))
-            ->assertInertia(fn ($page) => $page->where('minimum_charge', 5));
+            ->assertInertia(fn ($page) => $page->where('service_quote.minimum', 5)->where('service_quote.floor', 0));
     }
 }

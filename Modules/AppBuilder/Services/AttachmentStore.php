@@ -15,6 +15,8 @@ class AttachmentStore
     /** Said to Claude when the customer sent files with no text. */
     private const FILES_ONLY = 'The customer sent these files without a message.';
 
+    private const TOUR_PICTURES_FOR_CHAT = 8;
+
     /**
      * @param  list<UploadedFile>  $files
      * @return list<BuilderAttachment>
@@ -59,7 +61,9 @@ class AttachmentStore
         $fullPages = collect($message->payload['looks'] ?? [])->pluck('full_id')->filter();
         // the full-quality originals are for the build only: too big for the chat model, which saw the previews
         $blocks = $message->attachments->reject(fn (BuilderAttachment $file) => $fullPages->contains($file->id) || $file->quality === BuilderAttachment::ORIGINAL)
-            ->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()->all();
+            ->map(fn (BuilderAttachment $file) => $this->block($file))->filter()->values()
+            // every turn re-reads the chat: a site tour's first pages are enough for the chat, the build gets them all
+            ->take($message->role === BuilderMessage::TOUR ? self::TOUR_PICTURES_FOR_CHAT : PHP_INT_MAX)->all();
         $text = trim($message->forModel());
         $text = $text !== '' ? $text : self::FILES_ONLY;
 

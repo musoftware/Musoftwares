@@ -22,7 +22,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Notifications\InvoiceCreatedNotification;
 use App\Services\InvoiceService;
-use App\Services\TimerMinimumCharge;
+use App\Services\ServicePricing;
 use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -884,6 +884,11 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', 'WhatsApp service not available.');
         }
 
+        // The deleted invoice's own page no longer exists, so go to the list instead of back.
+        if ($action === 'delete' && $request->input('from') === 'show') {
+            return redirect()->route('admin.invoices.index')->with('success', __('admin.bulk_action_applied'));
+        }
+
         return redirect()->back()->with('success', __('admin.bulk_action_applied'));
     }
 
@@ -1117,53 +1122,24 @@ class InvoiceController extends Controller
     public function timerDetails($item_id)
     {
         $item = InvoiceItem::with(['timers', 'invoice.user', 'invoice.currency'])->findOrFail($item_id);
+        $sessions = $item->timers->where('is_service_adjustment', false)->values();
 
-        $timers = $item->timers->map(function ($timer) {
-            return [
-                'id' => $timer->id,
-                'start_date' => $timer->date_start,
-                'end_date' => $timer->date_end,
-                'amount' => (float) $timer->amount,
-                'duration_seconds' => $timer->date_start && $timer->date_end
-                    ? abs(Carbon::parse($timer->date_end)->diffInSeconds(Carbon::parse($timer->date_start)))
-                    : 0,
-            ];
-        });
+        $timers = $sessions->map(fn ($timer) => [
+            'id' => $timer->id,
+            'start_date' => $timer->date_start,
+            'end_date' => $timer->date_end,
+            'amount' => (float) $timer->amount,
+            'duration_seconds' => $timer->date_start && $timer->date_end
+                ? abs(Carbon::parse($timer->date_end)->diffInSeconds(Carbon::parse($timer->date_start)))
+                : 0,
+        ]);
 
-        $totalSeconds = $timers->sum('duration_seconds');
-        $totalBillable = $timers->sum('amount');
+        $first_start = $sessions->min('date_start');
+        $last_end = $sessions->max('date_end');
+        $spanSeconds = ($first_start && $last_end) ? abs(Carbon::parse($last_end)->diffInSeconds(Carbon::parse($first_start))) : 0;
 
-        $first_start = $item->timers->min('date_start');
-        $last_end = $item->timers->max('date_end');
-        $spanSeconds = 0;
-        if ($first_start && $last_end) {
-            $spanSeconds = abs(Carbon::parse($last_end)->diffInSeconds(Carbon::parse($first_start)));
-        }
-
-        $baseRate = FinanceHelper::calculateOverheadHourlyRate();
-        $system_base_rate = $this->convertRateForDisplay(
-            $baseRate,
-            AdminSettings::GetValue('business_currency', 2),
-            $item->invoice->currency_id,
-            $item->id
-        );
-
-        $client_rate = 0;
-        $is_custom_rate_enabled = false;
-        $user = $item->invoice->user;
-        if ($user) {
-            $is_custom_rate_enabled = (bool) ($user->enable_custom_hour_rate ?? false);
-            if ((float) ($user->hour_rate ?? 0) > 0) {
-                $client_rate = $this->convertRateForDisplay(
-                    $user->hour_rate,
-                    $user->hour_rate_currency_id ?? $user->hour_rate_currency ?? $user->currency_id ?? 1,
-                    $item->invoice->currency_id,
-                    $item->id
-                ) ?? 0;
-            }
-        }
-
-        $effectiveRate = ($is_custom_rate_enabled && $client_rate > 0) ? $client_rate : $system_base_rate;
+        $rates = ServicePricing::rates($item);
+        $round = fn (?float $value) => $value === null ? null : round($value, 2);
 
         return Inertia::render('Admin/Invoices/TimerDetails', [
             'item' => [
@@ -1177,38 +1153,29 @@ class InvoiceController extends Controller
                 'project_id' => $item->invoice->project_id,
                 'project_name' => $item->invoice->project ? $item->invoice->project->name : null,
                 'date' => $item->invoice->date() ?? null,
+                'requested_at' => $item->requested_at?->format('Y-m-d\TH:i'),
+                'market_minutes' => $item->market_minutes,
+                'client_rating' => $item->client_rating,
+                'client_rating_note' => $item->client_rating_note,
+                'rating_requested_at' => $item->rating_requested_at?->toDateTimeString(),
+                'client_has_email' => (bool) $item->invoice->user?->email,
             ],
             'invoice_currency' => ($curr = Currency::find($item->invoice->currency_id)) ? [
                 'id' => $curr->id,
                 'currency' => $curr->currency,
                 'symbol' => $curr->symbol,
             ] : null,
-            'timers' => $timers->values()->all(),
-            'total_seconds' => $totalSeconds,
-            'total_billable' => $totalBillable,
+            'timers' => $timers->all(),
+            'total_seconds' => $timers->sum('duration_seconds'),
+            'total_billable' => $timers->sum('amount'),
             'span_seconds' => $spanSeconds,
-            'system_base_rate' => $system_base_rate === null ? null : round($system_base_rate, 2),
-            'client_rate' => round($client_rate, 2),
-            'is_custom_rate_enabled' => $is_custom_rate_enabled,
-            'hour_rate' => $effectiveRate === null ? null : round($effectiveRate, 2),
-            'minimum_charge' => TimerMinimumCharge::inCurrency($item->invoice->currency_id, $item->id),
+            'system_base_rate' => $round($rates['system']),
+            'client_rate' => round($rates['client'], 2),
+            'is_custom_rate_enabled' => $rates['is_custom'],
+            'hour_rate' => $round($rates['effective']),
+            'service_quote' => ServicePricing::quote($item, $rates['effective']),
             'is_editable' => $item->invoice ? $item->invoice->canBeEdited() : false,
         ]);
-    }
-
-    /**
-     * Converts an hourly rate for the timer details page. Display only: a missing exchange
-     * rate returns null (the page shows a dash) instead of failing the whole page.
-     */
-    private function convertRateForDisplay(float|string $amount, mixed $fromCurrencyId, mixed $toCurrencyId, int $itemId): ?float
-    {
-        try {
-            return (float) CurrenciesExchange::RateToday($amount, $fromCurrencyId, $toCurrencyId);
-        } catch (MissingExchangeRateException $e) {
-            Log::warning('Timer details rate unavailable: missing exchange rate.', ['invoice_item_id' => $itemId, 'error' => $e->getMessage()]);
-
-            return null;
-        }
     }
 
     public function storeTimerDetails(Request $request, $item_id)
@@ -1221,21 +1188,23 @@ class InvoiceController extends Controller
 
         $request->validate([
             'reason' => 'nullable|string|max:255',
+            'requested_at' => 'nullable|date',
+            'market_minutes' => 'nullable|integer|min:0|max:100000',
             'sessions' => 'present|array',
             'sessions.*.start_date' => 'required|date',
             'sessions.*.end_date' => 'required|date',
             'sessions.*.amount' => 'required|numeric',
         ]);
 
-        if ($request->filled('reason')) {
-            $item->item_title = $request->reason;
-            $item->save();
-        }
-
         $newSessionsCount = DB::transaction(function () use ($request, $item) {
-            $newest = null;
+            $item->fill([
+                'item_title' => $request->filled('reason') ? $request->reason : $item->item_title,
+                'requested_at' => $request->filled('requested_at') ? Carbon::parse($request->requested_at) : null,
+                'market_minutes' => $request->filled('market_minutes') ? (int) $request->market_minutes : null,
+            ])->save();
+
             foreach ($request->sessions as $session) {
-                $newest = InvoiceItemTimer::create([
+                InvoiceItemTimer::create([
                     'invoice_item_id' => $item->id,
                     'date_start' => Carbon::parse($session['start_date'])->toDateTimeString(),
                     'date_end' => Carbon::parse($session['end_date'])->toDateTimeString(),
@@ -1245,29 +1214,30 @@ class InvoiceController extends Controller
                     'currency_id' => $item->invoice->currency_id,
                 ]);
             }
-            if ($newest) {
-                TimerMinimumCharge::apply($item, $newest);
-            }
+            ServicePricing::sync($item);
 
             return count($request->sessions);
         });
 
-        // Notify client ONCE with single queued summary notification for total updated invoice timers
-        if ($newSessionsCount > 0 && $item->invoice) {
-            try {
-                $client = $item->invoice->user ?? $item->invoice->client;
-                if ($client && ! $client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
-                    $item->invoice->load(['items.timers']);
-                    $client->notify(new \App\Notifications\TimerSavedNotification($item->invoice));
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Failed to dispatch TimerSavedNotification: '.$e->getMessage(), [
-                    'invoice_id' => $item->invoice->id,
-                ]);
-            }
+        if ($newSessionsCount > 0) {
+            $this->notifyTimerSaved($item);
         }
 
         return redirect()->back()->with('success', __('admin.timer_sessions_saved'));
+    }
+
+    /** Tells the client ONCE, with one queued summary, that the invoice timers changed. */
+    private function notifyTimerSaved(InvoiceItem $item): void
+    {
+        try {
+            $client = $item->invoice->user ?? $item->invoice->client;
+            if ($client && ! $client->hasAnyRole(['admin', 'super-admin', 'employee'])) {
+                $item->invoice->load(['items.timers']);
+                $client->notify(new \App\Notifications\TimerSavedNotification($item->invoice));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch TimerSavedNotification: '.$e->getMessage(), ['invoice_id' => $item->invoice->id]);
+        }
     }
 
     public function destroyTimerDetails($item_id, $timer_id)
@@ -1278,8 +1248,11 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', __('admin.cannot_add_timers_to_old_invoices', ['days' => 3]));
         }
 
-        $timer = InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
-        $timer->delete();
+        $timer = InvoiceItemTimer::where('invoice_item_id', $item->id)->where('is_service_adjustment', false)->findOrFail($timer_id);
+        DB::transaction(function () use ($timer, $item) {
+            $timer->delete();
+            ServicePricing::sync($item);
+        });
 
         return redirect()->back()->with('success', __('admin.timer_session_deleted'));
     }

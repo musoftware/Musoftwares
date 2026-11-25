@@ -1171,6 +1171,10 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 // ── App Invoice Redirect Route ─────────────────
 Route::get('/app/invoices/{invoice}', [InvoiceController::class, 'redirectAppInvoice'])->name('invoices.view-app');
 
+// ── Task Rating (client rates a timed task from an emailed link) ──
+Route::get('/rate/{token}', [App\Http\Controllers\TaskRatingController::class, 'show'])->name('task-rating.show')->middleware('throttle:30,1');
+Route::post('/rate/{token}', [App\Http\Controllers\TaskRatingController::class, 'store'])->name('task-rating.store')->middleware('throttle:10,1');
+
 // ── Guest Invoice Pay ─────────────────────────
 Route::get('/guest/invoices/{invoice}', [GuestInvoiceController::class, 'show'])->name('guest.invoices.show')->middleware('signed');
 Route::post('/guest/invoices/{invoice}/pay', [GuestInvoiceController::class, 'initiatePay'])->name('guest.invoices.pay')->middleware('signed');
@@ -1260,6 +1264,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::get('/invoices/timer-details/{item_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
     Route::post('/invoices/timer-details/{item_id}/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
     Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
+    Route::post('/invoices/timer-details/{item}/ask-rating', App\Http\Controllers\Admin\TaskRatingRequestController::class)->name('invoices.timer-details.ask-rating');
     Route::post('/invoices/{invoice}/create-timer', [App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
     Route::post('/invoices/bulk-action', [App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
     Route::get('/invoices/{invoice}', [App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');

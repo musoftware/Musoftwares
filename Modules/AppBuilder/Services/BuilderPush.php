@@ -12,10 +12,16 @@ use Modules\AppBuilder\Models\BuilderProject;
  */
 class BuilderPush
 {
-    /** The page offers notifications only when the site has the web push key. */
+    /**
+     * The page offers notifications when the site has the public Firebase web config.
+     * The web push key is optional: without it the Firebase SDK uses its own default key.
+     */
     public static function enabled(): bool
     {
-        return (string) config('services.fcm.web.vapid_key') !== '' && (string) config('services.fcm.web.api_key') !== '';
+        $web = (array) config('services.fcm.web');
+
+        return collect(['api_key', 'project_id', 'messaging_sender_id', 'app_id'])
+            ->every(fn (string $key): bool => (string) ($web[$key] ?? '') !== '');
     }
 
     /** The public Firebase web config the chat page needs to ask for notifications. */

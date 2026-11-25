@@ -35,6 +35,8 @@ final readonly class ChatTurn
         public bool $notSerious = false,
         /** a fact the chat is not sure of, asked of the programmer; '' when it knows */
         public string $askEngineer = '',
+        /** a site the customer wants copied, to walk through before the price; '' for none */
+        public string $tourSite = '',
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -64,6 +66,7 @@ final readonly class ChatTurn
             isNewProject: ($quote['kind'] ?? 'build') === 'new_project',
             notSerious: (bool) ($data['not_serious'] ?? false),
             askEngineer: trim((string) ($data['ask_engineer'] ?? '')),
+            tourSite: trim((string) ($data['tour_site'] ?? '')),
         );
     }
 
@@ -90,6 +93,7 @@ final readonly class ChatTurn
             'replaces_request' => $this->replacesRequest,
             'starter' => $this->starter,
             'designs' => $this->designs,
+            'tour_site' => $this->tourSite,
         ];
     }
 }

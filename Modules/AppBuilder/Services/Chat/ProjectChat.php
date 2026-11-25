@@ -9,6 +9,7 @@ use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
 use Illuminate\Http\UploadedFile;
 use Modules\AppBuilder\Models\BuilderSecret;
+use Modules\AppBuilder\Models\BuilderSiteTour;
 use Modules\AppBuilder\Services\AttachmentStore;
 use Modules\AppBuilder\Services\BuilderReferral;
 use Modules\AppBuilder\Services\ProjectSecrets;
@@ -162,6 +163,45 @@ class ProjectChat
         });
     }
 
+    /** The walk through the site to copy is over (or ran out of time): the chat writes its next message from it, once. */
+    public function continueAfterTour(BuilderSiteTour $tour): void
+    {
+        $project = $tour->project;
+        $customer = $project->lastCustomerMessage();
+        if ($customer === null) {
+            return;
+        }
+
+        $note = $tour->status === BuilderSiteTour::DONE
+            ? '[The walk through the site is done; its pictures and notes are above. Write your next message to the customer now, in the dialect of the chat, following "Copying a site". Do not ask for another walk now.]'
+            : "[The walk through {$tour->url} could not finish: {$tour->reason}. Tell the customer in one line, and ask for screenshots of the main screens instead (or a working test login if the login failed). Do not ask for another walk now.]";
+        try {
+            $turn = $this->reply($project, $this->systemPrompt($project), $this->withNote($this->turns($project), $note));
+        } catch (ChatUnavailable $exception) {
+            Log::warning('App builder: the answer after a site tour could not be written', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
+
+            return;
+        }
+
+        DB::transaction(fn () => $this->record($project, $turn, $customer, mayAsk: false));
+        // the customer was told they can close the page during the walk
+        app(\Modules\AppBuilder\Services\BuilderPush::class)->notify($project, 'toured');
+    }
+
+    /** A note for the model at the end of the chat, on the last customer-side line so the turns keep alternating. */
+    private function withNote(array $turns, string $note): array
+    {
+        $last = array_key_last($turns);
+        if ($last === null || $turns[$last]['role'] !== BuilderMessage::USER) {
+            return [...$turns, ['role' => BuilderMessage::USER, 'content' => $note]];
+        }
+
+        $content = $turns[$last]['content'];
+        $turns[$last]['content'] = is_array($content) ? [...$content, ['type' => 'text', 'text' => $note]] : $content."\n\n".$note;
+
+        return $turns;
+    }
+
     private function record(BuilderProject $project, ChatTurn $turn, BuilderMessage $question, bool $mayAsk = true): BuilderMessage
     {
         $this->keepSecretsApart($project, $turn, $question);
@@ -186,6 +226,10 @@ class ProjectChat
         }
         if ($mayAsk && $turn->askEngineer !== '') {
             app(\Modules\AppBuilder\Services\EngineerQuestions::class)->ask($project, $turn->askEngineer);
+        }
+        // a site to copy is walked through before the price; never right after a tour, so tours cannot chain
+        if ($mayAsk && $turn->tourSite !== '' && ! $project->takesRequests()) {
+            app(\Modules\AppBuilder\Services\SiteTours::class)->ask($project, $turn->tourSite);
         }
 
         return $answer;
@@ -304,10 +348,8 @@ class ProjectChat
 
         $facts = "[Facts right now, newer than anything said earlier in this chat. The request list:\n"
             .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project)."]";
-        $content = $turns[$last]['content'];
-        $turns[$last]['content'] = is_array($content) ? [...$content, ['type' => 'text', 'text' => $facts]] : $content."\n\n".$facts;
 
-        return $turns;
+        return $this->withNote($turns, $facts);
     }
 
     private const LANGUAGE_RULES = [

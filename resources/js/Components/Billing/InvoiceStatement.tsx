@@ -6,7 +6,7 @@ import { formatMoney } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
 type InvoiceLine = { id: number; title: string; quantity: number; unit_price: number; total: number };
-type TimeSession = { id: number; start: string; end: string; duration: string; amount: number };
+type TimeSession = { id: number; start: string; end: string; duration: string; amount: number; is_service_price?: boolean };
 type TimeReport = { total_time: string; billed: string; full_value: string; savings: string | null; market_value: string | null; sessions: TimeSession[] };
 
 /** The invoice as the server's InvoiceSummary sends it, for both the guest link and the signed-in pay page. */
@@ -127,8 +127,14 @@ function SessionList({ sessions, money }: { sessions: TimeSession[]; money: (n: 
         <ul className="divide-y divide-black/5 text-sm dark:divide-white/10">
             {sessions.map((s) => (
                 <li key={s.id} className="flex items-center justify-between gap-4 py-2">
-                    <span className={`min-w-0 truncate font-mono text-xs ${muted}`} dir="ltr">{s.start} → {s.end}</span>
-                    <span className="shrink-0 font-mono">{s.duration}</span>
+                    {s.is_service_price ? (
+                        <span className="min-w-0 truncate font-medium">{__('service_pricing.adjustment_line')}</span>
+                    ) : (
+                        <>
+                            <span className={`min-w-0 truncate font-mono text-xs ${muted}`} dir="ltr">{s.start} → {s.end}</span>
+                            <span className="shrink-0 font-mono">{s.duration}</span>
+                        </>
+                    )}
                     <span className="shrink-0 font-semibold" dir="ltr">{money(s.amount)}</span>
                 </li>
             ))}

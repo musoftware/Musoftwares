@@ -132,7 +132,8 @@ class WorkerJobController extends Controller
         return response()->json(['messages' => $project->messages()->with('attachments')->get()->map(fn (\Modules\AppBuilder\Models\BuilderMessage $message) => [
             'id' => $message->id,
             'role' => $message->role,
-            'text' => $message->content,
+            // a site tour's notes are the build's map of the site to copy
+            'text' => $message->role === \Modules\AppBuilder\Models\BuilderMessage::TOUR ? $message->tourNotes() : $message->content,
             'files' => $message->attachments->pluck('original_name')->values(),
             'at' => $message->created_at?->toIso8601String(),
         ])->values()]);

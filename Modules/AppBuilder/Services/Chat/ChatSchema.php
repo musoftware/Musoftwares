@@ -43,6 +43,8 @@ final class ChatSchema
                 'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
                 // free ready designs to show as pictures under this answer, so the customer picks one
                 'designs' => self::designs(),
+                // a site the customer wants copied: the worker walks through it and takes pictures; '' for none
+                'tour_site' => ['type' => 'string'],
                 'secrets' => ['type' => 'array', 'items' => [
                     'type' => 'object',
                     'properties' => ['name' => ['type' => 'string'], 'value' => ['type' => 'string']],
@@ -50,7 +52,7 @@ final class ChatSchema
                     'additionalProperties' => false,
                 ]],
             ],
-            'required' => ['reply', 'needs_team', 'ask_engineer', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'secrets'],
+            'required' => ['reply', 'needs_team', 'ask_engineer', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'tour_site', 'secrets'],
             'additionalProperties' => false,
         ];
     }

@@ -12,7 +12,9 @@ class InvoiceItemTimer extends Model
 {
     use HasFactory, ScopesToLegalWindow, SoftDeletes;
 
-    protected $fillable = ['invoice_item_id', 'date_start', 'date_end', 'amount', 'project_id', 'user_id', 'currency_id', 'business_amount', 'business_calculated'];
+    protected $fillable = ['invoice_item_id', 'date_start', 'date_end', 'amount', 'project_id', 'user_id', 'currency_id', 'business_amount', 'business_calculated', 'is_service_adjustment'];
+
+    protected $casts = ['is_service_adjustment' => 'boolean'];
 
     protected static function booted()
     {

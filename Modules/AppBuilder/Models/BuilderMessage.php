@@ -26,6 +26,9 @@ class BuilderMessage extends Model
     /** A screenshot the build sent when a big part of the program worked. */
     public const PROGRESS = 'progress';
 
+    /** Pictures and notes from walking through a site the customer wants copied (SiteTours). */
+    public const TOUR = 'tour';
+
     protected $guarded = ['id'];
 
     protected $casts = ['payload' => 'array'];
@@ -61,8 +64,20 @@ class BuilderMessage extends Model
             // the team's line (a notice or the owner's own words) is already on the customer's page
             self::TEAM => '[The Musoftware team wrote this to the customer; the customer did not write it. Do not reply to it or thank anyone for it, answer only what the customer writes] '.$this->content,
             self::PROGRESS => '[The build showed the customer a screenshot of finished work] '.$this->content,
+            self::TOUR => $this->tourNotes(),
             default => $this->content.$this->linkNotes(),
         };
+    }
+
+    /** What the walk through a site found, for the chat model and for the build; the customer saw only the line and the pictures. */
+    public function tourNotes(): string
+    {
+        $tour = (array) ($this->payload['tour'] ?? []);
+        $how = ! empty($tour['logged_in']) ? 'logged in with the customer\'s test account' : 'as a visitor, not logged in';
+
+        return '[The engineering computer walked through '.($tour['url'] ?? 'the site')." in a real browser, {$how}, and took one picture of each page (attached, in the order visited). "
+            .'The customer did not write this; they see the pictures. What it found on each page:]'
+            ."\n\n".($tour['report'] ?? '');
     }
 
     /** What each link or file the customer shared showed when it was looked at for Claude. */

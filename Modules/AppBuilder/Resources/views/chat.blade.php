@@ -76,7 +76,7 @@
         .design .btn{margin-top:auto}
         .idea{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
         .idea .note{margin:2px 0 0}
-        .msg.progress{border-inline-start:3px solid var(--line);padding-inline-start:12px}
+        .msg.progress,.msg.tour{border-inline-start:3px solid var(--line);padding-inline-start:12px}
         .shots{display:grid;gap:8px;margin-top:8px}
         .shots img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--soft)}
         /* the customer's chats: always beside the chat on a wide screen, a panel from the menu button on a phone or a tablet */
@@ -451,6 +451,7 @@
         const node = el('div', {class: 'msg ' + message.role, dir: 'auto'});
         if (message.role === 'team') node.append(el('span', {class: 'who'}, T.team_label));
         if (message.role === 'progress') node.append(el('span', {class: 'who'}, T.progress_label));
+        if (message.role === 'tour') node.append(el('span', {class: 'who'}, T.tour_label));
         node.append(document.createTextNode(message.text));
         if (message.images && message.images.length) {
             const shots = el('div', {class: 'shots'});
@@ -593,6 +594,12 @@
         return button;
     }
 
+    /** An invited customer's first small program is free: a start button instead of payment. */
+    function appendFreeBuild(card, free) {
+        if (!free) return;
+        card.append(el('p', {class: 'note'}, T.free_build_note), actionButton(T.free_build_go, free.url));
+    }
+
     /** A price in the customer's own money when the site has a rate for it; the gateway charges with the same rate. */
     function money(amount, currency) {
         const value = Number(String(amount).replaceAll(',', ''));
@@ -614,6 +621,7 @@
             .replaceAll(':price', money(quote.amount, quote.currency))));
         if (quote.discount) card.append(el('p', {class: 'note'}, T.leave.applied.replace(':percent', quote.discount.percent)));
         if (quote.design_fee) card.append(el('p', {class: 'note'}, T.design_included.replace(':amount', money(quote.design_fee, quote.currency))));
+        appendFreeBuild(card, quote.free_build);
         card.append(el('p', {class: 'note'}, T.pay_note + ' ' + T.close_page_note));
         appendPayForm(card, quote.pay_url, T.pay, quote.shares || []);
         // a customer who wants a person before paying can reach one from the price itself
@@ -721,7 +729,7 @@
             await loadScript('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
             if (!firebase.apps.length) firebase.initializeApp(PUSH.config);
             const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            const token = await firebase.messaging().getToken({vapidKey: PUSH.vapidKey, serviceWorkerRegistration: registration});
+            const token = await firebase.messaging().getToken({vapidKey: PUSH.vapidKey || undefined, serviceWorkerRegistration: registration});
             if (token) { await call(url, {token}); button.replaceWith(el('p', {class: 'hint'}, T.push_on)); }
         } catch (error) {
             showError(T.push_failed);
@@ -1121,6 +1129,7 @@
         if (waiting || (state && state.answering)) thread.append(statusNode(T.thinking));
         if (state && state.looking) thread.append(statusNode(state.looking === 'file' ? T.reading_file : T.looking));
         if (state && state.asking_engineer && !state.answering) thread.append(statusNode(T.asking_engineer));
+        if (state && state.touring && !state.answering) thread.append(statusNode(T.touring));
         if (state && state.quote) thread.append(quoteNode(state.quote));
         if (state && state.study) thread.append(studyNode(state.study));
         if (state && state.inspection) thread.append(inspectionNode(state.inspection));
@@ -1149,7 +1158,7 @@
         const studyWriting = state && state.study && state.study.status === 'writing';
         // a request in line or being built changes on its own; a paid one appears when the gateway reports it
         const requestsMoving = state && state.requests && state.requests.items.some((item) => ['reviewing', 'ready', 'building'].includes(item.status));
-        if (!state || (!state.progress && !state.looking && !state.answering && !state.asking_engineer && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
+        if (!state || (!state.progress && !state.looking && !state.answering && !state.asking_engineer && !state.touring && !state.waiting_for_answer && !(state.trial && state.trial.waiting) && !studyWriting && !requestsMoving)) return;
         pollTimer = setTimeout(async () => {
             try { state = await call(BASE + '/' + state.uuid + '/state'); } catch (error) { /* try again on the next tick */ }
             render();

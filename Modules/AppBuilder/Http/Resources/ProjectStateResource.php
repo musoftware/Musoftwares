@@ -21,6 +21,9 @@ class ProjectStateResource extends JsonResource
 
     private const ANSWER_MINUTES = 3;
 
+    /** Lines whose pictures are shown to the customer: the build's screenshots and a site tour's pages. */
+    private const PICTURE_ROLES = [BuilderMessage::PROGRESS, BuilderMessage::TOUR];
+
     public function toArray(Request $request): array
     {
         return [
@@ -42,6 +45,8 @@ class ProjectStateResource extends JsonResource
             'answering' => ! $this->awaiting_look && $this->isAnsweringAfterLook(),
             // the chat asked the programmer something and brings the answer when it comes
             'asking_engineer' => app(\Modules\AppBuilder\Services\EngineerQuestions::class)->isAsking($this->resource),
+            // the worker is walking through the site the customer wants copied; its pictures come into the chat
+            'touring' => app(\Modules\AppBuilder\Services\SiteTours::class)->isTouring($this->resource),
             'trial' => $this->hasDelivery() ? $this->trial() : null,
             // after payment: the build waits a while for the full-quality originals of the pictures sent smaller
             'originals' => $this->originals(),
@@ -147,7 +152,7 @@ class ProjectStateResource extends JsonResource
      */
     private function fileNames(BuilderMessage $message): array
     {
-        if ($message->role === BuilderMessage::PROGRESS) {
+        if (in_array($message->role, self::PICTURE_ROLES, true)) {
             return [];
         }
         $looks = collect($message->payload['looks'] ?? []);
@@ -167,7 +172,7 @@ class ProjectStateResource extends JsonResource
      */
     private function images(BuilderMessage $message): array
     {
-        if ($message->role !== BuilderMessage::PROGRESS) {
+        if (! in_array($message->role, self::PICTURE_ROLES, true)) {
             return [];
         }
 
@@ -201,6 +206,9 @@ class ProjectStateResource extends JsonResource
             ] : null,
             'pay_url' => route('builder.pay', $this->resource),
             'fix_url' => route('builder.fix', $this->resource),
+            // an invited customer's first small program is free; nothing shows when any check fails
+            'free_build' => app(\Modules\AppBuilder\Services\InvitedFreeBuild::class)->availableTo($this->resource, request()->user(), request()->ip(), request()->userAgent())
+                ? ['url' => route('builder.free', $this->resource)] : null,
         ];
     }
 

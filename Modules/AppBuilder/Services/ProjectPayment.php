@@ -256,6 +256,31 @@ class ProjectPayment
         return true;
     }
 
+    /**
+     * The first small program of an invited customer: no payment, a small spending cap, and the owner still approves
+     * it. The account row is locked, so two chats sent at the same moment cannot both take the one free build.
+     */
+    public function startFreeBuild(BuilderProject $project, \App\Models\User $user, string $ip, string $userAgent): bool
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($project, $user, $ip, $userAgent): bool {
+            $locked = \App\Models\User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            $free = app(InvitedFreeBuild::class);
+            if (! $free->availableTo($project->refresh(), $locked, $ip, $userAgent)) {
+                return false;
+            }
+
+            $this->queue($project, [
+                'free_build' => true,
+                'user_id' => $project->user_id ?? $locked->id,
+                'budget_usd' => min((float) $project->budget_usd, (float) config('builder.free_build.budget_usd')),
+            ]);
+            $inviter = \App\Models\User::find($project->referrer_user_id);
+            $this->tellOwner($project, 'Free first build (invited by #'.$inviter?->id.' '.$inviter?->name.'): '.$project->title);
+
+            return true;
+        });
+    }
+
     private function queue(BuilderProject $project, array $extra): void
     {
         $this->queueWithoutAsking($project, $extra);

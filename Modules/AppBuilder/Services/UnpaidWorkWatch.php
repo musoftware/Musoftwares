@@ -42,6 +42,9 @@ class UnpaidWorkWatch
             ->whereNull('imported_at')
             ->where(fn ($kind) => $kind->whereNull('job_kind')->orWhere('job_kind', BuilderProject::JOB_BUILD))
             ->where('paid_total', '<=', 0)
+            // an invited customer's free first build passed InvitedFreeBuild and the owner approves it; a free build
+            // with no inviter is not allowed any more and is still reported
+            ->where(fn ($paid) => $paid->where('free_build', false)->orWhereNull('referrer_user_id'))
             ->get();
     }
 

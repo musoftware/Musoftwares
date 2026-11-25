@@ -88,6 +88,7 @@ class BuilderProject extends Model
         'built_at' => 'datetime',
         'warranty_until' => 'datetime',
         'lease_expires_at' => 'datetime',
+        'invited_at' => 'datetime',
         'free_fix' => 'boolean',
         'free_build' => 'boolean',
         'quote_version' => 'integer',
@@ -123,6 +124,12 @@ class BuilderProject extends Model
     public function engineerQuestions(): HasMany
     {
         return $this->hasMany(BuilderEngineerQuestion::class, 'project_id');
+    }
+
+    /** The walks the worker made through a site the customer wants copied. */
+    public function siteTours(): HasMany
+    {
+        return $this->hasMany(BuilderSiteTour::class, 'project_id');
     }
 
     public function messages(): HasMany

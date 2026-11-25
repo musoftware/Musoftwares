@@ -12,7 +12,18 @@ class InvoiceItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['item_title', 'amount', 'qty', 'item_type', 'invoice_id', 'points'];
+    protected $fillable = [
+        'item_title', 'amount', 'qty', 'item_type', 'invoice_id', 'points',
+        'requested_at', 'market_minutes', 'client_rating', 'client_rating_note', 'rated_at', 'rating_token', 'rating_requested_at',
+    ];
+
+    protected $casts = [
+        'requested_at' => 'datetime',
+        'rated_at' => 'datetime',
+        'rating_requested_at' => 'datetime',
+        'market_minutes' => 'integer',
+        'client_rating' => 'integer',
+    ];
 
     protected static function booted()
     {

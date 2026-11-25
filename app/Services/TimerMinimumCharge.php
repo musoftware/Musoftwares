@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Exceptions\MissingExchangeRateException;
 use App\Models\AdminSettings;
 use App\Models\CurrenciesExchange;
-use App\Models\InvoiceItem;
-use App\Models\InvoiceItemTimer;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -36,22 +34,5 @@ final class TimerMinimumCharge
 
             return null;
         }
-    }
-
-    /** Raises the newest session so all the item's sessions together reach the minimum. */
-    public static function apply(InvoiceItem $item, InvoiceItemTimer $newest): void
-    {
-        $minimum = self::inCurrency($newest->currency_id, $item->id);
-        if ($minimum === null) {
-            return;
-        }
-
-        $gap = round($minimum - (float) $item->timers()->sum('amount'), 3);
-        if ($gap <= 0) {
-            return;
-        }
-
-        $newest->amount = (float) $newest->amount + $gap;
-        $newest->save();
     }
 }

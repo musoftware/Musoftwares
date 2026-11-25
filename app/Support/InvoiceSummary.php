@@ -63,6 +63,7 @@ final class InvoiceSummary
             'end' => $timer->date_end,
             'duration' => TextHelper::secondsToTime(self::seconds($timer)),
             'amount' => (float) $timer->amount,
+            'is_service_price' => (bool) $timer->is_service_adjustment,
         ]))->values()->all();
 
         return [

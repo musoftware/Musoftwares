@@ -95,6 +95,11 @@ class BuilderChatController extends Controller
         if ($looks->finishLate($project)) {
             $this->chat->continueAfterLook($project);
         }
+        // the walk through a site to copy ran out of time: the chat goes on without it
+        $lateTour = app(\Modules\AppBuilder\Services\SiteTours::class)->finishLate($project);
+        if ($lateTour !== null) {
+            $this->chat->continueAfterTour($lateTour);
+        }
         $this->speakCustomerLanguage($project);
 
         return response()->json($this->stateOf($project));

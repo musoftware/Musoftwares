@@ -21,6 +21,10 @@ class SignedInWithGoogle
             return $next($request);
         }
 
+        // an invite in the address (/ai?ref=code) is kept before the sign-in, so the new account comes after it
+        if (is_string($request->query('ref')) && $request->query('ref') !== '') {
+            app(\App\Services\ReferralService::class)->rememberInvite($request, $request->query('ref'));
+        }
         $google = route('social.google.redirect', ['redirect' => $this->pageToComeBackTo($request)]);
 
         if ($request->expectsJson()) {

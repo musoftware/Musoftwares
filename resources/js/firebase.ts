@@ -44,7 +44,9 @@ export async function fetchFcmToken(): Promise<string | null> {
     if (!messaging) return null;
 
     const { getToken } = await import('firebase/messaging');
-    const token = await getToken(messaging, { vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY });
+    // Without our own web push key, the SDK falls back to the Firebase default key.
+    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY || undefined;
+    const token = await getToken(messaging, { vapidKey });
     return token || null;
 }
 

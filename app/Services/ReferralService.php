@@ -151,6 +151,18 @@ class ReferralService extends BaseService
      * counted. View increments are deduped via a signed cookie set by the
      * caller (ReferralRedirectMiddleware).
      */
+    /**
+     * Keeps the invite code a visitor opened, and when a new one was first opened: the AI builder's free first build
+     * needs an account opened after the invite, so an old account cannot claim it.
+     */
+    public function rememberInvite(Request $request, string $ref): void
+    {
+        if ($request->session()->get('referral') !== $ref) {
+            $request->session()->put('referral_opened_at', now()->getTimestamp());
+        }
+        $request->session()->put('referral', $ref);
+    }
+
     public function processReferralRedirect($valueRef, ?Request $request = null): ?UserReferral
     {
         $referral = UserReferral::resolveRef($valueRef);

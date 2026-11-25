@@ -184,7 +184,7 @@ class ReferralController extends Controller
     public function referral_redirect(Request $request, $ref = null)
     {
         if ($ref != null) {
-            $request->session()->put('referral', $ref);
+            $this->referralService->rememberInvite($request, (string) $ref);
         }
         $HasRef = $request->session()->get('referral') != null;
         $valueRef = $request->session()->get('referral');
