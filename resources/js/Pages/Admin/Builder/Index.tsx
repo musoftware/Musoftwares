@@ -5,6 +5,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { t } from '@/Components/Admin/SoftwareStore/t';
 import ShopPager, { Paginated } from '@/Components/Admin/Shop/ShopPager';
 import ImportProject from '@/Components/Admin/Builder/ImportProject';
+import { dayLabel, groupByDay, timeOf } from '@/Components/Admin/Builder/ChatDays';
 
 interface Project {
     id: number;
@@ -18,7 +19,8 @@ interface Project {
     build_cost_usd: string;
     chat_cost_usd: number;
     client_name: string | null;
-    updated_at: string;
+    active_at: string;
+    is_new: boolean;
     visitor: Visitor;
 }
 
@@ -175,8 +177,38 @@ function ChatTabs({ tab, counts, waitingOnly }: { tab: ChatTab; counts: Record<C
     );
 }
 
+/** One chat in the list. "New" means the customer wrote after you last opened it. */
+function ChatRow({ project }: { project: Project }) {
+    return (
+        <Link href={`/admin/builder/${project.uuid}`} className={`flex flex-col gap-1 p-4 hover:bg-slate-50 ${project.is_new ? 'border-s-4 border-blue-600' : ''} sm:flex-row sm:items-center sm:justify-between`}>
+            <div className="min-w-0">
+                <p className="truncate font-semibold" dir="auto">
+                    {project.is_new && <span className="me-2 font-bold text-blue-700">{t('New', 'جديد')}</span>}
+                    {project.title || t('(no title yet)', '(لسه من غير اسم)')}
+                </p>
+                <p className="text-sm text-slate-500" dir="auto">
+                    {project.visitor.user
+                        ? <span className="font-semibold text-slate-700">{project.visitor.user.name} <span dir="ltr">{project.visitor.user.email}</span></span>
+                        : (project.client_name || t('Guest', 'زائر'))}
+                    {' · '}<span dir="ltr">{timeOf(project.active_at)}</span>
+                </p>
+                <p className="text-xs text-slate-500" dir="ltr">
+                    {[project.visitor.country, project.visitor.ip, deviceOf(project.visitor.user_agent), project.visitor.referrer && `ref: ${project.visitor.referrer.name}`].filter(Boolean).join(' · ')}
+                </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-3 text-sm">
+                {project.awaiting_answer && <span className="font-semibold text-amber-700">{t('Needs an answer', 'محتاج رد')}</span>}
+                <span>{t(...(STATUS_LABELS[project.status] || [project.status, project.status]))}</span>
+                <span dir="ltr">{t('paid', 'المدفوع')} {project.paid_total} / {project.amount} {project.currency}</span>
+                <span className="text-slate-500" dir="ltr">{t('chat', 'الشات')} ${project.chat_cost_usd.toFixed(4)} · {t('build', 'التنفيذ')} ${Number(project.build_cost_usd).toFixed(2)}</span>
+            </div>
+        </Link>
+    );
+}
+
 interface IndexProps {
     projects: Paginated<Project>;
+    today: string;
     waitingOnly: boolean;
     learning: Learned[];
     defaultFactor: number;
@@ -185,8 +217,9 @@ interface IndexProps {
     tabCounts: Record<ChatTab, number>;
 }
 
-export default function BuilderIndex({ projects, waitingOnly, learning, defaultFactor, deliveryStats, tab, tabCounts }: IndexProps) {
+export default function BuilderIndex({ projects, today, waitingOnly, learning, defaultFactor, deliveryStats, tab, tabCounts }: IndexProps) {
     const tabQuery = tab === 'customers' ? '' : `tab=${tab}&`;
+    const newCount = projects.data.filter((project) => project.is_new).length;
     return (
         <AdminSidebarLayout>
             <Head title={t('AI builder', 'منشئ البرامج')} />
@@ -208,33 +241,18 @@ export default function BuilderIndex({ projects, waitingOnly, learning, defaultF
                 <ChatTabs tab={tab} counts={tabCounts} waitingOnly={waitingOnly} />
 
                 {projects.data.length === 0 && <p className="text-slate-500">{t('No chats yet.', 'لسه مفيش محادثات.')}</p>}
+                {newCount > 0 && <p className="text-sm font-semibold text-blue-700">{t(`${newCount} chats with new messages on this page`, `${newCount} محادثة فيها رسايل جديدة في الصفحة دي`)}</p>}
 
-                <ul className="divide-y rounded-xl border bg-white">
-                    {projects.data.map((project) => (
-                        <li key={project.id}>
-                            <Link href={`/admin/builder/${project.uuid}`} className="flex flex-col gap-1 p-4 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="min-w-0">
-                                    <p className="truncate font-semibold" dir="auto">{project.title || t('(no title yet)', '(لسه من غير اسم)')}</p>
-                                    <p className="text-sm text-slate-500" dir="auto">
-                                        {project.visitor.user
-                                            ? <span className="font-semibold text-slate-700">{project.visitor.user.name} <span dir="ltr">{project.visitor.user.email}</span></span>
-                                            : (project.client_name || t('Guest', 'زائر'))}
-                                        {' · '}{project.updated_at}
-                                    </p>
-                                    <p className="text-xs text-slate-500" dir="ltr">
-                                        {[project.visitor.country, project.visitor.ip, deviceOf(project.visitor.user_agent), project.visitor.referrer && `ref: ${project.visitor.referrer.name}`].filter(Boolean).join(' · ')}
-                                    </p>
-                                </div>
-                                <div className="flex shrink-0 flex-wrap items-center gap-3 text-sm">
-                                    {project.awaiting_answer && <span className="font-semibold text-amber-700">{t('Needs an answer', 'محتاج رد')}</span>}
-                                    <span>{t(...(STATUS_LABELS[project.status] || [project.status, project.status]))}</span>
-                                    <span dir="ltr">{t('paid', 'المدفوع')} {project.paid_total} / {project.amount} {project.currency}</span>
-                                    <span className="text-slate-500" dir="ltr">{t('chat', 'الشات')} ${project.chat_cost_usd.toFixed(4)} · {t('build', 'التنفيذ')} ${Number(project.build_cost_usd).toFixed(2)}</span>
-                                </div>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                {groupByDay(projects.data).map((group) => (
+                    <section key={group.day} aria-labelledby={`day-${group.day}`} className="space-y-2">
+                        <h2 id={`day-${group.day}`} className="text-sm font-semibold text-slate-600">
+                            {dayLabel(group.day, today)} <span className="font-normal" dir="ltr">({group.items.length})</span>
+                        </h2>
+                        <ul className="divide-y rounded-xl border bg-white">
+                            {group.items.map((project) => <li key={project.id}><ChatRow project={project} /></li>)}
+                        </ul>
+                    </section>
+                ))}
 
                 <ShopPager page={projects} />
             </div>

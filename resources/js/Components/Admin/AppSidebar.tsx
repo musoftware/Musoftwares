@@ -117,6 +117,7 @@ const sections: Section[] = [
             { title: "admin.sidebar_reports", url: "/admin/business/reports", alsoActiveOn: ["/admin/business/balance-report"] },
             { title: "admin.sidebar_transactions", url: "/admin/transactions" },
             { title: "admin.sidebar_payment_links", url: "/admin/payment-links" },
+            { title: "client_systems.index_title", url: "/admin/client-systems" },
             { title: "admin.sidebar_currencies", url: "/admin/currencies", alsoActiveOn: ["/admin/currency-exchanges"] },
         ]
       },

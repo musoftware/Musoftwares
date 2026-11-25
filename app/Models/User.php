@@ -361,6 +361,11 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function clientSystems(): HasMany
+    {
+        return $this->hasMany(ClientSystem::class);
+    }
+
     public function hasUnpaidInvoices(): bool
     {
         return $this->invoices()

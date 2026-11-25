@@ -241,6 +241,12 @@ Route::post('/telegram/webhook', \App\Http\Controllers\TelegramWebhookController
 Route::post('/sso/notify', [\App\Http\Controllers\Api\SsoNotificationController::class, 'notify'])->name('sso.notify');
 Route::post('/sso/exchange-rates/sync', [ExchangeRateSyncController::class, 'sync'])->name('sso.exchange-rates.sync');
 
+// --- Licensed client systems (any language): signed check-in for a license, and sales for the share-of-sales bill ---
+Route::prefix('client-systems')->middleware(['force.json', 'throttle:120,1', \App\Http\Middleware\VerifyClientSystemSignature::class])->group(function () {
+    Route::post('check-in', [\App\Http\Controllers\Api\ClientSystemController::class, 'checkIn'])->name('api.client-systems.check-in');
+    Route::post('sales', [\App\Http\Controllers\Api\ClientSystemController::class, 'reportSales'])->name('api.client-systems.sales');
+});
+
 // --- Partner Gateway API (B2B SaaS Metering & Credit Leases) ---
 Route::prefix('v1/partner')->middleware([VerifyPartnerHmac::class])->group(function () {
     Route::get('/balance', [PartnerGatewayController::class, 'balance'])->name('api.partner.balance');

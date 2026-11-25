@@ -358,6 +358,8 @@ class UsersController extends Controller
             'availableDevices' => $availableDevices,
             'resellerAllocations' => $resellerAllocations,
             'allSerialSoftwares' => $allSerialSoftwares,
+            'clientCurrencyId' => $user->currency_id ? (int) $user->currency_id : null,
+            'clientSystems' => $user->clientSystems()->with(['user:id,name,email', 'currency:id,currency'])->latest()->get()->map->summary(),
         ]);
     }
 

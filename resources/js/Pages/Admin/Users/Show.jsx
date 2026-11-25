@@ -30,9 +30,10 @@ import { formatMoney as formatCurrency } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { useConfirm } from '@/hooks/useConfirm';
 import UserLoansTab from './UserLoansTab';
+import ClientSystemsSection from '@/Components/ClientSystems/ClientSystemsSection';
 import BadgeCardActions from './BadgeCardActions';
 
-export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [], resellerAllocations = [], allSerialSoftwares = [], badgeCardUrl = null }) {
+export default function Show({ auth, client, loans = [], stats = {}, modulePlans = [], subscriptions = [], recentProjects = [], projectsCount = 0, serialUserDevices = [], availableDevices = [], resellerAllocations = [], allSerialSoftwares = [], badgeCardUrl = null, clientSystems = [], clientCurrencyId = null, currencies = [] }) {
     const { confirm, confirmDialog } = useConfirm();
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
@@ -1144,6 +1145,8 @@ export default function Show({ auth, client, loans = [], stats = {}, modulePlans
                         </div>
                     </div>
                     )}
+
+                    <ClientSystemsSection clientId={client.id} clientCurrencyId={clientCurrencyId} systems={clientSystems} currencies={currencies} />
 
                     {/* Licenses & Devices Section */}
                     <div id="licenses-devices" className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200 scroll-mt-24 mb-6">

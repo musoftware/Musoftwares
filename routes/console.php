@@ -130,6 +130,9 @@ Schedule::command(\App\Console\Commands\PublishBlogArticle::class)
 // Send daily new services digest daily at 23:30 Cairo Time
 Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
 
+// Licensed client systems: make each monthly bill when its date comes (monthly fee + share of sales)
+Schedule::command('client-systems:bill')->hourly()->withoutOverlapping(30);
+
 // Auto-pay unpaid invoices daily at 04:30 Cairo Time
 Schedule::command(\App\Console\Commands\AutoPayInvoices::class)->dailyAt('04:30')->timezone('Africa/Cairo');
 

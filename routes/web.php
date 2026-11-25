@@ -861,6 +861,18 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     Route::get('/users/{user}/change-id', [\App\Http\Controllers\Admin\UserIdChangeController::class, 'show'])->name('users.change-id');
     Route::post('/users/{user}/change-id', [\App\Http\Controllers\Admin\UserIdChangeController::class, 'update'])->name('users.change-id.update');
+
+    // A client's own system: monthly price and/or share of sales, a signed license, and the integration prompt
+    Route::post('/users/{user}/client-systems', [\App\Http\Controllers\Admin\ClientSystemController::class, 'store'])->name('client-systems.store');
+    Route::prefix('client-systems')->name('client-systems.')->controller(\App\Http\Controllers\Admin\ClientSystemController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{clientSystem}', 'show')->name('show');
+        Route::put('/{clientSystem}', 'update')->name('update');
+        Route::post('/{clientSystem}/open-until', 'openUntil')->name('open-until');
+        Route::post('/{clientSystem}/toggle-lock', 'toggleLock')->name('toggle-lock');
+        Route::post('/{clientSystem}/accept-fingerprint', 'acceptFingerprint')->name('accept-fingerprint');
+        Route::post('/{clientSystem}/rotate-keys', 'rotateKeys')->name('rotate-keys');
+    });
     Route::get('/users/{user}/merge', [App\Http\Controllers\Admin\UserMergeController::class, 'preview'])->name('users.merge.preview');
     Route::get('/users/{user}/merge-select', [App\Http\Controllers\Admin\UserMergeController::class, 'select'])->name('users.merge.select');
     Route::post('/users/{user}/merge/confirm', [App\Http\Controllers\Admin\UserMergeController::class, 'confirm'])->name('users.merge.confirm');

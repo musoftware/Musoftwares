@@ -83,10 +83,21 @@ class UserIdChange
      */
     public function preview(int $userId): array
     {
-        return $this->columns()
-            ->map(fn (array $column) => $column + ['rows' => $this->pointingAt($column, $userId)->count()])
+        $columns = $this->columns();
+        if ($columns->isEmpty()) {
+            return [];
+        }
+        // a few union queries for all the counts: the page timed out on the live server with one count per column.
+        // Groups of 200 stay under SQLite's limit of 500 selects in one union.
+        $counts = $columns
+            ->map(fn (array $column, int $index) => $this->pointingAt($column, $userId)->selectRaw('? as idx, count(*) as aggregate', [$index]))
+            ->chunk(200)
+            ->flatMap(fn (Collection $queries) => $queries->reduce(fn ($union, $query) => $union ? $union->unionAll($query) : $query)->get())
+            ->pluck('aggregate', 'idx');
+
+        return $columns
+            ->map(fn (array $column, int $index) => ['table' => $column['table'], 'column' => $column['column'], 'rows' => (int) ($counts[$index] ?? 0)])
             ->filter(fn (array $column) => $column['rows'] > 0)
-            ->map(fn (array $column) => ['table' => $column['table'], 'column' => $column['column'], 'rows' => $column['rows']])
             ->values()
             ->all();
     }
@@ -132,21 +143,50 @@ class UserIdChange
      */
     private function columns(): Collection
     {
-        return collect(Schema::getTables())
-            ->map(fn ($table) => is_array($table) ? $table['name'] : $table->name)
-            ->reject(fn (string $table) => in_array($table, self::OTHER_USERS_TABLES, true))
-            ->flatMap(fn (string $table) => $this->columnsOf($table))
+        return collect($this->schema())
+            ->reject(fn (array $_, string $name) => in_array($name, self::OTHER_USERS_TABLES, true))
+            ->flatMap(fn (array $table, string $name) => $this->columnsOf($name, $table['columns'], $table['user_keys']))
             ->unique(fn (array $column) => $column['table'].'.'.$column['column'])
             ->values();
     }
 
-    /** @return list<array{table: string, column: string, type_column: ?string}> */
-    private function columnsOf(string $table): array
+    /**
+     * Every table with its columns and its single-column foreign keys to users.id.
+     * MySQL reads it in two queries; asking table by table took ~600 slow schema queries and timed out the page.
+     *
+     * @return array<string, array{columns: list<string>, user_keys: list<string>}>
+     */
+    private function schema(): array
     {
-        $names = Schema::getColumnListing($table);
-        $keyed = collect(Schema::getForeignKeys($table))
+        if (DB::getDriverName() !== 'mysql') {
+            return collect(Schema::getTables())
+                ->map(fn ($table) => is_array($table) ? $table['name'] : $table->name)
+                ->mapWithKeys(fn (string $name) => [$name => ['columns' => Schema::getColumnListing($name), 'user_keys' => $this->userKeysOf($name)]])
+                ->all();
+        }
+        $columns = DB::select("select c.table_name as t, c.column_name as c from information_schema.columns c join information_schema.tables b on b.table_schema = c.table_schema and b.table_name = c.table_name where c.table_schema = database() and b.table_type = 'BASE TABLE' order by c.table_name, c.ordinal_position");
+        $keys = DB::select("select table_name as t, column_name as c from information_schema.key_column_usage where table_schema = database() and referenced_table_name = 'users' and referenced_column_name = 'id'");
+        $keyed = collect($keys)->groupBy('t')->map(fn ($rows) => $rows->pluck('c')->all());
+
+        return collect($columns)->groupBy('t')
+            ->map(fn ($rows, string $name) => ['columns' => $rows->pluck('c')->all(), 'user_keys' => $keyed[$name] ?? []])
+            ->all();
+    }
+
+    /** @return list<string> */
+    private function userKeysOf(string $table): array
+    {
+        return collect(Schema::getForeignKeys($table))
             ->filter(fn (array $key) => $key['foreign_table'] === 'users' && $key['foreign_columns'] === ['id'] && count($key['columns']) === 1)
-            ->map(fn (array $key) => $key['columns'][0]);
+            ->map(fn (array $key) => $key['columns'][0])
+            ->values()
+            ->all();
+    }
+
+    /** @return list<array{table: string, column: string, type_column: ?string}> */
+    private function columnsOf(string $table, array $names, array $userKeys): array
+    {
+        $keyed = collect($userKeys);
         $named = array_intersect([...($table === 'users' ? [] : self::USER_COLUMNS), ...(self::MODEL_COLUMNS[$table] ?? [])], $names);
         $plain = $keyed->merge($named)->unique()->map(fn (string $column) => ['table' => $table, 'column' => $column, 'type_column' => null]);
         $morphs = collect($names)

@@ -22,7 +22,17 @@ class AdminBuilderController extends Controller
 {
     private const PER_PAGE = 30;
 
-    public function __construct(private readonly ProjectSecrets $secrets, private readonly BuildQuestions $questions) {}
+    /** Messages people wrote: the customer, the AI and the team (not build progress or tour lines). */
+    private const TALK_ROLES = [BuilderMessage::USER, BuilderMessage::ASSISTANT, BuilderMessage::TEAM];
+
+    /** When a chat last had a real message, or when it started if it has none. */
+    private const ACTIVE_AT = 'coalesce((select max(m.created_at) from builder_messages m where m.project_id = builder_projects.id and m.role in (?, ?, ?)), builder_projects.created_at)';
+
+    public function __construct(
+        private readonly ProjectSecrets $secrets,
+        private readonly BuildQuestions $questions,
+        private readonly \Modules\AppBuilder\Services\AdminChatViews $views,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -31,14 +41,20 @@ class AdminBuilderController extends Controller
         $projects = $chats->tab(BuilderProject::query(), $tab)
             ->with(['user', 'referrer'])
             ->when($request->boolean('waiting'), fn ($query) => $query->where('awaiting_answer', true))
-            ->latest('updated_at')
-            ->paginate(self::PER_PAGE, ['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'ip', 'country', 'user_agent', 'user_id', 'referrer_user_id', 'created_at', 'updated_at'])
-            ->withQueryString()
-            ->through(fn (BuilderProject $project) => $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name'])
-                + ['updated_at' => $project->updated_at?->timezone('Africa/Cairo')->toDateTimeString(), 'chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project)]);
+            ->select(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'chat_input_tokens', 'chat_output_tokens', 'client_name', 'ip', 'country', 'user_agent', 'user_id', 'referrer_user_id', 'created_at', 'updated_at'])
+            ->addSelect(['last_customer_at' => BuilderMessage::select('created_at')->whereColumn('project_id', 'builder_projects.id')->where('role', BuilderMessage::USER)->latest('id')->limit(1)])
+            // newest conversation first, by its last real message: updated_at also moves when nobody wrote anything
+            ->selectRaw(self::ACTIVE_AT.' as active_at', self::TALK_ROLES)
+            ->orderByRaw(self::ACTIVE_AT.' desc', self::TALK_ROLES)
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+        $seen = $this->views->seenTimes((int) $request->user()->id, $projects->pluck('id')->all());
+        $projects->through(fn (BuilderProject $project) => $this->listRow($project, $seen[$project->id] ?? null));
 
         return Inertia::render('Admin/Builder/Index', [
             'projects' => $projects,
+            'today' => now('Africa/Cairo')->toDateString(),
             'waitingOnly' => $request->boolean('waiting'),
             'tab' => $tab,
             'tabCounts' => $chats->counts(),
@@ -48,8 +64,22 @@ class AdminBuilderController extends Controller
         ]);
     }
 
-    public function show(BuilderProject $project): Response
+    /** One chat in the list; is_new when the customer wrote after this admin last opened it. */
+    private function listRow(BuilderProject $project, ?\Carbon\CarbonInterface $seenAt): array
     {
+        $lastCustomerAt = $project->last_customer_at ? \Illuminate\Support\Carbon::parse($project->last_customer_at) : null;
+
+        return $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name']) + [
+            'active_at' => \Illuminate\Support\Carbon::parse($project->active_at)->timezone('Africa/Cairo')->toDateTimeString(),
+            'is_new' => $this->views->isNew($lastCustomerAt, $seenAt),
+            'chat_cost_usd' => $project->chatCostUsd(),
+            'visitor' => $this->visitor($project),
+        ];
+    }
+
+    public function show(Request $request, BuilderProject $project): Response
+    {
+        $this->views->markSeen((int) $request->user()->id, (int) $project->id);
         $project->load(['messages.attachments', 'user', 'referrer']);
 
         return Inertia::render('Admin/Builder/Show', [

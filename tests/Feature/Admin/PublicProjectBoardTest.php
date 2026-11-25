@@ -146,6 +146,8 @@ class PublicProjectBoardTest extends TestCase
 
     public function test_guest_cannot_see_unpublished_or_future_reports(): void
     {
+        // midday, so "10 minutes ago" is still today (the test failed between 00:00 and 00:10)
+        $this->travelTo(\Carbon\Carbon::today()->setTime(12, 0));
         $today = \Carbon\Carbon::today()->toDateString();
 
         // 1. Past published report (should be visible)
