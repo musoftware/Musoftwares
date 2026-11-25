@@ -69,10 +69,7 @@ class AppServiceProvider extends ServiceProvider
             Lockout::class,
             function (Lockout $event) {
                 $ip = $event->request->ip();
-                BlockedIp::firstOrCreate(
-                    ['ip_address' => $ip],
-                    ['reason' => 'Brute-force login attempt', 'blocked_until' => now()->addHours(24)]
-                );
+                BlockedIp::block($ip, 'Brute-force login attempt', now()->addHours(24));
                 Cache::forget("blocked_ip:{$ip}");
             }
         );

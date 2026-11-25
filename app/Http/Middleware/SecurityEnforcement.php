@@ -68,10 +68,7 @@ class SecurityEnforcement
 
     protected function blockIp($ip, $reason)
     {
-        BlockedIp::firstOrCreate(
-            ['ip_address' => $ip],
-            ['reason' => $reason, 'blocked_until' => now()->addDays(7)]
-        );
+        BlockedIp::block($ip, $reason, now()->addDays(7));
         Cache::put("blocked_ip:{$ip}", true, 3600);
     }
 }

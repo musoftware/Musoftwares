@@ -26,10 +26,7 @@ final class RateLimitStrikes
             return;
         }
 
-        BlockedIp::firstOrCreate(
-            ['ip_address' => $ip],
-            ['reason' => 'Persistent rate limiting (Spam)', 'blocked_until' => now()->addHours(self::BLOCK_HOURS)]
-        );
+        BlockedIp::block($ip, 'Persistent rate limiting (Spam)', now()->addHours(self::BLOCK_HOURS));
         Cache::forget("blocked_ip:{$ip}");
     }
 }

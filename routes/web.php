@@ -817,9 +817,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Security & Rate Limits (Admin Settings) ───────────────────
     Route::get('settings/security', [SecurityController::class, 'index'])->name('settings.security.index');
-    Route::delete('settings/security/unblock-ip/{id}', [SecurityController::class, 'unblockIp'])->name('settings.security.unblock-ip');
+    // the parameter names must match the controller's (BlockedIp $blockedIp, RateLimit $rateLimit), or nothing is found
+    Route::delete('settings/security/unblock-ip/{blockedIp}', [SecurityController::class, 'unblockIp'])->name('settings.security.unblock-ip');
     Route::post('settings/security/rate-limits', [SecurityController::class, 'storeRateLimit'])->name('settings.security.rate-limits.store');
-    Route::delete('settings/security/rate-limits/{id}', [SecurityController::class, 'deleteRateLimit'])->name('settings.security.rate-limits.destroy');
+    Route::delete('settings/security/rate-limits/{rateLimit}', [SecurityController::class, 'deleteRateLimit'])->name('settings.security.rate-limits.destroy');
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
