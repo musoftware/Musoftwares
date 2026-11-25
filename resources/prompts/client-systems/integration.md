@@ -14,8 +14,14 @@ If this project has no server side (a static site or a browser-only app with no 
 | API base URL | `{{API_BASE}}` | config (environment variable, with this as the default) |
 | API key | `{{API_KEY}}` | secret config (environment variable) |
 | API secret | `{{API_SECRET}}` | secret config (environment variable) only. Never in code, git, logs, error pages, or any code sent to browsers or apps |
-| License public key (Ed25519, base64) | `{{PUBLIC_KEY}}` | code constant. It is public; it can only check licenses, not make them |
+| License public key | the PEM block below | code constant, exactly as written. It is public; it can only check licenses, not make them |
 | Currency of reported sales | `{{CURRENCY}}` | code constant |
+
+License public key (ECDSA P-256, PEM):
+
+```
+{{PUBLIC_KEY}}
+```
 
 Add the environment variable names to the project's example env file without the real secret.
 
@@ -48,7 +54,7 @@ Store the newest valid token on the server side (database or a file outside the 
 ### Verifying a token (do this every time the license is read, not only when it arrives)
 
 1. Split the token on "." into `body` and `sig`. Both are base64url without padding.
-2. Verify `sig` as an Ed25519 signature of the ASCII bytes of `body` (the base64url text itself, not the decoded JSON) with the public key. Use the platform's standard crypto (libsodium/sodium, Node `crypto`, Python `cryptography`/`PyNaCl`, .NET, Java, Go `crypto/ed25519`, and so on). Do not write your own Ed25519.
+2. Verify `sig` as an ECDSA P-256 signature with SHA-256 over the ASCII bytes of `body` (the base64url text itself, not the decoded JSON), using the public key. The signature is DER-encoded (ASN.1), not raw r||s. Use the platform's standard crypto: PHP `openssl_verify(..., OPENSSL_ALGO_SHA256)`, Node `crypto.verify('sha256', ...)`, Python `cryptography` (`ec.ECDSA(hashes.SHA256())`), .NET `ECDsa.VerifyData(..., DSASignatureFormat.Rfc3279DerSequence)`, Java `SHA256withECDSA`, Go `ecdsa.VerifyASN1`. Do not write your own crypto.
 3. Decode `body` and parse the JSON. It must have `v == 1` and `system == "{{SYSTEM_ID}}"`.
 4. Now must be before `valid_until` (Unix seconds).
 5. Clock rollback guard: remember the highest `issued_at` ever seen. If now is more than 10 minutes before it, the token is invalid.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ClientSystems\LicenseKeys;
 use App\Services\ClientSystems\SystemStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,11 +49,11 @@ class ClientSystem extends Model
     /** New API secret and signing key pair. Old integrations stop working until the new prompt is applied. */
     public function fillNewKeys(): void
     {
-        $pair = sodium_crypto_sign_keypair();
+        $pair = LicenseKeys::create();
         $this->api_key = 'cs_'.Str::lower(Str::random(32));
         $this->api_secret = Str::random(48);
-        $this->signing_public_key = base64_encode(sodium_crypto_sign_publickey($pair));
-        $this->signing_secret_key = base64_encode(sodium_crypto_sign_secretkey($pair));
+        $this->signing_public_key = $pair['public'];
+        $this->signing_secret_key = $pair['private'];
     }
 
     public function user(): BelongsTo

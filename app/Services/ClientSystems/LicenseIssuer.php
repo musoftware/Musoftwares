@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\URL;
 /**
  * Builds the signed license a client system stores and checks before it works.
  * Only we hold the private key, so the client side cannot make or stretch a license.
- * Token format: base64url(json) "." base64url(Ed25519 signature of the first part).
+ * Token format: base64url(json) "." base64url(DER ECDSA P-256 / SHA-256 signature of the first part).
  */
 final class LicenseIssuer
 {
@@ -75,8 +75,6 @@ final class LicenseIssuer
     private function sign(ClientSystem $system, array $payload): string
     {
         $body = self::base64Url(json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-        $signature = sodium_crypto_sign_detached($body, base64_decode($system->signing_secret_key));
-
-        return $body.'.'.self::base64Url($signature);
+        return $body.'.'.self::base64Url(LicenseKeys::sign($body, $system->signing_secret_key));
     }
 }

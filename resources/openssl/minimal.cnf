@@ -1,0 +1,2 @@
+# Minimal OpenSSL config so PHP can create EC keys where no system openssl.cnf exists (Windows dev machines).
+# Linux servers work with or without it. Used by App\Services\ClientSystems\LicenseKeys.

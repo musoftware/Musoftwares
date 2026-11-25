@@ -865,6 +865,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // A client's own system: monthly price and/or share of sales, a signed license, and the integration prompt
     Route::post('/users/{user}/client-systems', [\App\Http\Controllers\Admin\ClientSystemController::class, 'store'])->name('client-systems.store');
+    // a reload after a failed create opens this address: send the admin back to the form instead of a 405
+    Route::get('/users/{user}/client-systems', fn (\App\Models\User $user) => redirect()->to(route('admin.users.show', $user).'#client-systems'));
     Route::prefix('client-systems')->name('client-systems.')->controller(\App\Http\Controllers\Admin\ClientSystemController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{clientSystem}', 'show')->name('show');

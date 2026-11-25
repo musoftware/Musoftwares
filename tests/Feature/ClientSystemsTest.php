@@ -146,6 +146,22 @@ class ClientSystemsTest extends TestCase
         $this->actingAs($this->admin)->get("/admin/users/{$this->client->id}")->assertInertia(fn ($page) => $page->has('clientSystems', 2));
     }
 
+    /** The live server has no sodium extension: creating a system crashed there while every test here passed. */
+    public function test_licensing_never_needs_the_sodium_extension(): void
+    {
+        $files = [app_path('Models/ClientSystem.php'), ...glob(app_path('Services/ClientSystems/*.php')), app_path('Http/Controllers/Api/ClientSystemController.php'), app_path('Http/Controllers/Admin/ClientSystemController.php')];
+
+        foreach ($files as $file) {
+            $this->assertDoesNotMatchRegularExpression('/\bsodium_/', file_get_contents($file), basename($file).' calls sodium');
+        }
+    }
+
+    public function test_opening_the_create_address_goes_back_to_the_clients_page(): void
+    {
+        $this->actingAs($this->admin)->get("/admin/users/{$this->client->id}/client-systems")
+            ->assertRedirect(route('admin.users.show', $this->client).'#client-systems');
+    }
+
     public function test_new_keys_stop_the_old_ones(): void
     {
         $system = $this->createSystem(['monthly_price' => 0, 'sales_percent' => 0]);
@@ -198,8 +214,8 @@ class ClientSystemsTest extends TestCase
         [$body, $signature] = explode('.', $response->json('token'));
         $decode = fn (string $part) => base64_decode(strtr($part, '-_', '+/'));
         $system = ClientSystem::where('uuid', json_decode($decode($body), true)['system'])->firstOrFail();
-        $this->assertTrue(sodium_crypto_sign_verify_detached($decode($signature), $body, base64_decode($system->signing_public_key)));
-        $this->assertFalse(sodium_crypto_sign_verify_detached($decode($signature), $body.'x', base64_decode($system->signing_public_key)));
+        $this->assertSame(1, openssl_verify($body, $decode($signature), $system->signing_public_key, OPENSSL_ALGO_SHA256));
+        $this->assertSame(0, openssl_verify($body.'x', $decode($signature), $system->signing_public_key, OPENSSL_ALGO_SHA256));
 
         return json_decode($decode($body), true);
     }
