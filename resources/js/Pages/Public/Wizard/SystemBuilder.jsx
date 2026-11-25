@@ -6,7 +6,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import StudioHeader from '@/Components/Studio/StudioHeader';
 import { __ } from '@/lib/i18n';
 import { STUDIO_PHONE, whatsAppLink } from '@/lib/whatsapp';
-import { STEP_COUNT, buildLeadPayload, buildWhatsAppText, emptyBrief, firstInvalidStep, makeBriefCode, serverFieldErrors, validateStep } from '@/Components/StartProject/brief';
+import { STEP_COUNT, buildAssistantUrl, buildLeadPayload, buildWhatsAppText, emptyBrief, firstInvalidStep, makeBriefCode, serverFieldErrors, validateStep } from '@/Components/StartProject/brief';
 import { StepContact, StepDetails, StepProject } from '@/Components/StartProject/Steps';
 import { StepReview, summaryRows } from '@/Components/StartProject/Review';
 
@@ -108,7 +108,10 @@ export default function SystemBuilder() {
 
     const goTo = (next) => setStep(next);
     const { status, submit } = useSubmit(brief, code, goTo, setErrors);
+    const isSent = status === 'sent';
 
+    // A new step, or the "sent" screen replacing the long summary, starts at the card's heading (on phones the page
+    // would otherwise be left at the footer).
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;
@@ -116,7 +119,7 @@ export default function SystemBuilder() {
         }
         headingRef.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         headingRef.current?.focus({ preventScroll: true });
-    }, [step]);
+    }, [step, isSent]);
 
     const update = (changes) => {
         setBrief((prev) => ({ ...prev, ...changes }));
@@ -134,6 +137,12 @@ export default function SystemBuilder() {
         const rows = summaryRows(brief).map(([label, value]) => [label, value]);
         return whatsAppLink(buildWhatsAppText(__('start_project.wa_intro'), [[__('start_project.wa_request'), code], ...rows]), STUDIO_PHONE);
     }, [brief, code]);
+
+    // only what the visitor wants (steps 1 and 2); their name and number stay out of the chat link
+    const assistantUrl = useMemo(
+        () => buildAssistantUrl(__('start_project.ai_intro'), summaryRows(brief).filter(([, , rowStep]) => rowStep < 3).map(([label, value]) => [label, value])),
+        [brief],
+    );
 
     const current = STEPS[step - 1];
 
@@ -163,7 +172,7 @@ export default function SystemBuilder() {
                         {step === 1 && <StepProject brief={brief} errors={errors} update={update} />}
                         {step === 2 && <StepDetails brief={brief} update={update} />}
                         {step === 3 && <StepContact brief={brief} errors={errors} update={update} />}
-                        {step === 4 && <StepReview brief={brief} status={status} code={code} whatsAppUrl={whatsAppUrl} onEdit={goTo} onSubmit={submit} />}
+                        {step === 4 && <StepReview brief={brief} status={status} code={code} whatsAppUrl={whatsAppUrl} assistantUrl={assistantUrl} onEdit={goTo} onSubmit={submit} />}
 
                         {status !== 'sent' && <StepNav step={step} onBack={() => goTo(Math.max(1, step - 1))} onNext={next} />}
                     </div>

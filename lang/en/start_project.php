@@ -83,4 +83,7 @@ return [
     'whatsapp_send' => 'Send on WhatsApp',
     'wa_intro' => 'Hi, I\'d like to start a project with Musoftwares. Here are my details:',
     'wa_request' => 'Request number',
+    'ai_continue' => 'Continue with the assistant now',
+    'ai_hint' => 'It answers right away and can tell you the price. You sign in with Google.',
+    'ai_intro' => 'Hi, I\'d like to start a project. Here are the details:',
 ];

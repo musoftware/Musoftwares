@@ -260,7 +260,9 @@
             <button class="attach" type="button" id="attach" aria-label="{{ __('builder.attach') }}" title="{{ __('builder.attach') }}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
-            <textarea id="text" dir="auto" rows="1" aria-label="{{ __('builder.placeholder') }}" maxlength="{{ config('builder.limits.message_chars') }}" placeholder="{{ __('builder.placeholder') }}" autofocus></textarea>
+            {{-- /ai?brief=... (from the start-project form) only fills the box on the start page; the visitor still presses Send --}}
+            @php($brief = ! $state && is_string(request()->query('brief')) ? mb_substr(request()->query('brief'), 0, (int) config('builder.limits.message_chars')) : '')
+            <textarea id="text" dir="auto" rows="1" aria-label="{{ __('builder.placeholder') }}" maxlength="{{ config('builder.limits.message_chars') }}" placeholder="{{ __('builder.placeholder') }}" autofocus>{{ $brief }}</textarea>
             <button class="send" type="submit" id="send" aria-label="{{ __('builder.send') }}" disabled>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </button>
@@ -1213,6 +1215,13 @@
 
     watchForLeaving();
     render();
+    // a message filled from ?brief= sizes the box and enables Send; the address drops it so a reload does not fill it again
+    if (input.value) {
+        input.dispatchEvent(new Event('input'));
+        const address = new URL(location.href);
+        address.searchParams.delete('brief');
+        history.replaceState(history.state, '', address);
+    }
 })();
 </script>
 </body>

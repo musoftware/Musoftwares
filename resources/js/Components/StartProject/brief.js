@@ -109,6 +109,11 @@ export function buildWhatsAppText(intro, rows) {
     return [intro, '', ...lines].join('\n');
 }
 
+/** Link to the /ai assistant with the answers ready in its message box. Contact details are left out on purpose. */
+export function buildAssistantUrl(intro, rows) {
+    return `/ai?brief=${encodeURIComponent(buildWhatsAppText(intro, rows))}`;
+}
+
 export function makeBriefCode() {
     return `MS-SYS-${Math.floor(1000 + Math.random() * 9000)}`;
 }

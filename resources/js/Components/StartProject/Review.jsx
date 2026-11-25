@@ -1,4 +1,4 @@
-import { CheckCircle2, MessageSquare, Send } from 'lucide-react';
+import { CheckCircle2, MessageSquare, Send, Sparkles } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { archetypeOptions, budgetOptions, industryOptions, moduleGroups, platformOptions, solutionOptions, timelineOptions } from './options';
 
@@ -47,13 +47,28 @@ function SummaryList({ rows, onEdit }) {
     );
 }
 
-function SentNotice({ code, whatsAppUrl }) {
+function AssistantLink({ url }) {
+    return (
+        <div className="space-y-1.5">
+            <a href={url} className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#0071e3] px-6 text-[15px] font-semibold text-white hover:bg-[#0077ed]">
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+                {__('start_project.ai_continue')}
+            </a>
+            <p className="text-[13px] text-[#1d1d1f]/60">{__('start_project.ai_hint')}</p>
+        </div>
+    );
+}
+
+function SentNotice({ code, whatsAppUrl, assistantUrl }) {
     return (
         <div role="status" className="space-y-4 rounded-2xl border border-green-600/30 bg-white p-6 text-center">
             <CheckCircle2 className="mx-auto h-10 w-10 text-green-600" aria-hidden="true" />
             <h3 className="text-xl font-semibold text-[#1d1d1f]">{__('start_project.sent_title')}</h3>
             <p className="text-[15px] text-[#1d1d1f]/75">{__('start_project.sent_desc', { code })}</p>
-            <WhatsAppButton url={whatsAppUrl} />
+            <div className="flex flex-col items-center gap-4 pt-2">
+                <AssistantLink url={assistantUrl} />
+                <WhatsAppButton url={whatsAppUrl} />
+            </div>
         </div>
     );
 }
@@ -68,8 +83,8 @@ function WhatsAppButton({ url }) {
 }
 
 /** Step 4: summary, then one send button. After sending, the button is gone so the request cannot go twice. */
-export function StepReview({ brief, status, code, whatsAppUrl, onEdit, onSubmit }) {
-    if (status === 'sent') return <SentNotice code={code} whatsAppUrl={whatsAppUrl} />;
+export function StepReview({ brief, status, code, whatsAppUrl, assistantUrl, onEdit, onSubmit }) {
+    if (status === 'sent') return <SentNotice code={code} whatsAppUrl={whatsAppUrl} assistantUrl={assistantUrl} />;
 
     return (
         <div className="space-y-6">
