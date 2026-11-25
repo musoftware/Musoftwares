@@ -32,9 +32,13 @@ final class LicenseKeys
         return $signature;
     }
 
+    /**
+     * PHP 8.3 (the live site's web PHP) checks private_key_bits even for EC keys and the minimal config leaves it
+     * at 0, so it refused with "Private key length must be at least 384 bits". EC ignores the value.
+     */
     private static function options(): array
     {
-        return ['config' => resource_path('openssl/minimal.cnf')];
+        return ['config' => resource_path('openssl/minimal.cnf'), 'private_key_bits' => 2048];
     }
 
     private static function lastError(): string
