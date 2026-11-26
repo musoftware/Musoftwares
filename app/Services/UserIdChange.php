@@ -219,10 +219,14 @@ class UserIdChange
         return $plain->merge($morphs)->values()->all();
     }
 
+    /**
+     * The ID is compared as text: some of these columns are text (charity_transactions.reference_id holds 'admin_69'),
+     * and MySQL in strict mode refuses an update that compares a text column with a number. Number columns still match.
+     */
     private function pointingAt(array $column, int $userId)
     {
         return DB::table($column['table'])
-            ->where($column['column'], $userId)
+            ->where($column['column'], (string) $userId)
             ->when($column['type_column'], fn ($query, string $type) => $query->whereIn($type, self::USER_MORPH_TYPES));
     }
 

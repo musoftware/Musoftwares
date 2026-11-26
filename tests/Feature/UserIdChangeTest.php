@@ -90,6 +90,19 @@ class UserIdChangeTest extends TestCase
         $this->assertSame((int) $movedCopy->id, (int) $leftOnCopy->fresh()->user_id);
     }
 
+    /** charity_transactions.reference_id is text and holds values like 'admin_69'; strict MySQL refused the update. */
+    public function test_a_text_reference_column_moves_only_the_rows_of_the_account(): void
+    {
+        $client = User::factory()->create();
+        $other = DB::table('charity_transactions')->insertGetId($this->charityRow('admin_69'));
+        $own = DB::table('charity_transactions')->insertGetId($this->charityRow((string) $client->id));
+
+        $this->actingAs($this->admin)->post("/admin/users/{$client->id}/change-id", ['new_id' => 8000])->assertRedirect('/admin/users/8000');
+
+        $this->assertSame('8000', (string) DB::table('charity_transactions')->where('id', $own)->value('reference_id'));
+        $this->assertSame('admin_69', DB::table('charity_transactions')->where('id', $other)->value('reference_id'));
+    }
+
     public function test_the_id_of_a_copy_merged_into_another_account_is_refused(): void
     {
         $copy = User::factory()->create(['merged_into_user_id' => $this->admin->id]);
@@ -97,6 +110,16 @@ class UserIdChangeTest extends TestCase
         $client = User::factory()->create();
 
         $this->actingAs($this->admin)->post("/admin/users/{$client->id}/change-id", ['new_id' => $copy->id])->assertSessionHasErrors('new_id');
+    }
+
+    /** @return array<string, mixed> */
+    private function charityRow(string $referenceId): array
+    {
+        return [
+            'user_id' => $this->admin->id, 'type' => 'credit', 'amount' => 10, 'description' => 'test',
+            'reference_type' => User::class, 'reference_id' => $referenceId,
+            'balance_before' => 0, 'balance_after' => 10, 'created_at' => now(), 'updated_at' => now(),
+        ];
     }
 
     public function test_the_admin_who_changes_their_own_id_stays_signed_in(): void
