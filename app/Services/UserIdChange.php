@@ -12,7 +12,9 @@ use InvalidArgumentException;
 /**
  * Gives an account another ID, for example a free 1 for the owner. Every row that points at the account moves with
  * it in one transaction: columns with a foreign key to users.id, user_id and client_id columns, and polymorphic
- * columns that name the User model. The new ID must never have been used, deleted accounts included.
+ * columns that name the User model. The new ID must never have been used, deleted accounts included, with one
+ * exception: an old copy of this account that was merged into it. The merge kept the newer ID, so the account takes
+ * its old ID back; the merged copy (soft deleted, never removed) and anything still pointing at it move to a new ID.
  */
 class UserIdChange
 {
@@ -63,7 +65,7 @@ class UserIdChange
         'tickets' => ['assigned_employee_id', 'quoted_by'],
         'user_credentials' => ['admin_id'],
         'user_emails' => ['added_by_user_id'],
-        'users' => ['kyc_verified_by', 'ref_user_id'],
+        'users' => ['kyc_verified_by', 'ref_user_id', 'merged_into_user_id'],
         'user_threads' => ['user1_id', 'user2_id'],
         'wallet_transfers' => ['sender_id', 'receiver_id'],
     ];
@@ -74,6 +76,12 @@ class UserIdChange
     public function isFree(int $id): bool
     {
         return $id > 0 && ! User::withTrashed()->whereKey($id)->exists();
+    }
+
+    /** The ID was never used, or only by an old copy of this account that was merged into it. */
+    public function canTake(User $user, int $id): bool
+    {
+        return $id !== (int) $user->id && ($this->isFree($id) || $this->mergedCopyHolding($user, $id) !== null);
     }
 
     /**
@@ -106,20 +114,16 @@ class UserIdChange
     public function change(User $user, int $newId, int $adminId): array
     {
         $oldId = (int) $user->id;
-        if ($newId === $oldId || ! $this->isFree($newId)) {
+        if (! $this->canTake($user, $newId)) {
             throw new InvalidArgumentException("The ID {$newId} is taken or was used before.");
         }
-        $moved = DB::transaction(function () use ($oldId, $newId): array {
+        $copy = $this->mergedCopyHolding($user, $newId);
+        [$moved, $copyMovedTo] = DB::transaction(function () use ($copy, $oldId, $newId): array {
             $this->pauseForeignKeys();
             try {
-                $moved = $this->columns()
-                    ->map(fn (array $column) => ['table' => $column['table'], 'column' => $column['column'], 'rows' => $this->pointingAt($column, $oldId)->update([$column['column'] => $newId])])
-                    ->filter(fn (array $column) => $column['rows'] > 0)
-                    ->values()
-                    ->all();
-                DB::table('users')->where('id', $oldId)->update(['id' => $newId]);
+                $copyMovedTo = $copy ? $this->moveId((int) $copy->id, (int) User::withTrashed()->max('id') + 1)['to'] : null;
 
-                return $moved;
+                return [$this->moveId($oldId, $newId)['moved'], $copyMovedTo];
             } finally {
                 $this->resumeForeignKeys();
             }
@@ -130,10 +134,29 @@ class UserIdChange
             'severity' => AdminAuditLog::SEVERITY_WARNING,
             'target_type' => User::class,
             'target_id' => $newId,
-            'meta' => ['old_id' => $oldId, 'new_id' => $newId, 'moved' => $moved],
+            'meta' => ['old_id' => $oldId, 'new_id' => $newId, 'moved' => $moved, 'merged_copy_moved_to' => $copyMovedTo],
         ]);
 
         return $moved;
+    }
+
+    /** A soft-deleted account at this ID that was merged into $user. */
+    private function mergedCopyHolding(User $user, int $id): ?User
+    {
+        return User::onlyTrashed()->whereKey($id)->where('merged_into_user_id', $user->id)->first();
+    }
+
+    /** @return array{to: int, moved: list<array{table: string, column: string, rows: int}>} */
+    private function moveId(int $from, int $to): array
+    {
+        $moved = $this->columns()
+            ->map(fn (array $column) => ['table' => $column['table'], 'column' => $column['column'], 'rows' => $this->pointingAt($column, $from)->update([$column['column'] => $to])])
+            ->filter(fn (array $column) => $column['rows'] > 0)
+            ->values()
+            ->all();
+        DB::table('users')->where('id', $from)->update(['id' => $to]);
+
+        return ['to' => $to, 'moved' => $moved];
     }
 
     /**
