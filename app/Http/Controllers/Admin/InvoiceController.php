@@ -541,6 +541,32 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Moves the selected rows to a new unpaid invoice for the same client.
+     * At least one row must stay on this invoice.
+     */
+    public function splitItems(Request $request, Invoice $invoice)
+    {
+        if (! $invoice->canBeEdited()) {
+            return redirect()->back()->with('error', __('admin.only_unpaid_invoices_can_be_edited'));
+        }
+
+        $validated = $request->validate([
+            'item_ids' => 'required|array|min:1',
+            'item_ids.*' => 'integer|distinct',
+        ]);
+
+        $itemIds = $invoice->items()->whereIn('id', $validated['item_ids'])->pluck('id')->all();
+        if (count($itemIds) !== count($validated['item_ids']) || count($itemIds) >= $invoice->items()->count()) {
+            return redirect()->back()->with('error', __('admin.invoice_split_keep_one_row'));
+        }
+
+        $newInvoice = $invoice->splitItemsToNewInvoice($itemIds);
+
+        return redirect()->route('admin.invoices.show', $newInvoice->id)
+            ->with('success', __('admin.invoice_split_done', ['id' => $invoice->id]));
+    }
+
+    /**
      * Assign the invoice to one of the client's projects.
      * Pass project_id = null to unassign.
      */

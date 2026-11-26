@@ -17,7 +17,7 @@ import InvoiceActionsMenu from '@/Components/Billing/InvoiceActionsMenu';
 import {
     Printer, Download, User, MapPin, Phone, Folder, Receipt,
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
-    ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown,
+    ChartLine, AlertCircle, Network, Calculator, Merge, Split, ChevronDown,
     Bell, Mail, FolderKanban, ListTodo, StickyNote, Copy, ExternalLink, Link2
 } from 'lucide-react';
 
@@ -473,6 +473,24 @@ export default function Show({
             },
             onFinish: () => setIsSubmittingPayService(false)
         });
+    };
+
+    const selectedSavedItemIds = items
+        .filter((item, idx) => selectedItemsForMerge.includes(idx) && !item.isNew)
+        .map((item) => item.id);
+    const canSplitSelected = selectedSavedItemIds.length > 0
+        && selectedSavedItemIds.length === selectedItemsForMerge.length
+        && selectedSavedItemIds.length < items.filter((item) => !item.isNew).length;
+
+    const handleSplitSelected = async () => {
+        if (!canSplitSelected) return;
+        const accepted = await confirm({
+            title: __('admin.invoice_split_confirm_title', { count: selectedSavedItemIds.length }),
+            description: __('admin.invoice_split_confirm_desc'),
+            confirmLabel: __('admin.invoice_split_to_new'),
+        });
+        if (!accepted) return;
+        router.post(route('admin.invoices.split-items', { invoice: String(invoice.id) }), { item_ids: selectedSavedItemIds });
     };
 
     const toggleItemForMerge = (index: number) => {
@@ -1075,14 +1093,19 @@ export default function Show({
                             <tfoot className="bg-gray-50 border-t">
                                 <tr>
                                     <td colSpan={7} className="px-4 py-3">
-                                        <div className="flex justify-end gap-4 items-center">
+                                        <div className="flex flex-wrap justify-end gap-4 items-center">
                                             <div className="text-sm text-gray-500">
                                                 {__('admin.invoice_draft_total')} <span className="font-bold text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex flex-wrap justify-end gap-2">
                                                 {selectedItemsForMerge.length > 1 && (
                                                     <Button type="button" onClick={handleMergeSelected} variant="secondary" size="sm" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
                                                         <Merge className="w-4 h-4 me-1" /> Merge ({selectedItemsForMerge.length})
+                                                    </Button>
+                                                )}
+                                                {canSplitSelected && (
+                                                    <Button type="button" onClick={handleSplitSelected} variant="outline" size="sm">
+                                                        <Split className="w-4 h-4 me-1" /> {__('admin.invoice_split_to_new')} ({selectedSavedItemIds.length})
                                                     </Button>
                                                 )}
                                                 <Button type="button" onClick={handleCancel} variant="outline" size="sm" disabled={isSaving}>

@@ -437,6 +437,29 @@ class Invoice extends Model
         return $new_inc;
     }
 
+    /**
+     * Moves the given items (with their timers) to a new invoice for the same client.
+     *
+     * @param  array<int, int>  $itemIds  ids of items that belong to this invoice
+     */
+    public function splitItemsToNewInvoice(array $itemIds): Invoice
+    {
+        return DB::transaction(function () use ($itemIds) {
+            $newInvoice = $this->cloneInvoice();
+            $newInvoice->save();
+
+            $this->items()->whereIn('id', $itemIds)->get()->each(function (InvoiceItem $item) use ($newInvoice) {
+                $item->invoice_id = $newInvoice->id;
+                $item->save();
+            });
+
+            $this->unsetRelation('items');
+            $this->updateCachedTotal();
+
+            return $newInvoice;
+        });
+    }
+
     public function transfer_to_project($project_id)
     {
         DB::transaction(function () use ($project_id) {

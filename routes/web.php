@@ -1296,6 +1296,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'accountant'])->prefix('adm
     Route::post('/invoices/{invoice}/toggle-suspend', [App\Http\Controllers\Admin\InvoiceController::class, 'toggleSuspend'])->name('invoices.toggle-suspend');
     Route::post('/invoices/{invoice}/reschedule', [App\Http\Controllers\Admin\InvoiceController::class, 'reschedule'])->name('invoices.reschedule');
     Route::post('/invoices/{invoice}/assign-project', [App\Http\Controllers\Admin\InvoiceController::class, 'assignProject'])->name('invoices.assign-project');
+    Route::post('/invoices/{invoice}/split-items', [App\Http\Controllers\Admin\InvoiceController::class, 'splitItems'])->name('invoices.split-items');
 
     // ── Admin Invoice Board ───────────────────────────────────────
     Route::post('/invoices/{invoice}/board/notes', [App\Http\Controllers\Admin\AdminInvoiceBoardController::class, 'storeNote'])->name('invoices.board.store-note');
