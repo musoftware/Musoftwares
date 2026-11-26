@@ -151,12 +151,13 @@ export default function TimerDetails({
     const [manualMinutes, setManualMinutes] = useState('');
     const [rate, setRate] = useState<number>(hour_rate || system_base_rate || 0);
     const [rateVisible, setRateVisible] = useState(false);
-    const [reason, setReason] = useState(cache?.reason ?? (item.item_title || ''));
+    const [reason, setReason] = useState(cache?.reason || item.item_title || '');
     const [isSaving, setIsSaving] = useState(false);
     const initialMarketHours = item.market_minutes ? String(item.market_minutes / 60) : '';
     const [requestedAt, setRequestedAt] = useState<string>(item.requested_at || '');
     const [marketHours, setMarketHours] = useState<string>(initialMarketHours);
     const priceDetailsChanged = requestedAt !== (item.requested_at || '') || marketHours !== initialMarketHours;
+    const titleChanged = reason.trim() !== (item.item_title || '').trim();
 
     useEffect(() => {
         setRate(hour_rate || system_base_rate || 0);
@@ -283,7 +284,7 @@ export default function TimerDetails({
             return;
         }
         const newSessions = timers.filter((t) => t.isNew);
-        if (newSessions.length === 0 && !priceDetailsChanged) {
+        if (newSessions.length === 0 && !priceDetailsChanged && !titleChanged) {
             toast.error(__('general.no_new_sessions_to_save'));
             return;
         }
