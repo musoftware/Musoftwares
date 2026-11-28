@@ -8,6 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // the live database got this table before the migration was found on Linux; then there is nothing to do
+        if (Schema::hasTable('gateway_clients')) {
+            return;
+        }
+
         Schema::create('gateway_clients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
