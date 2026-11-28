@@ -977,6 +977,9 @@ class AppBuilderTest extends TestCase
         $project->update(['price_scope' => null, 'client_email' => 'trial@example.com']);
         $paid = $this->quotedByEstimator('web_app', 0, []);
         $paid->update(['price_scope' => null, 'paid_total' => 60, 'quote_paid' => 60]);
+        // a quote on top of a ready program was priced by the work on top; it is left alone too
+        $onReady = $this->quotedByEstimator('web_app', 0, []);
+        $onReady->update(['price_scope' => null, 'starter' => 'restaurant-pos', 'client_email' => 'ready@example.com']);
         $old = (float) $project->amount;
         $version = $project->quote_version;
         // reading the brief is Claude's job; here it counts 30 customer pages and the admin panel
@@ -1004,6 +1007,7 @@ class AppBuilderTest extends TestCase
         $this->assertSame(BuilderMessage::TEAM, $project->messages()->reorder('id', 'desc')->value('role'));
         $this->assertSame(['trial@example.com'], array_values($this->trialMails()));
         $this->assertNull($paid->refresh()->trial_ends_at);
+        $this->assertNull($onReady->refresh()->trial_ends_at);
         // sending again tells nobody twice
         $this->assertSame(0, $this->artisan('builder:trial-prices --send'));
         $this->assertCount(1, $this->trialMails());

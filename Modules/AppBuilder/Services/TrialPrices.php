@@ -36,8 +36,14 @@ class TrialPrices
             ->whereNotNull('spec')
             ->orderBy('id')
             ->get()
-            ->reject(fn (BuilderProject $project) => $project->hasDelivery())
+            ->reject(fn (BuilderProject $project) => $project->hasDelivery() || $this->startsFromReadyProgram($project))
             ->values();
+    }
+
+    /** A ready program is priced only by the work on top of it, so counting its whole brief would overprice it. */
+    private function startsFromReadyProgram(BuilderProject $project): bool
+    {
+        return filled($project->starter) && ! in_array($project->starter, app(Starters::class)->designSlugs(), true);
     }
 
     /** The price this project gets under the estimator. Counting its pages is saved, so it is asked only once. */
