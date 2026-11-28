@@ -2,24 +2,25 @@
 
 namespace Modules\SmsPaymentGateway\Models;
 
-
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\SmsPaymentGateway\database\factories\SmsPaymentGatewayDeviceFactory;
 
 class SmsPaymentGatewayDevice extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected static function newFactory()
     {
-        return \Modules\SmsPaymentGateway\Database\factories\SmsPaymentGatewayDeviceFactory::new();
+        return SmsPaymentGatewayDeviceFactory::new();
     }
 
     protected $table = 'sms_payment_gateway_devices';
+
     protected $fillable = [
         'tenant_id',
         'user_id',
@@ -67,7 +68,7 @@ class SmsPaymentGatewayDevice extends Model
      */
     public function isConnectionCodeValid(): bool
     {
-        if (!$this->connection_code_expires_at) {
+        if (! $this->connection_code_expires_at) {
             return false;
         }
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\SmsPaymentGateway\Database\factories;
+namespace Modules\SmsPaymentGateway\database\factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice;
-use App\Models\User;
 
 class SmsPaymentGatewayDeviceFactory extends Factory
 {

@@ -1,10 +1,11 @@
 <?php
 
-namespace Modules\SmsPaymentGateway\Database\factories;
+namespace Modules\SmsPaymentGateway\database\factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 
 class SmsPaymentGatewayTransactionFactory extends Factory
 {
@@ -23,7 +24,7 @@ class SmsPaymentGatewayTransactionFactory extends Factory
     public function definition()
     {
         return [
-            'device_id' => \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice::factory(),
+            'device_id' => SmsPaymentGatewayDevice::factory(),
             'user_id' => User::factory(),
             'amount' => $this->faker->randomFloat(2, 10, 1000),
             'balance' => $this->faker->randomFloat(2, 1000, 5000),
