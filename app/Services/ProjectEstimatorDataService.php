@@ -11,6 +11,9 @@ class ProjectEstimatorDataService extends BaseService
 {
     private const FALLBACK_USD_TO_EGP = 50.0;
 
+    /** The price of one page or screen per platform, in dollars; add-ons come from the price list on top. */
+    public const PAGE_RATE_USD = ['web' => 10, 'landing' => 60, 'mobile' => 15, 'desktop' => 25];
+
     /**
      * Get structured estimator configuration and items.
      *
@@ -29,48 +32,48 @@ class ProjectEstimatorDataService extends BaseService
                 'key' => 'web',
                 'title' => 'Website / Web App',
                 'title_ar' => 'موقع إلكتروني / تطبيق ويب',
-                'rate_usd' => 10,
-                'rate_egp' => round(10 * $exchangeRate),
+                'rate_usd' => self::PAGE_RATE_USD['web'],
+                'rate_egp' => round(self::PAGE_RATE_USD['web'] * $exchangeRate),
                 'unit' => 'Page',
                 'unit_ar' => 'صفحة',
                 'icon' => 'Globe',
-                'badge' => '$10/page',
+                'badge' => '$'.self::PAGE_RATE_USD['web'].'/page',
                 'description' => 'Responsive web applications, corporate websites, customer portals, and SaaS platforms.',
             ],
             'landing' => [
                 'key' => 'landing',
                 'title' => 'Landing Page',
                 'title_ar' => 'صفحة هبوط / Landing Page',
-                'rate_usd' => 60,
-                'rate_egp' => round(60 * $exchangeRate),
+                'rate_usd' => self::PAGE_RATE_USD['landing'],
+                'rate_egp' => round(self::PAGE_RATE_USD['landing'] * $exchangeRate),
                 'unit' => 'Page',
                 'unit_ar' => 'صفحة',
                 'icon' => 'Sparkles',
-                'badge' => '$60/page',
+                'badge' => '$'.self::PAGE_RATE_USD['landing'].'/page',
                 'description' => 'High-converting animated frontend landing pages, long detailed sections, with custom interactions and CMS.',
             ],
             'mobile' => [
                 'key' => 'mobile',
                 'title' => 'Mobile App (iOS & Android)',
                 'title_ar' => 'تطبيق هاتف (iOS و Android)',
-                'rate_usd' => 15,
-                'rate_egp' => round(15 * $exchangeRate),
+                'rate_usd' => self::PAGE_RATE_USD['mobile'],
+                'rate_egp' => round(self::PAGE_RATE_USD['mobile'] * $exchangeRate),
                 'unit' => 'Screen',
                 'unit_ar' => 'شاشة',
                 'icon' => 'Smartphone',
-                'badge' => '$15/screen',
+                'badge' => '$'.self::PAGE_RATE_USD['mobile'].'/screen',
                 'description' => 'Cross-platform native mobile applications for iOS and Android with high performance.',
             ],
             'desktop' => [
                 'key' => 'desktop',
                 'title' => 'Desktop Software',
                 'title_ar' => 'برنامج كمبيوتر ومكتبي',
-                'rate_usd' => 25,
-                'rate_egp' => round(25 * $exchangeRate),
+                'rate_usd' => self::PAGE_RATE_USD['desktop'],
+                'rate_egp' => round(self::PAGE_RATE_USD['desktop'] * $exchangeRate),
                 'unit' => 'Screen',
                 'unit_ar' => 'شاشة',
                 'icon' => 'Monitor',
-                'badge' => '$25/screen',
+                'badge' => '$'.self::PAGE_RATE_USD['desktop'].'/screen',
                 'description' => 'Offline-first desktop software for Windows, POS point-of-sale systems, and cashier terminals.',
             ],
         ];

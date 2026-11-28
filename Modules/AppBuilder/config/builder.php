@@ -100,6 +100,23 @@ return [
         'other' => (float) env('BUILDER_MIN_OTHER', 20),
     ],
 
+    // The site's own estimator prices a new program too: its pages or screens at the platform's rate, plus each
+    // module from the price list at its own price (an admin panel is one module, never counted by its pages).
+    // The quote is never below it. Types not listed here (a one-page tool, an extension, a game) skip it, so the
+    // cheap entry stays cheap.
+    'estimator' => [
+        'platforms' => [
+            'website' => 'web',
+            'web_app' => 'web',
+            'system' => 'web',
+            'clone' => 'web',
+            'desktop' => 'desktop',
+            'app_simple' => 'mobile',
+            'app_full' => 'mobile',
+            'app_fancy' => 'mobile',
+        ],
+    ],
+
     // The build model is picked per job: Sonnet builds by default; only a job the chat marks as hard (`complex`) gets
     // Opus. Size alone does not make a job hard: a big but ordinary system is still Sonnet's work.
     'build_models' => [

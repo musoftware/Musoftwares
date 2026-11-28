@@ -83,7 +83,7 @@ class AdminBuilderController extends Controller
         $project->load(['messages.attachments', 'user', 'referrer']);
 
         return Inertia::render('Admin/Builder/Show', [
-            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
+            'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'price_scope', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
                 + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner(), 'chat_banned' => app(\Modules\AppBuilder\Services\ChatBans::class)->isBanned($project->user_id, $project->ip)],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,

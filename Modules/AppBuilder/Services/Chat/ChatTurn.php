@@ -37,6 +37,10 @@ final readonly class ChatTurn
         public string $askEngineer = '',
         /** a site the customer wants copied, to walk through before the price; '' for none */
         public string $tourSite = '',
+        /** the customer's pages or screens, priced by the estimator (an admin panel is a module, not pages) */
+        public int $pages = 0,
+        /** @var list<string> price-list modules the program needs, priced by the estimator */
+        public array $modules = [],
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -67,6 +71,8 @@ final readonly class ChatTurn
             notSerious: (bool) ($data['not_serious'] ?? false),
             askEngineer: trim((string) ($data['ask_engineer'] ?? '')),
             tourSite: trim((string) ($data['tour_site'] ?? '')),
+            pages: max(0, (int) ($quote['pages'] ?? 0)),
+            modules: array_values(array_unique(array_filter((array) ($quote['modules'] ?? []), 'is_string'))),
         );
     }
 
@@ -86,6 +92,8 @@ final readonly class ChatTurn
                 'complex' => $this->complex,
                 'design_fee' => $this->designFee,
                 'project_type' => $this->projectType,
+                'pages' => $this->pages,
+                'modules' => $this->modules,
             ],
             'keep_quote' => $this->keepQuote,
             'release_now' => $this->releaseNow,

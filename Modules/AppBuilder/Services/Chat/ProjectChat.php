@@ -280,11 +280,13 @@ class ProjectChat
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
         $free = $project->hasDelivery() && $project->changeIsFree($turn->isFix, $turn->isNewProject);
+        // the site's estimator prices a new program by its pages and modules; changes keep their own price
+        $scope = $project->hasDelivery() ? null : app(\Modules\AppBuilder\Services\EstimatorPrice::class)->scope($turn->projectType, $turn->pages, $turn->modules);
         $price = match (true) {
             $free => $this->pricer->freeFix($turn->estimatedTokens, $turn->complex),
             // a change to what is delivered is priced by its own work, not as a new program of its type
             $project->hasDelivery() => $this->pricer->change($turn->estimatedTokens, $turn->complex),
-            default => $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType),
+            default => $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType, $scope['total'] ?? 0),
         };
         // a program we already sold keeps its known price: the same system is never cheaper than it was sold for
         if (! $free && ! $project->hasDelivery()) {
@@ -300,6 +302,7 @@ class ProjectChat
             // an older study whose cost was put in the price stays there; a study bought on its own comes off the first price
             'amount' => max(1.0, $share['amount'] + ($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0) - $project->studyCredit()),
             'project_type' => $price['project_type'],
+            'price_scope' => $scope,
             'referral_commission' => $share['commission'],
             'design_fee' => $price['design_fee'] ?? 0,
             'budget_usd' => $price['budget'],
@@ -541,7 +544,10 @@ class ProjectChat
         $starters = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
         $designs = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->designsForPrompt();
 
+        $modules = app(\Modules\AppBuilder\Services\EstimatorPrice::class)->forPrompt();
+
         return $prompt
+            .($modules !== '' ? "\n\n## Price list modules\n\n".$modules : '')
             .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
             .($designs !== '' ? "\n\n## Free designs\n\n".$designs : '')
             .$this->importedProject($project)

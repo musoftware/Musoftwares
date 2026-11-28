@@ -18,8 +18,11 @@ final class ChatSchema
                 'complex' => ['type' => 'boolean'],
                 'design_fee' => ['type' => 'number'],
                 'project_type' => ['type' => 'string', 'enum' => array_keys((array) config('builder.project_types'))],
+                // the estimator's view of the same work: the customer's pages or screens, and the price-list modules
+                'pages' => ['type' => 'integer'],
+                'modules' => self::modules(),
             ],
-            'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type'],
+            'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type', 'pages', 'modules'],
             'additionalProperties' => false,
         ];
 
@@ -55,6 +58,13 @@ final class ChatSchema
             'required' => ['reply', 'needs_team', 'ask_engineer', 'quote', 'keep_quote', 'release_now', 'not_serious', 'replaces_request', 'starter', 'designs', 'tour_site', 'secrets'],
             'additionalProperties' => false,
         ];
+    }
+
+    private static function modules(): array
+    {
+        $keys = app(\Modules\AppBuilder\Services\EstimatorPrice::class)->moduleKeys();
+
+        return ['type' => 'array', 'items' => $keys === [] ? ['type' => 'string'] : ['type' => 'string', 'enum' => $keys]];
     }
 
     private static function designs(): array

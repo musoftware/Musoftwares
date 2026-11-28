@@ -292,11 +292,11 @@ class AppBuilderTest extends TestCase
     }
 
     /** A paid quote, built and delivered by the worker at this real cost. */
-    private function deliverPaid(float $costUsd, ?\App\Models\User $customer = null): BuilderProject
+    private function deliverPaid(float $costUsd, ?\App\Models\User $customer = null, ?\Closure $quote = null): BuilderProject
     {
         $this->usdAndEgpRates();
         if ($customer) $this->actingAs($customer);
-        $project = $this->quotedProject();
+        $project = $quote ? $quote() : $this->quotedProject();
         app(\Modules\AppBuilder\Services\ProjectPayment::class)->markPaid($project, $project->quote_version, 'TX-SETTLE');
         $this->postJson('/api/builder/worker/claim', [], $this->worker())->assertOk();
         $this->post('/api/builder/worker/jobs/'.$project->uuid.'/complete', ['archive' => $this->zip(['index.html' => '<h1>Menu</h1>']), 'summary' => 'تم', 'cost_usd' => $costUsd], $this->worker())->assertOk();
@@ -914,6 +914,53 @@ class AppBuilderTest extends TestCase
         $uuid = $this->postJson('/ai/messages', ['text' => 'عايز تطبيق توصيل'])->assertOk()->json('uuid');
 
         $this->assertSame('200.00', BuilderProject::where('uuid', $uuid)->value('amount'));
+    }
+
+    /** Two web modules in the price list, and a quote for a program with these pages and modules. */
+    private function quotedByEstimator(string $type, int $pages, array $modules): BuilderProject
+    {
+        config(['builder.study.for_types' => []]);
+        \App\Models\ContractPriceItem::updateOrCreate(['key' => 'web_admin_panel'], ['name' => 'Admin', 'name_en' => 'Web Admin Dashboard', 'platform' => 'web', 'price_usd' => 100, 'is_active' => true]);
+        \App\Models\ContractPriceItem::updateOrCreate(['key' => 'web_multilingual'], ['name' => 'Languages', 'name_en' => 'Multilingual Interface', 'platform' => 'web', 'price_usd' => 30, 'is_active' => true]);
+        $this->script[] = ChatTurn::fromArray([
+            'reply' => 'تمام، ده السعر',
+            'needs_team' => false,
+            'quote' => ['ready' => true, 'title' => 'منصة', 'spec' => 'Kind: Laravel program.', 'estimated_output_tokens' => 20000, 'kind' => 'build', 'complex' => false, 'design_fee' => 0, 'project_type' => $type, 'pages' => $pages, 'modules' => $modules],
+        ], 1200, 300);
+        $uuid = $this->postJson('/ai/messages', ['text' => 'عايز منصة'])->assertOk()->json('uuid');
+
+        return BuilderProject::where('uuid', $uuid)->firstOrFail();
+    }
+
+    public function test_a_new_program_is_never_below_the_estimator_and_its_admin_panel_is_one_module(): void
+    {
+        // 30 customer pages at $10, the admin panel once at $100 and two languages at $30; an unknown key adds nothing
+        $project = $this->quotedByEstimator('web_app', 30, ['web_admin_panel', 'web_multilingual', 'not_in_the_list']);
+
+        $this->assertSame('430.00', $project->amount);
+        $this->assertSame(430.0, (float) $project->price_scope['total']);
+        $this->assertSame(['web_admin_panel', 'web_multilingual'], array_column($project->price_scope['modules'], 'key'));
+        $this->assertStringContainsString('`web_admin_panel` (Web Admin Dashboard)', $this->app->make(ChatModel::class)->lastSystem);
+    }
+
+    public function test_a_one_page_tool_keeps_its_cheap_price_whatever_the_estimator_says(): void
+    {
+        $project = $this->quotedByEstimator('page', 3, ['web_admin_panel']);
+
+        $this->assertNull($project->price_scope);
+        $this->assertLessThan(10, (float) $project->amount);
+    }
+
+    public function test_the_price_after_delivery_never_goes_below_the_estimator(): void
+    {
+        $usd = Currency::firstOrCreate(['currency' => 'USD'], ['symbol' => '$']);
+        $customer = \App\Models\User::factory()->google()->create(['onboarding_completed' => true, 'currency_id' => $usd->id]);
+
+        // the quote is 30 x $10 + $100 = $400; the build costs $1, which is no reason to sell the program for $1.20
+        $project = $this->deliverPaid(1.00, $customer, fn () => $this->quotedByEstimator('web_app', 30, ['web_admin_panel']));
+
+        $this->assertSame(400.0, (float) $project->amount);
+        $this->assertEqualsWithDelta(0, $this->balanceInUsd($customer), 0.001);
     }
 
     private function pastBuilds(string $type, array $factors): void
