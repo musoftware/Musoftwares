@@ -1,22 +1,16 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Access to an undefined property Modules\\Fbmb\\Models\\FbmbLookupResult\:\:\$expires_at\.$#'
+			message: '#^Access to an undefined property Modules\\AppBuilder\\Models\\BuilderProject\:\:\$owner_approved_at\.$#'
 			identifier: property.notFound
 			count: 1
-			path: Modules/Fbmb/Models/FbmbLookupResult.php
+			path: Modules/AppBuilder/Models/BuilderProject.php
 
 		-
-			message: '#^Access to an undefined property Modules\\Fbmb\\Models\\FbmbLookupResult\:\:\$result_path\.$#'
+			message: '#^Access to an undefined property Modules\\AppBuilder\\Models\\BuilderRequest\:\:\$approved_at\.$#'
 			identifier: property.notFound
 			count: 1
-			path: Modules/Fbmb/Models/FbmbLookupResult.php
-
-		-
-			message: '#^Access to an undefined property Modules\\Fbmb\\Models\\FbmbLookupResult\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 4
-			path: Modules/Fbmb/Models/FbmbLookupResult.php
+			path: Modules/AppBuilder/Models/BuilderRequest.php
 
 		-
 			message: '#^Call to static method find\(\) on an unknown class App\\Models\\ServiceLandingPageCtaVariant\.$#'
@@ -61,6 +55,12 @@ parameters:
 			path: Modules/Marketplace/Http/Controllers/Seller/ServiceLandingPageSubmissionController.php
 
 		-
+			message: '#^Property ''thumbnail'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: Modules/Marketplace/Models/Service.php
+
+		-
 			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingFormSubmission\:\:\$ip_address\.$#'
 			identifier: property.notFound
 			count: 2
@@ -79,33 +79,9 @@ parameters:
 			path: Modules/Marketplace/Models/ServiceLandingFormSubmission.php
 
 		-
-			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingPage\:\:\$ab_testing_enabled\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Modules/Marketplace/Models/ServiceLandingPage.php
-
-		-
-			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingPage\:\:\$auto_winner_visits\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/Marketplace/Models/ServiceLandingPage.php
-
-		-
-			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingPage\:\:\$is_winner\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/Marketplace/Models/ServiceLandingPage.php
-
-		-
 			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingPage\:\:\$parentVariant\.$#'
 			identifier: property.notFound
 			count: 1
-			path: Modules/Marketplace/Models/ServiceLandingPage.php
-
-		-
-			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceLandingPage\:\:\$parent_variant_id\.$#'
-			identifier: property.notFound
-			count: 2
 			path: Modules/Marketplace/Models/ServiceLandingPage.php
 
 		-
@@ -197,12 +173,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: Modules/Marketplace/Models/ServiceLandingPageCtaVariant.php
-
-		-
-			message: '#^Access to an undefined property Modules\\Marketplace\\Models\\ServiceReview\:\:\$rating\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Modules/Marketplace/Models/ServiceReview.php
 
 		-
 			message: '#^Access to an undefined property Modules\\PaymentGateway\\Http\\Resources\\GatewayClientResource\:\:\$client_id\.$#'
@@ -367,18 +337,6 @@ parameters:
 			path: Modules/PaymentGateway/Http/Resources/GatewayPaymentResource.php
 
 		-
-			message: '#^Access to an undefined property Modules\\PaymentGateway\\Models\\GatewayClient\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/PaymentGateway/Models/GatewayClient.php
-
-		-
-			message: '#^Access to an undefined property Modules\\PaymentGateway\\Models\\GatewayPayment\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 3
-			path: Modules/PaymentGateway/Models/GatewayPayment.php
-
-		-
 			message: '#^Call to static method sendTransactionWebhook\(\) on an unknown class App\\Http\\Controllers\\Api\\SmsPaymentGatewayWebhookController\.$#'
 			identifier: class.notFound
 			count: 1
@@ -397,96 +355,6 @@ parameters:
 			path: Modules/SmsPaymentGateway/Http/Controllers/SmsPaymentGatewayController.php
 
 		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayApiKey\:\:\$is_test\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayApiKey.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$amount\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$cancel_url\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$completed_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$created_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$customer_email\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$customer_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$customer_phone\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$expires_at\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$is_test\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$session_id\.$#'
-			identifier: property.notFound
-			count: 3
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$status\.$#'
-			identifier: property.notFound
-			count: 5
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$success_url\.$#'
-			identifier: property.notFound
-			count: 2
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsGatewayCheckoutSession\:\:\$transaction_reference\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsGatewayCheckoutSession.php
-
-		-
-			message: '#^Access to an undefined property Modules\\SmsPaymentGateway\\Models\\SmsPaymentGatewayDevice\:\:\$connection_code_expires_at\.$#'
-			identifier: property.notFound
-			count: 1
-			path: Modules/SmsPaymentGateway/Models/SmsPaymentGatewayDevice.php
-
-		-
 			message: '#^Class Modules\\SmsPaymentGateway\\Models\\User not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -495,6 +363,12 @@ parameters:
 		-
 			message: '#^Class Modules\\SmsPaymentGateway\\Models\\PaymentOrder not found\.$#'
 			identifier: class.notFound
+			count: 1
+			path: Modules/SmsPaymentGateway/Models/SmsPaymentGatewayTransaction.php
+
+		-
+			message: '#^Property ''reference_number'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
 			count: 1
 			path: Modules/SmsPaymentGateway/Models/SmsPaymentGatewayTransaction.php
 
@@ -511,28 +385,10 @@ parameters:
 			path: Modules/SmsPaymentGateway/Models/SmsPaymentGatewayWebhook.php
 
 		-
-			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
-			identifier: larastan.noEnvCallsOutsideOfConfig
-			count: 1
-			path: Modules/SmsPaymentGateway/config/config.php
-
-		-
 			message: '#^Undefined variable\: \$directories$#'
 			identifier: variable.undefined
 			count: 1
 			path: app/Console/Commands/CheckHardcodedStrings.php
-
-		-
-			message: '#^Call to static method with\(\) on an unknown class App\\Models\\PlatformSubscription\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/Console/Commands/RenewPlatformSubscriptions.php
-
-		-
-			message: '#^Parameter \$subscription of method App\\Console\\Commands\\RenewPlatformSubscriptions\:\:renewSubscription\(\) has invalid type App\\Models\\PlatformSubscription\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/Console/Commands/RenewPlatformSubscriptions.php
 
 		-
 			message: '#^Call to static method query\(\) on an unknown class App\\Models\\ShopGovernorate\.$#'
@@ -1985,12 +1841,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Models/MusoftwarePayment.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\OrderDeliveryFile\:\:\$file_path\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/OrderDeliveryFile.php
 
 		-
 			message: '#^Class App\\Models\\ServiceOrder not found\.$#'

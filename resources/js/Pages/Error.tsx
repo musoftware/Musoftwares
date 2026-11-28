@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { __ } from '@/lib/i18n';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { motion } from 'framer-motion';
 
 export default function Error({ status, message }: { status: number; message?: string }) {

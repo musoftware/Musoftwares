@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /**
@@ -64,25 +65,26 @@ class EveryPageOpensTest extends TestCase
 
         $failures = [];
         foreach ($this->pageAddresses() as $uri) {
-            $status = $this->open($uri, $user);
-            if ($status >= 500) {
-                $failures[] = "{$status} /{$uri}";
+            $response = $this->open($uri, $user);
+            if ($response->getStatusCode() >= 500) {
+                // the exception says why, so a failure on CI can be fixed without reproducing it
+                $failures[] = "{$response->getStatusCode()} /{$uri}: ".($response->exception?->getMessage() ?? 'no exception');
             }
         }
 
         $this->assertSame([], $failures, 'These pages answer with a server error');
     }
 
-    private function open(string $uri, ?User $user): int
+    private function open(string $uri, ?User $user): TestResponse
     {
         if ($user) {
             $this->actingAs($user);
         }
-        $status = $this->get('/'.ltrim($uri, '/'))->getStatusCode();
+        $response = $this->get('/'.ltrim($uri, '/'));
         $this->flushSession();
         app('auth')->forgetGuards();
 
-        return $status;
+        return $response;
     }
 
     /** @return list<string> */

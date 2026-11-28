@@ -2,14 +2,14 @@
 
 namespace Modules\SmsPaymentGateway\Models;
 
-
 use App\Models\Concerns\ScopesToLegalWindow;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\SmsPaymentGateway\database\factories\SmsPaymentGatewayTransactionFactory;
 
 class SmsPaymentGatewayTransaction extends Model
 {
@@ -17,10 +17,11 @@ class SmsPaymentGatewayTransaction extends Model
 
     protected static function newFactory()
     {
-        return \Modules\SmsPaymentGateway\Database\factories\SmsPaymentGatewayTransactionFactory::new();
+        return SmsPaymentGatewayTransactionFactory::new();
     }
 
     protected $table = 'sms_payment_gateway_transactions';
+
     protected $fillable = [
         'tenant_id',
         'device_id',

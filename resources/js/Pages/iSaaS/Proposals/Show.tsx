@@ -1,10 +1,10 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 import { formatMoney } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import { ArrowLeft, CheckCircle, FileText } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
