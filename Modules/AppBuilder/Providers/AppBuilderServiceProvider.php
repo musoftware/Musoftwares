@@ -14,6 +14,7 @@ class AppBuilderServiceProvider extends ServiceProvider
         $this->app->bind(ChatModel::class, ClaudeChatModel::class);
         $this->app->bind(\Modules\AppBuilder\Services\Study\StudyWriter::class, \Modules\AppBuilder\Services\Study\ClaudeStudyWriter::class);
         $this->app->bind(\Modules\AppBuilder\Services\Starters\StarterCardWriter::class, \Modules\AppBuilder\Services\Starters\ClaudeStarterCardWriter::class);
+        $this->app->bind(\Modules\AppBuilder\Services\ScopeCounter::class, \Modules\AppBuilder\Services\ClaudeScopeCounter::class);
     }
 
     public function boot(): void

@@ -86,6 +86,7 @@ class BuilderProject extends Model
         'owner_approved_at' => 'datetime',
         'progress_phases' => 'array',
         'price_scope' => 'array',
+        'trial_ends_at' => 'datetime',
         'built_at' => 'datetime',
         'warranty_until' => 'datetime',
         'lease_expires_at' => 'datetime',

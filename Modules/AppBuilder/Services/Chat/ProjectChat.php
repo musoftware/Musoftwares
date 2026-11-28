@@ -277,6 +277,12 @@ class ProjectChat
         $question->update(['content' => $this->secrets->mask($project, $question->content)]);
     }
 
+    /** Prices an already quoted project again from the given brief, the same way a new quote in the chat is priced. */
+    public function requote(BuilderProject $project, ChatTurn $turn): void
+    {
+        $this->applyQuote($project, $turn);
+    }
+
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
         $free = $project->hasDelivery() && $project->changeIsFree($turn->isFix, $turn->isNewProject);

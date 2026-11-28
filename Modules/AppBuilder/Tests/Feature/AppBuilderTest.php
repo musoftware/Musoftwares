@@ -963,6 +963,62 @@ class AppBuilderTest extends TestCase
         $this->assertEqualsWithDelta(0, $this->balanceInUsd($customer), 0.001);
     }
 
+    /** The new-price mails sent so far, as subject => recipient. */
+    private function trialMails(): array
+    {
+        return array_filter($this->sentMails(), fn (string $subject) => str_contains($subject, 'هيتغيّر'), ARRAY_FILTER_USE_KEY);
+    }
+
+    public function test_a_trial_quote_moves_to_its_estimator_price_after_48_hours_at_the_old_price(): void
+    {
+        config(['mail.default' => 'array']);
+        // a quote from the trial: priced by tokens only, nothing counted by the estimator
+        $project = $this->quotedByEstimator('web_app', 0, []);
+        $project->update(['price_scope' => null, 'client_email' => 'trial@example.com']);
+        $paid = $this->quotedByEstimator('web_app', 0, []);
+        $paid->update(['price_scope' => null, 'paid_total' => 60, 'quote_paid' => 60]);
+        $old = (float) $project->amount;
+        $version = $project->quote_version;
+        // reading the brief is Claude's job; here it counts 30 customer pages and the admin panel
+        $this->app->instance(\Modules\AppBuilder\Services\ScopeCounter::class, new class implements \Modules\AppBuilder\Services\ScopeCounter
+        {
+            public function count(string $projectType, string $spec): array
+            {
+                return ['pages' => 30, 'modules' => ['web_admin_panel']];
+            }
+        });
+
+        // without --send nothing changes for the customer
+        $this->assertSame(0, $this->artisan('builder:trial-prices'));
+        $project->refresh();
+        $this->assertSame($old, (float) $project->amount);
+        $this->assertNull($project->trial_ends_at);
+        $this->assertSame(400.0, (float) $project->price_scope['total']);
+        $this->assertSame([], $this->trialMails());
+
+        $this->assertSame(0, $this->artisan('builder:trial-prices --send'));
+        $project->refresh();
+        // the old price still works for 48 hours; the customer is told in the chat and by email; the paid one is left alone
+        $this->assertSame($old, (float) $project->amount);
+        $this->assertNotNull($project->trial_ends_at);
+        $this->assertSame(BuilderMessage::TEAM, $project->messages()->reorder('id', 'desc')->value('role'));
+        $this->assertSame(['trial@example.com'], array_values($this->trialMails()));
+        $this->assertNull($paid->refresh()->trial_ends_at);
+        // sending again tells nobody twice
+        $this->assertSame(0, $this->artisan('builder:trial-prices --send'));
+        $this->assertCount(1, $this->trialMails());
+
+        $trials = app(\Modules\AppBuilder\Services\TrialPrices::class);
+        $this->assertSame(0, $trials->applyDue());
+        $this->travel(49)->hours();
+        $this->assertSame(1, $trials->applyDue());
+        $project->refresh();
+        $this->assertSame(400.0, (float) $project->amount);
+        $this->assertSame($version + 1, $project->quote_version);
+        $this->assertNull($project->trial_ends_at);
+        $this->assertSame(60.0, (float) $paid->refresh()->paid_total);
+    }
+
     private function pastBuilds(string $type, array $factors): void
     {
         $project = BuilderProject::create(['ip' => '1.1.1.1', 'locale' => 'ar', 'currency' => 'USD']);

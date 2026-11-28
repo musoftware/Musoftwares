@@ -136,6 +136,22 @@ Your program is ready. Open it, try it and download it here:
 :link
 
 The Musoftware team",
+    'trial_price' => [
+        'subject' => 'The price of :title changes in :hours hours',
+        'chat' => 'The price you saw (:old) was an opening offer, because our program builder was new and on trial. The trial is over, and prices now follow our normal price list for each page and each part of the program, so the new price of your project is :new. You can still pay the old price of :old within :hours hours from now; after that the new price applies.',
+        'body' => "Hello,
+
+The price you saw for :title (:old) was an opening offer, because our program builder was new and on trial.
+
+The trial is over, and prices now follow our normal price list for each page and each part of the program. The new price of your project: :new.
+
+Because you talked with us before the change, you can still pay the old price of :old within :hours hours from now, on your project page:
+:link
+
+After that the new price applies.
+
+The Musoftware team",
+    ],
     'price_settled' => 'Good news: the work cost less than its price, so :amount went back to your balance on the site. You can use it for your next program.',
     'fix_free' => 'This change is free',
     'fix_note' => 'This is a fix or an adjustment within the idea we agreed on, so it is on us. It starts as soon as you press the button.',

@@ -51,6 +51,12 @@ Schedule::call(fn () => app(\Modules\AppBuilder\Services\ChatFollowUp::class)->s
     ->hourly()
     ->withoutOverlapping(30);
 
+// The AI builder: a trial-time quote whose 48 hours at the old price are over moves to its new estimator price
+Schedule::call(fn () => app(\Modules\AppBuilder\Services\TrialPrices::class)->applyDue())
+    ->name('builder-trial-prices')
+    ->hourly()
+    ->withoutOverlapping(30);
+
 // The AI builder: every paid delivery becomes an internal ready program for the next customer who wants the same
 Schedule::call(fn () => app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries())
     ->name('builder-learned-starters')
