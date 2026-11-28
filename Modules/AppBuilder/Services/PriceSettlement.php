@@ -2,6 +2,7 @@
 
 namespace Modules\AppBuilder\Services;
 
+use App\Models\Currency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderMessage;
@@ -75,6 +76,6 @@ class PriceSettlement
 
     private function currencyId(BuilderProject $project): ?int
     {
-        return \App\Models\Currency::resolve($project->currency)?->id;
+        return Currency::resolve($project->currency)?->id;
     }
 }

@@ -3,16 +3,34 @@
 namespace Modules\AppBuilder\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\AppBuilder\Http\Resources\ProjectStateResource;
+use Modules\AppBuilder\Models\BuilderAttachment;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
+use Modules\AppBuilder\Models\BuilderRequest;
 use Modules\AppBuilder\Models\BuilderSecret;
+use Modules\AppBuilder\Services\AdminChats;
+use Modules\AppBuilder\Services\AdminChatViews;
+use Modules\AppBuilder\Services\BuildCostHistory;
 use Modules\AppBuilder\Services\BuildQuestions;
+use Modules\AppBuilder\Services\ChatBans;
+use Modules\AppBuilder\Services\DeliveryStats;
+use Modules\AppBuilder\Services\JobQueue;
+use Modules\AppBuilder\Services\ProjectPayment;
+use Modules\AppBuilder\Services\ProjectRequests;
 use Modules\AppBuilder\Services\ProjectSecrets;
+use Modules\AppBuilder\Services\RequestStages;
+use Modules\AppBuilder\Services\WorkerActivity;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * The owner's view of the AI builder: every chat, what it cost, and a way to step in when the customer or the
@@ -31,12 +49,12 @@ class AdminBuilderController extends Controller
     public function __construct(
         private readonly ProjectSecrets $secrets,
         private readonly BuildQuestions $questions,
-        private readonly \Modules\AppBuilder\Services\AdminChatViews $views,
+        private readonly AdminChatViews $views,
     ) {}
 
     public function index(Request $request): Response
     {
-        $chats = app(\Modules\AppBuilder\Services\AdminChats::class);
+        $chats = app(AdminChats::class);
         $tab = in_array($request->query('tab'), $chats::TABS, true) ? (string) $request->query('tab') : 'customers';
         $projects = $chats->tab(BuilderProject::query(), $tab)
             ->with(['user', 'referrer'])
@@ -58,19 +76,19 @@ class AdminBuilderController extends Controller
             'waitingOnly' => $request->boolean('waiting'),
             'tab' => $tab,
             'tabCounts' => $chats->counts(),
-            'learning' => app(\Modules\AppBuilder\Services\BuildCostHistory::class)->summary(),
-            'deliveryStats' => app(\Modules\AppBuilder\Services\DeliveryStats::class)->summary(),
+            'learning' => app(BuildCostHistory::class)->summary(),
+            'deliveryStats' => app(DeliveryStats::class)->summary(),
             'defaultFactor' => (float) config('builder.pricing.work_factor'),
         ]);
     }
 
     /** One chat in the list; is_new when the customer wrote after this admin last opened it. */
-    private function listRow(BuilderProject $project, ?\Carbon\CarbonInterface $seenAt): array
+    private function listRow(BuilderProject $project, ?CarbonInterface $seenAt): array
     {
-        $lastCustomerAt = $project->last_customer_at ? \Illuminate\Support\Carbon::parse($project->last_customer_at) : null;
+        $lastCustomerAt = $project->last_customer_at ? Carbon::parse($project->last_customer_at) : null;
 
         return $project->only(['id', 'uuid', 'title', 'status', 'awaiting_answer', 'amount', 'paid_total', 'currency', 'build_cost_usd', 'client_name']) + [
-            'active_at' => \Illuminate\Support\Carbon::parse($project->active_at)->timezone('Africa/Cairo')->toDateTimeString(),
+            'active_at' => Carbon::parse($project->active_at)->timezone('Africa/Cairo')->toDateTimeString(),
             'is_new' => $this->views->isNew($lastCustomerAt, $seenAt),
             'chat_cost_usd' => $project->chatCostUsd(),
             'visitor' => $this->visitor($project),
@@ -84,7 +102,7 @@ class AdminBuilderController extends Controller
 
         return Inertia::render('Admin/Builder/Show', [
             'project' => $project->only(['uuid', 'title', 'status', 'design_fee', 'design_url', 'awaiting_answer', 'amount', 'leave_discount_percent', 'leave_discount_usd', 'paid_total', 'quote_paid', 'price_max', 'currency', 'build_cost_usd', 'budget_usd', 'build_model', 'price_scope', 'client_name', 'client_email', 'client_whatsapp', 'spec', 'error', 'version'])
-                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner(), 'chat_banned' => app(\Modules\AppBuilder\Services\ChatBans::class)->isBanned($project->user_id, $project->ip)],
+                + ['chat_cost_usd' => $project->chatCostUsd(), 'visitor' => $this->visitor($project), 'waits_for_owner' => $project->waitsForOwner(), 'chat_banned' => app(ChatBans::class)->isBanned($project->user_id, $project->ip)],
             'messages' => $project->messages->map(fn (BuilderMessage $message) => [
                 'id' => $message->id,
                 'role' => $message->role,
@@ -97,7 +115,7 @@ class AdminBuilderController extends Controller
             'chatUrl' => route('builder.show', $project),
             'import' => $this->importState($project),
             'requests' => $this->requestsToReview($project),
-            'workerEvents' => fn () => app(\Modules\AppBuilder\Services\WorkerActivity::class)->forAdmin($project),
+            'workerEvents' => fn () => app(WorkerActivity::class)->forAdmin($project),
         ]);
     }
 
@@ -107,10 +125,10 @@ class AdminBuilderController extends Controller
         if (! $project->requests()->exists()) {
             return [];
         }
-        $stages = new \Modules\AppBuilder\Services\RequestStages($project);
+        $stages = new RequestStages($project);
 
         // a payment that opens more free changes is not work: nothing for the owner to review
-        return $project->requests()->where('kind', '!=', \Modules\AppBuilder\Models\BuilderRequest::PACK)->latest('id')->limit(30)->get()->map(fn (\Modules\AppBuilder\Models\BuilderRequest $item) => [
+        return $project->requests()->where('kind', '!=', BuilderRequest::PACK)->latest('id')->limit(30)->get()->map(fn (BuilderRequest $item) => [
             'id' => $item->id,
             'title' => $item->title,
             'kind' => $item->kind,
@@ -128,7 +146,7 @@ class AdminBuilderController extends Controller
             'rolled_back' => $item->rolled_back_at !== null,
             'version' => $item->built_in_version,
             'stages' => $stages->of($item),
-            'open' => in_array($item->status, [\Modules\AppBuilder\Models\BuilderRequest::UNPAID, \Modules\AppBuilder\Models\BuilderRequest::READY], true),
+            'open' => in_array($item->status, [BuilderRequest::UNPAID, BuilderRequest::READY], true),
             'at' => $item->created_at?->timezone('Africa/Cairo')->toDateTimeString(),
         ])->values()->all();
     }
@@ -172,7 +190,7 @@ class AdminBuilderController extends Controller
     }
 
     /** @return array{id: int, name: string, email: string|null, phone: string|null, url: string}|null */
-    private function person(?\App\Models\User $user): ?array
+    private function person(?User $user): ?array
     {
         if ($user === null) {
             return null;
@@ -220,34 +238,34 @@ class AdminBuilderController extends Controller
     {
         abort_unless($project->status === BuilderProject::FAILED, 409);
         $project->update(['owner_touched' => true]);
-        app(\Modules\AppBuilder\Services\JobQueue::class)->requeue($project);
+        app(JobQueue::class)->requeue($project);
 
         return back()->with('success', __('builder.admin.retried'));
     }
 
     /** The owner marks the open price as paid, from the customer's chat page; the build starts as after a real payment. */
-    public function markPaid(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectPayment $payment): JsonResponse
+    public function markPaid(Request $request, BuilderProject $project, ProjectPayment $payment): JsonResponse
     {
         if (! $payment->markPaidByAdmin($project, (int) $request->user()->id)) {
             return response()->json(['message' => __('builder.errors.no_quote')], 409);
         }
 
-        return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
+        return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
     }
 
     /** The owner marks the requests ticked in the customer's list as paid (paid by hand, or a test). */
-    public function markRequestsPaid(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectRequests $requests): JsonResponse
+    public function markRequestsPaid(Request $request, BuilderProject $project, ProjectRequests $requests): JsonResponse
     {
         $ids = array_map('intval', explode(',', (string) $request->validate(['ids' => ['required', 'string', 'max:200', 'regex:/^\d+(,\d+)*$/']])['ids']));
-        if ($requests->markPaid($project, $ids, \Modules\AppBuilder\Services\ProjectPayment::ADMIN_REFERENCE.$request->user()->id.'-'.now()->timestamp) === 0) {
+        if ($requests->markPaid($project, $ids, ProjectPayment::ADMIN_REFERENCE.$request->user()->id.'-'.now()->timestamp) === 0) {
             return response()->json(['message' => __('builder.errors.no_requests')], 409);
         }
 
-        return response()->json(new \Modules\AppBuilder\Http\Resources\ProjectStateResource($project->refresh()->load('messages.attachments')));
+        return response()->json(new ProjectStateResource($project->refresh()->load('messages.attachments')));
     }
 
     /** The work turned out bigger: ask the customer for more, up to the top of the range they saw. */
-    public function extra(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ProjectPayment $payment): RedirectResponse
+    public function extra(Request $request, BuilderProject $project, ProjectPayment $payment): RedirectResponse
     {
         $extra = (float) $request->validate(['amount' => ['required', 'numeric', 'min:1', 'max:100000']])['amount'];
         abort_if($payment->askForMore($project, $extra) <= 0, 409);
@@ -256,7 +274,7 @@ class AdminBuilderController extends Controller
     }
 
     /** The owner closes this visitor's chat, or opens it again after the chat closed it. */
-    public function chatBan(Request $request, BuilderProject $project, \Modules\AppBuilder\Services\ChatBans $bans): RedirectResponse
+    public function chatBan(Request $request, BuilderProject $project, ChatBans $bans): RedirectResponse
     {
         $request->validate(['banned' => ['required', 'boolean']])['banned'] ? $bans->ban($project) : $bans->lift($project);
 
@@ -283,12 +301,12 @@ class AdminBuilderController extends Controller
     }
 
     /** The file as the customer sent it, under its own name; a picture or a PDF opens in the browser. */
-    public function file(BuilderProject $project, int $attachment): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function file(BuilderProject $project, int $attachment): StreamedResponse
     {
         $file = $project->attachments()->findOrFail($attachment);
-        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($file->path), 404);
-        $inline = $file->isImage() || $file->mime === \Modules\AppBuilder\Models\BuilderAttachment::PDF;
+        abort_unless(Storage::disk('local')->exists($file->path), 404);
+        $inline = $file->isImage() || $file->mime === BuilderAttachment::PDF;
 
-        return \Illuminate\Support\Facades\Storage::disk('local')->response($file->path, $file->original_name, ['Content-Type' => $file->mime], $inline ? 'inline' : 'attachment');
+        return Storage::disk('local')->response($file->path, $file->original_name, ['Content-Type' => $file->mime], $inline ? 'inline' : 'attachment');
     }
 }

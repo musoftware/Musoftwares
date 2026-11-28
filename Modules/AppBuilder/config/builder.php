@@ -182,7 +182,6 @@ return [
     // the engineer's delivery note is retold in plain words by the chat before the customer reads it
     'retell_delivery' => (bool) env('BUILDER_RETELL_DELIVERY', true),
 
-
     'warranty_days' => (int) env('BUILDER_WARRANTY_DAYS', 30),
     // the first days of the warranty: a few changes within the program's main idea are free, new work included;
     // something that is really another program always has a price. After them, new work is priced and fixes stay free.

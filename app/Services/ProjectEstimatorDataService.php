@@ -6,6 +6,7 @@ use App\Models\ContractPriceItem;
 use App\Models\CurrenciesExchange;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class ProjectEstimatorDataService extends BaseService
 {
@@ -21,9 +22,7 @@ class ProjectEstimatorDataService extends BaseService
      * contracts and the AI pricing use too. The list written below is only the starting data that the
      * price list was filled from, and the fallback while it is empty.
      *
-     * @param float $exchangeRate
-     * @param bool $fromPriceList false returns the built-in starting list
-     * @return array
+     * @param  bool  $fromPriceList  false returns the built-in starting list
      */
     public function getEstimatorData(float $exchangeRate = 50.0, bool $fromPriceList = true): array
     {
@@ -743,7 +742,7 @@ class ProjectEstimatorDataService extends BaseService
             'categories' => $categories,
             'modules' => $modules,
             'discount_policy' => $discountPolicy,
-            'exchangeRate' => (float)$exchangeRate,
+            'exchangeRate' => (float) $exchangeRate,
             'supported_currencies' => ['USD', 'EGP'],
             'quotation_api' => [
                 'endpoint' => route('public.quotation.generate'),
@@ -770,7 +769,7 @@ class ProjectEstimatorDataService extends BaseService
     /** @return array<string, array<int, array>> the estimator add-ons per platform, from the price list */
     private function modulesFromPriceList(float $exchangeRate): array
     {
-        if (! \Illuminate\Support\Facades\Schema::hasColumn('contract_price_items', 'platform')) {
+        if (! Schema::hasColumn('contract_price_items', 'platform')) {
             return [];
         }
 

@@ -2,12 +2,16 @@
 
 namespace Modules\AppBuilder\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Modules\AppBuilder\Services\Chat\Dialect;
+use Modules\AppBuilder\Services\Study\FeasibilityStudy;
 
 /** One customer conversation and the program it leads to. Paying moves it to the worker's queue. */
 class BuilderProject extends Model
@@ -113,13 +117,13 @@ class BuilderProject extends Model
     /** The signed-in customer it belongs to; a guest's project has none until they open it signed in. */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     /** Whoever shared the link the customer came from. */
     public function referrer(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'referrer_user_id');
+        return $this->belongsTo(User::class, 'referrer_user_id');
     }
 
     /** What the chat asked the programmer, and the answers it got. */
@@ -218,11 +222,11 @@ class BuilderProject extends Model
     public function studyIsPaid(): bool
     {
         return (float) $this->study_paid > 0 || ((float) $this->study_fee > 0 && (float) $this->quote_paid > 0) || $this->hasDelivery()
-            || $this->study_payment_reference === \Modules\AppBuilder\Services\Study\FeasibilityStudy::FREE_REFERENCE;
+            || $this->study_payment_reference === FeasibilityStudy::FREE_REFERENCE;
     }
 
     /** A signed-in customer reads the study for free; a guest pays for it. */
-    public function studyOpensFor(?\App\Models\User $viewer): bool
+    public function studyOpensFor(?User $viewer): bool
     {
         return $this->studyIsPaid() || $viewer !== null;
     }
@@ -282,7 +286,7 @@ class BuilderProject extends Model
     {
         $words = $this->messages()->where('role', BuilderMessage::USER)->where('content', '!=', '')->reorder('id')->limit(40)->pluck('content');
 
-        return \Modules\AppBuilder\Services\Chat\Dialect::arabicFor($this->country, $words);
+        return Dialect::arabicFor($this->country, $words);
     }
 
     /** What talking with the customer cost on the chat model, in USD. */
@@ -321,7 +325,7 @@ class BuilderProject extends Model
     }
 
     /** The last day any change within the program's main idea is free (the start of the warranty plus the free days). */
-    public function freeChangesUntil(): ?\Illuminate\Support\Carbon
+    public function freeChangesUntil(): ?Carbon
     {
         return $this->warranty_until?->copy()->subDays((int) config('builder.warranty_days'))->addDays((int) config('builder.free_changes_days'));
     }
@@ -401,9 +405,9 @@ class BuilderProject extends Model
             ->when(config('builder.owner_approval'), fn (Builder $approved) => $approved->where(fn (Builder $either) => $either
                 ->whereNotNull('owner_approved_at')->orWhere('version', '>', 0)->orWhereNotIn('job_kind', [self::JOB_BUILD])))
             ->where(function (Builder $inner): void {
-            $inner->where('status', self::QUEUED)
-                ->orWhere(fn (Builder $stale) => $stale->where('status', self::BUILDING)->where('lease_expires_at', '<', now()));
-        });
+                $inner->where('status', self::QUEUED)
+                    ->orWhere(fn (Builder $stale) => $stale->where('status', self::BUILDING)->where('lease_expires_at', '<', now()));
+            });
     }
 
     public function scopeStartedTodayFrom(Builder $query, string $ip): Builder
