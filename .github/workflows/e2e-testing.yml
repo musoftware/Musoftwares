@@ -81,6 +81,18 @@ jobs:
       - name: Install Composer Dependencies
         run: composer install -q --no-ansi --no-interaction --no-progress --prefer-dist
 
+      # pages render the Vite asset tags, so the tests need the built manifest like the live site has
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build --ignore-scripts
+
       - name: Prepare test environment
         run: |
           cp .env.testing.example .env.testing

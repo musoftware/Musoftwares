@@ -10,6 +10,15 @@ parameters:
         - app/
         - Modules/
 
+    # Modules keep their own config and migrations: env() is allowed in their config files, and their models'
+    # columns come from their migrations. Setting these replaces Larastan's defaults, so the app's own are listed too.
+    configDirectories:
+        - '%currentWorkingDirectory%/config'
+        - '%currentWorkingDirectory%/Modules/*/[Cc]onfig'
+    databaseMigrationsPath:
+        - '%currentWorkingDirectory%/database/migrations'
+        - '%currentWorkingDirectory%/Modules/*/[Dd]atabase/[Mm]igrations'
+
     # Level 1 catches undefined variables, properties, and methods.
     level: 1
 

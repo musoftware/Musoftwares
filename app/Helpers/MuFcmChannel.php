@@ -2,27 +2,28 @@
 
 namespace App\Helpers;
 
+use App\Jobs\SendFcmNotificationJob;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\MulticastSendReport;
 use Kreait\Firebase\Messaging\SendReport;
 
+/**
+ * Queues the push for SendFcmNotificationJob, which talks to Firebase. The channel itself never connects, so
+ * creating it needs no Firebase credentials.
+ */
 class MuFcmChannel
 {
     const TOKENS_PER_REQUEST = 500;
 
     protected Dispatcher $events;
 
-    protected Messaging $messaging;
-
-    public function __construct(Dispatcher $events, Messaging $messaging)
+    public function __construct(Dispatcher $events)
     {
         $this->events = $events;
-        $this->messaging = $messaging;
     }
 
     public function send(mixed $notifiable, Notification $notification): ?Collection
@@ -35,7 +36,7 @@ class MuFcmChannel
 
         $fcmMessage = $notification->toFcm($notifiable);
 
-        \App\Jobs\SendFcmNotificationJob::dispatch($tokens, $fcmMessage->jsonSerialize());
+        SendFcmNotificationJob::dispatch($tokens, $fcmMessage->jsonSerialize());
 
         return null;
     }
