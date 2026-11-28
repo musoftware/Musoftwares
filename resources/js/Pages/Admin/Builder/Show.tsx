@@ -25,6 +25,14 @@ interface Secret {
     updated_at: string | null;
 }
 
+/** What the site's estimator says the program costs: its pages at the platform rate plus each module's price. */
+interface PriceScope {
+    pages: number;
+    page_rate: number;
+    modules: { key: string; name: string; price: number }[];
+    total: number;
+}
+
 interface Project {
     uuid: string;
     design_fee: string;
@@ -43,6 +51,7 @@ interface Project {
     chat_cost_usd: number;
     budget_usd: string;
     build_model: string | null;
+    price_scope: PriceScope | null;
     client_name: string | null;
     client_email: string | null;
     client_whatsapp: string | null;
@@ -267,15 +276,30 @@ function Money({ project }: { project: Project }) {
     ];
 
     return (
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {items.map(([label, value, note]) => (
-                <div key={label} className="rounded-xl border bg-white p-3">
-                    <dt className="text-sm text-slate-500">{label}</dt>
-                    <dd className="text-xl font-bold" dir="ltr">{value}</dd>
-                    {note && <dd className="text-xs text-slate-500" dir="ltr">{note}</dd>}
-                </div>
-            ))}
-        </dl>
+        <div className="space-y-2">
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {items.map(([label, value, note]) => (
+                    <div key={label} className="rounded-xl border bg-white p-3">
+                        <dt className="text-sm text-slate-500">{label}</dt>
+                        <dd className="text-xl font-bold" dir="ltr">{value}</dd>
+                        {note && <dd className="text-xs text-slate-500" dir="ltr">{note}</dd>}
+                    </div>
+                ))}
+            </dl>
+            {project.price_scope && <EstimatorBreakdown scope={project.price_scope} />}
+        </div>
+    );
+}
+
+/** How the estimator reached its price, so the owner sees why the quote is what it is. */
+function EstimatorBreakdown({ scope }: { scope: PriceScope }) {
+    const parts = [`${scope.pages} × $${scope.page_rate}`, ...scope.modules.map((module) => `${module.name} $${module.price}`)];
+
+    return (
+        <p className="text-sm wrap-break-word text-slate-600">
+            <span className="font-semibold">{t('Estimator', 'حسب الـ Estimator')}: </span>
+            <span dir="ltr">{parts.join(' + ')} = ${scope.total}</span>
+        </p>
     );
 }
 

@@ -89,53 +89,69 @@ return [
     'follow_up' => [
         'your_idea' => 'your idea',
         'remind_subject' => 'Your project is waiting: :title',
-        'remind_body' => "Hello,
+        'remind_body' => 'Hello,
 
 You told us about :title. Everything you said is saved, and we can pick up where you stopped and get it built.
 
 Your chat:
 :link
 
-The Musoftware team",
+The Musoftware team',
         'offer_subject' => ':percent% off :title, for you',
-        'offer_body' => "Hello,
+        'offer_body' => 'Hello,
 
 We still have :title ready to build. We took :percent% off for you: it is now :price instead of :before.
 
 Open your chat and start whenever you are ready:
 :link
 
-The Musoftware team",
+The Musoftware team',
         'again_subject' => 'Shall we build :title?',
-        'again_body' => "Hello,
+        'again_body' => 'Hello,
 
 Your chat about :title is still here. Write to us any time and the engineer will pick it up.
 
 :link
 
-The Musoftware team",
+The Musoftware team',
     ],
     'how_title' => 'How it works',
     'how_steps' => ['Tell us your idea here. The engineer asks what it needs and gives you a price.', 'After payment, your program is built on the Musoftware computers, not on this page. You can close the page; nothing stops.', 'We email you and send a notification when it is ready, or if the engineer needs something from you.', 'Open your project link (it is in your email and your account) to see the program, try it and download it.'],
     'close_page_note' => 'After payment you can close this page: the build runs on our computers, and the project link reaches your email.',
     'mail_paid_subject' => 'Your program is being built',
-    'mail_paid_body' => "Hello,
+    'mail_paid_body' => 'Hello,
 
 We received your payment and the engineer started building your program on our computers. You can close the page; you will get an email when it is ready.
 
 Your project, any time:
 :link
 
-The Musoftware team",
-    'mail_new_account' => "We opened a Musoftware account with this email so your project is never lost. Set your password here:
-:link",
+The Musoftware team',
+    'mail_new_account' => 'We opened a Musoftware account with this email so your project is never lost. Set your password here:
+:link',
     'mail_ready_subject' => 'Your program is ready',
-    'mail_ready_body' => "Hello,
+    'mail_ready_body' => 'Hello,
 
 Your program is ready. Open it, try it and download it here:
 :link
 
-The Musoftware team",
+The Musoftware team',
+    'trial_price' => [
+        'subject' => 'The price of :title changes in :hours hours',
+        'chat' => 'The price you saw (:old) was an opening offer, because our program builder was new and on trial. The trial is over, and prices now follow our normal price list for each page and each part of the program, so the new price of your project is :new. You can still pay the old price of :old within :hours hours from now; after that the new price applies.',
+        'body' => 'Hello,
+
+The price you saw for :title (:old) was an opening offer, because our program builder was new and on trial.
+
+The trial is over, and prices now follow our normal price list for each page and each part of the program. The new price of your project: :new.
+
+Because you talked with us before the change, you can still pay the old price of :old within :hours hours from now, on your project page:
+:link
+
+After that the new price applies.
+
+The Musoftware team',
+    ],
     'price_settled' => 'Good news: the work cost less than its price, so :amount went back to your balance on the site. You can use it for your next program.',
     'fix_free' => 'This change is free',
     'fix_note' => 'This is a fix or an adjustment within the idea we agreed on, so it is on us. It starts as soon as you press the button.',
@@ -149,7 +165,7 @@ The Musoftware team",
     'question_mail_subject' => 'The engineer needs your answer to finish your program',
     'question_mail_body' => "Hello,\n\nThe engineer building your program needs something from you to continue:\n\n:question\n\nAnswer here:\n:link\n\nThe Musoftware team",
     'admin' => [
-    'extra_asked' => 'Added to the price. The customer sees the rest to pay.',
+        'extra_asked' => 'Added to the price. The customer sees the rest to pay.',
         'retried' => 'The build is queued again and continues from the last saved files.',
         'design_saved' => 'Saved, and the build has started.',
         'sent' => 'Sent.',

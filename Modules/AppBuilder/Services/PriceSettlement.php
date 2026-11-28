@@ -2,6 +2,7 @@
 
 namespace Modules\AppBuilder\Services;
 
+use App\Models\Currency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderMessage;
@@ -10,7 +11,8 @@ use Modules\AppBuilder\Models\BuilderProject;
 /**
  * After a paid build is delivered, its price follows what the work really cost: the cost plus our share (more when a
  * referrer also earns from it), plus the designer and the study as agreed, never above the price the customer
- * accepted. A signed-in customer gets what they paid above that back as site balance for their next program; a guest
+ * accepted, and never below the site estimator's price for its pages and modules (we sell the program, not the
+ * time it took). A signed-in customer gets what they paid above that back as site balance for their next program; a guest
  * pays less of what is still due. Once per quote version. A price an admin marked as paid by hand is never settled:
  * no money came in through the site, so there is nothing to give back.
  */
@@ -63,8 +65,9 @@ class PriceSettlement
         $work = max($jobCostUsd * (1 + $share), $jobCostUsd + (float) $project->referral_commission);
         $fees = (float) $project->design_fee + ($project->study_status === Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0);
 
-        // a program we already sold keeps its known price, however little this build cost
-        $known = $project->version <= 1 ? app(Starters::class)->knownPrice($project->starter) : 0;
+        // the first build keeps the price of a program we already sold, and the estimator's price for its pages and
+        // modules (plus the fees), however little the build cost
+        $known = $project->version <= 1 ? max(app(Starters::class)->knownPrice($project->starter), (float) ($project->price_scope['total'] ?? 0) + $fees) : 0;
         // what the customer paid for the study comes off the first build's price here too, as it did on the quote
         $studyCredit = $project->version <= 1 ? (float) $project->study_paid : 0;
 
@@ -73,6 +76,6 @@ class PriceSettlement
 
     private function currencyId(BuilderProject $project): ?int
     {
-        return \App\Models\Currency::resolve($project->currency)?->id;
+        return Currency::resolve($project->currency)?->id;
     }
 }

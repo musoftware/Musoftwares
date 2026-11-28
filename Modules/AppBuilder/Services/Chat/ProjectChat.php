@@ -2,18 +2,33 @@
 
 namespace Modules\AppBuilder\Services\Chat;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\AppBuilder\Models\BuilderEngineerQuestion;
 use Modules\AppBuilder\Models\BuilderMessage;
 use Modules\AppBuilder\Models\BuilderProject;
-use Illuminate\Http\UploadedFile;
 use Modules\AppBuilder\Models\BuilderSecret;
 use Modules\AppBuilder\Models\BuilderSiteTour;
+use Modules\AppBuilder\Services\AiCosts;
 use Modules\AppBuilder\Services\AttachmentStore;
+use Modules\AppBuilder\Services\BuilderPush;
 use Modules\AppBuilder\Services\BuilderReferral;
+use Modules\AppBuilder\Services\ChatBans;
+use Modules\AppBuilder\Services\EngineerQuestions;
+use Modules\AppBuilder\Services\EstimatorPrice;
+use Modules\AppBuilder\Services\LeaveDiscount;
+use Modules\AppBuilder\Services\LinkLooks;
+use Modules\AppBuilder\Services\LocalPrice;
+use Modules\AppBuilder\Services\PriceRange;
+use Modules\AppBuilder\Services\ProjectImports;
+use Modules\AppBuilder\Services\ProjectInspection;
+use Modules\AppBuilder\Services\ProjectRequests;
 use Modules\AppBuilder\Services\ProjectSecrets;
 use Modules\AppBuilder\Services\QuotePricer;
+use Modules\AppBuilder\Services\SiteTours;
+use Modules\AppBuilder\Services\Starters;
+use Modules\AppBuilder\Services\Study\FeasibilityStudy;
 
 /** One customer message in, one Claude answer out, with the quote kept on the project. */
 class ProjectChat
@@ -26,10 +41,10 @@ class ProjectChat
         private readonly AttachmentStore $attachments,
         private readonly ProjectSecrets $secrets,
         private readonly BuilderReferral $referral,
-        private readonly \Modules\AppBuilder\Services\LinkLooks $looks,
-        private readonly \Modules\AppBuilder\Services\LeaveDiscount $leaveDiscount,
+        private readonly LinkLooks $looks,
+        private readonly LeaveDiscount $leaveDiscount,
         private readonly FreeChat $freeChat,
-        private readonly \Modules\AppBuilder\Services\ChatBans $bans,
+        private readonly ChatBans $bans,
     ) {}
 
     /** @throws ChatLimitReached */
@@ -42,7 +57,7 @@ class ProjectChat
             throw new ChatBanned('This visitor\'s chat is closed.');
         }
 
-        return BuilderProject::create(['ip' => $ip, 'user_agent' => $userAgent !== null ? mb_substr($userAgent, 0, 500) : null,'locale' => $locale, 'currency' => config('builder.pricing.currency'), 'referrer_user_id' => $referrerId, 'user_id' => $userId]);
+        return BuilderProject::create(['ip' => $ip, 'user_agent' => $userAgent !== null ? mb_substr($userAgent, 0, 500) : null, 'locale' => $locale, 'currency' => config('builder.pricing.currency'), 'referrer_user_id' => $referrerId, 'user_id' => $userId]);
     }
 
     /**
@@ -185,7 +200,7 @@ class ProjectChat
 
         DB::transaction(fn () => $this->record($project, $turn, $customer, mayAsk: false));
         // the customer was told they can close the page during the walk
-        app(\Modules\AppBuilder\Services\BuilderPush::class)->notify($project, 'toured');
+        app(BuilderPush::class)->notify($project, 'toured');
     }
 
     /** A note for the model at the end of the chat, on the last customer-side line so the turns keep alternating. */
@@ -208,12 +223,12 @@ class ProjectChat
 
         $project->increment('chat_input_tokens', $turn->inputTokens);
         $project->increment('chat_output_tokens', $turn->outputTokens);
-        app(\Modules\AppBuilder\Services\AiCosts::class)->recordChat($project, $turn->inputTokens, $turn->outputTokens);
+        app(AiCosts::class)->recordChat($project, $turn->inputTokens, $turn->outputTokens);
         // a project that started and was paid keeps a list of requests instead of one price
         $project->takesRequests() ? $this->addRequest($project, $turn, $question) : $this->updateQuote($project, $turn);
         // "upload it", "publish the app": an order for the worker, which puts the delivered changes live
         if ($turn->releaseNow) {
-            app(\Modules\AppBuilder\Services\ProjectImports::class)->askRelease($project->refresh());
+            app(ProjectImports::class)->askRelease($project->refresh());
         }
 
         $answer = $project->messages()->create([
@@ -225,11 +240,11 @@ class ProjectChat
             $this->bans->countStrike($project);
         }
         if ($mayAsk && $turn->askEngineer !== '') {
-            app(\Modules\AppBuilder\Services\EngineerQuestions::class)->ask($project, $turn->askEngineer);
+            app(EngineerQuestions::class)->ask($project, $turn->askEngineer);
         }
         // a site to copy is walked through before the price; never right after a tour, so tours cannot chain
         if ($mayAsk && $turn->tourSite !== '' && ! $project->takesRequests()) {
-            app(\Modules\AppBuilder\Services\SiteTours::class)->ask($project, $turn->tourSite);
+            app(SiteTours::class)->ask($project, $turn->tourSite);
         }
 
         return $answer;
@@ -245,12 +260,12 @@ class ProjectChat
             return;
         }
         // a customer's own project has no price before its paid inspection, whatever the model says
-        if ($project->customer_project && $project->inspection_status !== \Modules\AppBuilder\Services\ProjectInspection::DONE) {
+        if ($project->customer_project && $project->inspection_status !== ProjectInspection::DONE) {
             return;
         }
         // a ready program to start from matters only for the first build; later builds start from the delivered one
         if (! $project->hasDelivery()) {
-            $project->update(['starter' => app(\Modules\AppBuilder\Services\Starters::class)->find($turn->starter)['slug'] ?? null]);
+            $project->update(['starter' => app(Starters::class)->find($turn->starter)['slug'] ?? null]);
         }
 
         $turn->quoteReady ? $this->applyQuote($project, $turn) : $this->withdrawQuote($project);
@@ -262,7 +277,7 @@ class ProjectChat
         // a price shown before the list existed is closed: the list holds every price now
         $this->withdrawQuote($project);
         if ($turn->quoteReady) {
-            app(\Modules\AppBuilder\Services\ProjectRequests::class)->add($project, $turn, $question);
+            app(ProjectRequests::class)->add($project, $turn, $question);
         }
     }
 
@@ -277,18 +292,26 @@ class ProjectChat
         $question->update(['content' => $this->secrets->mask($project, $question->content)]);
     }
 
+    /** Prices an already quoted project again from the given brief, the same way a new quote in the chat is priced. */
+    public function requote(BuilderProject $project, ChatTurn $turn): void
+    {
+        $this->applyQuote($project, $turn);
+    }
+
     private function applyQuote(BuilderProject $project, ChatTurn $turn): void
     {
         $free = $project->hasDelivery() && $project->changeIsFree($turn->isFix, $turn->isNewProject);
+        // the site's estimator prices a new program by its pages and modules; changes keep their own price
+        $scope = $project->hasDelivery() ? null : app(EstimatorPrice::class)->scope($turn->projectType, $turn->pages, $turn->modules);
         $price = match (true) {
             $free => $this->pricer->freeFix($turn->estimatedTokens, $turn->complex),
             // a change to what is delivered is priced by its own work, not as a new program of its type
             $project->hasDelivery() => $this->pricer->change($turn->estimatedTokens, $turn->complex),
-            default => $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType),
+            default => $this->pricer->price($turn->estimatedTokens, $turn->complex, $turn->designFee, $turn->projectType, $scope['total'] ?? 0),
         };
         // a program we already sold keeps its known price: the same system is never cheaper than it was sold for
         if (! $free && ! $project->hasDelivery()) {
-            $price['amount'] = max($price['amount'], app(\Modules\AppBuilder\Services\Starters::class)->knownPrice($project->starter));
+            $price['amount'] = max($price['amount'], app(Starters::class)->knownPrice($project->starter));
         }
         $share = ! $free && $project->referrer_user_id ? $this->referral->addShare($price) : ['amount' => $price['amount'], 'commission' => 0.0];
 
@@ -298,8 +321,9 @@ class ProjectChat
             'spec' => $turn->spec,
             'estimated_tokens' => $price['tokens'],
             // an older study whose cost was put in the price stays there; a study bought on its own comes off the first price
-            'amount' => max(1.0, $share['amount'] + ($project->study_status === \Modules\AppBuilder\Services\Study\FeasibilityStudy::READY ? (float) $project->study_fee : 0) - $project->studyCredit()),
+            'amount' => max(1.0, $share['amount'] + ($project->study_status === FeasibilityStudy::READY ? (float) $project->study_fee : 0) - $project->studyCredit()),
             'project_type' => $price['project_type'],
+            'price_scope' => $scope,
             'referral_commission' => $share['commission'],
             'design_fee' => $price['design_fee'] ?? 0,
             'budget_usd' => $price['budget'],
@@ -313,7 +337,7 @@ class ProjectChat
         // a discount the customer already took stays with the project
         $this->leaveDiscount->applyTo($project);
         // the top of the range is the most that can be asked for later; a free fix has no range
-        $project->update(['price_max' => $free ? 0 : \Modules\AppBuilder\Services\PriceRange::around((float) $project->amount)['to']]);
+        $project->update(['price_max' => $free ? 0 : PriceRange::around((float) $project->amount)['to']]);
     }
 
     /** The customer is changing the scope, so the old price must not stay payable. */
@@ -347,7 +371,7 @@ class ProjectChat
         }
 
         $facts = "[Facts right now, newer than anything said earlier in this chat. The request list:\n"
-            .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project)."]";
+            .app(ProjectRequests::class)->forPrompt($project).']';
 
         return $this->withNote($turns, $facts);
     }
@@ -372,7 +396,7 @@ class ProjectChat
     private function paymentFacts(BuilderProject $project): string
     {
         // the page shows prices in the customer's own money, so the chat says the same numbers
-        $local = app(\Modules\AppBuilder\Services\LocalPrice::class)->for($project);
+        $local = app(LocalPrice::class)->for($project);
         $money = fn (float $value) => number_format($value, 2).' '.$project->currency
             .($local !== null ? ' ('.number_format(round($value * $local['rate'])).' '.$local['currency'].', the amount the customer sees and pays; say this one)' : '');
         $facts = 'Paid in total on this project: '.$money((float) $project->paid_total).'.';
@@ -403,7 +427,7 @@ class ProjectChat
         return "\n\n## This is the customer's existing program\n\n"
             ."Musoftware brought this customer's own working program in, and the build engineer has all its files. Treat it as "
             ."already delivered. The study below (the project's MUSOFTWARE.md) lists what the program already has; use it, with "
-            ."what the customer shows you, to tell a fix from something new. Never offer ready programs, designs, a download or "
+            .'what the customer shows you, to tell a fix from something new. Never offer ready programs, designs, a download or '
             ."a live trial for it. Changes go live on the customer's own server.\n\n"
             .$this->releaseFacts($project)."\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
@@ -424,9 +448,9 @@ class ProjectChat
         };
 
         return "Putting changes live: the worker does it by itself (GitHub and the customer's server, and the app's new "
-            ."version when the project builds one). When the customer asks to upload, publish, update or see the changes "
-            ."live, set `release_now` true and say plainly it is on its way and they get a message here when it is live "
-            ."(if a build is running, it goes out right after it). Never say you cannot upload or deploy. If everything is "
+            .'version when the project builds one). When the customer asks to upload, publish, update or see the changes '
+            .'live, set `release_now` true and say plainly it is on its way and they get a message here when it is live '
+            .'(if a build is running, it goes out right after it). Never say you cannot upload or deploy. If everything is '
             ."already live, say so. Now: {$state}";
     }
 
@@ -436,17 +460,17 @@ class ProjectChat
      */
     private function customerProject(BuilderProject $project): string
     {
-        $inspected = $project->inspection_status === \Modules\AppBuilder\Services\ProjectInspection::DONE;
+        $inspected = $project->inspection_status === ProjectInspection::DONE;
         $head = "\n\n## The customer brought their own project\n\n";
         if (! $inspected) {
-            return $head."They sent a Google Drive link to a project of their own and said what they need. Before any price, the "
-                ."project is inspected for a small fixed fee shown on the page (the inspection card). Do not quote anything now "
-                ."(`quote.ready` false): answer their questions, and say the maintenance price shows after the inspection. What "
+            return $head.'They sent a Google Drive link to a project of their own and said what they need. Before any price, the '
+                .'project is inspected for a small fixed fee shown on the page (the inspection card). Do not quote anything now '
+                .'(`quote.ready` false): answer their questions, and say the maintenance price shows after the inspection. What '
                 ."they asked for:\n".mb_substr((string) $project->inspection_need, 0, 3000);
         }
 
-        return $head."We inspected it; the study below says what it has. We did not build it, so there is no warranty: every fix "
-            ."and every change is priced (`kind` \"fix\" for a fix, \"build\" for something new; both get a price). The finished "
+        return $head.'We inspected it; the study below says what it has. We did not build it, so there is no warranty: every fix '
+            .'and every change is priced (`kind` "fix" for a fix, "build" for something new; both get a price). The finished '
             ."files are delivered as a download. Never offer ready programs, designs or a live trial for it.\n\n"
             .mb_substr((string) $project->import_profile, 0, 12000);
     }
@@ -462,39 +486,39 @@ class ProjectChat
         }
 
         return "\n\n## The customer's list of requests\n\n"
-            ."This project has started and is paid, so the customer writes here like in a messaging app, at any time, even "
-            ."while the engineer works, and every change they ask for in the chat becomes one item in a list beside the chat. "
-            ."For each message decide: when it asks for work and you know enough, send it as a quote (`quote.ready` true) for "
-            ."that one request only, never one that is already in the list below. When the customer changes an item that is "
-            ."still open (\"that is a fix, not new work\", other details), send the corrected quote with `replaces_request` set "
+            .'This project has started and is paid, so the customer writes here like in a messaging app, at any time, even '
+            .'while the engineer works, and every change they ask for in the chat becomes one item in a list beside the chat. '
+            .'For each message decide: when it asks for work and you know enough, send it as a quote (`quote.ready` true) for '
+            .'that one request only, never one that is already in the list below. When the customer changes an item that is '
+            .'still open ("that is a fix, not new work", other details), send the corrected quote with `replaces_request` set '
             ."to that item's number from the list, so the old one leaves; otherwise `replaces_request` is 0. \"Yes, start\" "
             ."about an item already in the list adds nothing. Ask first only when you truly cannot tell what they want.\n\n"
             ."Fix or development, fairly:\n"
-            ."- `kind` \"fix\" (تصليح): something the program already has, shows or promises does not work, or works differently "
-            ."from what the customer means: a broken screen, a wrong result, a wording, a look, the steps of something it has. "
+            .'- `kind` "fix" (تصليح): something the program already has, shows or promises does not work, or works differently '
+            .'from what the customer means: a broken screen, a wrong result, a wording, a look, the steps of something it has. '
             ."A promise counts: when the program's own screens or texts already offer it (for example a subscription screen "
             ."that lists \"videos for subscribers only\"), making it really work is a fix, not development.\n"
-            ."- `kind` \"build\" (تطوير): something the program does not have and never promised: a new feature, screen, report, "
+            .'- `kind` "build" (تطوير): something the program does not have and never promised: a new feature, screen, report, '
             ."section of the admin panel, kind of user or integration, as long as it belongs to this program's main idea.\n"
             ."- `kind` \"new_project\" (مشروع تاني): really another program, outside this one's main idea (a separate app, "
             ."a different system or business). It always has its own price.\n"
             ."- Mixed: send the fix now, and say the new part comes as its own item once they ask for it.\n\n"
             .$this->warrantyLine($project)."\n\n"
             ."Keep `spec` short: the engineer also reads the customer's own words. Answer in one or two lines, and always say "
-            ."plainly which it is and why, in their language: for example \"ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، "
-            ."والمهندس هيراجعه ويبدأ عليه\" or, for new work: ".($project->hasFreeChanges()
-                ? "\"ده تطوير جديد ضمن فكرة مشروعك، وهو واحد من التعديلات المجانية بتاعتك وفاضلك بعده كذا، والمهندس هيراجعه ويبدأ عليه\""
+            .'plainly which it is and why, in their language: for example "ده تصليح لحاجة موجودة في التطبيق، مجاني ضمن الضمان، '
+            .'والمهندس هيراجعه ويبدأ عليه" or, for new work: '.($project->hasFreeChanges()
+                ? '"ده تطوير جديد ضمن فكرة مشروعك، وهو واحد من التعديلات المجانية بتاعتك وفاضلك بعده كذا، والمهندس هيراجعه ويبدأ عليه"'
                 : ($project->needsChangesPack()
                     ? 'the sentence about the used free changes given above'
-                    : "\"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب\""))
-            .". Never say "
-            ."a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds "
+                    : '"ده تطوير جديد مش موجود في التطبيق، سعره في قائمة طلباتك على الجنب تدفعه وقت ما تحب"'))
+            .'. Never say '
+            .'a price is shown below the message. A question or a message that asks for no work gets `quote.ready` false and adds '
             ."nothing.\n\nThe list below is the truth about these requests: what is paid, what is being worked on, what is done. "
-            ."Earlier answers in this chat may be out of date; the list is what is true now. "
-            ."Never tell the customer a request is unpaid when the list says PAID, and never say work started or finished "
-            ."unless the list says so: an item the engineer is reviewing has not started yet. Something the customer asked about earlier "
+            .'Earlier answers in this chat may be out of date; the list is what is true now. '
+            .'Never tell the customer a request is unpaid when the list says PAID, and never say work started or finished '
+            .'unless the list says so: an item the engineer is reviewing has not started yet. Something the customer asked about earlier '
             ."that is not in the list is not open (it was cancelled or never asked for); do not count it.\n\nThe list now:\n"
-            .app(\Modules\AppBuilder\Services\ProjectRequests::class)->forPrompt($project);
+            .app(ProjectRequests::class)->forPrompt($project);
     }
 
     /** The warranty as facts for the chat: fixes are free until it ends, then priced like any work. */
@@ -516,10 +540,10 @@ class ProjectChat
             $pack = number_format($project->changesPackPrice(), 2).' '.$project->currency;
 
             return "Free changes: the {$total} changes that come with the project are used. To open {$total} more, the customer pays {$pack} "
-                ."from their list: the rest up to the most the project costs (the top of the estimate they saw with the price). A `build` "
+                .'from their list: the rest up to the most the project costs (the top of the estimate they saw with the price). A `build` '
                 .'item is still sent as a quote, but it does not start and has no price of its own: it waits in the list until that is paid. '
                 ."Say it kindly and plainly, for example: \"خلصنا الـ {$total} تعديلات المسموحة لمشروعك. علشان تفتح {$total} تعديلات كمان ادفع "
-                ."الباقي لحد أقصى ميزانية المشروع من قائمة طلباتك، وطلبك ده هيبدأ بعدها\". Fixes are never counted: every fix is free, however "
+                .'الباقي لحد أقصى ميزانية المشروع من قائمة طلباتك، وطلبك ده هيبدأ بعدها". Fixes are never counted: every fix is free, however '
                 ."many, until {$until}. `new_project` always has its own price.";
         }
         if ($project->isUnderWarranty()) {
@@ -538,10 +562,13 @@ class ProjectChat
         $state = ($project->waitsForOwner() ? 'Paid. The engineer is reviewing the brief and starts the build soon; it has not started yet.' : (self::STATE_LINES[$project->status] ?? 'Unknown.')).' '.$this->paymentFacts($project);
 
         // an imported project is already a working program: no ready programs or designs to offer it
-        $starters = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->forPrompt();
-        $designs = $project->isImported() ? '' : app(\Modules\AppBuilder\Services\Starters::class)->designsForPrompt();
+        $starters = $project->isImported() ? '' : app(Starters::class)->forPrompt();
+        $designs = $project->isImported() ? '' : app(Starters::class)->designsForPrompt();
+
+        $modules = app(EstimatorPrice::class)->forPrompt();
 
         return $prompt
+            .($modules !== '' ? "\n\n## Price list modules\n\n".$modules : '')
             .($starters !== '' ? "\n\n## Ready programs\n\n".$starters : '')
             .($designs !== '' ? "\n\n## Free designs\n\n".$designs : '')
             .$this->importedProject($project)

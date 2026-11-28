@@ -2,6 +2,9 @@
 
 namespace Modules\AppBuilder\Services\Chat;
 
+use Modules\AppBuilder\Services\EstimatorPrice;
+use Modules\AppBuilder\Services\Starters;
+
 /** The one JSON shape every chat model answers with: the reply, the quote and any access details the customer typed. */
 final class ChatSchema
 {
@@ -18,8 +21,11 @@ final class ChatSchema
                 'complex' => ['type' => 'boolean'],
                 'design_fee' => ['type' => 'number'],
                 'project_type' => ['type' => 'string', 'enum' => array_keys((array) config('builder.project_types'))],
+                // the estimator's view of the same work: the customer's pages or screens, and the price-list modules
+                'pages' => ['type' => 'integer'],
+                'modules' => self::modules(),
             ],
-            'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type'],
+            'required' => ['ready', 'title', 'spec', 'estimated_output_tokens', 'kind', 'complex', 'design_fee', 'project_type', 'pages', 'modules'],
             'additionalProperties' => false,
         ];
 
@@ -40,7 +46,7 @@ final class ChatSchema
                 // the number of an open request in the list that this quote takes the place of, 0 for none
                 'replaces_request' => ['type' => 'integer'],
                 // a program Musoftware already has that this idea starts from, '' for none
-                'starter' => ['type' => 'string', 'enum' => ['', ...app(\Modules\AppBuilder\Services\Starters::class)->slugs()]],
+                'starter' => ['type' => 'string', 'enum' => ['', ...app(Starters::class)->slugs()]],
                 // free ready designs to show as pictures under this answer, so the customer picks one
                 'designs' => self::designs(),
                 // a site the customer wants copied: the worker walks through it and takes pictures; '' for none
@@ -57,9 +63,16 @@ final class ChatSchema
         ];
     }
 
+    private static function modules(): array
+    {
+        $keys = app(EstimatorPrice::class)->moduleKeys();
+
+        return ['type' => 'array', 'items' => $keys === [] ? ['type' => 'string'] : ['type' => 'string', 'enum' => $keys]];
+    }
+
     private static function designs(): array
     {
-        $slugs = app(\Modules\AppBuilder\Services\Starters::class)->designSlugs();
+        $slugs = app(Starters::class)->designSlugs();
 
         return ['type' => 'array', 'items' => $slugs === [] ? ['type' => 'string'] : ['type' => 'string', 'enum' => $slugs]];
     }

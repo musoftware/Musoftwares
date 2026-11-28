@@ -1,12 +1,48 @@
 <?php
 
+use App\Console\Commands\AcceptExpiredCancellationRequests;
+use App\Console\Commands\AddRecurringCosts;
+use App\Console\Commands\AddRecurringIncomes;
+use App\Console\Commands\AddRecurringInvoices;
+use App\Console\Commands\AddRecurringSalaries;
+use App\Console\Commands\AutoPayInvoices;
+use App\Console\Commands\CheckDsoLimits;
+use App\Console\Commands\CompleteDeliveredMarketplaceOrders;
+use App\Console\Commands\CreateEncryptedBackupCommand;
+use App\Console\Commands\DecrementDsoLimit;
+use App\Console\Commands\DeductOverdueInvoiceLoyaltyPenalties;
+use App\Console\Commands\EnforceDataRetentionPolicy;
+use App\Console\Commands\FetchExchangeRates;
+use App\Console\Commands\IndexNowSubmit;
+use App\Console\Commands\ProcessClientSoftwareWinback;
+use App\Console\Commands\ProcessEarningsClearing;
+use App\Console\Commands\ProcessLoyaltyDueReminders;
+use App\Console\Commands\ProcessWinbackCampaigns;
+use App\Console\Commands\PublishBlogArticle;
+use App\Console\Commands\RenewSubscriptions;
+use App\Console\Commands\SendDailyNewServicesDigest;
+use App\Console\Commands\SendSoftwareOrderReminders;
+use App\Console\Commands\SendSubscriptionExpiryReminders;
+use App\Console\Commands\TranslateMarketplaceServices;
+use App\Models\AdminSettings;
+use App\Services\Telegram\InvoiceReminders;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-use App\Console\Commands\FetchExchangeRates;
-use App\Console\Commands\RenewSubscriptions;
-use App\Console\Commands\ProcessEarningsClearing;
+use Modules\AppBuilder\Services\AiCosts;
+use Modules\AppBuilder\Services\AiPageImage;
+use Modules\AppBuilder\Services\ChatFollowUp;
+use Modules\AppBuilder\Services\CrashRetries;
+use Modules\AppBuilder\Services\LeaveDiscount;
+use Modules\AppBuilder\Services\OwnerReview;
+use Modules\AppBuilder\Services\ProjectImports;
+use Modules\AppBuilder\Services\ProjectRequests;
+use Modules\AppBuilder\Services\Starters\LearnedStarters;
+use Modules\AppBuilder\Services\TrialPrices;
+use Modules\AppBuilder\Services\UnpaidWorkWatch;
 use Modules\Fbmb\Console\CleanupExpiredFbmbResults;
+use Modules\Fbmb\Console\ProcessPendingFbmbLookups;
+use Modules\Marketplace\Console\SendDailyDiscountNotificationsCommand;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -15,79 +51,85 @@ Artisan::command('inspire', function () {
 Schedule::command(FetchExchangeRates::class)->dailyAt('00:00');
 
 Schedule::command(RenewSubscriptions::class)->dailyAt('03:00')->withoutOverlapping(10);
-Schedule::command(\App\Console\Commands\SendSubscriptionExpiryReminders::class)->dailyAt('03:15')->timezone('Africa/Cairo');
+Schedule::command(SendSubscriptionExpiryReminders::class)->dailyAt('03:15')->timezone('Africa/Cairo');
 Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 
 // Recurring Business Commands
-Schedule::command(\App\Console\Commands\AddRecurringCosts::class)->everyMinute()->withoutOverlapping(10);
-Schedule::command(\App\Console\Commands\AddRecurringSalaries::class)->everyMinute()->withoutOverlapping(10);
-Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute()->withoutOverlapping(10);
-Schedule::command(\App\Console\Commands\AddRecurringInvoices::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(AddRecurringCosts::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(AddRecurringSalaries::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(AddRecurringIncomes::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(AddRecurringInvoices::class)->everyMinute()->withoutOverlapping(10);
 
 // Process matured referral earnings every minute
 Schedule::command(ProcessEarningsClearing::class)->everyMinute()->withoutOverlapping(10);
 
 // Process pending FBMB database lookups every minute
-Schedule::command(\Modules\Fbmb\Console\ProcessPendingFbmbLookups::class)->everyMinute()->withoutOverlapping(10);
+Schedule::command(ProcessPendingFbmbLookups::class)->everyMinute()->withoutOverlapping(10);
 
 // Auto-complete delivered marketplace orders hourly
-Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
+Schedule::command(CompleteDeliveredMarketplaceOrders::class)->hourly();
 
 // Cancel and refund marketplace orders whose cancellation request got no answer
-Schedule::command(\App\Console\Commands\AcceptExpiredCancellationRequests::class)->hourly()->withoutOverlapping(10);
+Schedule::command(AcceptExpiredCancellationRequests::class)->hourly()->withoutOverlapping(10);
 
 // Background translation of untranslated marketplace services hourly
-Schedule::command(\App\Console\Commands\TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
+Schedule::command(TranslateMarketplaceServices::class)->hourly()->withoutOverlapping(10);
 
 // Tell IndexNow search engines about changed public pages (sends nothing when nothing changed)
-Schedule::command(\App\Console\Commands\IndexNowSubmit::class)->dailyAt('03:30')->timezone('Africa/Cairo');
+Schedule::command(IndexNowSubmit::class)->dailyAt('03:30')->timezone('Africa/Cairo');
 
 // One reminder for a store order that was started and not paid (2 to 48 hours old)
-Schedule::command(\App\Console\Commands\SendSoftwareOrderReminders::class)->hourly()->withoutOverlapping(10);
+Schedule::command(SendSoftwareOrderReminders::class)->hourly()->withoutOverlapping(10);
 
 // The AI builder: a customer who went quiet before paying gets a reminder email, then the discount by email
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\ChatFollowUp::class)->sendDue())
+Schedule::call(fn () => app(ChatFollowUp::class)->sendDue())
     ->name('builder-follow-ups')
     ->hourly()
     ->withoutOverlapping(30);
 
+// The AI builder: a trial-time quote whose 48 hours at the old price are over moves to its new estimator price
+Schedule::call(fn () => app(TrialPrices::class)->applyDue())
+    ->name('builder-trial-prices')
+    ->hourly()
+    ->withoutOverlapping(30);
+
 // The AI builder: every paid delivery becomes an internal ready program for the next customer who wants the same
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\Starters\LearnedStarters::class)->learnFromDeliveries())
+Schedule::call(fn () => app(LearnedStarters::class)->learnFromDeliveries())
     ->name('builder-learned-starters')
     ->everyThirtyMinutes()
     ->withoutOverlapping(20);
 
 // an imported project in batch mode releases its changes once enough are waiting or the customer has gone quiet
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectImports::class)->queueDueReleases())
+Schedule::call(fn () => app(ProjectImports::class)->queueDueReleases())
     ->name('builder-due-releases')
     ->everyFiveMinutes()
     ->withoutOverlapping(4);
 
 // the AI builder: requests that became ready while the engineer was busy (or a release ran) start once it is free
 // the free first period also frees what was priced before it (unpaid new work within the project's idea)
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)->freeAllInFirstPeriod())
+Schedule::call(fn () => app(ProjectRequests::class)->freeAllInFirstPeriod())
     ->name('builder-free-first-period')
     ->everyMinute()
     ->withoutOverlapping(2);
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\ProjectRequests::class)->startAllWaiting())
+Schedule::call(fn () => app(ProjectRequests::class)->startAllWaiting())
     ->name('builder-start-requests')
     ->everyMinute()
     ->withoutOverlapping(2);
 
 // the AI builder: work waiting for the engineer with no payment behind it is reported to the owner, once each
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\UnpaidWorkWatch::class)->check())
+Schedule::call(fn () => app(UnpaidWorkWatch::class)->check())
     ->name('builder-unpaid-watch')
     ->everyTenMinutes()
     ->withoutOverlapping(8);
 
 // the AI builder: a paid build that crashed (not a real failure) goes back to the worker by itself, twice at most
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\CrashRetries::class)->retryAll())
+Schedule::call(fn () => app(CrashRetries::class)->retryAll())
     ->name('builder-crash-retries')
     ->everyFiveMinutes()
     ->withoutOverlapping(4);
 
 // Telegram: an unpaid invoice is mentioned in the customer's linked Telegram, at most once every 3 days
-Schedule::call(fn () => app(\App\Services\Telegram\InvoiceReminders::class)->sendDue())
+Schedule::call(fn () => app(InvoiceReminders::class)->sendDue())
     ->name('telegram-invoice-reminders')
     ->dailyAt('11:00')
     ->timezone('Africa/Cairo')
@@ -95,46 +137,46 @@ Schedule::call(fn () => app(\App\Services\Telegram\InvoiceReminders::class)->sen
 
 // The AI builder: a customer who closed the page on a price, with notifications on, hears the discount waits
 // requests waiting for the owner's approval, twice a day, so a paid change never sits unseen
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\OwnerReview::class)->remindWaiting())
+Schedule::call(fn () => app(OwnerReview::class)->remindWaiting())
     ->name('builder-approval-reminders')
     ->twiceDaily(10, 18)
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(10);
 
 // The /ai page's share picture is drawn again each day with the current number of programs built
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\AiPageImage::class)->refresh())
+Schedule::call(fn () => app(AiPageImage::class)->refresh())
     ->name('builder-share-image')
     ->dailyAt('04:10')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(30);
 
 // What Claude cost yesterday, past the free credit, goes on the costs page as one "Claude AI" cost
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\AiCosts::class)->bookDue())
+Schedule::call(fn () => app(AiCosts::class)->bookDue())
     ->name('builder-ai-costs')
     ->dailyAt('00:20')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(30);
 
-Schedule::call(fn () => app(\Modules\AppBuilder\Services\LeaveDiscount::class)->sendReminders())
+Schedule::call(fn () => app(LeaveDiscount::class)->sendReminders())
     ->name('builder-leave-reminders')
     ->everyFiveMinutes()
     ->withoutOverlapping(10);
 
 // One blog article a day, Arabic and English in turn, written and published by AI; off with blog_autopilot_enabled = 0
-Schedule::command(\App\Console\Commands\PublishBlogArticle::class)
+Schedule::command(PublishBlogArticle::class)
     ->dailyAt('10:00')
     ->timezone('Africa/Cairo')
-    ->when(fn () => \App\Console\Commands\PublishBlogArticle::enabled())
+    ->when(fn () => PublishBlogArticle::enabled())
     ->withoutOverlapping(30);
 
 // Send daily new services digest daily at 23:30 Cairo Time
-Schedule::command(\App\Console\Commands\SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
+Schedule::command(SendDailyNewServicesDigest::class)->dailyAt('23:30')->timezone('Africa/Cairo');
 
 // Licensed client systems: make each monthly bill when its date comes (monthly fee + share of sales)
 Schedule::command('client-systems:bill')->hourly()->withoutOverlapping(30);
 
 // Auto-pay unpaid invoices daily at 04:30 Cairo Time
-Schedule::command(\App\Console\Commands\AutoPayInvoices::class)->dailyAt('04:30')->timezone('Africa/Cairo');
+Schedule::command(AutoPayInvoices::class)->dailyAt('04:30')->timezone('Africa/Cairo');
 
 // Store: refresh Angazny products hourly and send waiting orders
 Schedule::command('shop:angazny-sync')->hourly()->withoutOverlapping(30);
@@ -153,17 +195,17 @@ Schedule::command('listing:scrape-waseet')
     ->withoutOverlapping(10);
 
 // Check DSO limits daily at 01:00 Cairo Time
-Schedule::command(\App\Console\Commands\CheckDsoLimits::class)
+Schedule::command(CheckDsoLimits::class)
     ->dailyAt('01:00')
     ->timezone('Africa/Cairo');
 
 // Decrement global DSO limit monthly on the 1st at 00:00 Cairo Time
-Schedule::command(\App\Console\Commands\DecrementDsoLimit::class)
+Schedule::command(DecrementDsoLimit::class)
     ->monthlyOn(1, '00:00')
     ->timezone('Africa/Cairo');
 
 // Send daily marketplace discount notifications to 30 random users daily at 12:00 Cairo Time
-Schedule::command(\Modules\Marketplace\Console\SendDailyDiscountNotificationsCommand::class)
+Schedule::command(SendDailyDiscountNotificationsCommand::class)
     ->dailyAt('12:00')
     ->timezone('Africa/Cairo');
 
@@ -174,46 +216,40 @@ Schedule::command('marketplace:generate-ai-files')
     ->withoutOverlapping(10);
 
 // Loyalty tier-progress and invoice-due reminders daily at 08:00 Cairo Time
-Schedule::command(\App\Console\Commands\ProcessLoyaltyDueReminders::class)
+Schedule::command(ProcessLoyaltyDueReminders::class)
     ->dailyAt('08:00')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
 // Win-back re-engagement campaigns daily at 09:00 Cairo Time
-Schedule::command(\App\Console\Commands\ProcessWinbackCampaigns::class)
+Schedule::command(ProcessWinbackCampaigns::class)
     ->dailyAt('09:00')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
 // Deduct loyalty points daily for overdue unpaid invoices marked as done at 00:05 Cairo Time
-Schedule::command(\App\Console\Commands\DeductOverdueInvoiceLoyaltyPenalties::class)
+Schedule::command(DeductOverdueInvoiceLoyaltyPenalties::class)
     ->dailyAt('00:05')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
 // Client software winback campaigns daily at 09:30 Cairo Time
-Schedule::command(\App\Console\Commands\ProcessClientSoftwareWinback::class)
+Schedule::command(ProcessClientSoftwareWinback::class)
     ->dailyAt('09:30')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(5);
 
 // Automated PDPL data retention cleanup (expired OTPs/logs & abandoned account anonymization) daily at 02:30 Cairo Time
-Schedule::command(\App\Console\Commands\EnforceDataRetentionPolicy::class)
+Schedule::command(EnforceDataRetentionPolicy::class)
     ->dailyAt('02:30')
     ->timezone('Africa/Cairo')
     ->withoutOverlapping(15);
 
 // AES-256 encrypted database backups daily at 04:15 Cairo Time before external storage upload
-Schedule::command(\App\Console\Commands\CreateEncryptedBackupCommand::class, [
+Schedule::command(CreateEncryptedBackupCommand::class, [
     '--disk' => config('filesystems.disks.s3.key') ? 's3' : 'local',
 ])
     ->dailyAt('04:15')
     ->timezone('Africa/Cairo')
-    ->when(fn () => \App\Models\AdminSettings::GetValue('encrypted_backups_enabled', '1') === '1')
+    ->when(fn () => AdminSettings::GetValue('encrypted_backups_enabled', '1') === '1')
     ->withoutOverlapping(30);
-
-
-
-
-
-
