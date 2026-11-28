@@ -9,7 +9,8 @@ use RuntimeException;
 /** The chat model counts the pages and picks the modules, with the same rules the sales chat follows when it quotes. */
 class ClaudeScopeCounter implements ScopeCounter
 {
-    private const MAX_OUTPUT_TOKENS = 800;
+    // the model may think before it answers; a long brief needs room for that and the answer
+    private const MAX_OUTPUT_TOKENS = 6000;
 
     private const SYSTEM = <<<'TEXT'
         You price a software build brief with Musoftware's estimator. Answer with two things.
@@ -55,6 +56,9 @@ class ClaudeScopeCounter implements ScopeCounter
         $text = '';
         foreach ($message->content as $block) {
             $text .= $block->type === 'text' ? $block->text : '';
+        }
+        if ($message->stopReason !== 'end_turn') {
+            throw new RuntimeException('Scope not counted: the answer stopped early ('.$message->stopReason.').');
         }
 
         return $text;
